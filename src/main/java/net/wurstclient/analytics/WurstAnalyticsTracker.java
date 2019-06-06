@@ -91,11 +91,13 @@ public final class WurstAnalyticsTracker extends JGoogleAnalyticsTracker
 		super.makeCustomRequest(argData);
 	}
 	
+	@Override
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 	
+	@Override
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
