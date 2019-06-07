@@ -14,25 +14,32 @@ import java.nio.file.Path;
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.hack.HackList;
 
 public final class WurstClient
 {
 	public static final String VERSION = "7.0";
 	
-	private final Path wurstFolder;
 	private final WurstAnalytics analytics;
 	private final EventManager eventManager;
+	private final HackList hax;
 	
 	private boolean enabled = true;
 	
 	public WurstClient()
 	{
-		wurstFolder = createWurstFolder();
+		Path wurstFolder = createWurstFolder();
 		
-		analytics = new WurstAnalytics("UA-52838431-5",
-			"client.wurstclient.net", wurstFolder.resolve("analytics.json"));
+		String trackingID = "UA-52838431-5";
+		String hostname = "client.wurstclient.net";
+		Path analyticsFile = wurstFolder.resolve("analytics.json");
+		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
 		
 		eventManager = new EventManager(this);
+		
+		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
+		Path settingsFile = wurstFolder.resolve("settings.json");
+		hax = new HackList(enabledHacksFile, settingsFile);
 		
 		analytics.trackPageView("/mc1.14.2/v" + VERSION,
 			"Wurst " + VERSION + " MC1.14.2");
@@ -55,6 +62,21 @@ public final class WurstClient
 		}
 		
 		return wurstFolder;
+	}
+	
+	public WurstAnalytics getAnalytics()
+	{
+		return analytics;
+	}
+	
+	public EventManager getEventManager()
+	{
+		return eventManager;
+	}
+	
+	public HackList getHax()
+	{
+		return hax;
 	}
 	
 	public boolean isEnabled()
