@@ -14,9 +14,9 @@ import java.nio.file.Path;
 import com.google.gson.JsonObject;
 
 import net.wurstclient.analytics.dmurph.VisitorData;
-import net.wurstclient.utils.JsonException;
-import net.wurstclient.utils.JsonUtils;
-import net.wurstclient.utils.WsonObject;
+import net.wurstclient.util.JsonException;
+import net.wurstclient.util.JsonUtils;
+import net.wurstclient.util.WsonObject;
 
 public final class AnalyticsConfigFile
 {

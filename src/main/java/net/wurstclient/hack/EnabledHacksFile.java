@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonArray;
 
-import net.wurstclient.utils.JsonException;
-import net.wurstclient.utils.JsonUtils;
-import net.wurstclient.utils.WsonArray;
+import net.wurstclient.util.JsonException;
+import net.wurstclient.util.JsonUtils;
+import net.wurstclient.util.WsonArray;
 
 public final class EnabledHacksFile
 {
