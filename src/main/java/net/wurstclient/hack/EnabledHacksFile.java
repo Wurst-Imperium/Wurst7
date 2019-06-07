@@ -7,22 +7,16 @@
  */
 package net.wurstclient.hack;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 
+import net.wurstclient.utils.JsonException;
 import net.wurstclient.utils.JsonUtils;
+import net.wurstclient.utils.WsonArray;
 
 public final class EnabledHacksFile
 {
@@ -38,59 +32,41 @@ public final class EnabledHacksFile
 	{
 		try
 		{
-			JsonArray json = parseJson(path);
-			enableHacks(hackList, json);
-			
-		}catch(ConfigFileException e)
-		{
-			System.out.println("Couldn't load " + path.getFileName());
-			e.printStackTrace();
+			WsonArray wson = JsonUtils.parseWsonArray(path);
+			enableHacks(hackList, wson);
 			
 		}catch(NoSuchFileException e)
 		{
+			// The file doesn't exist yet. No problem, we'll create it later.
 			
+		}catch(IOException | JsonException e)
+		{
+			System.out.println("Couldn't load " + path.getFileName());
+			e.printStackTrace();
 		}
 		
 		save(hackList);
 	}
 	
-	private JsonArray parseJson(Path path)
-		throws NoSuchFileException, ConfigFileException
+	private void enableHacks(HackList hackList, WsonArray wson)
 	{
-		try(BufferedReader reader = Files.newBufferedReader(path))
+		try
 		{
-			JsonElement json = JsonUtils.JSON_PARSER.parse(reader);
-			if(!json.isJsonArray())
-				throw new ConfigFileException();
+			disableSaving = true;
 			
-			return json.getAsJsonArray();
+			for(String name : wson.getAllStrings())
+			{
+				Hack hack = hackList.getHackByName(name);
+				if(hack == null || !hack.isStateSaved())
+					continue;
+				
+				hack.setEnabled(true);
+			}
 			
-		}catch(NoSuchFileException e)
+		}finally
 		{
-			throw e;
-			
-		}catch(IOException | JsonParseException e)
-		{
-			throw new ConfigFileException(e);
+			disableSaving = false;
 		}
-	}
-	
-	private void enableHacks(HackList hackList, JsonArray json)
-	{
-		Stream<JsonElement> jsonElements =
-			StreamSupport.stream(json.spliterator(), false);
-		
-		Stream<String> names = jsonElements.filter(JsonElement::isJsonPrimitive)
-			.map(JsonElement::getAsJsonPrimitive)
-			.filter(JsonPrimitive::isString).map(JsonPrimitive::getAsString);
-		
-		Stream<Hack> hacksToEnable =
-			names.map(name -> hackList.getHackByName(name))
-				.filter(Objects::nonNull).filter(Hack::isStateSaved);
-		
-		disableSaving = true;
-		hacksToEnable.forEach(hack -> hack.setEnabled(true));
-		disableSaving = false;
 	}
 	
 	public void save(HackList hax)
@@ -100,11 +76,11 @@ public final class EnabledHacksFile
 		
 		JsonArray json = createJson(hax);
 		
-		try(BufferedWriter writer = Files.newBufferedWriter(path))
+		try
 		{
-			JsonUtils.PRETTY_GSON.toJson(json, writer);
+			JsonUtils.toJson(json, path);
 			
-		}catch(IOException | JsonParseException e)
+		}catch(IOException | JsonException e)
 		{
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
@@ -120,18 +96,5 @@ public final class EnabledHacksFile
 		enabledHax.map(Hack::getName).forEach(name -> json.add(name));
 		
 		return json;
-	}
-	
-	private static final class ConfigFileException extends Exception
-	{
-		public ConfigFileException()
-		{
-			super();
-		}
-		
-		public ConfigFileException(Throwable cause)
-		{
-			super(cause);
-		}
 	}
 }

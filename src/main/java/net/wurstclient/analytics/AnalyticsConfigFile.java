@@ -7,19 +7,16 @@
  */
 package net.wurstclient.analytics;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 
 import net.wurstclient.analytics.dmurph.VisitorData;
+import net.wurstclient.utils.JsonException;
 import net.wurstclient.utils.JsonUtils;
+import net.wurstclient.utils.WsonObject;
 
 public final class AnalyticsConfigFile
 {
@@ -34,72 +31,29 @@ public final class AnalyticsConfigFile
 	{
 		try
 		{
-			JsonElement json = parseJson(path);
-			tracker.setEnabled(readEnabled(json));
-			tracker.getConfigData().setVisitorData(readVisitorData(json));
-			
-		}catch(ConfigFileException e)
-		{
-			System.out.println("Couldn't load " + path.getFileName());
-			e.printStackTrace();
+			WsonObject wson = JsonUtils.parseWsonObject(path);
+			tracker.setEnabled(wson.getBoolean("enabled"));
+			tracker.getConfigData().setVisitorData(readVisitorData(wson));
 			
 		}catch(NoSuchFileException e)
 		{
+			// The file doesn't exist yet. No problem, we'll create it later.
 			
+		}catch(IOException | JsonException e)
+		{
+			System.out.println("Couldn't load " + path.getFileName());
+			e.printStackTrace();
 		}
 		
 		save(tracker);
 	}
 	
-	private JsonElement parseJson(Path path)
-		throws NoSuchFileException, ConfigFileException
+	private VisitorData readVisitorData(WsonObject wson) throws JsonException
 	{
-		try(BufferedReader reader = Files.newBufferedReader(path))
-		{
-			return JsonUtils.JSON_PARSER.parse(reader);
-			
-		}catch(NoSuchFileException e)
-		{
-			throw e;
-			
-		}catch(IOException | JsonParseException e)
-		{
-			throw new ConfigFileException(e);
-		}
-	}
-	
-	private boolean readEnabled(JsonElement json) throws ConfigFileException
-	{
-		try
-		{
-			return json.getAsJsonObject().get("enabled").getAsBoolean();
-			
-		}catch(Exception e)
-		{
-			throw new ConfigFileException(e);
-		}
-	}
-	
-	private VisitorData readVisitorData(JsonElement json)
-		throws ConfigFileException
-	{
-		int visitorID;
-		long firstLaunch;
-		long lastLaunch;
-		int launches;
-		
-		try
-		{
-			JsonObject jo = json.getAsJsonObject();
-			visitorID = jo.get("id").getAsInt();
-			firstLaunch = jo.get("first_launch").getAsLong();
-			lastLaunch = jo.get("last_launch").getAsLong();
-			launches = jo.get("launches").getAsInt();
-			
-		}catch(Exception e)
-		{
-			throw new ConfigFileException(e);
-		}
+		int visitorID = wson.getInt("id");
+		long firstLaunch = wson.getLong("first_launch");
+		long lastLaunch = wson.getLong("last_launch");
+		int launches = wson.getInt("launches");
 		
 		return VisitorData.newSession(visitorID, firstLaunch, lastLaunch,
 			launches);
@@ -109,11 +63,11 @@ public final class AnalyticsConfigFile
 	{
 		JsonObject json = createJson(tracker);
 		
-		try(BufferedWriter writer = Files.newBufferedWriter(path))
+		try
 		{
-			JsonUtils.PRETTY_GSON.toJson(json, writer);
+			JsonUtils.toJson(json, path);
 			
-		}catch(IOException | JsonParseException e)
+		}catch(IOException | JsonException e)
 		{
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
@@ -132,13 +86,5 @@ public final class AnalyticsConfigFile
 		json.addProperty("launches", visitorData.getVisits());
 		
 		return json;
-	}
-	
-	private static final class ConfigFileException extends Exception
-	{
-		public ConfigFileException(Throwable cause)
-		{
-			super(cause);
-		}
 	}
 }
