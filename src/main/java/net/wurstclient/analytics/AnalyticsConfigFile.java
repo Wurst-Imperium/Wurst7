@@ -113,7 +113,7 @@ public final class AnalyticsConfigFile
 		{
 			JsonUtils.PRETTY_GSON.toJson(json, writer);
 			
-		}catch(IOException e)
+		}catch(IOException | JsonParseException e)
 		{
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
