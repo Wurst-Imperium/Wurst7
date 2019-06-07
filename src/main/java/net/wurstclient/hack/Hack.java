@@ -57,7 +57,7 @@ public abstract class Hack extends Feature
 	{
 		this.category = category;
 	}
-
+	
 	// TODO
 	// public final Map<String, Setting> getSettings()
 	// {
@@ -91,7 +91,7 @@ public abstract class Hack extends Feature
 			onEnable();
 		else
 			onDisable();
-		
+			
 		// TODO
 		// if(stateSaved)
 		// wurst.getHax().saveEnabledHacks();
