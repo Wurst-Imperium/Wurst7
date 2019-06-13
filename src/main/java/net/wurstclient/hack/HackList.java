@@ -172,13 +172,13 @@ public final class HackList
 			
 		}catch(Exception e)
 		{
-			CrashReport report =
-				CrashReport.create(e, "Initializing Wurst hacks");
+			String message = "Initializing Wurst hacks";
+			CrashReport report = CrashReport.create(e, message);
 			throw new CrashException(report);
 		}
 	}
 	
-	public void saveEnabledHacks()
+	public void saveEnabledHax()
 	{
 		enabledHacksFile.save(this);
 	}

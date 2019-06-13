@@ -93,7 +93,7 @@ public abstract class Hack extends Feature
 			onDisable();
 		
 		if(stateSaved)
-			wurst.getHax().saveEnabledHacks();
+			wurst.getHax().saveEnabledHax();
 	}
 	
 	public final boolean isStateSaved()
