@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hack;
 
+import java.util.Objects;
+
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 
@@ -28,9 +30,9 @@ public abstract class Hack extends Feature
 	
 	public Hack(WurstClient wurst, String name, String description)
 	{
-		this.wurst = wurst;
-		this.name = name;
-		this.description = description;
+		this.wurst = Objects.requireNonNull(wurst);
+		this.name = Objects.requireNonNull(name);
+		this.description = Objects.requireNonNull(description);
 	}
 	
 	public final String getName()
