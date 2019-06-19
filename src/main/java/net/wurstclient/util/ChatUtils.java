@@ -24,6 +24,7 @@ public enum ChatUtils
 		"\u00a7c[\u00a76\u00a7lWARNING\u00a7c]\u00a7r ";
 	private static final String ERROR_PREFIX =
 		"\u00a7c[\u00a74\u00a7lERROR\u00a7c]\u00a7r ";
+	private static final String SYNTAX_ERROR_PREFIX = "§4Syntax error:§r ";
 	
 	private static boolean enabled = true;
 	
@@ -55,5 +56,10 @@ public enum ChatUtils
 	public static void error(String message)
 	{
 		message(ERROR_PREFIX + message);
+	}
+	
+	public static void syntaxError(String message)
+	{
+		message(SYNTAX_ERROR_PREFIX + message);
 	}
 }
