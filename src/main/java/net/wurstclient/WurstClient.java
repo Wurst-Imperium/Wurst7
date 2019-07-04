@@ -13,6 +13,7 @@ import java.nio.file.Path;
 
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.command.CmdList;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.hack.HackList;
 
@@ -23,6 +24,7 @@ public final class WurstClient
 	private final WurstAnalytics analytics;
 	private final EventManager eventManager;
 	private final HackList hax;
+	private final CmdList cmds;
 	
 	private boolean enabled = true;
 	
@@ -40,6 +42,8 @@ public final class WurstClient
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
 		Path settingsFile = wurstFolder.resolve("settings.json");
 		hax = new HackList(enabledHacksFile, settingsFile);
+		
+		cmds = new CmdList();
 		
 		analytics.trackPageView("/mc1.14.2/v" + VERSION,
 			"Wurst " + VERSION + " MC1.14.2");
@@ -77,6 +81,11 @@ public final class WurstClient
 	public HackList getHax()
 	{
 		return hax;
+	}
+	
+	public CmdList getCmds()
+	{
+		return cmds;
 	}
 	
 	public boolean isEnabled()
