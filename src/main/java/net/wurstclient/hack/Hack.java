@@ -10,12 +10,9 @@ package net.wurstclient.hack;
 import java.util.Objects;
 
 import net.wurstclient.Feature;
-import net.wurstclient.WurstClient;
 
 public abstract class Hack extends Feature
 {
-	protected final WurstClient wurst;
-	
 	private final String name;
 	private final String description;
 	private HackCategory category;
@@ -28,9 +25,8 @@ public abstract class Hack extends Feature
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
 	
-	public Hack(WurstClient wurst, String name, String description)
+	public Hack(String name, String description)
 	{
-		this.wurst = Objects.requireNonNull(wurst);
 		this.name = Objects.requireNonNull(name);
 		this.description = Objects.requireNonNull(description);
 	}
@@ -95,7 +91,7 @@ public abstract class Hack extends Feature
 			onDisable();
 		
 		if(stateSaved)
-			wurst.getHax().saveEnabledHax();
+			WURST.getHax().saveEnabledHax();
 	}
 	
 	public final boolean isStateSaved()

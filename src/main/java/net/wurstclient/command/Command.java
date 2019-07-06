@@ -10,20 +10,15 @@ package net.wurstclient.command;
 import java.util.Objects;
 
 import net.wurstclient.Feature;
-import net.wurstclient.WurstClient;
 
 public abstract class Command extends Feature
 {
-	protected final WurstClient wurst;
-	
 	private final String name;
 	private final String description;
 	private final String[] syntax;
 	
-	public Command(WurstClient wurst, String name, String description,
-		String... syntax)
+	public Command(String name, String description, String... syntax)
 	{
-		this.wurst = Objects.requireNonNull(wurst);
 		this.name = Objects.requireNonNull(name);
 		this.description = Objects.requireNonNull(description);
 		
