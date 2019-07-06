@@ -14,7 +14,9 @@ import java.nio.file.Path;
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.command.CmdList;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hack.HackList;
 
 public final class WurstClient
@@ -44,6 +46,9 @@ public final class WurstClient
 		hax = new HackList(enabledHacksFile, settingsFile);
 		
 		cmds = new CmdList();
+		
+		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
+		eventManager.add(ChatOutputListener.class, cmdProcessor);
 		
 		analytics.trackPageView("/mc1.14.2/v" + VERSION,
 			"Wurst " + VERSION + " MC1.14.2");
