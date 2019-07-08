@@ -10,6 +10,7 @@ package net.wurstclient.command;
 import java.util.Objects;
 
 import net.wurstclient.Feature;
+import net.wurstclient.util.ChatUtils;
 
 public abstract class Command extends Feature
 {
@@ -35,13 +36,17 @@ public abstract class Command extends Feature
 		return name;
 	}
 	
-	public final String getDescription()
-	{
-		return description;
-	}
-	
 	public final String[] getSyntax()
 	{
 		return syntax;
+	}
+	
+	public final void printHelp()
+	{
+		for(String line : description.split("\n"))
+			ChatUtils.message(line);
+		
+		for(String line : syntax)
+			ChatUtils.message(line);
 	}
 }

@@ -13,6 +13,7 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.commands.HelpCmd;
 
 public final class CmdList
 {
@@ -35,7 +36,7 @@ public final class CmdList
 	// public final GiveCmd giveCmd = new GiveCmd();
 	// public final GmCmd gmCmd = new GmCmd();
 	// public final GoToCmd goToCmd = new GoToCmd();
-	// public final HelpCmd HhelpCmd = new HelpCmd();
+	public final HelpCmd helpCmd = new HelpCmd();
 	// public final InvseeCmd invseeCmd = new InvseeCmd();
 	// public final IpCmd ipCmd = new IpCmd();
 	// public final JumpCmd jumpCmd = new JumpCmd();
