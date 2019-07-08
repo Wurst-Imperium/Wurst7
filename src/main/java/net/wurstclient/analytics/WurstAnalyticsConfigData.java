@@ -8,6 +8,7 @@
 package net.wurstclient.analytics;
 
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 
 import net.wurstclient.analytics.dmurph.AnalyticsConfigData;
@@ -19,7 +20,15 @@ public final class WurstAnalyticsConfigData extends AnalyticsConfigData
 	{
 		super(argTrackingCode, VisitorData.newVisitor());
 		
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		setScreenResolution(screen.width + "x" + screen.height);
+		try
+		{
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			setScreenResolution(screen.width + "x" + screen.height);
+			
+		}catch(HeadlessException e)
+		{
+			System.err.println("Couldn't determine screen size!");
+			e.printStackTrace();
+		}
 	}
 }
