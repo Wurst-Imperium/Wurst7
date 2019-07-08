@@ -106,11 +106,12 @@ public final class CmdProcessor implements ChatOutputListener
 			{
 				helpMsg.append("Use \".say " + input + "\"");
 				helpMsg.append(" to send it as a chat command.");
+				
 			}else
 			{
-				helpMsg.append(
-					"Type \".help\" for a list of commands or \".say .");
-				helpMsg.append(input + "\" to send it as a chat message.");
+				helpMsg.append("Type \".help\" for a list of commands or ");
+				helpMsg.append("\".say ." + input + "\"");
+				helpMsg.append(" to send it as a chat message.");
 			}
 			
 			ChatUtils.message(helpMsg.toString());
