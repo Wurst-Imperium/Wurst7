@@ -13,12 +13,13 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.commands.AnnoyCmd;
 import net.wurstclient.commands.HelpCmd;
 
 public final class CmdList
 {
 	// public final AddAltCmd addAltCmd = new AddAltCmd();
-	// public final AnnoyCmd annoyCmd = new AnnoyCmd();
+	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	// public final AuthorCmd authorCmd = new AuthorCmd();
 	// public final BindsCmd bindsCmd = new BindsCmd();
 	// public final BlinkCmd blinkCmd = new BlinkCmd();
