@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+  	"ChatHudMixin",
     "ClientPlayerEntityMixin"
   ],
   "injectors": {
