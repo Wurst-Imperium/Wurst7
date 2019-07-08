@@ -11,7 +11,7 @@ import net.fabricmc.api.ModInitializer;
 
 public final class WurstInitializer implements ModInitializer
 {
-	private static WurstClient WURST;
+	private static boolean initialized;
 	
 	@Override
 	public void onInitialize()
@@ -20,16 +20,11 @@ public final class WurstInitializer implements ModInitializer
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		
-		if(WURST != null)
+		if(initialized)
 			throw new RuntimeException(
 				"WurstInitializer.onInitialize() ran twice!");
 		
-		System.out.println("Hello Fabric world!");
-		WURST = new WurstClient();
-	}
-	
-	public static WurstClient getWurst()
-	{
-		return WURST;
+		WurstClient.INSTANCE.initialize();
+		initialized = true;
 	}
 }

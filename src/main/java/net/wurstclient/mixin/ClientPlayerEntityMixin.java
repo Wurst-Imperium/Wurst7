@@ -11,7 +11,6 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.wurstclient.WurstClient;
-import net.wurstclient.WurstInitializer;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 
 @Mixin(ClientPlayerEntity.class)
@@ -29,7 +28,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onSendChatMessage(String message, CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message, false);
-		WurstInitializer.getWurst().getEventManager().fire(event);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();

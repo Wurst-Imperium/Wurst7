@@ -12,7 +12,7 @@ import java.util.Arrays;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
-import net.wurstclient.WurstInitializer;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.util.ChatUtils;
 
@@ -28,7 +28,7 @@ public final class CmdProcessor implements ChatOutputListener
 	@Override
 	public void onSentMessage(ChatOutputEvent event)
 	{
-		if(!WurstInitializer.getWurst().isEnabled())
+		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
 		String message = event.getMessage().trim();

@@ -19,18 +19,20 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hack.HackList;
 
-public final class WurstClient
+public enum WurstClient
 {
+	INSTANCE;
+	
 	public static final String VERSION = "7.0";
 	
-	private final WurstAnalytics analytics;
-	private final EventManager eventManager;
-	private final HackList hax;
-	private final CmdList cmds;
+	private WurstAnalytics analytics;
+	private EventManager eventManager;
+	private HackList hax;
+	private CmdList cmds;
 	
 	private boolean enabled = true;
 	
-	public WurstClient()
+	public void initialize()
 	{
 		Path wurstFolder = createWurstFolder();
 		
