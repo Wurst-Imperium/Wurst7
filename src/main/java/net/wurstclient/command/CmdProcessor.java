@@ -54,7 +54,7 @@ public final class CmdProcessor implements ChatOutputListener
 	
 	private Command parseCmd(String input) throws CmdNotFoundException
 	{
-		String cmdName = input.substring(0, input.indexOf(" "));
+		String cmdName = input.split(" ")[0];
 		Command cmd = cmds.getCmdByName(cmdName);
 		
 		if(cmd == null)
@@ -97,7 +97,7 @@ public final class CmdProcessor implements ChatOutputListener
 		
 		public void printToChat()
 		{
-			String cmdName = input.substring(0, input.indexOf(" "));
+			String cmdName = input.split(" ")[0];
 			ChatUtils.error("Unknown command: ." + cmdName);
 			
 			StringBuilder helpMsg = new StringBuilder();
