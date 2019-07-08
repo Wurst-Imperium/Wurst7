@@ -1,11 +1,10 @@
 {
   "required": true,
-  "package": "net.fabricmc.example.mixin",
+  "package": "net.wurstclient.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],
   "client": [
-    "ExampleMixin",
     "ClientPlayerEntityMixin"
   ],
   "injectors": {
