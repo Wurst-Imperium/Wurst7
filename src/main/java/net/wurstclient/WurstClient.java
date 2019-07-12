@@ -13,6 +13,7 @@ import java.nio.file.Path;
 
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.event.EventManager;
@@ -29,8 +30,10 @@ public enum WurstClient
 	private EventManager eventManager;
 	private HackList hax;
 	private CmdList cmds;
+	private ClickGui gui;
 	
 	private boolean enabled = true;
+	private static boolean guiInitialized;
 	
 	public void initialize()
 	{
@@ -50,6 +53,8 @@ public enum WurstClient
 		hax = new HackList(enabledHacksFile, settingsFile);
 		
 		cmds = new CmdList();
+		
+		gui = new ClickGui(wurstFolder.resolve("windows.json"));
 		
 		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -95,6 +100,17 @@ public enum WurstClient
 	public CmdList getCmds()
 	{
 		return cmds;
+	}
+	
+	public ClickGui getGui()
+	{
+		if(!guiInitialized)
+		{
+			gui.init();
+			guiInitialized = true;
+		}
+		
+		return gui;
 	}
 	
 	public boolean isEnabled()

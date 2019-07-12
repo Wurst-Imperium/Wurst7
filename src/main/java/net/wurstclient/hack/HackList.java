@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.hacks.ClickGuiHack;
 
 public final class HackList
 {
@@ -55,7 +56,7 @@ public final class HackList
 	// public final CaveFinderHack caveFinderHack = new CaveFinderHack();
 	// public final ChestEspHack chestEspHack = new ChestEspHack();
 	// public final ClickAuraHack clickAuraHack = new ClickAuraHack();
-	// public final ClickGuiHack clickGuiHack = new ClickGuiHack();
+	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
 	// public final CmdBlockHack cmdBlockHack = new CmdBlockHack();
 	// public final CrashChestHack crashChestHack = new CrashChestHack();
 	// public final CrashTagHack crashTagHack = new CrashTagHack();
