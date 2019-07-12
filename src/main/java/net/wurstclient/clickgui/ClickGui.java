@@ -31,6 +31,8 @@ import net.wurstclient.util.json.JsonUtils;
 
 public final class ClickGui
 {
+	private static final MinecraftClient MC = WurstClient.MC;
+	
 	private final ArrayList<Window> windows = new ArrayList<>();
 	private final ArrayList<Popup> popups = new ArrayList<>();
 	private final Path windowsFile;
@@ -79,8 +81,7 @@ public final class ClickGui
 		
 		int x = 5;
 		int y = 5;
-		net.minecraft.client.util.Window sr =
-			MinecraftClient.getInstance().window;
+		net.minecraft.client.util.Window sr = MC.window;
 		for(Window window : windows)
 		{
 			window.pack();
@@ -499,9 +500,8 @@ public final class ClickGui
 		if(tooltip != null)
 		{
 			String[] lines = tooltip.split("\n");
-			MinecraftClient mc = MinecraftClient.getInstance();
 			// TODO: TextRenderer fr = Fonts.segoe15;
-			TextRenderer fr = mc.textRenderer;
+			TextRenderer fr = MC.textRenderer;
 			
 			int tw = 0;
 			int th = lines.length * fr.fontHeight;
@@ -511,8 +511,8 @@ public final class ClickGui
 				if(lw > tw)
 					tw = lw;
 			}
-			int sw = mc.currentScreen.width;
-			int sh = mc.currentScreen.height;
+			int sw = MC.currentScreen.width;
+			int sh = MC.currentScreen.height;
 			
 			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
 			int xt2 = xt1 + tw + 3;
@@ -684,8 +684,7 @@ public final class ClickGui
 			GL11.glVertex2i(x4, y3);
 			GL11.glEnd();
 			
-			net.minecraft.client.util.Window sr =
-				MinecraftClient.getInstance().window;
+			net.minecraft.client.util.Window sr = MC.window;
 			int sf = (int)sr.getScaleFactor();
 			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
 				window.getWidth() * sf, (y2 - y3) * sf);
@@ -815,7 +814,7 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(1, 1, 1, 1);
 		// TODO: TextRenderer fr = Fonts.segoe18;
-		TextRenderer fr = MinecraftClient.getInstance().textRenderer;
+		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
 		fr.draw(title, x1 + 2, y1, 0xf0f0f0);
 	}

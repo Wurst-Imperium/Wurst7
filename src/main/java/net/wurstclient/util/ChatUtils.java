@@ -11,12 +11,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.wurstclient.WurstClient;
 
 public enum ChatUtils
 {
 	;
 	
-	private static final MinecraftClient MC = MinecraftClient.getInstance();
+	private static final MinecraftClient MC = WurstClient.MC;
 	
 	public static final String WURST_PREFIX =
 		"\u00a7c[\u00a76Wurst\u00a7c]\u00a7r ";

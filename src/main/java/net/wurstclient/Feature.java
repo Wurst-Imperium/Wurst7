@@ -11,6 +11,6 @@ import net.minecraft.client.MinecraftClient;
 
 public abstract class Feature
 {
-	protected static final MinecraftClient MC = MinecraftClient.getInstance();
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
+	protected static final MinecraftClient MC = WurstClient.MC;
 }

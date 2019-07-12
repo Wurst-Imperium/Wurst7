@@ -23,7 +23,7 @@ import net.wurstclient.hack.HackList;
 public enum WurstClient
 {
 	INSTANCE;
-	
+	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final String VERSION = "7.0";
 	
 	private WurstAnalytics analytics;
@@ -65,8 +65,7 @@ public enum WurstClient
 	
 	private Path createWurstFolder()
 	{
-		MinecraftClient mc = MinecraftClient.getInstance();
-		Path dotMinecraftFolder = mc.runDirectory.toPath();
+		Path dotMinecraftFolder = MC.runDirectory.toPath();
 		Path wurstFolder = dotMinecraftFolder.resolve("wurst");
 		
 		try
