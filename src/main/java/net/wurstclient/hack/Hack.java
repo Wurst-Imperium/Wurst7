@@ -31,6 +31,7 @@ public abstract class Hack extends Feature
 		this.description = Objects.requireNonNull(description);
 	}
 	
+	@Override
 	public final String getName()
 	{
 		return name;
@@ -41,11 +42,13 @@ public abstract class Hack extends Feature
 		return name;
 	}
 	
+	@Override
 	public final String getDescription()
 	{
 		return description;
 	}
 	
+	@Override
 	public final HackCategory getCategory()
 	{
 		return category;
@@ -73,6 +76,7 @@ public abstract class Hack extends Feature
 	// settings.put(key, setting);
 	// }
 	
+	@Override
 	public final boolean isEnabled()
 	{
 		return enabled;
@@ -92,6 +96,12 @@ public abstract class Hack extends Feature
 		
 		if(stateSaved)
 			WURST.getHax().saveEnabledHax();
+	}
+	
+	@Override
+	public final void doPrimaryAction()
+	{
+		setEnabled(!enabled);
 	}
 	
 	public final boolean isStateSaved()

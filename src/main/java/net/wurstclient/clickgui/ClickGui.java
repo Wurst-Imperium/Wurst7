@@ -62,10 +62,10 @@ public final class ClickGui
 		features.addAll(WurstClient.INSTANCE.getCmds().getAllCmds());
 		// features.addAll(WurstClient.INSTANCE.special.getAllFeatures());
 		
-		// for(Feature f : features)
-		// if(f.getCategory() != null)
-		// windowMap.get(f.getCategory()).add(new FeatureButton(f));
-		
+		for(Feature f : features)
+			if(f.getCategory() != null)
+				windowMap.get(f.getCategory()).add(new FeatureButton(f));
+			
 		windows.addAll(windowMap.values());
 		
 		Window uiSettings = new Window("UI Settings");

@@ -8,9 +8,29 @@
 package net.wurstclient;
 
 import net.minecraft.client.MinecraftClient;
+import net.wurstclient.hack.HackCategory;
 
 public abstract class Feature
 {
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final MinecraftClient MC = WurstClient.MC;
+	
+	public abstract String getName();
+	
+	public abstract String getDescription();
+	
+	public HackCategory getCategory()
+	{
+		return null;
+	}
+	
+	public void doPrimaryAction()
+	{
+		
+	}
+	
+	public boolean isEnabled()
+	{
+		return false;
+	}
 }

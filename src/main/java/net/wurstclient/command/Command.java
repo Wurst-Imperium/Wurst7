@@ -31,9 +31,24 @@ public abstract class Command extends Feature
 	
 	public abstract void call(String[] args) throws CmdException;
 	
+	@Override
 	public final String getName()
 	{
 		return name;
+	}
+	
+	@Override
+	public final String getDescription()
+	{
+		String description = this.description;
+		
+		if(syntax.length > 0)
+			description += "\n";
+		
+		for(String line : syntax)
+			description += "\n" + line;
+		
+		return description;
 	}
 	
 	public final String[] getSyntax()

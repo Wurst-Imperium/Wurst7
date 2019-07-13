@@ -19,6 +19,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
+import net.wurstclient.events.UpdateListener.UpdateEvent;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
@@ -39,5 +40,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		if(event.isCancelled())
 			ci.cancel();
+	}
+	
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+		ordinal = 0), method = "tick()V")
+	private void onTick(CallbackInfo ci)
+	{
+		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
 	}
 }

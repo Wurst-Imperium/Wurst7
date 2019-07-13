@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.hacks;
+
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.hack.HackCategory;
+
+public final class NoFallHack extends Hack implements UpdateListener
+{
+	public NoFallHack()
+	{
+		super("NoFall", "Protects you from fall damage.");
+		setCategory(HackCategory.MOVEMENT);
+	}
+	
+	@Override
+	public void onEnable()
+	{
+		WURST.getEventManager().add(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		WURST.getEventManager().remove(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		ClientPlayerEntity player = MC.player;
+		if(player.fallDistance <= 2)
+			return;
+		
+		player.networkHandler.sendPacket(new PlayerMoveC2SPacket(true));
+	}
+}
