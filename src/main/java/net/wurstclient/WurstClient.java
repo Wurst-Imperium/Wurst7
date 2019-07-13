@@ -59,7 +59,6 @@ public enum WurstClient
 		
 		Path keybindsFile = wurstFolder.resolve("keybinds.json");
 		KeybindList keybinds = new KeybindList(keybindsFile);
-		keybinds.init();
 		
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);

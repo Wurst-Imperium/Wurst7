@@ -7,8 +7,11 @@
  */
 package net.wurstclient.util.json;
 
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.Objects;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public final class WsonObject
@@ -33,6 +36,22 @@ public final class WsonObject
 	public long getLong(String key) throws JsonException
 	{
 		return JsonUtils.getAsLong(json.get(key));
+	}
+	
+	public LinkedHashMap<String, String> getAllStrings()
+	{
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		
+		for(Entry<String, JsonElement> entry : json.entrySet())
+		{
+			JsonElement value = entry.getValue();
+			if(!JsonUtils.isString(value))
+				continue;
+			
+			map.put(entry.getKey(), value.getAsString());
+		}
+		
+		return map;
 	}
 	
 	public JsonObject toJsonObject()

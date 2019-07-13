@@ -111,6 +111,15 @@ public enum JsonUtils
 		return primitive.isNumber();
 	}
 	
+	public static boolean isString(JsonElement json)
+	{
+		if(json == null || !json.isJsonPrimitive())
+			return false;
+		
+		JsonPrimitive primitive = json.getAsJsonPrimitive();
+		return primitive.isString();
+	}
+	
 	public static int getAsInt(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
@@ -125,5 +134,13 @@ public enum JsonUtils
 			throw new JsonException();
 		
 		return json.getAsLong();
+	}
+	
+	public static String getAsString(JsonElement json) throws JsonException
+	{
+		if(!isString(json))
+			throw new JsonException();
+		
+		return json.getAsString();
 	}
 }

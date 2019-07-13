@@ -14,7 +14,6 @@ import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 
 public final class WsonArray
 {
@@ -28,9 +27,7 @@ public final class WsonArray
 	public ArrayList<String> getAllStrings()
 	{
 		return StreamSupport.stream(json.spliterator(), false)
-			.filter(JsonElement::isJsonPrimitive)
-			.map(JsonElement::getAsJsonPrimitive)
-			.filter(JsonPrimitive::isString).map(JsonPrimitive::getAsString)
+			.filter(JsonUtils::isString).map(JsonElement::getAsString)
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	

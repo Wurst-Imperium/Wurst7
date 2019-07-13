@@ -35,39 +35,49 @@ public final class KeybindProcessor implements KeyPressListener
 	@Override
 	public void onKeyPress(KeyPressEvent event)
 	{
+		if(event.getAction() != GLFW.GLFW_PRESS)
+			return;
+		
 		Screen screen = WurstClient.MC.currentScreen;
 		if(screen != null && !(screen instanceof ClickGuiScreen))
 			return;
 		
-		if(event.getAction() != GLFW.GLFW_PRESS)
-			return;
-		
+		String keyName = getKeyName(event);
+		String cmds = keybinds.getCommands(keyName);
+		processCmds(cmds);
+	}
+	
+	private String getKeyName(KeyPressEvent event)
+	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
-		String keyName = InputUtil.getKeyCode(keyCode, scanCode).getName();
-		
-		String cmds = keybinds.getCommands(keyName);
+		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+	}
+	
+	private void processCmds(String cmds)
+	{
 		if(cmds == null)
 			return;
 		
 		cmds = cmds.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
 		for(String cmd : cmds.split("\u00a7"))
+			processCmd(cmd.trim());
+	}
+	
+	private void processCmd(String cmd)
+	{
+		if(cmd.startsWith("."))
+			cmdProcessor.process(cmd.substring(1));
+		else if(cmd.contains(" "))
+			cmdProcessor.process(cmd);
+		else
 		{
-			cmd = cmd.trim();
+			Hack hack = hax.getHackByName(cmd);
 			
-			if(cmd.startsWith("."))
-				cmdProcessor.process(cmd.substring(1));
-			else if(cmd.contains(" "))
-				cmdProcessor.process(cmd);
+			if(hack != null)
+				hack.setEnabled(!hack.isEnabled());
 			else
-			{
-				Hack hack = hax.getHackByName(cmd);
-				
-				if(hack != null)
-					hack.setEnabled(!hack.isEnabled());
-				else
-					cmdProcessor.process(cmd);
-			}
+				cmdProcessor.process(cmd);
 		}
 	}
 }

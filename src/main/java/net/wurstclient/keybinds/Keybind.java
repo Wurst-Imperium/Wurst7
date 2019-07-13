@@ -7,15 +7,17 @@
  */
 package net.wurstclient.keybinds;
 
-public class Keybind
+import java.util.Objects;
+
+public class Keybind implements Comparable<Keybind>
 {
 	private final String key;
 	private final String commands;
 	
 	public Keybind(String key, String commands)
 	{
-		this.key = key;
-		this.commands = commands;
+		this.key = Objects.requireNonNull(key);
+		this.commands = Objects.requireNonNull(commands);
 	}
 	
 	public String getKey()
@@ -26,5 +28,27 @@ public class Keybind
 	public String getCommands()
 	{
 		return commands;
+	}
+	
+	@Override
+	public int compareTo(Keybind o)
+	{
+		return key.compareToIgnoreCase(o.key);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj == null || !(obj instanceof Keybind))
+			return false;
+		
+		Keybind otherKeybind = (Keybind)obj;
+		return key.equalsIgnoreCase(otherKeybind.key);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return key.hashCode();
 	}
 }
