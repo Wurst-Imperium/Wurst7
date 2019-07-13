@@ -18,7 +18,10 @@ import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
+import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.keybinds.KeybindList;
+import net.wurstclient.keybinds.KeybindProcessor;
 
 public enum WurstClient
 {
@@ -54,10 +57,19 @@ public enum WurstClient
 		
 		cmds = new CmdList();
 		
-		gui = new ClickGui(wurstFolder.resolve("windows.json"));
+		Path keybindsFile = wurstFolder.resolve("keybinds.json");
+		KeybindList keybinds = new KeybindList(keybindsFile);
+		keybinds.init();
+		
+		Path guiFile = wurstFolder.resolve("windows.json");
+		gui = new ClickGui(guiFile);
 		
 		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
+		
+		KeybindProcessor keybindProcessor =
+			new KeybindProcessor(hax, keybinds, cmdProcessor);
+		eventManager.add(KeyPressListener.class, keybindProcessor);
 		
 		analytics.trackPageView("/mc1.14.2/v" + VERSION,
 			"Wurst " + VERSION + " MC1.14.2");
