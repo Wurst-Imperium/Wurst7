@@ -48,7 +48,7 @@ public final class EnabledHacksFile
 		save(hackList);
 	}
 	
-	private void enableHacks(HackList hackList, WsonArray wson)
+	private void enableHacks(HackList hax, WsonArray wson)
 	{
 		try
 		{
@@ -56,7 +56,7 @@ public final class EnabledHacksFile
 			
 			for(String name : wson.getAllStrings())
 			{
-				Hack hack = hackList.getHackByName(name);
+				Hack hack = hax.getHackByName(name);
 				if(hack == null || !hack.isStateSaved())
 					continue;
 				
