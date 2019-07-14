@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 
-public final class Window
+public class Window
 {
 	private String title;
 	private int x;
@@ -50,42 +50,42 @@ public final class Window
 		this.title = title;
 	}
 	
-	public String getTitle()
+	public final String getTitle()
 	{
 		return title;
 	}
 	
-	public void setTitle(String title)
+	public final void setTitle(String title)
 	{
 		this.title = title;
 	}
 	
-	public int getX()
+	public final int getX()
 	{
 		return x;
 	}
 	
-	public void setX(int x)
+	public final void setX(int x)
 	{
 		this.x = x;
 	}
 	
-	public int getY()
+	public final int getY()
 	{
 		return y;
 	}
 	
-	public void setY(int y)
+	public final void setY(int y)
 	{
 		this.y = y;
 	}
 	
-	public int getWidth()
+	public final int getWidth()
 	{
 		return width;
 	}
 	
-	public void setWidth(int width)
+	public final void setWidth(int width)
 	{
 		if(this.width != width)
 			invalidate();
@@ -93,12 +93,12 @@ public final class Window
 		this.width = width;
 	}
 	
-	public int getHeight()
+	public final int getHeight()
 	{
 		return height;
 	}
 	
-	public void setHeight(int height)
+	public final void setHeight(int height)
 	{
 		if(this.height != height)
 			invalidate();
@@ -106,7 +106,7 @@ public final class Window
 		this.height = height;
 	}
 	
-	public void pack()
+	public final void pack()
 	{
 		int maxChildWidth = 0;
 		for(Component c : children)
@@ -142,7 +142,7 @@ public final class Window
 		validate();
 	}
 	
-	public void validate()
+	public final void validate()
 	{
 		if(valid)
 			return;
@@ -169,163 +169,163 @@ public final class Window
 		valid = true;
 	}
 	
-	public void invalidate()
+	public final void invalidate()
 	{
 		valid = false;
 	}
 	
-	public int countChildren()
+	public final int countChildren()
 	{
 		return children.size();
 	}
 	
-	public Component getChild(int index)
+	public final Component getChild(int index)
 	{
 		return children.get(index);
 	}
 	
-	public void add(Component component)
+	public final void add(Component component)
 	{
 		children.add(component);
 		component.setParent(this);
 		invalidate();
 	}
 	
-	public void remove(int index)
+	public final void remove(int index)
 	{
 		children.get(index).setParent(null);
 		children.remove(index);
 		invalidate();
 	}
 	
-	public void remove(Component component)
+	public final void remove(Component component)
 	{
 		children.remove(component);
 		component.setParent(null);
 		invalidate();
 	}
 	
-	public boolean isDragging()
+	public final boolean isDragging()
 	{
 		return dragging;
 	}
 	
-	public void startDragging(int mouseX, int mouseY)
+	public final void startDragging(int mouseX, int mouseY)
 	{
 		dragging = true;
 		dragOffsetX = x - mouseX;
 		dragOffsetY = y - mouseY;
 	}
 	
-	public void dragTo(int mouseX, int mouseY)
+	public final void dragTo(int mouseX, int mouseY)
 	{
 		x = mouseX + dragOffsetX;
 		y = mouseY + dragOffsetY;
 	}
 	
-	public void stopDragging()
+	public final void stopDragging()
 	{
 		dragging = false;
 		dragOffsetX = 0;
 		dragOffsetY = 0;
 	}
 	
-	public boolean isMinimized()
+	public final boolean isMinimized()
 	{
 		return minimized;
 	}
 	
-	public void setMinimized(boolean minimized)
+	public final void setMinimized(boolean minimized)
 	{
 		this.minimized = minimized;
 	}
 	
-	public boolean isMinimizable()
+	public final boolean isMinimizable()
 	{
 		return minimizable;
 	}
 	
-	public void setMinimizable(boolean minimizable)
+	public final void setMinimizable(boolean minimizable)
 	{
 		this.minimizable = minimizable;
 	}
 	
-	public boolean isPinned()
+	public final boolean isPinned()
 	{
 		return pinned;
 	}
 	
-	public void setPinned(boolean pinned)
+	public final void setPinned(boolean pinned)
 	{
 		this.pinned = pinned;
 	}
 	
-	public boolean isPinnable()
+	public final boolean isPinnable()
 	{
 		return pinnable;
 	}
 	
-	public void setPinnable(boolean pinnable)
+	public final void setPinnable(boolean pinnable)
 	{
 		this.pinnable = pinnable;
 	}
 	
-	public boolean isClosable()
+	public final boolean isClosable()
 	{
 		return closable;
 	}
 	
-	public void setClosable(boolean closable)
+	public final void setClosable(boolean closable)
 	{
 		this.closable = closable;
 	}
 	
-	public boolean isClosing()
+	public final boolean isClosing()
 	{
 		return closing;
 	}
 	
-	public void close()
+	public final void close()
 	{
 		closing = true;
 	}
 	
-	public boolean isInvisible()
+	public final boolean isInvisible()
 	{
 		return invisible;
 	}
 	
-	public void setInvisible(boolean invisible)
+	public final void setInvisible(boolean invisible)
 	{
 		this.invisible = invisible;
 	}
 	
-	public int getInnerHeight()
+	public final int getInnerHeight()
 	{
 		return innerHeight;
 	}
 	
-	public int getScrollOffset()
+	public final int getScrollOffset()
 	{
 		return scrollOffset;
 	}
 	
-	public void setScrollOffset(int scrollOffset)
+	public final void setScrollOffset(int scrollOffset)
 	{
 		this.scrollOffset = scrollOffset;
 	}
 	
-	public boolean isScrollingEnabled()
+	public final boolean isScrollingEnabled()
 	{
 		return scrollingEnabled;
 	}
 	
-	public boolean isDraggingScrollbar()
+	public final boolean isDraggingScrollbar()
 	{
 		return draggingScrollbar;
 	}
 	
-	public void startDraggingScrollbar(int mouseY)
+	public final void startDraggingScrollbar(int mouseY)
 	{
 		draggingScrollbar = true;
 		double outerHeight = height - 13;
@@ -334,7 +334,7 @@ public final class Window
 		scrollbarDragOffsetY = (int)(scrollbarY - mouseY);
 	}
 	
-	public void dragScrollbarTo(int mouseY)
+	public final void dragScrollbarTo(int mouseY)
 	{
 		int scrollbarY = mouseY + scrollbarDragOffsetY;
 		double outerHeight = height - 13;
@@ -343,7 +343,7 @@ public final class Window
 		scrollOffset = Math.max(scrollOffset, -innerHeight + height - 13);
 	}
 	
-	public void stopDraggingScrollbar()
+	public final void stopDraggingScrollbar()
 	{
 		draggingScrollbar = false;
 		scrollbarDragOffsetY = 0;
