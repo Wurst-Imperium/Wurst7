@@ -190,11 +190,10 @@ public final class FeatureButton extends Component
 		// hack name
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		// TextRenderer fr = Fonts.segoe18;
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		int fx = x1 + ((settings ? getWidth() - 11 : getWidth())
 			- fr.getStringWidth(feature.getName())) / 2;
-		int fy = y1 - 1;
+		int fy = y1 + 2;
 		fr.draw(feature.getName(), fx, fy, 0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
@@ -202,7 +201,6 @@ public final class FeatureButton extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		// TextRenderer fr = Fonts.segoe18;
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		int width = fr.getStringWidth(feature.getName()) + 2;
 		// if(!feature.getSettings().isEmpty())

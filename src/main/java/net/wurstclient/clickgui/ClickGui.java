@@ -500,7 +500,6 @@ public final class ClickGui
 		if(tooltip != null)
 		{
 			String[] lines = tooltip.split("\n");
-			// TODO: TextRenderer fr = Fonts.segoe15;
 			TextRenderer fr = MC.textRenderer;
 			
 			int tw = 0;
@@ -541,7 +540,7 @@ public final class ClickGui
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < lines.length; i++)
-				fr.draw(lines[i], xt1 + 2, yt1 - 1 + i * fr.fontHeight,
+				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 					0xffffff);
 		}
 	}
@@ -813,10 +812,9 @@ public final class ClickGui
 		// window title
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(1, 1, 1, 1);
-		// TODO: TextRenderer fr = Fonts.segoe18;
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
-		fr.draw(title, x1 + 2, y1, 0xf0f0f0);
+		fr.draw(title, x1 + 2, y1 + 3, 0xf0f0f0);
 	}
 	
 	private void renderTitleBarButton(int x1, int y1, int x2, int y2,
