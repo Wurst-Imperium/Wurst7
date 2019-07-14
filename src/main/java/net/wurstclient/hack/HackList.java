@@ -156,10 +156,9 @@ public final class HackList
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
 	private final EnabledHacksFile enabledHacksFile;
 	
-	public HackList(Path enabledHacksFile, Path settingsFile)
+	public HackList(Path enabledHacksFile)
 	{
 		this.enabledHacksFile = new EnabledHacksFile(enabledHacksFile);
-		this.enabledHacksFile.load(this);
 		
 		try
 		{
@@ -178,6 +177,11 @@ public final class HackList
 			CrashReport report = CrashReport.create(e, message);
 			throw new CrashException(report);
 		}
+	}
+	
+	public void loadEnabledHacks()
+	{
+		enabledHacksFile.load(this);
 	}
 	
 	public void saveEnabledHax()

@@ -22,6 +22,7 @@ import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
+import net.wurstclient.settings.SettingsFile;
 
 public enum WurstClient
 {
@@ -31,6 +32,7 @@ public enum WurstClient
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
+	private SettingsFile settingsFile;
 	private HackList hax;
 	private CmdList cmds;
 	private ClickGui gui;
@@ -52,10 +54,14 @@ public enum WurstClient
 		eventManager = new EventManager(this);
 		
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
-		Path settingsFile = wurstFolder.resolve("settings.json");
-		hax = new HackList(enabledHacksFile, settingsFile);
+		hax = new HackList(enabledHacksFile);
+		hax.loadEnabledHacks();
 		
 		cmds = new CmdList();
+		
+		Path settingsFile = wurstFolder.resolve("settings.json");
+		this.settingsFile = new SettingsFile(settingsFile, hax, cmds);
+		this.settingsFile.load();
 		
 		Path keybindsFile = wurstFolder.resolve("keybinds.json");
 		KeybindList keybinds = new KeybindList(keybindsFile);
@@ -100,6 +106,11 @@ public enum WurstClient
 	public EventManager getEventManager()
 	{
 		return eventManager;
+	}
+	
+	public void saveSettings()
+	{
+		settingsFile.save();
 	}
 	
 	public HackList getHax()

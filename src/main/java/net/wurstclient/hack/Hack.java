@@ -17,10 +17,6 @@ public abstract class Hack extends Feature
 	private final String description;
 	private HackCategory category;
 	
-	// TODO
-	// private final LinkedHashMap<String, Setting> settings =
-	// new LinkedHashMap<>();
-	
 	private boolean enabled;
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
@@ -58,23 +54,6 @@ public abstract class Hack extends Feature
 	{
 		this.category = category;
 	}
-	
-	// TODO
-	// public final Map<String, Setting> getSettings()
-	// {
-	// return Collections.unmodifiableMap(settings);
-	// }
-	//
-	// protected final void addSetting(Setting setting)
-	// {
-	// String key = setting.getName().toLowerCase();
-	//
-	// if(settings.containsKey(key))
-	// throw new IllegalArgumentException(
-	// "Duplicate setting: " + name + " " + key);
-	//
-	// settings.put(key, setting);
-	// }
 	
 	@Override
 	public final boolean isEnabled()

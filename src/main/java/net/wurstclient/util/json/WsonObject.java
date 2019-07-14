@@ -54,6 +54,22 @@ public final class WsonObject
 		return map;
 	}
 	
+	public LinkedHashMap<String, JsonObject> getAllJsonObjects()
+	{
+		LinkedHashMap<String, JsonObject> map = new LinkedHashMap<>();
+		
+		for(Entry<String, JsonElement> entry : json.entrySet())
+		{
+			JsonElement value = entry.getValue();
+			if(!value.isJsonObject())
+				continue;
+			
+			map.put(entry.getKey(), value.getAsJsonObject());
+		}
+		
+		return map;
+	}
+	
 	public JsonObject toJsonObject()
 	{
 		return json;
