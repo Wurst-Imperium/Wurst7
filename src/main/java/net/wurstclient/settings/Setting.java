@@ -7,12 +7,13 @@
  */
 package net.wurstclient.settings;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.keybinds.PossibleKeybind;
 
 public abstract class Setting
 {
@@ -41,11 +42,6 @@ public abstract class Setting
 	
 	public abstract JsonElement toJson();
 	
-	public void legacyFromJson(JsonObject json)
-	{
-		
-	}
-	
 	public void update()
 	{
 		
@@ -55,7 +51,7 @@ public abstract class Setting
 	// {
 	//
 	// }
-	//
-	// public abstract ArrayList<PossibleKeybind> getPossibleKeybinds(
-	// String featureName);
+	
+	public abstract ArrayList<PossibleKeybind> getPossibleKeybinds(
+		String featureName);
 }
