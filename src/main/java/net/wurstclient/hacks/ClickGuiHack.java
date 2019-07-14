@@ -8,8 +8,10 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.clickgui.ClickGuiScreen;
+import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 
+@DontSaveState
 public final class ClickGuiHack extends Hack
 {
 	// private final SliderSetting opacity = new SliderSetting("Opacity", 0.5,
