@@ -9,15 +9,14 @@ package net.wurstclient.clickgui;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.CheckboxSetting;
 
 public final class CheckboxComponent extends Component
 {
-	private static final ClickGui GUI = WurstClient.INSTANCE.getGui();
-	private static final TextRenderer TEXT_RENDERER =
-		WurstClient.MC.textRenderer;
+	private final MinecraftClient MC = WurstClient.MC;
+	private final ClickGui GUI = WurstClient.INSTANCE.getGui();
 	
 	private final CheckboxSetting setting;
 	
@@ -181,7 +180,7 @@ public final class CheckboxComponent extends Component
 		int tx = x3 + 2;
 		int ty = y1 - 1;
 		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
-		TEXT_RENDERER.draw(name, tx, ty, color);
+		MC.textRenderer.draw(name, tx, ty, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
@@ -189,7 +188,7 @@ public final class CheckboxComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TEXT_RENDERER.getStringWidth(setting.getName()) + 13;
+		return MC.textRenderer.getStringWidth(setting.getName()) + 13;
 	}
 	
 	@Override

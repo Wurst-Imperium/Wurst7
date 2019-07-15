@@ -7,17 +7,19 @@
  */
 package net.wurstclient.clickgui;
 
+import java.util.Objects;
+
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 
 public final class FeatureButton extends Component
 {
-	private static final ClickGui GUI = WurstClient.INSTANCE.getGui();
-	private static final TextRenderer TEXT_RENDERER =
-		WurstClient.MC.textRenderer;
+	private final MinecraftClient MC = WurstClient.MC;
+	private final ClickGui GUI = WurstClient.INSTANCE.getGui();
 	
 	private final Feature feature;
 	private final boolean hasSettings;
@@ -26,7 +28,7 @@ public final class FeatureButton extends Component
 	
 	public FeatureButton(Feature feature)
 	{
-		this.feature = feature;
+		this.feature = Objects.requireNonNull(feature);
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
 		hasSettings = !feature.getSettings().isEmpty();
@@ -234,12 +236,13 @@ public final class FeatureButton extends Component
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
+		TextRenderer tr = MC.textRenderer;
 		String name = feature.getName();
-		int nameWidth = TEXT_RENDERER.getStringWidth(name);
+		int nameWidth = tr.getStringWidth(name);
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		TEXT_RENDERER.draw(name, tx, ty, 0xF0F0F0);
+		tr.draw(name, tx, ty, 0xF0F0F0);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
@@ -248,7 +251,8 @@ public final class FeatureButton extends Component
 	public int getDefaultWidth()
 	{
 		String name = feature.getName();
-		int width = TEXT_RENDERER.getStringWidth(name) + 2;
+		TextRenderer tr = MC.textRenderer;
+		int width = tr.getStringWidth(name) + 2;
 		if(hasSettings)
 			width += 11;
 		

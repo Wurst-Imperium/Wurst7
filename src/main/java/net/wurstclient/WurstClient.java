@@ -127,8 +127,8 @@ public enum WurstClient
 	{
 		if(!guiInitialized)
 		{
-			gui.init();
 			guiInitialized = true;
+			gui.init();
 		}
 		
 		return gui;

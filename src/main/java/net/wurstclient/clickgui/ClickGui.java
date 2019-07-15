@@ -15,6 +15,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
@@ -27,10 +29,12 @@ import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.HackCategory;
 import net.wurstclient.hacks.ClickGuiHack;
+import net.wurstclient.settings.Setting;
 import net.wurstclient.util.json.JsonUtils;
 
 public final class ClickGui
 {
+	private static final WurstClient WURST = WurstClient.INSTANCE;
 	private static final MinecraftClient MC = WurstClient.MC;
 	
 	private final ArrayList<Window> windows = new ArrayList<>();
@@ -41,7 +45,7 @@ public final class ClickGui
 	private float[] acColor = new float[3];
 	private float opacity;
 	
-	private String tooltip;
+	private String tooltip = "";
 	
 	private boolean leftMouseButtonPressed;
 	
@@ -58,9 +62,9 @@ public final class ClickGui
 			windowMap.put(category, new Window(category.getName()));
 		
 		ArrayList<Feature> features = new ArrayList<>();
-		features.addAll(WurstClient.INSTANCE.getHax().getAllHax());
-		features.addAll(WurstClient.INSTANCE.getCmds().getAllCmds());
-		// features.addAll(WurstClient.INSTANCE.special.getAllFeatures());
+		features.addAll(WURST.getHax().getAllHax());
+		features.addAll(WURST.getCmds().getAllCmds());
+		// features.addAll(WURST.special.getAllFeatures());
 		
 		for(Feature f : features)
 			if(f.getCategory() != null)
@@ -69,9 +73,9 @@ public final class ClickGui
 		windows.addAll(windowMap.values());
 		
 		Window uiSettings = new Window("UI Settings");
-		// for(Setting setting : WurstClient.INSTANCE.getHax().clickGuiHack
-		// .getSettings())
-		// uiSettings.add(setting.getComponent());
+		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
+		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
+		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
 		windows.add(uiSettings);
 		
 		for(Window window : windows)
@@ -440,7 +444,7 @@ public final class ClickGui
 				break;
 			}
 		
-		tooltip = null;
+		tooltip = "";
 		for(Window window : windows)
 		{
 			if(window.isInvisible())
@@ -497,7 +501,7 @@ public final class ClickGui
 		}
 		
 		// tooltip
-		if(tooltip != null)
+		if(!tooltip.isEmpty())
 		{
 			String[] lines = tooltip.split("\n");
 			TextRenderer fr = MC.textRenderer;
@@ -566,7 +570,7 @@ public final class ClickGui
 	
 	public void updateColors()
 	{
-		ClickGuiHack clickGui = WurstClient.INSTANCE.getHax().clickGuiHack;
+		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
 		
 		opacity = clickGui.getOpacity();
 		bgColor = clickGui.getBgColor();
@@ -596,7 +600,7 @@ public final class ClickGui
 			y2 = y3;
 		
 		if(mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2)
-			tooltip = null;
+			tooltip = "";
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
@@ -1094,7 +1098,7 @@ public final class ClickGui
 	
 	public void setTooltip(String tooltip)
 	{
-		this.tooltip = tooltip;
+		this.tooltip = Objects.requireNonNull(tooltip);
 	}
 	
 	public void addWindow(Window window)
@@ -1105,5 +1109,10 @@ public final class ClickGui
 	public void addPopup(Popup popup)
 	{
 		popups.add(popup);
+	}
+	
+	public boolean isLeftMouseButtonPressed()
+	{
+		return leftMouseButtonPressed;
 	}
 }
