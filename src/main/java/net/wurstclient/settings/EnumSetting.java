@@ -74,7 +74,7 @@ public final class EnumSetting<T extends Enum> extends Setting
 	@Override
 	public Component getComponent()
 	{
-		return new ComboBoxComponent(this);
+		return new ComboBoxComponent<>(this);
 	}
 	
 	@Override

@@ -8,6 +8,8 @@
 package net.wurstclient.clickgui;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
@@ -15,22 +17,30 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
-public final class ComboBoxComponent extends Component
+public final class ComboBoxComponent<T extends Enum> extends Component
 {
-	private final EnumSetting setting;
+	private final ClickGui gui = WurstClient.INSTANCE.getGui();
+	private final TextRenderer tr = WurstClient.MC.textRenderer;
+	
+	private final EnumSetting<T> setting;
 	private final int popupWidth;
 	private ComboBoxPopup popup;
 	
-	public ComboBoxComponent(EnumSetting setting)
+	public ComboBoxComponent(EnumSetting<T> setting)
 	{
 		this.setting = setting;
-		
-		TextRenderer fr = WurstClient.MC.textRenderer;
-		popupWidth = Arrays.stream(setting.getValues())
-			.mapToInt(v -> fr.getStringWidth(v.toString())).max().getAsInt();
+		popupWidth = calculatePopupWitdh();
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
+	}
+	
+	private int calculatePopupWitdh()
+	{
+		Stream<T> values = Arrays.stream(setting.getValues());
+		Stream<String> vNames = values.map(T::toString);
+		IntStream vWidths = vNames.mapToInt(s -> tr.getStringWidth(s));
+		return vWidths.max().getAsInt();
 	}
 	
 	@Override
@@ -39,31 +49,48 @@ public final class ComboBoxComponent extends Component
 		if(mouseX < getX() + getWidth() - popupWidth - 15)
 			return;
 		
-		if(mouseButton == 0)
+		switch(mouseButton)
 		{
-			if(popup != null && !popup.isClosing())
-			{
-				popup.close();
-				popup = null;
-				return;
-			}
+			case 0:
+			handleLeftClick();
+			break;
 			
-			popup = new ComboBoxPopup(this);
-			ClickGui gui = WurstClient.INSTANCE.getGui();
-			gui.addPopup(popup);
-			
-		}else if(mouseButton == 1 && (popup == null || popup.isClosing()))
-			setting.setSelected(setting.getDefaultSelected().toString());
+			case 1:
+			handleRightClick();
+			break;
+		}
+	}
+	
+	private void handleLeftClick()
+	{
+		if(isPopupOpen())
+		{
+			popup.close();
+			popup = null;
+			return;
+		}
+		
+		popup = new ComboBoxPopup<>(this, setting, popupWidth);
+		gui.addPopup(popup);
+	}
+	
+	private void handleRightClick()
+	{
+		if(isPopupOpen())
+			return;
+		
+		T defaultSelected = setting.getDefaultSelected();
+		setting.setSelected(defaultSelected);
+	}
+	
+	private boolean isPopupOpen()
+	{
+		return popup != null && !popup.isClosing();
 	}
 	
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		float[] acColor = gui.getAcColor();
-		float opacity = gui.getOpacity();
-		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x2 - 11;
@@ -71,11 +98,7 @@ public final class ComboBoxComponent extends Component
 		int y1 = getY();
 		int y2 = y1 + getHeight();
 		
-		int scroll = getParent().isScrollingEnabled()
-			? getParent().getScrollOffset() : 0;
-		boolean hovering = mouseX >= x1 && mouseY >= y1 && mouseX < x2
-			&& mouseY < y2 && mouseY >= -scroll
-			&& mouseY < getParent().getHeight() - 13 - scroll;
+		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
 		boolean hText = hovering && mouseX < x4;
 		boolean hBox = hovering && mouseX >= x4;
 		
@@ -83,24 +106,57 @@ public final class ComboBoxComponent extends Component
 		if(hText)
 			gui.setTooltip(setting.getDescription());
 		
-		// background
+		drawBackground(x1, x4, y1, y2);
+		drawBox(x2, x4, y1, y2, hBox);
+		
+		drawSeparator(x3, y1, y2);
+		drawArrow(x2, x3, y1, y2, hBox);
+		
+		drawNameAndValue(x1, x4, y1);
+	}
+	
+	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
+		int y2)
+	{
+		Window parent = getParent();
+		boolean scrollEnabled = parent.isScrollingEnabled();
+		int scroll = scrollEnabled ? parent.getScrollOffset() : 0;
+		
+		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2
+			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
+	}
+	
+	private void drawBackground(int x1, int x4, int y1, int y2)
+	{
+		float[] bgColor = gui.getBgColor();
+		float opacity = gui.getOpacity();
 		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
 		GL11.glVertex2i(x4, y2);
 		GL11.glVertex2i(x4, y1);
 		GL11.glEnd();
+	}
+	
+	private void drawBox(int x2, int x4, int y1, int y2, boolean hBox)
+	{
+		float[] bgColor = gui.getBgColor();
+		float[] acColor = gui.getAcColor();
+		float opacity = gui.getOpacity();
 		
-		// box
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
-			hBox ? opacity * 1.5F : opacity);
+		// background
+		float bgAlpha = hBox ? opacity * 1.5F : opacity;
+		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], bgAlpha);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x4, y1);
 		GL11.glVertex2i(x4, y2);
 		GL11.glVertex2i(x2, y2);
 		GL11.glVertex2i(x2, y1);
 		GL11.glEnd();
+		
+		// outline
 		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x4, y1);
@@ -108,24 +164,30 @@ public final class ComboBoxComponent extends Component
 		GL11.glVertex2i(x2, y2);
 		GL11.glVertex2i(x2, y1);
 		GL11.glEnd();
-		
-		// separator
+	}
+	
+	private void drawSeparator(int x3, int y1, int y2)
+	{
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex2i(x3, y1);
 		GL11.glVertex2i(x3, y2);
 		GL11.glEnd();
-		
+	}
+	
+	private void drawArrow(int x2, int x3, int y1, int y2, boolean hBox)
+	{
 		double xa1 = x3 + 1;
 		double xa2 = (x3 + x2) / 2.0;
 		double xa3 = x2 - 1;
 		double ya1;
 		double ya2;
 		
-		if(popup != null && !popup.isClosing())
+		if(isPopupOpen())
 		{
 			ya1 = y2 - 3.5;
 			ya2 = y1 + 3;
 			GL11.glColor4f(hBox ? 1 : 0.85F, 0, 0, 1);
+			
 		}else
 		{
 			ya1 = y1 + 3.5;
@@ -147,135 +209,32 @@ public final class ComboBoxComponent extends Component
 		GL11.glVertex2d(xa3, ya1);
 		GL11.glVertex2d(xa2, ya2);
 		GL11.glEnd();
-		
-		// setting name
+	}
+	
+	private void drawNameAndValue(int x1, int x4, int y1)
+	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		TextRenderer fr = WurstClient.MC.textRenderer;
-		fr.draw(setting.getName(), x1, y1 + 2, 0xf0f0f0);
-		fr.draw(setting.getSelected().toString(), x4 + 2, y1 + 2, 0xf0f0f0);
+		
+		String name = setting.getName();
+		String value = "" + setting.getSelected();
+		int color = 0xF0F0F0;
+		
+		tr.draw(name, x1, y1 + 2, color);
+		tr.draw(value, x4 + 2, y1 + 2, color);
+		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		TextRenderer fr = WurstClient.MC.textRenderer;
-		return fr.getStringWidth(setting.getName()) + popupWidth + 17;
+		return tr.getStringWidth(setting.getName()) + popupWidth + 17;
 	}
 	
 	@Override
 	public int getDefaultHeight()
 	{
 		return 11;
-	}
-	
-	private static class ComboBoxPopup extends Popup
-	{
-		public ComboBoxPopup(ComboBoxComponent owner)
-		{
-			super(owner);
-			setWidth(getDefaultWidth());
-			setHeight(getDefaultHeight());
-			setX(owner.getWidth() - getWidth());
-			setY(owner.getHeight());
-		}
-		
-		@Override
-		public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
-		{
-			if(mouseButton != 0)
-				return;
-			
-			Enum[] values = ((ComboBoxComponent)getOwner()).setting.getValues();
-			int yi1 = getY() - 11;
-			for(Enum value : values)
-			{
-				if(value == ((ComboBoxComponent)getOwner()).setting
-					.getSelected())
-					continue;
-				
-				yi1 += 11;
-				int yi2 = yi1 + 11;
-				if(mouseY < yi1 || mouseY >= yi2)
-					continue;
-				
-				((ComboBoxComponent)getOwner()).setting
-					.setSelected(value.toString());
-				close();
-				break;
-			}
-		}
-		
-		@Override
-		public void render(int mouseX, int mouseY)
-		{
-			ClickGui gui = WurstClient.INSTANCE.getGui();
-			float[] bgColor = gui.getBgColor();
-			float[] acColor = gui.getAcColor();
-			float opacity = gui.getOpacity();
-			
-			int x1 = getX();
-			int x2 = x1 + getWidth();
-			int y1 = getY();
-			int y2 = y1 + getHeight();
-			
-			boolean hovering =
-				mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2;
-			if(hovering)
-				gui.setTooltip(null);
-			
-			// outline
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2i(x1, y1);
-			GL11.glVertex2i(x1, y2);
-			GL11.glVertex2i(x2, y2);
-			GL11.glVertex2i(x2, y1);
-			GL11.glEnd();
-			
-			Enum[] values = ((ComboBoxComponent)getOwner()).setting.getValues();
-			int yi1 = y1 - 11;
-			for(Enum value : values)
-			{
-				if(value == ((ComboBoxComponent)getOwner()).setting
-					.getSelected())
-					continue;
-				
-				yi1 += 11;
-				int yi2 = yi1 + 11;
-				boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
-				
-				// background
-				GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
-					hValue ? opacity * 1.5F : opacity);
-				GL11.glBegin(GL11.GL_QUADS);
-				GL11.glVertex2i(x1, yi1);
-				GL11.glVertex2i(x1, yi2);
-				GL11.glVertex2i(x2, yi2);
-				GL11.glVertex2i(x2, yi1);
-				GL11.glEnd();
-				
-				// value name
-				GL11.glColor4f(1, 1, 1, 1);
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				TextRenderer fr = WurstClient.MC.textRenderer;
-				fr.draw(value.toString(), x1 + 2, yi1 + 2, 0xf0f0f0);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-			}
-		}
-		
-		@Override
-		public int getDefaultWidth()
-		{
-			return ((ComboBoxComponent)getOwner()).popupWidth + 15;
-		}
-		
-		@Override
-		public int getDefaultHeight()
-		{
-			return (((ComboBoxComponent)getOwner()).setting.getValues().length
-				- 1) * 11;
-		}
 	}
 }
