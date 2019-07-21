@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+  	"BlockStateMixin",
   	"ChatHudMixin",
     "ClientPlayerEntityMixin",
     "GameRendererMixin",
