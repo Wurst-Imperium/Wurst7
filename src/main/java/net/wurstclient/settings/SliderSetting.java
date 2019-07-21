@@ -278,7 +278,7 @@ public class SliderSetting extends Setting implements SliderLock
 		public static final ValueDisplay PERCENTAGE =
 			v -> (int)(Math.round(v * 1e8) / 1e6) + "%";
 		
-		public static final ValueDisplay DEGREES = v -> (int)v + "°";
+		public static final ValueDisplay DEGREES = v -> (int)v + "\u00b0";
 		
 		public static final ValueDisplay NONE = v -> "";
 		
