@@ -17,12 +17,17 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.MovementType;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
+import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
+import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
+	implements IClientPlayerEntity
 {
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
 		GameProfile gameProfile_1)
@@ -48,5 +53,20 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
+	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
+	{
+		PlayerMoveEvent event = new PlayerMoveEvent(this);
+		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Override
+	public void setNoClip(boolean noClip)
+	{
+		this.noClip = noClip;
 	}
 }
