@@ -9,8 +9,8 @@ package net.wurstclient.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 public enum ChatUtils
@@ -35,19 +35,19 @@ public enum ChatUtils
 		ChatUtils.enabled = enabled;
 	}
 	
-	public static void component(Component component)
+	public static void component(Text component)
 	{
 		if(!enabled)
 			return;
 		
 		ChatHud chatHud = MC.inGameHud.getChatHud();
-		TextComponent prefix = new TextComponent(WURST_PREFIX);
+		LiteralText prefix = new LiteralText(WURST_PREFIX);
 		chatHud.addMessage(prefix.append(component));
 	}
 	
 	public static void message(String message)
 	{
-		component(new TextComponent(message));
+		component(new LiteralText(message));
 	}
 	
 	public static void warning(String message)

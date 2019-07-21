@@ -8,7 +8,7 @@
 package net.wurstclient.clickgui;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
 
 public final class ClickGuiScreen extends Screen
 {
@@ -16,7 +16,7 @@ public final class ClickGuiScreen extends Screen
 	
 	public ClickGuiScreen(ClickGui gui)
 	{
-		super(new TextComponent(""));
+		super(new LiteralText(""));
 		this.gui = gui;
 	}
 	

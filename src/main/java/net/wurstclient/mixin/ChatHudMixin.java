@@ -20,7 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
@@ -35,28 +35,27 @@ public class ChatHudMixin extends DrawableHelper
 	private MinecraftClient client;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/network/chat/Component;I)V",
+		method = "addMessage(Lnet/minecraft/text/Text;I)V",
 		cancellable = true)
-	private void onAddMessage(Component chatComponent, int chatLineId,
-		CallbackInfo ci)
+	private void onAddMessage(Text chatText, int chatLineId, CallbackInfo ci)
 	{
-		ChatInputEvent event = new ChatInputEvent(chatComponent, messages);
+		ChatInputEvent event = new ChatInputEvent(chatText, messages);
 		
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		if(event.isCancelled())
 			ci.cancel();
 		
-		chatComponent = event.getComponent();
-		shadow$addMessage(chatComponent, chatLineId,
-			client.inGameHud.getTicks(), false);
+		chatText = event.getComponent();
+		shadow$addMessage(chatText, chatLineId, client.inGameHud.getTicks(),
+			false);
 		
-		LOGGER.info("[CHAT] {}", chatComponent.getString()
-			.replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n"));
+		LOGGER.info("[CHAT] {}", chatText.getString().replaceAll("\r", "\\\\r")
+			.replaceAll("\n", "\\\\n"));
 		ci.cancel();
 	}
 	
 	@Shadow
-	private void shadow$addMessage(Component component_1, int int_1, int int_2,
+	private void shadow$addMessage(Text text_1, int int_1, int int_2,
 		boolean boolean_1)
 	{
 		

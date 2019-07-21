@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
@@ -22,21 +22,21 @@ public interface ChatInputListener extends Listener
 	public static class ChatInputEvent
 		extends CancellableEvent<ChatInputListener>
 	{
-		private Component component;
+		private Text component;
 		private List<ChatHudLine> chatLines;
 		
-		public ChatInputEvent(Component component, List<ChatHudLine> chatLines)
+		public ChatInputEvent(Text component, List<ChatHudLine> chatLines)
 		{
 			this.component = component;
 			this.chatLines = chatLines;
 		}
 		
-		public Component getComponent()
+		public Text getComponent()
 		{
 			return component;
 		}
 		
-		public void setComponent(Component component)
+		public void setComponent(Text component)
 		{
 			this.component = component;
 		}
