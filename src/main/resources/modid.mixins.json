@@ -11,6 +11,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "GameRendererMixin",
+    "KeyBindingMixin",
     "KeyboardMixin"
   ],
   "injectors": {
