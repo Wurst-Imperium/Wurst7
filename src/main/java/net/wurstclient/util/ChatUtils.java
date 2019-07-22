@@ -26,7 +26,7 @@ public enum ChatUtils
 	private static final String ERROR_PREFIX =
 		"\u00a7c[\u00a74\u00a7lERROR\u00a7c]\u00a7r ";
 	private static final String SYNTAX_ERROR_PREFIX =
-		"\\u00a74Syntax error:\\u00a7r ";
+		"\u00a74Syntax error:\u00a7r ";
 	
 	private static boolean enabled = true;
 	
