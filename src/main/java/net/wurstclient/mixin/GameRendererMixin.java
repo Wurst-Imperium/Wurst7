@@ -10,13 +10,16 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
+import net.wurstclient.events.RenderListener.RenderEvent;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin
@@ -38,6 +41,17 @@ public class GameRendererMixin
 			return;
 		
 		bobView(partalTicks);
+	}
+	
+	@Inject(at = {@At(value = "INVOKE_STRING",
+		target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+		ordinal = 15,
+		args = {"ldc=hand"})}, method = {"renderCenter(FJ)V"})
+	private void onRenderCenter(float partialTicks, long finishTimeNano,
+		CallbackInfo ci)
+	{
+		RenderEvent event = new RenderEvent(partialTicks);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
 	@Shadow
