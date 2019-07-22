@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.hacks.ClickGuiHack;
+import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.hacks.NoFallHack;
 
 public final class HackList
@@ -77,7 +78,7 @@ public final class HackList
 	// public final FollowHack followHack = new FollowHack();
 	// public final ForceOpHack forceOpHack = new ForceOpHack();
 	// public final ForcePushHack forcePushHack = new ForcePushHack();
-	// public final FreecamHack freecamHack = new FreecamHack();
+	public final FreecamHack freecamHack = new FreecamHack();
 	// public final FullbrightHack fullbrightHack = new FullbrightHack();
 	// public final GhostHandHack ghostHandHack = new GhostHandHack();
 	// public final GlideHack glideHack = new GlideHack();
