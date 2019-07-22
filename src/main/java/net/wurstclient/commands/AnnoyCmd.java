@@ -39,7 +39,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		}else
 		{
 			if(!enabled)
-				throw new CmdError(this, ".annoy is already turned off.");
+				throw new CmdError(".annoy is already turned off.");
 			
 			disable();
 		}
@@ -48,7 +48,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	private void enable(String[] args) throws CmdException
 	{
 		if(args.length < 1)
-			throw new CmdSyntaxError(this);
+			throw new CmdSyntaxError();
 		
 		target = String.join(" ", args);
 		ChatUtils.message("Now annoying " + target + ".");

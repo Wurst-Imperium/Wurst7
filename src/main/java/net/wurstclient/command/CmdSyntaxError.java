@@ -11,18 +11,18 @@ import net.wurstclient.util.ChatUtils;
 
 public final class CmdSyntaxError extends CmdException
 {
-	public CmdSyntaxError(Command cmd)
+	public CmdSyntaxError()
 	{
-		super(cmd);
+		super();
 	}
 	
-	public CmdSyntaxError(Command cmd, String message)
+	public CmdSyntaxError(String message)
 	{
-		super(cmd, message);
+		super(message);
 	}
 	
 	@Override
-	public void printToChat()
+	public void printToChat(Command cmd)
 	{
 		String message = getMessage();
 		if(message != null)

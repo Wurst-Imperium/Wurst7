@@ -28,17 +28,17 @@ public final class AuthorCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		if(args.length == 0)
-			throw new CmdSyntaxError(this);
+			throw new CmdSyntaxError();
 		
 		if(!MC.player.abilities.creativeMode)
-			throw new CmdError(this, "Creative mode only.");
+			throw new CmdError("Creative mode only.");
 		
 		ItemStack heldItem = MC.player.inventory.getMainHandStack();
 		int heldItemID = Item.getRawId(heldItem.getItem());
 		int writtenBookID = Item.getRawId(Items.WRITTEN_BOOK);
 		
 		if(heldItemID != writtenBookID)
-			throw new CmdError(this,
+			throw new CmdError(
 				"You must hold a written book in your main hand.");
 		
 		String author = String.join(" ", args);

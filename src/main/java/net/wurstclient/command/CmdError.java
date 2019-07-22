@@ -11,13 +11,13 @@ import net.wurstclient.util.ChatUtils;
 
 public final class CmdError extends CmdException
 {
-	public CmdError(Command cmd, String message)
+	public CmdError(String message)
 	{
-		super(cmd, message);
+		super(message);
 	}
 	
 	@Override
-	public void printToChat()
+	public void printToChat(Command cmd)
 	{
 		ChatUtils.error(getMessage());
 	}

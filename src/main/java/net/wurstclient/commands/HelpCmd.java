@@ -29,7 +29,7 @@ public final class HelpCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		if(args.length > 1)
-			throw new CmdSyntaxError(this);
+			throw new CmdSyntaxError();
 		
 		String arg = args.length > 0 ? args[0] : "1";
 		
@@ -46,7 +46,7 @@ public final class HelpCmd extends Command
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
-			throw new CmdSyntaxError(this, "Invalid page: " + page);
+			throw new CmdSyntaxError("Invalid page: " + page);
 		
 		String total = "Total: " + cmds.size() + " command";
 		total += cmds.size() != 1 ? "s" : "";
@@ -67,7 +67,7 @@ public final class HelpCmd extends Command
 		
 		Command cmd = WURST.getCmds().getCmdByName(cmdName);
 		if(cmd == null)
-			throw new CmdSyntaxError(this, "Unknown command: ." + cmdName);
+			throw new CmdSyntaxError("Unknown command: ." + cmdName);
 		
 		ChatUtils.message("Available help for ." + cmdName + ":");
 		cmd.printHelp();

@@ -9,19 +9,15 @@ package net.wurstclient.command;
 
 public abstract class CmdException extends Exception
 {
-	protected final Command cmd;
-	
-	public CmdException(Command cmd)
+	public CmdException()
 	{
 		super();
-		this.cmd = cmd;
 	}
 	
-	public CmdException(Command cmd, String message)
+	public CmdException(String message)
 	{
 		super(message);
-		this.cmd = cmd;
 	}
 	
-	public abstract void printToChat();
+	public abstract void printToChat(Command cmd);
 }

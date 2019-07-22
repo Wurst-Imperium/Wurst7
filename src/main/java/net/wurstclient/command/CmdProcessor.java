@@ -74,7 +74,7 @@ public final class CmdProcessor implements ChatOutputListener
 			
 		}catch(CmdException e)
 		{
-			e.printToChat();
+			e.printToChat(cmd);
 			
 		}catch(Throwable e)
 		{
