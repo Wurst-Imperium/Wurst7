@@ -51,4 +51,10 @@ public class Keybind implements Comparable<Keybind>
 	{
 		return key.hashCode();
 	}
+	
+	@Override
+	public String toString()
+	{
+		return key.replace("key.keyboard.", "") + " -> " + commands;
+	}
 }

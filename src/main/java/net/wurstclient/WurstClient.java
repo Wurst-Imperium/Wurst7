@@ -32,9 +32,10 @@ public enum WurstClient
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
-	private SettingsFile settingsFile;
 	private HackList hax;
 	private CmdList cmds;
+	private SettingsFile settingsFile;
+	private KeybindList keybinds;
 	private ClickGui gui;
 	
 	private boolean enabled = true;
@@ -64,7 +65,7 @@ public enum WurstClient
 		this.settingsFile.load();
 		
 		Path keybindsFile = wurstFolder.resolve("keybinds.json");
-		KeybindList keybinds = new KeybindList(keybindsFile);
+		keybinds = new KeybindList(keybindsFile);
 		
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);
@@ -121,6 +122,11 @@ public enum WurstClient
 	public CmdList getCmds()
 	{
 		return cmds;
+	}
+	
+	public KeybindList getKeybinds()
+	{
+		return keybinds;
 	}
 	
 	public ClickGui getGui()
