@@ -178,7 +178,7 @@ public final class CheckboxComponent extends Component
 		
 		String name = setting.getName();
 		int tx = x3 + 2;
-		int ty = y1 - 1;
+		int ty = y1 + 2;
 		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
 		MC.textRenderer.draw(name, tx, ty, color);
 		
