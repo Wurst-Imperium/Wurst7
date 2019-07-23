@@ -16,6 +16,7 @@ import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.commands.AnnoyCmd;
 import net.wurstclient.commands.AuthorCmd;
 import net.wurstclient.commands.BindsCmd;
+import net.wurstclient.commands.ClearCmd;
 import net.wurstclient.commands.HelpCmd;
 
 public final class CmdList
@@ -25,7 +26,7 @@ public final class CmdList
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
 	// public final BlinkCmd blinkCmd = new BlinkCmd();
-	// public final ClearCmd clearCmd = new ClearCmd();
+	public final ClearCmd clearCmd = new ClearCmd();
 	// public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	// public final DamageCmd damageCmd = new DamageCmd();
 	// public final DropCmd dropCmd = new DropCmd();
