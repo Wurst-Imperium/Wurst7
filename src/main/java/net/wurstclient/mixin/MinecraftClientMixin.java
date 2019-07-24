@@ -23,6 +23,9 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	implements SnooperListener, WindowEventHandler, AutoCloseable,
 	IMinecraftClient
 {
+	@Shadow
+	private int itemUseCooldown;
+	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
 		super(string_1);
@@ -32,6 +35,12 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	public void rightClick()
 	{
 		doItemUse();
+	}
+	
+	@Override
+	public void setItemUseCooldown(int itemUseCooldown)
+	{
+		this.itemUseCooldown = itemUseCooldown;
 	}
 	
 	@Shadow

@@ -10,4 +10,6 @@ package net.wurstclient.mixinterface;
 public interface IMinecraftClient
 {
 	public void rightClick();
+	
+	public void setItemUseCooldown(int itemUseCooldown);
 }

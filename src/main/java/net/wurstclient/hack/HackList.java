@@ -17,6 +17,7 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.hacks.AutoFishHack;
 import net.wurstclient.hacks.ClickGuiHack;
+import net.wurstclient.hacks.FastPlaceHack;
 import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.hacks.NoFallHack;
@@ -74,7 +75,7 @@ public final class HackList
 	// public final FastBowHack fastBowHack = new FastBowHack();
 	// public final FastEatHack fastEatHack = new FastEatHack();
 	// public final FastLadderHack fastLadderHack = new FastLadderHack();
-	// public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
+	public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
 	// public final FightBotHack fightBotHack = new FightBotHack();
 	// public final FlightHack flightHack = new FlightHack();
 	// public final FollowHack followHack = new FollowHack();
