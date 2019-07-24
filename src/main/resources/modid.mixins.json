@@ -13,7 +13,8 @@
     "ClientPlayNetworkHandlerMixin",
     "GameRendererMixin",
     "KeyBindingMixin",
-    "KeyboardMixin"
+    "KeyboardMixin",
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -12,12 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraft.client.MinecraftClient;
+import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.Setting;
 
 public abstract class Feature
 {
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	private final LinkedHashMap<String, Setting> settings =
 		new LinkedHashMap<>();

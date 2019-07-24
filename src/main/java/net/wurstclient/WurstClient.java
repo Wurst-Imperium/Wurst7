@@ -22,12 +22,14 @@ import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
+import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.SettingsFile;
 
 public enum WurstClient
 {
 	INSTANCE;
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
+	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	public static final String VERSION = "7.0";
 	
 	private WurstAnalytics analytics;
