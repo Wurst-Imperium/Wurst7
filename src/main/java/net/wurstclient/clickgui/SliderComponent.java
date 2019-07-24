@@ -270,8 +270,8 @@ public final class SliderComponent extends Component
 		String value = setting.getValueString();
 		int valueWidth = tr.getStringWidth(value);
 		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
-		tr.draw(name, x1, y1 - 1, color);
-		tr.draw(value, x2 - valueWidth, y1 - 1, color);
+		tr.draw(name, x1, y1 + 2, color);
+		tr.draw(value, x2 - valueWidth, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
