@@ -20,6 +20,7 @@ import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.hacks.FastPlaceHack;
 import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.hacks.FullbrightHack;
+import net.wurstclient.hacks.MobSpawnEspHack;
 import net.wurstclient.hacks.NoFallHack;
 
 public final class HackList
@@ -107,7 +108,7 @@ public final class HackList
 	// public final MassTpaHack massTpaHack = new MassTpaHack();
 	// public final MileyCyrusHack mileyCyrusHack = new MileyCyrusHack();
 	// public final MobEspHack mobEspHack = new MobEspHack();
-	// public final MobSpawnEspHack mobSpawnEspHack = new MobSpawnEspHack();
+	public final MobSpawnEspHack mobSpawnEspHack = new MobSpawnEspHack();
 	// public final MultiAuraHack multiAuraHack = new MultiAuraHack();
 	// public final NameProtectHack nameProtectHack = new NameProtectHack();
 	// public final NameTagsHack nameTagsHack = new NameTagsHack();

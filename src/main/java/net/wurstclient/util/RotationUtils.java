@@ -14,6 +14,14 @@ import net.wurstclient.WurstClient;
 
 public class RotationUtils
 {
+	public static Vec3d getEyesPos()
+	{
+		ClientPlayerEntity player = WurstClient.MC.player;
+		
+		return new Vec3d(player.x,
+			player.y + player.getEyeHeight(player.getPose()), player.z);
+	}
+	
 	public static Vec3d getClientLookVec()
 	{
 		ClientPlayerEntity player = WurstClient.MC.player;
