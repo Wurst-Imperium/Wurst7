@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.hacks.AutoFishHack;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.hacks.FullbrightHack;
@@ -35,7 +36,7 @@ public final class HackList
 	// public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
 	// public final AutoEatHack autoEatHack = new AutoEatHack();
 	// public final AutoFarmHack autoFarmHack = new AutoFarmHack();
-	// public final AutoFishHack autoFishHack = new AutoFishHack();
+	public final AutoFishHack autoFishHack = new AutoFishHack();
 	// public final AutoMineHack autoMineHack = new AutoMineHack();
 	// public final AutoRespawnHack autoRespawnHack = new AutoRespawnHack();
 	// public final AutoSignHack autoSignHack = new AutoSignHack();
