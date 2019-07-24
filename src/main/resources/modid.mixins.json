@@ -8,6 +8,7 @@
   	"BlockStateMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
+  	"ClientConnectionMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "GameRendererMixin",
