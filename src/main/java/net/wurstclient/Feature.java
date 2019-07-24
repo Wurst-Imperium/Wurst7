@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraft.client.MinecraftClient;
-import net.wurstclient.hack.HackCategory;
 import net.wurstclient.settings.Setting;
 
 public abstract class Feature
@@ -27,7 +26,7 @@ public abstract class Feature
 	
 	public abstract String getDescription();
 	
-	public HackCategory getCategory()
+	public Category getCategory()
 	{
 		return null;
 	}

@@ -25,9 +25,9 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
-import net.wurstclient.hack.HackCategory;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.json.JsonUtils;
@@ -57,8 +57,8 @@ public final class ClickGui
 	// TODO
 	public void init()
 	{
-		LinkedHashMap<HackCategory, Window> windowMap = new LinkedHashMap<>();
-		for(HackCategory category : HackCategory.values())
+		LinkedHashMap<Category, Window> windowMap = new LinkedHashMap<>();
+		for(Category category : Category.values())
 			windowMap.put(category, new Window(category.getName()));
 		
 		ArrayList<Feature> features = new ArrayList<>();

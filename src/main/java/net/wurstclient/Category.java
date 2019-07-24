@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2014 - 2018 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.hack;
+package net.wurstclient;
 
-public enum HackCategory
+public enum Category
 {
 	BLOCKS("Blocks"),
 	MOVEMENT("Movement"),
@@ -20,7 +20,7 @@ public enum HackCategory
 	
 	private final String name;
 	
-	private HackCategory(String name)
+	private Category(String name)
 	{
 		this.name = name;
 	}

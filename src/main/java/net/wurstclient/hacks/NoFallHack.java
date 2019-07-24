@@ -9,16 +9,16 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackCategory;
 
 public final class NoFallHack extends Hack implements UpdateListener
 {
 	public NoFallHack()
 	{
 		super("NoFall", "Protects you from fall damage.");
-		setCategory(HackCategory.MOVEMENT);
+		setCategory(Category.MOVEMENT);
 	}
 	
 	@Override

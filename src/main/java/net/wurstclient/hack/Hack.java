@@ -9,13 +9,14 @@ package net.wurstclient.hack;
 
 import java.util.Objects;
 
+import net.wurstclient.Category;
 import net.wurstclient.Feature;
 
 public abstract class Hack extends Feature
 {
 	private final String name;
 	private final String description;
-	private HackCategory category;
+	private Category category;
 	
 	private boolean enabled;
 	private final boolean stateSaved =
@@ -45,12 +46,12 @@ public abstract class Hack extends Feature
 	}
 	
 	@Override
-	public final HackCategory getCategory()
+	public final Category getCategory()
 	{
 		return category;
 	}
 	
-	protected final void setCategory(HackCategory category)
+	protected final void setCategory(Category category)
 	{
 		this.category = category;
 	}

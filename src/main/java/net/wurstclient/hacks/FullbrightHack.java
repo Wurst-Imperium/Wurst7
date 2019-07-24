@@ -8,9 +8,9 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.options.GameOptions;
+import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackCategory;
 import net.wurstclient.settings.CheckboxSetting;
 
 public final class FullbrightHack extends Hack implements UpdateListener
@@ -20,7 +20,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	public FullbrightHack()
 	{
 		super("Fullbright", "Allows you to see in the dark.");
-		setCategory(HackCategory.RENDER);
+		setCategory(Category.RENDER);
 		addSetting(fade);
 		
 		WURST.getEventManager().add(UpdateListener.class, this);

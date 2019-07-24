@@ -15,6 +15,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PacketOutputListener;
@@ -24,7 +25,6 @@ import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackCategory;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
@@ -52,7 +52,7 @@ public final class FreecamHack extends Hack
 	{
 		super("Freecam",
 			"Allows you to move the camera without moving your character.");
-		setCategory(HackCategory.RENDER);
+		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
 	}
