@@ -178,9 +178,7 @@ public final class FreecamHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		GL11.glPushMatrix();
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		RenderUtils.applyRenderOffset();
 		
 		GL11.glColor4f(1, 1, 1, 0.5F);
 		

@@ -29,7 +29,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
 import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
 import net.minecraft.util.math.BlockPos;
@@ -43,6 +42,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
@@ -224,9 +224,7 @@ public final class MobSpawnEspHack extends Hack
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		
 		GL11.glPushMatrix();
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		RenderUtils.applyRenderOffset();
 		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{

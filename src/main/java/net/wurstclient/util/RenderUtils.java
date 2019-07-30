@@ -9,6 +9,7 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -29,6 +30,13 @@ public class RenderUtils
 		int scissorWidth = (int)(width * factor);
 		int scissorHeight = (int)(height * factor);
 		GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+	}
+	
+	public static void applyRenderOffset()
+	{
+		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
+			-BlockEntityRenderDispatcher.renderOffsetY,
+			-BlockEntityRenderDispatcher.renderOffsetZ);
 	}
 	
 	public static void drawSolidBox()

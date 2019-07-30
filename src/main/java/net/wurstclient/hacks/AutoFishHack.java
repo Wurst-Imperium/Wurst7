@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.packet.PlaySoundS2CPacket;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
@@ -235,9 +234,7 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		GL11.glPushMatrix();
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		RenderUtils.applyRenderOffset();
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
