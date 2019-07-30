@@ -36,6 +36,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -44,6 +45,8 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RotationUtils;
 
+@SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
+	"LightLevelOverlay", "light level overlay"})
 public final class MobSpawnEspHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {

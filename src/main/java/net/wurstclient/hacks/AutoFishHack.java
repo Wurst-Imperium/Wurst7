@@ -22,6 +22,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -35,6 +36,7 @@ import net.wurstclient.util.InteractionManager;
 import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
+@SearchTags({"FishBot", "auto fish", "fish bot", "fishing"})
 public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {

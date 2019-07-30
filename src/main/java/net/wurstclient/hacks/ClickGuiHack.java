@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.ClickGuiScreen;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
@@ -14,6 +15,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @DontSaveState
+@SearchTags({"click gui", "WindowGUI", "window gui", "HackMenu", "hack menu"})
 public final class ClickGuiHack extends Hack
 {
 	private final SliderSetting opacity = new SliderSetting("Opacity", 0.5,

@@ -9,10 +9,12 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.options.GameOptions;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 
+@SearchTags({"NightVision", "full bright", "brightness", "night vision"})
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting fade = new CheckboxSetting("Fade", true);

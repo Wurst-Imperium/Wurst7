@@ -8,9 +8,11 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
+@SearchTags({"fast place"})
 public final class FastPlaceHack extends Hack implements UpdateListener
 {
 	public FastPlaceHack()

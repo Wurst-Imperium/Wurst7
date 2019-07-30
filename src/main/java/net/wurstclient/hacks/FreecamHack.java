@@ -16,6 +16,7 @@ import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PacketOutputListener;
@@ -35,6 +36,7 @@ import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @DontSaveState
+@SearchTags({"free camera", "spectator"})
 public final class FreecamHack extends Hack
 	implements UpdateListener, PacketOutputListener, PlayerMoveListener,
 	CameraTransformViewBobbingListener, IsNormalCubeListener,
