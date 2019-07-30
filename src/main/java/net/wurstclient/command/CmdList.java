@@ -18,6 +18,7 @@ import net.wurstclient.commands.AuthorCmd;
 import net.wurstclient.commands.BindsCmd;
 import net.wurstclient.commands.ClearCmd;
 import net.wurstclient.commands.HelpCmd;
+import net.wurstclient.commands.SayCmd;
 
 public final class CmdList
 {
@@ -55,7 +56,7 @@ public final class CmdList
 	// public final RepairCmd repairCmd = new RepairCmd();
 	// public final RvCmd rvCmd = new RvCmd();
 	// public final SvCmd svCmd = new SvCmd();
-	// public final SayCmd sayCmd = new SayCmd();
+	public final SayCmd sayCmd = new SayCmd();
 	// public final SearchCmd searchCmd = new SearchCmd();
 	// public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
 	// public final SetModeCmd setModeCmd = new SetModeCmd();

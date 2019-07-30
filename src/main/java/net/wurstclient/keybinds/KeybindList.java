@@ -81,7 +81,7 @@ public final class KeybindList
 		addKB(set, "c", "fullbright");
 		addKB(set, "g", "flight");
 		addKB(set, "semicolon", "speednuker");
-		addKB(set, "h", "/home");
+		addKB(set, "h", "say /home");
 		addKB(set, "j", "jesus");
 		addKB(set, "k", "multiaura");
 		addKB(set, "n", "nuker");
