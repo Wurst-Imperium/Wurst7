@@ -9,6 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
@@ -17,6 +20,7 @@ import net.minecraft.util.NonBlockingThreadExecutor;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
 import net.wurstclient.WurstClient;
+import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
@@ -33,6 +37,18 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
 		super(string_1);
+	}
+	
+	@Inject(at = {@At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;hitResult:Lnet/minecraft/util/hit/HitResult;",
+		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
+	private void onDoAttack(CallbackInfo ci)
+	{
+		LeftClickEvent event = new LeftClickEvent();
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		
+		if(event.isCancelled())
+			ci.cancel();
 	}
 	
 	@Override
