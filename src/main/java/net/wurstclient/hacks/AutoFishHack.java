@@ -31,7 +31,6 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.InteractionManager;
 import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
@@ -121,7 +120,7 @@ public final class AutoFishHack extends Hack
 		
 		if(timer < 0)
 		{
-			InteractionManager.windowClick_PICKUP(-timer);
+			IMC.getInteractionManager().windowClick_PICKUP(-timer);
 			timer = 15;
 			return;
 		}
@@ -177,15 +176,16 @@ public final class AutoFishHack extends Hack
 		if(firstEmptySlot != -1)
 		{
 			if(firstEmptySlot >= 9)
-				InteractionManager
+				IMC.getInteractionManager()
 					.windowClick_QUICK_MOVE(36 + inventory.selectedSlot);
 			
-			InteractionManager.windowClick_QUICK_MOVE(bestRodSlot);
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(bestRodSlot);
 			
 		}else
 		{
-			InteractionManager.windowClick_PICKUP(bestRodSlot);
-			InteractionManager.windowClick_PICKUP(36 + inventory.selectedSlot);
+			IMC.getInteractionManager().windowClick_PICKUP(bestRodSlot);
+			IMC.getInteractionManager()
+				.windowClick_PICKUP(36 + inventory.selectedSlot);
 			timer = -bestRodSlot;
 		}
 	}

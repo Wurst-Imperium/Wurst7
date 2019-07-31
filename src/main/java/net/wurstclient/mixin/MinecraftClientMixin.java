@@ -12,10 +12,12 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.util.NonBlockingThreadExecutor;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(MinecraftClient.class)
@@ -25,6 +27,8 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 {
 	@Shadow
 	private int itemUseCooldown;
+	@Shadow
+	public ClientPlayerInteractionManager interactionManager;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -41,6 +45,12 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	public void setItemUseCooldown(int itemUseCooldown)
 	{
 		this.itemUseCooldown = itemUseCooldown;
+	}
+	
+	@Override
+	public IClientPlayerInteractionManager getInteractionManager()
+	{
+		return (IClientPlayerInteractionManager)interactionManager;
 	}
 	
 	@Shadow

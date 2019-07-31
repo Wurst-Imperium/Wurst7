@@ -10,6 +10,7 @@
   	"ChunkOcclusionGraphBuilderMixin",
   	"ClientConnectionMixin",
     "ClientPlayerEntityMixin",
+    "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "GameRendererMixin",
     "KeyBindingMixin",
