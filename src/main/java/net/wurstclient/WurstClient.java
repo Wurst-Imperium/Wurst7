@@ -19,6 +19,8 @@ import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.KeyPressListener;
+import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
@@ -39,6 +41,7 @@ public enum WurstClient
 	private SettingsFile settingsFile;
 	private KeybindList keybinds;
 	private ClickGui gui;
+	private RotationFaker rotationFaker;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
@@ -78,6 +81,10 @@ public enum WurstClient
 		KeybindProcessor keybindProcessor =
 			new KeybindProcessor(hax, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
+		
+		rotationFaker = new RotationFaker();
+		eventManager.add(PreMotionListener.class, rotationFaker);
+		eventManager.add(PostMotionListener.class, rotationFaker);
 		
 		analytics.trackPageView("/mc1.14.2/v" + VERSION,
 			"Wurst " + VERSION + " MC1.14.2");
@@ -140,6 +147,11 @@ public enum WurstClient
 		}
 		
 		return gui;
+	}
+	
+	public RotationFaker getRotationFaker()
+	{
+		return rotationFaker;
 	}
 	
 	public boolean isEnabled()

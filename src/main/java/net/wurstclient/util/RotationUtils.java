@@ -35,4 +35,42 @@ public class RotationUtils
 		
 		return new Vec3d(f2 * f3, f4, f1 * f3);
 	}
+	
+	public static Rotation getNeededRotations(Vec3d vec)
+	{
+		Vec3d eyesPos = getEyesPos();
+		
+		double diffX = vec.x - eyesPos.x;
+		double diffY = vec.y - eyesPos.y;
+		double diffZ = vec.z - eyesPos.z;
+		
+		double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
+		
+		float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F;
+		float pitch = (float)-Math.toDegrees(Math.atan2(diffY, diffXZ));
+		
+		return new Rotation(yaw, pitch);
+	}
+	
+	public static final class Rotation
+	{
+		private final float yaw;
+		private final float pitch;
+		
+		public Rotation(float yaw, float pitch)
+		{
+			this.yaw = MathHelper.wrapDegrees(yaw);
+			this.pitch = MathHelper.wrapDegrees(pitch);
+		}
+		
+		public float getYaw()
+		{
+			return yaw;
+		}
+		
+		public float getPitch()
+		{
+			return pitch;
+		}
+	}
 }
