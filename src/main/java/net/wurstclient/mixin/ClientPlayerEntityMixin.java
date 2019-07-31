@@ -22,6 +22,8 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
+import net.wurstclient.events.PostMotionListener.PostMotionEvent;
+import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
@@ -53,6 +55,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
+	}
+	
+	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
+	private void onSendMovementPacketsHEAD(CallbackInfo ci)
+	{
+		WurstClient.INSTANCE.getEventManager().fire(PreMotionEvent.INSTANCE);
+	}
+	
+	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
+	private void onSendMovementPacketsTAIL(CallbackInfo ci)
+	{
+		WurstClient.INSTANCE.getEventManager().fire(PostMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = {@At("HEAD")},
