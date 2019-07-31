@@ -133,6 +133,9 @@ public final class MobSpawnEspHack extends Hack
 				&& Math.abs(scanner.chunk.getPos().z - chunkZ) <= chunkRange)
 				continue;
 			
+			if(!scanner.doneCompiling)
+				continue;
+			
 			if(scanner.displayList != 0)
 				GL11.glDeleteLists(scanner.displayList, 1);
 			
