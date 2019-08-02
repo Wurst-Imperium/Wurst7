@@ -21,18 +21,22 @@ import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
+import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.SettingsFile;
+import net.wurstclient.update.WurstUpdater;
 
 public enum WurstClient
 {
 	INSTANCE;
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
+	
 	public static final String VERSION = "7.0";
+	public static final String MC_VERSION = "1.14.4";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -86,8 +90,11 @@ public enum WurstClient
 		eventManager.add(PreMotionListener.class, rotationFaker);
 		eventManager.add(PostMotionListener.class, rotationFaker);
 		
-		analytics.trackPageView("/mc1.14.2/v" + VERSION,
-			"Wurst " + VERSION + " MC1.14.2");
+		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class,
+			new WurstUpdater());
+		
+		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
+			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
 	
 	private Path createWurstFolder()
