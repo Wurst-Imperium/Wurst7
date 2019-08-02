@@ -59,7 +59,7 @@ public final class SettingsFile
 	{
 		try
 		{
-			WsonObject wson = JsonUtils.parseWsonObject(path);
+			WsonObject wson = JsonUtils.parseFileToObject(path);
 			loadSettings(wson);
 			
 		}catch(NoSuchFileException e)

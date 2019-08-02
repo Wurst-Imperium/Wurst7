@@ -10,10 +10,18 @@ package net.wurstclient.util.json;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 public enum JsonUtils
 {
@@ -26,7 +34,8 @@ public enum JsonUtils
 	
 	public static final JsonParser JSON_PARSER = new JsonParser();
 	
-	public static JsonElement parse(Path path) throws IOException, JsonException
+	public static JsonElement parseFile(Path path)
+		throws IOException, JsonException
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
@@ -38,38 +47,64 @@ public enum JsonUtils
 		}
 	}
 	
-	public static JsonArray parseJsonArray(Path path)
+	public static JsonElement parseURL(String url)
 		throws IOException, JsonException
 	{
-		JsonElement json = parse(path);
+		URI uri = URI.create(url);
+		try(InputStream input = uri.toURL().openStream())
+		{
+			InputStreamReader reader = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			return new JsonParser().parse(bufferedReader);
+			
+		}catch(JsonParseException e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	public static WsonArray parseFileToArray(Path path)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseFile(path);
 		
 		if(!json.isJsonArray())
 			throw new JsonException();
 		
-		return json.getAsJsonArray();
+		return new WsonArray(json.getAsJsonArray());
 	}
 	
-	public static WsonArray parseWsonArray(Path path)
+	public static WsonArray parseURLToArray(String url)
 		throws IOException, JsonException
 	{
-		return new WsonArray(parseJsonArray(path));
+		JsonElement json = parseURL(url);
+		
+		if(!json.isJsonArray())
+			throw new JsonException();
+		
+		return new WsonArray(json.getAsJsonArray());
 	}
 	
-	public static JsonObject parseJsonObject(Path path)
+	public static WsonObject parseFileToObject(Path path)
 		throws IOException, JsonException
 	{
-		JsonElement json = parse(path);
+		JsonElement json = parseFile(path);
 		
 		if(!json.isJsonObject())
 			throw new JsonException();
 		
-		return json.getAsJsonObject();
+		return new WsonObject(json.getAsJsonObject());
 	}
 	
-	public static WsonObject parseWsonObject(Path path)
+	public static WsonObject parseURLToObject(String url)
 		throws IOException, JsonException
 	{
-		return new WsonObject(parseJsonObject(path));
+		JsonElement json = parseURL(url);
+		
+		if(!json.isJsonObject())
+			throw new JsonException();
+		
+		return new WsonObject(json.getAsJsonObject());
 	}
 	
 	public static void toJson(JsonElement json, Path path)
@@ -111,15 +146,6 @@ public enum JsonUtils
 		return primitive.isNumber();
 	}
 	
-	public static boolean isString(JsonElement json)
-	{
-		if(json == null || !json.isJsonPrimitive())
-			return false;
-		
-		JsonPrimitive primitive = json.getAsJsonPrimitive();
-		return primitive.isString();
-	}
-	
 	public static int getAsInt(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
@@ -136,11 +162,28 @@ public enum JsonUtils
 		return json.getAsLong();
 	}
 	
+	public static boolean isString(JsonElement json)
+	{
+		if(json == null || !json.isJsonPrimitive())
+			return false;
+		
+		JsonPrimitive primitive = json.getAsJsonPrimitive();
+		return primitive.isString();
+	}
+	
 	public static String getAsString(JsonElement json) throws JsonException
 	{
 		if(!isString(json))
 			throw new JsonException();
 		
 		return json.getAsString();
+	}
+	
+	public static WsonArray getAsArray(JsonElement json) throws JsonException
+	{
+		if(!json.isJsonArray())
+			throw new JsonException();
+		
+		return new WsonArray(json.getAsJsonArray());
 	}
 }

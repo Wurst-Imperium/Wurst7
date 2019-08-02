@@ -31,7 +31,7 @@ public final class AnalyticsConfigFile
 	{
 		try
 		{
-			WsonObject wson = JsonUtils.parseWsonObject(path);
+			WsonObject wson = JsonUtils.parseFileToObject(path);
 			tracker.setEnabled(wson.getBoolean("enabled"));
 			tracker.getConfigData().setVisitorData(readVisitorData(wson));
 			

@@ -31,6 +31,14 @@ public final class WsonArray
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	
+	public ArrayList<WsonObject> getAllObjects()
+	{
+		return StreamSupport.stream(json.spliterator(), false)
+			.filter(JsonElement::isJsonObject).map(JsonElement::getAsJsonObject)
+			.map(json -> new WsonObject(json))
+			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+	}
+	
 	public JsonArray toJsonArray()
 	{
 		return json;

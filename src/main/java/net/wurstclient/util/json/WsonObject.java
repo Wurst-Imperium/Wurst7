@@ -38,6 +38,16 @@ public final class WsonObject
 		return JsonUtils.getAsLong(json.get(key));
 	}
 	
+	public String getString(String key) throws JsonException
+	{
+		return JsonUtils.getAsString(json.get(key));
+	}
+	
+	public WsonArray getArray(String key) throws JsonException
+	{
+		return JsonUtils.getAsArray(json.get(key));
+	}
+	
 	public LinkedHashMap<String, String> getAllStrings()
 	{
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();

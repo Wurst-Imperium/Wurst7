@@ -32,7 +32,7 @@ public final class EnabledHacksFile
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.parseWsonArray(path);
+			WsonArray wson = JsonUtils.parseFileToArray(path);
 			enableHacks(hackList, wson);
 			
 		}catch(NoSuchFileException e)

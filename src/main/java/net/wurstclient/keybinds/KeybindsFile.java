@@ -33,7 +33,7 @@ public final class KeybindsFile
 	{
 		try
 		{
-			WsonObject wson = JsonUtils.parseWsonObject(path);
+			WsonObject wson = JsonUtils.parseFileToObject(path);
 			HashSet<Keybind> newKeybinds = new HashSet<>();
 			
 			for(Entry<String, String> entry : wson.getAllStrings().entrySet())
