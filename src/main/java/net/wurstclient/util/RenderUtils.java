@@ -14,8 +14,10 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 
-public class RenderUtils
+public enum RenderUtils
 {
+	;
+	
 	private static final Box DEFAULT_AABB = new Box(0, 0, 0, 1, 1, 1);
 	
 	public static void scissorBox(int startX, int startY, int endX, int endY)

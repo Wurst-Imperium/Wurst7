@@ -13,8 +13,10 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
-public class RotationUtils
+public enum RotationUtils
 {
+	;
+	
 	public static Vec3d getEyesPos()
 	{
 		ClientPlayerEntity player = WurstClient.MC.player;

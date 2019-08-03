@@ -17,8 +17,10 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShapes;
 import net.wurstclient.WurstClient;
 
-public final class BlockUtils
+public enum BlockUtils
 {
+	;
+	
 	private static final MinecraftClient MC = WurstClient.MC;
 	
 	public static BlockState getState(BlockPos pos)
