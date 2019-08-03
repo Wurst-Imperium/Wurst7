@@ -14,4 +14,6 @@ public interface IMinecraftClient
 	public void setItemUseCooldown(int itemUseCooldown);
 	
 	public IClientPlayerInteractionManager getInteractionManager();
+	
+	public int getItemUseCooldown();
 }

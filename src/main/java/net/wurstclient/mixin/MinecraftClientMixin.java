@@ -58,6 +58,12 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	}
 	
 	@Override
+	public int getItemUseCooldown()
+	{
+		return itemUseCooldown;
+	}
+	
+	@Override
 	public void setItemUseCooldown(int itemUseCooldown)
 	{
 		this.itemUseCooldown = itemUseCooldown;
