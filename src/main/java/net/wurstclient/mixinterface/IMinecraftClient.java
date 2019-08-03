@@ -16,4 +16,6 @@ public interface IMinecraftClient
 	public IClientPlayerInteractionManager getInteractionManager();
 	
 	public int getItemUseCooldown();
+	
+	public IClientPlayerEntity getPlayer();
 }

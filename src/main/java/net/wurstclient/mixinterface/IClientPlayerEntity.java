@@ -10,4 +10,8 @@ package net.wurstclient.mixinterface;
 public interface IClientPlayerEntity
 {
 	public void setNoClip(boolean noClip);
+	
+	public float getLastYaw();
+	
+	public float getLastPitch();
 }

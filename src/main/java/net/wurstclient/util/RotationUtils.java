@@ -11,6 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 public class RotationUtils
 {
@@ -50,6 +51,20 @@ public class RotationUtils
 		float pitch = (float)-Math.toDegrees(Math.atan2(diffY, diffXZ));
 		
 		return new Rotation(yaw, pitch);
+	}
+	
+	public static double getAngleToLastReportedLookVec(Vec3d vec)
+	{
+		Rotation needed = getNeededRotations(vec);
+		
+		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
+		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
+		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		
+		float diffYaw = lastReportedYaw - needed.yaw;
+		float diffPitch = lastReportedPitch - needed.pitch;
+		
+		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
 	
 	public static final class Rotation
