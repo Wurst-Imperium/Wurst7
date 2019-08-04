@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -158,7 +159,19 @@ public final class MobSpawnEspHack extends Hack
 			if(scanner.displayList == 0)
 				scanner.displayList = GL11.glGenLists(1);
 			
-			scanner.compileDisplayList();
+			try
+			{
+				scanner.compileDisplayList();
+				
+			}catch(ConcurrentModificationException e)
+			{
+				System.out.println(
+					"WARNING! ChunkScanner.compileDisplayList(); failed with the following exception:");
+				e.printStackTrace();
+				
+				GL11.glDeleteLists(scanner.displayList, 1);
+				scanner.displayList = 0;
+			}
 		}
 	}
 	
@@ -314,27 +327,37 @@ public final class MobSpawnEspHack extends Hack
 		{
 			GL11.glNewList(displayList, GL11.GL_COMPILE);
 			
-			GL11.glColor4f(1, 0, 0, 0.5F);
-			GL11.glBegin(GL11.GL_LINES);
-			new ArrayList<>(red).forEach(pos -> {
-				GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
-				GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-					pos.getZ() + 1);
-				GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01, pos.getZ());
-				GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ() + 1);
-			});
+			try
+			{
+				GL11.glColor4f(1, 0, 0, 0.5F);
+				GL11.glBegin(GL11.GL_LINES);
+				new ArrayList<>(red).forEach(pos -> {
+					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
+					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+						pos.getZ() + 1);
+					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+						pos.getZ());
+					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+						pos.getZ() + 1);
+				});
+				
+				GL11.glColor4f(1, 1, 0, 0.5F);
+				new ArrayList<>(yellow).forEach(pos -> {
+					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
+					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+						pos.getZ() + 1);
+					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+						pos.getZ());
+					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+						pos.getZ() + 1);
+				});
+				GL11.glEnd();
+				
+			}finally
+			{
+				GL11.glEndList();
+			}
 			
-			GL11.glColor4f(1, 1, 0, 0.5F);
-			new ArrayList<>(yellow).forEach(pos -> {
-				GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
-				GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-					pos.getZ() + 1);
-				GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01, pos.getZ());
-				GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ() + 1);
-			});
-			GL11.glEnd();
-			
-			GL11.glEndList();
 			doneCompiling = true;
 		}
 		
