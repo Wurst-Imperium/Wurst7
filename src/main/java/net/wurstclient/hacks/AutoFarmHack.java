@@ -63,9 +63,11 @@ public final class AutoFarmHack extends Hack
 	
 	public AutoFarmHack()
 	{
-		super("AutoFarm", "Harvests and re-plants crops automatically.\n"
-			+ "Works with wheat, carrots, potatoes, beetroots,\n"
-			+ "pumpkins, melons, cacti, sugar canes and\n" + "nether warts.");
+		super("AutoFarm",
+			"Harvests and re-plants crops automatically.\n"
+				+ "Works with wheat, carrots, potatoes, beetroots,\n"
+				+ "pumpkins, melons, cacti, sugar canes, kelp and\n"
+				+ "nether warts.");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 	}
@@ -255,6 +257,10 @@ public final class AutoFarmHack extends Hack
 		else if(block instanceof CactusBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
+		else if(block instanceof KelpPlantBlock)
+			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
+				&& !(BlockUtils
+					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
 		else if(block instanceof NetherWartBlock)
 			return state.get(NetherWartBlock.AGE) >= 3;
 		
