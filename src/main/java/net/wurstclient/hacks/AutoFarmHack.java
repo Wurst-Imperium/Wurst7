@@ -74,6 +74,13 @@ public final class AutoFarmHack extends Hack
 	public void onEnable()
 	{
 		plants.clear();
+		
+		WURST.getEventManager().add(UpdateListener.class, this);
+		WURST.getEventManager().add(RenderListener.class, this);
+	}
+	
+	private void genLists()
+	{
 		displayList = GL11.glGenLists(1);
 		box = GL11.glGenLists(1);
 		node = GL11.glGenLists(1);
@@ -90,9 +97,6 @@ public final class AutoFarmHack extends Hack
 		RenderUtils.drawNode(node);
 		GL11.glEnd();
 		GL11.glEndList();
-		
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
 	}
 	
 	@Override
@@ -112,11 +116,15 @@ public final class AutoFarmHack extends Hack
 		GL11.glDeleteLists(displayList, 1);
 		GL11.glDeleteLists(box, 1);
 		GL11.glDeleteLists(node, 1);
+		displayList = 0;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		if(displayList == 0)
+			genLists();
+		
 		currentBlock = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
 		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
@@ -140,6 +148,7 @@ public final class AutoFarmHack extends Hack
 					.sorted(Comparator.comparingDouble(
 						pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
 					.collect(Collectors.toList());
+			
 			blocksToReplant = getBlockStream(eyesBlock, blockRange)
 				.filter(
 					pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
@@ -222,31 +231,12 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private Stream<BlockPos.Mutable> getBlockStream(BlockPos center, int range)
+	private Stream<BlockPos> getBlockStream(BlockPos center, int range)
 	{
 		BlockPos min = center.add(-range, -range, -range);
 		BlockPos max = center.add(range, range, range);
 		
-		long numBlocks = (max.getX() - min.getX() + 1)
-			* (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
-		
-		return Stream.<BlockPos.Mutable> iterate(new BlockPos.Mutable(min),
-			pos -> {
-				
-				if(pos.getX() < max.getX())
-					return pos.setOffset(1, 0, 0);
-				else if(pos.getY() < max.getY())
-				{
-					pos.method_20787(min.getX());
-					return pos.setOffset(0, 1, 0);
-				}else if(pos.getZ() < max.getZ())
-				{
-					pos.method_20787(min.getX());
-					pos.setY(min.getY());
-					return pos.setOffset(0, 0, 1);
-				}else
-					return null;
-			}).limit(numBlocks);
+		return BlockUtils.getAllInBox(min, max).stream();
 	}
 	
 	private boolean shouldBeHarvested(BlockPos pos)
