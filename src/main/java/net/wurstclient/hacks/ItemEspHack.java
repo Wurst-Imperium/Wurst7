@@ -166,11 +166,10 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glColor4f(1, 1, 0, 0.5F);
 		
-		Vec3d start = RotationUtils.getClientLookVec()
-			.add(0, MC.player.getEyeHeight(MC.player.getPose()), 0)
-			.add(BlockEntityRenderDispatcher.renderOffsetX,
-				BlockEntityRenderDispatcher.renderOffsetY,
-				BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start = RotationUtils.getClientLookVec().add(
+			BlockEntityRenderDispatcher.renderOffsetX,
+			BlockEntityRenderDispatcher.renderOffsetY,
+			BlockEntityRenderDispatcher.renderOffsetZ);
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(ItemEntity e : items)
