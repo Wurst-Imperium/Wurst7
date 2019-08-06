@@ -101,7 +101,7 @@ public final class HackList
 	// public final LsdHack lsdHack = new LsdHack();
 	// public final MassTpaHack massTpaHack = new MassTpaHack();
 	// public final MileyCyrusHack mileyCyrusHack = new MileyCyrusHack();
-	// public final MobEspHack mobEspHack = new MobEspHack();
+	public final MobEspHack mobEspHack = new MobEspHack();
 	public final MobSpawnEspHack mobSpawnEspHack = new MobSpawnEspHack();
 	// public final MultiAuraHack multiAuraHack = new MultiAuraHack();
 	// public final NameProtectHack nameProtectHack = new NameProtectHack();
