@@ -79,10 +79,7 @@ public final class AutoFarmHack extends Hack
 		
 		WURST.getEventManager().add(UpdateListener.class, this);
 		WURST.getEventManager().add(RenderListener.class, this);
-	}
-	
-	private void genLists()
-	{
+		
 		displayList = GL11.glGenLists(1);
 		box = GL11.glGenLists(1);
 		node = GL11.glGenLists(1);
@@ -118,14 +115,11 @@ public final class AutoFarmHack extends Hack
 		GL11.glDeleteLists(displayList, 1);
 		GL11.glDeleteLists(box, 1);
 		GL11.glDeleteLists(node, 1);
-		displayList = 0;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(displayList == 0)
-			genLists();
 		
 		currentBlock = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);

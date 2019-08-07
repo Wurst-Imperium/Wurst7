@@ -15,9 +15,12 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hacks.*;
 
-public final class HackList
+public final class HackList implements UpdateListener
 {
 	// public final AntiAfkHack antiAfkHack = new AntiAfkHack();
 	// public final AntiBlindHack antiBlindHack = new AntiBlindHack();
@@ -154,6 +157,8 @@ public final class HackList
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
 	private final EnabledHacksFile enabledHacksFile;
+	private final EventManager eventManager =
+		WurstClient.INSTANCE.getEventManager();
 	
 	public HackList(Path enabledHacksFile)
 	{
@@ -176,11 +181,15 @@ public final class HackList
 			CrashReport report = CrashReport.create(e, message);
 			throw new CrashException(report);
 		}
+		
+		eventManager.add(UpdateListener.class, this);
 	}
 	
-	public void loadEnabledHacks()
+	@Override
+	public void onUpdate()
 	{
 		enabledHacksFile.load(this);
+		eventManager.remove(UpdateListener.class, this);
 	}
 	
 	public void saveEnabledHax()

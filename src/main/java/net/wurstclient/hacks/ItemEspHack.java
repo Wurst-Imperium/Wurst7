@@ -58,10 +58,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		WURST.getEventManager().add(CameraTransformViewBobbingListener.class,
 			this);
 		WURST.getEventManager().add(RenderListener.class, this);
-	}
-	
-	private void createItemBoxDisplayList()
-	{
+		
 		itemBox = GL11.glGenLists(1);
 		GL11.glNewList(itemBox, GL11.GL_COMPILE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -83,15 +80,11 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		WURST.getEventManager().remove(RenderListener.class, this);
 		
 		GL11.glDeleteLists(itemBox, 1);
-		itemBox = 0;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(itemBox == 0)
-			createItemBoxDisplayList();
-		
 		items.clear();
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ItemEntity)

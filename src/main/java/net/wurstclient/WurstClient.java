@@ -65,7 +65,6 @@ public enum WurstClient
 		
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
 		hax = new HackList(enabledHacksFile);
-		hax.loadEnabledHacks();
 		
 		cmds = new CmdList();
 		

@@ -25,7 +25,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
-import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -33,7 +32,6 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 
-@DontSaveState
 @SearchTags({"FishBot", "auto fish", "fish bot", "fishing"})
 public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
