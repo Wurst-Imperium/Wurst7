@@ -120,7 +120,7 @@ public final class HackList
 	// public final PanicHack panicHack = new PanicHack();
 	// public final ParkourHack parkourHack = new ParkourHack();
 	// public final PhaseHack phaseHack = new PhaseHack();
-	// public final PlayerEspHack playerEspHack = new PlayerEspHack();
+	public final PlayerEspHack playerEspHack = new PlayerEspHack();
 	// public final PlayerFinderHack playerFinderHack = new PlayerFinderHack();
 	// public final PotionSaverHack potionSaverHack = new PotionSaverHack();
 	// public final ProphuntEspHack prophuntEspHack = new ProphuntEspHack();
