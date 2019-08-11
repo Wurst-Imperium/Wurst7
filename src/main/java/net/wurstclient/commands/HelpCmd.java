@@ -57,7 +57,7 @@ public final class HelpCmd extends Command
 		
 		ChatUtils.message("Command list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
-			ChatUtils.message("- ." + cmds.get(i).getName());
+			ChatUtils.message("- " + cmds.get(i).getName());
 	}
 	
 	private void help(String cmdName) throws CmdException

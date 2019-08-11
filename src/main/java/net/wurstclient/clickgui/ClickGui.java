@@ -54,13 +54,15 @@ public final class ClickGui
 		this.windowsFile = windowsFile;
 	}
 	
-	// TODO
 	public void init()
 	{
+		updateColors();
+		
 		LinkedHashMap<Category, Window> windowMap = new LinkedHashMap<>();
 		for(Category category : Category.values())
 			windowMap.put(category, new Window(category.getName()));
 		
+		// TODO: spf
 		ArrayList<Feature> features = new ArrayList<>();
 		features.addAll(WURST.getHax().getAllHax());
 		features.addAll(WURST.getCmds().getAllCmds());
@@ -80,7 +82,8 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			window.setMinimized(true);
-		
+			
+		// TODO: Radar
 		// windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
 		
 		int x = 5;
@@ -203,7 +206,7 @@ public final class ClickGui
 			leftMouseButtonPressed = false;
 	}
 	
-	public boolean handleNavigatorPopupClick(int mouseX, int mouseY,
+	public boolean handleNavigatorPopupClick(double mouseX, double mouseY,
 		int mouseButton)
 	{
 		boolean popupClicked =
@@ -221,9 +224,12 @@ public final class ClickGui
 		return popupClicked;
 	}
 	
-	public void handleNavigatorMouseClick(int cMouseX, int cMouseY,
+	public void handleNavigatorMouseClick(double cMouseX, double cMouseY,
 		int mouseButton, Window window)
 	{
+		if(mouseButton == 0)
+			leftMouseButtonPressed = true;
+		
 		handleComponentMouseClick(window, cMouseX, cMouseY, mouseButton);
 		
 		for(Popup popup : popups)
@@ -233,7 +239,7 @@ public final class ClickGui
 		popups.removeIf(p -> p.isClosing());
 	}
 	
-	private boolean handlePopupMouseClick(int mouseX, int mouseY,
+	private boolean handlePopupMouseClick(double mouseX, double mouseY,
 		int mouseButton)
 	{
 		for(int i = popups.size() - 1; i >= 0; i--)
@@ -256,8 +262,8 @@ public final class ClickGui
 			if(mouseX >= x2 || mouseY >= y2)
 				continue;
 			
-			int cMouseX = mouseX - x0;
-			int cMouseY = mouseY - y0;
+			int cMouseX = (int)(mouseX - x0);
+			int cMouseY = (int)(mouseY - y0);
 			popup.handleMouseClick(cMouseX, cMouseY, mouseButton);
 			
 			popups.remove(i);
@@ -389,8 +395,8 @@ public final class ClickGui
 		window.startDraggingScrollbar(window.getY() + 13 + mouseY);
 	}
 	
-	private void handleComponentMouseClick(Window window, int mouseX,
-		int mouseY, int mouseButton)
+	private void handleComponentMouseClick(Window window, double mouseX,
+		double mouseY, int mouseButton)
 	{
 		for(int i2 = window.countChildren() - 1; i2 >= 0; i2--)
 		{
@@ -575,7 +581,7 @@ public final class ClickGui
 		opacity = clickGui.getOpacity();
 		bgColor = clickGui.getBgColor();
 		
-		// TODO
+		// TODO: RainbowUI
 		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
 		// {
 		// float x = System.currentTimeMillis() % 2000 / 1000F;

@@ -1,0 +1,252 @@
+/*
+ * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.navigator;
+
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+
+import java.util.Set;
+
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.InputUtil;
+import net.wurstclient.WurstClient;
+import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.util.RenderUtils;
+
+public class NavigatorNewKeybindScreen extends NavigatorScreen
+{
+	private Set<PossibleKeybind> possibleKeybinds;
+	private NavigatorFeatureScreen parent;
+	private PossibleKeybind hoveredCommand;
+	private PossibleKeybind selectedCommand;
+	private String selectedKey = "key.keyboard.unknown";
+	private String text = "";
+	private ButtonWidget okButton;
+	private boolean choosingKey;
+	
+	public NavigatorNewKeybindScreen(Set<PossibleKeybind> possibleKeybinds,
+		NavigatorFeatureScreen parent)
+	{
+		this.possibleKeybinds = possibleKeybinds;
+		this.parent = parent;
+	}
+	
+	@Override
+	protected void onResize()
+	{
+		// OK button
+		okButton =
+			new ButtonWidget(width / 2 - 151, height - 65, 149, 18, "OK", b -> {
+				if(choosingKey)
+				{
+					String newCommands = selectedCommand.getCommand();
+					
+					String oldCommands = WurstClient.INSTANCE.getKeybinds()
+						.getCommands(selectedKey);
+					if(oldCommands != null)
+						newCommands = oldCommands + " ; " + newCommands;
+					
+					WurstClient.INSTANCE.getKeybinds().add(selectedKey,
+						newCommands);
+					
+					WurstClient.INSTANCE.getNavigator()
+						.addPreference(parent.getFeature().getName());
+					WurstClient.MC.openScreen(parent);
+				}else
+				{
+					choosingKey = true;
+					okButton.active = false;
+				}
+			});
+		okButton.active = selectedCommand != null;
+		addButton(okButton);
+		
+		// cancel button
+		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+			"Cancel", b -> WurstClient.MC.openScreen(parent)));
+	}
+	
+	@Override
+	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	{
+		if(choosingKey)
+		{
+			selectedKey = InputUtil.getKeyCode(keyCode, scanCode).getName();
+			okButton.active = !selectedKey.equals("key.keyboard.unknown");
+			
+		}else if(keyCode == 1)
+			WurstClient.MC.openScreen(parent);
+	}
+	
+	@Override
+	protected void onMouseClick(double x, double y, int button)
+	{
+		// commands
+		if(hoveredCommand != null)
+		{
+			selectedCommand = hoveredCommand;
+			okButton.active = true;
+		}
+	}
+	
+	@Override
+	protected void onUpdate()
+	{
+		// text
+		if(choosingKey)
+		{
+			text = "Now press the key that should trigger this keybind.";
+			if(!selectedKey.equals("key.keyboard.unknown"))
+			{
+				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "");
+				String commands =
+					WurstClient.INSTANCE.getKeybinds().getCommands(selectedKey);
+				if(commands != null)
+				{
+					text +=
+						"\n\nWARNING: This key is already bound to the following\ncommand(s):";
+					commands = commands.replace(";", "§").replace("§§", ";");
+					
+					for(String cmd : commands.split("§"))
+						text += "\n- " + cmd;
+				}
+			}
+		}else
+			text = "Select what this keybind should do.";
+		
+		// content height
+		if(choosingKey)
+			setContentHeight(getStringHeight(text));
+		else
+			setContentHeight(possibleKeybinds.size() * 24 - 10);
+	}
+	
+	@Override
+	protected void onRender(int mouseX, int mouseY, float partialTicks)
+	{
+		// title bar
+		GL11.glEnable(GL_TEXTURE_2D);
+		drawCenteredString(minecraft.textRenderer, "New Keybind", middleX, 32,
+			0xffffff);
+		GL11.glDisable(GL_TEXTURE_2D);
+		
+		// background
+		int bgx1 = middleX - 154;
+		int bgx2 = middleX + 154;
+		int bgy1 = 60;
+		int bgy2 = height - 43;
+		
+		// scissor box
+		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
+			bgy2 - (buttons.isEmpty() ? 0 : 24));
+		glEnable(GL_SCISSOR_TEST);
+		
+		// possible keybinds
+		if(!choosingKey)
+		{
+			hoveredCommand = null;
+			int yi = bgy1 - 12 + scroll;
+			for(PossibleKeybind pkb : possibleKeybinds)
+			{
+				yi += 24;
+				
+				// positions
+				int x1 = bgx1 + 2;
+				int x2 = bgx2 - 2;
+				int y1 = yi;
+				int y2 = y1 + 20;
+				
+				// color
+				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2
+					&& mouseY <= bgy2 - 24)
+				{
+					hoveredCommand = pkb;
+					if(pkb == selectedCommand)
+						glColor4f(0F, 1F, 0F, 0.375F);
+					else
+						glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
+				}else if(pkb == selectedCommand)
+					glColor4f(0F, 1F, 0F, 0.25F);
+				else
+					glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				
+				// button
+				drawBox(x1, y1, x2, y2);
+				
+				// text
+				GL11.glEnable(GL_TEXTURE_2D);
+				drawString(minecraft.textRenderer, pkb.getDescription(), x1 + 1,
+					y1 + 1, 0xffffff);
+				drawString(minecraft.textRenderer, pkb.getCommand(), x1 + 1,
+					y1 + 1 + minecraft.textRenderer.fontHeight, 0xffffff);
+				glDisable(GL_TEXTURE_2D);
+			}
+		}
+		
+		// text
+		GL11.glEnable(GL_TEXTURE_2D);
+		int textY = bgy1 + scroll + 2;
+		for(String line : text.split("\n"))
+		{
+			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
+			textY += minecraft.textRenderer.fontHeight;
+		}
+		
+		// scissor box
+		glDisable(GL_SCISSOR_TEST);
+		
+		// buttons below scissor box
+		for(int i = 0; i < buttons.size(); i++)
+		{
+			AbstractButtonWidget button = buttons.get(i);
+			
+			// positions
+			int x1 = button.x;
+			int x2 = x1 + button.getWidth();
+			int y1 = button.y;
+			int y2 = y1 + 18;
+			
+			// color
+			if(!button.active)
+				glColor4f(0F, 0F, 0F, 0.25F);
+			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
+				&& mouseY <= y2)
+				glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+			else
+				glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+			
+			// button
+			glDisable(GL_TEXTURE_2D);
+			drawBox(x1, y1, x2, y2);
+			
+			// text
+			GL11.glEnable(GL_TEXTURE_2D);
+			drawCenteredString(minecraft.textRenderer, button.getMessage(),
+				(x1 + x2) / 2, y1 + 4, 0xffffff);
+		}
+	}
+	
+	@Override
+	protected void onMouseDrag(double mouseX, double mouseY, int button,
+		double double_3, double double_4)
+	{
+		
+	}
+	
+	@Override
+	protected void onMouseRelease(double x, double y, int button)
+	{
+		
+	}
+}

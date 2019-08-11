@@ -9,9 +9,12 @@ package net.wurstclient;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.minecraft.client.MinecraftClient;
+import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.Setting;
 
@@ -23,6 +26,12 @@ public abstract class Feature
 	
 	private final LinkedHashMap<String, Setting> settings =
 		new LinkedHashMap<>();
+	private final LinkedHashSet<PossibleKeybind> possibleKeybinds =
+		new LinkedHashSet<>();
+	
+	private final String searchTags =
+		getClass().isAnnotationPresent(SearchTags.class) ? String.join("§",
+			getClass().getAnnotation(SearchTags.class).value()) : "";
 	
 	public abstract String getName();
 	
@@ -32,6 +41,8 @@ public abstract class Feature
 	{
 		return null;
 	}
+	
+	public abstract String getPrimaryAction();
 	
 	public void doPrimaryAction()
 	{
@@ -57,5 +68,20 @@ public abstract class Feature
 				"Duplicate setting: " + getName() + " " + key);
 		
 		settings.put(key, setting);
+	}
+	
+	protected final void addPossibleKeybind(String command, String description)
+	{
+		possibleKeybinds.add(new PossibleKeybind(command, description));
+	}
+	
+	public final String getSearchTags()
+	{
+		return searchTags;
+	}
+	
+	public Set<PossibleKeybind> getPossibleKeybinds()
+	{
+		return Collections.unmodifiableSet(possibleKeybinds);
 	}
 }

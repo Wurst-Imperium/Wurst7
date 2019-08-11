@@ -31,7 +31,7 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
 	{
 		if(mouseY < getY() + 11)
 			return;

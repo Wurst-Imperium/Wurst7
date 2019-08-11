@@ -50,7 +50,7 @@ public final class SettingsFile
 			
 		for(Command cmd : cmds.getAllCmds())
 			if(!cmd.getSettings().isEmpty())
-				map.put("." + cmd.getName(), cmd);
+				map.put(cmd.getName(), cmd);
 			
 		return Collections.unmodifiableMap(map);
 	}

@@ -44,7 +44,7 @@ public final class ComboBoxComponent<T extends Enum> extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
 	{
 		if(mouseX < getX() + getWidth() - popupWidth - 15)
 			return;

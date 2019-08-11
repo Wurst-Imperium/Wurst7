@@ -28,7 +28,7 @@ public final class CheckboxComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
 	{
 		switch(mouseButton)
 		{

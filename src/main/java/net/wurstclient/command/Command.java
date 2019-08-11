@@ -34,7 +34,13 @@ public abstract class Command extends Feature
 	@Override
 	public final String getName()
 	{
-		return name;
+		return "." + name;
+	}
+	
+	@Override
+	public String getPrimaryAction()
+	{
+		return "";
 	}
 	
 	@Override

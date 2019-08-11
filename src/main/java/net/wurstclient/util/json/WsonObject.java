@@ -64,6 +64,22 @@ public final class WsonObject
 		return map;
 	}
 	
+	public LinkedHashMap<String, Number> getAllNumbers()
+	{
+		LinkedHashMap<String, Number> map = new LinkedHashMap<>();
+		
+		for(Entry<String, JsonElement> entry : json.entrySet())
+		{
+			JsonElement value = entry.getValue();
+			if(!JsonUtils.isNumber(value))
+				continue;
+			
+			map.put(entry.getKey(), value.getAsNumber());
+		}
+		
+		return map;
+	}
+	
 	public LinkedHashMap<String, JsonObject> getAllJsonObjects()
 	{
 		LinkedHashMap<String, JsonObject> map = new LinkedHashMap<>();

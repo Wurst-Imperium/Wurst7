@@ -26,6 +26,7 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.navigator.Navigator;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 
@@ -45,6 +46,7 @@ public enum WurstClient
 	private SettingsFile settingsFile;
 	private KeybindList keybinds;
 	private ClickGui gui;
+	private Navigator navigator;
 	private RotationFaker rotationFaker;
 	
 	private boolean enabled = true;
@@ -77,6 +79,9 @@ public enum WurstClient
 		
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);
+		
+		Path preferencesFile = wurstFolder.resolve("preferences.json");
+		navigator = new Navigator(preferencesFile, hax, cmds);
 		
 		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -153,6 +158,11 @@ public enum WurstClient
 		}
 		
 		return gui;
+	}
+	
+	public Navigator getNavigator()
+	{
+		return navigator;
 	}
 	
 	public RotationFaker getRotationFaker()

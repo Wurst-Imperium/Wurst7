@@ -97,7 +97,7 @@ public final class CmdList
 	
 	public Command getCmdByName(String name)
 	{
-		return cmds.get(name);
+		return cmds.get("." + name);
 	}
 	
 	public Collection<Command> getAllCmds()
