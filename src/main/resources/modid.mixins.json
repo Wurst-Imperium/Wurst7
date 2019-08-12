@@ -13,6 +13,7 @@
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "GameRendererMixin",
+    "IngameHudMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
     "MinecraftClientMixin"
