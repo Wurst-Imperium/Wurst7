@@ -25,6 +25,7 @@ public class IngameHudMixin extends DrawableHelper
 		ordinal = 4)}, method = {"render(F)V"})
 	private void onRender(float partialTicks, CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(GUIRenderEvent.INSTANCE);
+		GUIRenderEvent event = new GUIRenderEvent(partialTicks);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 }
