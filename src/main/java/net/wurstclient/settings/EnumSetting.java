@@ -7,7 +7,7 @@
  */
 package net.wurstclient.settings;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import com.google.gson.JsonElement;
@@ -92,15 +92,10 @@ public final class EnumSetting<T extends Enum> extends Setting
 		return new JsonPrimitive(selected.toString());
 	}
 	
-	// @Override
-	// public void addToFeatureScreen(NavigatorFeatureScreen featureScreen)
-	// {
-	//
-	// }
-	
 	@Override
-	public ArrayList<PossibleKeybind> getPossibleKeybinds(String featureName)
+	public LinkedHashSet<PossibleKeybind> getPossibleKeybinds(
+		String featureName)
 	{
-		return new ArrayList<>();
+		return new LinkedHashSet<>();
 	}
 }

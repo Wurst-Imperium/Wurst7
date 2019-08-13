@@ -7,7 +7,7 @@
  */
 package net.wurstclient.settings;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -32,8 +32,6 @@ public class SliderSetting extends Setting implements SliderLock
 	private boolean disabled;
 	private double usableMin;
 	private double usableMax;
-	
-	private int navigatorPosY;
 	
 	public SliderSetting(String name, String description, double value,
 		double minimum, double maximum, double increment, ValueDisplay display)
@@ -236,24 +234,8 @@ public class SliderSetting extends Setting implements SliderLock
 		return new JsonPrimitive(Math.round(value * 1e6) / 1e6);
 	}
 	
-	// @Override
-	// public final void addToFeatureScreen(NavigatorFeatureScreen
-	// featureScreen)
-	// {
-	// featureScreen.addText("\n" + getName() + ":");
-	// navigatorPosY = 60 + featureScreen.getTextHeight();
-	// featureScreen.addText("\n");
-	//
-	// featureScreen.addSlider(this);
-	// }
-	
-	public final int getNavigatorPosY()
-	{
-		return navigatorPosY;
-	}
-	
 	@Override
-	public final ArrayList<PossibleKeybind> getPossibleKeybinds(
+	public final LinkedHashSet<PossibleKeybind> getPossibleKeybinds(
 		String featureName)
 	{
 		String fullName = featureName + " " + getName();
@@ -261,7 +243,7 @@ public class SliderSetting extends Setting implements SliderLock
 		String command = ".setslider " + featureName.toLowerCase() + " ";
 		command += getName().toLowerCase().replace(" ", "_") + " ";
 		
-		ArrayList<PossibleKeybind> pkb = new ArrayList<>();
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
 		pkb.add(new PossibleKeybind(command + "more", "Increase " + fullName));
 		pkb.add(new PossibleKeybind(command + "less", "Decrease " + fullName));
 		

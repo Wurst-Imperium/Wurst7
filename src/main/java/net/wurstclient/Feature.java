@@ -68,6 +68,7 @@ public abstract class Feature
 				"Duplicate setting: " + getName() + " " + key);
 		
 		settings.put(key, setting);
+		possibleKeybinds.addAll(setting.getPossibleKeybinds(getName()));
 	}
 	
 	protected final void addPossibleKeybind(String command, String description)
@@ -80,7 +81,7 @@ public abstract class Feature
 		return searchTags;
 	}
 	
-	public Set<PossibleKeybind> getPossibleKeybinds()
+	public final Set<PossibleKeybind> getPossibleKeybinds()
 	{
 		return Collections.unmodifiableSet(possibleKeybinds);
 	}

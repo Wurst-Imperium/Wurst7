@@ -7,7 +7,8 @@
  */
 package net.wurstclient.settings;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -23,7 +24,6 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	private boolean checked;
 	private final boolean checkedByDefault;
 	private CheckboxLock lock;
-	private int navigatorPosY;
 	
 	public CheckboxSetting(String name, String description, boolean checked)
 	{
@@ -102,31 +102,15 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 		return new JsonPrimitive(checked);
 	}
 	
-	// @Override
-	// public final void addToFeatureScreen(NavigatorFeatureScreen
-	// featureScreen)
-	// {
-	// navigatorPosY = 60 + featureScreen.getTextHeight() + 4;
-	//
-	// featureScreen.addText("\n\n");
-	// featureScreen.addCheckbox(this);
-	// }
-	
-	public final int getNavigatorPosY()
-	{
-		return navigatorPosY;
-	}
-	
 	@Override
-	public final ArrayList<PossibleKeybind> getPossibleKeybinds(
-		String featureName)
+	public final Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
 		String fullName = featureName + " " + getName();
 		
 		String command = ".setcheckbox " + featureName.toLowerCase() + " ";
 		command += getName().toLowerCase().replace(" ", "_") + " ";
 		
-		ArrayList<PossibleKeybind> pkb = new ArrayList<>();
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
 		pkb.add(new PossibleKeybind(command + "toggle", "Toggle " + fullName));
 		pkb.add(new PossibleKeybind(command + "on", "Check " + fullName));
 		pkb.add(new PossibleKeybind(command + "off", "Uncheck " + fullName));

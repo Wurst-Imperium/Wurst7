@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings;
 
-import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
 
 import com.google.gson.JsonElement;
 
@@ -47,11 +47,6 @@ public abstract class Setting
 		
 	}
 	
-	// public void addToFeatureScreen(NavigatorFeatureScreen featureScreen)
-	// {
-	//
-	// }
-	
-	public abstract ArrayList<PossibleKeybind> getPossibleKeybinds(
+	public abstract Set<PossibleKeybind> getPossibleKeybinds(
 		String featureName);
 }
