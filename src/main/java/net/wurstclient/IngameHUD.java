@@ -16,7 +16,7 @@ import net.wurstclient.events.GUIRenderListener;
 public final class IngameHUD implements GUIRenderListener
 {
 	private final WurstLogo wurstLogo = new WurstLogo();
-	private final ModList modList = new ModList();
+	private final HackListHUD modList = new HackListHUD();
 	// private static final TabGui tabGui = new TabGui();
 	
 	@Override
@@ -53,7 +53,7 @@ public final class IngameHUD implements GUIRenderListener
 			GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public ModList getHackList()
+	public HackListHUD getHackList()
 	{
 		return modList;
 	}

@@ -15,7 +15,7 @@ import net.minecraft.client.util.Window;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
-public final class ModList implements UpdateListener
+public final class HackListHUD implements UpdateListener
 {
 	private final ArrayList<Entry> activeMods = new ArrayList<>();
 	// private final ModListSpf modListSpf =
@@ -23,7 +23,7 @@ public final class ModList implements UpdateListener
 	private int posY;
 	private int textColor;
 	
-	public ModList()
+	public HackListHUD()
 	{
 		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class, this);
 	}
