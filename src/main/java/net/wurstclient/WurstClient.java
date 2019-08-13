@@ -24,6 +24,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;

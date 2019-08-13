@@ -5,13 +5,14 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient;
+package net.wurstclient.hud;
 
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.util.Identifier;
+import net.wurstclient.WurstClient;
 
 public final class WurstLogo
 {

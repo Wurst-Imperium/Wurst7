@@ -5,13 +5,14 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient;
+package net.wurstclient.hud;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 
 import net.minecraft.client.util.Window;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
