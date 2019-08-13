@@ -110,6 +110,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			text += "Hack";
 		else if(feature instanceof Command)
 			text += "Command";
+		else
+			text += "Other Feature";
 		
 		// category
 		if(feature.getCategory() != null)

@@ -11,16 +11,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.Window;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.other_features.HackListOtf;
+import net.wurstclient.other_features.HackListOtf.Mode;
+import net.wurstclient.other_features.HackListOtf.Position;
 
 public final class HackListHUD implements UpdateListener
 {
-	private final ArrayList<Entry> activeMods = new ArrayList<>();
-	// private final ModListSpf modListSpf =
-	// WurstClient.INSTANCE.special.modListSpf;
+	private final ArrayList<HackListEntry> activeHax = new ArrayList<>();
+	private final HackListOtf otf = WurstClient.INSTANCE.getOtfs().hackListOtf;
 	private int posY;
 	private int textColor;
 	
@@ -31,15 +34,14 @@ public final class HackListHUD implements UpdateListener
 	
 	public void render(float partialTicks)
 	{
-		// if(modListSpf.isHidden())
-		// return;
+		if(otf.getMode() == Mode.HIDDEN)
+			return;
 		
-		// if(modListSpf.isPositionRight())
-		// posY = 0;
-		// else
-		posY = 22;
-		Window sr = WurstClient.MC.window;
-		
+		if(otf.getPosition() == Position.RIGHT)
+			posY = 0;
+		else
+			posY = 22;
+			
 		// color
 		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
 		// {
@@ -54,107 +56,112 @@ public final class HackListHUD implements UpdateListener
 		// if(yesCheatSpf.modeIndicator.isChecked())
 		// drawString("YesCheat+: " + yesCheatSpf.getProfile().getName());
 		
-		int height = posY + activeMods.size() * 9;
+		int height = posY + activeHax.size() * 9;
+		Window sr = WurstClient.MC.window;
 		
-		if(/* modListSpf.isCountMode() || */ height > sr.getScaledHeight())
+		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
 			// draw counter
-			drawString(activeMods.size() == 1 ? "1 mod active"
-				: activeMods.size() + " mods active");
+			drawString(activeHax.size() == 1 ? "1 mod active"
+				: activeHax.size() + " mods active");
 		
-		else// if(modListSpf.isAnimations())
+		else if(otf.isAnimations())
 			// draw mod list
-			for(Entry e : activeMods)
+			for(HackListEntry e : activeHax)
 				drawWithOffset(e, partialTicks);
-		// else
-		// for(Entry e : activeMods)
-		// drawString(e.mod.getRenderName());
+		else
+			for(HackListEntry e : activeHax)
+				drawString(e.hack.getRenderName());
 	}
 	
 	public void updateState(Hack mod)
 	{
 		if(mod.isEnabled())
 		{
-			for(Entry e : activeMods)
-				if(e.mod == mod)
+			for(HackListEntry e : activeHax)
+				if(e.hack == mod)
 					return;
 				
-			activeMods.add(new Entry(mod, 4));
-			activeMods.sort(Comparator.comparing(e -> e.mod.getName()));
+			activeHax.add(new HackListEntry(mod, 4));
+			activeHax.sort(Comparator.comparing(e -> e.hack.getName()));
 			
-		}// else if(!modListSpf.isAnimations())
-			// activeMods.removeIf(e -> e.mod == mod);
+		}else if(!otf.isAnimations())
+			activeHax.removeIf(e -> e.hack == mod);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		// if(!modListSpf.isAnimations())
-		// return;
+		if(!otf.isAnimations())
+			return;
 		
-		for(Iterator<Entry> itr = activeMods.iterator(); itr.hasNext();)
+		for(Iterator<HackListEntry> itr = activeHax.iterator(); itr.hasNext();)
 		{
-			Entry e = itr.next();
+			HackListEntry e = itr.next();
 			
-			if(e.mod.isEnabled())
+			if(e.hack.isEnabled())
 			{
 				e.prevOffset = e.offset;
 				if(e.offset > 0)
 					e.offset--;
 				
-			}else if(!e.mod.isEnabled() && e.offset < 4)
+			}else if(!e.hack.isEnabled() && e.offset < 4)
 			{
 				e.prevOffset = e.offset;
 				e.offset++;
 				
-			}else if(!e.mod.isEnabled() && e.offset == 4)
+			}else if(!e.hack.isEnabled() && e.offset == 4)
 				itr.remove();
 		}
 	}
 	
 	private void drawString(String s)
 	{
+		TextRenderer tr = WurstClient.MC.textRenderer;
+		Window sr = WurstClient.MC.window;
 		int posX;
-		// if(modListSpf.isPositionRight())
-		// posX = sr.getScaledWidth() - Fonts.segoe18.getStringWidth(s) - 2;
-		// else
-		posX = 2;
 		
-		WurstClient.MC.textRenderer.draw(s, posX + 1, posY + 1, 0xff000000);
-		WurstClient.MC.textRenderer.draw(s, posX, posY, textColor | 0xff000000);
+		if(otf.getPosition() == Position.RIGHT)
+			posX = sr.getScaledWidth() - tr.getStringWidth(s) - 2;
+		else
+			posX = 2;
+		
+		tr.draw(s, posX + 1, posY + 1, 0xff000000);
+		tr.draw(s, posX, posY, textColor | 0xff000000);
 		
 		posY += 9;
 	}
 	
-	private void drawWithOffset(Entry e, float partialTicks)
+	private void drawWithOffset(HackListEntry e, float partialTicks)
 	{
-		String s = e.mod.getRenderName();
+		TextRenderer tr = WurstClient.MC.textRenderer;
+		Window sr = WurstClient.MC.window;
+		
+		String s = e.hack.getRenderName();
 		float offset =
 			e.offset * partialTicks + e.prevOffset * (1 - partialTicks);
 		
 		float posX;
-		// if(modListSpf.isPositionRight())
-		// posX = sr.getScaledWidth() - Fonts.segoe18.getStringWidth(s) - 2
-		// + 5 * offset;
-		// else
-		posX = 2 - 5 * offset;
+		if(otf.getPosition() == Position.RIGHT)
+			posX = sr.getScaledWidth() - tr.getStringWidth(s) - 2 + 5 * offset;
+		else
+			posX = 2 - 5 * offset;
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		WurstClient.MC.textRenderer.draw(s, posX + 1, posY + 1,
-			0x04000000 | alpha);
-		WurstClient.MC.textRenderer.draw(s, posX, posY, textColor | alpha);
+		tr.draw(s, posX + 1, posY + 1, 0x04000000 | alpha);
+		tr.draw(s, posX, posY, textColor | alpha);
 		
 		posY += 9;
 	}
 	
-	private static final class Entry
+	private static final class HackListEntry
 	{
-		private final Hack mod;
+		private final Hack hack;
 		private int offset;
 		private int prevOffset;
 		
-		public Entry(Hack mod, int offset)
+		public HackListEntry(Hack mod, int offset)
 		{
-			this.mod = mod;
+			hack = mod;
 			this.offset = offset;
 			prevOffset = offset;
 		}

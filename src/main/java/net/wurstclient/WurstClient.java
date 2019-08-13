@@ -29,6 +29,7 @@ import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
+import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 
@@ -45,6 +46,7 @@ public enum WurstClient
 	private EventManager eventManager;
 	private HackList hax;
 	private CmdList cmds;
+	private OtfList otfs;
 	private SettingsFile settingsFile;
 	private KeybindList keybinds;
 	private ClickGui gui;
@@ -74,6 +76,8 @@ public enum WurstClient
 		
 		cmds = new CmdList();
 		
+		otfs = new OtfList();
+		
 		Path settingsFile = wurstFolder.resolve("settings.json");
 		this.settingsFile = new SettingsFile(settingsFile, hax, cmds);
 		this.settingsFile.load();
@@ -85,7 +89,7 @@ public enum WurstClient
 		gui = new ClickGui(guiFile);
 		
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
-		navigator = new Navigator(preferencesFile, hax, cmds);
+		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
 		
 		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -149,6 +153,11 @@ public enum WurstClient
 	public CmdList getCmds()
 	{
 		return cmds;
+	}
+	
+	public OtfList getOtfs()
+	{
+		return otfs;
 	}
 	
 	public KeybindList getKeybinds()

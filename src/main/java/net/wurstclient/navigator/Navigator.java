@@ -17,6 +17,7 @@ import java.util.List;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.other_feature.OtfList;
 
 public final class Navigator
 {
@@ -24,11 +25,11 @@ public final class Navigator
 	private final HashMap<String, Long> preferences = new HashMap<>();
 	private final PreferencesFile preferencesFile;
 	
-	public Navigator(Path path, HackList hax, CmdList cmds)
+	public Navigator(Path path, HackList hax, CmdList cmds, OtfList otfs)
 	{
 		navigatorList.addAll(hax.getAllHax());
 		navigatorList.addAll(cmds.getAllCmds());
-		// navigatorList.addAll(WurstClient.INSTANCE.special.getAllFeatures());
+		navigatorList.addAll(otfs.getAllOtfs());
 		
 		preferencesFile = new PreferencesFile(path, preferences);
 		preferencesFile.load();
