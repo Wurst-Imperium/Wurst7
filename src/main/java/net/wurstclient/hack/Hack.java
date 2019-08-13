@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
+import net.wurstclient.hacks.NavigatorHack;
 
 public abstract class Hack extends Feature
 {
@@ -69,6 +70,9 @@ public abstract class Hack extends Feature
 			return;
 		
 		this.enabled = enabled;
+		
+		if(!(this instanceof NavigatorHack))
+			WURST.getHud().getHackList().updateState(this);
 		
 		if(enabled)
 			onEnable();

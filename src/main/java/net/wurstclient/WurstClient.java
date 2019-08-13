@@ -18,6 +18,7 @@ import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
+import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
@@ -47,10 +48,12 @@ public enum WurstClient
 	private KeybindList keybinds;
 	private ClickGui gui;
 	private Navigator navigator;
+	private IngameHUD hud;
 	private RotationFaker rotationFaker;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
+	private WurstUpdater updater;
 	
 	public void initialize()
 	{
@@ -90,12 +93,15 @@ public enum WurstClient
 			new KeybindProcessor(hax, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
 		
+		hud = new IngameHUD();
+		eventManager.add(GUIRenderListener.class, hud);
+		
 		rotationFaker = new RotationFaker();
 		eventManager.add(PreMotionListener.class, rotationFaker);
 		eventManager.add(PostMotionListener.class, rotationFaker);
 		
-		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class,
-			new WurstUpdater());
+		updater = new WurstUpdater();
+		eventManager.add(UpdateListener.class, updater);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
@@ -165,6 +171,11 @@ public enum WurstClient
 		return navigator;
 	}
 	
+	public IngameHUD getHud()
+	{
+		return hud;
+	}
+	
 	public RotationFaker getRotationFaker()
 	{
 		return rotationFaker;
@@ -178,5 +189,10 @@ public enum WurstClient
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+	}
+	
+	public WurstUpdater getUpdater()
+	{
+		return updater;
 	}
 }
