@@ -8,7 +8,7 @@
 package net.wurstclient.hud;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Iterator;
 
 import net.minecraft.client.font.TextRenderer;
@@ -37,10 +37,10 @@ public final class HackListHUD implements UpdateListener
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
 		
-		if(otf.getPosition() == Position.RIGHT)
-			posY = 0;
-		else
+		if(otf.getPosition() == Position.LEFT)
 			posY = 22;
+		else
+			posY = 2;
 			
 		// color
 		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
@@ -60,12 +60,21 @@ public final class HackListHUD implements UpdateListener
 		Window sr = WurstClient.MC.window;
 		
 		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
-			// draw counter
-			drawString(activeHax.size() == 1 ? "1 mod active"
-				: activeHax.size() + " mods active");
-		
-		else if(otf.isAnimations())
-			// draw mod list
+			drawCounter();
+		else
+			drawHackList(partialTicks);
+	}
+	
+	private void drawCounter()
+	{
+		long size = activeHax.stream().filter(e -> e.hack.isEnabled()).count();
+		String s = size + " hack" + (size != 1 ? "s" : "") + " active";
+		drawString(s);
+	}
+	
+	private void drawHackList(float partialTicks)
+	{
+		if(otf.isAnimations())
 			for(HackListEntry e : activeHax)
 				drawWithOffset(e, partialTicks);
 		else
@@ -73,19 +82,21 @@ public final class HackListHUD implements UpdateListener
 				drawString(e.hack.getRenderName());
 	}
 	
-	public void updateState(Hack mod)
+	public void updateState(Hack hack)
 	{
-		if(mod.isEnabled())
+		int offset = otf.isAnimations() ? 4 : 0;
+		HackListEntry entry = new HackListEntry(hack, offset);
+		
+		if(hack.isEnabled())
 		{
-			for(HackListEntry e : activeHax)
-				if(e.hack == mod)
-					return;
-				
-			activeHax.add(new HackListEntry(mod, 4));
-			activeHax.sort(Comparator.comparing(e -> e.hack.getName()));
+			if(activeHax.contains(entry))
+				return;
+			
+			activeHax.add(entry);
+			Collections.sort(activeHax);
 			
 		}else if(!otf.isAnimations())
-			activeHax.removeIf(e -> e.hack == mod);
+			activeHax.remove(entry);
 	}
 	
 	@Override
@@ -97,19 +108,14 @@ public final class HackListHUD implements UpdateListener
 		for(Iterator<HackListEntry> itr = activeHax.iterator(); itr.hasNext();)
 		{
 			HackListEntry e = itr.next();
+			boolean enabled = e.hack.isEnabled();
+			e.prevOffset = e.offset;
 			
-			if(e.hack.isEnabled())
-			{
-				e.prevOffset = e.offset;
-				if(e.offset > 0)
-					e.offset--;
-				
-			}else if(!e.hack.isEnabled() && e.offset < 4)
-			{
-				e.prevOffset = e.offset;
+			if(enabled && e.offset > 0)
+				e.offset--;
+			else if(!enabled && e.offset < 4)
 				e.offset++;
-				
-			}else if(!e.hack.isEnabled() && e.offset == 4)
+			else if(!enabled && e.offset >= 4)
 				itr.remove();
 		}
 	}
@@ -117,13 +123,17 @@ public final class HackListHUD implements UpdateListener
 	private void drawString(String s)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		Window sr = WurstClient.MC.window;
 		int posX;
 		
-		if(otf.getPosition() == Position.RIGHT)
-			posX = sr.getScaledWidth() - tr.getStringWidth(s) - 2;
-		else
+		if(otf.getPosition() == Position.LEFT)
 			posX = 2;
+		else
+		{
+			int screenWidth = WurstClient.MC.window.getScaledWidth();
+			int stringWidth = tr.getStringWidth(s);
+			
+			posX = screenWidth - stringWidth - 2;
+		}
 		
 		tr.draw(s, posX + 1, posY + 1, 0xff000000);
 		tr.draw(s, posX, posY, textColor | 0xff000000);
@@ -134,17 +144,21 @@ public final class HackListHUD implements UpdateListener
 	private void drawWithOffset(HackListEntry e, float partialTicks)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		Window sr = WurstClient.MC.window;
-		
 		String s = e.hack.getRenderName();
+		
 		float offset =
 			e.offset * partialTicks + e.prevOffset * (1 - partialTicks);
 		
 		float posX;
-		if(otf.getPosition() == Position.RIGHT)
-			posX = sr.getScaledWidth() - tr.getStringWidth(s) - 2 + 5 * offset;
-		else
+		if(otf.getPosition() == Position.LEFT)
 			posX = 2 - 5 * offset;
+		else
+		{
+			int screenWidth = WurstClient.MC.window.getScaledWidth();
+			int stringWidth = tr.getStringWidth(s);
+			
+			posX = screenWidth - stringWidth - 2 + 5 * offset;
+		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
 		tr.draw(s, posX + 1, posY + 1, 0x04000000 | alpha);
@@ -154,6 +168,7 @@ public final class HackListHUD implements UpdateListener
 	}
 	
 	private static final class HackListEntry
+		implements Comparable<HackListEntry>
 	{
 		private final Hack hack;
 		private int offset;
@@ -164,6 +179,23 @@ public final class HackListHUD implements UpdateListener
 			hack = mod;
 			this.offset = offset;
 			prevOffset = offset;
+		}
+		
+		@Override
+		public int compareTo(HackListEntry o)
+		{
+			return hack.getRenderName()
+				.compareToIgnoreCase(o.hack.getRenderName());
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			if(!(obj instanceof HackListEntry))
+				return false;
+			
+			HackListEntry other = (HackListEntry)obj;
+			return hack == other.hack;
 		}
 	}
 }
