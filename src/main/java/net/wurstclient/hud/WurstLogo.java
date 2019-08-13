@@ -21,6 +21,9 @@ public final class WurstLogo
 	
 	public void render()
 	{
+		if(!WurstClient.INSTANCE.getOtfs().wurstLogoOtf.isVisible())
+			return;
+		
 		String version = getVersionString();
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		

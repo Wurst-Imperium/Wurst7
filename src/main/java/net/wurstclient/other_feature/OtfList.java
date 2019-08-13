@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.other_features.HackListOtf;
+import net.wurstclient.other_features.WurstLogoOtf;
 
 public final class OtfList
 {
@@ -24,6 +25,7 @@ public final class OtfList
 	// public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	// public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
 	// public final TargetOtf targetOtf = new TargetOtf();
+	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
 	// public final YesCheatOtf yesCheatOtf = new YesCheatOtf();
 	
 	private final TreeMap<String, OtherFeature> otfs =

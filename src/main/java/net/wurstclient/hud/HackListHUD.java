@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.Window;
 import net.wurstclient.WurstClient;
@@ -37,7 +39,8 @@ public final class HackListHUD implements UpdateListener
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
 		
-		if(otf.getPosition() == Position.LEFT)
+		if(otf.getPosition() == Position.LEFT
+			&& WurstClient.INSTANCE.getOtfs().wurstLogoOtf.isVisible())
 			posY = 22;
 		else
 			posY = 2;
@@ -50,6 +53,8 @@ public final class HackListHUD implements UpdateListener
 		// | (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
 		// }else
 		textColor = 0x04ffffff;
+		
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		// YesCheat+ mode indicator
 		// YesCheatSpf yesCheatSpf = WurstClient.INSTANCE.special.yesCheatSpf;
