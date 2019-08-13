@@ -62,11 +62,10 @@ public final class ClickGui
 		for(Category category : Category.values())
 			windowMap.put(category, new Window(category.getName()));
 		
-		// TODO: spf
 		ArrayList<Feature> features = new ArrayList<>();
 		features.addAll(WURST.getHax().getAllHax());
 		features.addAll(WURST.getCmds().getAllCmds());
-		// features.addAll(WURST.special.getAllFeatures());
+		features.addAll(WURST.getOtfs().getAllOtfs());
 		
 		for(Feature f : features)
 			if(f.getCategory() != null)
@@ -78,6 +77,7 @@ public final class ClickGui
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
 		windows.add(uiSettings);
 		
 		for(Window window : windows)

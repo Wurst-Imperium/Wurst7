@@ -40,7 +40,8 @@ public final class FeatureButton extends Component
 		if(mouseButton != 0)
 			return;
 		
-		if(hasSettings && mouseX > getX() + getWidth() - 12)
+		if(hasSettings && (mouseX > getX() + getWidth() - 12
+			|| feature.getPrimaryAction().isEmpty()))
 		{
 			if(isSettingsWindowOpen())
 				closeSettingsWindow();
