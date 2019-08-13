@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "wurst",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Wurst Client",
+  "description": "Wurst Wurst Wurst!",
   "authors": [
-    "Me!"
+    "Alexander01998"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.wurstclient.net/",
+    "sources": "https://www.wurstclient.net/github/"
   },
 
   "license": "GPL-3.0-or-later",
