@@ -30,7 +30,7 @@ public abstract class Feature
 		new LinkedHashSet<>();
 	
 	private final String searchTags =
-		getClass().isAnnotationPresent(SearchTags.class) ? String.join("§",
+		getClass().isAnnotationPresent(SearchTags.class) ? String.join("\u00a7",
 			getClass().getAnnotation(SearchTags.class).value()) : "";
 	
 	public abstract String getName();
