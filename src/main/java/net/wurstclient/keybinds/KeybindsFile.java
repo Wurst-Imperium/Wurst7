@@ -12,6 +12,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.gson.JsonObject;
 
@@ -34,7 +35,7 @@ public final class KeybindsFile
 		try
 		{
 			WsonObject wson = JsonUtils.parseFileToObject(path);
-			HashSet<Keybind> newKeybinds = new HashSet<>();
+			Set<Keybind> newKeybinds = new HashSet<>();
 			
 			for(Entry<String, String> entry : wson.getAllStrings().entrySet())
 			{
@@ -47,6 +48,9 @@ public final class KeybindsFile
 				Keybind keybind = new Keybind(keyName, commands);
 				newKeybinds.add(keybind);
 			}
+			
+			if(newKeybinds.isEmpty())
+				newKeybinds = KeybindList.DEFAULT_KEYBINDS;
 			
 			list.setKeybinds(newKeybinds);
 			
