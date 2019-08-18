@@ -116,7 +116,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				{
 					text +=
 						"\n\nWARNING: This key is already bound to the following\ncommand(s):";
-					commands = commands.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
+					commands = commands.replace(";", "\u00a7")
+						.replace("\u00a7\u00a7", ";");
 					
 					for(String cmd : commands.split("\u00a7"))
 						text += "\n- " + cmd;

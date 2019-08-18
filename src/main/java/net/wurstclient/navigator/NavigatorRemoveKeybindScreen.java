@@ -64,8 +64,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		if(oldCommands == null)
 			return;
 		
-		ArrayList<String> commandsList = new ArrayList<>(Arrays.asList(
-			oldCommands.replace(";", "\u00a7").replace("\u00a7\u00a7", ";").split("\u00a7")));
+		ArrayList<String> commandsList =
+			new ArrayList<>(Arrays.asList(oldCommands.replace(";", "\u00a7")
+				.replace("\u00a7\u00a7", ";").split("\u00a7")));
 		
 		String command = existingKeybinds.get(selectedKey).getCommand();
 		while(commandsList.contains(command))
