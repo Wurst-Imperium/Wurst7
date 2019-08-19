@@ -1,0 +1,40 @@
+/*
+ * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.mixin;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemConvertible;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
+import net.wurstclient.WurstClient;
+import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
+
+@Mixin(Block.class)
+public abstract class BlockMixin implements ItemConvertible
+{
+	@Inject(at = {@At("TAIL")},
+		method = {
+			"shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"},
+		cancellable = true)
+	private static void onShouldDrawSide(BlockState state, BlockView blockView,
+		BlockPos blockPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+	{
+		ShouldDrawSideEvent event =
+			new ShouldDrawSideEvent(state, cir.getReturnValueZ());
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		
+		cir.setReturnValue(event.isRendered());
+	}
+}
