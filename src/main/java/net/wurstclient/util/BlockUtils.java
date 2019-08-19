@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShapes;
@@ -40,8 +41,17 @@ public enum BlockUtils
 	
 	public static String getName(BlockPos pos)
 	{
-		Block block = BlockUtils.getBlock(pos);
+		return getName(getBlock(pos));
+	}
+	
+	public static String getName(Block block)
+	{
 		return Registry.BLOCK.getId(block).toString();
+	}
+	
+	public static Block getBlockFromName(String name)
+	{
+		return Registry.BLOCK.get(new Identifier(name));
 	}
 	
 	public static float getHardness(BlockPos pos)
