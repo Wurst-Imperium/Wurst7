@@ -47,7 +47,7 @@ public final class BlockListSetting extends Setting
 	
 	public BlockListSetting(String name, Block... blocks)
 	{
-		this(name, null, blocks);
+		this(name, "", blocks);
 	}
 	
 	public List<String> getBlockNames()
