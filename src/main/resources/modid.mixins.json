@@ -7,7 +7,6 @@
   "client": [
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
-  	"BlockModelRendererMixin",
   	"BlockStateMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
@@ -19,7 +18,8 @@
     "IngameHudMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "TerrainRenderContextMixin"
   ],
   "injectors": {
     "defaultRequire": 1

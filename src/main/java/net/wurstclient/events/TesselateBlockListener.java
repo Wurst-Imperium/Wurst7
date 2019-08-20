@@ -13,16 +13,16 @@ import net.minecraft.block.BlockState;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
-public interface RenderBlockModelListener extends Listener
+public interface TesselateBlockListener extends Listener
 {
-	public void onRenderBlockModel(RenderBlockModelEvent event);
+	public void onTesselateBlock(TesselateBlockEvent event);
 	
-	public static class RenderBlockModelEvent
-		extends CancellableEvent<RenderBlockModelListener>
+	public static class TesselateBlockEvent
+		extends CancellableEvent<TesselateBlockListener>
 	{
 		private final BlockState state;
 		
-		public RenderBlockModelEvent(BlockState state)
+		public TesselateBlockEvent(BlockState state)
 		{
 			this.state = state;
 		}
@@ -33,11 +33,11 @@ public interface RenderBlockModelListener extends Listener
 		}
 		
 		@Override
-		public void fire(ArrayList<RenderBlockModelListener> listeners)
+		public void fire(ArrayList<TesselateBlockListener> listeners)
 		{
-			for(RenderBlockModelListener listener : listeners)
+			for(TesselateBlockListener listener : listeners)
 			{
-				listener.onRenderBlockModel(this);
+				listener.onTesselateBlock(this);
 				
 				if(isCancelled())
 					break;
@@ -45,9 +45,9 @@ public interface RenderBlockModelListener extends Listener
 		}
 		
 		@Override
-		public Class<RenderBlockModelListener> getListenerType()
+		public Class<TesselateBlockListener> getListenerType()
 		{
-			return RenderBlockModelListener.class;
+			return TesselateBlockListener.class;
 		}
 	}
 }
