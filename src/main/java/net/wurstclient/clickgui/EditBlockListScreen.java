@@ -62,6 +62,7 @@ public final class EditBlockListScreen extends Screen
 		
 		blockNameField = new TextFieldWidget(minecraft.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, "");
+		children.add(blockNameField);
 		
 		addButton(addButton =
 			new ButtonWidget(width / 2 - 2, height - 56, 30, 20, "Add", b -> {
@@ -88,13 +89,40 @@ public final class EditBlockListScreen extends Screen
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
-		blockNameField.mouseClicked(mouseX, mouseY, mouseButton);
+		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
 		
-		if(mouseX < (width - 220) / 2 || mouseX > width / 2 + 129 || mouseY < 32
-			|| mouseY > height - 64)
+		blockNameField.mouseClicked(mouseX, mouseY, mouseButton);
+		listGui.mouseClicked(mouseX, mouseY, mouseButton);
+		
+		if(!childClicked && (mouseX < (width - 220) / 2
+			|| mouseX > width / 2 + 129 || mouseY < 32 || mouseY > height - 64))
 			listGui.selected = -1;
 		
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		return childClicked;
+	}
+	
+	@Override
+	public boolean mouseDragged(double double_1, double double_2, int int_1,
+		double double_3, double double_4)
+	{
+		listGui.mouseDragged(double_1, double_2, int_1, double_3, double_4);
+		return super.mouseDragged(double_1, double_2, int_1, double_3,
+			double_4);
+	}
+	
+	@Override
+	public boolean mouseReleased(double double_1, double double_2, int int_1)
+	{
+		listGui.mouseReleased(double_1, double_2, int_1);
+		return super.mouseReleased(double_1, double_2, int_1);
+	}
+	
+	@Override
+	public boolean mouseScrolled(double double_1, double double_2,
+		double double_3)
+	{
+		listGui.mouseScrolled(double_1, double_2, double_3);
+		return super.mouseScrolled(double_1, double_2, double_3);
 	}
 	
 	@Override
@@ -228,8 +256,8 @@ public final class EditBlockListScreen extends Screen
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
 				GuiLighting.enableForItems();
-				mc.getItemRenderer().renderGuiItem(new ItemStack(Blocks.GRASS),
-					0, 0);
+				mc.getItemRenderer()
+					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				GuiLighting.disable();
 				GL11.glPopMatrix();
 				
