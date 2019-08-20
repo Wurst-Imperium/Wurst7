@@ -24,17 +24,17 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
 {
-	@Inject(at = {@At("TAIL")},
+	@Inject(at = {@At("HEAD")},
 		method = {
 			"shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"},
 		cancellable = true)
 	private static void onShouldDrawSide(BlockState state, BlockView blockView,
 		BlockPos blockPos, Direction side, CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event =
-			new ShouldDrawSideEvent(state, cir.getReturnValueZ());
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
-		cir.setReturnValue(event.isRendered());
+		if(event.isRendered() != null)
+			cir.setReturnValue(event.isRendered());
 	}
 }

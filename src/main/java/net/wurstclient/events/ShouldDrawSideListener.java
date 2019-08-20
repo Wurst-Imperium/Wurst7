@@ -21,14 +21,11 @@ public interface ShouldDrawSideListener extends Listener
 		extends Event<ShouldDrawSideListener>
 	{
 		private final BlockState state;
-		private boolean rendered;
-		private final boolean normallyRendered;
+		private Boolean rendered;
 		
-		public ShouldDrawSideEvent(BlockState state, boolean rendered)
+		public ShouldDrawSideEvent(BlockState state)
 		{
 			this.state = state;
-			this.rendered = rendered;
-			normallyRendered = rendered;
 		}
 		
 		public BlockState getState()
@@ -36,7 +33,7 @@ public interface ShouldDrawSideListener extends Listener
 			return state;
 		}
 		
-		public boolean isRendered()
+		public Boolean isRendered()
 		{
 			return rendered;
 		}
@@ -44,11 +41,6 @@ public interface ShouldDrawSideListener extends Listener
 		public void setRendered(boolean rendered)
 		{
 			this.rendered = rendered;
-		}
-		
-		public boolean isNormallyRendered()
-		{
-			return normallyRendered;
 		}
 		
 		@Override
