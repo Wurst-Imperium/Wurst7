@@ -75,7 +75,7 @@ public final class HackList implements UpdateListener
 	// public final FastLadderHack fastLadderHack = new FastLadderHack();
 	public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
 	// public final FightBotHack fightBotHack = new FightBotHack();
-	// public final FlightHack flightHack = new FlightHack();
+	public final FlightHack flightHack = new FlightHack();
 	// public final FollowHack followHack = new FollowHack();
 	// public final ForceOpHack forceOpHack = new ForceOpHack();
 	// public final ForcePushHack forcePushHack = new ForcePushHack();
