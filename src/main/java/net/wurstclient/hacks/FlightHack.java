@@ -13,13 +13,15 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"FlyHack", "fly hack", "flying"})
-public final class FlightHack extends Hack implements UpdateListener
+public final class FlightHack extends Hack
+	implements UpdateListener, IsPlayerInWaterListener
 {
 	public final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
@@ -38,12 +40,14 @@ public final class FlightHack extends Hack implements UpdateListener
 	public void onEnable()
 	{
 		WURST.getEventManager().add(UpdateListener.class, this);
+		WURST.getEventManager().add(IsPlayerInWaterListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
 		WURST.getEventManager().remove(UpdateListener.class, this);
+		WURST.getEventManager().remove(IsPlayerInWaterListener.class, this);
 	}
 	
 	@Override
@@ -62,5 +66,11 @@ public final class FlightHack extends Hack implements UpdateListener
 		
 		if(MC.options.keySneak.isPressed())
 			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
+	}
+	
+	@Override
+	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
+	{
+		event.setInWater(false);
 	}
 }

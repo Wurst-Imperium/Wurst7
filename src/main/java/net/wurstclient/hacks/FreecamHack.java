@@ -17,13 +17,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.CameraTransformViewBobbingListener;
-import net.wurstclient.events.IsNormalCubeListener;
-import net.wurstclient.events.PacketOutputListener;
-import net.wurstclient.events.PlayerMoveListener;
-import net.wurstclient.events.RenderListener;
-import net.wurstclient.events.SetOpaqueCubeListener;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.*;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -39,8 +33,8 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"free camera", "spectator"})
 public final class FreecamHack extends Hack
 	implements UpdateListener, PacketOutputListener, PlayerMoveListener,
-	CameraTransformViewBobbingListener, IsNormalCubeListener,
-	SetOpaqueCubeListener, RenderListener
+	IsPlayerInWaterListener, CameraTransformViewBobbingListener,
+	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener
 {
 	private final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
@@ -64,6 +58,7 @@ public final class FreecamHack extends Hack
 	{
 		WURST.getEventManager().add(UpdateListener.class, this);
 		WURST.getEventManager().add(PacketOutputListener.class, this);
+		WURST.getEventManager().add(IsPlayerInWaterListener.class, this);
 		WURST.getEventManager().add(PlayerMoveListener.class, this);
 		WURST.getEventManager().add(CameraTransformViewBobbingListener.class,
 			this);
@@ -94,6 +89,7 @@ public final class FreecamHack extends Hack
 	{
 		WURST.getEventManager().remove(UpdateListener.class, this);
 		WURST.getEventManager().remove(PacketOutputListener.class, this);
+		WURST.getEventManager().remove(IsPlayerInWaterListener.class, this);
 		WURST.getEventManager().remove(PlayerMoveListener.class, this);
 		WURST.getEventManager().remove(CameraTransformViewBobbingListener.class,
 			this);
@@ -141,6 +137,12 @@ public final class FreecamHack extends Hack
 	public void onPlayerMove(IClientPlayerEntity player)
 	{
 		player.setNoClip(true);
+	}
+	
+	@Override
+	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
+	{
+		event.setInWater(false);
 	}
 	
 	@Override

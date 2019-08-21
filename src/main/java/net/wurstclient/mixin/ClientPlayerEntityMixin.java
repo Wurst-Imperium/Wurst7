@@ -22,6 +22,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
+import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
@@ -82,6 +83,16 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Override
+	public boolean isInsideWater()
+	{
+		boolean inWater = super.isInsideWater();
+		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		
+		return event.isInWater();
 	}
 	
 	@Override
