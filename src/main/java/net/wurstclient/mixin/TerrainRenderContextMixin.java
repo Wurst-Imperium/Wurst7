@@ -23,9 +23,9 @@ import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 public class TerrainRenderContextMixin
 {
 	@Inject(at = {@At("HEAD")},
-		method = {
-			"tesselateBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/model/BakedModel;)Z"},
-		cancellable = true)
+		method = {"tesselateBlock"},
+		cancellable = true,
+		remap = false)
 	private void tesselateBlock(BlockState blockState, BlockPos blockPos,
 		final BakedModel model, CallbackInfoReturnable<Boolean> cir)
 	{
