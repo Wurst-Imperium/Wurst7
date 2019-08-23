@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
@@ -29,21 +28,25 @@ public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
 {
-	private final BlockListSetting ores = new BlockListSetting("Ores",
-		Blocks.COAL_ORE, Blocks.COAL_BLOCK, Blocks.IRON_ORE, Blocks.IRON_BLOCK,
-		Blocks.GOLD_ORE, Blocks.GOLD_BLOCK, Blocks.LAPIS_ORE,
-		Blocks.LAPIS_BLOCK, Blocks.REDSTONE_ORE, Blocks.REDSTONE_BLOCK,
-		Blocks.DIAMOND_ORE, Blocks.DIAMOND_BLOCK, Blocks.EMERALD_ORE,
-		Blocks.EMERALD_BLOCK, Blocks.NETHER_QUARTZ_ORE, Blocks.CLAY,
-		Blocks.BONE_BLOCK, Blocks.GLOWSTONE, Blocks.CRAFTING_TABLE,
-		Blocks.FURNACE, Blocks.TORCH, Blocks.LADDER, Blocks.TNT,
-		Blocks.ENCHANTING_TABLE, Blocks.BOOKSHELF, Blocks.ANVIL,
-		Blocks.BREWING_STAND, Blocks.BEACON, Blocks.CHEST, Blocks.TRAPPED_CHEST,
-		Blocks.ENDER_CHEST, Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER,
-		Blocks.WATER, Blocks.LAVA, Blocks.MOSSY_COBBLESTONE, Blocks.SPAWNER,
-		Blocks.NETHER_PORTAL, Blocks.END_PORTAL, Blocks.END_PORTAL_FRAME,
-		Blocks.COMMAND_BLOCK, Blocks.CHAIN_COMMAND_BLOCK,
-		Blocks.REPEATING_COMMAND_BLOCK);
+	private final BlockListSetting ores = new BlockListSetting("Ores", "",
+		"minecraft:anvil", "minecraft:beacon", "minecraft:bone_block",
+		"minecraft:bookshelf", "minecraft:brewing_stand",
+		"minecraft:chain_command_block", "minecraft:chest", "minecraft:clay",
+		"minecraft:coal_block", "minecraft:coal_ore", "minecraft:command_block",
+		"minecraft:crafting_table", "minecraft:diamond_block",
+		"minecraft:diamond_ore", "minecraft:dispenser", "minecraft:dropper",
+		"minecraft:emerald_block", "minecraft:emerald_ore",
+		"minecraft:enchanting_table", "minecraft:end_portal",
+		"minecraft:end_portal_frame", "minecraft:ender_chest",
+		"minecraft:furnace", "minecraft:glowstone", "minecraft:gold_block",
+		"minecraft:gold_ore", "minecraft:hopper", "minecraft:iron_block",
+		"minecraft:iron_ore", "minecraft:ladder", "minecraft:lapis_block",
+		"minecraft:lapis_ore", "minecraft:lava", "minecraft:mossy_cobblestone",
+		"minecraft:nether_portal", "minecraft:nether_quartz_ore",
+		"minecraft:redstone_block", "minecraft:redstone_ore",
+		"minecraft:repeating_command_block", "minecraft:spawner",
+		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
+		"minecraft:water");
 	
 	private ArrayList<String> oreNames;
 	

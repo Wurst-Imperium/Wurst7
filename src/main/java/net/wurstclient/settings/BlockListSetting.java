@@ -35,19 +35,15 @@ public final class BlockListSetting extends Setting
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public BlockListSetting(String name, String description, Block... blocks)
+	public BlockListSetting(String name, String description, String... blocks)
 	{
 		super(name, description);
 		
-		Arrays.stream(blocks).parallel().filter(Objects::nonNull)
-			.map(b -> BlockUtils.getName(b)).distinct().sorted()
-			.forEachOrdered(s -> blockNames.add(s));
+		Arrays.stream(blocks).parallel()
+			.map(s -> Registry.BLOCK.get(new Identifier(s)))
+			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
+			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
-	}
-	
-	public BlockListSetting(String name, Block... blocks)
-	{
-		this(name, "", blocks);
 	}
 	
 	public List<String> getBlockNames()
