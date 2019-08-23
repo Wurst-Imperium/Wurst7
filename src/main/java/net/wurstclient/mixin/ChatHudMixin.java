@@ -28,7 +28,7 @@ import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 public class ChatHudMixin extends DrawableHelper
 {
 	@Shadow
-	private List<ChatHudLine> messages;
+	private List<ChatHudLine> visibleMessages;
 	@Shadow
 	private static Logger LOGGER;
 	@Shadow
@@ -39,11 +39,14 @@ public class ChatHudMixin extends DrawableHelper
 		cancellable = true)
 	private void onAddMessage(Text chatText, int chatLineId, CallbackInfo ci)
 	{
-		ChatInputEvent event = new ChatInputEvent(chatText, messages);
+		ChatInputEvent event = new ChatInputEvent(chatText, visibleMessages);
 		
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		if(event.isCancelled())
+		{
 			ci.cancel();
+			return;
+		}
 		
 		chatText = event.getComponent();
 		shadow$addMessage(chatText, chatLineId, client.inGameHud.getTicks(),
