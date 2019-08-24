@@ -79,7 +79,7 @@ public enum WurstClient
 		otfs = new OtfList();
 		
 		Path settingsFile = wurstFolder.resolve("settings.json");
-		this.settingsFile = new SettingsFile(settingsFile, hax, cmds);
+		this.settingsFile = new SettingsFile(settingsFile, hax, cmds, otfs);
 		this.settingsFile.load();
 		
 		Path keybindsFile = wurstFolder.resolve("keybinds.json");

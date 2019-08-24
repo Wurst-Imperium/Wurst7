@@ -24,6 +24,8 @@ import net.wurstclient.command.CmdList;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.other_feature.OtfList;
+import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonObject;
@@ -34,13 +36,14 @@ public final class SettingsFile
 	private final Map<String, Feature> featuresWithSettings;
 	private boolean disableSaving;
 	
-	public SettingsFile(Path path, HackList hax, CmdList cmds)
+	public SettingsFile(Path path, HackList hax, CmdList cmds, OtfList otfs)
 	{
 		this.path = path;
-		featuresWithSettings = createFeatureMap(hax, cmds);
+		featuresWithSettings = createFeatureMap(hax, cmds, otfs);
 	}
 	
-	private Map<String, Feature> createFeatureMap(HackList hax, CmdList cmds)
+	private Map<String, Feature> createFeatureMap(HackList hax, CmdList cmds,
+		OtfList otfs)
 	{
 		LinkedHashMap<String, Feature> map = new LinkedHashMap<>();
 		
@@ -51,6 +54,10 @@ public final class SettingsFile
 		for(Command cmd : cmds.getAllCmds())
 			if(!cmd.getSettings().isEmpty())
 				map.put(cmd.getName(), cmd);
+			
+		for(OtherFeature otf : otfs.getAllOtfs())
+			if(!otf.getSettings().isEmpty())
+				map.put(otf.getName(), otf);
 			
 		return Collections.unmodifiableMap(map);
 	}
