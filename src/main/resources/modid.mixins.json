@@ -8,6 +8,7 @@
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockStateMixin",
+  	"CactusBlockMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
   	"ClientConnectionMixin",
