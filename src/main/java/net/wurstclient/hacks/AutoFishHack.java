@@ -42,22 +42,31 @@ public final class AutoFishHack extends Hack
 			+ "detected, decrease it if other people's\n"
 			+ "bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
+	
 	private CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
 		"Shows where bites are occurring and where\n"
 			+ "they will be detected. Useful for optimizing\n"
 			+ "your 'Valid range' setting.",
 		false);
 	
-	private int timer;
-	private Vec3d lastSoundPos;
+	private int bestRodValue;
+	private int bestRodSlot;
+	
+	private int castRodTimer;
+	private int reelInTimer;
+	
 	private int box;
 	private int cross;
+	
+	private int scheduledWindowClick;
+	private Vec3d lastSoundPos;
 	
 	public AutoFishHack()
 	{
 		super("AutoFish", "Automatically catches fish using your\n"
 			+ "best fishing rod. If it finds a better\n"
 			+ "rod while fishing, it will automatically\n" + "switch to it.");
+		
 		setCategory(Category.OTHER);
 		addSetting(validRange);
 		addSetting(debugDraw);
@@ -66,7 +75,11 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		timer = 0;
+		bestRodValue = -1;
+		bestRodSlot = -1;
+		castRodTimer = 0;
+		reelInTimer = -1;
+		scheduledWindowClick = -1;
 		lastSoundPos = null;
 		
 		box = GL11.glGenLists(1);
@@ -101,7 +114,63 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		// update range box
+		updateDebugDraw();
+		
+		if(reelInTimer > 0)
+			reelInTimer--;
+		
+		ClientPlayerEntity player = MC.player;
+		PlayerInventory inventory = player.inventory;
+		
+		if(scheduledWindowClick != -1)
+		{
+			IMC.getInteractionManager()
+				.windowClick_PICKUP(scheduledWindowClick);
+			castRodTimer = 15;
+			return;
+		}
+		
+		updateBestRod();
+		
+		if(bestRodSlot == -1)
+		{
+			ChatUtils.message("Out of fishing rods.");
+			setEnabled(false);
+			return;
+		}
+		
+		if(bestRodSlot != inventory.selectedSlot)
+		{
+			selectBestRod();
+			return;
+		}
+		
+		// wait for timer
+		if(castRodTimer > 0)
+		{
+			castRodTimer--;
+			return;
+		}
+		
+		// cast rod
+		if(player.fishHook == null)
+		{
+			rightClick();
+			castRodTimer = 15;
+			reelInTimer = 1200;
+		}
+		
+		// reel in after 60s
+		if(reelInTimer == 0)
+		{
+			reelInTimer--;
+			rightClick();
+			castRodTimer = 15;
+		}
+	}
+	
+	private void updateDebugDraw()
+	{
 		if(debugDraw.isChecked())
 		{
 			GL11.glNewList(box, GL11.GL_COMPILE);
@@ -112,20 +181,17 @@ public final class AutoFishHack extends Hack
 			RenderUtils.drawOutlinedBox(box);
 			GL11.glEndList();
 		}
+	}
+	
+	private void updateBestRod()
+	{
+		PlayerInventory inventory = MC.player.inventory;
+		int selectedSlot = inventory.selectedSlot;
+		ItemStack selectedStack = inventory.getInvStack(selectedSlot);
 		
-		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.inventory;
-		
-		if(timer < 0)
-		{
-			IMC.getInteractionManager().windowClick_PICKUP(-timer);
-			timer = 15;
-			return;
-		}
-		
-		int bestRodValue =
-			getRodValue(inventory.getInvStack(inventory.selectedSlot));
-		int bestRodSlot = bestRodValue > -1 ? inventory.selectedSlot : -1;
+		// start with selected rod
+		bestRodValue = getRodValue(selectedStack);
+		bestRodSlot = bestRodValue > -1 ? selectedSlot : -1;
 		
 		// search inventory for better rod
 		for(int slot = 0; slot < 36; slot++)
@@ -139,29 +205,29 @@ public final class AutoFishHack extends Hack
 				bestRodSlot = slot;
 			}
 		}
+	}
+	
+	private int getRodValue(ItemStack stack)
+	{
+		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
+			return -1;
 		
-		if(bestRodSlot == inventory.selectedSlot)
-		{
-			// wait for timer
-			if(timer > 0)
-			{
-				timer--;
-				return;
-			}
-			
-			// cast rod
-			if(player.fishHook == null)
-				rightClick();
-			
-			return;
-		}
+		int luckOTSLvl =
+			EnchantmentHelper.getLevel(Enchantments.LUCK_OF_THE_SEA, stack);
+		int lureLvl = EnchantmentHelper.getLevel(Enchantments.LURE, stack);
+		int unbreakingLvl =
+			EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
+		int mendingBonus =
+			EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
+		int noVanishBonus = EnchantmentHelper.hasVanishingCurse(stack) ? 0 : 1;
 		
-		if(bestRodSlot == -1)
-		{
-			ChatUtils.message("Out of fishing rods.");
-			setEnabled(false);
-			return;
-		}
+		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
+			+ noVanishBonus;
+	}
+	
+	private void selectBestRod()
+	{
+		PlayerInventory inventory = MC.player.inventory;
 		
 		if(bestRodSlot < 9)
 		{
@@ -169,8 +235,8 @@ public final class AutoFishHack extends Hack
 			return;
 		}
 		
-		// place rod in hotbar
 		int firstEmptySlot = inventory.getEmptySlot();
+		
 		if(firstEmptySlot != -1)
 		{
 			if(firstEmptySlot >= 9)
@@ -184,7 +250,8 @@ public final class AutoFishHack extends Hack
 			IMC.getInteractionManager().windowClick_PICKUP(bestRodSlot);
 			IMC.getInteractionManager()
 				.windowClick_PICKUP(36 + inventory.selectedSlot);
-			timer = -bestRodSlot;
+			
+			scheduledWindowClick = -bestRodSlot;
 		}
 	}
 	
@@ -214,6 +281,18 @@ public final class AutoFishHack extends Hack
 		
 		// catch fish
 		rightClick();
+		castRodTimer = 15;
+	}
+	
+	private void rightClick()
+	{
+		// check held item
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
+			return;
+		
+		// right click
+		IMC.rightClick();
 	}
 	
 	@Override
@@ -259,37 +338,5 @@ public final class AutoFishHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private int getRodValue(ItemStack stack)
-	{
-		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
-			return -1;
-		
-		int luckOTSLvl =
-			EnchantmentHelper.getLevel(Enchantments.LUCK_OF_THE_SEA, stack);
-		int lureLvl = EnchantmentHelper.getLevel(Enchantments.LURE, stack);
-		int unbreakingLvl =
-			EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
-		int mendingBonus =
-			EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
-		int noVanishBonus = EnchantmentHelper.hasVanishingCurse(stack) ? 0 : 1;
-		
-		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
-			+ noVanishBonus;
-	}
-	
-	private void rightClick()
-	{
-		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
-			return;
-		
-		// right click
-		IMC.rightClick();
-		
-		// reset timer
-		timer = 15;
 	}
 }
