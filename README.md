@@ -1,6 +1,10 @@
-# Wurst Client MC 1.14.2
+# Wurst Client v7
 
-## Setup (Windows 10, Eclipse)
+## Downloads (for users)
+
+https://www.wurstclient.net/download/
+
+## Setup (for developers) (using Windows 10 & Eclipse)
 
 1. Run these two commands in PowerShell:
 
