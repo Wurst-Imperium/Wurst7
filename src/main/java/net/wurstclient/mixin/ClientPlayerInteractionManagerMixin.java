@@ -9,6 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -17,6 +20,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.container.SlotActionType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.packet.PlayerActionC2SPacket;
+import net.minecraft.server.network.packet.PlayerActionC2SPacket.Action;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -24,6 +29,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.wurstclient.WurstClient;
+import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -36,6 +43,25 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
+	
+	/**
+	 * blockHitDelay
+	 */
+	@Shadow
+	private int field_3716;
+	
+	@Inject(at = {@At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
+		ordinal = 0)},
+		method = {
+			"method_2902(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
+	private void onPlayerDamageBlock(BlockPos blockPos_1, Direction direction_1,
+		CallbackInfoReturnable<Boolean> cir)
+	{
+		BlockBreakingProgressEvent event =
+			new BlockBreakingProgressEvent(blockPos_1, direction_1);
+		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
 	
 	@Override
 	public float getCurrentBreakingProgress()
@@ -79,6 +105,27 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		interactBlock(client.player, client.world, Hand.MAIN_HAND,
 			new BlockHitResult(hitVec, side, pos, false));
+	}
+	
+	@Override
+	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
+		Direction direction)
+	{
+		method_21706(action, blockPos, direction);
+	}
+	
+	@Shadow
+	private void method_21706(
+		PlayerActionC2SPacket.Action playerActionC2SPacket$Action_1,
+		BlockPos blockPos_1, Direction direction_1)
+	{
+		
+	}
+	
+	@Override
+	public void setBlockHitDelay(int delay)
+	{
+		field_3716 = delay;
 	}
 	
 	@Shadow

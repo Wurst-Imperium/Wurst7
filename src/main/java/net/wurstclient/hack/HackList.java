@@ -69,7 +69,7 @@ public final class HackList implements UpdateListener
 	// public final ExcavatorHack excavatorHack = new ExcavatorHack();
 	// public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
 	// public final FancyChatHack fancyChatHack = new FancyChatHack();
-	// public final FastBreakHack fastBreakHack = new FastBreakHack();
+	public final FastBreakHack fastBreakHack = new FastBreakHack();
 	// public final FastBowHack fastBowHack = new FastBowHack();
 	// public final FastEatHack fastEatHack = new FastEatHack();
 	// public final FastLadderHack fastLadderHack = new FastLadderHack();

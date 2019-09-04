@@ -8,6 +8,7 @@
 package net.wurstclient.mixinterface;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.packet.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -27,4 +28,9 @@ public interface IClientPlayerInteractionManager
 	public void rightClickItem();
 	
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec);
+	
+	public void sendPlayerActionC2SPacket(PlayerActionC2SPacket.Action action,
+		BlockPos blockPos, Direction direction);
+	
+	public void setBlockHitDelay(int delay);
 }
