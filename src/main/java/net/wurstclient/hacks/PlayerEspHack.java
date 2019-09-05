@@ -137,6 +137,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glPopMatrix();
 		
 		// GL resets
+		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
