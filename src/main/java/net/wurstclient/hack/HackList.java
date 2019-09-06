@@ -42,7 +42,7 @@ public final class HackList implements UpdateListener
 	// public final AutoSplashPotHack autoSplashPotHack = new
 	// AutoSplashPotHack();
 	// public final AutoSoupHack autoSoupHack = new AutoSoupHack();
-	// public final AutoSprintHack autoSprintHack = new AutoSprintHack();
+	public final AutoSprintHack autoSprintHack = new AutoSprintHack();
 	// public final AutoStealHack autoStealHack = new AutoStealHack();
 	// public final AutoSwitchHack autoSwitchHack = new AutoSwitchHack();
 	// public final AutoSwordHack autoSwordHack = new AutoSwordHack();
