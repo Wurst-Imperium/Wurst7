@@ -39,7 +39,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.0pre6";
+	public static final String VERSION = "7.0pre7";
 	public static final String MC_VERSION = "1.14.4";
 	
 	private WurstAnalytics analytics;
