@@ -13,12 +13,12 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"auto sprint"})
-public final class AutoSprintHack extends Hack implements UpdateListener
+@SearchTags({"auto swim"})
+public final class AutoSwimHack extends Hack implements UpdateListener
 {
-	public AutoSprintHack()
+	public AutoSwimHack()
 	{
-		super("AutoSprint", "Makes you sprint automatically.");
+		super("AutoSwim", "Triggers the swimming animation automatically.");
 		setCategory(Category.MOVEMENT);
 	}
 	
@@ -42,7 +42,7 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		if(player.horizontalCollision || player.isSneaking())
 			return;
 		
-		if(player.isInWater())
+		if(!player.isInsideWater())
 			return;
 		
 		if(player.forwardSpeed > 0)
