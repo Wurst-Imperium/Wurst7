@@ -66,7 +66,7 @@ public final class HackList implements UpdateListener
 	// public final CrashTagHack crashTagHack = new CrashTagHack();
 	// public final CriticalsHack criticalsHack = new CriticalsHack();
 	// public final DerpHack derpHack = new DerpHack();
-	// public final DolphinHack dolphinHack = new DolphinHack();
+	public final DolphinHack dolphinHack = new DolphinHack();
 	// public final ExcavatorHack excavatorHack = new ExcavatorHack();
 	// public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
 	// public final FancyChatHack fancyChatHack = new FancyChatHack();
@@ -76,6 +76,7 @@ public final class HackList implements UpdateListener
 	// public final FastLadderHack fastLadderHack = new FastLadderHack();
 	public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
 	// public final FightBotHack fightBotHack = new FightBotHack();
+	public final FishHack fishHack = new FishHack();
 	public final FlightHack flightHack = new FlightHack();
 	// public final FollowHack followHack = new FollowHack();
 	// public final ForceOpHack forceOpHack = new ForceOpHack();
