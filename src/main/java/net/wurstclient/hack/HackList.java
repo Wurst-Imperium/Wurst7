@@ -94,6 +94,7 @@ public final class HackList implements UpdateListener
 	// InstantBunkerHack();
 	// public final InvWalkHack invWalkHack = new InvWalkHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
+	public final ItemGeneratorHack itemGeneratorHack = new ItemGeneratorHack();
 	// public final JesusHack jesusHack = new JesusHack();
 	// public final JetpackHack jetpackHack = new JetpackHack();
 	// public final KaboomHack kaboomHack = new KaboomHack();
