@@ -45,6 +45,12 @@ public final class DropCmd extends Command implements UpdateListener
 		WURST.getEventManager().add(UpdateListener.class, this);
 	}
 	
+	private void dropAllItems()
+	{
+		for(int i = 9; i < 45; i++)
+			IMC.getInteractionManager().windowClick_THROW(i);
+	}
+	
 	@Override
 	public void onUpdate()
 	{
@@ -52,7 +58,9 @@ public final class DropCmd extends Command implements UpdateListener
 		if(slowModeTimer > 0)
 			return;
 		
+		skipEmptySlots();
 		IMC.getInteractionManager().windowClick_THROW(slowModeSlotCounter);
+		
 		slowModeSlotCounter++;
 		slowModeTimer = 5;
 		
@@ -60,9 +68,18 @@ public final class DropCmd extends Command implements UpdateListener
 			WURST.getEventManager().remove(UpdateListener.class, this);
 	}
 	
-	private void dropAllItems()
+	private void skipEmptySlots()
 	{
-		for(int i = 9; i < 45; i++)
-			IMC.getInteractionManager().windowClick_THROW(i);
+		while(slowModeSlotCounter < 45)
+		{
+			int adjustedSlot = slowModeSlotCounter;
+			if(adjustedSlot >= 36)
+				adjustedSlot -= 36;
+			
+			if(!MC.player.inventory.getInvStack(adjustedSlot).isEmpty())
+				break;
+			
+			slowModeSlotCounter++;
+		}
 	}
 }
