@@ -56,7 +56,7 @@ public final class HackList implements UpdateListener
 	// public final BonemealAuraHack bonemealAuraHack = new BonemealAuraHack();
 	// public final BowAimbotHack bowAimbotHack = new BowAimbotHack();
 	// public final BuildRandomHack buildRandomHack = new BuildRandomHack();
-	// public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
+	public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
 	// public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	// public final CaveFinderHack caveFinderHack = new CaveFinderHack();
 	// public final ChestEspHack chestEspHack = new ChestEspHack();
