@@ -35,6 +35,14 @@ public final class MobEspHack extends Hack implements UpdateListener,
 {
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
+	
+	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
+		"\u00a7lAccurate\u00a7r mode shows the exact\n"
+			+ "hitbox of each mob.\n"
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
+			+ "boxes that look better.",
+		BoxSize.values(), BoxSize.FANCY);
+	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible mobs.", false);
 	
@@ -46,6 +54,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		super("MobESP", "Highlights nearby mobs.");
 		setCategory(Category.RENDER);
 		addSetting(style);
+		addSetting(boxSize);
 		addSetting(filterInvisible);
 	}
 	
@@ -132,14 +141,18 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private void renderBoxes(double partialTicks)
 	{
+		double extraSize = boxSize.getSelected().extraSize;
+		
 		for(MobEntity e : mobs)
 		{
 			GL11.glPushMatrix();
+			
 			GL11.glTranslated(e.prevX + (e.x - e.prevX) * partialTicks,
 				e.prevY + (e.y - e.prevY) * partialTicks,
 				e.prevZ + (e.z - e.prevZ) * partialTicks);
-			GL11.glScaled(e.getWidth() + 0.1, e.getHeight() + 0.1,
-				e.getWidth() + 0.1);
+			
+			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
+				e.getWidth() + extraSize);
 			
 			float f = MC.player.distanceTo(e) / 20F;
 			GL11.glColor4f(2 - f, f, 0, 0.5F);
@@ -188,6 +201,27 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			this.name = name;
 			this.boxes = boxes;
 			this.lines = lines;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
+	private enum BoxSize
+	{
+		ACCURATE("Accurate", 0),
+		FANCY("Fancy", 0.1);
+		
+		private final String name;
+		private final double extraSize;
+		
+		private BoxSize(String name, double extraSize)
+		{
+			this.name = name;
+			this.extraSize = extraSize;
 		}
 		
 		@Override
