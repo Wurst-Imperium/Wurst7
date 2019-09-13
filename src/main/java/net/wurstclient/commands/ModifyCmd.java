@@ -7,6 +7,8 @@
  */
 package net.wurstclient.commands;
 
+import java.util.Arrays;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -24,8 +26,12 @@ public final class ModifyCmd extends Command
 {
 	public ModifyCmd()
 	{
-		super("modify", "Allows you to modify NBT data of items.", "add <nbt>",
-			"set <nbt>", "remove <nbt_path>");
+		super("modify", "Allows you to modify NBT data of items.",
+			".modify add <nbt_data>", ".modify set <nbt_data>",
+			".modify remove <nbt_path>", "Use $ for colors, use $$ for $.", "",
+			"Example:",
+			".modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}",
+			"(changes the item's name to \u00a7cRed Name\u00a7r)");
 	}
 	
 	@Override
@@ -39,23 +45,23 @@ public final class ModifyCmd extends Command
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack item = player.inventory.getMainHandStack();
+		ItemStack stack = player.inventory.getMainHandStack();
 		
-		if(item == null)
+		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
 		
 		switch(args[0].toLowerCase())
 		{
 			case "add":
-			add(item, args);
+			add(stack, args);
 			break;
 			
 			case "set":
-			set(item, args);
+			set(stack, args);
 			break;
 			
 			case "remove":
-			remove(item, args);
+			remove(stack, args);
 			break;
 			
 			default:
@@ -64,24 +70,23 @@ public final class ModifyCmd extends Command
 		
 		MC.player.networkHandler
 			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.inventory.selectedSlot, item));
+				36 + player.inventory.selectedSlot, stack));
 		
 		ChatUtils.message("Item modified.");
 	}
 	
-	private void add(ItemStack item, String[] args) throws CmdError
+	private void add(ItemStack stack, String[] args) throws CmdError
 	{
-		String v = "";
-		for(int i = 1; i < args.length; i++)
-			v += args[i] + " ";
+		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
-		if(!item.hasTag())
-			item.setTag(new CompoundTag());
+		if(!stack.hasTag())
+			stack.setTag(new CompoundTag());
 		
 		try
 		{
-			CompoundTag value = StringNbtReader.parse(v);
-			item.getTag().copyFrom(value);
+			CompoundTag tag = StringNbtReader.parse(nbt);
+			stack.getTag().copyFrom(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -90,16 +95,15 @@ public final class ModifyCmd extends Command
 		}
 	}
 	
-	private void set(ItemStack item, String[] args) throws CmdError
+	private void set(ItemStack stack, String[] args) throws CmdError
 	{
-		String v = "";
-		for(int i = 1; i < args.length; i++)
-			v += args[i] + " ";
+		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
 		try
 		{
-			CompoundTag value = StringNbtReader.parse(v);
-			item.setTag(value);
+			CompoundTag tag = StringNbtReader.parse(nbt);
+			stack.setTag(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -108,12 +112,12 @@ public final class ModifyCmd extends Command
 		}
 	}
 	
-	private void remove(ItemStack item, String[] args) throws CmdException
+	private void remove(ItemStack stack, String[] args) throws CmdException
 	{
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		NbtPath path = parseNbtPath(item.getTag(), args[1]);
+		NbtPath path = parseNbtPath(stack.getTag(), args[1]);
 		
 		if(path == null)
 			throw new CmdError("The path does not exist.");
