@@ -41,7 +41,7 @@ public final class CmdList
 	// public final IpCmd ipCmd = new IpCmd();
 	// public final JumpCmd jumpCmd = new JumpCmd();
 	// public final LeaveCmd leaveCmd = new LeaveCmd();
-	// public final ModifyCmd modifyCmd = new ModifyCmd();
+	public final ModifyCmd modifyCmd = new ModifyCmd();
 	// public final NothingCmd nothingCmd = new NothingCmd();
 	// public final NukerCmd nukerCmd = new NukerCmd();
 	// public final PathCmd pathCmd = new PathCmd();
