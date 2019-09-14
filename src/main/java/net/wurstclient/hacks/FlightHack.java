@@ -10,12 +10,13 @@ package net.wurstclient.hacks;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
@@ -23,8 +24,22 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class FlightHack extends Hack
 	implements UpdateListener, IsPlayerInWaterListener
 {
-	public final SliderSetting speed =
-		new SliderSetting("Speed", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
+	//TODO: Add timer (ex: cheat engine speed hacks) as var.
+	public final SliderSetting speedXZ =
+		new SliderSetting("SpeedXZ", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
+	public final SliderSetting speedY =
+			new SliderSetting("SpeedY", 0.5, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
+	public final SliderSetting time =
+			new SliderSetting("Time", 1, 1, 50, 1, ValueDisplay.INTEGER);
+	private CheckboxSetting zeroY = new CheckboxSetting("Zero Y",
+			"Makes it so that the Y stays at 0",
+			false);
+	private CheckboxSetting spoofGround = new CheckboxSetting("Spoof Ground",
+			"Makes it so that you spoof the ground.",
+			false);
+	private CheckboxSetting zeroXZ = new CheckboxSetting("Zero XZ",
+			"Makes it so that the X and Z stays at 0",
+			false);
 	
 	public FlightHack()
 	{
@@ -33,7 +48,12 @@ public final class FlightHack extends Hack
 				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
 				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
-		addSetting(speed);
+		addSetting(speedXZ);
+		addSetting(speedY);
+		addSetting(time);
+		addSetting(zeroY);
+		addSetting(zeroXZ);
+		addSetting(spoofGround);
 	}
 	
 	@Override
@@ -48,24 +68,38 @@ public final class FlightHack extends Hack
 	{
 		WURST.getEventManager().remove(UpdateListener.class, this);
 		WURST.getEventManager().remove(IsPlayerInWaterListener.class, this);
+
 	}
-	
+	int ticks = 0;
 	@Override
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		
+
+
+
+		ticks++;
+
 		player.abilities.flying = false;
-		player.field_6281 = speed.getValueF();
-		
-		player.setVelocity(0, 0, 0);
-		Vec3d velcity = player.getVelocity();
-		
-		if(MC.options.keyJump.isPressed())
-			player.setVelocity(velcity.add(0, speed.getValue(), 0));
-		
-		if(MC.options.keySneak.isPressed())
-			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
+		if(ticks % time.getValueI() == 0) {
+			player.field_6281 = speedXZ.getValueF();
+
+			if (MC.options.keyJump.isPressed()){
+				player.setVelocity(0, speedY.getValue(), 0);
+			}else if(player.getVelocity().y>0 || zeroY.isChecked())
+				player.setVelocity(player.getVelocity().x, 0, player.getVelocity().z);
+
+			if (MC.options.keySneak.isPressed()){
+				player.setVelocity(0, -speedY.getValue(), 0);
+			}
+		}else{
+			if(player.getVelocity().y>0 || zeroY.isChecked())
+				player.setVelocity(player.getVelocity().x, 0, player.getVelocity().z);
+			if(zeroXZ.isChecked())
+				player.setVelocity(0, player.getVelocity().y, 0);
+		}
+		if(spoofGround.isChecked())
+			player.networkHandler.sendPacket(new PlayerMoveC2SPacket(true));
 	}
 	
 	@Override
