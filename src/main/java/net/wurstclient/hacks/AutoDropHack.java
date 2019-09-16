@@ -31,7 +31,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		"minecraft:wheat_seeds", "minecraft:white_tulip");
 	
 	private final String renderName =
-		Math.random() < 0.1 ? "AutoLinus" : getName();
+		Math.random() < 0.01 ? "AutoLinus" : getName();
 	
 	public AutoDropHack()
 	{
