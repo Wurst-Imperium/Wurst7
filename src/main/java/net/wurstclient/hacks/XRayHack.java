@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.screen.Screen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.clickgui.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
@@ -131,6 +133,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		if(!isVisible(BlockUtils.getBlock(event.getBlockEntity().getPos())))
 			event.cancel();
+	}
+	
+	public void openBlockListEditor(Screen prevScreen)
+	{
+		MC.openScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
 	private boolean isVisible(Block block)

@@ -16,6 +16,7 @@
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "FluidRendererMixin",
+    "GameMenuScreenMixin",
     "GameRendererMixin",
     "IngameHudMixin",
     "KeyBindingMixin",

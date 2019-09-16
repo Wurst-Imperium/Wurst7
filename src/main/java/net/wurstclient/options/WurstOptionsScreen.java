@@ -1,0 +1,157 @@
+/*
+ * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.options;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.SystemUtil;
+import net.minecraft.util.SystemUtil.OperatingSystem;
+import net.wurstclient.WurstClient;
+import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.hacks.XRayHack;
+
+public class WurstOptionsScreen extends Screen
+{
+	private Screen prevScreen;
+	
+	public WurstOptionsScreen(Screen prevScreen)
+	{
+		super(new LiteralText(""));
+		this.prevScreen = prevScreen;
+	}
+	
+	@Override
+	public void init()
+	{
+		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
+			20, "Back", b -> minecraft.openScreen(prevScreen)));
+		
+		addSettingButtons();
+		addManagerButtons();
+		addLinkButtons();
+	}
+	
+	private void addSettingButtons()
+	{
+		WurstAnalytics analytics = WurstClient.INSTANCE.getAnalytics();
+		
+		new WurstOptionsButton(-154, 24,
+			() -> "Analytics: " + (analytics.isEnabled() ? "ON" : "OFF"),
+			"Allows us to measure the popularity of Wurst\n"
+				+ "by sending anonymous usage statistics.",
+			b -> analytics.setEnabled(!analytics.isEnabled()));
+	}
+	
+	private void addManagerButtons()
+	{
+		XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
+		
+		new WurstOptionsButton(-50, 24, () -> "X-Ray Blocks",
+			"Manager for the blocks\n" + "that X-Ray will show.",
+			b -> xRayHack.openBlockListEditor(this));
+	}
+	
+	private void addLinkButtons()
+	{
+		OperatingSystem os = SystemUtil.getOperatingSystem();
+		
+		new WurstOptionsButton(54, 24, () -> "Official Website",
+			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
+		
+		new WurstOptionsButton(54, 48, () -> "Twitter", "@Wurst_Imperium",
+			b -> os.open("https://twitter.com/Wurst_Imperium"));
+		
+		new WurstOptionsButton(54, 72, () -> "Subreddit (NEW!)",
+			"r/WurstClient",
+			b -> os.open("https://www.reddit.com/r/WurstClient/"));
+		
+		new WurstOptionsButton(54, 96, () -> "Donate",
+			"paypal.me/WurstImperium",
+			b -> os.open("https://www.wurstclient.net/donate/"));
+	}
+	
+	@Override
+	public void render(int mouseX, int mouseY, float partialTicks)
+	{
+		renderBackground();
+		renderTitles();
+		super.render(mouseX, mouseY, partialTicks);
+		renderButtonTooltip(mouseX, mouseY);
+	}
+	
+	private void renderTitles()
+	{
+		TextRenderer tr = minecraft.textRenderer;
+		int middleX = width / 2;
+		int y1 = 40;
+		int y2 = height / 4 + 24 - 28;
+		
+		drawCenteredString(tr, "Wurst Options", middleX, y1, 0xffffff);
+		
+		drawCenteredString(tr, "Settings", middleX - 104, y2, 0xcccccc);
+		drawCenteredString(tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredString(tr, "Links", middleX + 104, y2, 0xcccccc);
+	}
+	
+	private void renderButtonTooltip(int mouseX, int mouseY)
+	{
+		for(AbstractButtonWidget button : buttons)
+		{
+			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
+				continue;
+			
+			WurstOptionsButton woButton = (WurstOptionsButton)button;
+			if(woButton.tooltip.isEmpty())
+				continue;
+			
+			renderTooltip(woButton.tooltip, mouseX, mouseY);
+			break;
+		}
+	}
+	
+	private final class WurstOptionsButton extends ButtonWidget
+	{
+		private final Supplier<String> messageSupplier;
+		private final List<String> tooltip;
+		
+		public WurstOptionsButton(int xOffset, int yOffset,
+			Supplier<String> messageSupplier, String tooltip,
+			PressAction pressAction)
+		{
+			super(WurstOptionsScreen.this.width / 2 + xOffset,
+				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
+				messageSupplier.get(), pressAction);
+			
+			this.messageSupplier = messageSupplier;
+			
+			if(tooltip.isEmpty())
+				this.tooltip = Arrays.asList(new String[0]);
+			else
+			{
+				String[] lines = tooltip.split("\n");
+				this.tooltip = Arrays.asList(lines);
+			}
+			
+			addButton(this);
+		}
+		
+		@Override
+		public void onPress()
+		{
+			super.onPress();
+			setMessage(messageSupplier.get());
+		}
+	}
+}

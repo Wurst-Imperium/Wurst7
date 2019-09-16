@@ -25,10 +25,21 @@ public final class WurstAnalytics
 		this.configFile.load(tracker);
 	}
 	
+	public boolean isEnabled()
+	{
+		return tracker.isEnabled();
+	}
+	
 	public void setEnabled(boolean enabled)
 	{
+		if(!enabled)
+			trackEvent("options", "analytics", "disable");
+		
 		tracker.setEnabled(enabled);
 		configFile.save(tracker);
+		
+		if(enabled)
+			trackEvent("options", "analytics", "enable");
 	}
 	
 	public void trackPageView(String url, String title)
