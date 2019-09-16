@@ -235,7 +235,10 @@ public final class KillauraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(target.x, target.y, target.z);
+		GL11.glTranslated(
+			target.prevX + (target.x - target.prevX) * partialTicks,
+			target.prevY + (target.y - target.prevY) * partialTicks,
+			target.prevZ + (target.z - target.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);
@@ -248,14 +251,10 @@ public final class KillauraHack extends Hack
 		}
 		
 		GL11.glColor4f(red, green, 0, 0.25F);
-		GL11.glBegin(GL11.GL_QUADS);
 		RenderUtils.drawSolidBox(box);
-		GL11.glEnd();
 		
 		GL11.glColor4f(red, green, 0, 0.5F);
-		GL11.glBegin(GL11.GL_LINES);
 		RenderUtils.drawOutlinedBox(box);
-		GL11.glEnd();
 		
 		GL11.glPopMatrix();
 		
