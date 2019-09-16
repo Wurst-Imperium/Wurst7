@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,10 +44,10 @@ public class GameRendererMixin
 		bobView(partalTicks);
 	}
 	
-	@Inject(at = {@At(value = "INVOKE_STRING",
-		target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-		ordinal = 15,
-		args = {"ldc=hand"})}, method = {"renderCenter(FJ)V"})
+	@Inject(at = {@At(value = "FIELD",
+		target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0)}, method = {"renderCenter(FJ)V"})
 	private void onRenderCenter(float partialTicks, long finishTimeNano,
 		CallbackInfo ci)
 	{
