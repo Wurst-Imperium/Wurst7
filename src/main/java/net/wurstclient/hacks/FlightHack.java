@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -29,8 +28,8 @@ public final class FlightHack extends Hack
 	public FlightHack()
 	{
 		super("Flight",
-			"Allows you to you fly.\n\n" + ChatFormatting.RED
-				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
+			"Allows you to you fly.\n\n" + TextFormat.RED + TextFormat.BOLD
+				+ "WARNING:" + TextFormat.RESET
 				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
@@ -56,7 +55,7 @@ public final class FlightHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		player.abilities.flying = false;
-		player.field_6281 = speed.getValueF();
+		player.flyingSpeed = speed.getValueF();
 		
 		player.setVelocity(0, 0, 0);
 		Vec3d velcity = player.getVelocity();

@@ -116,7 +116,7 @@ public final class FreecamHack extends Hack
 		player.setVelocity(Vec3d.ZERO);
 		
 		player.onGround = false;
-		player.field_6281 = speed.getValueF();
+		player.flyingSpeed = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())

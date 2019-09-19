@@ -134,14 +134,14 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	
 	@Shadow
 	@Override
-	protected Runnable prepareRunnable(Runnable var1)
+	protected Runnable createTask(Runnable var1)
 	{
 		return null;
 	}
 	
 	@Shadow
 	@Override
-	protected boolean canRun(Runnable var1)
+	protected boolean canExecute(Runnable var1)
 	{
 		return false;
 	}

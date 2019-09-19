@@ -7,8 +7,7 @@
  */
 package net.wurstclient.other_features;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
+import net.minecraft.client.util.TextFormat;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -19,11 +18,11 @@ import net.wurstclient.settings.EnumSetting;
 public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		ChatFormatting.BOLD + "Auto" + ChatFormatting.RESET
+		TextFormat.BOLD + "Auto" + TextFormat.RESET
 			+ " mode renders the whole list if it fits onto the screen.\n"
-			+ ChatFormatting.BOLD + "Count" + ChatFormatting.RESET
+			+ TextFormat.BOLD + "Count" + TextFormat.RESET
 			+ " mode only renders the number of active mods.\n"
-			+ ChatFormatting.BOLD + "Hidden" + ChatFormatting.RESET
+			+ TextFormat.BOLD + "Hidden" + TextFormat.RESET
 			+ " mode renders nothing.",
 		Mode.values(), Mode.AUTO);
 	
@@ -36,7 +35,7 @@ public final class HackListOtf extends OtherFeature
 	public HackListOtf()
 	{
 		super("HackList", "Shows a list of active hacks on the screen.\n"
-			+ "The " + ChatFormatting.BOLD + "Left" + ChatFormatting.RESET
+			+ "The " + TextFormat.BOLD + "Left" + TextFormat.RESET
 			+ " position should only be used while TabGui is\n" + "disabled.");
 		
 		addSetting(mode);

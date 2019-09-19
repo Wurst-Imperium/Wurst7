@@ -25,7 +25,7 @@ public enum RenderUtils
 		int width = endX - startX;
 		int height = endY - startY;
 		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.window.getScaleFactor();
+		double factor = WurstClient.MC.method_22683().getScaleFactor();
 		
 		int scissorX = (int)(startX * factor);
 		int scissorY = (int)(bottomY * factor);
