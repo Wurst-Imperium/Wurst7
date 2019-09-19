@@ -24,6 +24,7 @@ import net.minecraft.server.network.packet.PlayerActionC2SPacket;
 import net.minecraft.server.network.packet.PlayerActionC2SPacket.Action;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -48,13 +49,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 	 * blockHitDelay
 	 */
 	@Shadow
-	private int field_3716;
+	private int blockBreakingCooldown;
 	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
 		ordinal = 0)},
 		method = {
-			"method_2902(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
+			"updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
 	private void onPlayerDamageBlock(BlockPos blockPos_1, Direction direction_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{
@@ -125,7 +126,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public void setBlockHitDelay(int delay)
 	{
-		field_3716 = delay;
+		blockBreakingCooldown = delay;
 	}
 	
 	@Shadow
@@ -134,8 +135,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 		Hand hand_1, BlockHitResult blockHitResult_1);
 	
 	@Shadow
-	public abstract ActionResult interactItem(PlayerEntity playerEntity_1,
-		World world_1, Hand hand_1);
+	public abstract TypedActionResult<ItemStack> interactItem(
+		PlayerEntity playerEntity_1, World world_1, Hand hand_1);
 	
 	@Shadow
 	public abstract ItemStack method_2906(int int_1, int int_2, int int_3,
