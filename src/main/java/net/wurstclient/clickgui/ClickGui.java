@@ -529,6 +529,9 @@ public final class ClickGui
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 			int yt2 = yt1 + th + 2;
 			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0, 300);
+			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], 0.75F);
@@ -553,6 +556,8 @@ public final class ClickGui
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 					0xffffff);
+			
+			GL11.glPopMatrix();
 		}
 	}
 	
