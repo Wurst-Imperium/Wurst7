@@ -165,12 +165,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					possibleKeybind.getDescription());
 			TreeMap<String, PossibleKeybind> existingKeybinds = new TreeMap<>();
 			boolean noKeybindsSet = true;
-			for(int i = 0; i < WurstClient.INSTANCE.getKeybinds()
-				.getAllKeybinds().size(); i++)
+			for(Keybind keybind : WurstClient.INSTANCE.getKeybinds()
+				.getAllKeybinds())
 			{
-				Keybind keybind =
-					WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(i);
-				
 				String commands = keybind.getCommands();
 				commands = commands.replace(";", "\u00a7")
 					.replace("\u00a7\u00a7", ";");
@@ -469,10 +466,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glPopMatrix();
 		
 		// buttons below scissor box
-		for(int i = 0; i < buttons.size(); i++)
+		for(AbstractButtonWidget button : buttons)
 		{
-			AbstractButtonWidget button = buttons.get(i);
-			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();
