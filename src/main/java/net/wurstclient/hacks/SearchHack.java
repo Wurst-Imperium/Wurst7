@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
@@ -49,6 +51,10 @@ public final class SearchHack extends Hack
 		new EnumSetting<>("Area", "The area around the player to search in.",
 			DrawDistance.values(), DrawDistance.D11);
 	
+	private final SliderSetting limit = new SliderSetting("Limit",
+		"The maximum number of blocks to display.", 4, 3, 6, 1,
+		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool1;
 	private ForkJoinPool pool2;
@@ -58,7 +64,6 @@ public final class SearchHack extends Hack
 	private int displayList;
 	private boolean displayListUpToDate;
 	
-	private final int maxBlocks = 100000;
 	public boolean notify;
 	
 	public SearchHack()
@@ -67,6 +72,7 @@ public final class SearchHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(block);
 		addSetting(area);
+		addSetting(limit);
 	}
 	
 	@Override
@@ -127,7 +133,9 @@ public final class SearchHack extends Hack
 			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
 		
 		GL11.glColor4f(red, green, blue, 0.5F);
+		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glCallList(displayList);
+		GL11.glEnd();
 		
 		GL11.glPopMatrix();
 		
@@ -272,6 +280,8 @@ public final class SearchHack extends Hack
 	
 	private void startGetMatchingBlocksTask(BlockPos eyesPos)
 	{
+		int maxBlocks = (int)Math.pow(10, limit.getValueI());
+		
 		Callable<HashSet<BlockPos>> task =
 			() -> scanners.values().parallelStream()
 				.flatMap(scanner -> scanner.matchingBlocks.stream())
@@ -296,15 +306,17 @@ public final class SearchHack extends Hack
 			throw new RuntimeException(e);
 		}
 		
-		if(matchingBlocks.size() >= maxBlocks && notify)
-		{
-			ChatUtils.warning("Search found §lA LOT§r of blocks.");
-			ChatUtils.message("To prevent lag, it will only show the first "
-				+ maxBlocks + " blocks.");
-			notify = false;
-			
-		}else if(matchingBlocks.size() < maxBlocks)
+		int maxBlocks = (int)Math.pow(10, limit.getValueI());
+		
+		if(matchingBlocks.size() < maxBlocks)
 			notify = true;
+		else if(notify)
+		{
+			ChatUtils.warning("Search found \u00a7lA LOT\u00a7r of blocks!"
+				+ " To prevent lag, it will only show the closest \u00a76"
+				+ limit.getValueString() + "\u00a7r results.");
+			notify = false;
+		}
 		
 		return matchingBlocks;
 	}
@@ -395,10 +407,8 @@ public final class SearchHack extends Hack
 		}
 		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		GL11.glBegin(GL11.GL_QUADS);
 		for(int[] vertex : vertices)
 			GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
-		GL11.glEnd();
 		GL11.glEndList();
 		
 		displayListUpToDate = true;
@@ -505,7 +515,11 @@ public final class SearchHack extends Hack
 		D19("19x19 chunks", 9),
 		D21("21x21 chunks", 10),
 		D23("23x23 chunks", 11),
-		D25("25x25 chunks", 12);
+		D25("25x25 chunks", 12),
+		D27("27x27 chunks", 13),
+		D29("29x29 chunks", 14),
+		D31("31x31 chunks", 15),
+		D33("33x33 chunks", 16);
 		
 		private final String name;
 		private final int chunkRange;
