@@ -9,9 +9,12 @@ package net.wurstclient.hacks;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -24,11 +27,18 @@ import java.util.stream.Collectors;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
+import net.minecraft.client.network.packet.ChunkDataS2CPacket;
+import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.network.Packet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
+import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -42,7 +52,7 @@ import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 public final class SearchHack extends Hack
-	implements UpdateListener, RenderListener
+	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore");
@@ -61,7 +71,10 @@ public final class SearchHack extends Hack
 	private boolean notify;
 	
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
+	private final Set<Chunk> chunksToUpdate =
+		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService pool1;
+	
 	private ForkJoinPool pool2;
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
@@ -101,6 +114,7 @@ public final class SearchHack extends Hack
 		displayListUpToDate = false;
 		
 		WURST.getEventManager().add(UpdateListener.class, this);
+		WURST.getEventManager().add(PacketInputListener.class, this);
 		WURST.getEventManager().add(RenderListener.class, this);
 	}
 	
@@ -108,12 +122,54 @@ public final class SearchHack extends Hack
 	public void onDisable()
 	{
 		WURST.getEventManager().remove(UpdateListener.class, this);
+		WURST.getEventManager().remove(PacketInputListener.class, this);
 		WURST.getEventManager().remove(RenderListener.class, this);
 		
 		stopPool2Tasks();
 		pool1.shutdownNow();
 		pool2.shutdownNow();
 		GL11.glDeleteLists(displayList, 1);
+		chunksToUpdate.clear();
+	}
+	
+	@Override
+	public void onReceivedPacket(PacketInputEvent event)
+	{
+		ClientPlayerEntity player = MC.player;
+		ClientWorld world = MC.world;
+		if(player == null || world == null)
+			return;
+		
+		Packet packet = event.getPacket();
+		Chunk chunk;
+		
+		if(packet instanceof BlockUpdateS2CPacket)
+		{
+			BlockUpdateS2CPacket change = (BlockUpdateS2CPacket)packet;
+			BlockPos pos = change.getPos();
+			chunk = world.getChunk(pos);
+			
+		}else if(packet instanceof ChunkDeltaUpdateS2CPacket)
+		{
+			ChunkDeltaUpdateS2CPacket change =
+				(ChunkDeltaUpdateS2CPacket)packet;
+			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
+				change.getRecords();
+			if(changedBlocks.length == 0)
+				return;
+			
+			BlockPos pos = changedBlocks[0].getBlockPos();
+			chunk = world.getChunk(pos);
+			
+		}else if(packet instanceof ChunkDataS2CPacket)
+		{
+			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
+			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
+			
+		}else
+			return;
+		
+		chunksToUpdate.add(chunk);
 	}
 	
 	@Override
@@ -128,6 +184,7 @@ public final class SearchHack extends Hack
 		addScannersInRange(center, range, currentBlock);
 		removeScannersOutOfRange(center, range);
 		replaceScannersWithDifferentBlock(currentBlock);
+		replaceScannersWithChunkUpdate(currentBlock);
 		
 		if(!areAllChunkScannersDone())
 			return;
@@ -241,6 +298,28 @@ public final class SearchHack extends Hack
 			
 			removeScanner(oldScanner);
 			addScanner(oldScanner.chunk, currentBlock);
+		}
+	}
+	
+	private void replaceScannersWithChunkUpdate(Block currentBlock)
+	{
+		synchronized(chunksToUpdate)
+		{
+			if(chunksToUpdate.isEmpty())
+				return;
+			
+			for(Iterator<Chunk> itr = chunksToUpdate.iterator(); itr.hasNext();)
+			{
+				Chunk chunk = itr.next();
+				
+				ChunkScanner oldScanner = scanners.get(chunk);
+				if(oldScanner == null)
+					continue;
+				
+				removeScanner(oldScanner);
+				addScanner(chunk, currentBlock);
+				itr.remove();
+			}
 		}
 	}
 	
