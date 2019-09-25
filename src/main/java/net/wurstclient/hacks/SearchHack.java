@@ -47,13 +47,18 @@ public final class SearchHack extends Hack
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore");
 	
-	private final EnumSetting<DrawDistance> area =
-		new EnumSetting<>("Area", "The area around the player to search in.",
-			DrawDistance.values(), DrawDistance.D11);
+	private final EnumSetting<DrawDistance> area = new EnumSetting<>("Area",
+		"The area around the player to search in.\n"
+			+ "Higher values require a faster computer.",
+		DrawDistance.values(), DrawDistance.D11);
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
-		"The maximum number of blocks to display.", 4, 3, 6, 1,
+		"The maximum number of blocks to display.\n"
+			+ "Higher values require a faster computer.",
+		4, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	private int prevLimit;
+	private boolean notify;
 	
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool1;
@@ -64,11 +69,10 @@ public final class SearchHack extends Hack
 	private int displayList;
 	private boolean displayListUpToDate;
 	
-	public boolean notify;
-	
 	public SearchHack()
 	{
-		super("Search", "Helps you to find specific blocks.");
+		super("Search", "Helps you to find specific blocks by\n"
+			+ "highlighting them in rainbow color.");
 		setCategory(Category.RENDER);
 		addSetting(block);
 		addSetting(area);
@@ -85,11 +89,14 @@ public final class SearchHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		prevLimit = limit.getValueI();
 		notify = true;
+		
 		pool1 = Executors.newFixedThreadPool(
 			Runtime.getRuntime().availableProcessors(),
 			new MinPriorityThreadFactory());
 		pool2 = new ForkJoinPool();
+		
 		displayList = GL11.glGenLists(1);
 		displayListUpToDate = false;
 		
@@ -103,10 +110,44 @@ public final class SearchHack extends Hack
 		WURST.getEventManager().remove(UpdateListener.class, this);
 		WURST.getEventManager().remove(RenderListener.class, this);
 		
-		stopRunningTasks();
+		stopPool2Tasks();
 		pool1.shutdownNow();
 		pool2.shutdownNow();
 		GL11.glDeleteLists(displayList, 1);
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		Block currentBlock = block.getBlock();
+		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
+		
+		ChunkPos center = getPlayerChunkPos(eyesPos);
+		int range = area.getSelected().chunkRange;
+		
+		addScannersInRange(center, range, currentBlock);
+		removeScannersOutOfRange(center, range);
+		replaceScannersWithDifferentBlock(currentBlock);
+		
+		if(!areAllChunkScannersDone())
+			return;
+		
+		checkIfLimitChanged();
+		
+		if(getMatchingBlocksTask == null)
+			startGetMatchingBlocksTask(eyesPos);
+		
+		if(!getMatchingBlocksTask.isDone())
+			return;
+		
+		if(compileVerticesTask == null)
+			startCompileVerticesTask();
+		
+		if(!compileVerticesTask.isDone())
+			return;
+		
+		if(!displayListUpToDate)
+			setDisplayListFromTask();
 	}
 	
 	@Override
@@ -145,38 +186,6 @@ public final class SearchHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	@Override
-	public void onUpdate()
-	{
-		Block currentBlock = block.getBlock();
-		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
-		
-		ChunkPos center = getPlayerChunkPos(eyesPos);
-		int range = area.getSelected().chunkRange;
-		
-		addScannersInRange(center, range, currentBlock);
-		removeScannersOutOfRange(center, range);
-		replaceScannersWithDifferentBlock(currentBlock);
-		
-		if(!areAllChunkScannersDone())
-			return;
-		
-		if(getMatchingBlocksTask == null)
-			startGetMatchingBlocksTask(eyesPos);
-		
-		if(!getMatchingBlocksTask.isDone())
-			return;
-		
-		if(compileVerticesTask == null)
-			startCompileVerticesTask();
-		
-		if(!compileVerticesTask.isDone())
-			return;
-		
-		if(!displayListUpToDate)
-			setDisplayListFromTask();
 	}
 	
 	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
@@ -237,7 +246,7 @@ public final class SearchHack extends Hack
 	
 	private void addScanner(Chunk chunk, Block block)
 	{
-		stopRunningTasks();
+		stopPool2Tasks();
 		
 		ChunkScanner scanner = new ChunkScanner(chunk, block);
 		scanners.put(chunk, scanner);
@@ -246,13 +255,13 @@ public final class SearchHack extends Hack
 	
 	private void removeScanner(ChunkScanner scanner)
 	{
-		stopRunningTasks();
+		stopPool2Tasks();
 		
 		scanners.remove(scanner.chunk);
 		scanner.cancelScanning();
 	}
 	
-	private void stopRunningTasks()
+	private void stopPool2Tasks()
 	{
 		if(getMatchingBlocksTask != null)
 		{
@@ -276,6 +285,16 @@ public final class SearchHack extends Hack
 				return false;
 			
 		return true;
+	}
+	
+	private void checkIfLimitChanged()
+	{
+		if(limit.getValueI() != prevLimit)
+		{
+			stopPool2Tasks();
+			notify = true;
+			prevLimit = limit.getValueI();
+		}
 	}
 	
 	private void startGetMatchingBlocksTask(BlockPos eyesPos)
