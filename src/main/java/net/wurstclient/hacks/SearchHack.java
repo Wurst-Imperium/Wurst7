@@ -70,7 +70,7 @@ public final class SearchHack extends Hack
 	private int prevLimit;
 	private boolean notify;
 	
-	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
+	private final HashMap<Chunk, ChunkSearcher> searchers = new HashMap<>();
 	private final Set<Chunk> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService pool1;
@@ -181,12 +181,12 @@ public final class SearchHack extends Hack
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
 		
-		addScannersInRange(center, range, currentBlock);
-		removeScannersOutOfRange(center, range);
-		replaceScannersWithDifferentBlock(currentBlock);
-		replaceScannersWithChunkUpdate(currentBlock);
+		addSearchersInRange(center, range, currentBlock);
+		removeSearchersOutOfRange(center, range);
+		replaceSearchersWithDifferentBlock(currentBlock);
+		replaceSearchersWithChunkUpdate(currentBlock);
 		
-		if(!areAllChunkScannersDone())
+		if(!areAllChunkSearchersDone())
 			return;
 		
 		checkIfLimitChanged();
@@ -252,17 +252,17 @@ public final class SearchHack extends Hack
 		return MC.world.getChunk(chunkX, chunkZ).getPos();
 	}
 	
-	private void addScannersInRange(ChunkPos center, int chunkRange,
+	private void addSearchersInRange(ChunkPos center, int chunkRange,
 		Block block)
 	{
 		ArrayList<Chunk> chunksInRange = getChunksInRange(center, chunkRange);
 		
 		for(Chunk chunk : chunksInRange)
 		{
-			if(scanners.containsKey(chunk))
+			if(searchers.containsKey(chunk))
 				continue;
 			
-			addScanner(chunk, block);
+			addSearcher(chunk, block);
 		}
 	}
 	
@@ -277,31 +277,31 @@ public final class SearchHack extends Hack
 		return chunksInRange;
 	}
 	
-	private void removeScannersOutOfRange(ChunkPos center, int chunkRange)
+	private void removeSearchersOutOfRange(ChunkPos center, int chunkRange)
 	{
-		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
+		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
-			if(Math.abs(scanner.chunk.getPos().x - center.x) <= chunkRange
-				&& Math.abs(scanner.chunk.getPos().z - center.z) <= chunkRange)
+			if(Math.abs(searcher.chunk.getPos().x - center.x) <= chunkRange
+				&& Math.abs(searcher.chunk.getPos().z - center.z) <= chunkRange)
 				continue;
 			
-			removeScanner(scanner);
+			removeSearcher(searcher);
 		}
 	}
 	
-	private void replaceScannersWithDifferentBlock(Block currentBlock)
+	private void replaceSearchersWithDifferentBlock(Block currentBlock)
 	{
-		for(ChunkScanner oldScanner : new ArrayList<>(scanners.values()))
+		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
 		{
-			if(currentBlock.equals(oldScanner.block))
+			if(currentBlock.equals(oldSearcher.block))
 				continue;
 			
-			removeScanner(oldScanner);
-			addScanner(oldScanner.chunk, currentBlock);
+			removeSearcher(oldSearcher);
+			addSearcher(oldSearcher.chunk, currentBlock);
 		}
 	}
 	
-	private void replaceScannersWithChunkUpdate(Block currentBlock)
+	private void replaceSearchersWithChunkUpdate(Block currentBlock)
 	{
 		synchronized(chunksToUpdate)
 		{
@@ -312,32 +312,32 @@ public final class SearchHack extends Hack
 			{
 				Chunk chunk = itr.next();
 				
-				ChunkScanner oldScanner = scanners.get(chunk);
-				if(oldScanner == null)
+				ChunkSearcher oldSearcher = searchers.get(chunk);
+				if(oldSearcher == null)
 					continue;
 				
-				removeScanner(oldScanner);
-				addScanner(chunk, currentBlock);
+				removeSearcher(oldSearcher);
+				addSearcher(chunk, currentBlock);
 				itr.remove();
 			}
 		}
 	}
 	
-	private void addScanner(Chunk chunk, Block block)
+	private void addSearcher(Chunk chunk, Block block)
 	{
 		stopPool2Tasks();
 		
-		ChunkScanner scanner = new ChunkScanner(chunk, block);
-		scanners.put(chunk, scanner);
-		scanner.startScanning();
+		ChunkSearcher searcher = new ChunkSearcher(chunk, block);
+		searchers.put(chunk, searcher);
+		searcher.startSearching(pool1);
 	}
 	
-	private void removeScanner(ChunkScanner scanner)
+	private void removeSearcher(ChunkSearcher searcher)
 	{
 		stopPool2Tasks();
 		
-		scanners.remove(scanner.chunk);
-		scanner.cancelScanning();
+		searchers.remove(searcher.chunk);
+		searcher.cancelSearching();
 	}
 	
 	private void stopPool2Tasks()
@@ -357,10 +357,10 @@ public final class SearchHack extends Hack
 		displayListUpToDate = false;
 	}
 	
-	private boolean areAllChunkScannersDone()
+	private boolean areAllChunkSearchersDone()
 	{
-		for(ChunkScanner scanner : scanners.values())
-			if(scanner.status != ChunkScannerStatus.DONE)
+		for(ChunkSearcher searcher : searchers.values())
+			if(searcher.status != ChunkSearcher.Status.DONE)
 				return false;
 			
 		return true;
@@ -381,8 +381,8 @@ public final class SearchHack extends Hack
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
 		Callable<HashSet<BlockPos>> task =
-			() -> scanners.values().parallelStream()
-				.flatMap(scanner -> scanner.matchingBlocks.stream())
+			() -> searchers.values().parallelStream()
+				.flatMap(searcher -> searcher.matchingBlocks.stream())
 				.sorted(Comparator
 					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
 				.limit(maxBlocks)
@@ -512,33 +512,32 @@ public final class SearchHack extends Hack
 		displayListUpToDate = true;
 	}
 	
-	private class ChunkScanner
+	private static class ChunkSearcher
 	{
 		private final Chunk chunk;
 		private final Block block;
 		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
-		private ChunkScannerStatus status = ChunkScannerStatus.IDLE;
+		private Status status = Status.IDLE;
 		private Future future;
 		
-		public ChunkScanner(Chunk chunk, Block block)
+		public ChunkSearcher(Chunk chunk, Block block)
 		{
 			this.chunk = chunk;
 			this.block = block;
 		}
 		
-		public void startScanning()
+		public void startSearching(ExecutorService pool)
 		{
-			if(status != ChunkScannerStatus.IDLE)
+			if(status != Status.IDLE)
 				throw new IllegalStateException();
 			
-			status = ChunkScannerStatus.SCANNING;
-			future = pool1.submit(() -> scanNow());
+			status = Status.SEARCHING;
+			future = pool.submit(() -> searchNow());
 		}
 		
-		private void scanNow()
+		private void searchNow()
 		{
-			if(status == ChunkScannerStatus.IDLE
-				|| status == ChunkScannerStatus.DONE
+			if(status == Status.IDLE || status == Status.DONE
 				|| !matchingBlocks.isEmpty())
 				throw new IllegalStateException();
 			
@@ -554,8 +553,7 @@ public final class SearchHack extends Hack
 				for(int y = minY; y <= maxY; y++)
 					for(int z = minZ; z <= maxZ; z++)
 					{
-						if(status == ChunkScannerStatus.INTERRUPTED
-							|| Thread.interrupted())
+						if(status == Status.INTERRUPTED || Thread.interrupted())
 							return;
 						
 						BlockPos pos = new BlockPos(x, y, z);
@@ -566,12 +564,12 @@ public final class SearchHack extends Hack
 						matchingBlocks.add(pos);
 					}
 				
-			status = ChunkScannerStatus.DONE;
+			status = Status.DONE;
 		}
 		
-		public void cancelScanning()
+		public void cancelSearching()
 		{
-			new Thread(() -> cancelNow(), "ChunkScanner-canceller").start();
+			new Thread(() -> cancelNow(), "ChunkSearcher-canceller").start();
 		}
 		
 		private void cancelNow()
@@ -579,7 +577,7 @@ public final class SearchHack extends Hack
 			if(future != null)
 				try
 				{
-					status = ChunkScannerStatus.INTERRUPTED;
+					status = Status.INTERRUPTED;
 					future.get();
 					
 				}catch(InterruptedException | ExecutionException e)
@@ -588,16 +586,16 @@ public final class SearchHack extends Hack
 				}
 			
 			matchingBlocks.clear();
-			status = ChunkScannerStatus.IDLE;
+			status = Status.IDLE;
 		}
-	}
-	
-	private enum ChunkScannerStatus
-	{
-		IDLE,
-		SCANNING,
-		INTERRUPTED,
-		DONE;
+		
+		private enum Status
+		{
+			IDLE,
+			SEARCHING,
+			INTERRUPTED,
+			DONE;
+		}
 	}
 	
 	private enum DrawDistance
