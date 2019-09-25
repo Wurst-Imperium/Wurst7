@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
@@ -105,9 +104,7 @@ public final class SearchHack extends Hack
 		prevLimit = limit.getValueI();
 		notify = true;
 		
-		pool1 = Executors.newFixedThreadPool(
-			Runtime.getRuntime().availableProcessors(),
-			new MinPriorityThreadFactory());
+		pool1 = MinPriorityThreadFactory.newFixedThreadPool();
 		pool2 = new ForkJoinPool();
 		
 		displayList = GL11.glGenLists(1);

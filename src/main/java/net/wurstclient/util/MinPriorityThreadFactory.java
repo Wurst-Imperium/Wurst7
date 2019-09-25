@@ -7,6 +7,8 @@
  */
 package net.wurstclient.util;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,5 +37,12 @@ public class MinPriorityThreadFactory implements ThreadFactory
 		if(t.getPriority() != Thread.MIN_PRIORITY)
 			t.setPriority(Thread.MIN_PRIORITY);
 		return t;
+	}
+	
+	public static ExecutorService newFixedThreadPool()
+	{
+		return Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors(),
+			new MinPriorityThreadFactory());
 	}
 }
