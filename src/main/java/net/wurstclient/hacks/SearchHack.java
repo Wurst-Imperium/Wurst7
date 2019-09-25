@@ -10,6 +10,8 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +19,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
@@ -51,11 +52,13 @@ public final class SearchHack extends Hack
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool1;
 	private ForkJoinPool pool2;
-	private ForkJoinTask<ArrayList<BlockPos>> getMatchingBlocksTask;
+	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
+	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
-	private ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
+	private int displayList;
+	private boolean displayListUpToDate;
 	
-	private final int maxBlocks = 1000;
+	private final int maxBlocks = 100000;
 	public boolean notify;
 	
 	public SearchHack()
@@ -81,6 +84,8 @@ public final class SearchHack extends Hack
 			Runtime.getRuntime().availableProcessors(),
 			new MinPriorityThreadFactory());
 		pool2 = new ForkJoinPool();
+		displayList = GL11.glGenLists(1);
+		displayListUpToDate = false;
 		
 		WURST.getEventManager().add(UpdateListener.class, this);
 		WURST.getEventManager().add(RenderListener.class, this);
@@ -92,9 +97,10 @@ public final class SearchHack extends Hack
 		WURST.getEventManager().remove(UpdateListener.class, this);
 		WURST.getEventManager().remove(RenderListener.class, this);
 		
-		stopGetMatchingBlocksTask();
+		stopRunningTasks();
 		pool1.shutdownNow();
 		pool2.shutdownNow();
+		GL11.glDeleteLists(displayList, 1);
 	}
 	
 	@Override
@@ -120,24 +126,13 @@ public final class SearchHack extends Hack
 		float blue =
 			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
 		
-		// render boxes
-		for(BlockPos pos : matchingBlocks)
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-			
-			GL11.glColor4f(red, green, blue, 0.5F);
-			RenderUtils.drawOutlinedBox();
-			
-			GL11.glColor4f(red, green, blue, 0.25F);
-			RenderUtils.drawSolidBox();
-			
-			GL11.glPopMatrix();
-		}
+		GL11.glColor4f(red, green, blue, 0.5F);
+		GL11.glCallList(displayList);
 		
 		GL11.glPopMatrix();
 		
 		// GL resets
+		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -157,46 +152,23 @@ public final class SearchHack extends Hack
 		removeScannersOutOfRange(center, range);
 		replaceScannersWithDifferentBlock(currentBlock);
 		
-		for(ChunkScanner scanner : scanners.values())
-			if(scanner.status != ChunkScannerStatus.DONE)
-				return;
-			
+		if(!areAllChunkScannersDone())
+			return;
+		
 		if(getMatchingBlocksTask == null)
-			getMatchingBlocksTask =
-				pool2.submit(() -> getMatchingBlocksFromScanners(
-					scanners.values().parallelStream(), eyesPos));
+			startGetMatchingBlocksTask(eyesPos);
 		
 		if(!getMatchingBlocksTask.isDone())
 			return;
 		
-		try
-		{
-			matchingBlocks = getMatchingBlocksTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
+		if(compileVerticesTask == null)
+			startCompileVerticesTask();
 		
-		if(matchingBlocks.size() >= maxBlocks && notify)
-		{
-			ChatUtils.warning("Search found §lA LOT§r of blocks.");
-			ChatUtils.message("To prevent lag, it will only show the first "
-				+ maxBlocks + " blocks.");
-			notify = false;
-			
-		}else if(matchingBlocks.size() < maxBlocks)
-			notify = true;
-	}
-	
-	private ArrayList<BlockPos> getMatchingBlocksFromScanners(
-		Stream<ChunkScanner> scanners, BlockPos eyesPos)
-	{
-		return scanners.flatMap(scanner -> scanner.matchingBlocks.stream())
-			.sorted(Comparator
-				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-			.limit(maxBlocks)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		if(!compileVerticesTask.isDone())
+			return;
+		
+		if(!displayListUpToDate)
+			setDisplayListFromTask();
 	}
 	
 	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
@@ -257,27 +229,179 @@ public final class SearchHack extends Hack
 	
 	private void addScanner(Chunk chunk, Block block)
 	{
+		stopRunningTasks();
+		
 		ChunkScanner scanner = new ChunkScanner(chunk, block);
 		scanners.put(chunk, scanner);
 		scanner.startScanning();
-		
-		stopGetMatchingBlocksTask();
 	}
 	
 	private void removeScanner(ChunkScanner scanner)
 	{
+		stopRunningTasks();
+		
 		scanners.remove(scanner.chunk);
 		scanner.cancelScanning();
-		stopGetMatchingBlocksTask();
 	}
 	
-	private void stopGetMatchingBlocksTask()
+	private void stopRunningTasks()
 	{
 		if(getMatchingBlocksTask != null)
 		{
 			getMatchingBlocksTask.cancel(true);
 			getMatchingBlocksTask = null;
 		}
+		
+		if(compileVerticesTask != null)
+		{
+			compileVerticesTask.cancel(true);
+			compileVerticesTask = null;
+		}
+		
+		displayListUpToDate = false;
+	}
+	
+	private boolean areAllChunkScannersDone()
+	{
+		for(ChunkScanner scanner : scanners.values())
+			if(scanner.status != ChunkScannerStatus.DONE)
+				return false;
+			
+		return true;
+	}
+	
+	private void startGetMatchingBlocksTask(BlockPos eyesPos)
+	{
+		Callable<HashSet<BlockPos>> task =
+			() -> scanners.values().parallelStream()
+				.flatMap(scanner -> scanner.matchingBlocks.stream())
+				.sorted(Comparator
+					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+				.limit(maxBlocks)
+				.collect(Collectors.toCollection(() -> new HashSet<>()));
+		
+		getMatchingBlocksTask = pool2.submit(task);
+	}
+	
+	private HashSet<BlockPos> getMatchingBlocksFromTask()
+	{
+		HashSet<BlockPos> matchingBlocks = new HashSet<>();
+		
+		try
+		{
+			matchingBlocks = getMatchingBlocksTask.get();
+			
+		}catch(InterruptedException | ExecutionException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		if(matchingBlocks.size() >= maxBlocks && notify)
+		{
+			ChatUtils.warning("Search found §lA LOT§r of blocks.");
+			ChatUtils.message("To prevent lag, it will only show the first "
+				+ maxBlocks + " blocks.");
+			notify = false;
+			
+		}else if(matchingBlocks.size() < maxBlocks)
+			notify = true;
+		
+		return matchingBlocks;
+	}
+	
+	private void startCompileVerticesTask()
+	{
+		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
+		
+		Callable<ArrayList<int[]>> task = () -> matchingBlocks.parallelStream()
+			.flatMap(pos -> getVertices(pos, matchingBlocks).stream())
+			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		
+		compileVerticesTask = pool2.submit(task);
+	}
+	
+	private ArrayList<int[]> getVertices(BlockPos pos,
+		HashSet<BlockPos> matchingBlocks)
+	{
+		ArrayList<int[]> vertices = new ArrayList<>();
+		
+		if(!matchingBlocks.contains(pos.down()))
+		{
+			vertices.add(getVertex(pos, 0, 0, 0));
+			vertices.add(getVertex(pos, 1, 0, 0));
+			vertices.add(getVertex(pos, 1, 0, 1));
+			vertices.add(getVertex(pos, 0, 0, 1));
+		}
+		
+		if(!matchingBlocks.contains(pos.up()))
+		{
+			vertices.add(getVertex(pos, 0, 1, 0));
+			vertices.add(getVertex(pos, 0, 1, 1));
+			vertices.add(getVertex(pos, 1, 1, 1));
+			vertices.add(getVertex(pos, 1, 1, 0));
+		}
+		
+		if(!matchingBlocks.contains(pos.north()))
+		{
+			vertices.add(getVertex(pos, 0, 0, 0));
+			vertices.add(getVertex(pos, 0, 1, 0));
+			vertices.add(getVertex(pos, 1, 1, 0));
+			vertices.add(getVertex(pos, 1, 0, 0));
+		}
+		
+		if(!matchingBlocks.contains(pos.east()))
+		{
+			vertices.add(getVertex(pos, 1, 0, 0));
+			vertices.add(getVertex(pos, 1, 1, 0));
+			vertices.add(getVertex(pos, 1, 1, 1));
+			vertices.add(getVertex(pos, 1, 0, 1));
+		}
+		
+		if(!matchingBlocks.contains(pos.south()))
+		{
+			vertices.add(getVertex(pos, 0, 0, 1));
+			vertices.add(getVertex(pos, 1, 0, 1));
+			vertices.add(getVertex(pos, 1, 1, 1));
+			vertices.add(getVertex(pos, 0, 1, 1));
+		}
+		
+		if(!matchingBlocks.contains(pos.west()))
+		{
+			vertices.add(getVertex(pos, 0, 0, 0));
+			vertices.add(getVertex(pos, 0, 0, 1));
+			vertices.add(getVertex(pos, 0, 1, 1));
+			vertices.add(getVertex(pos, 0, 1, 0));
+		}
+		
+		return vertices;
+	}
+	
+	private int[] getVertex(BlockPos pos, int x, int y, int z)
+	{
+		return new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z};
+	}
+	
+	private void setDisplayListFromTask()
+	{
+		ArrayList<int[]> vertices;
+		
+		try
+		{
+			vertices = compileVerticesTask.get();
+			
+		}catch(InterruptedException | ExecutionException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		GL11.glNewList(displayList, GL11.GL_COMPILE);
+		GL11.glBegin(GL11.GL_QUADS);
+		for(int[] vertex : vertices)
+			GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
+		GL11.glEnd();
+		GL11.glEndList();
+		
+		displayListUpToDate = true;
 	}
 	
 	private class ChunkScanner
