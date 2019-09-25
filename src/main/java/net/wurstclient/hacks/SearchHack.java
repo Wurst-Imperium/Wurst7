@@ -56,10 +56,10 @@ public final class SearchHack extends Hack
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore");
 	
-	private final EnumSetting<DrawDistance> area = new EnumSetting<>("Area",
+	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
 			+ "Higher values require a faster computer.",
-		DrawDistance.values(), DrawDistance.D11);
+		Area.values(), Area.D11);
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"The maximum number of blocks to display.\n"
@@ -595,7 +595,7 @@ public final class SearchHack extends Hack
 		}
 	}
 	
-	private enum DrawDistance
+	private enum Area
 	{
 		D3("3x3 chunks", 1),
 		D5("5x5 chunks", 2),
@@ -617,7 +617,7 @@ public final class SearchHack extends Hack
 		private final String name;
 		private final int chunkRange;
 		
-		private DrawDistance(String name, int chunkRange)
+		private Area(String name, int chunkRange)
 		{
 			this.name = name;
 			this.chunkRange = chunkRange;
