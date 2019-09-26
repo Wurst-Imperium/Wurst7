@@ -208,9 +208,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		glDisable(GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(int i = 0; i < buttons.size(); i++)
+		for(AbstractButtonWidget button2 : buttons)
 		{
-			AbstractButtonWidget button = buttons.get(i);
+			AbstractButtonWidget button = button2;
 			
 			// positions
 			int x1 = button.x;

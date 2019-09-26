@@ -36,6 +36,7 @@ import net.wurstclient.update.WurstUpdater;
 public enum WurstClient
 {
 	INSTANCE;
+	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	

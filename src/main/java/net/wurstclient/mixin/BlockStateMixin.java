@@ -26,8 +26,7 @@ import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOc
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 
 @Mixin(BlockState.class)
-public class BlockStateMixin
-	extends AbstractState<Block, BlockState>
+public class BlockStateMixin extends AbstractState<Block, BlockState>
 	implements State<BlockState>
 {
 	private BlockStateMixin(WurstClient wurst, Block object_1,
