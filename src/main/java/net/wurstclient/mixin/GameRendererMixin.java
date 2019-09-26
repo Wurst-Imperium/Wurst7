@@ -30,8 +30,8 @@ public class GameRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/render/GameRenderer;bobView(F)V",
 			ordinal = 0),
-		method = {"applyCameraTransformations(F)V"})
-	private void onCameraTransformViewBobbing(GameRenderer gameRenderer,
+		method = {"renderWorld(FJ)V"})
+	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
 		float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
@@ -47,8 +47,8 @@ public class GameRendererMixin
 	@Inject(at = {@At(value = "FIELD",
 		target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0)}, method = {"renderCenter(FJ)V"})
-	private void onRenderCenter(float partialTicks, long finishTimeNano,
+		ordinal = 0)}, method = {"renderWorld(FJ)V"})
+	private void onRenderWorld(float partialTicks, long finishTimeNano,
 		CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
