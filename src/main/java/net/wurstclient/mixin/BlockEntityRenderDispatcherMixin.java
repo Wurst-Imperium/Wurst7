@@ -23,7 +23,8 @@ import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = {@At("HEAD")},
-		method = {"render(Lnet/minecraft/block/entity/BlockEntity;FI)V"},
+		method = {
+			"render(Lnet/minecraft/block/entity/BlockEntity;FILnet/minecraft/block/BlockRenderLayer;Lnet/minecraft/client/render/BufferBuilder;)V"},
 		cancellable = true)
 	private void onRender(BlockEntity blockEntity, float partialTicks,
 		int destroyStage, BlockRenderLayer blockRenderLayer_1,
