@@ -11,8 +11,10 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShapes;
@@ -51,7 +53,14 @@ public enum BlockUtils
 	
 	public static Block getBlockFromName(String name)
 	{
-		return Registry.BLOCK.get(new Identifier(name));
+		try
+		{
+			return Registry.BLOCK.get(new Identifier(name));
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return Blocks.AIR;
+		}
 	}
 	
 	public static float getHardness(BlockPos pos)

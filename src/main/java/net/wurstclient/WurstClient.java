@@ -40,7 +40,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.0pre8";
+	public static final String VERSION = "7.0pre9";
 	public static final String MC_VERSION = "19w38b";
 	
 	private WurstAnalytics analytics;
@@ -52,6 +52,7 @@ public enum WurstClient
 	private KeybindList keybinds;
 	private ClickGui gui;
 	private Navigator navigator;
+	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
 	
@@ -92,7 +93,7 @@ public enum WurstClient
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
 		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
 		
-		CmdProcessor cmdProcessor = new CmdProcessor(cmds);
+		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
 		
 		KeybindProcessor keybindProcessor =
@@ -180,6 +181,11 @@ public enum WurstClient
 	public Navigator getNavigator()
 	{
 		return navigator;
+	}
+	
+	public CmdProcessor getCmdProcessor()
+	{
+		return cmdProcessor;
 	}
 	
 	public IngameHUD getHud()
