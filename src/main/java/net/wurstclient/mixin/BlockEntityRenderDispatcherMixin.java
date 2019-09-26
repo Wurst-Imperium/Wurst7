@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
@@ -24,7 +26,8 @@ public class BlockEntityRenderDispatcherMixin
 		method = {"render(Lnet/minecraft/block/entity/BlockEntity;FI)V"},
 		cancellable = true)
 	private void onRender(BlockEntity blockEntity, float partialTicks,
-		int destroyStage, CallbackInfo ci)
+		int destroyStage, BlockRenderLayer blockRenderLayer_1,
+		BufferBuilder bufferBuilder_1, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
 		WurstClient.INSTANCE.getEventManager().fire(event);
