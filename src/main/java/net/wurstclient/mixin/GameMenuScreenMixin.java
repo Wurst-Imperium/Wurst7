@@ -106,7 +106,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1, 1, 1, 1);
 		
-		minecraft.getTextureManager().method_22813(wurstTexture);
+		minecraft.getTextureManager().bindTexture(wurstTexture);
 		
 		int x = width / 2 - 68;
 		int y = height / 4 + 73 - 15;
