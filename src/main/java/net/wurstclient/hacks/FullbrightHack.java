@@ -22,17 +22,17 @@ public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
 		"\u00a7lGamma\u00a7r works by setting the brightness to\n"
-			+ "beyond 100%. It supports the \u00a7eFade\u00a7r effect,\n"
+			+ "beyond 100%. It supports the \u00a76Fade\u00a7r effect,\n"
 			+ "but isn't compatible with shader packs.\n\n"
 			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
 			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
 			+ "shader packs, but doesn't support the\n"
-			+ "\u00a7eFade\u00a7r effect.",
+			+ "\u00a76Fade\u00a7r effect.",
 		Method.values(), Method.GAMMA);
 	
 	private final CheckboxSetting fade = new CheckboxSetting("Fade",
 		"Slowly fades between brightness and darkness.\n"
-			+ "Only works if \u00a7eMethod\u00a7r is set to \u00a7eGamma\u00a7r.",
+			+ "Only works if \u00a76Method\u00a7r is set to \u00a76Gamma\u00a7r.",
 		true);
 	
 	private boolean hasAppliedNightVision;
