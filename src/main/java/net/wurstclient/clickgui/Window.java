@@ -110,7 +110,7 @@ public class Window
 	{
 		int maxChildWidth = 0;
 		for(Component c : children)
-			if(c.getWidth() > maxChildWidth)
+			if(c.getDefaultWidth() > maxChildWidth)
 				maxChildWidth = c.getDefaultWidth();
 		maxChildWidth += 4;
 		
