@@ -20,9 +20,9 @@ public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		ChatFormatting.BOLD + "Auto" + ChatFormatting.RESET
-			+ " mode renders the whole list if it fits onto the screen.\n"
+			+ " mode renders the whole list if it\n" + "fits onto the screen.\n"
 			+ ChatFormatting.BOLD + "Count" + ChatFormatting.RESET
-			+ " mode only renders the number of active mods.\n"
+			+ " mode only renders the number\n" + "of active hacks.\n"
 			+ ChatFormatting.BOLD + "Hidden" + ChatFormatting.RESET
 			+ " mode renders nothing.",
 		Mode.values(), Mode.AUTO);
