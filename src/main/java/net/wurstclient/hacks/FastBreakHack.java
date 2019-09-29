@@ -17,17 +17,27 @@ import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"FastMine", "SpeedMine", "SpeedyGonzales", "fast break",
-	"fast mine", "speed mine", "speedy gonzales"})
+	"fast mine", "speed mine", "speedy gonzales", "NoBreakDelay",
+	"no break delay"})
 public final class FastBreakHack extends Hack
 	implements UpdateListener, BlockBreakingProgressListener
 {
+	private final CheckboxSetting legitMode = new CheckboxSetting("Legit mode",
+		"Only removes the delay between breaking blocks,\n"
+			+ "without speeding up the breaking process itself.\n\n"
+			+ "This is slower, but usually bypasses anti-cheat\n"
+			+ "plugins. Use it if regular FastBreak is not\n" + "working.",
+		false);
+	
 	public FastBreakHack()
 	{
 		super("FastBreak", "Allows you to break blocks faster.\n"
 			+ "Tip: This works with Nuker.");
 		setCategory(Category.BLOCKS);
+		addSetting(legitMode);
 	}
 	
 	@Override
@@ -54,6 +64,9 @@ public final class FastBreakHack extends Hack
 	@Override
 	public void onBlockBreakingProgress(BlockBreakingProgressEvent event)
 	{
+		if(legitMode.isChecked())
+			return;
+		
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		if(im.getCurrentBreakingProgress() >= 1)
