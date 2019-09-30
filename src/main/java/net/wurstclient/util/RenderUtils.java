@@ -25,7 +25,7 @@ public enum RenderUtils
 		int width = endX - startX;
 		int height = endY - startY;
 		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.method_22683().getScaleFactor();
+		double factor = WurstClient.MC.getWindow().getScaleFactor();
 		
 		int scissorX = (int)(startX * factor);
 		int scissorY = (int)(bottomY * factor);
@@ -36,9 +36,13 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d camPos = getCameraPos();
+		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
+	}
+	
+	public static Vec3d getCameraPos()
+	{
+		return BlockEntityRenderDispatcher.INSTANCE.cameraEntity.getPos();
 	}
 	
 	public static void drawSolidBox()

@@ -113,13 +113,6 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	
 	@Shadow
 	@Override
-	public void updateDisplay(boolean var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
 	public void onResolutionChanged()
 	{
 		

@@ -89,7 +89,7 @@ public final class ClickGui
 		
 		int x = 5;
 		int y = 5;
-		net.minecraft.client.util.Window sr = MC.method_22683();
+		net.minecraft.client.util.Window sr = MC.getWindow();
 		for(Window window : windows)
 		{
 			window.pack();
@@ -699,7 +699,7 @@ public final class ClickGui
 			GL11.glVertex2i(x4, y3);
 			GL11.glEnd();
 			
-			net.minecraft.client.util.Window sr = MC.method_22683();
+			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
 			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
 				window.getWidth() * sf, (y2 - y3) * sf);

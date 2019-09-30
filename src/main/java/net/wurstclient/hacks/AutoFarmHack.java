@@ -245,14 +245,17 @@ public final class AutoFarmHack extends Hack
 		else if(block instanceof GourdBlock)
 			return true;
 		else if(block instanceof SugarCaneBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
+			return BlockUtils
+				.getBlock(pos.method_10074()) instanceof SugarCaneBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
 		else if(block instanceof CactusBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
+			return BlockUtils
+				.getBlock(pos.method_10074()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
 		else if(block instanceof KelpPlantBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
+			return BlockUtils
+				.getBlock(pos.method_10074()) instanceof KelpPlantBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
 		else if(block instanceof NetherWartBlock)
@@ -285,10 +288,12 @@ public final class AutoFarmHack extends Hack
 		if(item == Items.WHEAT_SEEDS || item == Items.CARROT
 			|| item == Items.POTATO || item == Items.BEETROOT_SEEDS
 			|| item == Items.PUMPKIN_SEEDS || item == Items.MELON_SEEDS)
-			return BlockUtils.getBlock(pos.down()) instanceof FarmlandBlock;
+			return BlockUtils
+				.getBlock(pos.method_10074()) instanceof FarmlandBlock;
 		
 		if(item == Items.NETHER_WART)
-			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
+			return BlockUtils
+				.getBlock(pos.method_10074()) instanceof SoulSandBlock;
 		
 		return false;
 	}

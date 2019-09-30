@@ -14,7 +14,6 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -165,10 +164,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private void renderTracers(double partialTicks)
 	{
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(MobEntity e : mobs)
