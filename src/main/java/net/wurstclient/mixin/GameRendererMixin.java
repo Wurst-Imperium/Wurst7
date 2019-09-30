@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.class_4587;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
@@ -26,13 +27,11 @@ import net.wurstclient.events.RenderListener.RenderEvent;
 public class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloadListener
 {
-	@Redirect(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/render/GameRenderer;bobView(F)V",
-			ordinal = 0),
-		method = {"renderWorld(FJ)V"})
+	@Redirect(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/class_4587;F)V",
+		ordinal = 0), method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
 	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
-		float partalTicks)
+		class_4587 class_4587_1, float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
@@ -41,22 +40,24 @@ public class GameRendererMixin
 		if(event.isCancelled())
 			return;
 		
-		bobView(partalTicks);
+		bobView(class_4587_1, partalTicks);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0)}, method = {"renderWorld(FJ)V"})
+	@Inject(
+		at = {@At(value = "FIELD",
+			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0)},
+		method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
-		CallbackInfo ci)
+		class_4587 class_4587_1, CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
 	@Shadow
-	private void bobView(float partalTicks)
+	private void bobView(class_4587 class_4587_1, float float_1)
 	{
 		
 	}
