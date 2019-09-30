@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.fabricmc.indigo.renderer.render.TerrainRenderContext;
+import net.minecraft.class_4587;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +28,8 @@ public class TerrainRenderContextMixin
 		cancellable = true,
 		remap = false)
 	private void tesselateBlock(BlockState blockState, BlockPos blockPos,
-		final BakedModel model, CallbackInfoReturnable<Boolean> cir)
+		final BakedModel model, class_4587 matrixStack,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(blockState);
 		WurstClient.INSTANCE.getEventManager().fire(event);
