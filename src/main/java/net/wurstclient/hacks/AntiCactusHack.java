@@ -26,14 +26,13 @@ public final class AntiCactusHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getEventManager().add(CactusCollisionShapeListener.class, this);
+		EVENTS.add(CactusCollisionShapeListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		WURST.getEventManager().remove(CactusCollisionShapeListener.class,
-			this);
+		EVENTS.remove(CactusCollisionShapeListener.class, this);
 	}
 	
 	@Override

@@ -70,26 +70,24 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		oreNames = new ArrayList<>(ores.getBlockNames());
 		
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(SetOpaqueCubeListener.class, this);
-		WURST.getEventManager().add(GetAmbientOcclusionLightLevelListener.class,
-			this);
-		WURST.getEventManager().add(ShouldDrawSideListener.class, this);
-		WURST.getEventManager().add(TesselateBlockListener.class, this);
-		WURST.getEventManager().add(RenderBlockEntityListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(SetOpaqueCubeListener.class, this);
+		EVENTS.add(GetAmbientOcclusionLightLevelListener.class, this);
+		EVENTS.add(ShouldDrawSideListener.class, this);
+		EVENTS.add(TesselateBlockListener.class, this);
+		EVENTS.add(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(SetOpaqueCubeListener.class, this);
-		WURST.getEventManager()
-			.remove(GetAmbientOcclusionLightLevelListener.class, this);
-		WURST.getEventManager().remove(ShouldDrawSideListener.class, this);
-		WURST.getEventManager().remove(TesselateBlockListener.class, this);
-		WURST.getEventManager().remove(RenderBlockEntityListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(SetOpaqueCubeListener.class, this);
+		EVENTS.remove(GetAmbientOcclusionLightLevelListener.class, this);
+		EVENTS.remove(ShouldDrawSideListener.class, this);
+		EVENTS.remove(TesselateBlockListener.class, this);
+		EVENTS.remove(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
 		
 		if(!WURST.getHax().fullbrightHack.isEnabled())

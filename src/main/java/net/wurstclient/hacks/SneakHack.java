@@ -44,15 +44,15 @@ public final class SneakHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(PreMotionListener.class, this);
-		WURST.getEventManager().add(PostMotionListener.class, this);
+		EVENTS.add(PreMotionListener.class, this);
+		EVENTS.add(PostMotionListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(PreMotionListener.class, this);
-		WURST.getEventManager().remove(PostMotionListener.class, this);
+		EVENTS.remove(PreMotionListener.class, this);
+		EVENTS.remove(PostMotionListener.class, this);
 		
 		switch(mode.getSelected())
 		{

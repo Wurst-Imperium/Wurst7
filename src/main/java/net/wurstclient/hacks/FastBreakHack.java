@@ -43,16 +43,15 @@ public final class FastBreakHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(BlockBreakingProgressListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(BlockBreakingProgressListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(BlockBreakingProgressListener.class,
-			this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(BlockBreakingProgressListener.class, this);
 	}
 	
 	@Override

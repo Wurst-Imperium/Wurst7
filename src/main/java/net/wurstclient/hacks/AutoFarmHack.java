@@ -77,8 +77,8 @@ public final class AutoFarmHack extends Hack
 	{
 		plants.clear();
 		
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 		
 		displayList = GL11.glGenLists(1);
 		box = GL11.glGenLists(1);
@@ -101,8 +101,8 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		
 		if(currentBlock != null)
 		{

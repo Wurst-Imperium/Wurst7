@@ -39,15 +39,15 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(IsPlayerInWaterListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(IsPlayerInWaterListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(IsPlayerInWaterListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(IsPlayerInWaterListener.class, this);
 	}
 	
 	@Override

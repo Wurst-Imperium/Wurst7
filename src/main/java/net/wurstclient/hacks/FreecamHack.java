@@ -56,15 +56,14 @@ public final class FreecamHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(PacketOutputListener.class, this);
-		WURST.getEventManager().add(IsPlayerInWaterListener.class, this);
-		WURST.getEventManager().add(PlayerMoveListener.class, this);
-		WURST.getEventManager().add(CameraTransformViewBobbingListener.class,
-			this);
-		WURST.getEventManager().add(IsNormalCubeListener.class, this);
-		WURST.getEventManager().add(SetOpaqueCubeListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PacketOutputListener.class, this);
+		EVENTS.add(IsPlayerInWaterListener.class, this);
+		EVENTS.add(PlayerMoveListener.class, this);
+		EVENTS.add(CameraTransformViewBobbingListener.class, this);
+		EVENTS.add(IsNormalCubeListener.class, this);
+		EVENTS.add(SetOpaqueCubeListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
 		
@@ -87,15 +86,14 @@ public final class FreecamHack extends Hack
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(PacketOutputListener.class, this);
-		WURST.getEventManager().remove(IsPlayerInWaterListener.class, this);
-		WURST.getEventManager().remove(PlayerMoveListener.class, this);
-		WURST.getEventManager().remove(CameraTransformViewBobbingListener.class,
-			this);
-		WURST.getEventManager().remove(IsNormalCubeListener.class, this);
-		WURST.getEventManager().remove(SetOpaqueCubeListener.class, this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PacketOutputListener.class, this);
+		EVENTS.remove(IsPlayerInWaterListener.class, this);
+		EVENTS.remove(PlayerMoveListener.class, this);
+		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
+		EVENTS.remove(IsNormalCubeListener.class, this);
+		EVENTS.remove(SetOpaqueCubeListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();

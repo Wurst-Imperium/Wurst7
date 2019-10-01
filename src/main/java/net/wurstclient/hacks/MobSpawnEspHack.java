@@ -74,17 +74,17 @@ public final class MobSpawnEspHack extends Hack
 	{
 		pool = MinPriorityThreadFactory.newFixedThreadPool();
 		
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(PacketInputListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PacketInputListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(PacketInputListener.class, this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PacketInputListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{

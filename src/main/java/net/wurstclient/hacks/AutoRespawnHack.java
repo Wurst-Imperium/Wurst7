@@ -24,13 +24,13 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(DeathListener.class, this);
+		EVENTS.add(DeathListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(DeathListener.class, this);
+		EVENTS.remove(DeathListener.class, this);
 	}
 	
 	@Override

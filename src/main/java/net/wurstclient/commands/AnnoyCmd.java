@@ -57,13 +57,13 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		if(player != null && target.equals(player.getName().asString()))
 			ChatUtils.warning("Annoying yourself is a bad idea!");
 		
-		WURST.getEventManager().add(ChatInputListener.class, this);
+		EVENTS.add(ChatInputListener.class, this);
 		enabled = true;
 	}
 	
 	private void disable() throws CmdException
 	{
-		WURST.getEventManager().remove(ChatInputListener.class, this);
+		EVENTS.remove(ChatInputListener.class, this);
 		
 		if(target != null)
 		{

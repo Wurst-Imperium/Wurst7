@@ -62,10 +62,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(CameraTransformViewBobbingListener.class,
-			this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(CameraTransformViewBobbingListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 		
 		itemBox = GL11.glGenLists(1);
 		GL11.glNewList(itemBox, GL11.GL_COMPILE);
@@ -81,10 +80,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(CameraTransformViewBobbingListener.class,
-			this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		
 		GL11.glDeleteLists(itemBox, 1);
 	}

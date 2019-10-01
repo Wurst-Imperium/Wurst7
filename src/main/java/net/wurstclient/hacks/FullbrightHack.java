@@ -44,7 +44,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		addSetting(method);
 		addSetting(fade);
 		
-		WURST.getEventManager().add(UpdateListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
