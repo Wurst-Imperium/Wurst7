@@ -85,6 +85,8 @@ public final class NukerHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().autoMineHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
 		EVENTS.add(RenderListener.class, this);
