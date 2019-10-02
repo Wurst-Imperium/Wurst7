@@ -9,8 +9,10 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 
@@ -36,7 +38,11 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
-		Vec3d camPos = getCameraPos();
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.cameraEntity;
+		Vec3d camPos = camera.getPos();
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
+			0);
 		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
 	}
 	
