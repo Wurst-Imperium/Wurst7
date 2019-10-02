@@ -12,8 +12,6 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -24,6 +22,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.BlockListSetting;
@@ -271,8 +270,7 @@ public final class EditBlockListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return ChatFormatting.ITALIC + "unknown block"
-					+ ChatFormatting.RESET;
+				return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
 				
 			}else
 			{
