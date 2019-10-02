@@ -48,13 +48,13 @@ public final class TacoCmd extends Command
 		
 		if(enabled)
 		{
-			WURST.getEventManager().add(GUIRenderListener.class, this);
-			WURST.getEventManager().add(UpdateListener.class, this);
+			EVENTS.add(GUIRenderListener.class, this);
+			EVENTS.add(UpdateListener.class, this);
 			
 		}else
 		{
-			WURST.getEventManager().remove(GUIRenderListener.class, this);
-			WURST.getEventManager().remove(UpdateListener.class, this);
+			EVENTS.remove(GUIRenderListener.class, this);
+			EVENTS.remove(UpdateListener.class, this);
 		}
 	}
 	

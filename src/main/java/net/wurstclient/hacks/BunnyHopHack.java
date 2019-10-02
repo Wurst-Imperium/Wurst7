@@ -38,13 +38,13 @@ public final class BunnyHopHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
 	}
 	
 	@Override

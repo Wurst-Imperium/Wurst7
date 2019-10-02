@@ -82,6 +82,9 @@ public final class SliderComponent extends Component
 		
 		if(hovering && mouseY < y3)
 			setTooltip();
+		else if(hSlider && !dragging)
+			GUI.setTooltip(
+				"\u00a7e[ctrl]\u00a7r+\u00a7e[left-click]\u00a7r for precise input");
 		
 		if(renderAsDisabled)
 		{

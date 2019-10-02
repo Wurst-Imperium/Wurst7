@@ -50,7 +50,7 @@ public final class EditBlockScreen extends Screen
 		
 		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, "");
 		blockField.setText(valueString);
-		blockField.setCursor(0);
+		blockField.setSelectionStart(0);
 		
 		children.add(blockField);
 		setInitialFocus(blockField);

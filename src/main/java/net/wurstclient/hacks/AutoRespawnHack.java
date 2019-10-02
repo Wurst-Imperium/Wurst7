@@ -9,34 +9,34 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.DeathListener;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"fast place"})
-public final class FastPlaceHack extends Hack implements UpdateListener
+@SearchTags({"auto respawn", "AutoRevive", "auto revive"})
+public final class AutoRespawnHack extends Hack implements DeathListener
 {
-	public FastPlaceHack()
+	public AutoRespawnHack()
 	{
-		super("FastPlace", "Allows you to place blocks 5 times faster.\n"
-			+ "Tip: This can speed up other hacks like AutoBuild.");
-		setCategory(Category.BLOCKS);
+		super("AutoRespawn", "Automatically respawns you whenever you die.");
+		setCategory(Category.COMBAT);
 	}
 	
 	@Override
 	public void onEnable()
 	{
-		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(DeathListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(DeathListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
+	public void onDeath()
 	{
-		IMC.setItemUseCooldown(0);
+		MC.player.requestRespawn();
+		MC.openScreen(null);
 	}
 }

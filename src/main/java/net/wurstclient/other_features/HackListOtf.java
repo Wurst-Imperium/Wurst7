@@ -19,9 +19,9 @@ public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		TextFormat.BOLD + "Auto" + TextFormat.RESET
-			+ " mode renders the whole list if it fits onto the screen.\n"
+			+ " mode renders the whole list if it\n" + "fits onto the screen.\n"
 			+ TextFormat.BOLD + "Count" + TextFormat.RESET
-			+ " mode only renders the number of active mods.\n"
+			+ " mode only renders the number\n" + "of active hacks.\n"
 			+ TextFormat.BOLD + "Hidden" + TextFormat.RESET
 			+ " mode renders nothing.",
 		Mode.values(), Mode.AUTO);

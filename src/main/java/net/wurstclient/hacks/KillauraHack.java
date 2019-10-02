@@ -119,15 +119,15 @@ public final class KillauraHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		target = null;
 	}
 	
