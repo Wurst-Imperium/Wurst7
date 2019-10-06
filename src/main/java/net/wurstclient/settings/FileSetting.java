@@ -22,6 +22,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.FileComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -117,7 +118,7 @@ public final class FileSetting extends Setting
 	@Override
 	public Component getComponent()
 	{
-		return null; // TODO
+		return new FileComponent(this);
 	}
 	
 	@Override
