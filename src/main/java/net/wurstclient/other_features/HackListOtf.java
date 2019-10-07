@@ -13,6 +13,8 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"ArrayList", "ModList", "CheatList", "mod list", "array list",
 	"hack list", "cheat list"})
@@ -33,6 +35,9 @@ public final class HackListOtf extends OtherFeature
 	private final CheckboxSetting animations =
 		new CheckboxSetting("Animations", true);
 	
+	public final SliderSetting offsetX = new SliderSetting("UI Offset X", "Offsets the UI in the x axis", 0, -20, 300, 1, ValueDisplay.INTEGER);
+	public final SliderSetting offsetY = new SliderSetting("UI Offset Y", "Offsets the UI in the y axis", 0, -20, 300, 1, ValueDisplay.INTEGER);
+	
 	public HackListOtf()
 	{
 		super("HackList", "Shows a list of active hacks on the screen.\n"
@@ -42,6 +47,8 @@ public final class HackListOtf extends OtherFeature
 		addSetting(mode);
 		addSetting(position);
 		addSetting(animations);
+		addSetting(offsetX);
+		addSetting(offsetY);
 	}
 	
 	public Mode getMode()

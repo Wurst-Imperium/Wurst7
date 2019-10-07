@@ -41,9 +41,9 @@ public final class HackListHUD implements UpdateListener
 		
 		if(otf.getPosition() == Position.LEFT
 			&& WurstClient.INSTANCE.getOtfs().wurstLogoOtf.isVisible())
-			posY = 22;
+			posY = 22 + otf.offsetY.getValueI();
 		else
-			posY = 2;
+			posY = 2 + otf.offsetY.getValueI();
 			
 		// color
 		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
@@ -156,13 +156,13 @@ public final class HackListHUD implements UpdateListener
 		
 		float posX;
 		if(otf.getPosition() == Position.LEFT)
-			posX = 2 - 5 * offset;
+			posX = 2 - 5 * offset + otf.offsetX.getValueI();
 		else
 		{
 			int screenWidth = WurstClient.MC.window.getScaledWidth();
 			int stringWidth = tr.getStringWidth(s);
 			
-			posX = screenWidth - stringWidth - 2 + 5 * offset;
+			posX = screenWidth - stringWidth - 2 + 5 * offset + otf.offsetX.getValueI();
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
