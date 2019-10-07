@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import net.mersid.io.Mouse;
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
@@ -55,6 +56,7 @@ public enum WurstClient
 	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
+	private Mouse mouse;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
@@ -107,6 +109,9 @@ public enum WurstClient
 		rotationFaker = new RotationFaker();
 		eventManager.add(PreMotionListener.class, rotationFaker);
 		eventManager.add(PostMotionListener.class, rotationFaker);
+
+		mouse = new Mouse();
+		eventManager.add(UpdateListener.class, mouse);
 		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
