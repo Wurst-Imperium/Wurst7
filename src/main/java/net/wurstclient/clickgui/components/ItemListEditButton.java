@@ -13,7 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.EditItemListScreen;
+import net.wurstclient.clickgui.screens.EditItemListScreen;
 import net.wurstclient.settings.ItemListSetting;
 
 public final class ItemListEditButton extends Component

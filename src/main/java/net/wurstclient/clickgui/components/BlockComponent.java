@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.EditBlockScreen;
+import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 
 public final class BlockComponent extends Component

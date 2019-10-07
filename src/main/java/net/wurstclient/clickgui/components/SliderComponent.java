@@ -15,8 +15,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.EditSliderScreen;
 import net.wurstclient.clickgui.Window;
+import net.wurstclient.clickgui.screens.EditSliderScreen;
 import net.wurstclient.settings.SliderSetting;
 
 public final class SliderComponent extends Component

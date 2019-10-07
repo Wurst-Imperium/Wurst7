@@ -13,7 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.EditBlockListScreen;
+import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.settings.BlockListSetting;
 
 public final class BlockListEditButton extends Component

@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.WurstClient;
-import net.wurstclient.clickgui.ClickGuiScreen;
+import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
