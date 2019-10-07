@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "net.mersid.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+	],
+	"client": [
+		"GameRendererMixin"
+	],
+	"injectors": {
+	  "defaultRequire": 1
+	}
+  }
+  
