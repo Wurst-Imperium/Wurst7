@@ -22,7 +22,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.FileComponent;
+import net.wurstclient.clickgui.components.FileComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
