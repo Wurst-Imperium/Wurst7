@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeMap;
 
+import net.mersid.hacks.ChestESPHack;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.WurstClient;
@@ -157,6 +158,8 @@ public final class HackList implements UpdateListener
 	// public final TrueSightHack trueSightHack = new TrueSightHack();
 	// public final TunnellerHack tunnellerHack = new TunnellerHack();
 	public final XRayHack xRayHack = new XRayHack();
+	
+	public final ChestESPHack chestESPHack = new ChestESPHack();
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
