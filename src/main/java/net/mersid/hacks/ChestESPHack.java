@@ -29,31 +29,34 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-public class ChestESPHack extends Hack implements UpdateListener, CameraTransformViewBobbingListener, RenderListener {
+public class ChestESPHack extends Hack implements UpdateListener,
+	CameraTransformViewBobbingListener, RenderListener
+{
 	
 	private final EnumSetting<Style> style =
-			new EnumSetting<>("Style", Style.values(), Style.BOXES);
-		
-		private final ArrayList<Box> basicChests = new ArrayList<>();
-		private final ArrayList<Box> trappedChests = new ArrayList<>();
-		private final ArrayList<Box> enderChests = new ArrayList<>();
-		private final ArrayList<Entity> minecarts = new ArrayList<>();
-		
-		private int greenBox;
-		private int orangeBox;
-		private int cyanBox;
-		private int normalChests;
-		
-		private boolean init = false;
-
-	public ChestESPHack() {
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
+	
+	private final ArrayList<Box> basicChests = new ArrayList<>();
+	private final ArrayList<Box> trappedChests = new ArrayList<>();
+	private final ArrayList<Box> enderChests = new ArrayList<>();
+	private final ArrayList<Entity> minecarts = new ArrayList<>();
+	
+	private int greenBox;
+	private int orangeBox;
+	private int cyanBox;
+	private int normalChests;
+	
+	private boolean init = false;
+	
+	public ChestESPHack()
+	{
 		super("ChestESP",
-				"Highlights nearby chests.\n"
-					+ "\u00a7agreen\u00a7r - normal chests\n"
-					+ "\u00a76orange\u00a7r - trapped chests\n"
-					+ "\u00a7bcyan\u00a7r - ender chests");
-			setCategory(Category.RENDER);
-			addSetting(style);
+			"Highlights nearby chests.\n"
+				+ "\u00a7agreen\u00a7r - normal chests\n"
+				+ "\u00a76orange\u00a7r - trapped chests\n"
+				+ "\u00a7bcyan\u00a7r - ender chests");
+		setCategory(Category.RENDER);
+		addSetting(style);
 	}
 	
 	@Override
@@ -63,7 +66,8 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		if (MC.player != null) GLInit();
+		if(MC.player != null)
+			GLInit();
 	}
 	
 	@Override
@@ -119,105 +123,116 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 	public void onUpdate()
 	{
 		World world = MC.player.world;
-		if (!init) GLInit();
+		if(!init)
+			GLInit();
 		
 		basicChests.clear();
 		trappedChests.clear();
 		enderChests.clear();
 		
 		for(BlockEntity tileEntity : world.blockEntities)
-		{
-			if (tileEntity instanceof ChestBlockEntity)
+			if(tileEntity instanceof ChestBlockEntity)
 			{
 				/*
-				ChestBlockEntity chest = (ChestBlockEntity)tileEntity;
-				ChestType type = chest.getCachedState().get(ChestBlock.CHEST_TYPE); // If a chest is solo, left, or right.
-				
-				// For double chests, AABB union will combine them. No need to render it again.
-				// Picking right is an arbitrary decision. We could have picked left.
-				if (type == ChestType.RIGHT) continue;
-				
-				// get hitbox
-				BlockPos pos = chest.getPos();
-				Box bb = BlockUtils.getBoundingBox(pos);
-				
-				// Kinda taken from ChestBlockEntity. Finds the adjacent chest for doubles.
-				BlockState state = chest.getCachedState();
-				BlockPos opos = chest.getPos().offset(ChestBlock.getFacing(state));
-				BlockEntity ote = chest.getWorld().getBlockEntity(opos);
-				
-				if (ote instanceof ChestBlockEntity)
-				{
-					// Separation is to ensure that normal and trapped chests do not union-box each other.
-					//if (type == ChestType.SINGLE) return;
-					
-					if ((ote instanceof TrappedChestBlockEntity && chest instanceof TrappedChestBlockEntity) ||
-							!(ote instanceof TrappedChestBlockEntity) && !(chest instanceof TrappedChestBlockEntity)
-							)
-					{
-						ChestType type2 = ote.getCachedState().get(ChestBlock.CHEST_TYPE); System.out.println(type);
-						if (type == ChestType.SINGLE) break;
-						
-						BlockPos pos2 = ote.getPos();
-						Box bb2 = BlockUtils.getBoundingBox(pos2);
-						bb = bb.union(bb2);
-					}
-					
-				}*/
+				 * ChestBlockEntity chest = (ChestBlockEntity)tileEntity;
+				 * ChestType type =
+				 * chest.getCachedState().get(ChestBlock.CHEST_TYPE); // If a
+				 * chest is solo, left, or right.
+				 * 
+				 * // For double chests, AABB union will combine them. No need
+				 * to render it again.
+				 * // Picking right is an arbitrary decision. We could have
+				 * picked left.
+				 * if (type == ChestType.RIGHT) continue;
+				 * 
+				 * // get hitbox
+				 * BlockPos pos = chest.getPos();
+				 * Box bb = BlockUtils.getBoundingBox(pos);
+				 * 
+				 * // Kinda taken from ChestBlockEntity. Finds the adjacent
+				 * chest for doubles.
+				 * BlockState state = chest.getCachedState();
+				 * BlockPos opos =
+				 * chest.getPos().offset(ChestBlock.getFacing(state));
+				 * BlockEntity ote = chest.getWorld().getBlockEntity(opos);
+				 * 
+				 * if (ote instanceof ChestBlockEntity)
+				 * {
+				 * // Separation is to ensure that normal and trapped chests do
+				 * not union-box each other.
+				 * //if (type == ChestType.SINGLE) return;
+				 * 
+				 * if ((ote instanceof TrappedChestBlockEntity && chest
+				 * instanceof TrappedChestBlockEntity) ||
+				 * !(ote instanceof TrappedChestBlockEntity) && !(chest
+				 * instanceof TrappedChestBlockEntity)
+				 * )
+				 * {
+				 * ChestType type2 =
+				 * ote.getCachedState().get(ChestBlock.CHEST_TYPE);
+				 * System.out.println(type);
+				 * if (type == ChestType.SINGLE) break;
+				 * 
+				 * BlockPos pos2 = ote.getPos();
+				 * Box bb2 = BlockUtils.getBoundingBox(pos2);
+				 * bb = bb.union(bb2);
+				 * }
+				 * 
+				 * }
+				 */
 				
 				// Gets the chest
 				ChestBlockEntity chest = (ChestBlockEntity)tileEntity;
-				ChestType type = chest.getCachedState().get(ChestBlock.CHEST_TYPE);
+				ChestType type =
+					chest.getCachedState().get(ChestBlock.CHEST_TYPE);
 				
 				// get hitbox
 				BlockPos pos = chest.getPos();
 				Box bb = BlockUtils.getBoundingBox(pos);
 				
-				if (type == ChestType.SINGLE)
+				if(type == ChestType.SINGLE)
 				{
-					if (chest instanceof TrappedChestBlockEntity)
-					{
+					if(chest instanceof TrappedChestBlockEntity)
 						trappedChests.add(bb);
-					}
 					else
-					{
 						basicChests.add(bb);
-					}
-				}
-				else
+				}else
 				{
-					// Double chests. Ignore one half so that it does not get double-rendered
-					if (type == ChestType.RIGHT) continue;
+					// Double chests. Ignore one half so that it does not get
+					// double-rendered
+					if(type == ChestType.RIGHT)
+						continue;
 					
-					// Kinda taken from ChestBlockEntity. Finds the adjacent chest for doubles.
+					// Kinda taken from ChestBlockEntity. Finds the adjacent
+					// chest for doubles.
 					BlockState state = chest.getCachedState();
-					BlockPos opos = chest.getPos().offset(ChestBlock.getFacing(state));
+					BlockPos opos =
+						chest.getPos().offset(ChestBlock.getFacing(state));
 					BlockEntity ote = chest.getWorld().getBlockEntity(opos);
 					
-					if (ote instanceof ChestBlockEntity)
+					if(ote instanceof ChestBlockEntity)
 					{
 						BlockPos pos2 = ote.getPos();
 						Box bb2 = BlockUtils.getBoundingBox(pos2);
 						bb = bb.union(bb2);
 						
-						if (chest instanceof TrappedChestBlockEntity)
-						{
+						if(chest instanceof TrappedChestBlockEntity)
 							trappedChests.add(bb);
-						}
 						else
-						{
 							basicChests.add(bb);
-						}
 					}
 				}
-			}
-			else if (tileEntity instanceof EnderChestBlockEntity) // Some reason, ender chests are not ChestBlockEntity.
+			}else if(tileEntity instanceof EnderChestBlockEntity) // Some
+																	// reason,
+																	// ender
+																	// chests
+																	// are not
+																	// ChestBlockEntity.
 			{
 				BlockPos pos = ((EnderChestBlockEntity)tileEntity).getPos();
 				Box bb = BlockUtils.getBoundingBox(pos);
 				enderChests.add(bb);
 			}
-		}
 		
 		GL11.glNewList(normalChests, GL11.GL_COMPILE);
 		renderBoxes(basicChests, greenBox);
@@ -225,13 +240,12 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 		renderBoxes(enderChests, cyanBox);
 		GL11.glEndList();
 		
-		
 		// minecarts
 		minecarts.clear();
 		for(Entity entity : GetEntitiesInRadius.get())
 			if(entity instanceof ChestMinecartEntity)
 				minecarts.add(entity);
-				
+			
 	}
 	
 	@Override
@@ -256,21 +270,20 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-				-BlockEntityRenderDispatcher.renderOffsetY,
-				-BlockEntityRenderDispatcher.renderOffsetZ);
+			-BlockEntityRenderDispatcher.renderOffsetY,
+			-BlockEntityRenderDispatcher.renderOffsetZ);
 		
 		// minecart interpolation
-		ArrayList<Box> minecartBoxes =
-			new ArrayList<>(minecarts.size());
+		ArrayList<Box> minecartBoxes = new ArrayList<>(minecarts.size());
 		minecarts.forEach(e -> {
-			double offsetX = -(e.x - e.prevRenderX)
-				+ (e.x - e.prevRenderX) * partialTicks;
-			double offsetY = -(e.y - e.prevRenderY)
-				+ (e.y - e.prevRenderY) * partialTicks;
-			double offsetZ = -(e.z - e.prevRenderZ)
-				+ (e.z - e.prevRenderZ) * partialTicks;
-			minecartBoxes.add(
-				e.getBoundingBox().offset(offsetX, offsetY, offsetZ));
+			double offsetX =
+				-(e.x - e.prevRenderX) + (e.x - e.prevRenderX) * partialTicks;
+			double offsetY =
+				-(e.y - e.prevRenderY) + (e.y - e.prevRenderY) * partialTicks;
+			double offsetZ =
+				-(e.z - e.prevRenderZ) + (e.z - e.prevRenderZ) * partialTicks;
+			minecartBoxes
+				.add(e.getBoundingBox().offset(offsetX, offsetY, offsetZ));
 		});
 		
 		if(style.getSelected().boxes)
@@ -281,15 +294,13 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 		
 		if(style.getSelected().lines)
 		{
-			// This block of code down to the end of else statement copied from EntityESP.
-			Vec3d start = new Vec3d(
-					BlockEntityRenderDispatcher.renderOffsetX,
-					BlockEntityRenderDispatcher.renderOffsetY,
-					BlockEntityRenderDispatcher.renderOffsetZ);
+			// This block of code down to the end of else statement copied from
+			// EntityESP.
+			Vec3d start = new Vec3d(BlockEntityRenderDispatcher.renderOffsetX,
+				BlockEntityRenderDispatcher.renderOffsetY,
+				BlockEntityRenderDispatcher.renderOffsetZ);
 			
-
 			start = start.add(RotationUtils.getClientLookVec());
-
 			
 			GL11.glBegin(GL11.GL_LINES);
 			
@@ -317,7 +328,7 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 	}
 	
 	private void renderBoxes(ArrayList<Box> boxes, int displayList)
-	{//GL11.glEnable(GL11.GL_DEPTH_TEST);
+	{// GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		for(Box bb : boxes)
 		{
@@ -328,21 +339,19 @@ public class ChestESPHack extends Hack implements UpdateListener, CameraTransfor
 			GL11.glCallList(displayList);
 			GL11.glPopMatrix();
 			
-		}//GL11.glDisable(GL11.GL_DEPTH_TEST);
+		}// GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 	}
 	
 	private void renderLines(Vec3d start, ArrayList<Box> boxes)
-	{//GL11.glEnable(GL11.GL_DEPTH_TEST);
+	{// GL11.glEnable(GL11.GL_DEPTH_TEST);
 		for(Box bb : boxes)
 		{
 			Vec3d end = bb.getCenter();
 			
-			GL11.glVertex3d(start.x, start.y,
-				start.z);
-			GL11.glVertex3d(end.x, end.y,
-				end.z);
-		}//GL11.glDisable(GL11.GL_DEPTH_TEST);
+			GL11.glVertex3d(start.x, start.y, start.z);
+			GL11.glVertex3d(end.x, end.y, end.z);
+		}// GL11.glDisable(GL11.GL_DEPTH_TEST);
 	}
 	
 	private enum Style

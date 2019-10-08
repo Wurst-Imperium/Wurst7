@@ -91,13 +91,15 @@ public enum BlockUtils
 	{
 		try
 		{
-			return getState(pos).getCollisionShape(MinecraftClient.getInstance().world, pos)
-					.offset(pos.getX(), pos.getY(), pos.getZ())
-					.getBoundingBox();
-		}
-		catch (UnsupportedOperationException e)
+			return getState(pos)
+				.getCollisionShape(MinecraftClient.getInstance().world, pos)
+				.offset(pos.getX(), pos.getY(), pos.getZ()).getBoundingBox();
+		}catch(UnsupportedOperationException e)
 		{
-			return new Box(new BlockPos(0, 0, 0)); // Hackish solution to fix no bounds for empty shape crash (1.14.4 version only tested). - Mersid.
+			return new Box(new BlockPos(0, 0, 0)); // Hackish solution to fix no
+													// bounds for empty shape
+													// crash (1.14.4 version
+													// only tested). - Mersid.
 		}
 		
 	}
