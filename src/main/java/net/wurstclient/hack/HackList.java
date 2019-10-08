@@ -59,7 +59,7 @@ public final class HackList implements UpdateListener
 	public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
 	// public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	// public final CaveFinderHack caveFinderHack = new CaveFinderHack();
-	// public final ChestEspHack chestEspHack = new ChestEspHack();
+	public final ChestEspHack chestEspHack = new ChestEspHack();
 	// public final ClickAuraHack clickAuraHack = new ClickAuraHack();
 	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
 	// public final CmdBlockHack cmdBlockHack = new CmdBlockHack();
@@ -157,8 +157,6 @@ public final class HackList implements UpdateListener
 	// public final TrueSightHack trueSightHack = new TrueSightHack();
 	// public final TunnellerHack tunnellerHack = new TunnellerHack();
 	public final XRayHack xRayHack = new XRayHack();
-	
-	public final ChestEspHack chestESPHack = new ChestEspHack();
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
