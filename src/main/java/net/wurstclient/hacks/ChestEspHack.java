@@ -139,6 +139,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			}else if(blockEntity instanceof EnderChestBlockEntity)
 			{
 				BlockPos pos = ((EnderChestBlockEntity)blockEntity).getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
 				Box bb = BlockUtils.getBoundingBox(pos);
 				enderChests.add(bb);
 			}
@@ -165,14 +168,21 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			return null;
 		
 		BlockPos pos = chestBE.getPos();
+		if(!BlockUtils.canBeClicked(pos))
+			return null;
+		
 		Box box = BlockUtils.getBoundingBox(pos);
 		
 		// larger box for double chest
 		if(chestType != ChestType.SINGLE)
 		{
 			BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
-			Box box2 = BlockUtils.getBoundingBox(pos2);
-			box = box.union(box2);
+			
+			if(BlockUtils.canBeClicked(pos2))
+			{
+				Box box2 = BlockUtils.getBoundingBox(pos2);
+				box = box.union(box2);
+			}
 		}
 		
 		return box;
