@@ -1,4 +1,4 @@
-package net.mersid.hacks;
+package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-public class ChestESPHack extends Hack implements UpdateListener,
+public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	
@@ -48,7 +48,7 @@ public class ChestESPHack extends Hack implements UpdateListener,
 	
 	private boolean init = false;
 	
-	public ChestESPHack()
+	public ChestEspHack()
 	{
 		super("ChestESP",
 			"Highlights nearby chests.\n"
@@ -138,30 +138,30 @@ public class ChestESPHack extends Hack implements UpdateListener,
 				 * ChestType type =
 				 * chest.getCachedState().get(ChestBlock.CHEST_TYPE); // If a
 				 * chest is solo, left, or right.
-				 * 
+				 *
 				 * // For double chests, AABB union will combine them. No need
 				 * to render it again.
 				 * // Picking right is an arbitrary decision. We could have
 				 * picked left.
 				 * if (type == ChestType.RIGHT) continue;
-				 * 
+				 *
 				 * // get hitbox
 				 * BlockPos pos = chest.getPos();
 				 * Box bb = BlockUtils.getBoundingBox(pos);
-				 * 
+				 *
 				 * // Kinda taken from ChestBlockEntity. Finds the adjacent
 				 * chest for doubles.
 				 * BlockState state = chest.getCachedState();
 				 * BlockPos opos =
 				 * chest.getPos().offset(ChestBlock.getFacing(state));
 				 * BlockEntity ote = chest.getWorld().getBlockEntity(opos);
-				 * 
+				 *
 				 * if (ote instanceof ChestBlockEntity)
 				 * {
 				 * // Separation is to ensure that normal and trapped chests do
 				 * not union-box each other.
 				 * //if (type == ChestType.SINGLE) return;
-				 * 
+				 *
 				 * if ((ote instanceof TrappedChestBlockEntity && chest
 				 * instanceof TrappedChestBlockEntity) ||
 				 * !(ote instanceof TrappedChestBlockEntity) && !(chest
@@ -172,12 +172,12 @@ public class ChestESPHack extends Hack implements UpdateListener,
 				 * ote.getCachedState().get(ChestBlock.CHEST_TYPE);
 				 * System.out.println(type);
 				 * if (type == ChestType.SINGLE) break;
-				 * 
+				 *
 				 * BlockPos pos2 = ote.getPos();
 				 * Box bb2 = BlockUtils.getBoundingBox(pos2);
 				 * bb = bb.union(bb2);
 				 * }
-				 * 
+				 *
 				 * }
 				 */
 				
@@ -202,7 +202,7 @@ public class ChestESPHack extends Hack implements UpdateListener,
 					// double-rendered
 					if(type == ChestType.RIGHT)
 						continue;
-					
+						
 					// Kinda taken from ChestBlockEntity. Finds the adjacent
 					// chest for doubles.
 					BlockState state = chest.getCachedState();

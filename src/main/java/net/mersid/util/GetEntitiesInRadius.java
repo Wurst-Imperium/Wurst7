@@ -16,7 +16,7 @@ public class GetEntitiesInRadius
 	
 	/**
 	 * Returns all entities within a radius of 200, excluding self.
-	 * 
+	 *
 	 * @return
 	 */
 	public static List<Entity> get()
@@ -26,7 +26,7 @@ public class GetEntitiesInRadius
 	
 	/**
 	 * Returns all entities within a radius of radius, excluding self.
-	 * 
+	 *
 	 * @param radius
 	 * @return
 	 */
