@@ -32,7 +32,6 @@ import net.wurstclient.util.RotationUtils;
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
@@ -46,8 +45,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private int cyanBox;
 	private int normalChests;
 	
-	private boolean init = false;
-	
 	public ChestEspHack()
 	{
 		super("ChestESP",
@@ -55,6 +52,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				+ "\u00a7agreen\u00a7r - normal chests\n"
 				+ "\u00a76orange\u00a7r - trapped chests\n"
 				+ "\u00a7bcyan\u00a7r - ender chests");
+		
 		setCategory(Category.RENDER);
 		addSetting(style);
 	}
@@ -66,29 +64,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		if(MC.player != null)
-			GLInit();
-	}
-	
-	@Override
-	protected void onDisable()
-	{
-		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(greenBox, 1);
-		greenBox = 0;
-		GL11.glDeleteLists(orangeBox, 1);
-		orangeBox = 0;
-		GL11.glDeleteLists(cyanBox, 1);
-		cyanBox = 0;
-		GL11.glDeleteLists(normalChests, 1);
-		normalChests = 0;
-	}
-	
-	private void GLInit()
-	{
 		Box bb = new Box(BlockPos.ORIGIN);
 		
 		greenBox = GL11.glGenLists(1);
@@ -116,15 +91,29 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glEndList();
 		
 		normalChests = GL11.glGenLists(1);
-		init = true;
+	}
+	
+	@Override
+	protected void onDisable()
+	{
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
+		
+		GL11.glDeleteLists(greenBox, 1);
+		greenBox = 0;
+		GL11.glDeleteLists(orangeBox, 1);
+		orangeBox = 0;
+		GL11.glDeleteLists(cyanBox, 1);
+		cyanBox = 0;
+		GL11.glDeleteLists(normalChests, 1);
+		normalChests = 0;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		World world = MC.player.world;
-		if(!init)
-			GLInit();
 		
 		basicChests.clear();
 		trappedChests.clear();
