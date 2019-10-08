@@ -23,7 +23,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.ItemListEditButton;
+import net.wurstclient.clickgui.components.ItemListEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;

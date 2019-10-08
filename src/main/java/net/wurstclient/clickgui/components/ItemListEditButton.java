@@ -5,20 +5,23 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.clickgui;
+package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
-import net.wurstclient.settings.FileSetting;
+import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.screens.EditItemListScreen;
+import net.wurstclient.settings.ItemListSetting;
 
-public final class FileComponent extends Component
+public final class ItemListEditButton extends Component
 {
-	private final FileSetting setting;
+	private final ItemListSetting setting;
 	private int buttonWidth;
 	
-	public FileComponent(FileSetting setting)
+	public ItemListEditButton(ItemListSetting setting)
 	{
 		this.setting = setting;
 		
@@ -38,7 +41,8 @@ public final class FileComponent extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		// TODO
+		WurstClient.MC.openScreen(
+			new EditItemListScreen(WurstClient.MC.currentScreen, setting));
 	}
 	
 	@Override
@@ -97,7 +101,7 @@ public final class FileComponent extends Component
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ": " + setting.getSelectedFileName();
+		String text = setting.getName() + ": " + setting.getItemNames().size();
 		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
 		fr.draw("Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -107,7 +111,7 @@ public final class FileComponent extends Component
 	public int getDefaultWidth()
 	{
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ": " + setting.getSelectedFileName();
+		String text = setting.getName() + ": " + setting.getItemNames().size();
 		return fr.getStringWidth(text) + buttonWidth + 6;
 	}
 	

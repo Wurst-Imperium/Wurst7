@@ -5,25 +5,28 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.clickgui;
+package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
-import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.screens.SelectFileScreen;
+import net.wurstclient.settings.FileSetting;
 
-public final class ItemListEditButton extends Component
+public final class FileComponent extends Component
 {
-	private final ItemListSetting setting;
+	private final FileSetting setting;
 	private int buttonWidth;
 	
-	public ItemListEditButton(ItemListSetting setting)
+	public FileComponent(FileSetting setting)
 	{
 		this.setting = setting;
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		buttonWidth = fr.getStringWidth("Edit...");
+		buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
@@ -39,7 +42,7 @@ public final class ItemListEditButton extends Component
 			return;
 		
 		WurstClient.MC.openScreen(
-			new EditItemListScreen(WurstClient.MC.currentScreen, setting));
+			new SelectFileScreen(WurstClient.MC.currentScreen, setting));
 	}
 	
 	@Override
@@ -67,6 +70,11 @@ public final class ItemListEditButton extends Component
 		// tooltip
 		if(hText)
 			gui.setTooltip(setting.getDescription());
+		else if(hBox)
+		{
+			String tooltip = "\u00a7e[left-click]\u00a7r to select file";
+			gui.setTooltip(tooltip);
+		}
 		
 		// background
 		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
@@ -98,9 +106,9 @@ public final class ItemListEditButton extends Component
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ": " + setting.getItemNames().size();
+		String text = setting.getName() + ": ";
 		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw("Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(setting.getSelectedFileName(), x3 + 2, y1 + 2, 0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 	
@@ -108,7 +116,7 @@ public final class ItemListEditButton extends Component
 	public int getDefaultWidth()
 	{
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ": " + setting.getItemNames().size();
+		String text = setting.getName() + ": ";
 		return fr.getStringWidth(text) + buttonWidth + 6;
 	}
 	

@@ -18,8 +18,9 @@ import net.wurstclient.settings.FileSetting;
 
 public final class AutoBuildHack extends Hack implements UpdateListener
 {
-	private final FileSetting template = new FileSetting("Template", "",
-		"autobuild", folder -> createDefaultTemplates(folder));
+	private final FileSetting template =
+		new FileSetting("Template", "Determines what to build.", "autobuild",
+			folder -> createDefaultTemplates(folder));
 	
 	public AutoBuildHack()
 	{
@@ -50,7 +51,7 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 	{
 		try
 		{
-			Files.createFile(folder.resolve("test.txt"));
+			Files.createFile(folder.resolve("test.json"));
 			
 		}catch(IOException e)
 		{

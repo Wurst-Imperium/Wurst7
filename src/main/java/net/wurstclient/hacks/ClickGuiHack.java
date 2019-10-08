@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.SearchTags;
-import net.wurstclient.clickgui.ClickGuiScreen;
+import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;

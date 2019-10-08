@@ -14,7 +14,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.clickgui.EditBlockListScreen;
+import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
 import net.wurstclient.events.SetOpaqueCubeListener;

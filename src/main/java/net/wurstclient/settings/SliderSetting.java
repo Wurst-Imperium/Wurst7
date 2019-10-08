@@ -14,7 +14,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.SliderComponent;
+import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonUtils;

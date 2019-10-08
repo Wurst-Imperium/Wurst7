@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
-import net.wurstclient.clickgui.ClickGuiScreen;
+import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.events.GUIRenderListener;
 
 public final class IngameHUD implements GUIRenderListener
