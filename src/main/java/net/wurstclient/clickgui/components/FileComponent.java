@@ -13,6 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.screens.SelectFileScreen;
 import net.wurstclient.settings.FileSetting;
 
 public final class FileComponent extends Component
@@ -40,7 +41,8 @@ public final class FileComponent extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		// TODO
+		WurstClient.MC.openScreen(
+			new SelectFileScreen(WurstClient.MC.currentScreen, setting));
 	}
 	
 	@Override
@@ -71,7 +73,6 @@ public final class FileComponent extends Component
 		else if(hBox)
 		{
 			String tooltip = "\u00a7e[left-click]\u00a7r to select file";
-			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
 			gui.setTooltip(tooltip);
 		}
 		

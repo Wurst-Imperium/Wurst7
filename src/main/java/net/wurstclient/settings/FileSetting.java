@@ -68,9 +68,25 @@ public final class FileSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	private void resetToDefault()
+	public void resetFolder()
 	{
-		createFolder();
+		for(Path path : listFiles())
+			try
+			{
+				Files.delete(path);
+				
+			}catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		
+		generateDefaultFiles();
+		WurstClient.INSTANCE.saveSettings();
+	}
+	
+	private void generateDefaultFiles()
+	{
+		createFolderIfNeeded();
 		ArrayList<Path> files = listFiles();
 		
 		if(files.isEmpty())
@@ -86,7 +102,7 @@ public final class FileSetting extends Setting
 		selectedFile = "" + files.get(0).getFileName();
 	}
 	
-	private void createFolder()
+	private void createFolderIfNeeded()
 	{
 		if(Files.isDirectory(folder))
 			return;
@@ -102,11 +118,11 @@ public final class FileSetting extends Setting
 		}
 	}
 	
-	private ArrayList<Path> listFiles()
+	public ArrayList<Path> listFiles()
 	{
 		try
 		{
-			return Files.list(folder)
+			return Files.list(folder).filter(Files::isRegularFile)
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 			
 		}catch(IOException e)
@@ -136,7 +152,7 @@ public final class FileSetting extends Setting
 		}catch(JsonException e)
 		{
 			e.printStackTrace();
-			resetToDefault();
+			generateDefaultFiles();
 		}
 	}
 	
