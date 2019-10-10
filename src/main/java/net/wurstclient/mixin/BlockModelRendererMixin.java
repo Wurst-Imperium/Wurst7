@@ -15,12 +15,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.class_4587;
-import net.minecraft.class_4588;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MatrixStack;
 import net.minecraft.world.BlockRenderView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
@@ -36,8 +36,9 @@ public abstract class BlockModelRendererMixin
 		cancellable = true)
 	private void onTesselateSmoothOrFlat(BlockRenderView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		class_4587 class_4587_1, class_4588 class_4588_1, boolean depthTest,
-		Random random_1, long long_1, CallbackInfoReturnable<Boolean> cir)
+		MatrixStack class_4587_1, VertexConsumer class_4588_1,
+		boolean depthTest, Random random_1, long long_1,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
@@ -64,8 +65,8 @@ public abstract class BlockModelRendererMixin
 	@Shadow
 	public boolean tesselateSmooth(BlockRenderView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		class_4587 class_4587_1, class_4588 class_4588_1, boolean boolean_1,
-		Random random_1, long long_1)
+		MatrixStack class_4587_1, VertexConsumer class_4588_1,
+		boolean boolean_1, Random random_1, long long_1)
 	{
 		return false;
 	}

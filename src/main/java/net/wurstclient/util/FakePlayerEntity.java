@@ -54,9 +54,9 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void resetCapeMovement()
 	{
-		field_7500 = x;
-		field_7521 = y;
-		field_7499 = z;
+		field_7500 = getX();
+		field_7521 = getY();
+		field_7499 = getZ();
 	}
 	
 	private void spawn()
@@ -71,6 +71,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void resetPlayerPosition()
 	{
-		player.setPositionAndAngles(x, y, z, yaw, pitch);
+		player.setPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
 	}
 }

@@ -19,6 +19,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
@@ -152,7 +153,8 @@ public final class EditBlockScreen extends Screen
 		double scale = large ? 1.5 : 0.75;
 		GL11.glScaled(scale, scale, scale);
 		
-		GuiLighting.enableForItems();
+		MatrixStack matrixStack = new MatrixStack();
+		GuiLighting.enableForItems(matrixStack.peek());
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);

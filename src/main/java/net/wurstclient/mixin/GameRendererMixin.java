@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.class_4587;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
@@ -31,7 +31,7 @@ public class GameRendererMixin
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/class_4587;F)V",
 		ordinal = 0), method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
 	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
-		class_4587 class_4587_1, float partalTicks)
+		MatrixStack class_4587_1, float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
@@ -50,14 +50,14 @@ public class GameRendererMixin
 			ordinal = 0)},
 		method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
-		class_4587 class_4587_1, CallbackInfo ci)
+		MatrixStack class_4587_1, CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
 	@Shadow
-	private void bobView(class_4587 class_4587_1, float float_1)
+	private void bobView(MatrixStack class_4587_1, float float_1)
 	{
 		
 	}

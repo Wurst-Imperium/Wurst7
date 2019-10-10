@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -236,9 +236,9 @@ public final class KillauraHack extends Hack
 		float green = 2 - red;
 		
 		GL11.glTranslated(
-			target.prevX + (target.x - target.prevX) * partialTicks,
-			target.prevY + (target.y - target.prevY) * partialTicks,
-			target.prevZ + (target.z - target.prevZ) * partialTicks);
+			target.prevX + (target.getX() - target.prevX) * partialTicks,
+			target.prevY + (target.getY() - target.prevY) * partialTicks,
+			target.prevZ + (target.getZ() - target.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);

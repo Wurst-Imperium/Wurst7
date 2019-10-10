@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 
@@ -126,7 +127,8 @@ public final class BlockComponent extends Component
 		double scale = large ? 1.5 : 0.75;
 		GL11.glScaled(scale, scale, scale);
 		
-		GuiLighting.enableForItems();
+		MatrixStack matrixStack = new MatrixStack();
+		GuiLighting.enableForItems(matrixStack.peek());
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);

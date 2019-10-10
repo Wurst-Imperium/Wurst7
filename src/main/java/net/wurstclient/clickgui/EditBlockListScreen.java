@@ -25,6 +25,7 @@ import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.MatrixStack;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 
@@ -254,7 +255,8 @@ public final class EditBlockListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				MatrixStack matrixStack = new MatrixStack();
+				GuiLighting.enableForItems(matrixStack.peek());
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				GuiLighting.disable();
@@ -281,7 +283,8 @@ public final class EditBlockListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				MatrixStack matrixStack = new MatrixStack();
+				GuiLighting.enableForItems(matrixStack.peek());
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
 				GuiLighting.disable();
 				
