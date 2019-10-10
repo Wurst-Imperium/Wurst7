@@ -28,10 +28,11 @@ public class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloadListener
 {
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/class_4587;F)V",
-		ordinal = 0), method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
+		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/util/math/MatrixStack;F)V",
+		ordinal = 0),
+		method = {"renderWorld(FJLnet/minecraft/util/math/MatrixStack;)V"})
 	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
-		MatrixStack class_4587_1, float partalTicks)
+		MatrixStack matrixStack, float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
@@ -40,7 +41,7 @@ public class GameRendererMixin
 		if(event.isCancelled())
 			return;
 		
-		bobView(class_4587_1, partalTicks);
+		bobView(matrixStack, partalTicks);
 	}
 	
 	@Inject(
@@ -48,16 +49,16 @@ public class GameRendererMixin
 			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0)},
-		method = {"renderWorld(FJLnet/minecraft/class_4587;)V"})
+		method = {"renderWorld(FJLnet/minecraft/util/math/MatrixStack;)V"})
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
-		MatrixStack class_4587_1, CallbackInfo ci)
+		MatrixStack matrixStack, CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
 	@Shadow
-	private void bobView(MatrixStack class_4587_1, float float_1)
+	private void bobView(MatrixStack matrixStack, float partalTicks)
 	{
 		
 	}
