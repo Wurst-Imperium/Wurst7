@@ -31,13 +31,13 @@ public abstract class BlockModelRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"tesselateSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/class_4587;Lnet/minecraft/class_4588;ZLjava/util/Random;J)Z",
-			"tesselateFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/class_4587;Lnet/minecraft/class_4588;ZLjava/util/Random;J)Z"},
+			"tesselateSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z",
+			"tesselateFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z"},
 		cancellable = true)
 	private void onTesselateSmoothOrFlat(BlockRenderView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack class_4587_1, VertexConsumer class_4588_1,
-		boolean depthTest, Random random_1, long long_1,
+		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
+		boolean depthTest, Random random_1, long long_1, int int_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
@@ -58,15 +58,15 @@ public abstract class BlockModelRendererMixin
 			return;
 		
 		tesselateSmooth(blockRenderView_1, bakedModel_1, blockState_1,
-			blockPos_1, class_4587_1, class_4588_1, depthTest, random_1,
-			long_1);
+			blockPos_1, matrixStack_1, vertexConsumer_1, depthTest, random_1,
+			long_1, int_1);
 	}
 	
 	@Shadow
 	public boolean tesselateSmooth(BlockRenderView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack class_4587_1, VertexConsumer class_4588_1,
-		boolean boolean_1, Random random_1, long long_1)
+		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
+		boolean boolean_1, Random random_1, long long_1, int int_1)
 	{
 		return false;
 	}
