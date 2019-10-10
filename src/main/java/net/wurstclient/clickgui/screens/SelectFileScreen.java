@@ -20,6 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.SystemUtil;
 import net.wurstclient.settings.FileSetting;
 
 public final class SelectFileScreen extends Screen
@@ -48,13 +49,20 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(minecraft, this, setting.listFiles());
 		
+		addButton(
+			new ButtonWidget(8, 8, 100, 20, "Open Folder", b -> openFolder()));
 		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
 			b -> askToConfirmReset()));
 		
-		doneButton = addButton(new ButtonWidget(width / 2 - 102, height - 28,
+		doneButton = addButton(new ButtonWidget(width / 2 - 102, height - 48,
 			100, 20, "Done", b -> done()));
-		addButton(new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
+		addButton(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
 			"Cancel", b -> openPrevScreen()));
+	}
+	
+	private void openFolder()
+	{
+		SystemUtil.getOperatingSystem().open(setting.getFolder().toFile());
 	}
 	
 	private void openPrevScreen()
@@ -175,7 +183,7 @@ public final class SelectFileScreen extends Screen
 		public ListGui(MinecraftClient mc, SelectFileScreen screen,
 			ArrayList<Path> list)
 		{
-			super(mc, screen.width, screen.height, 32, screen.height - 64, 20);
+			super(mc, screen.width, screen.height, 36, screen.height - 64, 20);
 			this.mc = mc;
 			this.list = list;
 		}
