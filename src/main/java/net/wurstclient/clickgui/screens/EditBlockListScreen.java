@@ -5,13 +5,14 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.clickgui;
+package net.wurstclient.clickgui.screens;
 
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -22,32 +23,30 @@ import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.util.TextFormat;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MatrixStack;
-import net.minecraft.util.registry.Registry;
-import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.util.BlockUtils;
 
-public final class EditItemListScreen extends Screen
+public final class EditBlockListScreen extends Screen
 {
 	private final Screen prevScreen;
-	private final ItemListSetting itemList;
+	private final BlockListSetting blockList;
 	
 	private ListGui listGui;
-	private TextFieldWidget itemNameField;
+	private TextFieldWidget blockNameField;
 	private ButtonWidget addButton;
 	private ButtonWidget removeButton;
 	private ButtonWidget doneButton;
 	
-	private Item itemToAdd;
+	private Block blockToAdd;
 	
-	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList)
+	public EditBlockListScreen(Screen prevScreen, BlockListSetting blockList)
 	{
 		super(new LiteralText(""));
 		this.prevScreen = prevScreen;
-		this.itemList = itemList;
+		this.blockList = blockList;
 	}
 	
 	@Override
@@ -59,27 +58,27 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, itemList.getItemNames());
+		listGui = new ListGui(minecraft, this, blockList.getBlockNames());
 		
-		itemNameField = new TextFieldWidget(minecraft.textRenderer,
+		blockNameField = new TextFieldWidget(minecraft.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, "");
-		children.add(itemNameField);
+		children.add(blockNameField);
 		
 		addButton(addButton =
 			new ButtonWidget(width / 2 - 2, height - 56, 30, 20, "Add", b -> {
-				itemList.add(itemToAdd);
-				itemNameField.setText("");
+				blockList.add(blockToAdd);
+				blockNameField.setText("");
 			}));
 		
-		addButton(
-			removeButton = new ButtonWidget(width / 2 + 52, height - 56, 100,
-				20, "Remove Selected", b -> itemList.remove(listGui.selected)));
+		addButton(removeButton =
+			new ButtonWidget(width / 2 + 52, height - 56, 100, 20,
+				"Remove Selected", b -> blockList.remove(listGui.selected)));
 		
 		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
 			b -> minecraft.openScreen(new ConfirmScreen(b2 -> {
 				if(b2)
-					itemList.resetToDefaults();
-				minecraft.openScreen(EditItemListScreen.this);
+					blockList.resetToDefaults();
+				minecraft.openScreen(EditBlockListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
@@ -92,7 +91,7 @@ public final class EditItemListScreen extends Screen
 	{
 		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
 		
-		itemNameField.mouseClicked(mouseX, mouseY, mouseButton);
+		blockNameField.mouseClicked(mouseX, mouseY, mouseButton);
 		listGui.mouseClicked(mouseX, mouseY, mouseButton);
 		
 		if(!childClicked && (mouseX < (width - 220) / 2
@@ -142,10 +141,10 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void tick()
 	{
-		itemNameField.tick();
+		blockNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(new Identifier(itemNameField.getText()));
-		addButton.active = itemToAdd != null;
+		blockToAdd = BlockUtils.getBlockFromName(blockNameField.getText());
+		addButton.active = blockToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
@@ -158,17 +157,17 @@ public final class EditItemListScreen extends Screen
 		listGui.render(mouseX, mouseY, partialTicks);
 		
 		drawCenteredString(minecraft.textRenderer,
-			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
-			12, 0xffffff);
+			blockList.getName() + " (" + listGui.getItemCount() + ")",
+			width / 2, 12, 0xffffff);
 		
-		itemNameField.render(mouseX, mouseY, partialTicks);
+		blockNameField.render(mouseX, mouseY, partialTicks);
 		super.render(mouseX, mouseY, partialTicks);
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
 		
-		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
-			drawString(minecraft.textRenderer, "item name or ID", 68,
+		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
+			drawString(minecraft.textRenderer, "block name or ID", 68,
 				height - 50, 0x808080);
 		
 		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
@@ -180,7 +179,7 @@ public final class EditItemListScreen extends Screen
 		fill(214, height - 40, 243, height - 37, 0xff000000);
 		fill(215, height - 55, 216, height - 37, 0xff000000);
 		fill(242, height - 55, 245, height - 37, 0xff000000);
-		listGui.renderIconAndGetName(new ItemStack(itemToAdd), 52, height - 52,
+		listGui.renderIconAndGetName(new ItemStack(blockToAdd), 52, height - 52,
 			false);
 		
 		GL11.glPopMatrix();
@@ -192,7 +191,7 @@ public final class EditItemListScreen extends Screen
 		private final List<String> list;
 		private int selected = -1;
 		
-		public ListGui(MinecraftClient mc, EditItemListScreen screen,
+		public ListGui(MinecraftClient mc, EditBlockListScreen screen,
 			List<String> list)
 		{
 			super(mc, screen.width, screen.height, 32, screen.height - 64, 30);
@@ -233,16 +232,15 @@ public final class EditItemListScreen extends Screen
 			int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registry.ITEM.get(new Identifier(name));
-			ItemStack stack = new ItemStack(item);
+			ItemStack stack = new ItemStack(BlockUtils.getBlockFromName(name));
 			TextRenderer fr = mc.textRenderer;
 			
 			String displayName =
 				renderIconAndGetName(stack, x + 1, y + 1, true);
 			fr.draw(displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw("ID: " + Registry.ITEM.getId(item).toString(), x + 28,
-				y + 18, 0xa0a0a0);
+			fr.draw("ID: " + BlockUtils.getBlockFromName(name), x + 28, y + 18,
+				0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(ItemStack stack, int x, int y,
@@ -274,7 +272,7 @@ public final class EditItemListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return TextFormat.ITALIC + "unknown item" + TextFormat.RESET;
+				return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
 				
 			}else
 			{

@@ -16,9 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
+import net.minecraft.server.network.packet.ChatMessageC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
@@ -37,6 +39,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private float lastYaw;
 	@Shadow
 	private float lastPitch;
+	@Shadow
+	private ClientPlayNetworkHandler networkHandler;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
 		GameProfile gameProfile_1)
@@ -49,11 +53,22 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		cancellable = true)
 	private void onSendChatMessage(String message, CallbackInfo ci)
 	{
-		ChatOutputEvent event = new ChatOutputEvent(message, false);
+		ChatOutputEvent event = new ChatOutputEvent(message);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())
+		{
 			ci.cancel();
+			return;
+		}
+		
+		if(!event.isModified())
+			return;
+		
+		ChatMessageC2SPacket packet =
+			new ChatMessageC2SPacket(event.getMessage());
+		networkHandler.sendPacket(packet);
+		ci.cancel();
 	}
 	
 	@Inject(at = @At(value = "INVOKE",

@@ -8,6 +8,7 @@
 package net.wurstclient.events;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
@@ -19,13 +20,13 @@ public interface ChatOutputListener extends Listener
 	public static class ChatOutputEvent
 		extends CancellableEvent<ChatOutputListener>
 	{
+		private final String originalMessage;
 		private String message;
-		private boolean automatic;
 		
-		public ChatOutputEvent(String message, boolean automatic)
+		public ChatOutputEvent(String message)
 		{
-			this.message = message;
-			this.automatic = automatic;
+			this.message = Objects.requireNonNull(message);
+			originalMessage = message;
 		}
 		
 		public String getMessage()
@@ -38,9 +39,14 @@ public interface ChatOutputListener extends Listener
 			this.message = message;
 		}
 		
-		public boolean isAutomatic()
+		public String getOriginalMessage()
 		{
-			return automatic;
+			return originalMessage;
+		}
+		
+		public boolean isModified()
+		{
+			return !originalMessage.equals(message);
 		}
 		
 		@Override

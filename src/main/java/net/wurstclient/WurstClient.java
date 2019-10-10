@@ -59,12 +59,13 @@ public enum WurstClient
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
+	private Path wurstFolder;
 	
 	public void initialize()
 	{
 		System.out.println("Starting Wurst Client...");
 		
-		Path wurstFolder = createWurstFolder();
+		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -211,5 +212,10 @@ public enum WurstClient
 	public WurstUpdater getUpdater()
 	{
 		return updater;
+	}
+	
+	public Path getWurstFolder()
+	{
+		return wurstFolder;
 	}
 }

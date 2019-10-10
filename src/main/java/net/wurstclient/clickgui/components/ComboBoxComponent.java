@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.clickgui;
+package net.wurstclient.clickgui.components;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -15,6 +15,10 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.clickgui.ComboBoxPopup;
+import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.EnumSetting;
 
 public final class ComboBoxComponent<T extends Enum> extends Component
