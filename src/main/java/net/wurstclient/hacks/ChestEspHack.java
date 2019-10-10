@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BarrelBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.EnderChestBlockEntity;
@@ -50,7 +51,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	{
 		super("ChestESP",
 			"Highlights nearby chests.\n"
-				+ "\u00a7agreen\u00a7r - normal chests\n"
+				+ "\u00a7agreen\u00a7r - normal chests & barrels\n"
 				+ "\u00a76orange\u00a7r - trapped chests\n"
 				+ "\u00a7bcyan\u00a7r - ender chests\n"
 				+ "\u00a7dpurple\u00a7r - shulker boxes");
@@ -152,7 +153,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				
 			}else if(blockEntity instanceof EnderChestBlockEntity)
 			{
-				BlockPos pos = ((EnderChestBlockEntity)blockEntity).getPos();
+				BlockPos pos = blockEntity.getPos();
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
@@ -161,12 +162,21 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				
 			}else if(blockEntity instanceof ShulkerBoxBlockEntity)
 			{
-				BlockPos pos = ((ShulkerBoxBlockEntity)blockEntity).getPos();
+				BlockPos pos = blockEntity.getPos();
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
 				Box bb = BlockUtils.getBoundingBox(pos);
 				shulkerBoxes.add(bb);
+				
+			}else if(blockEntity instanceof BarrelBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				basicChests.add(bb);
 			}
 		
 		GL11.glNewList(normalChests, GL11.GL_COMPILE);
