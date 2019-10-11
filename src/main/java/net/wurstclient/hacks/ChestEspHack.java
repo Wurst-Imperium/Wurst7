@@ -195,6 +195,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private Box getBoxFromChest(ChestBlockEntity chestBE)
 	{
 		BlockState state = chestBE.getCachedState();
+		if(!state.contains(ChestBlock.CHEST_TYPE))
+			return null;
+		
 		ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
 		
 		// ignore other block in double chest
