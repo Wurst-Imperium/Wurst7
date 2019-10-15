@@ -18,13 +18,14 @@ import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.BlockBreakingProgressListener;
+import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"auto tool", "AutoSwitch", "auto switch"})
 public final class AutoToolHack extends Hack
-	implements BlockBreakingProgressListener
+	implements BlockBreakingProgressListener, UpdateListener
 {
 	private final CheckboxSetting useSwords = new CheckboxSetting("Use swords",
 		"Uses swords to break leaves,\n" + "cobwebs, etc.", false);
@@ -38,6 +39,13 @@ public final class AutoToolHack extends Hack
 	private final CheckboxSetting repairMode = new CheckboxSetting(
 		"Repair mode", "Won't use tools that are about to break.", false);
 	
+	private final CheckboxSetting switchBack = new CheckboxSetting(
+		"Switch back", "After using a tool, automatically switches\n"
+			+ "back to the previously selected slot.",
+		true);
+	
+	private int prevSelectedSlot;
+	
 	public AutoToolHack()
 	{
 		super("AutoTool", "Automatically equips the fastest applicable tool\n"
@@ -47,18 +55,22 @@ public final class AutoToolHack extends Hack
 		addSetting(useSwords);
 		addSetting(useHands);
 		addSetting(repairMode);
+		addSetting(switchBack);
 	}
 	
 	@Override
 	public void onEnable()
 	{
 		EVENTS.add(BlockBreakingProgressListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		prevSelectedSlot = -1;
 	}
 	
 	@Override
 	public void onDisable()
 	{
 		EVENTS.remove(BlockBreakingProgressListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -68,8 +80,23 @@ public final class AutoToolHack extends Hack
 		if(!BlockUtils.canBeClicked(pos))
 			return;
 		
+		if(prevSelectedSlot == -1)
+			prevSelectedSlot = MC.player.inventory.selectedSlot;
+		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
 			repairMode.isChecked());
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		if(prevSelectedSlot == -1 || MC.interactionManager.isBreakingBlock())
+			return;
+		
+		if(switchBack.isChecked())
+			MC.player.inventory.selectedSlot = prevSelectedSlot;
+		
+		prevSelectedSlot = -1;
 	}
 	
 	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
