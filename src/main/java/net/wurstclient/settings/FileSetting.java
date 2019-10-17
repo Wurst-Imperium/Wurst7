@@ -144,14 +144,13 @@ public final class FileSetting extends Setting
 		{
 			String newFile = JsonUtils.getAsString(json);
 			
-			if(!Files.exists(folder.resolve(newFile)))
+			if(newFile.isEmpty() || !Files.exists(folder.resolve(newFile)))
 				throw new JsonException();
 			
 			selectedFile = newFile;
 			
 		}catch(JsonException e)
 		{
-			e.printStackTrace();
 			generateDefaultFiles();
 		}
 	}

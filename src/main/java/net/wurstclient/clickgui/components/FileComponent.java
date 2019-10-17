@@ -19,14 +19,10 @@ import net.wurstclient.settings.FileSetting;
 public final class FileComponent extends Component
 {
 	private final FileSetting setting;
-	private int buttonWidth;
 	
 	public FileComponent(FileSetting setting)
 	{
 		this.setting = setting;
-		
-		TextRenderer fr = WurstClient.MC.textRenderer;
-		buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
@@ -37,6 +33,9 @@ public final class FileComponent extends Component
 	{
 		if(mouseButton != 0)
 			return;
+		
+		TextRenderer fr = WurstClient.MC.textRenderer;
+		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
 		
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
@@ -52,6 +51,9 @@ public final class FileComponent extends Component
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
+		
+		TextRenderer fr = WurstClient.MC.textRenderer;
+		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
 		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -105,7 +107,6 @@ public final class FileComponent extends Component
 		// setting name
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": ";
 		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
 		fr.draw(setting.getSelectedFileName(), x3 + 2, y1 + 2, 0xf0f0f0);
@@ -116,7 +117,10 @@ public final class FileComponent extends Component
 	public int getDefaultWidth()
 	{
 		TextRenderer fr = WurstClient.MC.textRenderer;
+		
 		String text = setting.getName() + ": ";
+		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		
 		return fr.getStringWidth(text) + buttonWidth + 6;
 	}
 	

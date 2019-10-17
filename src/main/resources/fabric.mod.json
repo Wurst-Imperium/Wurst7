@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "wurst.mixins.json"
   ],
 
   "depends": {

@@ -6,9 +6,11 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BarrelBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.EnderChestBlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.entity.Entity;
@@ -35,20 +37,23 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private final ArrayList<Box> basicChests = new ArrayList<>();
 	private final ArrayList<Box> trappedChests = new ArrayList<>();
 	private final ArrayList<Box> enderChests = new ArrayList<>();
+	private final ArrayList<Box> shulkerBoxes = new ArrayList<>();
 	private final ArrayList<Entity> minecarts = new ArrayList<>();
 	
 	private int greenBox;
 	private int orangeBox;
 	private int cyanBox;
+	private int purpleBox;
 	private int normalChests;
 	
 	public ChestEspHack()
 	{
 		super("ChestESP",
 			"Highlights nearby chests.\n"
-				+ "\u00a7agreen\u00a7r - normal chests\n"
+				+ "\u00a7agreen\u00a7r - normal chests & barrels\n"
 				+ "\u00a76orange\u00a7r - trapped chests\n"
-				+ "\u00a7bcyan\u00a7r - ender chests");
+				+ "\u00a7bcyan\u00a7r - ender chests\n"
+				+ "\u00a7dpurple\u00a7r - shulker boxes");
 		
 		setCategory(Category.RENDER);
 		addSetting(style);
@@ -92,6 +97,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
+		purpleBox = GL11.glGenLists(1);
+		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
+		GL11.glColor4f(1, 0, 1, 0.25F);
+		RenderUtils.drawSolidBox(box);
+		GL11.glColor4f(1, 0, 1, 0.5F);
+		RenderUtils.drawOutlinedBox(box);
+		GL11.glEndList();
+		
 		normalChests = GL11.glGenLists(1);
 	}
 	
@@ -102,14 +115,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		deletDisplayLists();
+		deleteDisplayLists();
 	}
 	
-	private void deletDisplayLists()
+	private void deleteDisplayLists()
 	{
 		GL11.glDeleteLists(greenBox, 1);
 		GL11.glDeleteLists(orangeBox, 1);
 		GL11.glDeleteLists(cyanBox, 1);
+		GL11.glDeleteLists(purpleBox, 1);
 		GL11.glDeleteLists(normalChests, 1);
 	}
 	
@@ -119,6 +133,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		basicChests.clear();
 		trappedChests.clear();
 		enderChests.clear();
+		shulkerBoxes.clear();
 		
 		for(BlockEntity blockEntity : MC.world.blockEntities)
 			if(blockEntity instanceof TrappedChestBlockEntity)
@@ -137,18 +152,37 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				
 			}else if(blockEntity instanceof EnderChestBlockEntity)
 			{
-				BlockPos pos = ((EnderChestBlockEntity)blockEntity).getPos();
+				BlockPos pos = blockEntity.getPos();
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
 				Box bb = BlockUtils.getBoundingBox(pos);
 				enderChests.add(bb);
+				
+			}else if(blockEntity instanceof ShulkerBoxBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				shulkerBoxes.add(bb);
+				
+			}else if(blockEntity instanceof BarrelBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				basicChests.add(bb);
 			}
 		
 		GL11.glNewList(normalChests, GL11.GL_COMPILE);
 		renderBoxes(basicChests, greenBox);
 		renderBoxes(trappedChests, orangeBox);
 		renderBoxes(enderChests, cyanBox);
+		renderBoxes(shulkerBoxes, purpleBox);
 		GL11.glEndList();
 		
 		minecarts.clear();
@@ -160,6 +194,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private Box getBoxFromChest(ChestBlockEntity chestBE)
 	{
 		BlockState state = chestBE.getCachedState();
+		if(!state.contains(ChestBlock.CHEST_TYPE))
+			return null;
+		
 		ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
 		
 		// ignore other block in double chest
@@ -234,6 +271,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			GL11.glColor4f(0, 1, 1, 0.5F);
 			renderLines(start, enderChests);
+			
+			GL11.glColor4f(1, 0, 1, 0.5F);
+			renderLines(start, shulkerBoxes);
 			
 			GL11.glEnd();
 		}
