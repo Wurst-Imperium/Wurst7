@@ -58,7 +58,7 @@ public abstract class BlockModelRendererMixin
 			return;
 		
 		tesselateSmooth(blockRenderView_1, bakedModel_1, blockState_1,
-			blockPos_1, matrixStack_1, vertexConsumer_1, depthTest, random_1,
+			blockPos_1, matrixStack_1, vertexConsumer_1, false, random_1,
 			long_1, int_1);
 	}
 	
