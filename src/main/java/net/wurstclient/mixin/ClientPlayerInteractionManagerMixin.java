@@ -24,7 +24,6 @@ import net.minecraft.server.network.packet.PlayerActionC2SPacket;
 import net.minecraft.server.network.packet.PlayerActionC2SPacket.Action;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -134,8 +133,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 		Hand hand_1, BlockHitResult blockHitResult_1);
 	
 	@Shadow
-	public abstract TypedActionResult<ItemStack> interactItem(
-		PlayerEntity playerEntity_1, World world_1, Hand hand_1);
+	public abstract ActionResult interactItem(PlayerEntity playerEntity_1,
+		World world_1, Hand hand_1);
 	
 	@Shadow
 	public abstract ItemStack clickSlot(int int_1, int int_2, int int_3,
