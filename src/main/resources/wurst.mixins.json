@@ -25,6 +25,7 @@
     "KeyboardMixin",
     "MinecraftClientMixin",
     "MultiplayerScreenMixin",
+    "ServerListMixin",
     "TerrainRenderContextMixin"
   ],
   "injectors": {

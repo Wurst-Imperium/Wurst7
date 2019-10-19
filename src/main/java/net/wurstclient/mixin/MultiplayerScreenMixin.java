@@ -20,6 +20,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
+import net.wurstclient.serverfinder.CleanUpScreen;
 import net.wurstclient.serverfinder.ServerFinderScreen;
 
 @Mixin(MultiplayerScreen.class)
@@ -48,5 +49,9 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
 			"Server Finder", b -> minecraft.openScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
+		
+		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
+			"Clean Up", b -> minecraft.openScreen(
+				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 }
