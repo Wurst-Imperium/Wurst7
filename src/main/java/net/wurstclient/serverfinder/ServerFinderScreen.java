@@ -59,14 +59,16 @@ public class ServerFinderScreen extends Screen
 		ipBox = new TextFieldWidget(font, width / 2 - 100, height / 4 + 34, 200,
 			20, "");
 		ipBox.setMaxLength(200);
-		setInitialFocus(ipBox);
 		ipBox.method_1876(true);
+		children.add(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(font, width / 2 - 32,
 			height / 4 + 58, 26, 12, "");
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
+		children.add(maxThreadsBox);
 		
+		setInitialFocus(ipBox);
 		state = ServerFinderState.NOT_RUNNING;
 		
 		WurstClient.INSTANCE.getAnalytics()
