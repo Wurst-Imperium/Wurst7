@@ -9,6 +9,7 @@ package net.wurstclient.command;
 
 import java.util.Objects;
 
+import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.util.ChatUtils;
 
@@ -17,6 +18,7 @@ public abstract class Command extends Feature
 	private final String name;
 	private final String description;
 	private final String[] syntax;
+	private Category category;
 	
 	public Command(String name, String description, String... syntax)
 	{
@@ -69,5 +71,16 @@ public abstract class Command extends Feature
 		
 		for(String line : syntax)
 			ChatUtils.message(line);
+	}
+	
+	@Override
+	public final Category getCategory()
+	{
+		return category;
+	}
+	
+	protected final void setCategory(Category category)
+	{
+		this.category = category;
 	}
 }

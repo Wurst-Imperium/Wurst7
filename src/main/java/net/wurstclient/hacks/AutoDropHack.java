@@ -31,7 +31,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		"minecraft:wheat_seeds", "minecraft:white_tulip");
 	
 	private final String renderName =
-		Math.random() < 0.1 ? "AutoLinus" : getName();
+		Math.random() < 0.01 ? "AutoLinus" : getName();
 	
 	public AutoDropHack()
 	{
@@ -49,13 +49,13 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(UpdateListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
 	}
 	
 	@Override

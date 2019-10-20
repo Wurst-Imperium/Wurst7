@@ -33,13 +33,13 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getEventManager().add(ChatInputListener.class, this);
+		EVENTS.add(ChatInputListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(ChatInputListener.class, this);
+		EVENTS.remove(ChatInputListener.class, this);
 	}
 	
 	@Override

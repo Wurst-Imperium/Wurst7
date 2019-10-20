@@ -42,7 +42,7 @@ public final class DropCmd extends Command implements UpdateListener
 		
 		slowModeTimer = 5;
 		slowModeSlotCounter = 9;
-		WURST.getEventManager().add(UpdateListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	private void dropAllItems()
@@ -65,7 +65,7 @@ public final class DropCmd extends Command implements UpdateListener
 		slowModeTimer = 5;
 		
 		if(slowModeSlotCounter >= 45)
-			WURST.getEventManager().remove(UpdateListener.class, this);
+			EVENTS.remove(UpdateListener.class, this);
 	}
 	
 	private void skipEmptySlots()

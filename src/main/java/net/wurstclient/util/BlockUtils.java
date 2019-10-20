@@ -11,10 +11,14 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.wurstclient.WurstClient;
 
@@ -51,7 +55,14 @@ public enum BlockUtils
 	
 	public static Block getBlockFromName(String name)
 	{
-		return Registry.BLOCK.get(new Identifier(name));
+		try
+		{
+			return Registry.BLOCK.get(new Identifier(name));
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return Blocks.AIR;
+		}
 	}
 	
 	public static float getHardness(BlockPos pos)
@@ -59,10 +70,19 @@ public enum BlockUtils
 		return getState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos);
 	}
 	
+	private static VoxelShape getOutlineShape(BlockPos pos)
+	{
+		return getState(pos).getOutlineShape(MC.world, pos);
+	}
+	
+	public static Box getBoundingBox(BlockPos pos)
+	{
+		return getOutlineShape(pos).getBoundingBox().offset(pos);
+	}
+	
 	public static boolean canBeClicked(BlockPos pos)
 	{
-		return getState(pos).getOutlineShape(MC.world, pos) != VoxelShapes
-			.empty();
+		return getOutlineShape(pos) != VoxelShapes.empty();
 	}
 	
 	public static ArrayList<BlockPos> getAllInBox(BlockPos min, BlockPos max)

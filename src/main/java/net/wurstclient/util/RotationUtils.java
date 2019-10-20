@@ -55,6 +55,20 @@ public enum RotationUtils
 		return new Rotation(yaw, pitch);
 	}
 	
+	public static double getAngleToLookVec(Vec3d vec)
+	{
+		Rotation needed = getNeededRotations(vec);
+		
+		ClientPlayerEntity player = WurstClient.MC.player;
+		float currentYaw = MathHelper.wrapDegrees(player.yaw);
+		float currentPitch = MathHelper.wrapDegrees(player.pitch);
+		
+		float diffYaw = currentYaw - needed.yaw;
+		float diffPitch = currentPitch - needed.pitch;
+		
+		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+	}
+	
 	public static double getAngleToLastReportedLookVec(Vec3d vec)
 	{
 		Rotation needed = getNeededRotations(vec);

@@ -13,7 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
-class ComboBoxPopup<T extends Enum> extends Popup
+public final class ComboBoxPopup<T extends Enum> extends Popup
 {
 	private final ClickGui gui = WurstClient.INSTANCE.getGui();
 	private final TextRenderer tr = WurstClient.MC.textRenderer;

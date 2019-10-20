@@ -15,10 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
@@ -43,6 +40,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -74,21 +72,19 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		pool = Executors.newFixedThreadPool(
-			Runtime.getRuntime().availableProcessors(),
-			new MinPriorityThreadFactory());
+		pool = MinPriorityThreadFactory.newFixedThreadPool();
 		
-		WURST.getEventManager().add(UpdateListener.class, this);
-		WURST.getEventManager().add(PacketInputListener.class, this);
-		WURST.getEventManager().add(RenderListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PacketInputListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		WURST.getEventManager().remove(UpdateListener.class, this);
-		WURST.getEventManager().remove(PacketInputListener.class, this);
-		WURST.getEventManager().remove(RenderListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PacketInputListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
@@ -371,35 +367,6 @@ public final class MobSpawnEspHack extends Hack
 			
 			doneScanning = false;
 			doneCompiling = false;
-		}
-	}
-	
-	private static class MinPriorityThreadFactory implements ThreadFactory
-	{
-		private static final AtomicInteger poolNumber = new AtomicInteger(1);
-		private final ThreadGroup group;
-		private final AtomicInteger threadNumber = new AtomicInteger(1);
-		private final String namePrefix;
-		
-		public MinPriorityThreadFactory()
-		{
-			SecurityManager s = System.getSecurityManager();
-			group = s != null ? s.getThreadGroup()
-				: Thread.currentThread().getThreadGroup();
-			namePrefix =
-				"pool-min-" + poolNumber.getAndIncrement() + "-thread-";
-		}
-		
-		@Override
-		public Thread newThread(Runnable r)
-		{
-			Thread t = new Thread(group, r,
-				namePrefix + threadNumber.getAndIncrement(), 0);
-			if(t.isDaemon())
-				t.setDaemon(false);
-			if(t.getPriority() != Thread.MIN_PRIORITY)
-				t.setPriority(Thread.MIN_PRIORITY);
-			return t;
 		}
 	}
 	

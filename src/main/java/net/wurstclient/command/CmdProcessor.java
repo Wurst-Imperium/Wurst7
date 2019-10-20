@@ -31,7 +31,7 @@ public final class CmdProcessor implements ChatOutputListener
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		String message = event.getMessage().trim();
+		String message = event.getOriginalMessage().trim();
 		if(!message.startsWith("."))
 			return;
 		

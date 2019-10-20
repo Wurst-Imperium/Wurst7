@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.client.MinecraftClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.Setting;
@@ -21,6 +22,7 @@ import net.wurstclient.settings.Setting;
 public abstract class Feature
 {
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
+	protected static final EventManager EVENTS = WURST.getEventManager();
 	protected static final MinecraftClient MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
 	

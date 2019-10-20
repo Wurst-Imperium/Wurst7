@@ -14,8 +14,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
-import net.wurstclient.clickgui.CheckboxComponent;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.components.CheckboxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
 
