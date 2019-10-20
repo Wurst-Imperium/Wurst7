@@ -42,6 +42,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
 			+ "boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
+
+	private final EnumSetting<Color> color = new EnumSetting<>("Color", "Color scheme: use Range to color mobs by range, " +
+			"and use Red to set all mob ESP to red.", Color.values(), Color.RANGE);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible mobs.", false);
@@ -55,6 +58,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);
+		addSetting(color);
 		addSetting(filterInvisible);
 	}
 	
@@ -151,9 +155,17 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			
 			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
 				e.getWidth() + extraSize);
-			
-			float f = MC.player.distanceTo(e) / 20F;
-			GL11.glColor4f(2 - f, f, 0, 0.5F);
+
+			if (color.getSelected().equals(Color.RANGE))
+			{
+				float f = MC.player.distanceTo(e) / 20F;
+				GL11.glColor4f(2 - f, f, 0, 0.5F);
+			}
+			else if (color.getSelected().equals(Color.RED))
+			{
+				GL11.glColor4f(1, 0.2f, 0.2f, 0.5f);
+			}
+
 			
 			GL11.glCallList(mobBox);
 			
@@ -174,9 +186,16 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			Vec3d end = e.getBoundingBox().getCenter().subtract(
 				new Vec3d(e.x, e.y, e.z).subtract(e.prevX, e.prevY, e.prevZ)
 					.multiply(1 - partialTicks));
-			
-			float f = MC.player.distanceTo(e) / 20F;
-			GL11.glColor4f(2 - f, f, 0, 0.5F);
+
+			if (color.getSelected().equals(Color.RANGE))
+			{
+				float f = MC.player.distanceTo(e) / 20F;
+				GL11.glColor4f(2 - f, f, 0, 0.5F);
+			}
+			else if (color.getSelected().equals(Color.RED))
+			{
+				GL11.glColor4f(1, 0.2f, 0.2f, 0.5f);
+			}
 			
 			GL11.glVertex3d(start.x, start.y, start.z);
 			GL11.glVertex3d(end.x, end.y, end.z);
@@ -222,6 +241,30 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			this.extraSize = extraSize;
 		}
 		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+
+	private enum Color
+	{
+		RANGE("Range", true, false),
+		RED("Red", false, true);
+
+		private final String name;
+		private final boolean range;
+		private final boolean red;
+
+
+		private Color(String name, boolean range, boolean red)
+		{
+			this.name = name;
+			this.range = range;
+			this.red = red;
+		}
+
 		@Override
 		public String toString()
 		{
