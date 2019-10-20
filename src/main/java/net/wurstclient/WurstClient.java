@@ -32,6 +32,7 @@ import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
+import net.wurstclient.util.FriendsList;
 
 public enum WurstClient
 {
@@ -60,8 +61,9 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
-	
-	public void initialize()
+	private FriendsList friends;
+
+	public <friends> void initialize()
 	{
 		System.out.println("Starting Wurst Client...");
 		
@@ -93,6 +95,9 @@ public enum WurstClient
 		
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
 		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
+
+		Path friendsFile = wurstFolder.resolve("friends.json");
+		friends = new FriendsList(friendsFile);
 		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -217,5 +222,9 @@ public enum WurstClient
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
+	}
+
+	public FriendsList getFriendsList() {
+		return friends;
 	}
 }
