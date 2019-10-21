@@ -125,8 +125,7 @@ public class CleanUpScreen extends Screen
 		{
 			ServerEntry server = prevScreen.getServerList().get(i);
 			if(cleanupUnknown
-				&& server.label != null
-				&& server.label.equals("\u00a74Can\'t resolve hostname")
+				&& "\u00a74Can\'t resolve hostname".equals(server.label)
 				|| cleanupOutdated && server.protocolVersion != 498
 				|| cleanupFailed && server.ping != -2L && server.ping < 0L
 				|| cleanupGriefMe && server.name.startsWith("Grief me"))
