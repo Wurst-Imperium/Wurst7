@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -126,7 +127,8 @@ public class CleanUpScreen extends Screen
 			ServerEntry server = prevScreen.getServerList().get(i);
 			if(cleanupUnknown
 				&& "\u00a74Can\'t resolve hostname".equals(server.label)
-				|| cleanupOutdated && server.protocolVersion != 498
+				|| cleanupOutdated && server.protocolVersion != SharedConstants
+					.getGameVersion().getProtocolVersion()
 				|| cleanupFailed && server.ping != -2L && server.ping < 0L
 				|| cleanupGriefMe && server.name.startsWith("Grief me"))
 			{
