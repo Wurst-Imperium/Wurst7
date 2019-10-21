@@ -8,9 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.wurstclient.WurstClient;
+import net.wurstclient.util.ColorCode;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -44,6 +49,14 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
 			+ "boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
+
+	private final EnumSetting<Color> color = new EnumSetting<>("Color",
+			"Range: The default style. Player colors are rendered according to their range.\n"
+					+ "Fixed: All players are rendered in green. Friends are rendered in blue.\n"
+					+ "Team: Players are rendered according to their team. Friends are rendered in rainbow.\n"
+					+ "Team note: As many servers do not utilize the scoreboard team system, colors are guessed\n"
+					+ "by the player's name tag color. This is not always accurate. Sorry!"
+			, Color.values(), Color.RANGE);
 	
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't show sleeping players.", false);
@@ -62,6 +75,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		addSetting(style);
 		addSetting(boxSize);
+		addSetting(color);
 		addSetting(filterSleeping);
 		addSetting(filterInvisible);
 	}
@@ -167,14 +181,42 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
 				e.getWidth() + extraSize);
 			
-			// set color
-			// TODO: friends
-			// if(WURST.friends.contains(e.getName()))
-			// GL11.glColor4f(0, 0, 1, 0.5F);
-			// else
+			List<String> friends = WurstClient.INSTANCE.getFriendsList().getAllFriends();
+			// Render color
+			if (color.getSelected() == Color.RANGE)
 			{
 				float f = MC.player.distanceTo(e) / 20F;
 				GL11.glColor4f(2 - f, f, 0, 0.5F);
+			}
+			else if (color.getSelected() == Color.FIXED)
+			{
+				if (friends.contains(e.getName().asString()))
+				{
+					GL11.glColor4f(0, 0.2f, 1, 0.5f);
+				}
+				else
+				{
+					GL11.glColor4f(0, 1, 0.2f, 0.5f);
+				}
+			}
+			else if (color.getSelected() == Color.TEAM)
+			{
+				if (friends.contains(e.getName().asString()))
+				{
+					// Generates a rainbow color.
+					int rgb = java.awt.Color.HSBtoRGB(
+							(float) ((double)System.currentTimeMillis() / 1000.0d % 1), // Color iterates fully every millis / x milliseconds
+							1, 1);
+					java.awt.Color color = new java.awt.Color(rgb);
+					ColorCode colorCode = new ColorCode(color.getRed(), color.getGreen(), color.getBlue()); // Can transform color from 0-255 to 0-1.
+
+					GL11.glColor4f(colorCode.r, colorCode.g, colorCode.b, 0.5f);
+				}
+				else
+				{
+					ColorCode colorCode = GetBestColorCode(e.getDisplayName().asFormattedString());
+					GL11.glColor4f(colorCode.r, colorCode.g, colorCode.b, 0.5f);
+				}
 			}
 			
 			GL11.glCallList(playerBox);
@@ -196,20 +238,83 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			Vec3d end = e.getBoundingBox().getCenter().subtract(
 				new Vec3d(e.x, e.y, e.z).subtract(e.prevX, e.prevY, e.prevZ)
 					.multiply(1 - partialTicks));
-			
-			// TODO: friends
-			// if(WURST.friends.contains(e.getName()))
-			// GL11.glColor4f(0, 0, 1, 0.5F);
-			// else
+
+			List<String> friends = WurstClient.INSTANCE.getFriendsList().getAllFriends();
+			// Render color
+			if (color.getSelected() == Color.RANGE)
 			{
 				float f = MC.player.distanceTo(e) / 20F;
 				GL11.glColor4f(2 - f, f, 0, 0.5F);
+			}
+			else if (color.getSelected() == Color.FIXED)
+			{
+				if (friends.contains(e.getName().asString()))
+				{
+					GL11.glColor4f(0, 0.2f, 1, 0.5f);
+				}
+				else
+				{
+					GL11.glColor4f(0, 1, 0.2f, 0.5f);
+				}
+			}
+			else if (color.getSelected() == Color.TEAM)
+			{
+				if (friends.contains(e.getName().asString()))
+				{
+					// Generates a rainbow color.
+					int rgb = java.awt.Color.HSBtoRGB(
+							(float) ((double)System.currentTimeMillis() / 1000.0d % 1), // Color iterates fully every millis / x milliseconds
+							1, 1);
+					java.awt.Color color = new java.awt.Color(rgb);
+					ColorCode colorCode = new ColorCode(color.getRed(), color.getGreen(), color.getBlue()); // Can transform color from 0-255 to 0-1.
+
+					GL11.glColor4f(colorCode.r, colorCode.g, colorCode.b, 0.5f);
+				}
+				else
+				{
+					ColorCode colorCode = GetBestColorCode(e.getDisplayName().asFormattedString());
+					GL11.glColor4f(colorCode.r, colorCode.g, colorCode.b, 0.5f);
+				}
 			}
 			
 			GL11.glVertex3d(start.x, start.y, start.z);
 			GL11.glVertex3d(end.x, end.y, end.z);
 		}
 		GL11.glEnd();
+	}
+
+	// The following methods are used to determine the player's team color without using the scoreboard.
+	// As this code was written when I was a beginner, the quality is quite dubious.
+	// Despite its unnecessary complexity, it works, and I've little desire to refactor it, so I've simply updated the comments.
+
+	// OLD: Feed output of getPlayerName into this
+	// NEW: Feed an entity's displayName into this.
+	private static ColorCode GetBestColorCode(String text)
+	{
+		// https://stackoverflow.com/questions/6020384/create-array-of-regex-matches
+		List<String> allMatches = new ArrayList<String>(); // Each item in list is one character.
+
+		Matcher m = Pattern.compile("(?<=\\xa7).").matcher(text);
+
+		while (m.find())
+		{
+			allMatches.add(m.group());
+		}
+
+		// Try to find applicable character to feed into ColorCode().
+		// If color code is modifier, go to next. If none, or list was empty, this loop skips, and returns light purple by default.
+		while (allMatches.size() > 0)
+		{
+			if (allMatches.get(allMatches.size() - 1).matches("[0-9a-f]")) // Character is 0-9 or a-f; that is, it is valid
+			{
+				return new ColorCode(allMatches.get(allMatches.size() - 1));
+			}
+
+			allMatches.remove(allMatches.size() - 1); // If did not match from back, remove element and try again.
+		}
+		// No matches left or none applicable. Return default.
+
+		return new ColorCode("d");
 	}
 	
 	private enum Style
@@ -250,6 +355,34 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			this.extraSize = extraSize;
 		}
 		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+
+
+	private enum Color
+	{
+		RANGE("Range", true, false, false),
+		FIXED("Fixed", false, true, false),
+		TEAM("Team", false, false, true);
+
+		private final String name;
+		private final boolean range;
+		private final boolean fixed;
+		private final boolean team;
+
+
+		private Color(String name, boolean range, boolean fixed, boolean team)
+		{
+			this.name = name;
+			this.range = range;
+			this.fixed = fixed;
+			this.team = team;
+		}
+
 		@Override
 		public String toString()
 		{

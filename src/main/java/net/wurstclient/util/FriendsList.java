@@ -1,15 +1,27 @@
 package net.wurstclient.util;
 
+import com.google.gson.JsonArray;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.hack.HackList;
+import net.wurstclient.util.json.JsonException;
+import net.wurstclient.util.json.JsonUtils;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Represents a list of friends, along with methods to save or load the list from disk.
  */
 public class FriendsList {
-	private final List<String> friends = new ArrayList<>();
+	private List<String> friends = new ArrayList<>();
 	private Path friendsFile;
 
 	public FriendsList(Path friendsFile)
@@ -43,6 +55,7 @@ public class FriendsList {
 		if (friends.contains(playerName))
 		{
 			friends.remove(playerName);
+			save();
 		}
 		else
 		{
@@ -60,11 +73,19 @@ public class FriendsList {
 	}
 
 	/**
-	 * Save all friends in the list to the file at friendsFile.
+	 * Save all friends in the list to the file at friendsFile. This file will be created if necessary.
 	 */
 	private void save()
 	{
-
+		try
+		{
+			JsonUtils.toJson(createJson(), friendsFile);
+		}
+		catch (JsonException | IOException e)
+		{
+			System.out.println("Error while trying to save friends list.");
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -72,6 +93,24 @@ public class FriendsList {
 	 */
 	private void load()
 	{
+		try
+		{
+			friends = JsonUtils.parseFileToArray(friendsFile).getAllStrings();
+		} catch (IOException | JsonException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
+	/**
+	 * Creates a JsonArray from the friends list.
+	 * @return A JsonArray
+	 */
+	private JsonArray createJson()
+	{
+		JsonArray json = new JsonArray();
+		friends.forEach(json::add);
+
+		return json;
 	}
 }

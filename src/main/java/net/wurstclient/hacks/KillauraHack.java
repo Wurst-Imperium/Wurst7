@@ -8,10 +8,12 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -60,6 +62,8 @@ public final class KillauraHack extends Hack
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
+	private final CheckboxSetting filterFriends = new CheckboxSetting(
+			"Filter friends", "Won't attack your friends", true);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't attack sleeping players.", false);
 	private final SliderSetting filterFlying =
@@ -103,6 +107,7 @@ public final class KillauraHack extends Hack
 		addSetting(range);
 		addSetting(priority);
 		addSetting(filterPlayers);
+		addSetting(filterFriends);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
 		addSetting(filterMonsters);
@@ -151,6 +156,12 @@ public final class KillauraHack extends Hack
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
+
+		if (filterFriends.isChecked())
+		{
+			List<String> friends = WurstClient.INSTANCE.getFriendsList().getAllFriends();
+			stream = stream.filter(e -> !friends.contains(e.getName().asString()));
+		}
 		
 		if(filterSleeping.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity
