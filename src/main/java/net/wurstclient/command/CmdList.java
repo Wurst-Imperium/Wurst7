@@ -64,6 +64,7 @@ public final class CmdList
 	// public final VClipCmd vClipCmd = new VClipCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
+	public final FCmd fCmd = new FCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
