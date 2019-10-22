@@ -1,4 +1,4 @@
-package net.wurstclient.util;
+package net.wurstclient;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.google.gson.JsonArray;
 
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 

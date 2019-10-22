@@ -32,7 +32,6 @@ import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
-import net.wurstclient.util.FriendsList;
 
 public enum WurstClient
 {
