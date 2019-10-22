@@ -37,13 +37,13 @@ import net.wurstclient.util.FriendsList;
 public enum WurstClient
 {
 	INSTANCE;
-
+	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
-
+	
 	public static final String VERSION = "7.0pre13";
 	public static final String MC_VERSION = "1.14.4";
-
+	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
 	private HackList hax;
@@ -56,123 +56,123 @@ public enum WurstClient
 	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
-
+	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
 	private FriendsList friends;
-
+	
 	public void initialize()
 	{
 		System.out.println("Starting Wurst Client...");
-
+		
 		wurstFolder = createWurstFolder();
-
+		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
 		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
-
+		
 		eventManager = new EventManager(this);
-
+		
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
 		hax = new HackList(enabledHacksFile);
-
+		
 		cmds = new CmdList();
-
+		
 		otfs = new OtfList();
-
+		
 		Path settingsFile = wurstFolder.resolve("settings.json");
 		this.settingsFile = new SettingsFile(settingsFile, hax, cmds, otfs);
 		this.settingsFile.load();
-
+		
 		Path keybindsFile = wurstFolder.resolve("keybinds.json");
 		keybinds = new KeybindList(keybindsFile);
-
+		
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);
-
+		
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
 		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
-
+		
 		Path friendsFile = wurstFolder.resolve("friends.json");
 		friends = new FriendsList(friendsFile);
-
+		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
-
+		
 		KeybindProcessor keybindProcessor =
-				new KeybindProcessor(hax, keybinds, cmdProcessor);
+			new KeybindProcessor(hax, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
-
+		
 		hud = new IngameHUD();
 		eventManager.add(GUIRenderListener.class, hud);
-
+		
 		rotationFaker = new RotationFaker();
 		eventManager.add(PreMotionListener.class, rotationFaker);
 		eventManager.add(PostMotionListener.class, rotationFaker);
-
+		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
-
+		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
-				"Wurst " + VERSION + " MC" + MC_VERSION);
+			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
-
+	
 	private Path createWurstFolder()
 	{
 		Path dotMinecraftFolder = MC.runDirectory.toPath();
 		Path wurstFolder = dotMinecraftFolder.resolve("wurst");
-
+		
 		try
 		{
 			Files.createDirectories(wurstFolder);
-
+			
 		}catch(IOException e)
 		{
 			throw new RuntimeException(
-					"Couldn't create .minecraft/wurst folder.", e);
+				"Couldn't create .minecraft/wurst folder.", e);
 		}
-
+		
 		return wurstFolder;
 	}
-
+	
 	public WurstAnalytics getAnalytics()
 	{
 		return analytics;
 	}
-
+	
 	public EventManager getEventManager()
 	{
 		return eventManager;
 	}
-
+	
 	public void saveSettings()
 	{
 		settingsFile.save();
 	}
-
+	
 	public HackList getHax()
 	{
 		return hax;
 	}
-
+	
 	public CmdList getCmds()
 	{
 		return cmds;
 	}
-
+	
 	public OtfList getOtfs()
 	{
 		return otfs;
 	}
-
+	
 	public KeybindList getKeybinds()
 	{
 		return keybinds;
 	}
-
+	
 	public ClickGui getGui()
 	{
 		if(!guiInitialized)
@@ -180,51 +180,52 @@ public enum WurstClient
 			guiInitialized = true;
 			gui.init();
 		}
-
+		
 		return gui;
 	}
-
+	
 	public Navigator getNavigator()
 	{
 		return navigator;
 	}
-
+	
 	public CmdProcessor getCmdProcessor()
 	{
 		return cmdProcessor;
 	}
-
+	
 	public IngameHUD getHud()
 	{
 		return hud;
 	}
-
+	
 	public RotationFaker getRotationFaker()
 	{
 		return rotationFaker;
 	}
-
+	
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
-
+	
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
 	}
-
+	
 	public WurstUpdater getUpdater()
 	{
 		return updater;
 	}
-
+	
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
 	}
-
-	public FriendsList getFriendsList() {
+	
+	public FriendsList getFriendsList()
+	{
 		return friends;
 	}
 }
