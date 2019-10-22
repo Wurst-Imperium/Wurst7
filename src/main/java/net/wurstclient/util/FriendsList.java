@@ -29,7 +29,7 @@ public class FriendsList
 	/**
 	 * Adds a friend, and saves them to a list. If the player already exists,
 	 * they will not be re-added, and a message will be printed to chat.
-	 * 
+	 *
 	 * @param playerName
 	 *            The name of the player to add as friend.
 	 */
@@ -47,7 +47,7 @@ public class FriendsList
 	/**
 	 * Removes a friend and then save the list. If the player does not exist,
 	 * nothing will happen and a message will be printed.
-	 * 
+	 *
 	 * @param playerName
 	 *            The name of the player to remove from the friends list.
 	 */
@@ -64,7 +64,7 @@ public class FriendsList
 	/**
 	 * Gets a list of all friends. Attempts to add or remove from this will
 	 * cause a crash.
-	 * 
+	 *
 	 * @return A unmodifiable list of friends.
 	 */
 	public List<String> getAllFriends()
@@ -105,7 +105,7 @@ public class FriendsList
 	
 	/**
 	 * Creates a JsonArray from the friends list.
-	 * 
+	 *
 	 * @return A JsonArray
 	 */
 	private JsonArray createJson()

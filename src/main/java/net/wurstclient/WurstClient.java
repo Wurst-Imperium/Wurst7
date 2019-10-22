@@ -56,12 +56,12 @@ public enum WurstClient
 	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
+	private FriendsList friends;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
-	private FriendsList friends;
 	
 	public void initialize()
 	{

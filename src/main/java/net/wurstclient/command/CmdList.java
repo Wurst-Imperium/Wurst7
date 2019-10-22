@@ -30,7 +30,7 @@ public final class CmdList
 	// public final ExcavateCmd excavateCmd = new ExcavateCmd();
 	// public final FeaturesCmd featuresCmd = new FeaturesCmd();
 	// public final FollowCmd followCmd = new FollowCmd();
-	// public final FriendsCmd friendsCmd = new FriendsCmd();
+	public final FriendsCmd friendsCmd = new FriendsCmd();
 	// public final GetPosCmd getPosCmd = new GetPosCmd();
 	// public final GhostHandCmd ghostHandCmd = new GhostHandCmd();
 	// public final GiveCmd giveCmd = new GiveCmd();
@@ -64,7 +64,6 @@ public final class CmdList
 	// public final VClipCmd vClipCmd = new VClipCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
-	public final FCmd fCmd = new FCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));

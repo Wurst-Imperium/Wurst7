@@ -7,12 +7,12 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
 
-public class FCmd extends Command
+public class FriendsCmd extends Command
 {
-	public FCmd()
+	public FriendsCmd()
 	{
-		super("f", "List, add, or remove friends.",
-			".f [list|add|remove] <playername>");
+		super("friends", "List, add, or remove friends.",
+			".friends [list|add|remove] <playername>");
 	}
 	
 	@Override
