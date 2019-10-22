@@ -147,7 +147,8 @@ public final class KillauraHack extends Hack
 			.filter(e -> !e.removed && e.getHealth() > 0)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e != player)
-			.filter(e -> !(e instanceof FakePlayerEntity));
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
