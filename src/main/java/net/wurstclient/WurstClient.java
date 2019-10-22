@@ -97,6 +97,7 @@ public enum WurstClient
 		
 		Path friendsFile = wurstFolder.resolve("friends.json");
 		friends = new FriendsList(friendsFile);
+		friends.load();
 		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -203,6 +204,11 @@ public enum WurstClient
 		return rotationFaker;
 	}
 	
+	public FriendsList getFriends()
+	{
+		return friends;
+	}
+	
 	public boolean isEnabled()
 	{
 		return enabled;
@@ -221,10 +227,5 @@ public enum WurstClient
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
-	}
-	
-	public FriendsList getFriendsList()
-	{
-		return friends;
 	}
 }
