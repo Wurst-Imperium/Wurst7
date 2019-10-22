@@ -55,6 +55,7 @@ public enum WurstClient
 	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
+	private FriendsList friends;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
@@ -93,6 +94,10 @@ public enum WurstClient
 		
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
 		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
+		
+		Path friendsFile = wurstFolder.resolve("friends.json");
+		friends = new FriendsList(friendsFile);
+		friends.load();
 		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
@@ -197,6 +202,11 @@ public enum WurstClient
 	public RotationFaker getRotationFaker()
 	{
 		return rotationFaker;
+	}
+	
+	public FriendsList getFriends()
+	{
+		return friends;
 	}
 	
 	public boolean isEnabled()
