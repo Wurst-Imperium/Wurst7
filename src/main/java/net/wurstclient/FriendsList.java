@@ -40,6 +40,12 @@ public class FriendsList
 		save();
 	}
 	
+	public void removeAllAndSave()
+	{
+		friends.clear();
+		save();
+	}
+	
 	public boolean contains(String name)
 	{
 		return friends.contains(name);

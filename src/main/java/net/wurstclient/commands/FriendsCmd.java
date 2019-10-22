@@ -23,7 +23,8 @@ public class FriendsCmd extends Command
 	public FriendsCmd()
 	{
 		super("friends", "Manages your friends list.", ".friends add <name>",
-			".friends remove <name>", ".friends list [<page>]");
+			".friends remove <name>", ".friends remove-all",
+			".friends list [<page>]");
 	}
 	
 	@Override
@@ -40,6 +41,10 @@ public class FriendsCmd extends Command
 			
 			case "remove":
 			remove(args);
+			break;
+			
+			case "remove-all":
+			removeAll(args);
 			break;
 			
 			case "list":
@@ -76,6 +81,15 @@ public class FriendsCmd extends Command
 		
 		WURST.getFriends().removeAndSave(name);
 		ChatUtils.message("Removed friend \"" + name + "\".");
+	}
+	
+	private void removeAll(String[] args) throws CmdException
+	{
+		if(args.length > 1)
+			throw new CmdSyntaxError();
+		
+		WURST.getFriends().removeAllAndSave();
+		ChatUtils.message("All friends removed. Oof.");
 	}
 	
 	private void list(String[] args) throws CmdException
