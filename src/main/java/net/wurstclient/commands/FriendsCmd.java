@@ -13,6 +13,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
@@ -20,11 +21,18 @@ public class FriendsCmd extends Command
 {
 	private static final int FRIENDS_PER_PAGE = 8;
 	
+	private final CheckboxSetting middleClickFriends = new CheckboxSetting(
+		"Middle click friends", "Add/remove friends by clicking them with\n"
+			+ "the middle mouse button.",
+		true);
+	
 	public FriendsCmd()
 	{
 		super("friends", "Manages your friends list.", ".friends add <name>",
 			".friends remove <name>", ".friends remove-all",
 			".friends list [<page>]");
+		
+		addSetting(middleClickFriends);
 	}
 	
 	@Override
@@ -124,5 +132,10 @@ public class FriendsCmd extends Command
 			throw new CmdSyntaxError("Not a number: " + args[1]);
 		
 		return Integer.parseInt(args[1]);
+	}
+	
+	public CheckboxSetting getMiddleClickFriends()
+	{
+		return middleClickFriends;
 	}
 }

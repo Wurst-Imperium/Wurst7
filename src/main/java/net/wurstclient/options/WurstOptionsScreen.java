@@ -20,7 +20,9 @@ import net.minecraft.util.SystemUtil;
 import net.minecraft.util.SystemUtil.OperatingSystem;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
 {
@@ -45,9 +47,17 @@ public class WurstOptionsScreen extends Screen
 	
 	private void addSettingButtons()
 	{
+		FriendsCmd friendsCmd = WurstClient.INSTANCE.getCmds().friendsCmd;
+		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
 		WurstAnalytics analytics = WurstClient.INSTANCE.getAnalytics();
 		
 		new WurstOptionsButton(-154, 24,
+			() -> "Click Friends: "
+				+ (middleClickFriends.isChecked() ? "ON" : "OFF"),
+			middleClickFriends.getDescription(), b -> middleClickFriends
+				.setChecked(!middleClickFriends.isChecked()));
+		
+		new WurstOptionsButton(-154, 48,
 			() -> "Analytics: " + (analytics.isEnabled() ? "ON" : "OFF"),
 			"Allows us to measure the popularity of Wurst\n"
 				+ "by sending anonymous usage statistics.",

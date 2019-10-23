@@ -15,6 +15,10 @@ import java.util.TreeSet;
 
 import com.google.gson.JsonArray;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.wurstclient.commands.FriendsCmd;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -44,6 +48,24 @@ public class FriendsList
 	{
 		friends.clear();
 		save();
+	}
+	
+	public void middleClick(Entity entity)
+	{
+		if(entity == null || !(entity instanceof PlayerEntity))
+			return;
+		
+		FriendsCmd friendsCmd = WurstClient.INSTANCE.getCmds().friendsCmd;
+		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
+		if(!middleClickFriends.isChecked())
+			return;
+		
+		String name = entity.getEntityName();
+		
+		if(contains(name))
+			removeAndSave(name);
+		else
+			addAndSave(name);
 	}
 	
 	public boolean contains(String name)
