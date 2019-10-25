@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
@@ -43,6 +44,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
+	@Shadow
+	private ClientPlayNetworkHandler networkHandler;
 	
 	/**
 	 * blockHitDelay
@@ -114,12 +117,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 		method_21706(action, blockPos, direction);
 	}
 	
-	@Shadow
 	private void method_21706(
 		PlayerActionC2SPacket.Action playerActionC2SPacket$Action_1,
 		BlockPos blockPos_1, Direction direction_1)
 	{
-		
+		networkHandler.sendPacket(new PlayerActionC2SPacket(
+			playerActionC2SPacket$Action_1, blockPos_1, direction_1));
 	}
 	
 	@Override
