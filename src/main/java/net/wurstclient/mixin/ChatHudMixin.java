@@ -35,7 +35,7 @@ public class ChatHudMixin extends DrawableHelper
 	private MinecraftClient client;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/text/Text;I)V",
+		method = "addMessage(Lnet/minecraft/network/chat/Component;I)V",
 		cancellable = true)
 	private void onAddMessage(Component chatText, int chatLineId,
 		CallbackInfo ci)
