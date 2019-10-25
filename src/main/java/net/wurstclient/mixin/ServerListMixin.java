@@ -20,11 +20,11 @@ import net.wurstclient.mixinterface.IServerList;
 public class ServerListMixin implements IServerList
 {
 	@Shadow
-	private List<ServerInfo> serverEntries;
+	private List<ServerInfo> servers;
 	
 	@Override
 	public void clear()
 	{
-		serverEntries.clear();
+		servers.clear();
 	}
 }
