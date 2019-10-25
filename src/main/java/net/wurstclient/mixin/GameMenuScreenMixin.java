@@ -36,7 +36,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"initWidgets()V"})
+	@Inject(at = {@At("TAIL")}, method = {"method_20543()V"})
 	private void onInitWidgets(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
