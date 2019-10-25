@@ -16,7 +16,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -73,7 +73,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glColor4f(1, 1, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(new Box(-0.5, 0, -0.5, 0.5, 1, 0.5));
+		RenderUtils
+			.drawOutlinedBox(new BoundingBox(-0.5, 0, -0.5, 0.5, 1, 0.5));
 		GL11.glEndList();
 	}
 	
@@ -156,7 +157,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				ItemStack stack = e.getStack();
 				GameRenderer.renderFloatingText(MC.textRenderer,
 					stack.getCount() + "x "
-						+ stack.getName().asFormattedString(),
+						+ stack.getCustomName().getFormattedText(),
 					0, 1, 0, 0, MC.getEntityRenderManager().cameraYaw,
 					MC.getEntityRenderManager().cameraPitch, false);
 				GL11.glDisable(GL11.GL_LIGHTING);

@@ -12,7 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.awt.Rectangle;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 
 public abstract class NavigatorScreen extends Screen
@@ -29,7 +29,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	public NavigatorScreen()
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 	}
 	
 	@Override

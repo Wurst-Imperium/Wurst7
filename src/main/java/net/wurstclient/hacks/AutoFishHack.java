@@ -18,7 +18,7 @@ import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -174,7 +174,7 @@ public final class AutoFishHack extends Hack
 		if(debugDraw.isChecked())
 		{
 			GL11.glNewList(box, GL11.GL_COMPILE);
-			Box box = new Box(-validRange.getValue(), -1 / 16.0,
+			BoundingBox box = new BoundingBox(-validRange.getValue(), -1 / 16.0,
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
 			GL11.glColor4f(1, 0, 0, 0.5F);

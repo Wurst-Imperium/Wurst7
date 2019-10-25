@@ -16,22 +16,22 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.PauseScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.options.WurstOptionsScreen;
 
-@Mixin(GameMenuScreen.class)
+@Mixin(PauseScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
 	private static final Identifier wurstTexture =
 		new Identifier("wurst", "wurst_128.png");
 	
-	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
+	private GameMenuScreenMixin(WurstClient wurst, Component text_1)
 	{
 		super(text_1);
 	}

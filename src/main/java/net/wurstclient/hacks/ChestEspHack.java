@@ -24,7 +24,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
@@ -42,10 +42,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
-	private final ArrayList<Box> basicChests = new ArrayList<>();
-	private final ArrayList<Box> trappedChests = new ArrayList<>();
-	private final ArrayList<Box> enderChests = new ArrayList<>();
-	private final ArrayList<Box> shulkerBoxes = new ArrayList<>();
+	private final ArrayList<BoundingBox> basicChests = new ArrayList<>();
+	private final ArrayList<BoundingBox> trappedChests = new ArrayList<>();
+	private final ArrayList<BoundingBox> enderChests = new ArrayList<>();
+	private final ArrayList<BoundingBox> shulkerBoxes = new ArrayList<>();
 	private final ArrayList<Entity> minecarts = new ArrayList<>();
 	
 	private int greenBox;
@@ -79,7 +79,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private void setupDisplayLists()
 	{
-		Box box = new Box(BlockPos.ORIGIN);
+		BoundingBox box = new BoundingBox(BlockPos.ORIGIN);
 		
 		greenBox = GL11.glGenLists(1);
 		GL11.glNewList(greenBox, GL11.GL_COMPILE);
@@ -146,14 +146,16 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(BlockEntity blockEntity : MC.world.blockEntities)
 			if(blockEntity instanceof TrappedChestBlockEntity)
 			{
-				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
+				BoundingBox box =
+					getBoxFromChest((ChestBlockEntity)blockEntity);
 				
 				if(box != null)
 					trappedChests.add(box);
 				
 			}else if(blockEntity instanceof ChestBlockEntity)
 			{
-				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
+				BoundingBox box =
+					getBoxFromChest((ChestBlockEntity)blockEntity);
 				
 				if(box != null)
 					basicChests.add(box);
@@ -164,7 +166,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
+				BoundingBox bb = BlockUtils.getBoundingBox(pos);
 				enderChests.add(bb);
 				
 			}else if(blockEntity instanceof ShulkerBoxBlockEntity)
@@ -173,7 +175,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
+				BoundingBox bb = BlockUtils.getBoundingBox(pos);
 				shulkerBoxes.add(bb);
 				
 			}else if(blockEntity instanceof BarrelBlockEntity)
@@ -182,7 +184,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
+				BoundingBox bb = BlockUtils.getBoundingBox(pos);
 				basicChests.add(bb);
 			}
 		
@@ -199,7 +201,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				minecarts.add(entity);
 	}
 	
-	private Box getBoxFromChest(ChestBlockEntity chestBE)
+	private BoundingBox getBoxFromChest(ChestBlockEntity chestBE)
 	{
 		BlockState state = chestBE.getCachedState();
 		if(!state.contains(ChestBlock.CHEST_TYPE))
@@ -215,7 +217,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		if(!BlockUtils.canBeClicked(pos))
 			return null;
 		
-		Box box = BlockUtils.getBoundingBox(pos);
+		BoundingBox box = BlockUtils.getBoundingBox(pos);
 		
 		// larger box for double chest
 		if(chestType != ChestType.SINGLE)
@@ -224,7 +226,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			if(BlockUtils.canBeClicked(pos2))
 			{
-				Box box2 = BlockUtils.getBoundingBox(pos2);
+				BoundingBox box2 = BlockUtils.getBoundingBox(pos2);
 				box = box.union(box2);
 			}
 		}
@@ -255,7 +257,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		ArrayList<Box> minecartBoxes = calculateMinecartBoxes(partialTicks);
+		ArrayList<BoundingBox> minecartBoxes =
+			calculateMinecartBoxes(partialTicks);
 		
 		if(style.getSelected().boxes)
 		{
@@ -298,9 +301,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private ArrayList<Box> calculateMinecartBoxes(float partialTicks)
+	private ArrayList<BoundingBox> calculateMinecartBoxes(float partialTicks)
 	{
-		ArrayList<Box> minecartBoxes = new ArrayList<>(minecarts.size());
+		ArrayList<BoundingBox> minecartBoxes =
+			new ArrayList<>(minecarts.size());
 		
 		minecarts.forEach(e -> {
 			double offsetX =
@@ -316,9 +320,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		return minecartBoxes;
 	}
 	
-	private void renderBoxes(ArrayList<Box> boxes, int displayList)
+	private void renderBoxes(ArrayList<BoundingBox> boxes, int displayList)
 	{
-		for(Box box : boxes)
+		for(BoundingBox box : boxes)
 		{
 			GL11.glPushMatrix();
 			GL11.glTranslated(box.minX, box.minY, box.minZ);
@@ -329,9 +333,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderLines(Vec3d start, ArrayList<Box> boxes)
+	private void renderLines(Vec3d start, ArrayList<BoundingBox> boxes)
 	{
-		for(Box box : boxes)
+		for(BoundingBox box : boxes)
 		{
 			Vec3d end = box.getCenter();
 			GL11.glVertex3d(start.x, start.y, start.z);

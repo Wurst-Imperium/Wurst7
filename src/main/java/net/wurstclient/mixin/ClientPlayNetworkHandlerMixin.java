@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.packet.*;
 import net.minecraft.network.Packet;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
@@ -38,7 +38,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onDisconnected(Text var1)
+	public void onDisconnected(Component var1)
 	{
 		
 	}

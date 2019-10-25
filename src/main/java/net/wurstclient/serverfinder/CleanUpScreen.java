@@ -19,7 +19,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.ServerEntry;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.mixinterface.IServerList;
@@ -38,7 +38,7 @@ public class CleanUpScreen extends Screen
 	
 	public CleanUpScreen(MultiplayerScreen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 	}
 	

@@ -25,7 +25,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
@@ -210,7 +210,7 @@ public final class NukerHack extends Hack
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		Box box = new Box(BlockPos.ORIGIN);
+		BoundingBox box = new BoundingBox(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;

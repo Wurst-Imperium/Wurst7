@@ -27,7 +27,7 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.packet.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -85,13 +85,13 @@ public final class AutoFarmHack extends Hack
 		node = GL11.glGenLists(1);
 		
 		GL11.glNewList(box, GL11.GL_COMPILE);
-		Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0,
-			15 / 16.0);
+		BoundingBox box = new BoundingBox(1 / 16.0, 1 / 16.0, 1 / 16.0,
+			15 / 16.0, 15 / 16.0, 15 / 16.0);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
 		GL11.glNewList(node, GL11.GL_COMPILE);
-		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+		BoundingBox node = new BoundingBox(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		GL11.glBegin(GL11.GL_LINES);
 		RenderUtils.drawNode(node);
 		GL11.glEnd();
@@ -194,7 +194,7 @@ public final class AutoFarmHack extends Hack
 		{
 			GL11.glPushMatrix();
 			
-			Box box = new Box(BlockPos.ORIGIN);
+			BoundingBox box = new BoundingBox(BlockPos.ORIGIN);
 			float p = prevProgress + (progress - prevProgress) * partialTicks;
 			float red = p * 2F;
 			float green = 2 - red;

@@ -23,7 +23,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
@@ -43,7 +43,7 @@ public final class EditItemListScreen extends Screen
 	
 	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		this.itemList = itemList;
 	}
@@ -78,8 +78,8 @@ public final class EditItemListScreen extends Screen
 				if(b2)
 					itemList.resetToDefaults();
 				minecraft.openScreen(EditItemListScreen.this);
-			}, new LiteralText("Reset to Defaults"),
-				new LiteralText("Are you sure?")))));
+			}, new TextComponent("Reset to Defaults"),
+				new TextComponent("Are you sure?")))));
 		
 		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28,
 			200, 20, "Done", b -> minecraft.openScreen(prevScreen)));
@@ -288,7 +288,7 @@ public final class EditItemListScreen extends Screen
 				
 				GL11.glPopMatrix();
 				
-				return stack.getName().asFormattedString();
+				return stack.getCustomName().getFormattedText();
 			}
 		}
 	}

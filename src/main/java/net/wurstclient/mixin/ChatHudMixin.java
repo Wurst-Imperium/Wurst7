@@ -20,7 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
@@ -37,7 +37,8 @@ public class ChatHudMixin extends DrawableHelper
 	@Inject(at = @At("HEAD"),
 		method = "addMessage(Lnet/minecraft/text/Text;I)V",
 		cancellable = true)
-	private void onAddMessage(Text chatText, int chatLineId, CallbackInfo ci)
+	private void onAddMessage(Component chatText, int chatLineId,
+		CallbackInfo ci)
 	{
 		ChatInputEvent event = new ChatInputEvent(chatText, visibleMessages);
 		
@@ -58,7 +59,7 @@ public class ChatHudMixin extends DrawableHelper
 	}
 	
 	@Shadow
-	private void shadow$addMessage(Text text_1, int int_1, int int_2,
+	private void shadow$addMessage(Component text_1, int int_1, int int_2,
 		boolean boolean_1)
 	{
 		

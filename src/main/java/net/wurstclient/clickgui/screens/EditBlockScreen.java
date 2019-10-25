@@ -18,7 +18,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
@@ -33,7 +33,7 @@ public final class EditBlockScreen extends Screen
 	
 	public EditBlockScreen(Screen prevScreen, BlockSetting setting)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		this.setting = setting;
 	}
