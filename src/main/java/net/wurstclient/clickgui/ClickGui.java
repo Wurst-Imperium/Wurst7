@@ -75,11 +75,11 @@ public final class ClickGui
 		windows.addAll(windowMap.values());
 		
 		Window uiSettings = new Window("UI Settings");
+		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
-		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
-		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
 		windows.add(uiSettings);
 		
 		for(Window window : windows)
@@ -206,6 +206,35 @@ public final class ClickGui
 	{
 		if(mouseButton == 0)
 			leftMouseButtonPressed = false;
+	}
+	
+	public void handleMouseScroll(double mouseX, double mouseY, double delta)
+	{
+		int dWheel = (int)delta * 4;
+		if(dWheel == 0)
+			return;
+		
+		for(int i = windows.size() - 1; i >= 0; i--)
+		{
+			Window window = windows.get(i);
+			
+			if(!window.isScrollingEnabled() || window.isMinimized()
+				|| window.isInvisible())
+				continue;
+			
+			if(mouseX < window.getX() || mouseY < window.getY() + 13)
+				continue;
+			if(mouseX >= window.getX() + window.getWidth()
+				|| mouseY >= window.getY() + window.getHeight())
+				continue;
+			
+			int scroll = window.getScrollOffset() + dWheel;
+			scroll = Math.min(scroll, 0);
+			scroll = Math.max(scroll,
+				-window.getInnerHeight() + window.getHeight() - 13);
+			window.setScrollOffset(scroll);
+			break;
+		}
 	}
 	
 	public boolean handleNavigatorPopupClick(double mouseX, double mouseY,
@@ -425,32 +454,6 @@ public final class ClickGui
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		GL11.glLineWidth(1);
-		
-		// scrolling
-		// TODO: int dWheel = Mouse.getDWheel();
-		int dWheel = 0;
-		if(dWheel != 0)
-			for(int i = windows.size() - 1; i >= 0; i--)
-			{
-				Window window = windows.get(i);
-				
-				if(!window.isScrollingEnabled() || window.isMinimized()
-					|| window.isInvisible())
-					continue;
-				
-				if(mouseX < window.getX() || mouseY < window.getY() + 13)
-					continue;
-				if(mouseX >= window.getX() + window.getWidth()
-					|| mouseY >= window.getY() + window.getHeight())
-					continue;
-				
-				int scroll = window.getScrollOffset() + dWheel / 16;
-				scroll = Math.min(scroll, 0);
-				scroll = Math.max(scroll,
-					-window.getInnerHeight() + window.getHeight() - 13);
-				window.setScrollOffset(scroll);
-				break;
-			}
 		
 		tooltip = "";
 		for(Window window : windows)

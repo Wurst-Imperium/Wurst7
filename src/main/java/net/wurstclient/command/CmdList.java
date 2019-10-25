@@ -26,11 +26,11 @@ public final class CmdList
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	// public final DamageCmd damageCmd = new DamageCmd();
 	public final DropCmd dropCmd = new DropCmd();
-	// public final EnchantCmd enchantCmd = new EnchantCmd();
+	public final EnchantCmd enchantCmd = new EnchantCmd();
 	// public final ExcavateCmd excavateCmd = new ExcavateCmd();
 	// public final FeaturesCmd featuresCmd = new FeaturesCmd();
 	// public final FollowCmd followCmd = new FollowCmd();
-	// public final FriendsCmd friendsCmd = new FriendsCmd();
+	public final FriendsCmd friendsCmd = new FriendsCmd();
 	// public final GetPosCmd getPosCmd = new GetPosCmd();
 	// public final GhostHandCmd ghostHandCmd = new GhostHandCmd();
 	// public final GiveCmd giveCmd = new GiveCmd();
