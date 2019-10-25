@@ -20,13 +20,12 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
 import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
 import net.minecraft.util.math.BlockPos;
@@ -60,10 +59,10 @@ public final class MobSpawnEspHack extends Hack
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + ChatFormatting.YELLOW
-				+ "yellow" + ChatFormatting.RESET
-				+ " - mobs can spawn at night\n" + ChatFormatting.RED + "red"
-				+ ChatFormatting.RESET + " - mobs can always spawn");
+			"Highlights areas where mobs can spawn.\n" + TextFormat.YELLOW
+				+ "yellow" + TextFormat.RESET + " - mobs can spawn at night\n"
+				+ TextFormat.RED + "red" + TextFormat.RESET
+				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
@@ -295,8 +294,9 @@ public final class MobSpawnEspHack extends Hack
 						if(!state.getFluidState().isEmpty())
 							continue;
 						
-						BlockState stateDown = world.getBlockState(pos.down());
-						if(!stateDown.isFullOpaque(world, pos.down()))
+						BlockState stateDown =
+							world.getBlockState(pos.method_10074());
+						if(!stateDown.isFullOpaque(world, pos.method_10074()))
 							continue;
 						
 						blocks.add(pos);

@@ -11,7 +11,7 @@ import java.util.List;
 
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.util.TextComponentUtil;
+import net.minecraft.client.util.Texts;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
@@ -52,7 +52,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<Text> newLines = TextComponentUtil.wrapLines(event.getComponent(),
+		List<Text> newLines = Texts.wrapLines(event.getComponent(),
 			maxTextLength, MC.textRenderer, false, false);
 		
 		int spamCounter = 1;

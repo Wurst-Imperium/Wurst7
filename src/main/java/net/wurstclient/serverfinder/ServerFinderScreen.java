@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.options.ServerEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.SystemUtil;
 import net.wurstclient.WurstClient;
@@ -59,7 +59,7 @@ public class ServerFinderScreen extends Screen
 		ipBox = new TextFieldWidget(font, width / 2 - 100, height / 4 + 34, 200,
 			20, "");
 		ipBox.setMaxLength(200);
-		ipBox.method_1876(true);
+		ipBox.setSelected(true);
 		children.add(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(font, width / 2 - 32,
@@ -183,13 +183,13 @@ public class ServerFinderScreen extends Screen
 					if(!isServerInList(pingers.get(i).getServerIP()))
 					{
 						prevScreen.getServerList()
-							.add(new ServerEntry("Grief me #" + working,
+							.add(new ServerInfo("Grief me #" + working,
 								pingers.get(i).getServerIP(), false));
 						prevScreen.getServerList().saveFile();
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
 							.method_20122(null);
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.method_20125(prevScreen.getServerList());
+							.setServers(prevScreen.getServerList());
 					}
 				}
 				pingers.remove(i);
