@@ -12,8 +12,6 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -271,8 +269,7 @@ public final class EditBlockListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return ChatFormatting.ITALIC + "unknown block"
-					+ ChatFormatting.RESET;
+				return "\u00a7ounknown block\u00a7r";
 				
 			}else
 			{

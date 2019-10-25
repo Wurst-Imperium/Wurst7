@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.packet.*;
-import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.text.Text;
@@ -42,13 +41,6 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	public void onDisconnected(Text var1)
 	{
 		
-	}
-	
-	@Shadow
-	@Override
-	public ClientConnection getConnection()
-	{
-		return null;
 	}
 	
 	@Shadow
@@ -586,7 +578,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onCraftFailedResponse(CraftFailedResponseS2CPacket var1)
+	public void onCraftResponse(CraftResponseS2CPacket var1)
 	{
 		
 	}
@@ -672,13 +664,6 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	@Override
 	public void handleChunkRenderDistanceCenter(
 		ChunkRenderDistanceCenterS2CPacket var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void method_21707(BlockPlayerActionS2CPacket var1)
 	{
 		
 	}

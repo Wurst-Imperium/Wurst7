@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -28,10 +26,8 @@ public final class FlightHack extends Hack
 	
 	public FlightHack()
 	{
-		super("Flight",
-			"Allows you to you fly.\n\n" + ChatFormatting.RED
-				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
-				+ " You will take fall damage if you don't use NoFall.");
+		super("Flight", "Allows you to you fly.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
 	}

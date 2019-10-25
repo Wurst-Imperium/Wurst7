@@ -7,8 +7,6 @@
  */
 package net.wurstclient.other_features;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -19,12 +17,11 @@ import net.wurstclient.settings.EnumSetting;
 public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		ChatFormatting.BOLD + "Auto" + ChatFormatting.RESET
-			+ " mode renders the whole list if it\n" + "fits onto the screen.\n"
-			+ ChatFormatting.BOLD + "Count" + ChatFormatting.RESET
-			+ " mode only renders the number\n" + "of active hacks.\n"
-			+ ChatFormatting.BOLD + "Hidden" + ChatFormatting.RESET
-			+ " mode renders nothing.",
+		"\u00a7lAuto\u00a7r mode renders the whole list if it\n"
+			+ "fits onto the screen.\n"
+			+ "\u00a7lCount\u00a7r mode only renders the number\n"
+			+ "of active hacks.\n"
+			+ "\u00a7lHidden\u00a7r mode renders nothing.",
 		Mode.values(), Mode.AUTO);
 	
 	private final EnumSetting<Position> position =
@@ -36,8 +33,8 @@ public final class HackListOtf extends OtherFeature
 	public HackListOtf()
 	{
 		super("HackList", "Shows a list of active hacks on the screen.\n"
-			+ "The " + ChatFormatting.BOLD + "Left" + ChatFormatting.RESET
-			+ " position should only be used while TabGui is\n" + "disabled.");
+			+ "The \u00a7lLeft\u00a7r position should only be used while TabGui is\n"
+			+ "disabled.");
 		
 		addSetting(mode);
 		addSetting(position);

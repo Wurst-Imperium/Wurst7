@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
@@ -60,10 +58,9 @@ public final class MobSpawnEspHack extends Hack
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + ChatFormatting.YELLOW
-				+ "yellow" + ChatFormatting.RESET
-				+ " - mobs can spawn at night\n" + ChatFormatting.RED + "red"
-				+ ChatFormatting.RESET + " - mobs can always spawn");
+			"Highlights areas where mobs can spawn.\n"
+				+ "\u00a7eyellow\u00a7r - mobs can spawn at night\n"
+				+ "\u00a7cred\u00a7r - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);

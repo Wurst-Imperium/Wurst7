@@ -9,8 +9,6 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -161,8 +159,7 @@ public final class BlockComponent extends Component
 	private String getBlockName(ItemStack stack)
 	{
 		if(stack.isEmpty())
-			return ChatFormatting.ITALIC + "unknown block"
-				+ ChatFormatting.RESET;
+			return "\u00a7ounknown block\u00a7r";
 		else
 			return stack.getName().asFormattedString();
 	}
