@@ -22,7 +22,7 @@ public class IngameHudMixin extends DrawableHelper
 {
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
-		ordinal = 4)}, method = {"render(F)V"})
+		ordinal = 4)}, method = {"draw(F)V"})
 	private void onRender(float partialTicks, CallbackInfo ci)
 	{
 		if(WurstClient.MC.options.debugEnabled)
