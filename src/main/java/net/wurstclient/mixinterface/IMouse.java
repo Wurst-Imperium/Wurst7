@@ -7,17 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-public interface IMinecraftClient
+public interface IMouse
 {
-	public void rightClick();
-	
-	public void setItemUseCooldown(int itemUseCooldown);
-	
-	public IClientPlayerInteractionManager getInteractionManager();
-	
-	public int getItemUseCooldown();
-	
-	public IClientPlayerEntity getPlayer();
-	
-	public IMouse getMouse();
+	public double getWheelDelta();
 }
