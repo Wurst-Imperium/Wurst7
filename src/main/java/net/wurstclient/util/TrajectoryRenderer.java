@@ -113,7 +113,7 @@ public class TrajectoryRenderer implements RenderListener {
 	private static TrajectoryPath getPath(LivingEntity entity, boolean maxPitch)
 	{
 		TrajectoryPath path = new TrajectoryPath();
-		Item item = entity.getHeldItemMainhand() == null ? null : entity.getHeldItemMainhand().getItem();
+		Item item = entity.getActiveItem() == null ? null : entity.getActiveItem().getItem();
 		
 		// If not holding anything or held item is not ranged weapon, return empty path (not null).
 		if (item == null || !isRangedWeapon(item))
