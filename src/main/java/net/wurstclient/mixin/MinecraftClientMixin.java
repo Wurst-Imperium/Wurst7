@@ -29,7 +29,6 @@ import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
-import net.wurstclient.mixinterface.IMouse;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
@@ -104,12 +103,6 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
-	}
-	
-	@Override
-	public IMouse getMouse()
-	{
-		return (IMouse)mouse;
 	}
 	
 	@Shadow

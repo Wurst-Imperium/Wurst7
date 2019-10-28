@@ -18,6 +18,4 @@ public interface IMinecraftClient
 	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();
-	
-	public IMouse getMouse();
 }

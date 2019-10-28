@@ -8,20 +8,22 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Mouse;
-import net.wurstclient.mixinterface.IMouse;
+import net.wurstclient.WurstClient;
+import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 
 @Mixin(Mouse.class)
-public class MouseMixin implements IMouse
+public class MouseMixin
 {
-	@Shadow
-	private double eventDeltaWheel;
-	
-	@Override
-	public double getWheelDelta()
+	@Inject(at = {@At("RETURN")}, method = {"onMouseScroll(JDD)V"})
+	private void onOnMouseScroll(long long_1, double double_1, double double_2,
+		CallbackInfo ci)
 	{
-		return eventDeltaWheel;
+		MouseScrollEvent event = new MouseScrollEvent(double_2);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 }
