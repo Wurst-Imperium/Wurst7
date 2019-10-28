@@ -7,6 +7,7 @@
  */
 package net.wurstclient.settings;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 
 import com.google.gson.JsonElement;
@@ -93,7 +94,12 @@ public class SliderSetting extends Setting implements SliderLock
 	
 	private void setValueIgnoreLock(double value)
 	{
-		value = (int)(value / increment) * increment;
+		BigDecimal valueBD = BigDecimal.valueOf(value);
+		BigDecimal incrementBD = BigDecimal.valueOf(increment);
+		
+		value = valueBD.divide(incrementBD, BigDecimal.ROUND_FLOOR)
+			.multiply(incrementBD).doubleValue();
+		
 		value = MathUtils.clamp(value, usableMin, usableMax);
 		
 		this.value = value;
