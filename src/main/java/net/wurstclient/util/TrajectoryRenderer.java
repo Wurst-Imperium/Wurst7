@@ -1,6 +1,7 @@
 package net.wurstclient.util;
 
 import com.sun.istack.internal.Nullable;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
@@ -124,16 +125,16 @@ public class TrajectoryRenderer implements RenderListener {
 		// The three values indicate the arrow's position in space, using standard Minecraft coordinates.
 		// They will be updated each cycle until arrow impacts.
 		// Obviously, at this point, these values are very close to the firing entity's pos.
-		double arrowPosX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * Minecraft.getInstance().getRenderPartialTicks() - Math.cos((float)Math.toRadians(entity.rotationYaw)) * 0.16f;
-	    double arrowPosY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * Minecraft.getInstance().getRenderPartialTicks() + entity.getEyeHeight() - 0.1;
-	    double arrowPosZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * Minecraft.getInstance().getRenderPartialTicks() - Math.sin((float)Math.toRadians(entity.rotationYaw)) * 0.16f;
+		double arrowPosX = entity.prevRenderX + (entity.x - entity.prevRenderX) * MinecraftClient.getInstance().getTickDelta() - Math.cos((float)Math.toRadians(entity.yaw)) * 0.16f;
+	    double arrowPosY = entity.prevRenderY + (entity.y - entity.prevRenderY) * MinecraftClient.getInstance().getTickDelta() + entity.getStandingEyeHeight() - 0.1;
+	    double arrowPosZ = entity.prevRenderZ + (entity.z - entity.prevRenderZ) * MinecraftClient.getInstance().getTickDelta() - Math.sin((float)Math.toRadians(entity.yaw)) * 0.16f;
 	    
 	    // Motion factor. Arrows go faster than snowballs and all that...
 	    double projectileMotionFactor = (item instanceof BowItem) ? 1.0 : 0.4;
 	    
 	    // Pitch and yaw of the entity's facing, in radians. This is because the Java Math library expects values in radians.
-	    double yaw = Math.toRadians(entity.rotationYaw); // Left/right. Right is positive, left is negative. Does not wrap.
-	    double pitch = maxPitch ? (-0.25 * Math.PI) : Math.toRadians(entity.rotationPitch); // Up/down. Up is negative, down is positive.
+	    double yaw = Math.toRadians(entity.yaw); // Left/right. Right is positive, left is negative. Does not wrap.
+	    double pitch = maxPitch ? (-0.25 * Math.PI) : Math.toRadians(entity.pitch); // Up/down. Up is negative, down is positive.
 	    
 	    // The motion of the projectile. These values are small doubles that will be added to the arrowPos values
 	    // each iteration of the projection in order to form a list of points that show the motion of a projectile.
@@ -154,7 +155,7 @@ public class TrajectoryRenderer implements RenderListener {
         
         // Calculation that modifies the projectilemotion. No idea how this works.
         if (item instanceof BowItem || item instanceof CrossbowItem) {
-            float bowPower = (72000 - entity.getItemInUseCount()) / 20.0f;
+            float bowPower = (72000 - entity.getItemUseTimeLeft()) / 20.0f;
             bowPower = (bowPower * bowPower + bowPower * 2.0f) / 3.0f;
             if (bowPower > 1.0f || bowPower <= 0.1f) {
                 bowPower = 1.0f;
