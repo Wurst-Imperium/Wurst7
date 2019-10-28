@@ -24,6 +24,7 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
+    "MouseMixin",
     "MultiplayerScreenMixin",
     "ServerListMixin",
     "TerrainRenderContextMixin"

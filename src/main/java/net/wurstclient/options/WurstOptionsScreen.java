@@ -71,6 +71,12 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "X-Ray Blocks",
 			"Manager for the blocks\n" + "that X-Ray will show.",
 			b -> xRayHack.openBlockListEditor(this));
+		
+		new WurstOptionsButton(-50, 48, () -> "Zoom",
+			"The Zoom Manager allows you to\n"
+				+ "change the zoom key, how far it\n"
+				+ "will zoom in and more.",
+			b -> minecraft.openScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()

@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
@@ -53,6 +54,18 @@ public class GameRendererMixin
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Redirect(
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0),
+		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
+	private double getFov(GameOptions options)
+	{
+		return WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(options.fov);
 	}
 	
 	@Shadow
