@@ -1,13 +1,10 @@
 package net.wurstclient.util;
 
-import com.sun.istack.internal.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.events.RenderListener;
-import net.wurstclient.events.UpdateListener;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Iterator;
@@ -19,7 +16,7 @@ import java.util.List;
  * @author Admin
  *
  */
-public class TrajectoryRenderer implements RenderListener {
+public class TrajectoryRenderer {
 	private static final int MAX_POINTS = 1000; // Max points in a trajectory. Bigger means longer traces in air, but takes longer to calculate.
 	private static boolean init = false; // Set to true if initialized.
 	private static List<TrajectoryRenderPost> trajectoryRenderPosts = new LinkedList<>();
@@ -34,7 +31,7 @@ public class TrajectoryRenderer implements RenderListener {
 	 * @param bvrcolor Color to render if line is beyond the player's LOS. (NOTE: The player's LOS, not the entity's.)
 	 * @param interceptcolor Color to render if the trajectory will hit a mob or player. This value can be null to render in defaultcolor.
 	 */
-	public static void post(LivingEntity entity, Style style, long defaultcolor, long bvrcolor, @Nullable Long interceptcolor)
+	public static void post(LivingEntity entity, Style style, long defaultcolor, long bvrcolor, Long interceptcolor)
 	{
 		if (!init) init();
 		trajectoryRenderPosts.add(new TrajectoryRenderPost(entity, style, defaultcolor, bvrcolor, interceptcolor));
@@ -42,7 +39,7 @@ public class TrajectoryRenderer implements RenderListener {
 	
 	private static void init()
 	{
-		MinecraftForge.EVENT_BUS.register(TrajectoryRenderer.class);
+		//MinecraftForge.EVENT_BUS.register(TrajectoryRenderer.class);
 	}
 
 	public static void onRender(float partialticks)

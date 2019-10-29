@@ -9,9 +9,10 @@ import net.wurstclient.util.TrajectoryRenderer.Style;
  *
  */
 public class TrajectoryRenderPost {
-	LivingEntity entity;
+	public LivingEntity entity;
 	Style style;
-	long defaultcolor, bvrcolor;
+	public long defaultcolor;
+	long bvrcolor;
 	Long interceptcolor;
 	
 	public TrajectoryRenderPost(LivingEntity entity, Style style, long defaultcolor, long bvrcolor, Long interceptcolor)
