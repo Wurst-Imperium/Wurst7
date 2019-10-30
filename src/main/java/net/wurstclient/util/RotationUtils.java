@@ -10,6 +10,7 @@ package net.wurstclient.util;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.RotationFaker;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
@@ -37,6 +38,19 @@ public enum RotationUtils
 		float f4 = MathHelper.sin(-player.pitch * f);
 		
 		return new Vec3d(f2 * f3, f4, f1 * f3);
+	}
+	
+	public static Vec3d getServerLookVec()
+	{
+		RotationFaker rotationFaker = WurstClient.INSTANCE.getRotationFaker();
+		float serverYaw = rotationFaker.getServerYaw();
+		float serverPitch = rotationFaker.getServerPitch();
+		
+		float f = MathHelper.cos(-serverYaw * 0.017453292F - (float)Math.PI);
+		float f1 = MathHelper.sin(-serverYaw * 0.017453292F - (float)Math.PI);
+		float f2 = -MathHelper.cos(-serverPitch * 0.017453292F);
+		float f3 = MathHelper.sin(-serverPitch * 0.017453292F);
+		return new Vec3d(f1 * f2, f3, f * f2);
 	}
 	
 	public static Rotation getNeededRotations(Vec3d vec)
