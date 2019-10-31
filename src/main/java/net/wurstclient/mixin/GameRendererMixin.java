@@ -29,9 +29,10 @@ public class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloadListener
 {
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/util/math/MatrixStack;F)V",
+		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
 		ordinal = 0),
-		method = {"renderWorld(FJLnet/minecraft/util/math/MatrixStack;)V"})
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
 		MatrixStack matrixStack, float partalTicks)
 	{
@@ -50,7 +51,8 @@ public class GameRendererMixin
 			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0)},
-		method = {"renderWorld(FJLnet/minecraft/util/math/MatrixStack;)V"})
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
 		MatrixStack matrixStack, CallbackInfo ci)
 	{
