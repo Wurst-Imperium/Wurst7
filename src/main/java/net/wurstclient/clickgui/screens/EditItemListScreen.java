@@ -22,11 +22,11 @@ import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.util.TextFormat;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MatrixStack;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 

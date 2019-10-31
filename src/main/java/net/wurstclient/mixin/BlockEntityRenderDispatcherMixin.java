@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.LayeredVertexConsumerStorage;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.util.math.MatrixStack;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 
