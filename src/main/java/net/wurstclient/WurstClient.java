@@ -11,7 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
+import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
@@ -40,8 +46,8 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.0pre13";
-	public static final String MC_VERSION = "19w42a";
+	public static final String VERSION = "7.0pre14";
+	public static final String MC_VERSION = "19w44a";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -61,6 +67,8 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
+	
+	private FabricKeyBinding zoomKey;
 	
 	public void initialize()
 	{
@@ -115,6 +123,11 @@ public enum WurstClient
 		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
+		
+		zoomKey =
+			FabricKeyBinding.Builder.create(new Identifier("wurst", "zoom"),
+				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "Zoom").build();
+		KeyBindingRegistry.INSTANCE.register(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
@@ -227,5 +240,10 @@ public enum WurstClient
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
+	}
+	
+	public FabricKeyBinding getZoomKey()
+	{
+		return zoomKey;
 	}
 }

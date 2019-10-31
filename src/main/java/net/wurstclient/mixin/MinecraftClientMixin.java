@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -40,6 +41,8 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	private ClientPlayerInteractionManager interactionManager;
 	@Shadow
 	private ClientPlayerEntity player;
+	@Shadow
+	public Mouse mouse;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
