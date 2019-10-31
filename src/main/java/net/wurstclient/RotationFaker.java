@@ -56,4 +56,14 @@ public final class RotationFaker
 		serverYaw = rotations.getYaw();
 		serverPitch = rotations.getPitch();
 	}
+	
+	public float getServerYaw()
+	{
+		return fakeRotation ? serverYaw : WurstClient.MC.player.yaw;
+	}
+	
+	public float getServerPitch()
+	{
+		return fakeRotation ? serverPitch : WurstClient.MC.player.pitch;
+	}
 }

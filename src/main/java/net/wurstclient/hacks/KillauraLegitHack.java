@@ -32,6 +32,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -43,12 +45,13 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.RotationUtils.Rotation;
 
-public final class KillauraHack extends Hack
+public final class KillauraLegitHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -61,12 +64,12 @@ public final class KillauraHack extends Hack
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
+		"Filter sleeping", "Won't attack sleeping players.", true);
 	private final SliderSetting filterFlying =
 		new SliderSetting("Filter flying",
 			"Won't attack players that\n" + "are at least the given\n"
 				+ "distance above ground.",
-			0, 0, 2, 0.05,
+			0.5, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
@@ -92,13 +95,14 @@ public final class KillauraHack extends Hack
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
+		"Filter invisible", "Won't attack invisible entities.", true);
 	
 	private LivingEntity target;
 	
-	public KillauraHack()
+	public KillauraLegitHack()
 	{
-		super("Killaura", "Automatically attacks entities around you.");
+		super("KillauraLegit", "Slower Killaura that is harder to detect.\n"
+			+ "Not required on normal NoCheat+ servers!");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);
@@ -119,7 +123,7 @@ public final class KillauraHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -207,10 +211,51 @@ public final class KillauraHack extends Hack
 		if(target == null)
 			return;
 		
-		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+		// face entity
+		if(!faceEntityClient(target))
+			return;
+		
+		// attack entity
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
+	}
+	
+	private boolean faceEntityClient(LivingEntity entity)
+	{
+		// get position & rotation
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d lookVec = RotationUtils.getServerLookVec();
+		
+		// try to face center of boundingBox
+		Box bb = entity.getBoundingBox();
+		if(faceVectorClient(bb.getCenter()))
+			return true;
+		
+		// if not facing center, check if facing anything in boundingBox
+		return bb.rayTrace(eyesPos,
+			eyesPos.add(lookVec.multiply(range.getValue()))) != null;
+	}
+	
+	private boolean faceVectorClient(Vec3d vec)
+	{
+		Rotation rotation = RotationUtils.getNeededRotations(vec);
+		
+		float oldYaw = MC.player.prevYaw;
+		float oldPitch = MC.player.prevPitch;
+		
+		MC.player.yaw = limitAngleChange(oldYaw, rotation.getYaw(), 30);
+		MC.player.pitch = rotation.getPitch();
+		
+		return Math.abs(oldYaw - rotation.getYaw())
+			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;
+	}
+	
+	private float limitAngleChange(float current, float intended,
+		float maxChange)
+	{
+		float change = MathHelper.wrapDegrees(intended - current);
+		change = MathHelper.clamp(change, -maxChange, maxChange);
+		return MathHelper.wrapDegrees(current + change);
 	}
 	
 	@Override

@@ -7,6 +7,8 @@
  */
 package net.wurstclient.options;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
@@ -28,7 +30,9 @@ public class PressAKeyScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		prevScreen.setKey(getKeyName(keyCode, scanCode));
+		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
+			prevScreen.setKey(getKeyName(keyCode, scanCode));
+		
 		minecraft.openScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -36,6 +40,12 @@ public class PressAKeyScreen extends Screen
 	private String getKeyName(int keyCode, int scanCode)
 	{
 		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	@Override
