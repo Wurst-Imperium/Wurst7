@@ -24,7 +24,7 @@ public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/util/math/MatrixStack;Lnet/minecraft/client/render/LayeredVertexConsumerStorage;DDD)V"},
+			"render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/LayeredVertexConsumerStorage;DDD)V"},
 		cancellable = true)
 	private <E extends BlockEntity> void onRender(E blockEntity,
 		float partialTicks, MatrixStack matrixStack_1,
