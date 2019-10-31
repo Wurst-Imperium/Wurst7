@@ -18,7 +18,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.ServerEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
@@ -117,14 +117,14 @@ public class CleanUpScreen extends Screen
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
 				.method_20122(null);
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
-				.method_20125(prevScreen.getServerList());
+				.setServers(prevScreen.getServerList());
 			minecraft.openScreen(prevScreen);
 			return;
 		}
 		
 		for(int i = prevScreen.getServerList().size() - 1; i >= 0; i--)
 		{
-			ServerEntry server = prevScreen.getServerList().get(i);
+			ServerInfo server = prevScreen.getServerList().get(i);
 			if(cleanupUnknown
 				&& "\u00a74Can\'t resolve hostname".equals(server.label)
 				|| cleanupOutdated && server.protocolVersion != SharedConstants
@@ -137,20 +137,20 @@ public class CleanUpScreen extends Screen
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
 					.method_20122(null);
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.method_20125(prevScreen.getServerList());
+					.setServers(prevScreen.getServerList());
 			}
 		}
 		
 		if(cleanupRename)
 			for(int i = 0; i < prevScreen.getServerList().size(); i++)
 			{
-				ServerEntry server = prevScreen.getServerList().get(i);
+				ServerInfo server = prevScreen.getServerList().get(i);
 				server.name = "Grief me #" + (i + 1);
 				prevScreen.getServerList().saveFile();
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
 					.method_20122(null);
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.method_20125(prevScreen.getServerList());
+					.setServers(prevScreen.getServerList());
 			}
 		
 		minecraft.openScreen(prevScreen);

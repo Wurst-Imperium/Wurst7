@@ -95,7 +95,7 @@ public final class TacoCmd extends Command
 		// }else
 		GL11.glColor4f(1, 1, 1, 1);
 		
-		MC.getTextureManager().bindTexture(tacos[ticks / 8]);
+		MC.getTextureManager().bindTextureInner(tacos[ticks / 8]);
 		Window sr = MC.window;
 		int x = sr.getScaledWidth() / 2 - 32 + 76;
 		int y = sr.getScaledHeight() - 32 - 19;

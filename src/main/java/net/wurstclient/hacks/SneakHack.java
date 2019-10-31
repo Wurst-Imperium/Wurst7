@@ -62,7 +62,7 @@ public final class SneakHack extends Hack
 			break;
 			
 			case PACKET:
-			sendSneakPacket(Mode.STOP_SNEAKING);
+			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;
 		}
 	}
@@ -80,8 +80,8 @@ public final class SneakHack extends Hack
 			
 			case PACKET:
 			sneakKey.setPressed(sneakKey.isActallyPressed());
-			sendSneakPacket(Mode.START_SNEAKING);
-			sendSneakPacket(Mode.STOP_SNEAKING);
+			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;
 		}
 	}
@@ -92,8 +92,8 @@ public final class SneakHack extends Hack
 		if(mode.getSelected() != SneakMode.PACKET)
 			return;
 		
-		sendSneakPacket(Mode.STOP_SNEAKING);
-		sendSneakPacket(Mode.START_SNEAKING);
+		sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+		sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 	}
 	
 	private void sendSneakPacket(Mode mode)
