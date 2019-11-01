@@ -63,7 +63,6 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 
 		for (Entity e : MC.world.getEntities())
 		{
-			GL11.glBegin(GL11.GL_LINE_STRIP);
 			if (!(e instanceof LivingEntity)) continue;
 			LivingEntity entity = (LivingEntity)e;
 
@@ -74,7 +73,7 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 			double defaultblue = ((DEFAULT_COLOR & 0x0000FF00) >> 8) / 255d;
 			double defaultalpha = (DEFAULT_COLOR & 0x000000FF) / 255d;
 
-
+			GL11.glBegin(GL11.GL_LINE_STRIP);
 			for (Vec3d point : path)
 			{
 				//System.out.println("R: " + defaultred + ", G: " + defaultgreen + ", B: " + defaultblue + ", A: " + defaultalpha);
@@ -83,7 +82,6 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 			}
 			GL11.glEnd();
 		}
-
 
 
 		GL11.glDisable(GL11.GL_BLEND);
