@@ -104,7 +104,7 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 
 	/**
 	 * Returns the path the entity's held item will take through the air.
-	 * if maxPitch is true, return the value of the path at 45�.
+	 * if maxPitch is true, return the value of the path at 45°.
 	 * @param entity
 	 * @return
 	 */
