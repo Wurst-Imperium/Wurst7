@@ -56,13 +56,14 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2.0f);
-		GL11.glBegin(GL11.GL_LINE_STRIP);
+
 
 
 		//RenderUtils.drawSolidBox(new AxisAlignedBB(new BlockPos(0 - TileEntityRendererDispatcher.staticPlayerX, 100 - TileEntityRendererDispatcher.staticPlayerY, 0 - TileEntityRendererDispatcher.staticPlayerZ)));
 
 		for (Entity e : MC.world.getEntities())
 		{
+			GL11.glBegin(GL11.GL_LINE_STRIP);
 			if (!(e instanceof LivingEntity)) continue;
 			LivingEntity entity = (LivingEntity)e;
 
@@ -80,10 +81,11 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 				GL11.glColor4d(defaultred, defaultgreen, defaultblue, defaultalpha);
 				GL11.glVertex3d(point.x - BlockEntityRenderDispatcher.renderOffsetX, point.y - BlockEntityRenderDispatcher.renderOffsetY , point.z - BlockEntityRenderDispatcher.renderOffsetZ);
 			}
+			GL11.glEnd();
 		}
 
 
-		GL11.glEnd();
+
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		//GL11.glEnable(GL11.GL_DEPTH_TEST);
