@@ -48,9 +48,6 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 	@Override
 	public void onRender(float partialTicks)
 	{
-
-		//trajectoryRenderPosts.add(new TrajectoryRenderPost(MinecraftClient.getInstance().player, TrajectoryRenderer.Style.LINES_AND_BOXES, 0x00FF007Fl, 0l, 0l));
-
 		GL11.glPushMatrix();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
