@@ -1,26 +1,31 @@
 package net.wurstclient.hacks;
 
+import com.google.common.collect.Streams;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.TrajectoryPath;
-import net.wurstclient.util.TrajectoryRenderPost;
-import net.wurstclient.util.TrajectoryRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TrajectoriesHack extends Hack implements RenderListener {
 
 	private static final int MAX_POINTS = 1000; // Max points in a trajectory. Bigger means longer traces in air, but takes longer to calculate.
-	private static List<TrajectoryRenderPost> trajectoryRenderPosts = new LinkedList<>();
+	private static final long DEFAULT_COLOR = 0x00FF007FL;
+
+	private final ArrayList<PlayerEntity> livingEntities = new ArrayList<>();
 
 	public TrajectoriesHack()
 	{
@@ -44,7 +49,7 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 	public void onRender(float partialTicks)
 	{
 
-		trajectoryRenderPosts.add(new TrajectoryRenderPost(MinecraftClient.getInstance().player, TrajectoryRenderer.Style.LINES_AND_BOXES, 0x00FF007Fl, 0l, 0l));
+		//trajectoryRenderPosts.add(new TrajectoryRenderPost(MinecraftClient.getInstance().player, TrajectoryRenderer.Style.LINES_AND_BOXES, 0x00FF007Fl, 0l, 0l));
 
 		GL11.glPushMatrix();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -59,15 +64,17 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 
 		//RenderUtils.drawSolidBox(new AxisAlignedBB(new BlockPos(0 - TileEntityRendererDispatcher.staticPlayerX, 100 - TileEntityRendererDispatcher.staticPlayerY, 0 - TileEntityRendererDispatcher.staticPlayerZ)));
 
-		for (Iterator<TrajectoryRenderPost> iterator = trajectoryRenderPosts.iterator(); iterator.hasNext();)
+		for (Entity e : MC.world.getEntities())
 		{
-			TrajectoryRenderPost post = iterator.next();
-			TrajectoryPath path = getPath(post.entity);
+			if (!(e instanceof LivingEntity)) continue;
+			LivingEntity entity = (LivingEntity)e;
 
-			double defaultred = ((post.defaultcolor & 0xFF000000) >> 24) / 255d;
-			double defaultgreen = ((post.defaultcolor & 0x00FF0000) >> 16) / 255d;
-			double defaultblue = ((post.defaultcolor & 0x0000FF00) >> 8) / 255d;
-			double defaultalpha = (post.defaultcolor & 0x000000FF) / 255d;
+			TrajectoryPath path = getPath(entity);
+
+			double defaultred = ((DEFAULT_COLOR & 0xFF000000) >> 24) / 255d;
+			double defaultgreen = ((DEFAULT_COLOR & 0x00FF0000) >> 16) / 255d;
+			double defaultblue = ((DEFAULT_COLOR & 0x0000FF00) >> 8) / 255d;
+			double defaultalpha = (DEFAULT_COLOR & 0x000000FF) / 255d;
 
 
 			for (Vec3d point : path)
@@ -76,7 +83,6 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 				GL11.glColor4d(defaultred, defaultgreen, defaultblue, defaultalpha);
 				GL11.glVertex3d(point.x - BlockEntityRenderDispatcher.renderOffsetX, point.y - BlockEntityRenderDispatcher.renderOffsetY , point.z - BlockEntityRenderDispatcher.renderOffsetZ);
 			}
-			iterator.remove();
 		}
 
 
@@ -170,7 +176,8 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		}
 
 		// Specifies the ballistic drop for various items. Smaller values means less drop, so greater range.
-		double gravity = (item instanceof BowItem || item instanceof CrossbowItem) ? 0.05 : ((item instanceof PotionItem) ? 0.4 : ((item instanceof FishingRodItem) ? 0.15 : 0.03));
+		double gravity = (item instanceof BowItem || item instanceof CrossbowItem) ? 0.05 :
+				((item instanceof PotionItem) ? 0.4 : ((item instanceof FishingRodItem) ? 0.15 : (item instanceof TridentItem) ? 0.015 :0.03));
 
 		for (int i = 0; i < MAX_POINTS; i++)
 		{
@@ -204,7 +211,8 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 						item instanceof EnderPearlItem ||
 						item instanceof SplashPotionItem ||
 						item instanceof LingeringPotionItem ||
-						item instanceof FishingRodItem;
+						item instanceof FishingRodItem ||
+						item instanceof TridentItem;
 	}
 
 	public enum Style
