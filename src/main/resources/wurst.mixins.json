@@ -27,7 +27,8 @@
     "MouseMixin",
     "MultiplayerScreenMixin",
     "ServerListMixin",
-    "TerrainRenderContextMixin"
+    "TerrainRenderContextMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
