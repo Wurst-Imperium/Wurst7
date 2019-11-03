@@ -7,17 +7,20 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.NonBlockingThreadExecutor;
 import net.minecraft.util.hit.EntityHitResult;
@@ -42,7 +45,9 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	@Shadow
 	private ClientPlayerEntity player;
 	@Shadow
-	public Mouse mouse;
+	private Session session;
+	
+	private Session wurstSession;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -75,6 +80,31 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 		WurstClient.INSTANCE.getFriends().middleClick(entity);
 	}
 	
+	@Inject(at = {@At("HEAD")},
+		method = {"getSession()Lnet/minecraft/client/util/Session;"},
+		cancellable = true)
+	private void onGetSession(CallbackInfoReturnable<Session> cir)
+	{
+		if(wurstSession == null)
+			return;
+		
+		cir.setReturnValue(wurstSession);
+	}
+	
+	@Redirect(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0),
+		method = {
+			"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
+	private Session getSessionForSessionProperties(MinecraftClient mc)
+	{
+		if(wurstSession != null)
+			return wurstSession;
+		else
+			return session;
+	}
+	
 	@Override
 	public void rightClick()
 	{
@@ -103,6 +133,12 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
+	}
+	
+	@Override
+	public void setSession(Session session)
+	{
+		wurstSession = session;
 	}
 	
 	@Shadow
