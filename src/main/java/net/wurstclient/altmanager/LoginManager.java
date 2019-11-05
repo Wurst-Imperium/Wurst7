@@ -40,7 +40,7 @@ public final class LoginManager
 			
 		}catch(AuthenticationUnavailableException e)
 		{
-			return "§4§lCannot contact authentication server!";
+			return "\u00a74\u00a7lCannot contact authentication server!";
 			
 		}catch(AuthenticationException e)
 		{
@@ -48,14 +48,14 @@ public final class LoginManager
 			
 			if(e.getMessage().contains("Invalid username or password.")
 				|| e.getMessage().toLowerCase().contains("account migrated"))
-				return "§4§lWrong password! (or shadowbanned)";
+				return "\u00a74\u00a7lWrong password! (or shadowbanned)";
 			else
-				return "§4§lCannot contact authentication server!";
+				return "\u00a74\u00a7lCannot contact authentication server!";
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
-			return "§4§lWrong password! (or shadowbanned)";
+			return "\u00a74\u00a7lWrong password! (or shadowbanned)";
 		}
 	}
 	
