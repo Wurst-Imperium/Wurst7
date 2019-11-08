@@ -9,6 +9,7 @@ package net.wurstclient.options;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
@@ -92,6 +93,8 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	public void setKey(String key)
 	{
 		WurstClient.INSTANCE.getZoomKey().setKeyCode(InputUtil.fromName(key));
+		minecraft.options.write();
+		KeyBinding.updateKeysByCode();
 		keyButton.setMessage("Zoom Key: " + key);
 	}
 }
