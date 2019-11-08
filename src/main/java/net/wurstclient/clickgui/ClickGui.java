@@ -560,6 +560,7 @@ public final class ClickGui
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 					0xffffff);
+			GL11.glEnable(GL11.GL_BLEND);
 			
 			GL11.glPopMatrix();
 		}

@@ -314,6 +314,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		drawCenteredString(minecraft.textRenderer, feature.getName(), middleX,
 			32, 0xffffff);
 		glDisable(GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -444,6 +445,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				(x1 + x2) / 2, y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
 			glDisable(GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// text
@@ -454,6 +456,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
 			textY += minecraft.textRenderer.fontHeight;
 		}
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		// scissor box
 		glDisable(GL_SCISSOR_TEST);
@@ -495,6 +498,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(minecraft.textRenderer, button.getMessage(),
 				(x1 + x2) / 2, y1 + 4, 0xffffff);
+			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// GL resets
