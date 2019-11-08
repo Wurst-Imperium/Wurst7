@@ -256,7 +256,8 @@ public final class EditBlockListScreen extends Screen
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
 				MatrixStack matrixStack = new MatrixStack();
-				GuiLighting.enableForItems(matrixStack.peek());
+				GuiLighting
+					.enableForItems(matrixStack.method_23760().method_23761());
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				GuiLighting.disable();
@@ -284,7 +285,8 @@ public final class EditBlockListScreen extends Screen
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
 				MatrixStack matrixStack = new MatrixStack();
-				GuiLighting.enableForItems(matrixStack.peek());
+				GuiLighting
+					.enableForItems(matrixStack.method_23760().method_23761());
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
 				GuiLighting.disable();
 				

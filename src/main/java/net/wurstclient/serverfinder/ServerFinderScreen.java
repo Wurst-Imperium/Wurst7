@@ -19,7 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
@@ -50,7 +50,7 @@ public class ServerFinderScreen extends Screen
 			height / 4 + 96 + 12, 200, 20, "Search", b -> searchOrCancel()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, "Tutorial", b -> SystemUtil.getOperatingSystem().open(
+			20, "Tutorial", b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,

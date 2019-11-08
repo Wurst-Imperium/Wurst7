@@ -131,7 +131,7 @@ public final class BlockComponent extends Component
 		GL11.glScaled(scale, scale, scale);
 		
 		MatrixStack matrixStack = new MatrixStack();
-		GuiLighting.enableForItems(matrixStack.peek());
+		GuiLighting.enableForItems(matrixStack.method_23760().method_23761());
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);
