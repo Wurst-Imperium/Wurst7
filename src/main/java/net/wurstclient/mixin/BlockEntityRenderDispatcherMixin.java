@@ -24,14 +24,14 @@ public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/LayeredVertexConsumerStorage;DDD)V"},
+			"render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V"},
 		cancellable = true)
-	private <E extends BlockEntity> void onRender(E blockEntity,
-		float partialTicks, MatrixStack matrixStack_1,
-		VertexConsumerProvider layeredVertexConsumerStorage_1, double double_1,
-		double double_2, double double_3, CallbackInfo ci)
+	private <E extends BlockEntity> void onRender(E blockEntity_1,
+		float float_1, MatrixStack matrixStack_1,
+		VertexConsumerProvider vertexConsumerProvider_1, CallbackInfo ci)
 	{
-		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
+		RenderBlockEntityEvent event =
+			new RenderBlockEntityEvent(blockEntity_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())
