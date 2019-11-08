@@ -835,6 +835,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
 		fr.draw(title, x1 + 2, y1 + 3, 0xf0f0f0);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	private void renderTitleBarButton(int x1, int y1, int x2, int y2,

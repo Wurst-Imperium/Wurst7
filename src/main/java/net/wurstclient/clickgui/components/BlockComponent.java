@@ -106,6 +106,7 @@ public final class BlockComponent extends Component
 		renderIcon(stack, x3, y1, true);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override
@@ -155,6 +156,7 @@ public final class BlockComponent extends Component
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		tr.drawWithShadow("?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		GL11.glPopMatrix();
 	}
