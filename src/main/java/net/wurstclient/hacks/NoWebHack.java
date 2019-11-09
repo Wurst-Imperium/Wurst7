@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
@@ -36,6 +35,6 @@ public final class NoWebHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		MC.player.slowMovement(Blocks.AIR.getDefaultState(), Vec3d.ZERO);
+		IMC.getPlayer().setMovementMultiplier(Vec3d.ZERO);
 	}
 }

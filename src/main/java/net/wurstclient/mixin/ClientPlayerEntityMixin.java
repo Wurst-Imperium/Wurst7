@@ -127,4 +127,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		return lastPitch;
 	}
+	
+	@Override
+	public void setMovementMultiplier(Vec3d movementMultiplier)
+	{
+		this.movementMultiplier = movementMultiplier;
+	}
 }
