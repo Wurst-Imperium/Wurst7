@@ -27,6 +27,7 @@
     "MouseMixin",
     "MultiplayerScreenMixin",
     "ServerListMixin",
+    "SignEditScreenMixin",
     "TerrainRenderContextMixin",
     "TitleScreenMixin"
   ],
