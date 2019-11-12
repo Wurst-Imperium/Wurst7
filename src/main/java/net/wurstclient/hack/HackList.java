@@ -30,6 +30,7 @@ public final class HackList implements UpdateListener
 	// AntiKnockbackHack();
 	// public final AntiPotionHack antiPotionHack = new AntiPotionHack();
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
+	public final AutoTranslateHack autoTranslateHack = new AutoTranslateHack();
 	// public final AutoArmorHack autoArmorHack = new AutoArmorHack();
 	// public final AutoBuildHack autoBuildHack = new AutoBuildHack();
 	public final AutoDropHack autoDropHack = new AutoDropHack();
