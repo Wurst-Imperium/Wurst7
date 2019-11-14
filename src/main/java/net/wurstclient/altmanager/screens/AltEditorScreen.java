@@ -144,12 +144,12 @@ public abstract class AltEditorScreen extends Screen
 		try(InputStream in = u.toURL().openStream())
 		{
 			Files.copy(in, path);
-			return "§a§lSaved skin as " + skin;
+			return "\u00a7a\u00a7lSaved skin as " + skin;
 			
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			return "§4§lSkin could not be saved.";
+			return "\u00a74\u00a7lSkin could not be saved.";
 		}
 	}
 	
