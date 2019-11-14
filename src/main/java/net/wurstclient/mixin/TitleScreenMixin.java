@@ -18,12 +18,11 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.altmanager.screens.DirectLoginScreen;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
 {
-	private ButtonWidget altManagerButton;
-	
 	private TitleScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
@@ -32,10 +31,9 @@ public abstract class TitleScreenMixin extends Screen
 	@Inject(at = {@At("RETURN")}, method = {"initWidgetsNormal(II)V"})
 	private void onInitWidgetsNormal(int int_1, int int_2, CallbackInfo ci)
 	{
-		addButton(altManagerButton =
-			new ButtonWidget(width / 2 + 2, int_1 + int_2 * 2, 98, 20,
-				"Alt Manager (NYI)", (buttonWidget_1) -> {}));
-		altManagerButton.active = false;
+		addButton(new ButtonWidget(width / 2 + 2, int_1 + int_2 * 2, 98, 20,
+			"Alt Manager",
+			b -> minecraft.openScreen(new DirectLoginScreen(this))));
 		
 		for(AbstractButtonWidget button : buttons)
 		{

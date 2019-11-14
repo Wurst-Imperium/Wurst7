@@ -21,7 +21,7 @@ public final class CmdList
 	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
-	// public final BlinkCmd blinkCmd = new BlinkCmd();
+	public final BlinkCmd blinkCmd = new BlinkCmd();
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	// public final DamageCmd damageCmd = new DamageCmd();

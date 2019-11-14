@@ -7,17 +7,19 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
-public final class NoWebHack extends Hack implements UpdateListener
+@SearchTags({"legit", "disable"})
+public final class PanicHack extends Hack implements UpdateListener
 {
-	public NoWebHack()
+	public PanicHack()
 	{
-		super("NoWeb", "Prevents you from getting slowed down by cobwebs.");
-		setCategory(Category.MOVEMENT);
+		super("Panic", "Instantly turns off all enabled hacks.\n"
+			+ "Be careful with this one!");
+		setCategory(Category.OTHER);
 	}
 	
 	@Override
@@ -35,6 +37,10 @@ public final class NoWebHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		IMC.getPlayer().setMovementMultiplier(Vec3d.ZERO);
+		for(Hack hack : WURST.getHax().getAllHax())
+			if(hack.isEnabled() && hack != this)
+				hack.setEnabled(false);
+			
+		setEnabled(false);
 	}
 }
