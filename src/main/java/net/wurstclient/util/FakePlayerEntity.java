@@ -49,7 +49,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	private void copyRotation()
 	{
 		headYaw = player.headYaw;
-		field_6283 = player.field_6283;
+		bodyYaw = player.bodyYaw;
 	}
 	
 	private void resetCapeMovement()

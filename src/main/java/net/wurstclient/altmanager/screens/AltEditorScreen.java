@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -67,11 +67,11 @@ public abstract class AltEditorScreen extends Screen
 		
 		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
 			20, "Open Skin Folder",
-			b -> SystemUtil.getOperatingSystem().open(skinFolder.toFile())));
+			b -> Util.getOperatingSystem().open(skinFolder.toFile())));
 		
 		emailBox = new TextFieldWidget(font, width / 2 - 100, 60, 200, 20, "");
 		emailBox.setMaxLength(48);
-		emailBox.method_1876(true);
+		emailBox.setSelected(true);
 		emailBox.setText(getDefaultEmail());
 		children.add(emailBox);
 		
@@ -144,12 +144,12 @@ public abstract class AltEditorScreen extends Screen
 		try(InputStream in = u.toURL().openStream())
 		{
 			Files.copy(in, path);
-			return "§a§lSaved skin as " + skin;
+			return "ï¿½aï¿½lSaved skin as " + skin;
 			
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			return "§4§lSkin could not be saved.";
+			return "ï¿½4ï¿½lSkin could not be saved.";
 		}
 	}
 	
