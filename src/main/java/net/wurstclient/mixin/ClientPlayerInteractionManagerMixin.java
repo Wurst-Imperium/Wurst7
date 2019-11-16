@@ -43,7 +43,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
-	
+	private float reachDistance = 4.5F;
+	private boolean extendedReach = false;
 	/**
 	 * blockHitDelay
 	 */
@@ -140,4 +141,33 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	public abstract ItemStack method_2906(int int_1, int int_2, int int_3,
 		SlotActionType slotActionType_1, PlayerEntity playerEntity_1);
+
+
+		@Inject(at = @At("RETURN"),
+		method = "hasExtendedReach",
+		cancellable = true)
+	private void onHasExtendedReach(CallbackInfoReturnable<Boolean> cir)
+	{
+		cir.setReturnValue(this.extendedReach);
+	}
+	
+	@Override
+	public void setHasExtendedReach(boolean value)
+	{
+		this.extendedReach = value;
+	}
+
+	@Inject(at = @At("RETURN"),
+		method = "getReachDistance",
+		cancellable = true)
+	private void onGetReachDistance(CallbackInfoReturnable<Float> cir)
+	{
+		cir.setReturnValue(this.reachDistance);
+	}
+	
+	@Override
+	public void setReachDistance(float dist)
+	{
+		this.reachDistance = dist;
+	}
 }

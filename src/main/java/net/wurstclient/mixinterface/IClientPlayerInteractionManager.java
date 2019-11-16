@@ -33,4 +33,8 @@ public interface IClientPlayerInteractionManager
 		BlockPos blockPos, Direction direction);
 	
 	public void setBlockHitDelay(int delay);
+
+	public void setReachDistance(float dist);
+
+	public void setHasExtendedReach(boolean value);
 }
