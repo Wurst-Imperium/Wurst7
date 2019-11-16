@@ -49,6 +49,9 @@ public abstract class ClientPlayerInteractionManagerMixin
 	 */
 	@Shadow
 	private int field_3716;
+
+	private float reachDistance = 4.5F;
+	private boolean extendedReach = false;
 	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
@@ -62,7 +65,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
-	
+
 	@Override
 	public float getCurrentBreakingProgress()
 	{
@@ -140,4 +143,32 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	public abstract ItemStack method_2906(int int_1, int int_2, int int_3,
 		SlotActionType slotActionType_1, PlayerEntity playerEntity_1);
+
+		@Inject(at = @At("RETURN"),
+		method = "hasExtendedReach",
+		cancellable = true)
+	private void onHasExtendedReach(CallbackInfoReturnable<Boolean> cir)
+	{
+		cir.setReturnValue(this.extendedReach);
+	}
+	
+	@Override
+	public void setHasExtendedReach(boolean value)
+	{
+		this.extendedReach = value;
+	}
+
+	@Inject(at = @At("RETURN"),
+		method = "getReachDistance",
+		cancellable = true)
+	private void onGetReachDistance(CallbackInfoReturnable<Float> cir)
+	{
+		cir.setReturnValue(this.reachDistance);
+	}
+	
+	@Override
+	public void setReachDistance(float dist)
+	{
+		this.reachDistance = dist;
+	}
 }
