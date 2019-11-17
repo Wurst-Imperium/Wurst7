@@ -22,6 +22,7 @@ import net.minecraft.block.StemBlock;
 import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -188,9 +189,11 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 				continue;
 			
 			// check line of sight
-			if(MC.world.rayTrace(new RayTraceContext(eyesPos, hitVec,
-				RayTraceContext.ShapeType.COLLIDER,
-				RayTraceContext.FluidHandling.NONE, MC.player)) != null)
+			if(MC.world
+				.rayTrace(new RayTraceContext(eyesPos, hitVec,
+					RayTraceContext.ShapeType.COLLIDER,
+					RayTraceContext.FluidHandling.NONE, MC.player))
+				.getType() != HitResult.Type.MISS)
 				continue;
 			
 			// face block
