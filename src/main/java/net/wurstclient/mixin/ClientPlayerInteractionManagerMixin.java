@@ -50,6 +50,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	private int field_3716;
 	
+	private boolean overrideReach;
+	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
 		ordinal = 0)},
@@ -61,6 +63,24 @@ public abstract class ClientPlayerInteractionManagerMixin
 		BlockBreakingProgressEvent event =
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"getReachDistance()F"},
+		cancellable = true)
+	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
+	{
+		if(overrideReach)
+			ci.setReturnValue(10F);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"hasExtendedReach()Z"},
+		cancellable = true)
+	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(overrideReach)
+			cir.setReturnValue(true);
 	}
 	
 	@Override
@@ -112,6 +132,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 		Direction direction)
 	{
 		method_21706(action, blockPos, direction);
+	}
+	
+	@Override
+	public void setOverrideReach(boolean overrideReach)
+	{
+		this.overrideReach = overrideReach;
 	}
 	
 	@Shadow
