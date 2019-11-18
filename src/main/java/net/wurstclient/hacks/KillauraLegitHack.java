@@ -123,7 +123,10 @@ public final class KillauraLegitHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		// disable other killauras
 		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().triggerBotHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
