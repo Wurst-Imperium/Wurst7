@@ -18,6 +18,7 @@
     "ClientPlayNetworkHandlerMixin",
     "FluidRendererMixin",
     "DeathScreenMixin",
+    "EntityMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
     "IngameHudMixin",
