@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "ArmorItemMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
