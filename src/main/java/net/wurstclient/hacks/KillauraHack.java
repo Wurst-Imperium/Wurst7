@@ -120,6 +120,7 @@ public final class KillauraHack extends Hack
 	protected void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		

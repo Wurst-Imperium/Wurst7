@@ -60,7 +60,7 @@ public final class HackList implements UpdateListener
 	// public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	// public final CaveFinderHack caveFinderHack = new CaveFinderHack();
 	public final ChestEspHack chestEspHack = new ChestEspHack();
-	// public final ClickAuraHack clickAuraHack = new ClickAuraHack();
+	public final ClickAuraHack clickAuraHack = new ClickAuraHack();
 	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
 	// public final CmdBlockHack cmdBlockHack = new CmdBlockHack();
 	// public final CrashChestHack crashChestHack = new CrashChestHack();
