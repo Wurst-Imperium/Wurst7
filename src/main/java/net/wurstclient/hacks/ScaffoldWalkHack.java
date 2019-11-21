@@ -51,7 +51,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		BlockPos belowPlayer = new BlockPos(MC.player).down();
+		BlockPos belowPlayer = new BlockPos(MC.player).method_10074();
 		
 		// check if block is already placed
 		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())
@@ -74,8 +74,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 				continue;
 			
 			// filter out blocks that would fall
-			if(block instanceof FallingBlock && FallingBlock
-				.canFallThrough(BlockUtils.getState(belowPlayer.down())))
+			if(block instanceof FallingBlock && FallingBlock.canFallThrough(
+				BlockUtils.getState(belowPlayer.method_10074())))
 				continue;
 			
 			newSlot = i;
@@ -98,9 +98,9 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	
 	private boolean placeBlock(BlockPos pos)
 	{
-		Vec3d eyesPos = new Vec3d(MC.player.x,
-			MC.player.y + MC.player.getEyeHeight(MC.player.getPose()),
-			MC.player.z);
+		Vec3d eyesPos = new Vec3d(MC.player.getX(),
+			MC.player.getY() + MC.player.getEyeHeight(MC.player.getPose()),
+			MC.player.getZ());
 		
 		for(Direction side : Direction.values())
 		{

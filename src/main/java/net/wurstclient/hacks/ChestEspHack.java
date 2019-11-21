@@ -20,7 +20,6 @@ import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
@@ -265,10 +264,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(style.getSelected().lines)
 		{
-			Vec3d start = RotationUtils.getClientLookVec().add(
-				BlockEntityRenderDispatcher.renderOffsetX,
-				BlockEntityRenderDispatcher.renderOffsetY,
-				BlockEntityRenderDispatcher.renderOffsetZ);
+			Vec3d start = RotationUtils.getClientLookVec()
+				.add(RenderUtils.getCameraPos());
 			
 			GL11.glBegin(GL11.GL_LINES);
 			
@@ -303,12 +300,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		ArrayList<Box> minecartBoxes = new ArrayList<>(minecarts.size());
 		
 		minecarts.forEach(e -> {
-			double offsetX =
-				-(e.x - e.prevRenderX) + (e.x - e.prevRenderX) * partialTicks;
-			double offsetY =
-				-(e.y - e.prevRenderY) + (e.y - e.prevRenderY) * partialTicks;
-			double offsetZ =
-				-(e.z - e.prevRenderZ) + (e.z - e.prevRenderZ) * partialTicks;
+			double offsetX = -(e.getX() - e.prevRenderX)
+				+ (e.getX() - e.prevRenderX) * partialTicks;
+			double offsetY = -(e.getY() - e.prevRenderY)
+				+ (e.getY() - e.prevRenderY) * partialTicks;
+			double offsetZ = -(e.getZ() - e.prevRenderZ)
+				+ (e.getZ() - e.prevRenderZ) * partialTicks;
 			minecartBoxes
 				.add(e.getBoundingBox().offset(offsetX, offsetY, offsetZ));
 		});
@@ -321,9 +318,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(box.minX, box.minY, box.minZ);
-			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
-				box.maxZ - box.minZ);
+			GL11.glTranslated(box.x1, box.y1, box.z1);
+			GL11.glScaled(box.x2 - box.x1, box.y2 - box.y1, box.z2 - box.z1);
 			GL11.glCallList(displayList);
 			GL11.glPopMatrix();
 		}

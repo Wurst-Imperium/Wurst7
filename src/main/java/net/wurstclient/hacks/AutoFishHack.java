@@ -275,8 +275,8 @@ public final class AutoFishHack extends Hack
 		
 		// check position
 		FishingBobberEntity bobber = player.fishHook;
-		if(Math.abs(sound.getX() - bobber.x) > validRange.getValue()
-			|| Math.abs(sound.getZ() - bobber.z) > validRange.getValue())
+		if(Math.abs(sound.getX() - bobber.getX()) > validRange.getValue()
+			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
 			return;
 		
 		// catch fish
@@ -317,7 +317,7 @@ public final class AutoFishHack extends Hack
 		if(bobber != null)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(bobber.x, bobber.y, bobber.z);
+			GL11.glTranslated(bobber.getX(), bobber.getY(), bobber.getZ());
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}

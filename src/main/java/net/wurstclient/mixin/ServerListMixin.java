@@ -12,7 +12,7 @@ import java.util.List;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.client.options.ServerEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.options.ServerList;
 import net.wurstclient.mixinterface.IServerList;
 
@@ -20,11 +20,11 @@ import net.wurstclient.mixinterface.IServerList;
 public class ServerListMixin implements IServerList
 {
 	@Shadow
-	private List<ServerEntry> serverEntries;
+	private List<ServerInfo> servers;
 	
 	@Override
 	public void clear()
 	{
-		serverEntries.clear();
+		servers.clear();
 	}
 }

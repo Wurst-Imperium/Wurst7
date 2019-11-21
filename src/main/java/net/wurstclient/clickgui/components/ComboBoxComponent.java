@@ -228,6 +228,7 @@ public final class ComboBoxComponent<T extends Enum> extends Component
 		tr.draw(value, x4 + 2, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

@@ -34,7 +34,7 @@ public final class LiquidsHack extends Hack implements HitResultRayTraceListener
 	@Override
 	public void onHitResultRayTrace(float float_1)
 	{
-		MC.hitResult = MC.getCameraEntity()
+		MC.crosshairTarget = MC.getCameraEntity()
 			.rayTrace(MC.interactionManager.getReachDistance(), float_1, true);
 	}
 }

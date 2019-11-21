@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,11 +22,11 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.NonBlockingThreadExecutor;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
+import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -34,7 +34,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
+public class MinecraftClientMixin extends ReentrantThreadExecutor<Runnable>
 	implements SnooperListener, WindowEventHandler, AutoCloseable,
 	IMinecraftClient
 {
@@ -55,7 +55,7 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	}
 	
 	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;hitResult:Lnet/minecraft/util/hit/HitResult;",
+		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
 		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
 	private void onDoAttack(CallbackInfo ci)
 	{
@@ -72,7 +72,7 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		HitResult hitResult = WurstClient.MC.hitResult;
+		HitResult hitResult = WurstClient.MC.crosshairTarget;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.ENTITY)
 			return;
 		
@@ -169,13 +169,6 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	
 	@Shadow
 	@Override
-	public void updateDisplay(boolean var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
 	public void onResolutionChanged()
 	{
 		
@@ -190,14 +183,14 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	
 	@Shadow
 	@Override
-	protected Runnable prepareRunnable(Runnable var1)
+	protected Runnable createTask(Runnable var1)
 	{
 		return null;
 	}
 	
 	@Shadow
 	@Override
-	protected boolean canRun(Runnable var1)
+	protected boolean canExecute(Runnable var1)
 	{
 		return false;
 	}

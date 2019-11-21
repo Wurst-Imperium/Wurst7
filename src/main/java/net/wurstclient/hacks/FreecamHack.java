@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -114,7 +113,7 @@ public final class FreecamHack extends Hack
 		player.setVelocity(Vec3d.ZERO);
 		
 		player.onGround = false;
-		player.field_6281 = speed.getValueF();
+		player.flyingSpeed = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
@@ -184,17 +183,16 @@ public final class FreecamHack extends Hack
 		
 		// box
 		GL11.glPushMatrix();
-		GL11.glTranslated(fakePlayer.x, fakePlayer.y, fakePlayer.z);
+		GL11.glTranslated(fakePlayer.getX(), fakePlayer.getY(),
+			fakePlayer.getZ());
 		GL11.glScaled(fakePlayer.getWidth() + 0.1, fakePlayer.getHeight() + 0.1,
 			fakePlayer.getWidth() + 0.1);
 		GL11.glCallList(playerBox);
 		GL11.glPopMatrix();
 		
 		// line
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		Vec3d end = fakePlayer.getBoundingBox().getCenter();
 		
 		GL11.glBegin(GL11.GL_LINES);

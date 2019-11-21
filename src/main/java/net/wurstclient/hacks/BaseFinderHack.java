@@ -161,7 +161,8 @@ public final class BaseFinderHack extends Hack
 		int startY = 255 - modulo * 4;
 		int endY = startY - 4;
 		
-		BlockPos playerPos = new BlockPos(MC.player.x, 0, MC.player.z);
+		BlockPos playerPos =
+			new BlockPos(MC.player.getX(), 0, MC.player.getZ());
 		
 		// search matching blocks
 		loop: for(int y = startY; y > endY; y--)
@@ -208,7 +209,7 @@ public final class BaseFinderHack extends Hack
 		vertices.clear();
 		for(BlockPos pos : matchingBlocks)
 		{
-			if(!matchingBlocks.contains(pos.down()))
+			if(!matchingBlocks.contains(pos.method_10074()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 1, 0, 0);

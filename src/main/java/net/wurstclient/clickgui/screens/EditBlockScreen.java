@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
@@ -50,11 +51,11 @@ public final class EditBlockScreen extends Screen
 		
 		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, "");
 		blockField.setText(valueString);
-		blockField.setCursor(0);
+		blockField.setSelectionStart(0);
 		
 		children.add(blockField);
 		setInitialFocus(blockField);
-		blockField.method_1876(true);
+		blockField.setSelected(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
 		addButton(doneButton);
@@ -152,7 +153,8 @@ public final class EditBlockScreen extends Screen
 		double scale = large ? 1.5 : 0.75;
 		GL11.glScaled(scale, scale, scale);
 		
-		GuiLighting.enableForItems();
+		MatrixStack matrixStack = new MatrixStack();
+		GuiLighting.enableForItems(matrixStack.peek().getModel());
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);

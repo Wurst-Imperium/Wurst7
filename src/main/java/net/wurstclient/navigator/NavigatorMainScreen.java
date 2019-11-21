@@ -50,7 +50,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		children.add(searchBar);
 		setInitialFocus(searchBar);
-		searchBar.method_1876(true);
+		searchBar.setSelected(true);
 		
 		searchBar.x = middleX - 100;
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
@@ -149,6 +149,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				0xffffff);
 			searchBar.render(mouseX, mouseY, partialTicks);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// feature list
@@ -294,6 +295,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 					minecraft.textRenderer.draw(buttonText, area.x + 4,
 						area.y + 4, 0xffffff);
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
+					GL11.glEnable(GL11.GL_BLEND);
 				}
 			}
 		}
