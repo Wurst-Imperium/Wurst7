@@ -26,11 +26,11 @@ public final class HackList implements UpdateListener
 	// public final AntiBlindHack antiBlindHack = new AntiBlindHack();
 	public final AntiCactusHack antiCactusHack = new AntiCactusHack();
 	// public final AntiFireHack antiFireHack = new AntiFireHack();
-	// public final AntiKnockbackHack antiKnockbackHack = new
-	// AntiKnockbackHack();
+	public final AntiKnockbackHack antiKnockbackHack = new AntiKnockbackHack();
 	// public final AntiPotionHack antiPotionHack = new AntiPotionHack();
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
-	// public final AutoArmorHack autoArmorHack = new AutoArmorHack();
+	public final AntiWaterPushHack antiWaterPushHack = new AntiWaterPushHack();
+	public final AutoArmorHack autoArmorHack = new AutoArmorHack();
 	// public final AutoBuildHack autoBuildHack = new AutoBuildHack();
 	public final AutoDropHack autoDropHack = new AutoDropHack();
 	// public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
@@ -50,17 +50,17 @@ public final class HackList implements UpdateListener
 	// public final AutoSwordHack autoSwordHack = new AutoSwordHack();
 	public final AutoToolHack autoToolHack = new AutoToolHack();
 	public final AutoWalkHack autoWalkHack = new AutoWalkHack();
-	// public final BaseFinderHack baseFinderHack = new BaseFinderHack();
+	public final BaseFinderHack baseFinderHack = new BaseFinderHack();
 	public final BlinkHack blinkHack = new BlinkHack();
 	// public final BoatFlyHack boatFlyHack = new BoatFlyHack();
-	// public final BonemealAuraHack bonemealAuraHack = new BonemealAuraHack();
+	public final BonemealAuraHack bonemealAuraHack = new BonemealAuraHack();
 	// public final BowAimbotHack bowAimbotHack = new BowAimbotHack();
-	// public final BuildRandomHack buildRandomHack = new BuildRandomHack();
+	public final BuildRandomHack buildRandomHack = new BuildRandomHack();
 	public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
 	// public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	// public final CaveFinderHack caveFinderHack = new CaveFinderHack();
 	public final ChestEspHack chestEspHack = new ChestEspHack();
-	// public final ClickAuraHack clickAuraHack = new ClickAuraHack();
+	public final ClickAuraHack clickAuraHack = new ClickAuraHack();
 	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
 	// public final CmdBlockHack cmdBlockHack = new CmdBlockHack();
 	// public final CrashChestHack crashChestHack = new CrashChestHack();
@@ -98,11 +98,11 @@ public final class HackList implements UpdateListener
 	public final ItemGeneratorHack itemGeneratorHack = new ItemGeneratorHack();
 	// public final JesusHack jesusHack = new JesusHack();
 	// public final JetpackHack jetpackHack = new JetpackHack();
-	// public final KaboomHack kaboomHack = new KaboomHack();
+	public final KaboomHack kaboomHack = new KaboomHack();
 	public final KillauraLegitHack killauraLegitHack = new KillauraLegitHack();
 	public final KillauraHack killauraHack = new KillauraHack();
 	// public final KillPotionHack killPotionHack = new KillPotionHack();
-	// public final LiquidsHack liquidsHack = new LiquidsHack();
+	public final LiquidsHack liquidsHack = new LiquidsHack();
 	// public final LogSpammerHack logSpammerHack = new LogSpammerHack();
 	// public final LsdHack lsdHack = new LsdHack();
 	// public final MassTpaHack massTpaHack = new MassTpaHack();
@@ -133,6 +133,7 @@ public final class HackList implements UpdateListener
 	// public final ProtectHack protectHack = new ProtectHack();
 	// public final RadarHack radarHack = new RadarHack();
 	// public final RainbowUiHack rainbowUiHack = new RainbowUiHack();
+	public final ReachHack reachHack = new ReachHack();
 	// public final RegenHack regenHack = new RegenHack();
 	// public final RemoteViewHack remoteViewHack = new RemoteViewHack();
 	// public final SafeWalkHack safeWalkHack = new SafeWalkHack();
@@ -151,7 +152,7 @@ public final class HackList implements UpdateListener
 	// public final TiredHack tiredHack = new TiredHack();
 	// public final TpAuraHack tpAuraHack = new TpAuraHack();
 	// public final TrajectoriesHack trajectoriesHack = new TrajectoriesHack();
-	// public final TriggerBotHack triggerBotHack = new TriggerBotHack();
+	public final TriggerBotHack triggerBotHack = new TriggerBotHack();
 	// public final TrollPotionHack trollPotionHack = new TrollPotionHack();
 	// public final TrueSightHack trueSightHack = new TrueSightHack();
 	// public final TunnellerHack tunnellerHack = new TunnellerHack();

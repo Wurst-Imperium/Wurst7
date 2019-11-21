@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "ArmorItemMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
@@ -18,6 +19,7 @@
     "ClientPlayNetworkHandlerMixin",
     "FluidRendererMixin",
     "DeathScreenMixin",
+    "EntityMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
     "IngameHudMixin",

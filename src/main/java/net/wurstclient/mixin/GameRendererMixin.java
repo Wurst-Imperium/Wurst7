@@ -22,6 +22,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
+import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
 
 @Mixin(GameRenderer.class)
@@ -70,6 +71,16 @@ public class GameRendererMixin
 	{
 		return WurstClient.INSTANCE.getOtfs().zoomOtf
 			.changeFovBasedOnZoom(options.fov);
+	}
+	
+	@Inject(at = {@At(value = "INVOKE",
+		target = "Lnet/minecraft/entity/Entity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;",
+		opcode = Opcodes.INVOKEVIRTUAL,
+		ordinal = 0)}, method = {"updateTargetedEntity(F)V"})
+	private void onHitResultRayTrace(float float_1, CallbackInfo ci)
+	{
+		HitResultRayTraceEvent event = new HitResultRayTraceEvent(float_1);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
 	@Shadow
