@@ -15,10 +15,10 @@ import java.util.stream.StreamSupport;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -96,12 +96,11 @@ public final class ClickAuraHack extends Hack
 	
 	public ClickAuraHack()
 	{
-		super("ClickAura",
-			"Automatically attacks the closest valid entity\n"
-				+ "whenever you click.\n\n"
-				+ "§c§lWARNING:§r ClickAuras generally look more suspicious\n"
-				+ "than Killauras and are easier for plugins to detect.\n"
-				+ "It is recommended to use Killaura or TriggerBot instead.");
+		super("ClickAura", "Automatically attacks the closest valid entity\n"
+			+ "whenever you click.\n\n"
+			+ "ï¿½cï¿½lWARNING:ï¿½r ClickAuras generally look more suspicious\n"
+			+ "than Killauras and are easier for plugins to detect.\n"
+			+ "It is recommended to use Killaura or TriggerBot instead.");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);

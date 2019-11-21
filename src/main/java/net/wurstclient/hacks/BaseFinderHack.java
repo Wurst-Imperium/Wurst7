@@ -191,7 +191,7 @@ public final class BaseFinderHack extends Hack
 			// show message
 			if(messageTimer <= 0)
 			{
-				ChatUtils.warning("BaseFinder found §lA LOT§r of blocks.");
+				ChatUtils.warning("BaseFinder found ï¿½lA LOTï¿½r of blocks.");
 				ChatUtils.message(
 					"To prevent lag, it will only show the first 10000 blocks.");
 			}
@@ -207,7 +207,7 @@ public final class BaseFinderHack extends Hack
 		vertices.clear();
 		for(BlockPos pos : matchingBlocks)
 		{
-			if(!matchingBlocks.contains(pos.down()))
+			if(!matchingBlocks.contains(pos.method_10074()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 1, 0, 0);

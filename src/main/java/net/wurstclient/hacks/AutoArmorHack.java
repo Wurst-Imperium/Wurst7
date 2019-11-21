@@ -11,11 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -47,8 +46,8 @@ public final class AutoArmorHack extends Hack
 	private final CheckboxSetting swapWhileMoving =
 		new CheckboxSetting("Swap while moving",
 			"Whether or not to swap armor pieces\n"
-				+ "while the player is moving.\n\n" + ChatFormatting.RED
-				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
+				+ "while the player is moving.\n\n" + TextFormat.RED
+				+ TextFormat.BOLD + "WARNING:" + TextFormat.RESET
 				+ " This would not be possible\n"
 				+ "without cheats. It may raise suspicion.",
 			false);

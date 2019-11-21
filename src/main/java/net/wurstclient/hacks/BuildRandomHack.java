@@ -35,11 +35,10 @@ import net.wurstclient.util.RotationUtils.Rotation;
 public final class BuildRandomHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final EnumSetting<Mode> mode =
-		new EnumSetting<>("Mode",
-			"§lFast§r mode can place blocks behind other blocks.\n"
-				+ "§lLegit§r mode can bypass NoCheat+.",
-			Mode.values(), Mode.FAST);
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"ï¿½lFastï¿½r mode can place blocks behind other blocks.\n"
+			+ "ï¿½lLegitï¿½r mode can bypass NoCheat+.",
+		Mode.values(), Mode.FAST);
 	
 	private final Random random = new Random();
 	private BlockPos lastPos;

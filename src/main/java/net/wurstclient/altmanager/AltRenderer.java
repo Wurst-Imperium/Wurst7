@@ -32,7 +32,7 @@ public final class AltRenderer
 		
 		if(loadedSkins.contains(name))
 		{
-			mc.getTextureManager().bindTexture(location);
+			mc.getTextureManager().bindTextureInner(location);
 			return;
 		}
 		
@@ -47,7 +47,7 @@ public final class AltRenderer
 			e.printStackTrace();
 		}
 		
-		mc.getTextureManager().bindTexture(location);
+		mc.getTextureManager().bindTextureInner(location);
 		loadedSkins.add(name);
 	}
 	
