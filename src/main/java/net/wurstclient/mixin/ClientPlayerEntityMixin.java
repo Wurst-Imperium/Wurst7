@@ -25,6 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
+import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
@@ -101,6 +102,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
+	public void setVelocityClient(double x, double y, double z)
+	{
+		KnockbackEvent event = new KnockbackEvent(x, y, z);
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
+	}
+	
+	@Override
 	public boolean isInsideWater()
 	{
 		boolean inWater = super.isInsideWater();
@@ -126,5 +135,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public float getLastPitch()
 	{
 		return lastPitch;
+	}
+	
+	@Override
+	public void setMovementMultiplier(Vec3d movementMultiplier)
+	{
+		this.movementMultiplier = movementMultiplier;
 	}
 }

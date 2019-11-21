@@ -66,7 +66,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void despawn()
 	{
-		world.removeEntity(getEntityId());
+		removed = true;
 	}
 	
 	public void resetPlayerPosition()

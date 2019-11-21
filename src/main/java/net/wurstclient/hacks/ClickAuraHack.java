@@ -12,8 +12,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
@@ -29,11 +27,12 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
-import net.wurstclient.events.RenderListener;
+import net.wurstclient.SearchTags;
+import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -41,11 +40,12 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
-import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.RotationUtils.Rotation;
 
-public final class KillauraHack extends Hack
-	implements UpdateListener, RenderListener
+@SearchTags({"click aura", "ClickAimbot", "click aimbot"})
+public final class ClickAuraHack extends Hack
+	implements UpdateListener, LeftClickListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
@@ -94,11 +94,14 @@ public final class KillauraHack extends Hack
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
 	
-	private LivingEntity target;
-	
-	public KillauraHack()
+	public ClickAuraHack()
 	{
-		super("Killaura", "Automatically attacks entities around you.");
+		super("ClickAura", "Automatically attacks the closest valid entity\n"
+			+ "whenever you click.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r ClickAuras generally look more suspicious\n"
+			+ "than Killauras and are easier for plugins to detect.\n"
+			+ "It is recommended to use Killaura or TriggerBot instead.");
+		
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);
@@ -117,28 +120,45 @@ public final class KillauraHack extends Hack
 	}
 	
 	@Override
-	protected void onEnable()
+	public void onEnable()
 	{
 		// disable other killauras
-		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(LeftClickListener.class, this);
 	}
 	
 	@Override
-	protected void onDisable()
+	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
-		target = null;
+		EVENTS.remove(LeftClickListener.class, this);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		if(!MC.options.keyAttack.isPressed())
+			return;
+		
+		if(MC.player.getAttackCooldownProgress(0) < 1)
+			return;
+		
+		attack();
+	}
+	
+	@Override
+	public void onLeftClick(LeftClickEvent event)
+	{
+		attack();
+	}
+	
+	private void attack()
+	{
+		// set entity
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
 		
@@ -207,69 +227,21 @@ public final class KillauraHack extends Hack
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		LivingEntity target =
+			stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
 		
-		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+		// face entity
+		Rotation rotation = RotationUtils
+			.getNeededRotations(target.getBoundingBox().getCenter());
+		PlayerMoveC2SPacket.LookOnly packet = new PlayerMoveC2SPacket.LookOnly(
+			rotation.getYaw(), rotation.getPitch(), MC.player.onGround);
+		MC.player.networkHandler.sendPacket(packet);
+		
+		// attack entity
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
-	}
-	
-	@Override
-	public void onRender(float partialTicks)
-	{
-		if(target == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
-		
-		Box box = new Box(BlockPos.ORIGIN);
-		float p = (target.getHealthMaximum() - target.getHealth())
-			/ target.getHealthMaximum();
-		float red = p * 2F;
-		float green = 2 - red;
-		
-		GL11.glTranslated(
-			target.prevX + (target.x - target.prevX) * partialTicks,
-			target.prevY + (target.y - target.prevY) * partialTicks,
-			target.prevZ + (target.z - target.prevZ) * partialTicks);
-		GL11.glTranslated(0, 0.05, 0);
-		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
-		GL11.glTranslated(-0.5, 0, -0.5);
-		
-		if(p < 1)
-		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
-		}
-		
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		
-		GL11.glPopMatrix();
-		
-		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private enum Priority

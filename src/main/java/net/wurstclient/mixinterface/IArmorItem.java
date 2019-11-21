@@ -7,15 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.util.math.Vec3d;
-
-public interface IClientPlayerEntity
+public interface IArmorItem
 {
-	public void setNoClip(boolean noClip);
-	
-	public float getLastYaw();
-	
-	public float getLastPitch();
-	
-	public void setMovementMultiplier(Vec3d movementMultiplier);
+	public float getToughness();
 }

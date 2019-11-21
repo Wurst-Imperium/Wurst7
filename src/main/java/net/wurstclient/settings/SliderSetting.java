@@ -93,7 +93,7 @@ public class SliderSetting extends Setting implements SliderLock
 	
 	private void setValueIgnoreLock(double value)
 	{
-		value = (int)(value / increment) * increment;
+		value = (int)Math.round(value / increment) * increment;
 		value = MathUtils.clamp(value, usableMin, usableMax);
 		
 		this.value = value;
