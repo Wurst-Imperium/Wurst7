@@ -98,7 +98,7 @@ public final class ClickAuraHack extends Hack
 	{
 		super("ClickAura", "Automatically attacks the closest valid entity\n"
 			+ "whenever you click.\n\n"
-			+ "�c�lWARNING:�r ClickAuras generally look more suspicious\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r ClickAuras generally look more suspicious\n"
 			+ "than Killauras and are easier for plugins to detect.\n"
 			+ "It is recommended to use Killaura or TriggerBot instead.");
 		

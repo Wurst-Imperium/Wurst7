@@ -192,7 +192,8 @@ public final class BaseFinderHack extends Hack
 			// show message
 			if(messageTimer <= 0)
 			{
-				ChatUtils.warning("BaseFinder found �lA LOT�r of blocks.");
+				ChatUtils
+					.warning("BaseFinder found \u00a7lA LOT\u00a7r of blocks.");
 				ChatUtils.message(
 					"To prevent lag, it will only show the first 10000 blocks.");
 			}
