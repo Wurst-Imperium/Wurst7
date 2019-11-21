@@ -21,7 +21,7 @@ public final class CmdList
 	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
-	// public final BlinkCmd blinkCmd = new BlinkCmd();
+	public final BlinkCmd blinkCmd = new BlinkCmd();
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	// public final DamageCmd damageCmd = new DamageCmd();
@@ -61,7 +61,7 @@ public final class CmdList
 	public final TCmd tCmd = new TCmd();
 	// public final ThrowCmd throwCmd = new ThrowCmd();
 	// public final TpCmd tpCmd = new TpCmd();
-	// public final VClipCmd vClipCmd = new VClipCmd();
+	public final VClipCmd vClipCmd = new VClipCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
 	

@@ -15,6 +15,7 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.other_features.HackListOtf;
 import net.wurstclient.other_features.WurstLogoOtf;
+import net.wurstclient.other_features.ZoomOtf;
 
 public final class OtfList
 {
@@ -27,6 +28,7 @@ public final class OtfList
 	// public final TargetOtf targetOtf = new TargetOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
 	// public final YesCheatOtf yesCheatOtf = new YesCheatOtf();
+	public final ZoomOtf zoomOtf = new ZoomOtf();
 	
 	private final TreeMap<String, OtherFeature> otfs =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));

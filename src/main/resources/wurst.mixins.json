@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "ArmorItemMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
@@ -18,15 +19,20 @@
     "ClientPlayNetworkHandlerMixin",
     "FluidRendererMixin",
     "DeathScreenMixin",
+    "EntityMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
     "IngameHudMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
+    "MouseMixin",
     "MultiplayerScreenMixin",
+    "RenderTickCounterMixin",
     "ServerListMixin",
-    "TerrainRenderContextMixin"
+    "SignEditScreenMixin",
+    "TerrainRenderContextMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
