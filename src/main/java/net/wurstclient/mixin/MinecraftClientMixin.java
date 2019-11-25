@@ -24,7 +24,6 @@ import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
@@ -34,9 +33,9 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin extends ReentrantThreadExecutor<Runnable>
-	implements SnooperListener, WindowEventHandler, AutoCloseable,
-	IMinecraftClient
+public abstract class MinecraftClientMixin
+	extends ReentrantThreadExecutor<Runnable> implements SnooperListener,
+	WindowEventHandler, AutoCloseable, IMinecraftClient
 {
 	@Shadow
 	private int itemUseCooldown;
@@ -145,60 +144,5 @@ public class MinecraftClientMixin extends ReentrantThreadExecutor<Runnable>
 	private void doItemUse()
 	{
 		
-	}
-	
-	@Override
-	public void send(Runnable var1)
-	{
-		throw new RuntimeException();
-	}
-	
-	@Shadow
-	@Override
-	public void close()
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void onWindowFocusChanged(boolean var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void onResolutionChanged()
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void addSnooperInfo(Snooper var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	protected Runnable createTask(Runnable var1)
-	{
-		return null;
-	}
-	
-	@Shadow
-	@Override
-	protected boolean canExecute(Runnable var1)
-	{
-		return false;
-	}
-	
-	@Shadow
-	@Override
-	protected Thread getThread()
-	{
-		return null;
 	}
 }
