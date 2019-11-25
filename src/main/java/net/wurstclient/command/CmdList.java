@@ -47,7 +47,7 @@ public final class CmdList
 	// public final PathCmd pathCmd = new PathCmd();
 	// public final PotionCmd potionCmd = new PotionCmd();
 	// public final ProtectCmd protectCmd = new ProtectCmd();
-	// public final RenameCmd renameCmd = new RenameCmd();
+	public final RenameCmd renameCmd = new RenameCmd();
 	// public final RepairCmd repairCmd = new RepairCmd();
 	// public final RvCmd rvCmd = new RvCmd();
 	// public final SvCmd svCmd = new SvCmd();
