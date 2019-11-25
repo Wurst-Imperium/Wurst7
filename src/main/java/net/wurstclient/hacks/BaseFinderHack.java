@@ -209,7 +209,7 @@ public final class BaseFinderHack extends Hack
 		vertices.clear();
 		for(BlockPos pos : matchingBlocks)
 		{
-			if(!matchingBlocks.contains(pos.method_10074()))
+			if(!matchingBlocks.contains(pos.down()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 1, 0, 0);

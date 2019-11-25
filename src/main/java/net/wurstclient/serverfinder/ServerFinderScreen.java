@@ -187,7 +187,7 @@ public class ServerFinderScreen extends Screen
 								pingers.get(i).getServerIP(), false));
 						prevScreen.getServerList().saveFile();
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.method_20122(null);
+							.setSelected(null);
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
 							.setServers(prevScreen.getServerList());
 					}
