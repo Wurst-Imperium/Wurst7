@@ -294,9 +294,8 @@ public final class MobSpawnEspHack extends Hack
 						if(!state.getFluidState().isEmpty())
 							continue;
 						
-						BlockState stateDown =
-							world.getBlockState(pos.method_10074());
-						if(!stateDown.isFullOpaque(world, pos.method_10074()))
+						BlockState stateDown = world.getBlockState(pos.down());
+						if(!stateDown.isFullOpaque(world, pos.down()))
 							continue;
 						
 						blocks.add(pos);
