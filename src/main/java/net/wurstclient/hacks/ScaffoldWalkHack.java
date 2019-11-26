@@ -51,7 +51,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		BlockPos belowPlayer = new BlockPos(MC.player).method_10074();
+		BlockPos belowPlayer = new BlockPos(MC.player).down();
 		
 		// check if block is already placed
 		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())
@@ -74,8 +74,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 				continue;
 			
 			// filter out blocks that would fall
-			if(block instanceof FallingBlock && FallingBlock.canFallThrough(
-				BlockUtils.getState(belowPlayer.method_10074())))
+			if(block instanceof FallingBlock && FallingBlock
+				.canFallThrough(BlockUtils.getState(belowPlayer.down())))
 				continue;
 			
 			newSlot = i;

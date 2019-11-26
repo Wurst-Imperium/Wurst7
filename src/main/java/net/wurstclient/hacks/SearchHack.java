@@ -432,7 +432,7 @@ public final class SearchHack extends Hack
 	{
 		ArrayList<int[]> vertices = new ArrayList<>();
 		
-		if(!matchingBlocks.contains(pos.method_10074()))
+		if(!matchingBlocks.contains(pos.down()))
 		{
 			vertices.add(getVertex(pos, 0, 0, 0));
 			vertices.add(getVertex(pos, 1, 0, 0));
