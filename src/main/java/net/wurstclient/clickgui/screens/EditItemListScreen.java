@@ -7,12 +7,11 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
-
-import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -23,6 +22,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
@@ -257,7 +257,8 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				MatrixStack matrixStack = new MatrixStack();
+				GuiLighting.enableForItems(matrixStack.peek().getModel());
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				GuiLighting.disable();
@@ -273,8 +274,7 @@ public final class EditItemListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return ChatFormatting.ITALIC + "unknown item"
-					+ ChatFormatting.RESET;
+				return ChatFormatting.ITALIC + "unknown item" + ChatFormatting.RESET;
 				
 			}else
 			{
@@ -285,7 +285,8 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				MatrixStack matrixStack = new MatrixStack();
+				GuiLighting.enableForItems(matrixStack.peek().getModel());
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
 				GuiLighting.disable();
 				

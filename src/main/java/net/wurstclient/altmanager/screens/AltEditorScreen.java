@@ -71,7 +71,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		emailBox = new TextFieldWidget(font, width / 2 - 100, 60, 200, 20, "");
 		emailBox.setMaxLength(48);
-		emailBox.method_1876(true);
+		emailBox.setSelected(true);
 		emailBox.setText(getDefaultEmail());
 		children.add(emailBox);
 		

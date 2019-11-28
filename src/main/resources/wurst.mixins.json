@@ -17,6 +17,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
+    "FluidBlockMixin",
     "FluidRendererMixin",
     "DeathScreenMixin",
     "EntityMixin",

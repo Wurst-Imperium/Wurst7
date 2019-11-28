@@ -137,8 +137,7 @@ public final class ModifyCmd extends Command
 		{
 			String part = parts[i];
 			
-			if(!base.containsKey(part)
-				|| !(base.getTag(part) instanceof CompoundTag))
+			if(!base.containsKey(part) || !(base.getTag(part) instanceof CompoundTag))
 				return null;
 			
 			base = base.getCompound(part);

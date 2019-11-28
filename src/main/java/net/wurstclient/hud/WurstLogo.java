@@ -46,6 +46,7 @@ public final class WurstLogo
 		
 		// draw Wurst logo
 		GL11.glColor4f(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_BLEND);
 		WurstClient.MC.getTextureManager().bindTexture(texture);
 		DrawableHelper.blit(0, 3, 0, 0, 72, 18, 72, 18);
 	}

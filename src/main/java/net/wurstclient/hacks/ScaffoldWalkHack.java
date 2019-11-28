@@ -98,9 +98,9 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	
 	private boolean placeBlock(BlockPos pos)
 	{
-		Vec3d eyesPos = new Vec3d(MC.player.x,
-			MC.player.y + MC.player.getEyeHeight(MC.player.getPose()),
-			MC.player.z);
+		Vec3d eyesPos = new Vec3d(MC.player.getX(),
+			MC.player.getY() + MC.player.getEyeHeight(MC.player.getPose()),
+			MC.player.getZ());
 		
 		for(Direction side : Direction.values())
 		{

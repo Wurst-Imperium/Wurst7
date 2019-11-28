@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -19,8 +20,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
-
-import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -61,9 +60,9 @@ public final class MobSpawnEspHack extends Hack
 	{
 		super("MobSpawnESP",
 			"Highlights areas where mobs can spawn.\n" + ChatFormatting.YELLOW
-				+ "yellow" + ChatFormatting.RESET
-				+ " - mobs can spawn at night\n" + ChatFormatting.RED + "red"
-				+ ChatFormatting.RESET + " - mobs can always spawn");
+				+ "yellow" + ChatFormatting.RESET + " - mobs can spawn at night\n"
+				+ ChatFormatting.RED + "red" + ChatFormatting.RESET
+				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);

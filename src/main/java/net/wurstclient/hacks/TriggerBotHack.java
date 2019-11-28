@@ -123,7 +123,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		if(player.getAttackCooldownProgress(0) < 1)
 			return;
 		
-		if(MC.hitResult == null || !(MC.hitResult instanceof EntityHitResult))
+		if(MC.hitResult == null
+			|| !(MC.hitResult instanceof EntityHitResult))
 			return;
 		
 		Entity target = ((EntityHitResult)MC.hitResult).getEntity();

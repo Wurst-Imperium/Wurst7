@@ -186,6 +186,7 @@ public final class CheckboxComponent extends Component
 		MC.textRenderer.draw(name, tx, ty, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

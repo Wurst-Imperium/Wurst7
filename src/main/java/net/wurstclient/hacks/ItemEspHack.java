@@ -11,11 +11,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -33,8 +30,11 @@ import net.wurstclient.util.RotationUtils;
 public final class ItemEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	private final CheckboxSetting names =
-		new CheckboxSetting("Show item names", true);
+	private final CheckboxSetting names = new CheckboxSetting("Show item names",
+		"Sorry, this is currently broken!\n"
+			+ "19w39a changed how nameplates work\n"
+			+ "and we haven't figured it out yet.",
+		true);
 	
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
@@ -138,9 +138,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		{
 			GL11.glPushMatrix();
 			
-			GL11.glTranslated(e.prevX + (e.x - e.prevX) * partialTicks,
-				e.prevY + (e.y - e.prevY) * partialTicks,
-				e.prevZ + (e.z - e.prevZ) * partialTicks);
+			GL11.glTranslated(e.prevX + (e.getX() - e.prevX) * partialTicks,
+				e.prevY + (e.getY() - e.prevY) * partialTicks,
+				e.prevZ + (e.getZ() - e.prevZ) * partialTicks);
 			
 			if(style.getSelected().boxes)
 			{
@@ -153,13 +153,13 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			
 			if(names.isChecked())
 			{
-				ItemStack stack = e.getStack();
-				GameRenderer.renderFloatingText(MC.textRenderer,
-					stack.getCount() + "x "
-						+ stack.getName().asFormattedString(),
-					0, 1, 0, 0, MC.getEntityRenderManager().cameraYaw,
-					MC.getEntityRenderManager().cameraPitch, false);
-				GL11.glDisable(GL11.GL_LIGHTING);
+				// ItemStack stack = e.getStack();
+				// GameRenderer.renderFloatingText(MC.textRenderer,
+				// stack.getCount() + "x "
+				// + stack.getName().asFormattedString(),
+				// 0, 1, 0, 0, MC.getEntityRenderManager().cameraYaw,
+				// MC.getEntityRenderManager().cameraPitch, false);
+				// GL11.glDisable(GL11.GL_LIGHTING);
 			}
 			
 			GL11.glPopMatrix();
@@ -173,16 +173,15 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glColor4f(1, 1, 0, 0.5F);
 		
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(ItemEntity e : items)
 		{
-			Vec3d end = e.getBoundingBox().getCenter().subtract(
-				new Vec3d(e.x, e.y, e.z).subtract(e.prevX, e.prevY, e.prevZ)
+			Vec3d end = e.getBoundingBox().getCenter()
+				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
+					.subtract(e.prevX, e.prevY, e.prevZ)
 					.multiply(1 - partialTicks));
 			
 			GL11.glVertex3d(start.x, start.y, start.z);

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,8 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
-
-import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
@@ -54,8 +53,8 @@ public final class NukerHack extends Hack
 			+ " mode simply breaks everything\n" + "around you.\n"
 			+ ChatFormatting.BOLD + "ID" + ChatFormatting.RESET
 			+ " mode only breaks the selected block\n"
-			+ "type. Left-click on a block to select it.\n"
-			+ ChatFormatting.BOLD + "Flat" + ChatFormatting.RESET
+			+ "type. Left-click on a block to select it.\n" + ChatFormatting.BOLD
+			+ "Flat" + ChatFormatting.RESET
 			+ " mode flattens the area around you,\n" + "but won't dig down.\n"
 			+ ChatFormatting.BOLD + "Smash" + ChatFormatting.RESET
 			+ " mode only breaks blocks that\n"

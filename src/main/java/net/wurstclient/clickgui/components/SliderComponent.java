@@ -281,6 +281,7 @@ public final class SliderComponent extends Component
 		tr.draw(value, x2 - valueWidth, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

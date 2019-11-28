@@ -61,8 +61,8 @@ public final class KaboomHack extends Hack implements UpdateListener
 			return;
 		
 		// do explosion particles
-		new Explosion(MC.world, MC.player, MC.player.x, MC.player.y,
-			MC.player.z, 6F, false, Explosion.DestructionType.NONE)
+		new Explosion(MC.world, MC.player, MC.player.getX(), MC.player.getY(),
+			MC.player.getZ(), 6F, false, Explosion.DestructionType.NONE)
 				.affectWorld(true);
 		
 		// get valid blocks

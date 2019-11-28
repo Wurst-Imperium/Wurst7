@@ -8,7 +8,6 @@
 package net.wurstclient.other_features;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;

@@ -9,8 +9,10 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 
@@ -25,7 +27,7 @@ public enum RenderUtils
 		int width = endX - startX;
 		int height = endY - startY;
 		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.window.getScaleFactor();
+		double factor = WurstClient.MC.getWindow().getScaleFactor();
 		
 		int scissorX = (int)(startX * factor);
 		int scissorY = (int)(bottomY * factor);
@@ -36,9 +38,17 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.cameraEntity;
+		Vec3d camPos = camera.getPos();
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
+			0);
+		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
+	}
+	
+	public static Vec3d getCameraPos()
+	{
+		return BlockEntityRenderDispatcher.INSTANCE.cameraEntity.getPos();
 	}
 	
 	public static void drawSolidBox()

@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
 import net.wurstclient.WurstClient;
@@ -28,13 +29,13 @@ import net.wurstclient.events.RenderListener.RenderEvent;
 public class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloadListener
 {
-	@Redirect(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/render/GameRenderer;bobView(F)V",
-			ordinal = 0),
-		method = {"applyCameraTransformations(F)V"})
-	private void onCameraTransformViewBobbing(GameRenderer gameRenderer,
-		float partalTicks)
+	@Redirect(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
+		ordinal = 0),
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
+		MatrixStack matrixStack, float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
@@ -43,15 +44,18 @@ public class GameRendererMixin
 		if(event.isCancelled())
 			return;
 		
-		bobView(partalTicks);
+		bobView(matrixStack, partalTicks);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0)}, method = {"renderCenter(FJ)V"})
-	private void onRenderCenter(float partialTicks, long finishTimeNano,
-		CallbackInfo ci)
+	@Inject(
+		at = {@At(value = "FIELD",
+			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0)},
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+	private void onRenderWorld(float partialTicks, long finishTimeNano,
+		MatrixStack matrixStack, CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
@@ -80,7 +84,7 @@ public class GameRendererMixin
 	}
 	
 	@Shadow
-	private void bobView(float partalTicks)
+	private void bobView(MatrixStack matrixStack, float partalTicks)
 	{
 		
 	}

@@ -22,8 +22,9 @@ public enum RotationUtils
 	{
 		ClientPlayerEntity player = WurstClient.MC.player;
 		
-		return new Vec3d(player.x,
-			player.y + player.getEyeHeight(player.getPose()), player.z);
+		return new Vec3d(player.getX(),
+			player.getY() + player.getEyeHeight(player.getPose()),
+			player.getZ());
 	}
 	
 	public static Vec3d getClientLookVec()
