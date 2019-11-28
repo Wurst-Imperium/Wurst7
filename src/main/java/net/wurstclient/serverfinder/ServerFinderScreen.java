@@ -22,7 +22,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.SystemUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
-import net.wurstclient.serverfinder.ServerFinderScreen.ServerFinderState;
 import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
@@ -60,7 +59,7 @@ public class ServerFinderScreen extends Screen
 		ipBox = new TextFieldWidget(font, width / 2 - 100, height / 4 + 34, 200,
 			20, "");
 		ipBox.setMaxLength(200);
-		ipBox.setSelected(true);
+		ipBox.method_1876(true);
 		children.add(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(font, width / 2 - 32,
@@ -188,9 +187,9 @@ public class ServerFinderScreen extends Screen
 								pingers.get(i).getServerIP(), false));
 						prevScreen.getServerList().saveFile();
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.setSelected(null);
+							.method_20122(null);
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.setServers(prevScreen.getServerList());
+							.method_20125(prevScreen.getServerList());
 					}
 				}
 				pingers.remove(i);

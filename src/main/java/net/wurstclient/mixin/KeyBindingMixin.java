@@ -32,7 +32,7 @@ public class KeyBindingMixin implements IKeyBinding
 	@Override
 	public boolean isActallyPressed()
 	{
-		long handle = WurstClient.MC.getWindow().getHandle();
+		long handle = WurstClient.MC.window.getHandle();
 		int code = keyCode.getKeyCode();
 		return InputUtil.isKeyPressed(handle, code);
 	}

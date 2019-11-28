@@ -9,6 +9,7 @@ package net.wurstclient.serverfinder;
 
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import net.minecraft.client.network.ServerEntryNetworkPart;
 import net.minecraft.client.options.ServerEntry;
 
@@ -53,7 +54,7 @@ public class WurstServerPinger
 			failed = true;
 		}
 		
-		pinger.cancel();
+		pinger.method_3004();
 		done = true;
 	}
 	

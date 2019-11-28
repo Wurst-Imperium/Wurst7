@@ -7,10 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;

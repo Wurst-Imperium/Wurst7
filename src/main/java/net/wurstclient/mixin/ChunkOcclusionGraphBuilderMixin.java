@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.render.chunk.ChunkOcclusionGraphBuilder;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.WurstClient;
