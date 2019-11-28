@@ -21,7 +21,7 @@ import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.world.ExtendedBlockView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
@@ -34,7 +34,7 @@ public abstract class BlockModelRendererMixin
 			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z",
 			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z"},
 		cancellable = true)
-	private void onRenderSmoothOrFlat(BlockRenderView blockRenderView_1,
+	private void onRenderSmoothOrFlat(ExtendedBlockView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
 		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
 		boolean depthTest, Random random_1, long long_1, int int_1,
@@ -62,7 +62,7 @@ public abstract class BlockModelRendererMixin
 	}
 	
 	@Shadow
-	public boolean renderSmooth(BlockRenderView blockRenderView_1,
+	public boolean renderSmooth(ExtendedBlockView blockRenderView_1,
 		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
 		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
 		boolean boolean_1, Random random_1, long long_1, int int_1)

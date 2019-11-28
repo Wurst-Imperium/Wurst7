@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
@@ -22,7 +23,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
@@ -272,7 +272,7 @@ public final class EditBlockListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
+				return ChatFormatting.ITALIC + "unknown block" + ChatFormatting.RESET;
 				
 			}else
 			{

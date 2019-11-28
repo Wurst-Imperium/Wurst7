@@ -663,14 +663,14 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
+	public void handleChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onChunkRenderDistanceCenter(
+	public void handleChunkRenderDistanceCenter(
 		ChunkRenderDistanceCenterS2CPacket var1)
 	{
 		
@@ -678,7 +678,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void handlePlayerActionResponse(PlayerActionResponseS2CPacket var1)
+	public void handlePlayerActionResponse(BlockPlayerActionS2CPacket var1)
 	{
 		
 	}

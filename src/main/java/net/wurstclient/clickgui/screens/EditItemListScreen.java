@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
@@ -21,7 +22,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -274,7 +274,7 @@ public final class EditItemListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return TextFormat.ITALIC + "unknown item" + TextFormat.RESET;
+				return ChatFormatting.ITALIC + "unknown item" + ChatFormatting.RESET;
 				
 			}else
 			{

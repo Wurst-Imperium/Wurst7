@@ -8,12 +8,11 @@
 package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
-
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
@@ -164,7 +163,7 @@ public final class BlockComponent extends Component
 	private String getBlockName(ItemStack stack)
 	{
 		if(stack.isEmpty())
-			return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
+			return ChatFormatting.ITALIC + "unknown block" + ChatFormatting.RESET;
 		else
 			return stack.getName().asFormattedString();
 	}

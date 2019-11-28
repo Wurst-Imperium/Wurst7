@@ -13,10 +13,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -123,11 +123,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		if(player.getAttackCooldownProgress(0) < 1)
 			return;
 		
-		if(MC.crosshairTarget == null
-			|| !(MC.crosshairTarget instanceof EntityHitResult))
+		if(MC.hitResult == null
+			|| !(MC.hitResult instanceof EntityHitResult))
 			return;
 		
-		Entity target = ((EntityHitResult)MC.crosshairTarget).getEntity();
+		Entity target = ((EntityHitResult)MC.hitResult).getEntity();
 		if(!isCorrectEntity(target))
 			return;
 		

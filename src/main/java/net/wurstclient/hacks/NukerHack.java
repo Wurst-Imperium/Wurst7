@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,7 +23,6 @@ import java.util.stream.Stream;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,14 +49,14 @@ public final class NukerHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		TextFormat.BOLD + "Normal" + TextFormat.RESET
+		ChatFormatting.BOLD + "Normal" + ChatFormatting.RESET
 			+ " mode simply breaks everything\n" + "around you.\n"
-			+ TextFormat.BOLD + "ID" + TextFormat.RESET
+			+ ChatFormatting.BOLD + "ID" + ChatFormatting.RESET
 			+ " mode only breaks the selected block\n"
-			+ "type. Left-click on a block to select it.\n" + TextFormat.BOLD
-			+ "Flat" + TextFormat.RESET
+			+ "type. Left-click on a block to select it.\n" + ChatFormatting.BOLD
+			+ "Flat" + ChatFormatting.RESET
 			+ " mode flattens the area around you,\n" + "but won't dig down.\n"
-			+ TextFormat.BOLD + "Smash" + TextFormat.RESET
+			+ ChatFormatting.BOLD + "Smash" + ChatFormatting.RESET
 			+ " mode only breaks blocks that\n"
 			+ "can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
@@ -187,11 +187,11 @@ public final class NukerHack extends Hack
 		if(mode.getSelected() != Mode.ID)
 			return;
 		
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
+		if(MC.hitResult == null
+			|| MC.hitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		BlockHitResult blockHitResult = (BlockHitResult)MC.crosshairTarget;
+		BlockHitResult blockHitResult = (BlockHitResult)MC.hitResult;
 		BlockPos pos = new BlockPos(blockHitResult.getBlockPos());
 		id = BlockUtils.getName(pos);
 	}

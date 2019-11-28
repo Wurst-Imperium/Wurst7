@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import net.minecraft.util.SystemUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -67,7 +67,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
 			20, "Open Skin Folder",
-			b -> Util.getOperatingSystem().open(skinFolder.toFile())));
+			b -> SystemUtil.getOperatingSystem().open(skinFolder.toFile())));
 		
 		emailBox = new TextFieldWidget(font, width / 2 - 100, 60, 200, 20, "");
 		emailBox.setMaxLength(48);
