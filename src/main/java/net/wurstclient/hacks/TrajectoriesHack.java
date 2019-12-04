@@ -1,9 +1,8 @@
 package net.wurstclient.hacks;
 
-import com.google.common.collect.Streams;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,14 +10,11 @@ import net.minecraft.item.*;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.TrajectoryPath;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TrajectoriesHack extends Hack implements RenderListener {
 
@@ -56,10 +52,13 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2.0f);
+		Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
 
-
-
-		//RenderUtils.drawSolidBox(new AxisAlignedBB(new BlockPos(0 - TileEntityRendererDispatcher.staticPlayerX, 100 - TileEntityRendererDispatcher.staticPlayerY, 0 - TileEntityRendererDispatcher.staticPlayerZ)));
+		// Minecraft 1.15+ handles rotations and transforms relative to the camera position.
+		// This code "undoes" the rotation and places it relative to Minecraftian x/y/z coords.
+		// Fun fact - it took dozens of hours to come up with this. :facepalm:
+		GL11.glRotated(camera.getPitch(), 1, 0, 0);
+		GL11.glRotated(camera.getYaw() + 180, 0, 1, 0);
 
 		for (Entity e : MC.world.getEntities())
 		{
@@ -74,11 +73,12 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 			double defaultalpha = (DEFAULT_COLOR & 0x000000FF) / 255d;
 
 			GL11.glBegin(GL11.GL_LINE_STRIP);
+
 			for (Vec3d point : path)
 			{
 				//System.out.println("R: " + defaultred + ", G: " + defaultgreen + ", B: " + defaultblue + ", A: " + defaultalpha);
 				GL11.glColor4d(defaultred, defaultgreen, defaultblue, defaultalpha);
-				GL11.glVertex3d(point.x - BlockEntityRenderDispatcher.renderOffsetX, point.y - BlockEntityRenderDispatcher.renderOffsetY , point.z - BlockEntityRenderDispatcher.renderOffsetZ);
+				GL11.glVertex3d(point.x - BlockEntityRenderDispatcher.INSTANCE.camera.getPos().x, point.y - BlockEntityRenderDispatcher.INSTANCE.camera.getPos().y , point.z - BlockEntityRenderDispatcher.INSTANCE.camera.getPos().z);
 			}
 			GL11.glEnd();
 		}
@@ -124,9 +124,9 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		// The three values indicate the arrow's position in space, using standard Minecraft coordinates.
 		// They will be updated each cycle until arrow impacts.
 		// Obviously, at this point, these values are very close to the firing entity's pos.
-		double arrowPosX = entity.prevRenderX + (entity.x - entity.prevRenderX) * MinecraftClient.getInstance().getTickDelta() - Math.cos((float)Math.toRadians(entity.yaw)) * 0.16f;
-		double arrowPosY = entity.prevRenderY + (entity.y - entity.prevRenderY) * MinecraftClient.getInstance().getTickDelta() + entity.getStandingEyeHeight() - 0.1;
-		double arrowPosZ = entity.prevRenderZ + (entity.z - entity.prevRenderZ) * MinecraftClient.getInstance().getTickDelta() - Math.sin((float)Math.toRadians(entity.yaw)) * 0.16f;
+		double arrowPosX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * MinecraftClient.getInstance().getTickDelta() - Math.cos((float)Math.toRadians(entity.yaw)) * 0.16f;
+		double arrowPosY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * MinecraftClient.getInstance().getTickDelta() + entity.getStandingEyeHeight() - 0.1;
+		double arrowPosZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * MinecraftClient.getInstance().getTickDelta() - Math.sin((float)Math.toRadians(entity.yaw)) * 0.16f;
 
 		// Motion factor. Arrows go faster than snowballs and all that...
 		double projectileMotionFactor = (item instanceof BowItem) ? 1.0 : 0.4;
@@ -174,7 +174,7 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		// Specifies the ballistic drop for various items. Smaller values means less drop, so greater range.
 		double gravity = (item instanceof BowItem || item instanceof CrossbowItem) ? 0.05 :
 				((item instanceof PotionItem) ? 0.4 : ((item instanceof FishingRodItem) ? 0.15 : (item instanceof TridentItem) ? 0.015 :0.03));
-
+		//gravity = 0;
 		for (int i = 0; i < MAX_POINTS; i++)
 		{
 			// Add this point (in absolute space) to the path.
