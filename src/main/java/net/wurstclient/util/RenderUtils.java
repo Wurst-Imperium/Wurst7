@@ -9,8 +9,10 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 
@@ -25,7 +27,7 @@ public enum RenderUtils
 		int width = endX - startX;
 		int height = endY - startY;
 		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.window.getScaleFactor();
+		double factor = WurstClient.MC.getWindow().getScaleFactor();
 		
 		int scissorX = (int)(startX * factor);
 		int scissorY = (int)(bottomY * factor);
@@ -36,9 +38,17 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
+		Vec3d camPos = camera.getPos();
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
+		GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
+			0);
+		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
+	}
+	
+	public static Vec3d getCameraPos()
+	{
+		return BlockEntityRenderDispatcher.INSTANCE.camera.getPos();
 	}
 	
 	public static void drawSolidBox()
@@ -49,35 +59,35 @@ public enum RenderUtils
 	public static void drawSolidBox(Box bb)
 	{
 		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
 		GL11.glEnd();
 	}
 	
@@ -89,41 +99,41 @@ public enum RenderUtils
 	public static void drawOutlinedBox(Box bb)
 	{
 		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
 		GL11.glEnd();
 	}
 	
@@ -135,85 +145,85 @@ public enum RenderUtils
 	public static void drawCrossBox(Box bb)
 	{
 		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y2, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y2, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z1);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z2);
 		
-		GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+		GL11.glVertex3d(bb.x2, bb.y1, bb.z2);
+		GL11.glVertex3d(bb.x1, bb.y1, bb.z1);
 		GL11.glEnd();
 	}
 	
 	public static void drawNode(Box bb)
 	{
-		double midX = (bb.minX + bb.maxX) / 2;
-		double midY = (bb.minY + bb.maxY) / 2;
-		double midZ = (bb.minZ + bb.maxZ) / 2;
+		double midX = (bb.x1 + bb.x2) / 2;
+		double midY = (bb.y1 + bb.y2) / 2;
+		double midZ = (bb.z1 + bb.z2) / 2;
 		
-		GL11.glVertex3d(midX, midY, bb.maxZ);
-		GL11.glVertex3d(bb.minX, midY, midZ);
+		GL11.glVertex3d(midX, midY, bb.z2);
+		GL11.glVertex3d(bb.x1, midY, midZ);
 		
-		GL11.glVertex3d(bb.minX, midY, midZ);
-		GL11.glVertex3d(midX, midY, bb.minZ);
+		GL11.glVertex3d(bb.x1, midY, midZ);
+		GL11.glVertex3d(midX, midY, bb.z1);
 		
-		GL11.glVertex3d(midX, midY, bb.minZ);
-		GL11.glVertex3d(bb.maxX, midY, midZ);
+		GL11.glVertex3d(midX, midY, bb.z1);
+		GL11.glVertex3d(bb.x2, midY, midZ);
 		
-		GL11.glVertex3d(bb.maxX, midY, midZ);
-		GL11.glVertex3d(midX, midY, bb.maxZ);
+		GL11.glVertex3d(bb.x2, midY, midZ);
+		GL11.glVertex3d(midX, midY, bb.z2);
 		
-		GL11.glVertex3d(midX, bb.maxY, midZ);
-		GL11.glVertex3d(bb.maxX, midY, midZ);
+		GL11.glVertex3d(midX, bb.y2, midZ);
+		GL11.glVertex3d(bb.x2, midY, midZ);
 		
-		GL11.glVertex3d(midX, bb.maxY, midZ);
-		GL11.glVertex3d(bb.minX, midY, midZ);
+		GL11.glVertex3d(midX, bb.y2, midZ);
+		GL11.glVertex3d(bb.x1, midY, midZ);
 		
-		GL11.glVertex3d(midX, bb.maxY, midZ);
-		GL11.glVertex3d(midX, midY, bb.minZ);
+		GL11.glVertex3d(midX, bb.y2, midZ);
+		GL11.glVertex3d(midX, midY, bb.z1);
 		
-		GL11.glVertex3d(midX, bb.maxY, midZ);
-		GL11.glVertex3d(midX, midY, bb.maxZ);
+		GL11.glVertex3d(midX, bb.y2, midZ);
+		GL11.glVertex3d(midX, midY, bb.z2);
 		
-		GL11.glVertex3d(midX, bb.minY, midZ);
-		GL11.glVertex3d(bb.maxX, midY, midZ);
+		GL11.glVertex3d(midX, bb.y1, midZ);
+		GL11.glVertex3d(bb.x2, midY, midZ);
 		
-		GL11.glVertex3d(midX, bb.minY, midZ);
-		GL11.glVertex3d(bb.minX, midY, midZ);
+		GL11.glVertex3d(midX, bb.y1, midZ);
+		GL11.glVertex3d(bb.x1, midY, midZ);
 		
-		GL11.glVertex3d(midX, bb.minY, midZ);
-		GL11.glVertex3d(midX, midY, bb.minZ);
+		GL11.glVertex3d(midX, bb.y1, midZ);
+		GL11.glVertex3d(midX, midY, bb.z1);
 		
-		GL11.glVertex3d(midX, bb.minY, midZ);
-		GL11.glVertex3d(midX, midY, bb.maxZ);
+		GL11.glVertex3d(midX, bb.y1, midZ);
+		GL11.glVertex3d(midX, midY, bb.z2);
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to)

@@ -21,7 +21,7 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 public class IngameHudMixin extends DrawableHelper
 {
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
+		target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
 		ordinal = 4)}, method = {"render(F)V"})
 	private void onRender(float partialTicks, CallbackInfo ci)
 	{

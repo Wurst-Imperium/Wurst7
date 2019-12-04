@@ -90,7 +90,7 @@ public final class ClickGui
 		
 		int x = 5;
 		int y = 5;
-		net.minecraft.client.util.Window sr = MC.window;
+		net.minecraft.client.util.Window sr = MC.getWindow();
 		for(Window window : windows)
 		{
 			window.pack();
@@ -560,6 +560,7 @@ public final class ClickGui
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 					0xffffff);
+			GL11.glEnable(GL11.GL_BLEND);
 			
 			GL11.glPopMatrix();
 		}
@@ -703,7 +704,7 @@ public final class ClickGui
 			GL11.glVertex2i(x4, y3);
 			GL11.glEnd();
 			
-			net.minecraft.client.util.Window sr = MC.window;
+			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
 			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
 				window.getWidth() * sf, (y2 - y3) * sf);
@@ -835,6 +836,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
 		fr.draw(title, x1 + 2, y1 + 3, 0xf0f0f0);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	private void renderTitleBarButton(int x1, int y1, int x2, int y2,

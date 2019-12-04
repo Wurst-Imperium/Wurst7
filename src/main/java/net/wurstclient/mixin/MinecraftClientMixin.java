@@ -7,23 +7,25 @@
  */
 package net.wurstclient.mixin;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.NonBlockingThreadExecutor;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
+import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -31,9 +33,9 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
-	implements SnooperListener, WindowEventHandler, AutoCloseable,
-	IMinecraftClient
+public abstract class MinecraftClientMixin
+	extends ReentrantThreadExecutor<Runnable> implements SnooperListener,
+	WindowEventHandler, AutoCloseable, IMinecraftClient
 {
 	@Shadow
 	private int itemUseCooldown;
@@ -42,7 +44,9 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	@Shadow
 	private ClientPlayerEntity player;
 	@Shadow
-	public Mouse mouse;
+	private Session session;
+	
+	private Session wurstSession;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -50,7 +54,7 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 	}
 	
 	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;hitResult:Lnet/minecraft/util/hit/HitResult;",
+		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
 		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
 	private void onDoAttack(CallbackInfo ci)
 	{
@@ -67,12 +71,37 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		HitResult hitResult = WurstClient.MC.hitResult;
+		HitResult hitResult = WurstClient.MC.crosshairTarget;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.ENTITY)
 			return;
 		
 		Entity entity = ((EntityHitResult)hitResult).getEntity();
 		WurstClient.INSTANCE.getFriends().middleClick(entity);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"getSession()Lnet/minecraft/client/util/Session;"},
+		cancellable = true)
+	private void onGetSession(CallbackInfoReturnable<Session> cir)
+	{
+		if(wurstSession == null)
+			return;
+		
+		cir.setReturnValue(wurstSession);
+	}
+	
+	@Redirect(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0),
+		method = {
+			"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
+	private Session getSessionForSessionProperties(MinecraftClient mc)
+	{
+		if(wurstSession != null)
+			return wurstSession;
+		else
+			return session;
 	}
 	
 	@Override
@@ -105,71 +134,15 @@ public class MinecraftClientMixin extends NonBlockingThreadExecutor<Runnable>
 		return (IClientPlayerInteractionManager)interactionManager;
 	}
 	
+	@Override
+	public void setSession(Session session)
+	{
+		wurstSession = session;
+	}
+	
 	@Shadow
 	private void doItemUse()
 	{
 		
-	}
-	
-	@Override
-	public void send(Runnable var1)
-	{
-		throw new RuntimeException();
-	}
-	
-	@Shadow
-	@Override
-	public void close()
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void onWindowFocusChanged(boolean var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void updateDisplay(boolean var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void onResolutionChanged()
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void addSnooperInfo(Snooper var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	protected Runnable prepareRunnable(Runnable var1)
-	{
-		return null;
-	}
-	
-	@Shadow
-	@Override
-	protected boolean canRun(Runnable var1)
-	{
-		return false;
-	}
-	
-	@Shadow
-	@Override
-	protected Thread getThread()
-	{
-		return null;
 	}
 }

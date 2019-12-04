@@ -137,14 +137,13 @@ public final class ModifyCmd extends Command
 		{
 			String part = parts[i];
 			
-			if(!base.containsKey(part)
-				|| !(base.getTag(part) instanceof CompoundTag))
+			if(!base.contains(part) || !(base.get(part) instanceof CompoundTag))
 				return null;
 			
 			base = base.getCompound(part);
 		}
 		
-		if(!base.containsKey(parts[parts.length - 1]))
+		if(!base.contains(parts[parts.length - 1]))
 			return null;
 		
 		return new NbtPath(base, parts[parts.length - 1]);

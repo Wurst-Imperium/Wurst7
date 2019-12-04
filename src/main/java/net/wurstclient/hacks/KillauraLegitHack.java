@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -123,7 +123,11 @@ public final class KillauraLegitHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		// disable other killauras
+		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().triggerBotHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -277,15 +281,15 @@ public final class KillauraLegitHack extends Hack
 		RenderUtils.applyRenderOffset();
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = (target.getHealthMaximum() - target.getHealth())
-			/ target.getHealthMaximum();
+		float p = (target.getMaximumHealth() - target.getHealth())
+			/ target.getMaximumHealth();
 		float red = p * 2F;
 		float green = 2 - red;
 		
 		GL11.glTranslated(
-			target.prevX + (target.x - target.prevX) * partialTicks,
-			target.prevY + (target.y - target.prevY) * partialTicks,
-			target.prevZ + (target.z - target.prevZ) * partialTicks);
+			target.prevX + (target.getX() - target.prevX) * partialTicks,
+			target.prevY + (target.getY() - target.prevY) * partialTicks,
+			target.prevZ + (target.getZ() - target.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);

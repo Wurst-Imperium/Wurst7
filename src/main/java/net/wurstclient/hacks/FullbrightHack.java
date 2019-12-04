@@ -81,7 +81,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	private void applyNightVision()
 	{
-		MC.player.addPotionEffect(new StatusEffectInstance(
+		MC.player.addStatusEffect(new StatusEffectInstance(
 			StatusEffects.NIGHT_VISION, 16360, 0, false, false));
 		hasAppliedNightVision = true;
 	}
@@ -91,7 +91,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		if(!hasAppliedNightVision)
 			return;
 		
-		MC.player.removePotionEffect(StatusEffects.NIGHT_VISION);
+		MC.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
 		hasAppliedNightVision = false;
 	}
 	

@@ -21,7 +21,7 @@ public final class CmdList
 	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
-	// public final BlinkCmd blinkCmd = new BlinkCmd();
+	public final BlinkCmd blinkCmd = new BlinkCmd();
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	// public final DamageCmd damageCmd = new DamageCmd();
@@ -33,7 +33,7 @@ public final class CmdList
 	public final FriendsCmd friendsCmd = new FriendsCmd();
 	// public final GetPosCmd getPosCmd = new GetPosCmd();
 	// public final GhostHandCmd ghostHandCmd = new GhostHandCmd();
-	// public final GiveCmd giveCmd = new GiveCmd();
+	public final GiveCmd giveCmd = new GiveCmd();
 	public final GmCmd gmCmd = new GmCmd();
 	// public final GoToCmd goToCmd = new GoToCmd();
 	public final HelpCmd helpCmd = new HelpCmd();
@@ -47,7 +47,7 @@ public final class CmdList
 	// public final PathCmd pathCmd = new PathCmd();
 	// public final PotionCmd potionCmd = new PotionCmd();
 	// public final ProtectCmd protectCmd = new ProtectCmd();
-	// public final RenameCmd renameCmd = new RenameCmd();
+	public final RenameCmd renameCmd = new RenameCmd();
 	// public final RepairCmd repairCmd = new RepairCmd();
 	// public final RvCmd rvCmd = new RvCmd();
 	// public final SvCmd svCmd = new SvCmd();
@@ -60,8 +60,8 @@ public final class CmdList
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
 	// public final ThrowCmd throwCmd = new ThrowCmd();
-	// public final TpCmd tpCmd = new TpCmd();
-	// public final VClipCmd vClipCmd = new VClipCmd();
+	public final TpCmd tpCmd = new TpCmd();
+	public final VClipCmd vClipCmd = new VClipCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
 	

@@ -13,7 +13,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 
@@ -21,12 +23,15 @@ import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = {@At("HEAD")},
-		method = {"render(Lnet/minecraft/block/entity/BlockEntity;FI)V"},
+		method = {
+			"render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V"},
 		cancellable = true)
-	private void onRender(BlockEntity blockEntity, float partialTicks,
-		int destroyStage, CallbackInfo ci)
+	private <E extends BlockEntity> void onRender(E blockEntity_1,
+		float float_1, MatrixStack matrixStack_1,
+		VertexConsumerProvider vertexConsumerProvider_1, CallbackInfo ci)
 	{
-		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
+		RenderBlockEntityEvent event =
+			new RenderBlockEntityEvent(blockEntity_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())

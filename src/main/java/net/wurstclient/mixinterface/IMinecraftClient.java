@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixinterface;
 
+import net.minecraft.client.util.Session;
+
 public interface IMinecraftClient
 {
 	public void rightClick();
@@ -18,4 +20,6 @@ public interface IMinecraftClient
 	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();
+	
+	public void setSession(Session session);
 }

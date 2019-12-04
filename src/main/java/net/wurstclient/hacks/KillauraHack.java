@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -33,6 +33,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
+import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -45,7 +46,7 @@ import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 public final class KillauraHack extends Hack
-	implements UpdateListener, RenderListener
+	implements UpdateListener, PostMotionListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
@@ -95,6 +96,7 @@ public final class KillauraHack extends Hack
 		"Filter invisible", "Won't attack invisible entities.", false);
 	
 	private LivingEntity target;
+	private LivingEntity renderTarget;
 	
 	public KillauraHack()
 	{
@@ -119,8 +121,13 @@ public final class KillauraHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		// disable other killauras
+		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().triggerBotHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PostMotionListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -128,8 +135,11 @@ public final class KillauraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PostMotionListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		
 		target = null;
+		renderTarget = null;
 	}
 	
 	@Override
@@ -204,19 +214,31 @@ public final class KillauraHack extends Hack
 			stream = stream.filter(e -> !e.isInvisible());
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
+		renderTarget = target;
 		if(target == null)
 			return;
 		
 		WURST.getRotationFaker()
 			.faceVectorPacket(target.getBoundingBox().getCenter());
+	}
+	
+	@Override
+	public void onPostMotion()
+	{
+		if(target == null)
+			return;
+		
+		ClientPlayerEntity player = MC.player;
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
+		
+		target = null;
 	}
 	
 	@Override
 	public void onRender(float partialTicks)
 	{
-		if(target == null)
+		if(renderTarget == null)
 			return;
 		
 		// GL settings
@@ -232,17 +254,21 @@ public final class KillauraHack extends Hack
 		RenderUtils.applyRenderOffset();
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = (target.getHealthMaximum() - target.getHealth())
-			/ target.getHealthMaximum();
+		float p = (renderTarget.getMaximumHealth() - renderTarget.getHealth())
+			/ renderTarget.getMaximumHealth();
 		float red = p * 2F;
 		float green = 2 - red;
 		
 		GL11.glTranslated(
-			target.prevX + (target.x - target.prevX) * partialTicks,
-			target.prevY + (target.y - target.prevY) * partialTicks,
-			target.prevZ + (target.z - target.prevZ) * partialTicks);
+			renderTarget.prevX
+				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
+			renderTarget.prevY
+				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
+			renderTarget.prevZ
+				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
-		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
+		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
+			renderTarget.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);
 		
 		if(p < 1)

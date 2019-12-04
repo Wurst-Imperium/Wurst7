@@ -80,7 +80,7 @@ public enum BlockBreaker
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
 		
 		// damage block
-		if(!MC.interactionManager.method_2902(pos, side))
+		if(!MC.interactionManager.updateBlockBreakingProgress(pos, side))
 			return false;
 		
 		// swing arm
