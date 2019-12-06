@@ -1,21 +1,17 @@
 package net.wurstclient.hacks;
 
-import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.ErrorUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Method;
-import java.util.function.Consumer;
 
 @SearchTags({"AutoClicker", "auto clicker"})
 public final class ClickHack extends Hack implements UpdateListener
@@ -84,17 +80,6 @@ public final class ClickHack extends Hack implements UpdateListener
     {
         LEFT_CLICK("Left Click", GLFW.GLFW_MOUSE_BUTTON_LEFT),
         RIGHT_CLICK("Right Click", GLFW.GLFW_MOUSE_BUTTON_RIGHT);
-
-        /*
-        mouseTriggerMethod -> {
-            System.out.println("click");
-            ErrorUtil.runUnchecked(() -> {
-                mouseTriggerMethod.invoke(MC.mouse, MC.getWindow().getHandle(),
-                        GLFW.GLFW_MOUSE_BUTTON_RIGHT, GLFW.GLFW_PRESS, 0);
-                mouseTriggerMethod.invoke(MC.mouse, MC.getWindow().getHandle(),
-                        GLFW.GLFW_MOUSE_BUTTON_RIGHT, GLFW.GLFW_RELEASE, 0);
-            }
-         */
 
         private final String name;
         private final InputUtil.KeyCode keyCode;
