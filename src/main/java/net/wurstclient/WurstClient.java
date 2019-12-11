@@ -135,7 +135,7 @@ public enum WurstClient
 	
 	private Path createWurstFolder()
 	{
-		Path dotMinecraftFolder = MC.runDirectory.toPath();
+		Path dotMinecraftFolder = MC.runDirectory.toPath().normalize();
 		Path wurstFolder = dotMinecraftFolder.resolve("wurst");
 		
 		try
