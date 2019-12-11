@@ -40,6 +40,7 @@ public final class FileSetting extends Setting
 		super(name, description);
 		folder = WurstClient.INSTANCE.getWurstFolder().resolve(folderName);
 		this.createDefaultFiles = createDefaultFiles;
+		setSelectedFileToDefault();
 	}
 	
 	public Path getFolder()
@@ -69,6 +70,37 @@ public final class FileSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
+	private void setSelectedFileToDefault()
+	{
+		ArrayList<Path> files = listFiles();
+		
+		if(files.isEmpty())
+			files = createDefaultFiles();
+		
+		selectedFile = "" + files.get(0).getFileName();
+	}
+	
+	private ArrayList<Path> createDefaultFiles()
+	{
+		try
+		{
+			Files.createDirectories(folder);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		createDefaultFiles.accept(folder);
+		
+		ArrayList<Path> files = listFiles();
+		if(files.isEmpty())
+			throw new IllegalStateException(
+				"Created default files but folder is still empty!");
+		
+		return files;
+	}
+	
 	public void resetFolder()
 	{
 		for(Path path : listFiles())
@@ -81,42 +113,8 @@ public final class FileSetting extends Setting
 				throw new RuntimeException(e);
 			}
 		
-		generateDefaultFiles();
+		setSelectedFileToDefault();
 		WurstClient.INSTANCE.saveSettings();
-	}
-	
-	private void generateDefaultFiles()
-	{
-		createFolderIfNeeded();
-		ArrayList<Path> files = listFiles();
-		
-		if(files.isEmpty())
-		{
-			createDefaultFiles.accept(folder);
-			files = listFiles();
-			
-			if(files.isEmpty())
-				throw new IllegalStateException(
-					"Couldn't generate default files!");
-		}
-		
-		selectedFile = "" + files.get(0).getFileName();
-	}
-	
-	private void createFolderIfNeeded()
-	{
-		if(Files.isDirectory(folder))
-			return;
-		
-		try
-		{
-			Files.deleteIfExists(folder);
-			Files.createDirectories(folder);
-			
-		}catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 	
 	public ArrayList<Path> listFiles()
@@ -155,7 +153,7 @@ public final class FileSetting extends Setting
 			
 		}catch(JsonException e)
 		{
-			generateDefaultFiles();
+			e.printStackTrace();
 		}
 	}
 	
