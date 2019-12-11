@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -120,9 +121,12 @@ public final class FileSetting extends Setting
 	
 	public ArrayList<Path> listFiles()
 	{
-		try
+		if(!Files.isDirectory(folder))
+			return new ArrayList<>();
+		
+		try(Stream<Path> files = Files.list(folder))
 		{
-			return Files.list(folder).filter(Files::isRegularFile)
+			return files.filter(Files::isRegularFile)
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 			
 		}catch(IOException e)
