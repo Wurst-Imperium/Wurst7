@@ -17,6 +17,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -26,6 +27,9 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 		new FileSetting("Template", "Determines what to build.", "autobuild",
 			folder -> createDefaultTemplates(folder));
 	
+	private int[][] blocks;
+	private String loadedTemplateName = "";
+	
 	public AutoBuildHack()
 	{
 		super("AutoBuild", "Builds things automatically.");
@@ -34,9 +38,45 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 	}
 	
 	@Override
+	public String getRenderName()
+	{
+		String name = getName();
+		
+		if(!loadedTemplateName.isEmpty())
+			name += " [" + loadedTemplateName + "]";
+		
+		return name;
+	}
+	
+	@Override
 	public void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
+		loadSelectedTemplate();
+	}
+	
+	private void loadSelectedTemplate()
+	{
+		Path path = template.getSelectedFile();
+		
+		try
+		{
+			loadTemplate(path);
+			System.out.println("Loaded template '" + loadedTemplateName
+				+ "' with " + blocks.length + " blocks.");
+			
+		}catch(IOException | JsonException e)
+		{
+			Path fileName = path.getFileName();
+			ChatUtils.error("Couldn't load template '" + fileName + "'.");
+			
+			String simpleClassName = e.getClass().getSimpleName();
+			String message = e.getMessage();
+			ChatUtils.message(simpleClassName + ": " + message);
+			
+			e.printStackTrace();
+			setEnabled(false);
+		}
 	}
 	
 	@Override
@@ -49,6 +89,27 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		
+	}
+	
+	private void loadTemplate(Path path) throws IOException, JsonException
+	{
+		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
+		int[][] blocks =
+			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
+		
+		for(int i = 0; i < blocks.length; i++)
+		{
+			int length = blocks[i].length;
+			
+			if(length < 3)
+				throw new JsonException("Entry blocks[" + i
+					+ "] doesn't have X, Y and Z offset. Only found " + length
+					+ " values");
+		}
+		
+		String fileName = template.getSelectedFileName();
+		loadedTemplateName = fileName.substring(0, fileName.lastIndexOf("."));
+		this.blocks = blocks;
 	}
 	
 	private void createDefaultTemplates(Path folder)
