@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import com.google.gson.JsonObject;
-
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -23,29 +21,29 @@ import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.DefaultAutoBuildTemplates;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.json.JsonException;
-import net.wurstclient.util.json.JsonUtils;
 
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener
 {
-	private final FileSetting template =
+	private final FileSetting templateSetting =
 		new FileSetting("Template", "Determines what to build.", "autobuild",
 			folder -> DefaultAutoBuildTemplates.createFiles(folder));
 	
-	private int[][] blocks;
-	private String loadedTemplateName = "";
-	private final ArrayList<BlockPos> positions = new ArrayList<>();
+	private Status status = Status.NO_TEMPLATE;
+	private AutoBuildTemplate template;
+	private ArrayList<BlockPos> positions = new ArrayList<>();
 	
 	public AutoBuildHack()
 	{
 		super("AutoBuild", "Builds things automatically.");
 		setCategory(Category.BLOCKS);
-		addSetting(template);
+		addSetting(templateSetting);
 	}
 	
 	@Override
@@ -53,8 +51,19 @@ public final class AutoBuildHack extends Hack
 	{
 		String name = getName();
 		
-		if(!loadedTemplateName.isEmpty())
-			name += " [" + loadedTemplateName + "]";
+		switch(status)
+		{
+			case IDLE:
+			name += " [" + template.getName() + "]";
+			break;
+			
+			case LOADING:
+			name += " [Loading...]";
+			break;
+			
+			default:
+			break;
+		}
 		
 		return name;
 	}
@@ -62,17 +71,52 @@ public final class AutoBuildHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RightClickListener.class, this);
-		loadSelectedTemplate();
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RightClickListener.class, this);
+		
+		positions.clear();
+		
+		if(template == null)
+			status = Status.NO_TEMPLATE;
+		else
+			status = Status.IDLE;
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		switch(status)
+		{
+			case NO_TEMPLATE:
+			loadSelectedTemplate();
+			break;
+			
+			case IDLE:
+			if(!template.isSelected(templateSetting))
+				loadSelectedTemplate();
+			break;
+			
+			default:
+			break;
+		}
 	}
 	
 	private void loadSelectedTemplate()
 	{
-		Path path = template.getSelectedFile();
+		status = Status.LOADING;
+		Path path = templateSetting.getSelectedFile();
 		
 		try
 		{
-			loadTemplate(path);
+			template = AutoBuildTemplate.load(path);
+			status = Status.IDLE;
 			
 		}catch(IOException | JsonException e)
 		{
@@ -88,43 +132,12 @@ public final class AutoBuildHack extends Hack
 		}
 	}
 	
-	private void loadTemplate(Path path) throws IOException, JsonException
-	{
-		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
-		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
-		
-		for(int i = 0; i < blocks.length; i++)
-		{
-			int length = blocks[i].length;
-			
-			if(length < 3)
-				throw new JsonException("Entry blocks[" + i
-					+ "] doesn't have X, Y and Z offset. Only found " + length
-					+ " values");
-		}
-		
-		String fileName = template.getSelectedFileName();
-		loadedTemplateName = fileName.substring(0, fileName.lastIndexOf("."));
-		this.blocks = blocks;
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(RightClickListener.class, this);
-	}
-	
-	@Override
-	public void onUpdate()
-	{
-		
-	}
-	
 	@Override
 	public void onRightClick(RightClickEvent event)
 	{
+		if(status != Status.IDLE)
+			return;
+		
 		HitResult hitResult = MC.crosshairTarget;
 		if(hitResult == null || hitResult.getPos() == null
 			|| hitResult.getType() != HitResult.Type.BLOCK
@@ -137,31 +150,11 @@ public final class AutoBuildHack extends Hack
 			return;
 		
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
-		loadPositions(startPos);
+		Direction direction = MC.player.getHorizontalFacing();
+		positions = template.getPositions(startPos, direction);
 		
 		if(positions.size() <= 64)
 			buildInstantly();
-		else
-		{
-			EVENTS.add(UpdateListener.class, this);
-			EVENTS.remove(RightClickListener.class, this);
-		}
-	}
-	
-	private void loadPositions(BlockPos startPos)
-	{
-		Direction front = MC.player.getHorizontalFacing();
-		Direction left = front.rotateYCounterclockwise();
-		
-		positions.clear();
-		for(int[] block : blocks)
-		{
-			BlockPos pos = startPos;
-			pos = pos.offset(left, block[0]);
-			pos = pos.up(block[1]);
-			pos = pos.offset(front, block[2]);
-			positions.add(pos);
-		}
 	}
 	
 	private void buildInstantly()
@@ -201,4 +194,11 @@ public final class AutoBuildHack extends Hack
 		return false;
 	}
 	
+	private enum Status
+	{
+		NO_TEMPLATE,
+		LOADING,
+		IDLE,
+		BUILDING;
+	}
 }
