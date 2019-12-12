@@ -20,6 +20,8 @@ import net.wurstclient.Category;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockUtils;
@@ -35,6 +37,12 @@ public final class AutoBuildHack extends Hack
 		new FileSetting("Template", "Determines what to build.", "autobuild",
 			folder -> DefaultAutoBuildTemplates.createFiles(folder));
 	
+	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
+		"Builds small templates (<= 64 blocks) instantly.\n"
+			+ "Turn this off if your template is not\n"
+			+ "being built correctly.",
+		true);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
 	private ArrayList<BlockPos> positions = new ArrayList<>();
@@ -44,6 +52,7 @@ public final class AutoBuildHack extends Hack
 		super("AutoBuild", "Builds things automatically.");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
+		addSetting(instaBuild);
 	}
 	
 	@Override
@@ -153,45 +162,43 @@ public final class AutoBuildHack extends Hack
 		Direction direction = MC.player.getHorizontalFacing();
 		positions = template.getPositions(startPos, direction);
 		
-		if(positions.size() <= 64)
+		if(instaBuild.isChecked() && positions.size() <= 64)
 			buildInstantly();
 	}
 	
 	private void buildInstantly()
 	{
-		for(BlockPos pos : positions)
-			if(BlockUtils.getState(pos).getMaterial().isReplaceable())
-				placeBlockSimple_old(pos);
-	}
-	
-	private boolean placeBlockSimple_old(BlockPos pos)
-	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
-		for(Direction side : Direction.values())
+		for(BlockPos pos : positions)
 		{
-			BlockPos neighbor = pos.offset(side);
-			
-			// check if neighbor can be right clicked
-			if(!BlockUtils.canBeClicked(neighbor))
+			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
 			
-			// check if hitVec is within range (6 blocks)
-			if(eyesPos.squaredDistanceTo(hitVec) > 36)
-				continue;
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
-			
-			return true;
+			for(Direction side : Direction.values())
+			{
+				BlockPos neighbor = pos.offset(side);
+				
+				// check if neighbor can be right-clicked
+				if(!BlockUtils.canBeClicked(neighbor))
+					continue;
+				
+				Vec3d sideVec = new Vec3d(side.getVector());
+				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
+				
+				// check if hitVec is within range (6 blocks)
+				if(eyesPos.squaredDistanceTo(hitVec) > 36)
+					continue;
+				
+				// place block
+				im.rightClickBlock(neighbor, side.getOpposite(), hitVec);
+				
+				break;
+			}
 		}
-		
-		return false;
 	}
 	
 	private enum Status
