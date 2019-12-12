@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.util.hit.BlockHitResult;
@@ -26,6 +25,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.DefaultAutoBuildTemplates;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -35,7 +35,7 @@ public final class AutoBuildHack extends Hack
 {
 	private final FileSetting template =
 		new FileSetting("Template", "Determines what to build.", "autobuild",
-			folder -> createDefaultTemplates(folder));
+			folder -> DefaultAutoBuildTemplates.createFiles(folder));
 	
 	private int[][] blocks;
 	private String loadedTemplateName = "";
@@ -86,6 +86,27 @@ public final class AutoBuildHack extends Hack
 			e.printStackTrace();
 			setEnabled(false);
 		}
+	}
+	
+	private void loadTemplate(Path path) throws IOException, JsonException
+	{
+		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
+		int[][] blocks =
+			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
+		
+		for(int i = 0; i < blocks.length; i++)
+		{
+			int length = blocks[i].length;
+			
+			if(length < 3)
+				throw new JsonException("Entry blocks[" + i
+					+ "] doesn't have X, Y and Z offset. Only found " + length
+					+ " values");
+		}
+		
+		String fileName = template.getSelectedFileName();
+		loadedTemplateName = fileName.substring(0, fileName.lastIndexOf("."));
+		this.blocks = blocks;
 	}
 	
 	@Override
@@ -180,123 +201,4 @@ public final class AutoBuildHack extends Hack
 		return false;
 	}
 	
-	private void loadTemplate(Path path) throws IOException, JsonException
-	{
-		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
-		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
-		
-		for(int i = 0; i < blocks.length; i++)
-		{
-			int length = blocks[i].length;
-			
-			if(length < 3)
-				throw new JsonException("Entry blocks[" + i
-					+ "] doesn't have X, Y and Z offset. Only found " + length
-					+ " values");
-		}
-		
-		String fileName = template.getSelectedFileName();
-		loadedTemplateName = fileName.substring(0, fileName.lastIndexOf("."));
-		this.blocks = blocks;
-	}
-	
-	private void createDefaultTemplates(Path folder)
-	{
-		for(DefaultTemplate template : DefaultTemplate.values())
-		{
-			JsonObject json = createJson(template);
-			
-			Path path = folder.resolve(template.name + ".json");
-			
-			try
-			{
-				JsonUtils.toJson(json, path);
-				
-			}catch(IOException | JsonException e)
-			{
-				System.out.println("Couldn't save " + path.getFileName());
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private JsonObject createJson(DefaultTemplate template)
-	{
-		JsonObject json = new JsonObject();
-		JsonElement blocks = JsonUtils.GSON.toJsonTree(template.data);
-		json.add("blocks", blocks);
-		
-		return json;
-	}
-	
-	private static enum DefaultTemplate
-	{
-		BRIDGE("Bridge",
-			new int[][]{{0, 0, 0}, {1, 0, 0}, {1, 0, -1}, {0, 0, -1},
-				{-1, 0, -1}, {-1, 0, 0}, {-1, 0, -2}, {0, 0, -2}, {1, 0, -2},
-				{1, 0, -3}, {0, 0, -3}, {-1, 0, -3}, {-1, 0, -4}, {0, 0, -4},
-				{1, 0, -4}, {1, 0, -5}, {0, 0, -5}, {-1, 0, -5}}),
-		
-		FLOOR("Floor",
-			new int[][]{{0, 0, 0}, {0, 0, 1}, {1, 0, 1}, {1, 0, 0}, {1, 0, -1},
-				{0, 0, -1}, {-1, 0, -1}, {-1, 0, 0}, {-1, 0, 1}, {-1, 0, 2},
-				{0, 0, 2}, {1, 0, 2}, {2, 0, 2}, {2, 0, 1}, {2, 0, 0},
-				{2, 0, -1}, {2, 0, -2}, {1, 0, -2}, {0, 0, -2}, {-1, 0, -2},
-				{-2, 0, -2}, {-2, 0, -1}, {-2, 0, 0}, {-2, 0, 1}, {-2, 0, 2},
-				{-2, 0, 3}, {-1, 0, 3}, {0, 0, 3}, {1, 0, 3}, {2, 0, 3},
-				{3, 0, 3}, {3, 0, 2}, {3, 0, 1}, {3, 0, 0}, {3, 0, -1},
-				{3, 0, -2}, {3, 0, -3}, {2, 0, -3}, {1, 0, -3}, {0, 0, -3},
-				{-1, 0, -3}, {-2, 0, -3}, {-3, 0, -3}, {-3, 0, -2}, {-3, 0, -1},
-				{-3, 0, 0}, {-3, 0, 1}, {-3, 0, 2}, {-3, 0, 3}}),
-		
-		PENIS("Penis", new int[][]{{0, 0, 0}, {0, 0, 1}, {1, 0, 1}, {1, 0, 0},
-			{1, 1, 0}, {0, 1, 0}, {0, 1, 1}, {1, 1, 1}, {1, 2, 1}, {0, 2, 1},
-			{0, 2, 0}, {1, 2, 0}, {1, 3, 0}, {0, 3, 0}, {0, 3, 1}, {1, 3, 1},
-			{1, 4, 1}, {0, 4, 1}, {0, 4, 0}, {1, 4, 0}, {1, 5, 0}, {0, 5, 0},
-			{0, 5, 1}, {1, 5, 1}, {1, 6, 1}, {0, 6, 1}, {0, 6, 0}, {1, 6, 0},
-			{1, 7, 0}, {0, 7, 0}, {0, 7, 1}, {1, 7, 1}, {-1, 0, -1},
-			{-1, 1, -1}, {-2, 1, -1}, {-2, 0, -1}, {-2, 0, -2}, {-1, 0, -2},
-			{-1, 1, -2}, {-2, 1, -2}, {2, 0, -1}, {2, 1, -1}, {2, 1, -2},
-			{2, 0, -2}, {3, 0, -2}, {3, 0, -1}, {3, 1, -1}, {3, 1, -2}}),
-		
-		PILLAR("Pillar",
-			new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {0, 3, 0}, {0, 4, 0},
-				{0, 5, 0}, {0, 6, 0}}),
-		
-		SWASTIKA("Swastika",
-			new int[][]{{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {0, 1, 0}, {0, 2, 0},
-				{1, 2, 0}, {2, 2, 0}, {2, 3, 0}, {2, 4, 0}, {0, 3, 0},
-				{0, 4, 0}, {-1, 4, 0}, {-2, 4, 0}, {-1, 2, 0}, {-2, 2, 0},
-				{-2, 1, 0}, {-2, 0, 0}}),
-		
-		WALL("Wall",
-			new int[][]{{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0}, {-1, 1, 0},
-				{-1, 0, 0}, {-2, 0, 0}, {-2, 1, 0}, {-2, 2, 0}, {-1, 2, 0},
-				{0, 2, 0}, {1, 2, 0}, {2, 2, 0}, {2, 1, 0}, {2, 0, 0},
-				{3, 0, 0}, {3, 1, 0}, {3, 2, 0}, {3, 3, 0}, {2, 3, 0},
-				{1, 3, 0}, {0, 3, 0}, {-1, 3, 0}, {-2, 3, 0}, {-3, 3, 0},
-				{-3, 2, 0}, {-3, 1, 0}, {-3, 0, 0}, {-3, 4, 0}, {-2, 4, 0},
-				{-1, 4, 0}, {0, 4, 0}, {1, 4, 0}, {2, 4, 0}, {3, 4, 0},
-				{3, 5, 0}, {2, 5, 0}, {1, 5, 0}, {0, 5, 0}, {-1, 5, 0},
-				{-2, 5, 0}, {-3, 5, 0}, {-3, 6, 0}, {-2, 6, 0}, {-1, 6, 0},
-				{0, 6, 0}, {1, 6, 0}, {2, 6, 0}, {3, 6, 0}}),
-		
-		WURST("Wurst",
-			new int[][]{{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0}, {0, 1, 1},
-				{1, 1, 1}, {2, 1, 1}, {2, 1, 0}, {2, 0, 0}, {2, 1, -1},
-				{1, 1, -1}, {0, 1, -1}, {-1, 1, -1}, {-1, 1, 0}, {-1, 0, 0},
-				{-2, 0, 0}, {-2, 1, 0}, {-2, 1, 1}, {-1, 1, 1}, {-1, 2, 0},
-				{0, 2, 0}, {1, 2, 0}, {2, 2, 0}, {3, 1, 0}, {-2, 1, -1},
-				{-2, 2, 0}, {-3, 1, 0}});
-		
-		private final String name;
-		private final int[][] data;
-		
-		private DefaultTemplate(String name, int[][] data)
-		{
-			this.name = name;
-			this.data = data;
-		}
-	}
 }
