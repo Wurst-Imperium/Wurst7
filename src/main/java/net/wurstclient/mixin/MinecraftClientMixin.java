@@ -28,6 +28,7 @@ import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
+import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -59,6 +60,18 @@ public abstract class MinecraftClientMixin
 	private void onDoAttack(CallbackInfo ci)
 	{
 		LeftClickEvent event = new LeftClickEvent();
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		
+		if(event.isCancelled())
+			ci.cancel();
+	}
+	
+	@Inject(at = {@At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
+		ordinal = 0)}, method = {"doItemUse()V"}, cancellable = true)
+	private void onDoItemUse(CallbackInfo ci)
+	{
+		RightClickEvent event = new RightClickEvent();
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())

@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.wurstclient.Category;
+import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.FileSetting;
@@ -21,7 +22,8 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
-public final class AutoBuildHack extends Hack implements UpdateListener
+public final class AutoBuildHack extends Hack
+	implements UpdateListener, RightClickListener
 {
 	private final FileSetting template =
 		new FileSetting("Template", "Determines what to build.", "autobuild",
@@ -51,7 +53,7 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RightClickListener.class, this);
 		loadSelectedTemplate();
 	}
 	
@@ -83,12 +85,20 @@ public final class AutoBuildHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RightClickListener.class, this);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		
+	}
+	
+	@Override
+	public void onRightClick(RightClickEvent event)
+	{
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.remove(RightClickListener.class, this);
 	}
 	
 	private void loadTemplate(Path path) throws IOException, JsonException
