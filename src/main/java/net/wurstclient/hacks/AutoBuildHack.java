@@ -9,16 +9,24 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -31,6 +39,7 @@ public final class AutoBuildHack extends Hack
 	
 	private int[][] blocks;
 	private String loadedTemplateName = "";
+	private final ArrayList<BlockPos> positions = new ArrayList<>();
 	
 	public AutoBuildHack()
 	{
@@ -64,8 +73,6 @@ public final class AutoBuildHack extends Hack
 		try
 		{
 			loadTemplate(path);
-			System.out.println("Loaded template '" + loadedTemplateName
-				+ "' with " + blocks.length + " blocks.");
 			
 		}catch(IOException | JsonException e)
 		{
@@ -97,8 +104,80 @@ public final class AutoBuildHack extends Hack
 	@Override
 	public void onRightClick(RightClickEvent event)
 	{
-		EVENTS.add(UpdateListener.class, this);
-		EVENTS.remove(RightClickListener.class, this);
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult == null || hitResult.getPos() == null
+			|| hitResult.getType() != HitResult.Type.BLOCK
+			|| !(hitResult instanceof BlockHitResult))
+			return;
+		
+		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
+		BlockPos hitResultPos = blockHitResult.getBlockPos();
+		if(!BlockUtils.canBeClicked(hitResultPos))
+			return;
+		
+		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
+		loadPositions(startPos);
+		
+		if(positions.size() <= 64)
+			buildInstantly();
+		else
+		{
+			EVENTS.add(UpdateListener.class, this);
+			EVENTS.remove(RightClickListener.class, this);
+		}
+	}
+	
+	private void loadPositions(BlockPos startPos)
+	{
+		Direction front = MC.player.getHorizontalFacing();
+		Direction left = front.rotateYCounterclockwise();
+		
+		positions.clear();
+		for(int[] block : blocks)
+		{
+			BlockPos pos = startPos;
+			pos = pos.offset(left, block[0]);
+			pos = pos.up(block[1]);
+			pos = pos.offset(front, block[2]);
+			positions.add(pos);
+		}
+	}
+	
+	private void buildInstantly()
+	{
+		for(BlockPos pos : positions)
+			if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+				placeBlockSimple_old(pos);
+	}
+	
+	private boolean placeBlockSimple_old(BlockPos pos)
+	{
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		
+		for(Direction side : Direction.values())
+		{
+			BlockPos neighbor = pos.offset(side);
+			
+			// check if neighbor can be right clicked
+			if(!BlockUtils.canBeClicked(neighbor))
+				continue;
+			
+			Vec3d hitVec =
+				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+			
+			// check if hitVec is within range (6 blocks)
+			if(eyesPos.squaredDistanceTo(hitVec) > 36)
+				continue;
+			
+			// place block
+			IMC.getInteractionManager().rightClickBlock(neighbor,
+				side.getOpposite(), hitVec);
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private void loadTemplate(Path path) throws IOException, JsonException
