@@ -174,7 +174,7 @@ public class TrajectoriesHack extends Hack implements RenderListener {
 		// Specifies the ballistic drop for various items. Smaller values means less drop, so greater range.
 		double gravity = (item instanceof BowItem || item instanceof CrossbowItem) ? 0.05 :
 				((item instanceof PotionItem) ? 0.4 : ((item instanceof FishingRodItem) ? 0.15 : (item instanceof TridentItem) ? 0.015 :0.03));
-		//gravity = 0;
+
 		for (int i = 0; i < MAX_POINTS; i++)
 		{
 			// Add this point (in absolute space) to the path.
