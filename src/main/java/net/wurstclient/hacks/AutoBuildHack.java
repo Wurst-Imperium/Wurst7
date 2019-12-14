@@ -30,6 +30,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
@@ -46,6 +48,11 @@ public final class AutoBuildHack extends Hack
 		new FileSetting("Template", "Determines what to build.", "autobuild",
 			folder -> DefaultAutoBuildTemplates.createFiles(folder));
 	
+	private final SliderSetting range = new SliderSetting("Range",
+		"How far to reach when placing blocks.\n" + "Recommended values:\n"
+			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
+		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	
 	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
 		"Builds small templates (<= 64 blocks) instantly.\n"
 			+ "Turn this off if your template is not\n"
@@ -61,6 +68,7 @@ public final class AutoBuildHack extends Hack
 		super("AutoBuild", "Builds things automatically.");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
+		addSetting(range);
 		addSetting(instaBuild);
 	}
 	
@@ -191,6 +199,7 @@ public final class AutoBuildHack extends Hack
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		double rangeSq = Math.pow(range.getValue(), 2);
 		
 		for(BlockPos pos : positions)
 		{
@@ -210,8 +219,8 @@ public final class AutoBuildHack extends Hack
 				Vec3d sideVec = new Vec3d(side.getVector());
 				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
 				
-				// check if hitVec is within range (6 blocks)
-				if(eyesPos.squaredDistanceTo(hitVec) > 36)
+				// check if hitVec is within range
+				if(eyesPos.squaredDistanceTo(hitVec) > rangeSq)
 					continue;
 				
 				// place block
@@ -265,6 +274,7 @@ public final class AutoBuildHack extends Hack
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		double rangeSq = Math.pow(range.getValue(), 2);
 		
 		for(Direction side : Direction.values())
 		{
@@ -277,8 +287,8 @@ public final class AutoBuildHack extends Hack
 			Vec3d dirVec = new Vec3d(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
-			// check if hitVec is within range (4.25 blocks)
-			if(eyesPos.squaredDistanceTo(hitVec) > 18.0625)
+			// check if hitVec is within range
+			if(eyesPos.squaredDistanceTo(hitVec) > rangeSq)
 				continue;
 			
 			// check if side is visible (facing away from player)
