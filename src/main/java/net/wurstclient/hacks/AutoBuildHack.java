@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -45,7 +45,7 @@ public final class AutoBuildHack extends Hack
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private ArrayList<BlockPos> positions = new ArrayList<>();
+	private LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
 	
 	public AutoBuildHack()
 	{

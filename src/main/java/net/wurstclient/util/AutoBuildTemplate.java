@@ -9,7 +9,7 @@ package net.wurstclient.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import com.google.gson.JsonObject;
 
@@ -53,12 +53,12 @@ public final class AutoBuildTemplate
 		return new AutoBuildTemplate(path, blocks);
 	}
 	
-	public ArrayList<BlockPos> getPositions(BlockPos startPos,
+	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
 		Direction direction)
 	{
 		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
-		ArrayList<BlockPos> positions = new ArrayList<>();
+		LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
 		
 		for(int[] block : blocks)
 		{
