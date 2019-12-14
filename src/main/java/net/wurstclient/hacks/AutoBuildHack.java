@@ -229,6 +229,8 @@ public final class AutoBuildHack extends Hack
 				break;
 			}
 		}
+		
+		positions.clear();
 	}
 	
 	private void buildNormally()
@@ -325,6 +327,9 @@ public final class AutoBuildHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		if(status != Status.BUILDING)
+			return;
+		
 		// scale and offset
 		double scale = 1D * 7D / 8D;
 		double offset = (1D - scale) / 2D;
