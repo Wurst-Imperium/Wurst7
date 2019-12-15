@@ -54,6 +54,9 @@ public final class AutoBuildHack extends Hack
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight", false);
+	
 	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
 		"Builds small templates (<= 64 blocks) instantly.\n"
 			+ "Turn this off if your template is not\n"
@@ -70,6 +73,7 @@ public final class AutoBuildHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
+		addSetting(checkLOS);
 		addSetting(instaBuild);
 	}
 	
@@ -220,7 +224,7 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			// check line of sight
-			if(MC.world
+			if(checkLOS.isChecked() && MC.world
 				.rayTrace(new RayTraceContext(eyesPos, hitVec,
 					RayTraceContext.ShapeType.COLLIDER,
 					RayTraceContext.FluidHandling.NONE, MC.player))
