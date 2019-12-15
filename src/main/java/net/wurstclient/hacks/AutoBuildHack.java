@@ -55,7 +55,11 @@ public final class AutoBuildHack extends Hack
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting checkLOS =
-		new CheckboxSetting("Check line of sight", false);
+		new CheckboxSetting("Check line of sight",
+			"Makes sure that you don't reach through walls\n"
+				+ "when placing blocks. Can help with AntiCheat\n"
+				+ "plugins but slows down building.",
+			false);
 	
 	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
 		"Builds small templates (<= 64 blocks) instantly.\n"
