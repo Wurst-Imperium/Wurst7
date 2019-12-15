@@ -72,6 +72,11 @@ public final class AutoBuildTemplate
 		return positions;
 	}
 	
+	public int size()
+	{
+		return blocks.length;
+	}
+	
 	public boolean isSelected(FileSetting setting)
 	{
 		return path.equals(setting.getSelectedFile());

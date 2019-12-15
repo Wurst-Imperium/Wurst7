@@ -96,7 +96,10 @@ public final class AutoBuildHack extends Hack
 			break;
 			
 			case BUILDING:
-			name += " [" + template.getName() + "] " + remainingBlocks.size();
+			double total = template.size();
+			double placed = total - remainingBlocks.size();
+			double progress = Math.round(placed / total * 1e4) / 1e2;
+			name += " [" + template.getName() + "] " + progress + "%";
 			break;
 		}
 		
@@ -282,7 +285,7 @@ public final class AutoBuildHack extends Hack
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getPositions(startPos, direction);
 		
-		if(instaBuild.isChecked() && remainingBlocks.size() <= 64)
+		if(instaBuild.isChecked() && template.size() <= 64)
 			buildInstantly();
 		else
 			status = Status.BUILDING;
