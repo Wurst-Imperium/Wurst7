@@ -189,6 +189,18 @@ public final class AutoBuildHack extends Hack
 		placeNextBlock();
 	}
 	
+	private void updateRemainingBlocks()
+	{
+		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext();)
+		{
+			BlockPos pos = itr.next();
+			BlockState state = BlockUtils.getState(pos);
+			
+			if(!state.getMaterial().isReplaceable())
+				itr.remove();
+		}
+	}
+	
 	private void placeNextBlock()
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
@@ -312,18 +324,6 @@ public final class AutoBuildHack extends Hack
 		}
 		
 		remainingBlocks.clear();
-	}
-	
-	private void updateRemainingBlocks()
-	{
-		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext();)
-		{
-			BlockPos pos = itr.next();
-			BlockState state = BlockUtils.getState(pos);
-			
-			if(!state.getMaterial().isReplaceable())
-				itr.remove();
-		}
 	}
 	
 	@Override
