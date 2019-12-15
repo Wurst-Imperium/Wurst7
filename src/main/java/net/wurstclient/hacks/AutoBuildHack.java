@@ -63,6 +63,10 @@ public final class AutoBuildHack extends Hack
 			+ "being built correctly.",
 		true);
 	
+	private final CheckboxSetting fastPlace = new CheckboxSetting(
+		"Always FastPlace",
+		"Builds as if FastPlace was enabled,\n" + "even if it's not.", true);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
 	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
@@ -75,6 +79,7 @@ public final class AutoBuildHack extends Hack
 		addSetting(range);
 		addSetting(checkLOS);
 		addSetting(instaBuild);
+		addSetting(fastPlace);
 	}
 	
 	@Override
@@ -186,7 +191,7 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(IMC.getItemUseCooldown() > 0)
+		if(!fastPlace.isChecked() && IMC.getItemUseCooldown() > 0)
 			return;
 		
 		placeNextBlock();
