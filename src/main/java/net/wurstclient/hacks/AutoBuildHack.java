@@ -332,9 +332,10 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.BUILDING)
 			return;
 		
-		// scale and offset
 		double scale = 1D * 7D / 8D;
 		double offset = (1D - scale) / 2D;
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		double rangeSq = Math.pow(range.getValue(), 2);
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -343,6 +344,7 @@ public final class AutoBuildHack extends Hack
 		GL11.glLineWidth(2F);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glColor4f(0F, 0F, 0F, 0.5F);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -352,15 +354,22 @@ public final class AutoBuildHack extends Hack
 			&& blocksDrawn < 1024;)
 		{
 			BlockPos pos = itr.next();
-			
 			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
 				continue;
 			
-			if(blocksDrawn == 0)
-				drawGreenBox(pos, scale, offset);
-			else
-				drawOutline(pos, scale, offset);
+			GL11.glPushMatrix();
+			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(offset, offset, offset);
+			GL11.glScaled(scale, scale, scale);
 			
+			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			
+			if(eyesPos.squaredDistanceTo(posVec) <= rangeSq)
+				drawGreenBox();
+			else
+				RenderUtils.drawOutlinedBox();
+			
+			GL11.glPopMatrix();
 			blocksDrawn++;
 		}
 		
@@ -373,13 +382,8 @@ public final class AutoBuildHack extends Hack
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
-	private void drawGreenBox(BlockPos pos, double scale, double offset)
+	private void drawGreenBox()
 	{
-		GL11.glPushMatrix();
-		GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-		GL11.glTranslated(offset, offset, offset);
-		GL11.glScaled(scale, scale, scale);
-		
 		GL11.glDepthMask(false);
 		GL11.glColor4f(0F, 1F, 0F, 0.15F);
 		RenderUtils.drawSolidBox();
@@ -387,20 +391,6 @@ public final class AutoBuildHack extends Hack
 		
 		GL11.glColor4f(0F, 0F, 0F, 0.5F);
 		RenderUtils.drawOutlinedBox();
-		
-		GL11.glPopMatrix();
-	}
-	
-	private void drawOutline(BlockPos pos, double scale, double offset)
-	{
-		GL11.glPushMatrix();
-		GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-		GL11.glTranslated(offset, offset, offset);
-		GL11.glScaled(scale, scale, scale);
-		
-		RenderUtils.drawOutlinedBox();
-		
-		GL11.glPopMatrix();
 	}
 	
 	private enum Status
