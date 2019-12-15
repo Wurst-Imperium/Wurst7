@@ -224,7 +224,8 @@ public final class AutoBuildHack extends Hack
 			BlockPos neighbor = pos.offset(side);
 			
 			// check if neighbor can be right clicked
-			if(!BlockUtils.canBeClicked(neighbor))
+			if(!BlockUtils.canBeClicked(neighbor)
+				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
 				continue;
 			
 			Vec3d dirVec = new Vec3d(side.getVector());
