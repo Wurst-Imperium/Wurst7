@@ -29,6 +29,7 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
+    "PlayerInventoryMixin",
     "RenderTickCounterMixin",
     "ServerListMixin",
     "SignEditScreenMixin",
