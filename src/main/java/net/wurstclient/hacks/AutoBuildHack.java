@@ -45,9 +45,13 @@ import net.wurstclient.util.json.JsonException;
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener, RenderListener
 {
-	private final FileSetting templateSetting =
-		new FileSetting("Template", "Determines what to build.", "autobuild",
-			folder -> DefaultAutoBuildTemplates.createFiles(folder));
+	private final FileSetting templateSetting = new FileSetting("Template",
+		"Determines what to build.\n\n"
+			+ "Templates are just JSON files. Feel free to\n"
+			+ "add your own or to edit / delete the\n"
+			+ "default templates.\n\n" + "If you mess up, simply press the\n"
+			+ "'Reset to Defaults' button or\n" + "delete the folder.",
+		"autobuild", folder -> DefaultAutoBuildTemplates.createFiles(folder));
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
@@ -63,8 +67,7 @@ public final class AutoBuildHack extends Hack
 	
 	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
 		"Builds small templates (<= 64 blocks) instantly.\n"
-			+ "Turn this off if your template is not\n"
-			+ "being built correctly.",
+			+ "For best results, stand close to the block you're placing.",
 		true);
 	
 	private final CheckboxSetting fastPlace = new CheckboxSetting(
@@ -77,7 +80,8 @@ public final class AutoBuildHack extends Hack
 	
 	public AutoBuildHack()
 	{
-		super("AutoBuild", "Builds things automatically.");
+		super("AutoBuild", "Builds things automatically.\n"
+			+ "Place a single block to start building.");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
