@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
@@ -153,13 +155,10 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			
 			if(names.isChecked())
 			{
-				// ItemStack stack = e.getStack();
-				// GameRenderer.renderFloatingText(MC.textRenderer,
-				// stack.getCount() + "x "
-				// + stack.getName().asFormattedString(),
-				// 0, 1, 0, 0, MC.getEntityRenderManager().cameraYaw,
-				// MC.getEntityRenderManager().cameraPitch, false);
-				// GL11.glDisable(GL11.GL_LIGHTING);
+				ItemStack stack = e.getStack();
+
+				e.setCustomName(new LiteralText(stack.getCount() + "x " + stack.getName().asFormattedString()));
+				if (!e.isCustomNameVisible()) e.setCustomNameVisible(true);
 			}
 			
 			GL11.glPopMatrix();
