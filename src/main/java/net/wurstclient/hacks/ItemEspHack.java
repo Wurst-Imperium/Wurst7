@@ -160,6 +160,10 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				e.setCustomName(new LiteralText(stack.getCount() + "x " + stack.getName().asFormattedString()));
 				if (!e.isCustomNameVisible()) e.setCustomNameVisible(true);
 			}
+			else
+			{
+				e.setCustomNameVisible(false);
+			}
 			
 			GL11.glPopMatrix();
 		}
