@@ -10,6 +10,8 @@ package net.wurstclient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -67,6 +69,7 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
+	private Path encFolder;
 	
 	private FabricKeyBinding zoomKey;
 	
@@ -75,6 +78,7 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
+		encFolder = createEncryptionFolder();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -149,6 +153,37 @@ public enum WurstClient
 		}
 		
 		return wurstFolder;
+	}
+	
+	private Path createEncryptionFolder()
+	{
+		Path encFolder =
+			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+				.normalize();
+		
+		try
+		{
+			Files.createDirectories(encFolder);
+			Files.setAttribute(encFolder, "dos:hidden", true);
+			
+			Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");
+			String readmeText = "DO NOT SHARE THESE FILES WITH ANYONE!\r\n"
+				+ "They are encryption keys that protect your alt list file from being read by someone else.\r\n"
+				+ "If someone is asking you to send these files, they are 100% trying to scam you.\r\n"
+				+ "\r\n"
+				+ "DO NOT EDIT, RENAME OR DELETE THESE FILES! (unless you know what you're doing)\r\n"
+				+ "If you do, Wurst's Alt Manager can no longer read your alt list and will replace it with a blank one.\r\n"
+				+ "In other words, YOUR ALT LIST WILL BE DELETED.";
+			Files.write(readme, readmeText.getBytes("UTF-8"),
+				StandardOpenOption.CREATE);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(
+				"Couldn't create '.Wurst encryption' folder.", e);
+		}
+		
+		return encFolder;
 	}
 	
 	public WurstAnalytics getAnalytics()
@@ -240,6 +275,11 @@ public enum WurstClient
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
+	}
+	
+	public Path getEncryptionFolder()
+	{
+		return encFolder;
 	}
 	
 	public FabricKeyBinding getZoomKey()
