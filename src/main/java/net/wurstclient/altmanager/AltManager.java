@@ -19,4 +19,19 @@ public final class AltManager
 		this.altsFile = new AltsFile(altsFile, encFolder);
 		this.altsFile.load(alts);
 	}
+	
+	public void addAlt(String email, String password, boolean starred)
+	{
+		Alt alt = new Alt(email, password, null, starred);
+		alts.add(alt);
+		altsFile.save(alts);
+	}
+	
+	public void editAlt(Alt alt, String newEmail, String newPassword)
+	{
+		Alt newAlt = new Alt(newEmail, newPassword, null, alt.isStarred());
+		alts.remove(alt);
+		alts.add(newAlt);
+		altsFile.save(alts);
+	}
 }

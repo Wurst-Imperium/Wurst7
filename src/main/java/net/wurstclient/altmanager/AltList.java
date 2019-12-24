@@ -38,10 +38,25 @@ public class AltList implements Iterable<Alt>
 		return numCracked;
 	}
 	
+	public void add(Alt alt)
+	{
+		alts.add(alt);
+		sortAlts();
+	}
+	
 	public void addAll(Collection<? extends Alt> c)
 	{
 		alts.addAll(c);
 		sortAlts();
+	}
+	
+	public void remove(Alt alt)
+	{
+		if(alts.remove(alt))
+			if(alt.isCracked())
+				numCracked--;
+			else
+				numPremium--;
 	}
 	
 	@Override
