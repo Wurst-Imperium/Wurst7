@@ -102,7 +102,7 @@ public final class AltsFile
 		
 		try
 		{
-			JsonUtils.toJson(json, path);
+			encryption.toEncryptedJson(json, path);
 			
 		}catch(IOException | JsonException e)
 		{

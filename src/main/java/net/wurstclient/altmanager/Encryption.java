@@ -31,6 +31,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import net.minecraft.util.crash.CrashException;
@@ -73,30 +74,6 @@ public final class Encryption
 		}
 	}
 	
-	public String loadEncryptedFile(Path path) throws IOException
-	{
-		try
-		{
-			return new String(decrypt(Files.readAllBytes(path)), CHARSET);
-			
-		}catch(CrashException e)
-		{
-			throw new IOException(e);
-		}
-	}
-	
-	public void saveEncryptedFile(Path path, String content) throws IOException
-	{
-		try
-		{
-			Files.write(path, encrypt(content.getBytes(CHARSET)));
-			
-		}catch(CrashException e)
-		{
-			throw new IOException(e);
-		}
-	}
-	
 	public JsonElement parseFile(Path path) throws IOException, JsonException
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
@@ -106,6 +83,18 @@ public final class Encryption
 		}catch(JsonParseException e)
 		{
 			throw new JsonException(e);
+		}
+	}
+	
+	public String loadEncryptedFile(Path path) throws IOException
+	{
+		try
+		{
+			return new String(decrypt(Files.readAllBytes(path)), CHARSET);
+			
+		}catch(CrashException e)
+		{
+			throw new IOException(e);
 		}
 	}
 	
@@ -131,18 +120,6 @@ public final class Encryption
 		return new WsonObject(json.getAsJsonObject());
 	}
 	
-	public byte[] encrypt(byte[] bytes)
-	{
-		try
-		{
-			return Base64.getEncoder().encode(encryptCipher.doFinal(bytes));
-			
-		}catch(GeneralSecurityException e)
-		{
-			throw new CrashException(CrashReport.create(e, "Encrypting bytes"));
-		}
-	}
-	
 	public byte[] decrypt(byte[] bytes)
 	{
 		try
@@ -152,6 +129,43 @@ public final class Encryption
 		}catch(IllegalArgumentException | GeneralSecurityException e)
 		{
 			throw new CrashException(CrashReport.create(e, "Decrypting bytes"));
+		}
+	}
+	
+	public void toEncryptedJson(JsonObject json, Path path)
+		throws IOException, JsonException
+	{
+		try
+		{
+			saveEncryptedFile(path, JsonUtils.PRETTY_GSON.toJson(json));
+			
+		}catch(JsonParseException e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	public void saveEncryptedFile(Path path, String content) throws IOException
+	{
+		try
+		{
+			Files.write(path, encrypt(content.getBytes(CHARSET)));
+			
+		}catch(CrashException e)
+		{
+			throw new IOException(e);
+		}
+	}
+	
+	public byte[] encrypt(byte[] bytes)
+	{
+		try
+		{
+			return Base64.getEncoder().encode(encryptCipher.doFinal(bytes));
+			
+		}catch(GeneralSecurityException e)
+		{
+			throw new CrashException(CrashReport.create(e, "Encrypting bytes"));
 		}
 	}
 	
