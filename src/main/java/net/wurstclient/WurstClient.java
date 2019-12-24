@@ -20,6 +20,7 @@ import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
+import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
@@ -53,6 +54,7 @@ public enum WurstClient
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
+	private AltManager altManager;
 	private HackList hax;
 	private CmdList cmds;
 	private OtfList otfs;
@@ -69,7 +71,6 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
-	private Path encFolder;
 	
 	private FabricKeyBinding zoomKey;
 	
@@ -78,7 +79,6 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
-		encFolder = createEncryptionFolder();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -127,6 +127,10 @@ public enum WurstClient
 		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
+		
+		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
+		Path encFolder = createEncryptionFolder();
+		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey =
 			FabricKeyBinding.Builder.create(new Identifier("wurst", "zoom"),
@@ -277,13 +281,13 @@ public enum WurstClient
 		return wurstFolder;
 	}
 	
-	public Path getEncryptionFolder()
-	{
-		return encFolder;
-	}
-	
 	public FabricKeyBinding getZoomKey()
 	{
 		return zoomKey;
+	}
+	
+	public AltManager getAltManager()
+	{
+		return altManager;
 	}
 }

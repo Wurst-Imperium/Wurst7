@@ -7,6 +7,7 @@
  */
 package net.wurstclient.altmanager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,9 +30,15 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
-import net.wurstclient.WurstClient;
+import net.wurstclient.util.json.JsonException;
+import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonArray;
+import net.wurstclient.util.json.WsonObject;
 
 public final class Encryption
 {
@@ -40,10 +47,8 @@ public final class Encryption
 	private final Cipher encryptCipher;
 	private final Cipher decryptCipher;
 	
-	public Encryption()
+	public Encryption(Path encFolder)
 	{
-		Path encFolder = WurstClient.INSTANCE.getEncryptionFolder();
-		
 		KeyPair rsaKeyPair =
 			getRsaKeyPair(encFolder.resolve("wurst_rsa_public.txt"),
 				encFolder.resolve("wurst_rsa_private.txt"));
@@ -68,14 +73,48 @@ public final class Encryption
 		}
 	}
 	
+	public String loadEncryptedFile(Path path) throws IOException
+	{
+		return new String(decrypt(Files.readAllBytes(path)), CHARSET);
+	}
+	
 	public void saveEncryptedFile(Path path, String content) throws IOException
 	{
 		Files.write(path, encrypt(content.getBytes(CHARSET)));
 	}
 	
-	public String loadEncryptedFile(Path path) throws IOException
+	public JsonElement parseFile(Path path) throws IOException, JsonException
 	{
-		return new String(decrypt(Files.readAllBytes(path)), CHARSET);
+		try(BufferedReader reader = Files.newBufferedReader(path))
+		{
+			return JsonUtils.JSON_PARSER.parse(loadEncryptedFile(path));
+			
+		}catch(JsonParseException e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	public WsonArray parseFileToArray(Path path)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseFile(path);
+		
+		if(!json.isJsonArray())
+			throw new JsonException();
+		
+		return new WsonArray(json.getAsJsonArray());
+	}
+	
+	public WsonObject parseFileToObject(Path path)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseFile(path);
+		
+		if(!json.isJsonObject())
+			throw new JsonException();
+		
+		return new WsonObject(json.getAsJsonObject());
 	}
 	
 	public byte[] encrypt(byte[] bytes)
