@@ -75,12 +75,26 @@ public final class Encryption
 	
 	public String loadEncryptedFile(Path path) throws IOException
 	{
-		return new String(decrypt(Files.readAllBytes(path)), CHARSET);
+		try
+		{
+			return new String(decrypt(Files.readAllBytes(path)), CHARSET);
+			
+		}catch(CrashException e)
+		{
+			throw new IOException(e);
+		}
 	}
 	
 	public void saveEncryptedFile(Path path, String content) throws IOException
 	{
-		Files.write(path, encrypt(content.getBytes(CHARSET)));
+		try
+		{
+			Files.write(path, encrypt(content.getBytes(CHARSET)));
+			
+		}catch(CrashException e)
+		{
+			throw new IOException(e);
+		}
 	}
 	
 	public JsonElement parseFile(Path path) throws IOException, JsonException
@@ -122,6 +136,7 @@ public final class Encryption
 		try
 		{
 			return Base64.getEncoder().encode(encryptCipher.doFinal(bytes));
+			
 		}catch(GeneralSecurityException e)
 		{
 			throw new CrashException(CrashReport.create(e, "Encrypting bytes"));
@@ -133,7 +148,8 @@ public final class Encryption
 		try
 		{
 			return decryptCipher.doFinal(Base64.getDecoder().decode(bytes));
-		}catch(GeneralSecurityException e)
+			
+		}catch(IllegalArgumentException | GeneralSecurityException e)
 		{
 			throw new CrashException(CrashReport.create(e, "Decrypting bytes"));
 		}
@@ -147,6 +163,7 @@ public final class Encryption
 		try
 		{
 			return loadRsaKeys(publicFile, privateFile);
+			
 		}catch(GeneralSecurityException | ReflectiveOperationException
 			| IOException e)
 		{
@@ -165,6 +182,7 @@ public final class Encryption
 		try
 		{
 			return loadAesKey(path, pair);
+			
 		}catch(GeneralSecurityException | IOException e)
 		{
 			System.err.println("Couldn't load AES key!");
