@@ -8,8 +8,10 @@
 package net.wurstclient.altmanager;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
@@ -46,9 +48,28 @@ public final class AltsFile
 		{
 			System.out.println("Couldn't load " + path.getFileName());
 			e.printStackTrace();
+			
+			renameCorrupted();
 		}
 		
 		save(altList);
+	}
+	
+	private void renameCorrupted()
+	{
+		try
+		{
+			Path newPath =
+				path.resolveSibling("!CORRUPTED_" + path.getFileName());
+			Files.move(path, newPath, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("Renamed to " + newPath.getFileName());
+			
+		}catch(IOException e2)
+		{
+			System.out.println(
+				"Couldn't rename corrupted file " + path.getFileName());
+			e2.printStackTrace();
+		}
 	}
 	
 	private ArrayList<Alt> loadAlts(WsonObject wson)
