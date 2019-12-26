@@ -32,13 +32,13 @@ public final class AltsFile
 		encryption = new Encryption(encFolder);
 	}
 	
-	public void load(AltList altList)
+	public void load(AltManager altManager)
 	{
 		try
 		{
 			WsonObject wson = encryption.parseFileToObject(path);
 			ArrayList<Alt> alts = loadAlts(wson);
-			altList.addAll(alts);
+			altManager.loadAlts(alts);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -52,7 +52,7 @@ public final class AltsFile
 			renameCorrupted();
 		}
 		
-		save(altList);
+		save(altManager);
 	}
 	
 	private void renameCorrupted()
@@ -96,7 +96,7 @@ public final class AltsFile
 		return new Alt(email, password, name, starred);
 	}
 	
-	public void save(AltList alts)
+	public void save(AltManager alts)
 	{
 		JsonObject json = createJson(alts);
 		
@@ -111,11 +111,11 @@ public final class AltsFile
 		}
 	}
 	
-	private JsonObject createJson(AltList alts)
+	private JsonObject createJson(AltManager alts)
 	{
 		JsonObject json = new JsonObject();
 		
-		for(Alt alt : alts)
+		for(Alt alt : alts.getList())
 		{
 			JsonObject jsonAlt = new JsonObject();
 			

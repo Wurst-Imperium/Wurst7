@@ -8,30 +8,79 @@
 package net.wurstclient.altmanager;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class AltManager
 {
 	private final AltsFile altsFile;
-	private AltList alts = new AltList();
+	private ArrayList<Alt> alts = new ArrayList<>();
+	private int numPremium;
+	private int numCracked;
 	
 	public AltManager(Path altsFile, Path encFolder)
 	{
 		this.altsFile = new AltsFile(altsFile, encFolder);
-		this.altsFile.load(alts);
+		this.altsFile.load(this);
 	}
 	
 	public void addAlt(String email, String password, boolean starred)
 	{
-		Alt alt = new Alt(email, password, null, starred);
+		add(new Alt(email, password, null, starred));
+	}
+	
+	private void add(Alt alt)
+	{
 		alts.add(alt);
-		altsFile.save(alts);
+		sortAlts();
+		altsFile.save(this);
 	}
 	
 	public void editAlt(Alt alt, String newEmail, String newPassword)
 	{
-		Alt newAlt = new Alt(newEmail, newPassword, null, alt.isStarred());
-		alts.remove(alt);
-		alts.add(newAlt);
-		altsFile.save(alts);
+		remove(alt);
+		add(new Alt(newEmail, newPassword, null, alt.isStarred()));
+	}
+	
+	private void remove(Alt alt)
+	{
+		if(alts.remove(alt))
+			if(alt.isCracked())
+				numCracked--;
+			else
+				numPremium--;
+	}
+	
+	private void sortAlts()
+	{
+		alts = alts.stream().distinct().sorted()
+			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		
+		numCracked = (int)alts.stream().filter(Alt::isCracked).count();
+		numPremium = alts.size() - numCracked;
+	}
+	
+	public void loadAlts(Collection<? extends Alt> c)
+	{
+		alts.addAll(c);
+		sortAlts();
+	}
+	
+	public List<Alt> getList()
+	{
+		return Collections.unmodifiableList(alts);
+	}
+	
+	public int getNumPremium()
+	{
+		return numPremium;
+	}
+	
+	public int getNumCracked()
+	{
+		return numCracked;
 	}
 }
