@@ -30,7 +30,7 @@ public final class AddAltScreen extends AltEditorScreen
 	@Override
 	protected void pressDoneButton()
 	{
-		altManager.addAlt(getEmail(), getPassword(), false);
+		altManager.add(getEmail(), getPassword(), false);
 		minecraft.openScreen(prevScreen);
 	}
 }

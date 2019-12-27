@@ -24,6 +24,7 @@ import net.wurstclient.util.json.WsonObject;
 public final class AltsFile
 {
 	private final Path path;
+	private boolean disableSaving;
 	private final Encryption encryption;
 	
 	public AltsFile(Path path, Path encFolder)
@@ -37,8 +38,7 @@ public final class AltsFile
 		try
 		{
 			WsonObject wson = encryption.parseFileToObject(path);
-			ArrayList<Alt> alts = loadAlts(wson);
-			altManager.loadAlts(alts);
+			loadAlts(wson, altManager);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -72,7 +72,7 @@ public final class AltsFile
 		}
 	}
 	
-	private ArrayList<Alt> loadAlts(WsonObject wson)
+	private void loadAlts(WsonObject wson, AltManager altManager)
 	{
 		ArrayList<Alt> alts = new ArrayList<>();
 		
@@ -84,7 +84,15 @@ public final class AltsFile
 			alts.add(loadAlt(email, jsonAlt));
 		}
 		
-		return alts;
+		try
+		{
+			disableSaving = true;
+			altManager.addAll(alts);
+			
+		}finally
+		{
+			disableSaving = false;
+		}
 	}
 	
 	private Alt loadAlt(String email, JsonObject jsonAlt)
@@ -98,6 +106,9 @@ public final class AltsFile
 	
 	public void save(AltManager alts)
 	{
+		if(disableSaving)
+			return;
+		
 		JsonObject json = createJson(alts);
 		
 		try

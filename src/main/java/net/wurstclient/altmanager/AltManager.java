@@ -27,22 +27,52 @@ public final class AltManager
 		this.altsFile.load(this);
 	}
 	
-	public void addAlt(String email, String password, boolean starred)
+	public void add(String email, String password, boolean starred)
 	{
 		add(new Alt(email, password, null, starred));
 	}
 	
-	private void add(Alt alt)
+	public void add(Alt alt)
 	{
 		alts.add(alt);
 		sortAlts();
 		altsFile.save(this);
 	}
 	
-	public void editAlt(Alt alt, String newEmail, String newPassword)
+	public void addAll(Collection<Alt> c)
+	{
+		alts.addAll(c);
+		sortAlts();
+		altsFile.save(this);
+	}
+	
+	public void edit(Alt alt, String newEmail, String newPassword)
 	{
 		remove(alt);
 		add(new Alt(newEmail, newPassword, null, alt.isStarred()));
+	}
+	
+	public void setChecked(int index, String name)
+	{
+		alts.get(index).setChecked(name);
+		altsFile.save(this);
+	}
+	
+	public void setStarred(int index, boolean starred)
+	{
+		alts.get(index).setStarred(starred);
+		sortAlts();
+		altsFile.save(this);
+	}
+	
+	public void remove(int index)
+	{
+		if(alts.get(index).isCracked())
+			numCracked--;
+		else
+			numPremium--;
+		
+		alts.remove(index);
 	}
 	
 	private void remove(Alt alt)
@@ -61,12 +91,6 @@ public final class AltManager
 		
 		numCracked = (int)alts.stream().filter(Alt::isCracked).count();
 		numPremium = alts.size() - numCracked;
-	}
-	
-	public void loadAlts(Collection<? extends Alt> c)
-	{
-		alts.addAll(c);
-		sortAlts();
 	}
 	
 	public List<Alt> getList()
