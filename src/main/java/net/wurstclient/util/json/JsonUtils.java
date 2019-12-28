@@ -137,6 +137,14 @@ public enum JsonUtils
 		return json.getAsBoolean();
 	}
 	
+	public static boolean getAsBoolean(JsonElement json, boolean fallback)
+	{
+		if(!isBoolean(json))
+			return fallback;
+		
+		return json.getAsBoolean();
+	}
+	
 	public static boolean isNumber(JsonElement json)
 	{
 		if(json == null || !json.isJsonPrimitive())
@@ -154,10 +162,26 @@ public enum JsonUtils
 		return json.getAsInt();
 	}
 	
+	public static int getAsInt(JsonElement json, int fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
+		
+		return json.getAsInt();
+	}
+	
 	public static long getAsLong(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
 			throw new JsonException();
+		
+		return json.getAsLong();
+	}
+	
+	public static long getAsLong(JsonElement json, long fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
 		
 		return json.getAsLong();
 	}
@@ -175,6 +199,14 @@ public enum JsonUtils
 	{
 		if(!isString(json))
 			throw new JsonException();
+		
+		return json.getAsString();
+	}
+	
+	public static String getAsString(JsonElement json, String fallback)
+	{
+		if(!isString(json))
+			return fallback;
 		
 		return json.getAsString();
 	}

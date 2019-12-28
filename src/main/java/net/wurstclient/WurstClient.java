@@ -10,6 +10,8 @@ package net.wurstclient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -18,6 +20,7 @@ import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
+import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
@@ -51,6 +54,7 @@ public enum WurstClient
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
+	private AltManager altManager;
 	private HackList hax;
 	private CmdList cmds;
 	private OtfList otfs;
@@ -124,6 +128,10 @@ public enum WurstClient
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
 		
+		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
+		Path encFolder = createEncryptionFolder();
+		altManager = new AltManager(altsFile, encFolder);
+		
 		zoomKey =
 			FabricKeyBinding.Builder.create(new Identifier("wurst", "zoom"),
 				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "Zoom").build();
@@ -149,6 +157,37 @@ public enum WurstClient
 		}
 		
 		return wurstFolder;
+	}
+	
+	private Path createEncryptionFolder()
+	{
+		Path encFolder =
+			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+				.normalize();
+		
+		try
+		{
+			Files.createDirectories(encFolder);
+			Files.setAttribute(encFolder, "dos:hidden", true);
+			
+			Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");
+			String readmeText = "DO NOT SHARE THESE FILES WITH ANYONE!\r\n"
+				+ "They are encryption keys that protect your alt list file from being read by someone else.\r\n"
+				+ "If someone is asking you to send these files, they are 100% trying to scam you.\r\n"
+				+ "\r\n"
+				+ "DO NOT EDIT, RENAME OR DELETE THESE FILES! (unless you know what you're doing)\r\n"
+				+ "If you do, Wurst's Alt Manager can no longer read your alt list and will replace it with a blank one.\r\n"
+				+ "In other words, YOUR ALT LIST WILL BE DELETED.";
+			Files.write(readme, readmeText.getBytes("UTF-8"),
+				StandardOpenOption.CREATE);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(
+				"Couldn't create '.Wurst encryption' folder.", e);
+		}
+		
+		return encFolder;
 	}
 	
 	public WurstAnalytics getAnalytics()
@@ -245,5 +284,10 @@ public enum WurstClient
 	public FabricKeyBinding getZoomKey()
 	{
 		return zoomKey;
+	}
+	
+	public AltManager getAltManager()
+	{
+		return altManager;
 	}
 }
