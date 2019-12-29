@@ -118,8 +118,8 @@ public final class Alt implements Comparable<Alt>
 	@Override
 	public int compareTo(Alt o)
 	{
-		Comparator<Alt> c = Comparator.comparing(a -> a.starred);
-		c = c.thenComparing(a -> !a.cracked);
+		Comparator<Alt> c = Comparator.comparing(a -> !a.starred);
+		c = c.thenComparing(a -> a.cracked);
 		c = c.thenComparing(a -> a.email);
 		
 		return c.compare(this, o);
