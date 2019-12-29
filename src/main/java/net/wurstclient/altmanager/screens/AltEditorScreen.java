@@ -66,8 +66,7 @@ public abstract class AltEditorScreen extends Screen
 				128, 20, "Steal Skin", b -> message = stealSkin(getEmail())));
 		
 		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
-			20, "Open Skin Folder",
-			b -> Util.getOperatingSystem().open(skinFolder.toFile())));
+			20, "Open Skin Folder", b -> openSkinFolder()));
 		
 		emailBox = new TextFieldWidget(font, width / 2 - 100, 60, 200, 20, "");
 		emailBox.setMaxLength(48);
@@ -87,6 +86,25 @@ public abstract class AltEditorScreen extends Screen
 		children.add(passwordBox);
 		
 		setInitialFocus(emailBox);
+	}
+	
+	private void openSkinFolder()
+	{
+		createSkinFolder();
+		Util.getOperatingSystem().open(skinFolder.toFile());
+	}
+	
+	private void createSkinFolder()
+	{
+		try
+		{
+			Files.createDirectories(skinFolder);
+			
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+			message = "\u00a74\u00a7lSkin folder could not be created.";
+		}
 	}
 	
 	@Override
@@ -140,6 +158,8 @@ public abstract class AltEditorScreen extends Screen
 		URI u = URI.create("http://skins.minecraft.net/MinecraftSkins/")
 			.resolve(skin);
 		Path path = skinFolder.resolve(skin);
+		
+		createSkinFolder();
 		
 		try(InputStream in = u.toURL().openStream())
 		{
