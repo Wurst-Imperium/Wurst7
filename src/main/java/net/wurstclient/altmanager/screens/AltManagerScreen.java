@@ -176,6 +176,7 @@ public final class AltManagerScreen extends Screen
 	{
 		Alt alt = listGui.getSelectedAlt();
 		altManager.setStarred(listGui.selected, !alt.isStarred());
+		listGui.selected = -1;
 	}
 	
 	private void pressEdit()
