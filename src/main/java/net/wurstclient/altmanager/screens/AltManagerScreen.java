@@ -7,21 +7,12 @@
  */
 package net.wurstclient.altmanager.screens;
 
-import java.awt.Component;
-import java.awt.HeadlessException;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -37,8 +28,10 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.AltRenderer;
+import net.wurstclient.altmanager.ImportAltsFileChooser;
 import net.wurstclient.altmanager.LoginManager;
 import net.wurstclient.altmanager.NameGenerator;
+import net.wurstclient.util.MultiProcessingUtils;
 
 public final class AltManagerScreen extends Screen
 {
@@ -201,56 +194,41 @@ public final class AltManagerScreen extends Screen
 	
 	private void pressImportAlts()
 	{
-		new Thread(() -> showImportDialog()).start();
-	}
-	
-	private void showImportDialog()
-	{
-		JFileChooser fileChooser =
-			new JFileChooser(WurstClient.INSTANCE.getWurstFolder().toFile())
-			{
-				@Override
-				protected JDialog createDialog(Component parent)
-					throws HeadlessException
-				{
-					JDialog dialog = super.createDialog(parent);
-					dialog.setAlwaysOnTop(true);
-					return dialog;
-				}
-			};
-		
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(
-			new FileNameExtensionFilter("TXT file (username:password)", "txt"));
-		
-		if(fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
-			return;
-		
-		File file = fileChooser.getSelectedFile();
-		try(BufferedReader load = new BufferedReader(new FileReader(file)))
+		try
 		{
-			ArrayList<Alt> alts = new ArrayList<>();
+			Process process = MultiProcessingUtils.startProcessWithIO(
+				ImportAltsFileChooser.class,
+				WurstClient.INSTANCE.getWurstFolder().toString());
 			
-			for(String line = ""; (line = load.readLine()) != null;)
+			try(BufferedReader bf = new BufferedReader(new InputStreamReader(
+				process.getInputStream(), StandardCharsets.UTF_8)))
 			{
-				String[] data = line.split(":");
-				if(data.length != 2)
-					continue;
+				ArrayList<Alt> alts = new ArrayList<>();
 				
-				alts.add(new Alt(data[0], data[1], null));
+				for(String line = ""; (line = bf.readLine()) != null;)
+				{
+					String[] data = line.split(":");
+					
+					switch(data.length)
+					{
+						case 1:
+						alts.add(new Alt(data[0], null, null));
+						break;
+						
+						case 2:
+						alts.add(new Alt(data[0], data[1], null));
+						break;
+					}
+				}
+				
+				altManager.addAll(alts);
 			}
 			
-			altManager.addAll(alts);
+			process.waitFor();
 			
-		}catch(IOException e)
+		}catch(IOException | InterruptedException e)
 		{
 			e.printStackTrace();
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			String message = writer.toString();
-			JOptionPane.showMessageDialog(fileChooser, message, "Error",
-				JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
