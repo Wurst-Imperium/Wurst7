@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public final class AltManager
 {
 	private final AltsFile altsFile;
-	private ArrayList<Alt> alts = new ArrayList<>();
+	private final ArrayList<Alt> alts = new ArrayList<>();
 	private int numPremium;
 	private int numCracked;
 	
@@ -86,8 +86,11 @@ public final class AltManager
 	
 	private void sortAlts()
 	{
-		alts = alts.stream().distinct().sorted()
+		ArrayList<Alt> newAlts = alts.stream().distinct().sorted()
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		
+		alts.clear();
+		alts.addAll(newAlts);
 		
 		numCracked = (int)alts.stream().filter(Alt::isCracked).count();
 		numPremium = alts.size() - numCracked;
