@@ -62,6 +62,7 @@ public final class CmdList
 	// public final ThrowCmd throwCmd = new ThrowCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
+	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
 	
