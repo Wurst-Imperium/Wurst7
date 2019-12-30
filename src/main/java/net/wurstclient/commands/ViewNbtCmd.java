@@ -9,12 +9,14 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
 
+@SearchTags({"view nbt", "NBTViewer", "nbt viewer"})
 public final class ViewNbtCmd extends Command
 {
 	public ViewNbtCmd()
