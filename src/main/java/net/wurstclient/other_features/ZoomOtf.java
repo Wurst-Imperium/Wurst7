@@ -29,8 +29,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		true);
 	
 	private Double currentLevel;
-	private long zoomedTicks; // How many ticks zoom has occurred.
-	private double defaultMouseSensitivity;
+	private Double defaultMouseSensitivity;
 	
 	public ZoomOtf()
 	{
@@ -45,30 +44,32 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	public double changeFovBasedOnZoom(double fov)
 	{
 		GameOptions gameOptions = MinecraftClient.getInstance().options;
-
+		
 		if(currentLevel == null)
 			currentLevel = level.getValue();
 		
 		if(!WURST.getZoomKey().isPressed())
 		{
 			currentLevel = level.getValue();
-
-			if (zoomedTicks != 0) gameOptions.mouseSensitivity = defaultMouseSensitivity; // Runs once when zoom key is released
-			zoomedTicks = 0;
+			
+			if(defaultMouseSensitivity != null)
+			{
+				gameOptions.mouseSensitivity = defaultMouseSensitivity;
+				defaultMouseSensitivity = null;
+			}
+			
 			return fov;
 		}
-
-		// Runs once when zoom key is pressed.
-		if (zoomedTicks == 0)
-		{
+		
+		if(defaultMouseSensitivity == null)
 			defaultMouseSensitivity = gameOptions.mouseSensitivity;
-		}
-
-		// Adjust mouse sensitivity in relation to zoom level. The final -0.01 helps when zooming in very far.
-		// (fov / currentLevel) / fov is a value between 0.02 and 1, with 1 being no zoom.
-		gameOptions.mouseSensitivity = defaultMouseSensitivity * ((fov / currentLevel) / fov) - 0.01;
-
-		zoomedTicks++;
+			
+		// Adjust mouse sensitivity in relation to zoom level. The final -0.01
+		// helps when zooming in very far. (fov / currentLevel) / fov is a value
+		// between 0.02 and 1, with 1 being no zoom.
+		gameOptions.mouseSensitivity =
+			defaultMouseSensitivity * (fov / currentLevel / fov) - 0.01;
+		
 		return fov / currentLevel;
 	}
 	
