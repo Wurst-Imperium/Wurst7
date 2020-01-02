@@ -124,6 +124,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		interactBlock(client.player, client.world, Hand.MAIN_HAND,
 			new BlockHitResult(hitVec, side, pos, false));
+		interactItem(client.player, client.world, Hand.MAIN_HAND);
 	}
 	
 	@Override
