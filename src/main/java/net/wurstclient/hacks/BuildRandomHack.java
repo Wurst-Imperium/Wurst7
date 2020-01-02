@@ -25,13 +25,15 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
 
-@SearchTags({"build random"})
+@SearchTags({"build random", "RandomBuild", "random build", "PlaceRandom",
+	"place random", "RandomPlace", "random place"})
 public final class BuildRandomHack extends Hack
 	implements UpdateListener, RenderListener
 {
@@ -40,15 +42,24 @@ public final class BuildRandomHack extends Hack
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
+	private final CheckboxSetting checkItem =
+		new CheckboxSetting("Check held item",
+			"Only builds when you are\n" + "actually holding a block.", true);
+	
+	private final CheckboxSetting fastPlace = new CheckboxSetting(
+		"Always FastPlace",
+		"Builds as if FastPlace was enabled,\n" + "even if it's not.", false);
+	
 	private final Random random = new Random();
 	private BlockPos lastPos;
 	
 	public BuildRandomHack()
 	{
-		super("BuildRandom", "Randomly places blocks around you.\n"
-			+ "Tip: Use with FastPlace to make it faster.");
+		super("BuildRandom", "Randomly places blocks around you.");
 		setCategory(Category.BLOCKS);
 		addSetting(mode);
+		addSetting(checkItem);
+		addSetting(fastPlace);
 	}
 	
 	@Override
@@ -75,13 +86,10 @@ public final class BuildRandomHack extends Hack
 			return;
 		
 		// check timer
-		if(IMC.getItemUseCooldown() > 0
-			&& !WURST.getHax().fastPlaceHack.isEnabled())
+		if(!fastPlace.isChecked() && IMC.getItemUseCooldown() > 0)
 			return;
 		
-		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
+		if(!checkHeldItem())
 			return;
 		
 		// set mode & range
@@ -100,6 +108,15 @@ public final class BuildRandomHack extends Hack
 			attempts++;
 			
 		}while(attempts < 128 && !tryToPlaceBlock(legitMode, pos));
+	}
+	
+	private boolean checkHeldItem()
+	{
+		if(!checkItem.isChecked())
+			return true;
+		
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
 	}
 	
 	@Override
