@@ -44,7 +44,11 @@ public final class BuildRandomHack extends Hack
 	
 	private final CheckboxSetting checkItem =
 		new CheckboxSetting("Check held item",
-			"Only builds when you are\n" + "actually holding a block.", true);
+			"Only builds when you are actually holding a block.\n"
+				+ "Turn this off to build with fire, water, lava,\n"
+				+ "spawn eggs, or if you just want to right click\n"
+				+ "with an empty hand in random places.",
+			true);
 	
 	private final CheckboxSetting fastPlace = new CheckboxSetting(
 		"Always FastPlace",
