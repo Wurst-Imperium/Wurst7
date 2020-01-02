@@ -46,7 +46,7 @@ public final class BuildRandomHack extends Hack
 	public BuildRandomHack()
 	{
 		super("BuildRandom", "Randomly places blocks around you.\n"
-			+ "Tip: Using this mod in combination with FastPlace will make it faster.");
+			+ "Tip: Use with FastPlace to make it faster.");
 		setCategory(Category.BLOCKS);
 		addSetting(mode);
 	}
