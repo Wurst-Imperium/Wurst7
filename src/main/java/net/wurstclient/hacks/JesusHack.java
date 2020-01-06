@@ -140,7 +140,7 @@ public final class JesusHack extends Hack
 			y += 0.05;
 		
 		// create new packet
-		Packet newPacket;
+		Packet<?> newPacket;
 		if(packet instanceof PlayerMoveC2SPacket.PositionOnly)
 			newPacket = new PlayerMoveC2SPacket.PositionOnly(x, y, z, true);
 		else

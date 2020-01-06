@@ -178,7 +178,7 @@ public final class MobSpawnEspHack extends Hack
 		if(player == null || world == null)
 			return;
 		
-		Packet packet = event.getPacket();
+		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
 		if(packet instanceof BlockUpdateS2CPacket)
@@ -256,7 +256,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	private class ChunkScanner
 	{
-		public Future future;
+		public Future<?> future;
 		private final Chunk chunk;
 		private final Set<BlockPos> red = new HashSet<>();
 		private final Set<BlockPos> yellow = new HashSet<>();

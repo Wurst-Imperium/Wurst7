@@ -19,7 +19,7 @@ import net.wurstclient.clickgui.components.ComboBoxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
 
-public final class EnumSetting<T extends Enum> extends Setting
+public final class EnumSetting<T extends Enum<T>> extends Setting
 {
 	private final T[] values;
 	private T selected;

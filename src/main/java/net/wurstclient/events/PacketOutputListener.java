@@ -20,19 +20,19 @@ public interface PacketOutputListener extends Listener
 	public static class PacketOutputEvent
 		extends CancellableEvent<PacketOutputListener>
 	{
-		private Packet packet;
+		private Packet<?> packet;
 		
-		public PacketOutputEvent(Packet packet)
+		public PacketOutputEvent(Packet<?> packet)
 		{
 			this.packet = packet;
 		}
 		
-		public Packet getPacket()
+		public Packet<?> getPacket()
 		{
 			return packet;
 		}
 		
-		public void setPacket(Packet packet)
+		public void setPacket(Packet<?> packet)
 		{
 			this.packet = packet;
 		}

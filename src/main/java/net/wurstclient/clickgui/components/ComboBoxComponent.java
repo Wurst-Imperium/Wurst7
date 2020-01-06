@@ -21,14 +21,14 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.EnumSetting;
 
-public final class ComboBoxComponent<T extends Enum> extends Component
+public final class ComboBoxComponent<T extends Enum<T>> extends Component
 {
 	private final ClickGui gui = WurstClient.INSTANCE.getGui();
 	private final TextRenderer tr = WurstClient.MC.textRenderer;
 	
 	private final EnumSetting<T> setting;
 	private final int popupWidth;
-	private ComboBoxPopup popup;
+	private ComboBoxPopup<T> popup;
 	
 	public ComboBoxComponent(EnumSetting<T> setting)
 	{

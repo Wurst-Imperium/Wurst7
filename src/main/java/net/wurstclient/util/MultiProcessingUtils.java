@@ -18,7 +18,7 @@ public enum MultiProcessingUtils
 {
 	;
 	
-	public static ProcessBuilder makeProcess(Class mainClass, String... args)
+	public static ProcessBuilder makeProcess(Class<?> mainClass, String... args)
 		throws IOException
 	{
 		ArrayList<String> cmd = new ArrayList<>();
@@ -31,13 +31,13 @@ public enum MultiProcessingUtils
 		return new ProcessBuilder(cmd);
 	}
 	
-	public static Process startProcess(Class mainClass, String... args)
+	public static Process startProcess(Class<?> mainClass, String... args)
 		throws IOException
 	{
 		return makeProcess(mainClass, args).inheritIO().start();
 	}
 	
-	public static Process startProcessWithIO(Class mainClass, String... args)
+	public static Process startProcessWithIO(Class<?> mainClass, String... args)
 		throws IOException
 	{
 		return makeProcess(mainClass, args).start();

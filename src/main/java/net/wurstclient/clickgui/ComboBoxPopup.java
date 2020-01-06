@@ -13,7 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
-public final class ComboBoxPopup<T extends Enum> extends Popup
+public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 {
 	private final ClickGui gui = WurstClient.INSTANCE.getGui();
 	private final TextRenderer tr = WurstClient.MC.textRenderer;
@@ -124,7 +124,7 @@ public final class ComboBoxPopup<T extends Enum> extends Popup
 		GL11.glEnd();
 	}
 	
-	private void drawValueName(int x1, int yi1, Enum value)
+	private void drawValueName(int x1, int yi1, Enum<?> value)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);

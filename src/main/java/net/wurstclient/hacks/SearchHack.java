@@ -137,7 +137,7 @@ public final class SearchHack extends Hack
 		if(player == null || world == null)
 			return;
 		
-		Packet packet = event.getPacket();
+		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
 		if(packet instanceof BlockUpdateS2CPacket)
@@ -515,7 +515,7 @@ public final class SearchHack extends Hack
 		private final Block block;
 		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
 		private Status status = Status.IDLE;
-		private Future future;
+		private Future<?> future;
 		
 		public ChunkSearcher(Chunk chunk, Block block)
 		{
