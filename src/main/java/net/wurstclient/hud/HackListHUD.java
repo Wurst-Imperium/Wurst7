@@ -202,5 +202,11 @@ public final class HackListHUD implements UpdateListener
 			HackListEntry other = (HackListEntry)obj;
 			return hack == other.hack;
 		}
+		
+		@Override
+		public int hashCode()
+		{
+			return hack.hashCode();
+		}
 	}
 }
