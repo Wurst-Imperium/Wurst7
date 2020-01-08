@@ -41,6 +41,15 @@ public final class FastBreakHack extends Hack
 	}
 	
 	@Override
+	public String getRenderName()
+	{
+		if(legitMode.isChecked())
+			return getName() + "Legit";
+		else
+			return getName();
+	}
+	
+	@Override
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
