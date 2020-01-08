@@ -31,8 +31,10 @@ public abstract class ContainerScreen54Mixin
 	@Shadow
 	@Final
 	private int rows;
+	
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
+	private int mode;
 	
 	public ContainerScreen54Mixin(WurstClient wurst, GenericContainer container,
 		PlayerInventory playerInventory, Text name)
@@ -63,12 +65,12 @@ public abstract class ContainerScreen54Mixin
 	
 	private void steal()
 	{
-		runInThread(() -> shiftClickSlots(0, rows * 9));
+		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
 	}
 	
 	private void store()
 	{
-		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44));
+		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44, 2));
 	}
 	
 	private void runInThread(Runnable r)
@@ -85,18 +87,20 @@ public abstract class ContainerScreen54Mixin
 		}).start();
 	}
 	
-	private void shiftClickSlots(int from, int to)
+	private void shiftClickSlots(int from, int to, int mode)
 	{
+		this.mode = mode;
+		
 		for(int i = from; i < to; i++)
 		{
 			Slot slot = container.slotList.get(i);
 			if(slot.getStack().isEmpty())
 				continue;
 			
-			if(minecraft.currentScreen == null)
+			waitForDelay();
+			if(this.mode != mode || minecraft.currentScreen == null)
 				break;
 			
-			waitForDelay();
 			onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
 		}
 	}
