@@ -180,8 +180,13 @@ public final class EditItemListScreen extends Screen
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
+		{
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0, 300);
 			drawString(minecraft.textRenderer, "item name or ID", 68,
 				height - 50, 0x808080);
+			GL11.glPopMatrix();
+		}
 		
 		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(49, height - 55, 64, height - 37, 0xff000000);
