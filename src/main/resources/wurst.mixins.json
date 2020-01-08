@@ -10,6 +10,7 @@
   	"BlockMixin",
   	"BlockModelRendererMixin",
   	"BlockStateMixin",
+  	"ButtonWidgetMixin",
   	"CactusBlockMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
