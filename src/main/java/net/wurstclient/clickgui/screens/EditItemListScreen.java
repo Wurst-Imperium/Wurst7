@@ -26,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 
@@ -143,11 +144,23 @@ public final class EditItemListScreen extends Screen
 	{
 		itemNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(new Identifier(itemNameField.getText()));
+		itemToAdd = Registry.ITEM.get(getItemIDFromField());
 		addButton.active = itemToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
+	}
+	
+	private Identifier getItemIDFromField()
+	{
+		try
+		{
+			return new Identifier(itemNameField.getText().toLowerCase());
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
+		}
 	}
 	
 	@Override
