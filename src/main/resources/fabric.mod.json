@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wurst",
-  "version": "${version}",
+  "version": "$version",
 
   "name": "Wurst Client",
   "description": "Wurst Wurst Wurst!",
@@ -14,7 +14,7 @@
   },
 
   "license": "GPL-3.0-or-later",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/wurst/icon.png",
 
   "environment": "client",
   "entrypoints": {
