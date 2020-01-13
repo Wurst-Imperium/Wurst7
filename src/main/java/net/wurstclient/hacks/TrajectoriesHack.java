@@ -248,24 +248,4 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			|| item instanceof LingeringPotionItem
 			|| item instanceof FishingRodItem || item instanceof TridentItem;
 	}
-	
-	public enum Style
-	{
-		BOXES("Boxes only", true, false),
-		LINES("Lines only", false, true),
-		LINES_AND_BOXES("Lines and boxes", true, true);
-		
-		private final String name;
-		
-		private Style(String name, boolean boxes, boolean lines)
-		{
-			this.name = name;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
-	}
 }
