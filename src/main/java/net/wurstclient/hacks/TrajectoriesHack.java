@@ -6,12 +6,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RayTraceContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.TrajectoryPath;
 
 @SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
@@ -217,7 +220,8 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		for(int i = 0; i < MAX_POINTS; i++)
 		{
 			// Add this point (in absolute space) to the path.
-			path.addPoint(new Vec3d(arrowPosX, arrowPosY, arrowPosZ));
+			Vec3d arrowPos = new Vec3d(arrowPosX, arrowPosY, arrowPosZ);
+			path.addPoint(arrowPos);
 			
 			// Add the projectile's motion this iteration to its absolute
 			// position, thereby updating it for the next iteration.
@@ -233,6 +237,15 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			
 			// Apply gravity drop to the motion.
 			projectileMotionY -= gravity * 0.1;
+			
+			Vec3d eyesPos = RotationUtils.getEyesPos();
+			
+			if(MC.world
+				.rayTrace(new RayTraceContext(eyesPos, arrowPos,
+					RayTraceContext.ShapeType.COLLIDER,
+					RayTraceContext.FluidHandling.NONE, MC.player))
+				.getType() != HitResult.Type.MISS)
+				break;
 		}
 		
 		return path;
