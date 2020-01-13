@@ -31,7 +31,8 @@ public class TrajectoriesHack extends Hack implements RenderListener
 	
 	public TrajectoriesHack()
 	{
-		super("Trajectories", "Shows the trajectory of ranged items");
+		super("Trajectories",
+			"Predicts the flight path of arrows and throwable items.");
 		setCategory(Category.RENDER);
 	}
 	
