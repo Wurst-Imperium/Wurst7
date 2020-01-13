@@ -1,7 +1,5 @@
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.MinecraftClient;
@@ -9,7 +7,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -26,8 +23,6 @@ public class TrajectoriesHack extends Hack implements RenderListener
 	// Max points in a trajectory. Bigger means longer traces in air, but takes
 	// longer to calculate.
 	private static final long DEFAULT_COLOR = 0x00FF007FL;
-	
-	private final ArrayList<PlayerEntity> livingEntities = new ArrayList<>();
 	
 	public TrajectoriesHack()
 	{
