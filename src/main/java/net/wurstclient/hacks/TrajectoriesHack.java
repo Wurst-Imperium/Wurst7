@@ -13,13 +13,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.TrajectoryPath;
 
+@SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
+	"arrow trajectories"})
 public class TrajectoriesHack extends Hack implements RenderListener
 {
-	
 	private static final int MAX_POINTS = 1000;
 	// Max points in a trajectory. Bigger means longer traces in air, but takes
 	// longer to calculate.
