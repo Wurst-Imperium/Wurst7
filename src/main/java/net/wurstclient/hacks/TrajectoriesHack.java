@@ -3,8 +3,6 @@ package net.wurstclient.hacks;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
@@ -13,6 +11,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.TrajectoryPath;
 
 @SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
@@ -54,15 +53,8 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2.0f);
-		Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
 		
-		// Minecraft 1.15+ handles rotations and transforms relative to the
-		// camera position.
-		// This code "undoes" the rotation and places it relative to
-		// Minecraftian x/y/z coords.
-		// Fun fact - it took dozens of hours to come up with this. :facepalm:
-		GL11.glRotated(camera.getPitch(), 1, 0, 0);
-		GL11.glRotated(camera.getYaw() + 180, 0, 1, 0);
+		RenderUtils.applyCameraRotationOnly();
 		
 		for(Entity e : MC.world.getEntities())
 		{
@@ -86,12 +78,10 @@ public class TrajectoriesHack extends Hack implements RenderListener
 				// defaultalpha);
 				GL11.glColor4d(defaultred, defaultgreen, defaultblue,
 					defaultalpha);
-				GL11.glVertex3d(point.x
-					- BlockEntityRenderDispatcher.INSTANCE.camera.getPos().x,
-					point.y - BlockEntityRenderDispatcher.INSTANCE.camera
-						.getPos().y,
-					point.z - BlockEntityRenderDispatcher.INSTANCE.camera
-						.getPos().z);
+				
+				Vec3d camPos = RenderUtils.getCameraPos();
+				GL11.glVertex3d(point.x - camPos.x, point.y - camPos.y,
+					point.z - camPos.z);
 			}
 			GL11.glEnd();
 		}

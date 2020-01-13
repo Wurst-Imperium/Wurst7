@@ -38,12 +38,17 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
+		applyCameraRotationOnly();
+		Vec3d camPos = getCameraPos();
+		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
+	}
+	
+	public static void applyCameraRotationOnly()
+	{
 		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
-		Vec3d camPos = camera.getPos();
 		GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
 		GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
 			0);
-		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
 	}
 	
 	public static Vec3d getCameraPos()

@@ -10,7 +10,7 @@ import net.minecraft.util.math.Vec3d;
  * The path a projectile will take through the air. This consists solely of
  * vectors depicting the coordinates the projectile will likely pass through.
  * Positions are in standard Minecraft coordinates.
- * 
+ *
  * @author Admin
  *
  */
@@ -36,7 +36,7 @@ public class TrajectoryPath implements Iterable<Vec3d>
 	
 	/**
 	 * Returns pairs of numbers in the form (x, y).
-	 * 
+	 *
 	 * @return
 	 */
 	public String plotX()
@@ -51,7 +51,7 @@ public class TrajectoryPath implements Iterable<Vec3d>
 	
 	/**
 	 * Returns pairs of numbers in the form (z, y).
-	 * 
+	 *
 	 * @return
 	 */
 	public String plotZ()
