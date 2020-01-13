@@ -24,7 +24,6 @@ public class TrajectoriesHack extends Hack implements RenderListener
 	private static final int MAX_POINTS = 1000;
 	// Max points in a trajectory. Bigger means longer traces in air, but takes
 	// longer to calculate.
-	private static final long DEFAULT_COLOR = 0x00FF007FL;
 	
 	public TrajectoriesHack()
 	{
@@ -67,21 +66,11 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			
 			TrajectoryPath path = getPath(entity);
 			
-			double defaultred = ((DEFAULT_COLOR & 0xFF000000) >> 24) / 255d;
-			double defaultgreen = ((DEFAULT_COLOR & 0x00FF0000) >> 16) / 255d;
-			double defaultblue = ((DEFAULT_COLOR & 0x0000FF00) >> 8) / 255d;
-			double defaultalpha = (DEFAULT_COLOR & 0x000000FF) / 255d;
-			
 			GL11.glBegin(GL11.GL_LINE_STRIP);
+			GL11.glColor4f(0, 1, 0, 0.75F);
 			
 			for(Vec3d point : path)
 			{
-				// System.out.println("R: " + defaultred + ", G: " +
-				// defaultgreen + ", B: " + defaultblue + ", A: " +
-				// defaultalpha);
-				GL11.glColor4d(defaultred, defaultgreen, defaultblue,
-					defaultalpha);
-				
 				Vec3d camPos = RenderUtils.getCameraPos();
 				GL11.glVertex3d(point.x - camPos.x, point.y - camPos.y,
 					point.z - camPos.z);
@@ -89,7 +78,6 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			GL11.glEnd();
 		}
 		
-		GL11.glColor4d(1, 1, 1, 1);
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
