@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -31,7 +31,7 @@ public final class HackList implements UpdateListener
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
 	public final AntiWaterPushHack antiWaterPushHack = new AntiWaterPushHack();
 	public final AutoArmorHack autoArmorHack = new AutoArmorHack();
-	// public final AutoBuildHack autoBuildHack = new AutoBuildHack();
+	public final AutoBuildHack autoBuildHack = new AutoBuildHack();
 	public final AutoDropHack autoDropHack = new AutoDropHack();
 	// public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
 	// public final AutoEatHack autoEatHack = new AutoEatHack();
@@ -44,7 +44,7 @@ public final class HackList implements UpdateListener
 	// AutoSplashPotHack();
 	// public final AutoSoupHack autoSoupHack = new AutoSoupHack();
 	public final AutoSprintHack autoSprintHack = new AutoSprintHack();
-	// public final AutoStealHack autoStealHack = new AutoStealHack();
+	public final AutoStealHack autoStealHack = new AutoStealHack();
 	public final AutoSwimHack autoSwimHack = new AutoSwimHack();
 	public final AutoSwitchHack autoSwitchHack = new AutoSwitchHack();
 	// public final AutoSwordHack autoSwordHack = new AutoSwordHack();
@@ -52,7 +52,7 @@ public final class HackList implements UpdateListener
 	public final AutoWalkHack autoWalkHack = new AutoWalkHack();
 	public final BaseFinderHack baseFinderHack = new BaseFinderHack();
 	public final BlinkHack blinkHack = new BlinkHack();
-	// public final BoatFlyHack boatFlyHack = new BoatFlyHack();
+	public final BoatFlyHack boatFlyHack = new BoatFlyHack();
 	public final BonemealAuraHack bonemealAuraHack = new BonemealAuraHack();
 	// public final BowAimbotHack bowAimbotHack = new BowAimbotHack();
 	public final BuildRandomHack buildRandomHack = new BuildRandomHack();
@@ -69,7 +69,7 @@ public final class HackList implements UpdateListener
 	// public final DerpHack derpHack = new DerpHack();
 	public final DolphinHack dolphinHack = new DolphinHack();
 	// public final ExcavatorHack excavatorHack = new ExcavatorHack();
-	// public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
+	public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
 	public final FancyChatHack fancyChatHack = new FancyChatHack();
 	public final FastBreakHack fastBreakHack = new FastBreakHack();
 	// public final FastBowHack fastBowHack = new FastBowHack();
@@ -139,6 +139,7 @@ public final class HackList implements UpdateListener
 	// public final SafeWalkHack safeWalkHack = new SafeWalkHack();
 	public final ScaffoldWalkHack scaffoldWalkHack = new ScaffoldWalkHack();
 	public final SearchHack searchHack = new SearchHack();
+	public final ServerCrasherHack serverCrasherHack = new ServerCrasherHack();
 	// public final SkinDerpHack skinDerpHack = new SkinDerpHack();
 	public final SneakHack sneakHack = new SneakHack();
 	// public final SpammerHack spammerHack = new SpammerHack();

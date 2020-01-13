@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ import net.wurstclient.clickgui.components.ComboBoxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
 
-public final class EnumSetting<T extends Enum> extends Setting
+public final class EnumSetting<T extends Enum<T>> extends Setting
 {
 	private final T[] values;
 	private T selected;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 
@@ -143,11 +144,23 @@ public final class EditItemListScreen extends Screen
 	{
 		itemNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(new Identifier(itemNameField.getText()));
+		itemToAdd = Registry.ITEM.get(getItemIDFromField());
 		addButton.active = itemToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
+	}
+	
+	private Identifier getItemIDFromField()
+	{
+		try
+		{
+			return new Identifier(itemNameField.getText().toLowerCase());
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
+		}
 	}
 	
 	@Override
@@ -167,8 +180,13 @@ public final class EditItemListScreen extends Screen
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
+		{
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0, 300);
 			drawString(minecraft.textRenderer, "item name or ID", 68,
 				height - 50, 0x808080);
+			GL11.glPopMatrix();
+		}
 		
 		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(49, height - 55, 64, height - 37, 0xff000000);

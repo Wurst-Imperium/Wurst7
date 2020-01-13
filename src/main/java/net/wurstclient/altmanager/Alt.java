@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,10 @@
  */
 package net.wurstclient.altmanager;
 
-public final class Alt
+import java.util.Comparator;
+import java.util.Objects;
+
+public final class Alt implements Comparable<Alt>
 {
 	private String email;
 	private String name;
@@ -23,7 +26,7 @@ public final class Alt
 	
 	public Alt(String email, String password, String name, boolean starred)
 	{
-		this.email = email;
+		this.email = Objects.requireNonNull(email);
 		this.starred = starred;
 		
 		if(password == null || password.isEmpty())
@@ -39,7 +42,7 @@ public final class Alt
 			cracked = false;
 			unchecked = name == null || name.isEmpty();
 			
-			this.name = name;
+			this.name = unchecked ? "" : name;
 			this.password = password;
 		}
 	}
@@ -93,5 +96,32 @@ public final class Alt
 	{
 		this.name = name;
 		unchecked = false;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(!(obj instanceof Alt))
+			return false;
+		
+		Alt other = (Alt)obj;
+		
+		return email.equals(other.email) && cracked == other.cracked;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return email.hashCode() << 1 | (cracked ? 1 : 0);
+	}
+	
+	@Override
+	public int compareTo(Alt o)
+	{
+		Comparator<Alt> c = Comparator.comparing(a -> !a.starred);
+		c = c.thenComparing(a -> a.cracked);
+		c = c.thenComparing(a -> a.email);
+		
+		return c.compare(this, o);
 	}
 }

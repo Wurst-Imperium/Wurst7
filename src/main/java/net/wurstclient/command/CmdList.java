@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -62,6 +62,7 @@ public final class CmdList
 	// public final ThrowCmd throwCmd = new ThrowCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
+	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
 	
