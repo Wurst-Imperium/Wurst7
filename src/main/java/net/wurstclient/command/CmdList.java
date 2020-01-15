@@ -42,7 +42,6 @@ public final class CmdList
 	// public final JumpCmd jumpCmd = new JumpCmd();
 	// public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
-	// public final NothingCmd nothingCmd = new NothingCmd();
 	// public final NukerCmd nukerCmd = new NukerCmd();
 	// public final PathCmd pathCmd = new PathCmd();
 	// public final PotionCmd potionCmd = new PotionCmd();
@@ -52,18 +51,15 @@ public final class CmdList
 	// public final RvCmd rvCmd = new RvCmd();
 	// public final SvCmd svCmd = new SvCmd();
 	public final SayCmd sayCmd = new SayCmd();
-	// public final SearchCmd searchCmd = new SearchCmd();
 	// public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
 	// public final SetModeCmd setModeCmd = new SetModeCmd();
 	// public final SetSliderCmd setSliderCmd = new SetSliderCmd();
-	// public final SpammerCmd spammerCmd = new SpammerCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
 	// public final ThrowCmd throwCmd = new ThrowCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
-	// public final WmsCmd wmsCmd = new WmsCmd();
 	// public final XRayCmd xRayCmd = new XRayCmd();
 	
 	private final TreeMap<String, Command> cmds =
