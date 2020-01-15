@@ -25,9 +25,7 @@ public final class HackList implements UpdateListener
 	// public final AntiAfkHack antiAfkHack = new AntiAfkHack();
 	// public final AntiBlindHack antiBlindHack = new AntiBlindHack();
 	public final AntiCactusHack antiCactusHack = new AntiCactusHack();
-	// public final AntiFireHack antiFireHack = new AntiFireHack();
 	public final AntiKnockbackHack antiKnockbackHack = new AntiKnockbackHack();
-	// public final AntiPotionHack antiPotionHack = new AntiPotionHack();
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
 	public final AntiWaterPushHack antiWaterPushHack = new AntiWaterPushHack();
 	public final AutoArmorHack autoArmorHack = new AutoArmorHack();
@@ -81,7 +79,6 @@ public final class HackList implements UpdateListener
 	public final FlightHack flightHack = new FlightHack();
 	// public final FollowHack followHack = new FollowHack();
 	// public final ForceOpHack forceOpHack = new ForceOpHack();
-	// public final ForcePushHack forcePushHack = new ForcePushHack();
 	public final FreecamHack freecamHack = new FreecamHack();
 	public final FullbrightHack fullbrightHack = new FullbrightHack();
 	// public final GhostHandHack ghostHandHack = new GhostHandHack();
@@ -90,7 +87,6 @@ public final class HackList implements UpdateListener
 	// public final HeadRollHack headRollHack = new HeadRollHack();
 	// public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	// public final HighJumpHack highJumpHack = new HighJumpHack();
-	// public final HomeHack homeHack = new HomeHack();
 	// public final InstantBunkerHack instantBunkerHack = new
 	// InstantBunkerHack();
 	// public final InvWalkHack invWalkHack = new InvWalkHack();
@@ -125,7 +121,6 @@ public final class HackList implements UpdateListener
 	// public final OverlayHack overlayHack = new OverlayHack();
 	public final PanicHack panicHack = new PanicHack();
 	// public final ParkourHack parkourHack = new ParkourHack();
-	// public final PhaseHack phaseHack = new PhaseHack();
 	public final PlayerEspHack playerEspHack = new PlayerEspHack();
 	// public final PlayerFinderHack playerFinderHack = new PlayerFinderHack();
 	// public final PotionSaverHack potionSaverHack = new PotionSaverHack();
@@ -134,7 +129,6 @@ public final class HackList implements UpdateListener
 	// public final RadarHack radarHack = new RadarHack();
 	// public final RainbowUiHack rainbowUiHack = new RainbowUiHack();
 	public final ReachHack reachHack = new ReachHack();
-	// public final RegenHack regenHack = new RegenHack();
 	// public final RemoteViewHack remoteViewHack = new RemoteViewHack();
 	// public final SafeWalkHack safeWalkHack = new SafeWalkHack();
 	public final ScaffoldWalkHack scaffoldWalkHack = new ScaffoldWalkHack();
