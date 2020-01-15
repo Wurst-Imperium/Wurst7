@@ -25,9 +25,7 @@ public final class OtfList
 	public final HackListOtf hackListOtf = new HackListOtf();
 	// public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	// public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
-	// public final TargetOtf targetOtf = new TargetOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
-	// public final YesCheatOtf yesCheatOtf = new YesCheatOtf();
 	public final ZoomOtf zoomOtf = new ZoomOtf();
 	
 	private final TreeMap<String, OtherFeature> otfs =
