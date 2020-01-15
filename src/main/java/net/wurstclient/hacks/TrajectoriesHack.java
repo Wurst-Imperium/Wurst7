@@ -57,8 +57,12 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		Vec3d camPos = RenderUtils.getCameraPos();
 		
 		drawLine(path, camPos);
-		Vec3d end = path.get(path.size() - 1);
-		drawEndOfLine(end, camPos);
+		
+		if(!path.isEmpty())
+		{
+			Vec3d end = path.get(path.size() - 1);
+			drawEndOfLine(end, camPos);
+		}
 		
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
