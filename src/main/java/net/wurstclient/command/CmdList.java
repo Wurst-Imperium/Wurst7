@@ -17,7 +17,7 @@ import net.wurstclient.commands.*;
 
 public final class CmdList
 {
-	// public final AddAltCmd addAltCmd = new AddAltCmd();
+	public final AddAltCmd addAltCmd = new AddAltCmd();
 	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();

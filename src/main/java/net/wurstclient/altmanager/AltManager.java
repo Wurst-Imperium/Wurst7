@@ -27,6 +27,15 @@ public final class AltManager
 		this.altsFile.load(this);
 	}
 	
+	public boolean contains(String name)
+	{
+		for(Alt alt : alts)
+			if(alt.getNameOrEmail().equalsIgnoreCase(name))
+				return true;
+			
+		return false;
+	}
+	
 	public void add(String email, String password, boolean starred)
 	{
 		add(new Alt(email, password, null, starred));
