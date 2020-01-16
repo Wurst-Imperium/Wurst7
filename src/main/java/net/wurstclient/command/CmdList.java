@@ -24,7 +24,7 @@ public final class CmdList
 	public final BlinkCmd blinkCmd = new BlinkCmd();
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
-	// public final DamageCmd damageCmd = new DamageCmd();
+	public final DamageCmd damageCmd = new DamageCmd();
 	public final DropCmd dropCmd = new DropCmd();
 	public final EnchantCmd enchantCmd = new EnchantCmd();
 	// public final ExcavateCmd excavateCmd = new ExcavateCmd();
