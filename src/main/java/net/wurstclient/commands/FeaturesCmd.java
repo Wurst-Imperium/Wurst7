@@ -64,6 +64,6 @@ public final class FeaturesCmd extends Command
 	@Override
 	public void doPrimaryAction()
 	{
-		WURST.getCmdProcessor().process(".features");
+		WURST.getCmdProcessor().process("features");
 	}
 }
