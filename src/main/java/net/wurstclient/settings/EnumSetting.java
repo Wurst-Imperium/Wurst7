@@ -116,6 +116,22 @@ public final class EnumSetting<T extends Enum<T>> extends Setting
 	public LinkedHashSet<PossibleKeybind> getPossibleKeybinds(
 		String featureName)
 	{
-		return new LinkedHashSet<>();
+		String fullName = featureName + " " + getName();
+		
+		String command = ".setmode " + featureName.toLowerCase() + " "
+			+ getName().toLowerCase().replace(" ", "_") + " ";
+		String description = "Set " + fullName + " to ";
+		
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
+		pkb.add(new PossibleKeybind(command + "next", "Next " + fullName));
+		pkb.add(new PossibleKeybind(command + "prev", "Previous " + fullName));
+		
+		for(T v : values)
+		{
+			String vName = v.toString().replace(" ", "_").toLowerCase();
+			pkb.add(new PossibleKeybind(command + vName, description + v));
+		}
+		
+		return pkb;
 	}
 }
