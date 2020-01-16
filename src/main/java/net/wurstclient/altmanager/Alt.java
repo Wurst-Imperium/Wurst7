@@ -120,7 +120,7 @@ public final class Alt implements Comparable<Alt>
 	{
 		Comparator<Alt> c = Comparator.comparing(a -> !a.starred);
 		c = c.thenComparing(a -> a.cracked);
-		c = c.thenComparing(a -> a.email);
+		c = c.thenComparing(a -> a.email.toLowerCase());
 		
 		return c.compare(this, o);
 	}
