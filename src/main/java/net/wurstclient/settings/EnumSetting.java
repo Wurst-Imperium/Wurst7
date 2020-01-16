@@ -59,7 +59,7 @@ public final class EnumSetting<T extends Enum<T>> extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	public void setSelected(String selected)
+	public boolean setSelected(String selected)
 	{
 		for(T value : values)
 		{
@@ -67,8 +67,28 @@ public final class EnumSetting<T extends Enum<T>> extends Setting
 				continue;
 			
 			setSelected(value);
-			break;
+			return true;
 		}
+		
+		return false;
+	}
+	
+	public void selectNext()
+	{
+		int next = selected.ordinal() + 1;
+		if(next >= values.length)
+			next = 0;
+		
+		setSelected(values[next]);
+	}
+	
+	public void selectPrev()
+	{
+		int prev = selected.ordinal() - 1;
+		if(prev < 0)
+			prev = values.length - 1;
+		
+		setSelected(values[prev]);
 	}
 	
 	@Override
