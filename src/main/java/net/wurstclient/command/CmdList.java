@@ -53,7 +53,7 @@ public final class CmdList
 	public final SayCmd sayCmd = new SayCmd();
 	public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
 	// public final SetModeCmd setModeCmd = new SetModeCmd();
-	// public final SetSliderCmd setSliderCmd = new SetSliderCmd();
+	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
 	// public final ThrowCmd throwCmd = new ThrowCmd();
