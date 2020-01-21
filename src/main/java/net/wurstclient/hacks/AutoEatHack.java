@@ -22,16 +22,53 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"AutoSoup", "auto eat", "auto soup"})
 public final class AutoEatHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting eatWhileWalking =
+		new CheckboxSetting("Eat while walking", false);
+	
+	private final EnumSetting<FoodPriority> foodPriority =
+		new EnumSetting<>("Prefer food with", FoodPriority.values(),
+			FoodPriority.HIGH_SATURATION);
+	
+	private final CheckboxSetting allowRotten =
+		new CheckboxSetting("Allow rotten flesh",
+			"Rotten flesh applies a harmless 'hunger' effect.\n"
+				+ "It is safe to eat and useful as emergency food.",
+			true);
+	
+	private final CheckboxSetting allowPoison =
+		new CheckboxSetting("Allow poison",
+			"Poisoned food applies damage over time.\n" + "Not recommended.",
+			false);
+	
+	private final CheckboxSetting allowChorus =
+		new CheckboxSetting("Allow chorus fruit",
+			"Chorus fruit teleports you to a random location.\n"
+				+ "Not recommended.",
+			true);
+	
+	private final CheckboxSetting allowStew = new CheckboxSetting(
+		"Allow suspicious stew", "Suspicious stew can apply any potion effect\n"
+			+ "for a couple of seconds.",
+		false);
+	
 	private int oldSlot = -1;
 	
 	public AutoEatHack()
 	{
 		super("AutoEat", "Automatically eats food when necessary.");
 		setCategory(Category.ITEMS);
+		addSetting(eatWhileWalking);
+		addSetting(foodPriority);
+		addSetting(allowRotten);
+		addSetting(allowPoison);
+		addSetting(allowChorus);
+		addSetting(allowStew);
 	}
 	
 	@Override
@@ -150,5 +187,26 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		MC.player.inventory.selectedSlot = oldSlot;
 		oldSlot = -1;
+	}
+	
+	public static enum FoodPriority
+	{
+		HIGH_HUNGER("High Food Points"),
+		HIGH_SATURATION("High Saturation"),
+		LOW_HUNGER("Low Food Points"),
+		LOW_SATURATION("Low Saturation");
+		
+		private final String name;
+		
+		private FoodPriority(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }
