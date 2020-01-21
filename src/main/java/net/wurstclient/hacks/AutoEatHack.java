@@ -7,12 +7,15 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Comparator;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -51,7 +54,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		new CheckboxSetting("Allow chorus fruit",
 			"Chorus fruit teleports you to a random location.\n"
 				+ "Not recommended.",
-			true);
+			false);
 	
 	private final CheckboxSetting allowStew = new CheckboxSetting(
 		"Allow suspicious stew", "Suspicious stew can apply any potion effect\n"
@@ -116,7 +119,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	private int getBestSlot()
 	{
 		int bestSlot = -1;
-		float bestSaturation = -1;
+		FoodComponent bestFood = null;
+		Comparator<FoodComponent> comparator =
+			foodPriority.getSelected().comparator;
 		
 		for(int i = 0; i < 9; i++)
 		{
@@ -126,10 +131,10 @@ public final class AutoEatHack extends Hack implements UpdateListener
 				continue;
 			
 			// compare to previously found food
-			float saturation = item.getFoodComponent().getSaturationModifier();
-			if(saturation > bestSaturation)
+			FoodComponent food = item.getFoodComponent();
+			if(bestFood == null || comparator.compare(food, bestFood) > 0)
 			{
-				bestSaturation = saturation;
+				bestFood = food;
 				bestSlot = i;
 			}
 		}
@@ -139,6 +144,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private boolean shouldEat()
 	{
+		if(MC.player.abilities.creativeMode)
+			return false;
+		
 		if(!MC.player.canConsume(false))
 			return false;
 		
@@ -196,16 +204,28 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	public static enum FoodPriority
 	{
-		HIGH_HUNGER("High Food Points"),
-		HIGH_SATURATION("High Saturation"),
-		LOW_HUNGER("Low Food Points"),
-		LOW_SATURATION("Low Saturation");
+		HIGH_HUNGER("High Food Points",
+			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())),
+		
+		HIGH_SATURATION("High Saturation",
+			Comparator.<FoodComponent> comparingDouble(
+				food -> food.getSaturationModifier())),
+		
+		LOW_HUNGER("Low Food Points",
+			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())
+				.reversed()),
+		
+		LOW_SATURATION("Low Saturation",
+			Comparator.<FoodComponent> comparingDouble(
+				food -> food.getSaturationModifier()).reversed());
 		
 		private final String name;
+		private final Comparator<FoodComponent> comparator;
 		
-		private FoodPriority(String name)
+		private FoodPriority(String name, Comparator<FoodComponent> comparator)
 		{
 			this.name = name;
+			this.comparator = comparator;
 		}
 		
 		@Override
