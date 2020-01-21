@@ -25,7 +25,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 
-@SearchTags({"AutoSoup", "auto eat", "auto soup"})
+@SearchTags({"auto eat", "AutoFood", "auto food", "AutoFeeder", "auto feeder",
+	"AutoFeeding", "auto feeding", "AutoSoup", "auto soup"})
 public final class AutoEatHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting eatWhileWalking =
