@@ -32,7 +32,7 @@ public final class FeaturesCmd extends Command
 		
 		if(WurstClient.VERSION.startsWith("7.0pre"))
 			ChatUtils.warning(
-				"This is just a pre-release! It doesn’t (yet) have all of the features of Wurst 7.0! See download page for details.");
+				"This is just a pre-release! It doesn't (yet) have all of the features of Wurst 7.0! See download page for details.");
 		
 		int hax = WURST.getHax().countHax();
 		int cmds = WURST.getCmds().countCmds();
