@@ -6,6 +6,7 @@
   ],
   "client": [
     "ArmorItemMixin",
+    "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
