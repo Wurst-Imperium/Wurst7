@@ -39,14 +39,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		new EnumSetting<>("Prefer food with", FoodPriority.values(),
 			FoodPriority.HIGH_SATURATION);
 	
-	private final CheckboxSetting allowRotten =
-		new CheckboxSetting("Allow rotten flesh",
+	private final CheckboxSetting allowHunger =
+		new CheckboxSetting("Allow hunger effect",
 			"Rotten flesh applies a harmless 'hunger' effect.\n"
 				+ "It is safe to eat and useful as emergency food.",
 			true);
 	
 	private final CheckboxSetting allowPoison =
-		new CheckboxSetting("Allow poison",
+		new CheckboxSetting("Allow poison effect",
 			"Poisoned food applies damage over time.\n" + "Not recommended.",
 			false);
 	
@@ -56,11 +56,6 @@ public final class AutoEatHack extends Hack implements UpdateListener
 				+ "Not recommended.",
 			false);
 	
-	private final CheckboxSetting allowStew = new CheckboxSetting(
-		"Allow suspicious stew", "Suspicious stew can apply any potion effect\n"
-			+ "for a couple of seconds.",
-		false);
-	
 	private int oldSlot = -1;
 	
 	public AutoEatHack()
@@ -69,10 +64,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		setCategory(Category.ITEMS);
 		addSetting(eatWhileWalking);
 		addSetting(foodPriority);
-		addSetting(allowRotten);
+		addSetting(allowHunger);
 		addSetting(allowPoison);
 		addSetting(allowChorus);
-		addSetting(allowStew);
 	}
 	
 	@Override
