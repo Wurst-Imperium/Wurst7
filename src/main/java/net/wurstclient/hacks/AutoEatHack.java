@@ -9,13 +9,19 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.FoodComponent;
+import net.minecraft.item.FoodComponents;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -32,8 +38,8 @@ import net.wurstclient.settings.EnumSetting;
 	"AutoFeeding", "auto feeding", "AutoSoup", "auto soup"})
 public final class AutoEatHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting eatWhileWalking =
-		new CheckboxSetting("Eat while walking", false);
+	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
+		"Eat while walking", "Slows you down, not recommended.", false);
 	
 	private final EnumSetting<FoodPriority> foodPriority =
 		new EnumSetting<>("Prefer food with", FoodPriority.values(),
@@ -52,7 +58,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting allowChorus =
 		new CheckboxSetting("Allow chorus fruit",
-			"Chorus fruit teleports you to a random location.\n"
+			"Eating chorus fruit teleports you to a random location.\n"
 				+ "Not recommended.",
 			false);
 	
@@ -124,8 +130,11 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			if(!item.isFood())
 				continue;
 			
-			// compare to previously found food
 			FoodComponent food = item.getFoodComponent();
+			if(!isAllowedFood(food))
+				continue;
+			
+			// compare to previously found food
 			if(bestFood == null || comparator.compare(food, bestFood) > 0)
 			{
 				bestFood = food;
@@ -134,6 +143,25 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		}
 		
 		return bestSlot;
+	}
+	
+	private boolean isAllowedFood(FoodComponent food)
+	{
+		if(!allowChorus.isChecked() && food == FoodComponents.CHORUS_FRUIT)
+			return false;
+		
+		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
+		{
+			StatusEffect effect = pair.getLeft().getEffectType();
+			
+			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
+				return false;
+			
+			if(!allowPoison.isChecked() && effect == StatusEffects.POISON)
+				return false;
+		}
+		
+		return true;
 	}
 	
 	private boolean shouldEat()
