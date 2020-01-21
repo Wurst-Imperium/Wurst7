@@ -20,6 +20,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
@@ -81,6 +82,20 @@ public class GameRendererMixin
 	{
 		HitResultRayTraceEvent event = new HitResultRayTraceEvent(float_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Redirect(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F",
+			ordinal = 0),
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+	private float wurstNauseaLerp(float delta, float first, float second)
+	{
+		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
+			return MathHelper.lerp(delta, first, second);
+		
+		return 0;
 	}
 	
 	@Shadow
