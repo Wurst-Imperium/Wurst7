@@ -142,6 +142,10 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(!MC.player.canConsume(false))
 			return false;
 		
+		if(!eatWhileWalking.isChecked()
+			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
+			return false;
+		
 		if(isClickable(MC.crosshairTarget))
 			return false;
 		
