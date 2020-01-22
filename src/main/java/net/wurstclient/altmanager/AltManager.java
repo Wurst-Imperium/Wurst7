@@ -88,6 +88,7 @@ public final class AltManager
 			numPremium--;
 		
 		alts.remove(index);
+		altsFile.save(this);
 	}
 	
 	private void remove(Alt alt)
@@ -97,6 +98,8 @@ public final class AltManager
 				numCracked--;
 			else if(!alt.isUnchecked())
 				numPremium--;
+			
+		altsFile.save(this);
 	}
 	
 	private void sortAlts()
