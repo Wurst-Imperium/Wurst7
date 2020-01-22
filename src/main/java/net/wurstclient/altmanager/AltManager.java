@@ -63,7 +63,11 @@ public final class AltManager
 	
 	public void setChecked(int index, String name)
 	{
-		alts.get(index).setChecked(name);
+		Alt alt = alts.get(index);
+		if(alt.isUnchecked())
+			numPremium++;
+		
+		alt.setChecked(name);
 		altsFile.save(this);
 	}
 	
@@ -76,9 +80,11 @@ public final class AltManager
 	
 	public void remove(int index)
 	{
-		if(alts.get(index).isCracked())
+		Alt alt = alts.get(index);
+		
+		if(alt.isCracked())
 			numCracked--;
-		else
+		else if(!alt.isUnchecked())
 			numPremium--;
 		
 		alts.remove(index);
@@ -89,7 +95,7 @@ public final class AltManager
 		if(alts.remove(alt))
 			if(alt.isCracked())
 				numCracked--;
-			else
+			else if(!alt.isUnchecked())
 				numPremium--;
 	}
 	
@@ -102,7 +108,8 @@ public final class AltManager
 		alts.addAll(newAlts);
 		
 		numCracked = (int)alts.stream().filter(Alt::isCracked).count();
-		numPremium = alts.size() - numCracked;
+		numPremium = (int)alts.stream().filter(alt -> !alt.isCracked())
+			.filter(alt -> !alt.isUnchecked()).count();
 	}
 	
 	public List<Alt> getList()
