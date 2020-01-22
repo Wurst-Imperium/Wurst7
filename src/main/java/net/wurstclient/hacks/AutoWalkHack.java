@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.options.KeyBinding;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -33,14 +34,13 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
-		IKeyBinding forwardKey = (IKeyBinding)MC.options.keyForward;
-		forwardKey.setPressed(forwardKey.isActallyPressed());
+		KeyBinding forwardKey = MC.options.keyForward;
+		forwardKey.setPressed(((IKeyBinding)forwardKey).isActallyPressed());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		IKeyBinding forwardKey = (IKeyBinding)MC.options.keyForward;
-		forwardKey.setPressed(true);
+		MC.options.keyForward.setPressed(true);
 	}
 }
