@@ -40,7 +40,7 @@ public final class CmdList
 	// public final InvseeCmd invseeCmd = new InvseeCmd();
 	// public final IpCmd ipCmd = new IpCmd();
 	// public final JumpCmd jumpCmd = new JumpCmd();
-	// public final LeaveCmd leaveCmd = new LeaveCmd();
+	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
 	// public final NukerCmd nukerCmd = new NukerCmd();
 	// public final PathCmd pathCmd = new PathCmd();
