@@ -15,6 +15,7 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.other_features.ChangelogOtf;
 import net.wurstclient.other_features.HackListOtf;
+import net.wurstclient.other_features.ServerFinderOtf;
 import net.wurstclient.other_features.WurstLogoOtf;
 import net.wurstclient.other_features.ZoomOtf;
 
@@ -23,7 +24,7 @@ public final class OtfList
 	public final ChangelogOtf changelogOtf = new ChangelogOtf();
 	// public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();
-	// public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
+	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	// public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
 	public final ZoomOtf zoomOtf = new ZoomOtf();
