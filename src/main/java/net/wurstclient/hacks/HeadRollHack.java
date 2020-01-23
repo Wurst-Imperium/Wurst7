@@ -27,6 +27,10 @@ public final class HeadRollHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		// disable incompatible derps
+		WURST.getHax().derpHack.setEnabled(false);
+		WURST.getHax().tiredHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
