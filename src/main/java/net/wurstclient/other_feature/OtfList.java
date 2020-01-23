@@ -19,7 +19,6 @@ import net.wurstclient.other_features.ZoomOtf;
 
 public final class OtfList
 {
-	// public final BookHackOtf bookHackOtf = new BookHackOtf();
 	// public final ChangelogOtf changelogOtf = new ChangelogOtf();
 	// public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();

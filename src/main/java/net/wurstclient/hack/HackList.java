@@ -83,7 +83,6 @@ public final class HackList implements UpdateListener
 	public final FullbrightHack fullbrightHack = new FullbrightHack();
 	// public final GhostHandHack ghostHandHack = new GhostHandHack();
 	// public final GlideHack glideHack = new GlideHack();
-	// public final HeadlessHack headlessHack = new HeadlessHack();
 	// public final HeadRollHack headRollHack = new HeadRollHack();
 	// public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	// public final HighJumpHack highJumpHack = new HighJumpHack();
@@ -136,12 +135,10 @@ public final class HackList implements UpdateListener
 	public final ServerCrasherHack serverCrasherHack = new ServerCrasherHack();
 	public final SkinDerpHack skinDerpHack = new SkinDerpHack();
 	public final SneakHack sneakHack = new SneakHack();
-	// public final SpammerHack spammerHack = new SpammerHack();
 	// public final SpeedHackHack speedHackHack = new SpeedHackHack();
 	// public final SpeedNukerHack speedNukerHack = new SpeedNukerHack();
 	public final SpiderHack spiderHack = new SpiderHack();
 	// public final StepHack stepHack = new StepHack();
-	// public final TemplateToolHack templateToolHack = new TemplateToolHack();
 	// public final ThrowHack throwHack = new ThrowHack();
 	public final TimerHack timerHack = new TimerHack();
 	public final TiredHack tiredHack = new TiredHack();

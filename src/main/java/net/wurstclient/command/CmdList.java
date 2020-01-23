@@ -42,7 +42,6 @@ public final class CmdList
 	// public final JumpCmd jumpCmd = new JumpCmd();
 	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
-	// public final NukerCmd nukerCmd = new NukerCmd();
 	// public final PathCmd pathCmd = new PathCmd();
 	// public final PotionCmd potionCmd = new PotionCmd();
 	// public final ProtectCmd protectCmd = new ProtectCmd();
@@ -60,7 +59,6 @@ public final class CmdList
 	public final TpCmd tpCmd = new TpCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
-	// public final XRayCmd xRayCmd = new XRayCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
