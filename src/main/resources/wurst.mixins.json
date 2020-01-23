@@ -29,6 +29,7 @@
     "IngameHudMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
+    "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
