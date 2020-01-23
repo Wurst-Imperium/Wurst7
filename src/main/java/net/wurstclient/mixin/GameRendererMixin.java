@@ -18,17 +18,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
+import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
-public class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloadListener
+public abstract class GameRendererMixin
+	implements AutoCloseable, SynchronousResourceReloadListener, IGameRenderer
 {
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
@@ -104,16 +105,14 @@ public class GameRendererMixin
 		
 	}
 	
-	@Shadow
 	@Override
-	public void apply(ResourceManager var1)
+	public void loadWurstShader(Identifier identifier)
 	{
-		
+		loadShader(identifier);
 	}
 	
 	@Shadow
-	@Override
-	public void close() throws Exception
+	private void loadShader(Identifier identifier)
 	{
 		
 	}
