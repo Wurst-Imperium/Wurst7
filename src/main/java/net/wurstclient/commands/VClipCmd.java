@@ -31,7 +31,7 @@ public final class VClipCmd extends Command
 			throw new CmdSyntaxError();
 		
 		ClientPlayerEntity player = MC.player;
-		player.setPosition(player.getX(),
+		player.updatePosition(player.getX(),
 			player.getY() + Integer.parseInt(args[0]), player.getZ());
 	}
 }
