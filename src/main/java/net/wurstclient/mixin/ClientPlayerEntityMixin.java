@@ -120,6 +120,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
+	protected float getJumpVelocity()
+	{
+		return super.getJumpVelocity()
+			+ WurstClient.INSTANCE.getHax().highJumpHack
+				.getAdditionalJumpMotion();
+	}
+	
+	@Override
 	public void setNoClip(boolean noClip)
 	{
 		this.noClip = noClip;
