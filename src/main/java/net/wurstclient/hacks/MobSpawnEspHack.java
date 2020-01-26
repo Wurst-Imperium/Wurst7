@@ -37,6 +37,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.MinPriorityThreadFactory;
@@ -52,6 +53,7 @@ public final class MobSpawnEspHack extends Hack
 		"Draw distance", DrawDistance.values(), DrawDistance.D9);
 	private final SliderSetting loadingSpeed =
 		new SliderSetting("Loading speed", 1, 1, 5, 1, v -> (int)v + "x");
+	private final CheckboxSetting xRay = new CheckboxSetting("X-Ray", "Reveal out-of-sight spawn areas.", false);
 	
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool;
@@ -66,6 +68,7 @@ public final class MobSpawnEspHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
+		addSetting(xRay);
 	}
 	
 	@Override
@@ -226,12 +229,18 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		// Avoid inconsistent GL state if setting changed mid-onRender
+		boolean disableDepthTest = xRay.isChecked();
+
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		if (disableDepthTest) {
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+		}
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		
 		GL11.glPushMatrix();
@@ -249,6 +258,9 @@ public final class MobSpawnEspHack extends Hack
 		
 		// GL resets
 		GL11.glColor4f(1, 1, 1, 1);
+		if (disableDepthTest) {
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+		}
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
