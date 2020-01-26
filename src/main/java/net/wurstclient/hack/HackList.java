@@ -129,7 +129,7 @@ public final class HackList implements UpdateListener
 	public final RainbowUiHack rainbowUiHack = new RainbowUiHack();
 	public final ReachHack reachHack = new ReachHack();
 	// public final RemoteViewHack remoteViewHack = new RemoteViewHack();
-	// public final SafeWalkHack safeWalkHack = new SafeWalkHack();
+	public final SafeWalkHack safeWalkHack = new SafeWalkHack();
 	public final ScaffoldWalkHack scaffoldWalkHack = new ScaffoldWalkHack();
 	public final SearchHack searchHack = new SearchHack();
 	public final ServerCrasherHack serverCrasherHack = new ServerCrasherHack();
