@@ -35,7 +35,7 @@ public final class CmdList
 	// public final GhostHandCmd ghostHandCmd = new GhostHandCmd();
 	public final GiveCmd giveCmd = new GiveCmd();
 	public final GmCmd gmCmd = new GmCmd();
-	// public final GoToCmd goToCmd = new GoToCmd();
+	public final GoToCmd goToCmd = new GoToCmd();
 	public final HelpCmd helpCmd = new HelpCmd();
 	// public final InvseeCmd invseeCmd = new InvseeCmd();
 	// public final IpCmd ipCmd = new IpCmd();
