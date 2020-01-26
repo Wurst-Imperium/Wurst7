@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -92,6 +93,8 @@ public final class KillauraHack extends Hack
 		new CheckboxSetting("Filter golems",
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
 	
+	private final CheckboxSetting filterArmorStands = new CheckboxSetting(
+		"Filter armor stands", "Won't attack armor stands.", true);
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
 	
@@ -115,6 +118,7 @@ public final class KillauraHack extends Hack
 		addSetting(filterPets);
 		addSetting(filterVillagers);
 		addSetting(filterGolems);
+		addSetting(filterArmorStands);
 		addSetting(filterInvisible);
 	}
 	
@@ -209,6 +213,9 @@ public final class KillauraHack extends Hack
 		
 		if(filterGolems.isChecked())
 			stream = stream.filter(e -> !(e instanceof GolemEntity));
+		
+		if (filterArmorStands.isChecked())
+			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
