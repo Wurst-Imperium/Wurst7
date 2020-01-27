@@ -57,6 +57,15 @@ public final class RotationFaker
 		serverPitch = rotations.getPitch();
 	}
 	
+	public void faceVectorClient(Vec3d vec)
+	{
+		RotationUtils.Rotation rotations =
+			RotationUtils.getNeededRotations(vec);
+		
+		WurstClient.MC.player.yaw = rotations.getYaw();
+		WurstClient.MC.player.pitch = rotations.getPitch();
+	}
+	
 	public void faceVectorClientIgnorePitch(Vec3d vec)
 	{
 		RotationUtils.Rotation rotations =
