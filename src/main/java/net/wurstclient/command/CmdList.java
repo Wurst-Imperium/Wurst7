@@ -27,7 +27,7 @@ public final class CmdList
 	public final DamageCmd damageCmd = new DamageCmd();
 	public final DropCmd dropCmd = new DropCmd();
 	public final EnchantCmd enchantCmd = new EnchantCmd();
-	// public final ExcavateCmd excavateCmd = new ExcavateCmd();
+	public final ExcavateCmd excavateCmd = new ExcavateCmd();
 	public final FeaturesCmd featuresCmd = new FeaturesCmd();
 	public final FollowCmd followCmd = new FollowCmd();
 	public final FriendsCmd friendsCmd = new FriendsCmd();
