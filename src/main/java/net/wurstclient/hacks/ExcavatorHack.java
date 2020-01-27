@@ -21,7 +21,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -381,7 +380,7 @@ public final class ExcavatorHack extends Hack
 		}
 		
 		if(MC.crosshairTarget != null
-			&& MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
+			&& MC.crosshairTarget instanceof BlockHitResult)
 		{
 			// set posLookingAt
 			posLookingAt = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
@@ -557,7 +556,7 @@ public final class ExcavatorHack extends Hack
 		
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
-			.filter(validator)
+			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
@@ -667,7 +666,11 @@ public final class ExcavatorHack extends Hack
 			return done = goal.down(2).equals(current)
 				|| goal.up().equals(current) || goal.north().equals(current)
 				|| goal.south().equals(current) || goal.west().equals(current)
-				|| goal.east().equals(current);
+				|| goal.east().equals(current)
+				|| goal.down().north().equals(current)
+				|| goal.down().south().equals(current)
+				|| goal.down().west().equals(current)
+				|| goal.down().east().equals(current);
 		}
 	}
 }
