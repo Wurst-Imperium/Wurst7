@@ -29,7 +29,7 @@ public final class CmdList
 	public final EnchantCmd enchantCmd = new EnchantCmd();
 	// public final ExcavateCmd excavateCmd = new ExcavateCmd();
 	public final FeaturesCmd featuresCmd = new FeaturesCmd();
-	// public final FollowCmd followCmd = new FollowCmd();
+	public final FollowCmd followCmd = new FollowCmd();
 	public final FriendsCmd friendsCmd = new FriendsCmd();
 	public final GetPosCmd getPosCmd = new GetPosCmd();
 	// public final GhostHandCmd ghostHandCmd = new GhostHandCmd();
