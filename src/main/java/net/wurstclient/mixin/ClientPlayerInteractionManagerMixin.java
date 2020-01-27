@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -47,17 +47,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 	/**
 	 * blockHitDelay
 	 */
-	@Shadow
-	private int field_3716;
-
-	private float reachDistance = 4.5F;
-	private boolean extendedReach = false;
-	
+ 
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
 		ordinal = 0)},
 		method = {
-			"method_2902(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
+			"updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
 	private void onPlayerDamageBlock(BlockPos blockPos_1, Direction direction_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{
@@ -65,7 +60,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
-
+ 
 	@Override
 	public float getCurrentBreakingProgress()
 	{
@@ -81,20 +76,19 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public ItemStack windowClick_PICKUP(int slot)
 	{
-		return method_2906(0, slot, 0, SlotActionType.PICKUP, client.player);
+		return clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
 	}
 	
 	@Override
 	public ItemStack windowClick_QUICK_MOVE(int slot)
 	{
-		return method_2906(0, slot, 0, SlotActionType.QUICK_MOVE,
-			client.player);
+		return clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
 	}
 	
 	@Override
 	public ItemStack windowClick_THROW(int slot)
 	{
-		return method_2906(0, slot, 1, SlotActionType.THROW, client.player);
+		return clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
 	}
 	
 	@Override
@@ -108,17 +102,24 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		interactBlock(client.player, client.world, Hand.MAIN_HAND,
 			new BlockHitResult(hitVec, side, pos, false));
+		interactItem(client.player, client.world, Hand.MAIN_HAND);
 	}
 	
 	@Override
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
 		Direction direction)
 	{
-		method_21706(action, blockPos, direction);
+		sendPlayerAction(action, blockPos, direction);
+	}
+	
+	@Override
+	public void setOverrideReach(boolean overrideReach)
+	{
+		this.overrideReach = overrideReach;
 	}
 	
 	@Shadow
-	private void method_21706(
+	private void sendPlayerAction(
 		PlayerActionC2SPacket.Action playerActionC2SPacket$Action_1,
 		BlockPos blockPos_1, Direction direction_1)
 	{
@@ -128,7 +129,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public void setBlockHitDelay(int delay)
 	{
-		field_3716 = delay;
+		blockBreakingCooldown = delay;
 	}
 	
 	@Shadow
@@ -141,7 +142,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 		World world_1, Hand hand_1);
 	
 	@Shadow
-	public abstract ItemStack method_2906(int int_1, int int_2, int int_3,
+	public abstract ItemStack clickSlot(int int_1, int int_2, int int_3,
 		SlotActionType slotActionType_1, PlayerEntity playerEntity_1);
 
 		@Inject(at = @At("RETURN"),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,7 +21,7 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 public class IngameHudMixin extends DrawableHelper
 {
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
+		target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
 		ordinal = 4)}, method = {"render(F)V"})
 	private void onRender(float partialTicks, CallbackInfo ci)
 	{

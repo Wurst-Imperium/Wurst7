@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -46,11 +46,11 @@ public final class EditSliderScreen extends Screen
 		
 		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, "");
 		valueField.setText(valueString);
-		valueField.setCursor(0);
+		valueField.setSelectionStart(0);
 		
 		children.add(valueField);
 		setInitialFocus(valueField);
-		valueField.method_1876(true);
+		valueField.setSelected(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
 		addButton(doneButton);

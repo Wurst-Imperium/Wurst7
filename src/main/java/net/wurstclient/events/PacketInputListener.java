@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,14 +20,14 @@ public interface PacketInputListener extends Listener
 	public static class PacketInputEvent
 		extends CancellableEvent<PacketInputListener>
 	{
-		private final Packet packet;
+		private final Packet<?> packet;
 		
-		public PacketInputEvent(Packet packet)
+		public PacketInputEvent(Packet<?> packet)
 		{
 			this.packet = packet;
 		}
 		
-		public Packet getPacket()
+		public Packet<?> getPacket()
 		{
 			return packet;
 		}

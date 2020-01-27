@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -187,7 +187,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onGuiClose(GuiCloseS2CPacket var1)
+	public void onCloseContainer(CloseContainerS2CPacket var1)
 	{
 		
 	}
@@ -201,21 +201,21 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onGuiOpen(GuiOpenS2CPacket var1)
+	public void onOpenHorseContainer(OpenHorseContainerS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onGuiUpdate(GuiUpdateS2CPacket var1)
+	public void onContainerPropertyUpdate(ContainerPropertyUpdateS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onGuiSlotUpdate(GuiSlotUpdateS2CPacket var1)
+	public void onContainerSlotUpdate(ContainerSlotUpdateS2CPacket var1)
 	{
 		
 	}
@@ -649,28 +649,28 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerPacket var1)
+	public void onOpenContainer(OpenContainerS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onSetTradeOffers(SetTradeOffersPacket var1)
+	public void onSetTradeOffers(SetTradeOffersS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void handleChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
+	public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void handleChunkRenderDistanceCenter(
+	public void onChunkRenderDistanceCenter(
 		ChunkRenderDistanceCenterS2CPacket var1)
 	{
 		
@@ -678,7 +678,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void method_21707(BlockPlayerActionS2CPacket var1)
+	public void onPlayerActionResponse(PlayerActionResponseS2CPacket var1)
 	{
 		
 	}

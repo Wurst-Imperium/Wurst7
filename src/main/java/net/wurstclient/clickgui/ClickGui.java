@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -84,13 +84,12 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			window.setMinimized(true);
-			
-		// TODO: Radar
-		// windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
+		
+		windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
 		
 		int x = 5;
 		int y = 5;
-		net.minecraft.client.util.Window sr = MC.window;
+		net.minecraft.client.util.Window sr = MC.getWindow();
 		for(Window window : windows)
 		{
 			window.pack();
@@ -560,6 +559,7 @@ public final class ClickGui
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 					0xffffff);
+			GL11.glEnable(GL11.GL_BLEND);
 			
 			GL11.glPopMatrix();
 		}
@@ -591,16 +591,15 @@ public final class ClickGui
 		opacity = clickGui.getOpacity();
 		bgColor = clickGui.getBgColor();
 		
-		// TODO: RainbowUI
-		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
-		// {
-		// float x = System.currentTimeMillis() % 2000 / 1000F;
-		// acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
-		// acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
-		// acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
-		//
-		// }else
-		acColor = clickGui.getAcColor();
+		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
+		{
+			float x = System.currentTimeMillis() % 2000 / 1000F;
+			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
+			acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
+			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
+			
+		}else
+			acColor = clickGui.getAcColor();
 	}
 	
 	private void renderWindow(Window window, int mouseX, int mouseY,
@@ -703,7 +702,7 @@ public final class ClickGui
 			GL11.glVertex2i(x4, y3);
 			GL11.glEnd();
 			
-			net.minecraft.client.util.Window sr = MC.window;
+			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
 			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
 				window.getWidth() * sf, (y2 - y3) * sf);
@@ -835,6 +834,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
 		fr.draw(title, x1 + 2, y1 + 3, 0xf0f0f0);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	private void renderTitleBarButton(int x1, int y1, int x2, int y2,

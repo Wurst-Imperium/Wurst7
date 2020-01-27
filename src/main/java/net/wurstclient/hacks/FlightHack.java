@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -29,8 +28,8 @@ public final class FlightHack extends Hack
 	public FlightHack()
 	{
 		super("Flight",
-			"Allows you to you fly.\n\n" + ChatFormatting.RED
-				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
+			"Allows you to you fly.\n\n" + TextFormat.RED + TextFormat.BOLD
+				+ "WARNING:" + TextFormat.RESET
 				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
@@ -39,6 +38,8 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().jetpackHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);
 	}
@@ -56,7 +57,7 @@ public final class FlightHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		player.abilities.flying = false;
-		player.field_6281 = speed.getValueF();
+		player.flyingSpeed = speed.getValueF();
 		
 		player.setVelocity(0, 0, 0);
 		Vec3d velcity = player.getVelocity();

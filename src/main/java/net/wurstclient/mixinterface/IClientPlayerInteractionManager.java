@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,8 +33,5 @@ public interface IClientPlayerInteractionManager
 		BlockPos blockPos, Direction direction);
 	
 	public void setBlockHitDelay(int delay);
-
-	public void setReachDistance(float dist);
-	
-	public void setHasExtendedReach(boolean value);
+ 
 }

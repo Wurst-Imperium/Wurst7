@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -80,7 +80,7 @@ public enum BlockBreaker
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
 		
 		// damage block
-		if(!MC.interactionManager.method_2902(pos, side))
+		if(!MC.interactionManager.updateBlockBreakingProgress(pos, side))
 			return false;
 		
 		// swing arm

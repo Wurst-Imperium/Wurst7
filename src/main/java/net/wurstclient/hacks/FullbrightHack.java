@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -81,7 +81,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	private void applyNightVision()
 	{
-		MC.player.addPotionEffect(new StatusEffectInstance(
+		MC.player.addStatusEffect(new StatusEffectInstance(
 			StatusEffects.NIGHT_VISION, 16360, 0, false, false));
 		hasAppliedNightVision = true;
 	}
@@ -91,7 +91,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		if(!hasAppliedNightVision)
 			return;
 		
-		MC.player.removePotionEffect(StatusEffects.NIGHT_VISION);
+		MC.player.removeStatusEffectInternal(StatusEffects.NIGHT_VISION);
 		hasAppliedNightVision = false;
 	}
 	

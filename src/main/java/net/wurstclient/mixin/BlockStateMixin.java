@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,8 +16,8 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.state.AbstractPropertyContainer;
-import net.minecraft.state.PropertyContainer;
+import net.minecraft.state.AbstractState;
+import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
@@ -26,9 +26,8 @@ import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOc
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 
 @Mixin(BlockState.class)
-public class BlockStateMixin
-	extends AbstractPropertyContainer<Block, BlockState>
-	implements PropertyContainer<BlockState>
+public class BlockStateMixin extends AbstractState<Block, BlockState>
+	implements State<BlockState>
 {
 	private BlockStateMixin(WurstClient wurst, Block object_1,
 		ImmutableMap<Property<?>, Comparable<?>> immutableMap_1)

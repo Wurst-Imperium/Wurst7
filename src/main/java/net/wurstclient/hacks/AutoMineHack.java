@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,15 +54,15 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	
 	private void setCurrentBlockFromHitResult()
 	{
-		if(MC.hitResult == null || MC.hitResult.getPos() == null
-			|| MC.hitResult.getType() != HitResult.Type.BLOCK
-			|| !(MC.hitResult instanceof BlockHitResult))
+		if(MC.crosshairTarget == null || MC.crosshairTarget.getPos() == null
+			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK
+			|| !(MC.crosshairTarget instanceof BlockHitResult))
 		{
 			stopMiningAndResetProgress();
 			return;
 		}
 		
-		currentBlock = ((BlockHitResult)MC.hitResult).getBlockPos();
+		currentBlock = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
 	}
 	
 	private void breakCurrentBlock()

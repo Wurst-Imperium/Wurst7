@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -96,15 +96,12 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void tick()
+	public boolean mouseScrolled(double mouseX, double mouseY, double delta)
 	{
-		onUpdate();
-		
 		// scrollbar
 		if(!scrollbarLocked)
 		{
-			// TODO: Fix scrolling
-			// scroll += Mouse.getDWheel() / 10;
+			scroll += delta * 4;
 			
 			if(scroll > 0)
 				scroll = 0;
@@ -118,6 +115,14 @@ public abstract class NavigatorScreen extends Screen
 					(int)((height - 131) * scroll / (float)maxScroll);
 			scrollKnobPosition += 2;
 		}
+		
+		return super.mouseScrolled(mouseX, mouseY, delta);
+	}
+	
+	@Override
+	public final void tick()
+	{
+		onUpdate();
 	}
 	
 	@Override

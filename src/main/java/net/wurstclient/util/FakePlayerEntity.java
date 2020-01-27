@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -42,21 +42,21 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	{
 		DataTracker fromTracker = from.getDataTracker();
 		DataTracker toTracker = to.getDataTracker();
-		Byte playerModel = fromTracker.get(PlayerEntity.PLAYER_MODEL_BIT_MASK);
-		toTracker.set(PlayerEntity.PLAYER_MODEL_BIT_MASK, playerModel);
+		Byte playerModel = fromTracker.get(PlayerEntity.PLAYER_MODEL_PARTS);
+		toTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
 	}
 	
 	private void copyRotation()
 	{
 		headYaw = player.headYaw;
-		field_6283 = player.field_6283;
+		bodyYaw = player.bodyYaw;
 	}
 	
 	private void resetCapeMovement()
 	{
-		field_7500 = x;
-		field_7521 = y;
-		field_7499 = z;
+		field_7500 = getX();
+		field_7521 = getY();
+		field_7499 = getZ();
 	}
 	
 	private void spawn()
@@ -71,6 +71,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void resetPlayerPosition()
 	{
-		player.setPositionAndAngles(x, y, z, yaw, pitch);
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
 	}
 }

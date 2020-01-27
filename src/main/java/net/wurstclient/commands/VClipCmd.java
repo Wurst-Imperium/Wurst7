@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -31,7 +31,7 @@ public final class VClipCmd extends Command
 			throw new CmdSyntaxError();
 		
 		ClientPlayerEntity player = MC.player;
-		player.setPosition(player.x, player.y + Integer.parseInt(args[0]),
-			player.z);
+		player.updatePosition(player.getX(),
+			player.getY() + Integer.parseInt(args[0]), player.getZ());
 	}
 }

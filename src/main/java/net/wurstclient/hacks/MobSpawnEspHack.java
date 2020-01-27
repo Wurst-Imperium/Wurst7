@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,13 +20,12 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
 import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
 import net.minecraft.util.math.BlockPos;
@@ -60,10 +59,10 @@ public final class MobSpawnEspHack extends Hack
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + ChatFormatting.YELLOW
-				+ "yellow" + ChatFormatting.RESET
-				+ " - mobs can spawn at night\n" + ChatFormatting.RED + "red"
-				+ ChatFormatting.RESET + " - mobs can always spawn");
+			"Highlights areas where mobs can spawn.\n" + TextFormat.YELLOW
+				+ "yellow" + TextFormat.RESET + " - mobs can spawn at night\n"
+				+ TextFormat.RED + "red" + TextFormat.RESET
+				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
@@ -179,7 +178,7 @@ public final class MobSpawnEspHack extends Hack
 		if(player == null || world == null)
 			return;
 		
-		Packet packet = event.getPacket();
+		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
 		if(packet instanceof BlockUpdateS2CPacket)
@@ -257,7 +256,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	private class ChunkScanner
 	{
-		public Future future;
+		public Future<?> future;
 		private final Chunk chunk;
 		private final Set<BlockPos> red = new HashSet<>();
 		private final Set<BlockPos> yellow = new HashSet<>();

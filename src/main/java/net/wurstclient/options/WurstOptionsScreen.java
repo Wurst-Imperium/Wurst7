@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,8 +16,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.SystemUtil;
-import net.minecraft.util.SystemUtil.OperatingSystem;
+import net.minecraft.util.Util;
+import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
@@ -86,7 +86,7 @@ public class WurstOptionsScreen extends Screen
 	
 	private void addLinkButtons()
 	{
-		OperatingSystem os = SystemUtil.getOperatingSystem();
+		OperatingSystem os = Util.getOperatingSystem();
 		
 		new WurstOptionsButton(54, 24, () -> "Official Website",
 			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));

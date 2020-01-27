@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,8 +12,6 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -22,11 +20,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 
@@ -144,11 +144,23 @@ public final class EditItemListScreen extends Screen
 	{
 		itemNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(new Identifier(itemNameField.getText()));
+		itemToAdd = Registry.ITEM.get(getItemIDFromField());
 		addButton.active = itemToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
+	}
+	
+	private Identifier getItemIDFromField()
+	{
+		try
+		{
+			return new Identifier(itemNameField.getText().toLowerCase());
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
+		}
 	}
 	
 	@Override
@@ -168,8 +180,13 @@ public final class EditItemListScreen extends Screen
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
+		{
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0, 300);
 			drawString(minecraft.textRenderer, "item name or ID", 68,
 				height - 50, 0x808080);
+			GL11.glPopMatrix();
+		}
 		
 		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(49, height - 55, 64, height - 37, 0xff000000);
@@ -257,10 +274,10 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				DiffuseLighting.enable();
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				GuiLighting.disable();
+				DiffuseLighting.disable();
 				GL11.glPopMatrix();
 				
 				GL11.glPushMatrix();
@@ -273,8 +290,7 @@ public final class EditItemListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return ChatFormatting.ITALIC + "unknown item"
-					+ ChatFormatting.RESET;
+				return TextFormat.ITALIC + "unknown item" + TextFormat.RESET;
 				
 			}else
 			{
@@ -285,9 +301,9 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enableForItems();
+				DiffuseLighting.enable();
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
-				GuiLighting.disable();
+				DiffuseLighting.disable();
 				
 				GL11.glPopMatrix();
 				

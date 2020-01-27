@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,7 +35,7 @@ public final class SettingsWindow extends Window
 		int x = parent.getX() + parent.getWidth() + 5;
 		int y = parent.getY() + 12 + buttonY + scroll;
 		
-		net.minecraft.client.util.Window mcWindow = WurstClient.MC.window;
+		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
 		if(x + getWidth() > mcWindow.getScaledWidth())
 			x = parent.getX() - getWidth() - 5;
 		if(y + getHeight() > mcWindow.getScaledHeight())

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,6 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
+import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
@@ -101,13 +102,36 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean isInsideWater()
+	public void setVelocityClient(double x, double y, double z)
 	{
-		boolean inWater = super.isInsideWater();
+		KnockbackEvent event = new KnockbackEvent(x, y, z);
+		WurstClient.INSTANCE.getEventManager().fire(event);
+		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
+	}
+	
+	@Override
+	public boolean isTouchingWater()
+	{
+		boolean inWater = super.isTouchingWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		return event.isInWater();
+	}
+	
+	@Override
+	protected float getJumpVelocity()
+	{
+		return super.getJumpVelocity()
+			+ WurstClient.INSTANCE.getHax().highJumpHack
+				.getAdditionalJumpMotion();
+	}
+	
+	@Override
+	protected boolean clipAtLedge()
+	{
+		return super.clipAtLedge()
+			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
 	@Override

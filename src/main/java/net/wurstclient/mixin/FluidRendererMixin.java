@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,9 +25,9 @@ public class FluidRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"method_3344(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
+			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
 		cancellable = true)
-	private static void onMethod_3344(BlockView blockView_1,
+	private static void onIsSideCovered(BlockView blockView_1,
 		BlockPos blockPos_1, Direction direction_1, float float_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{
