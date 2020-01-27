@@ -41,10 +41,7 @@ public final class AutoTranslateHack extends Hack implements ChatInputListener, 
             Language.JAPANESE);
 
     public AutoTranslateHack() {
-        super("AutoTranslate", "Translate every chat into other language.\n" 
-        + "Translate your message into other language.\n"
-        +"\n"
-        +"Created by Dj-jom2x");
+        super("AutoTranslate", "Translate every chat into another language.");
         setCategory(Category.CHAT);
         addSetting(mychat);
         addSetting(otherchat);
