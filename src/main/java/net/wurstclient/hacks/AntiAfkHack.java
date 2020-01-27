@@ -25,13 +25,12 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 
-@SearchTags({"AFKBot", "anti afk", "afk bot"})
+@SearchTags({"anti afk", "AFKBot", "afk bot"})
 @DontSaveState
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final CheckboxSetting useAi =
-		new CheckboxSetting("Use AI (experimental)", false);
+	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
 	private int timer;
 	private Random random = new Random();
