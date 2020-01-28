@@ -149,16 +149,20 @@ public final class ProtectHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
 		// set friend
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+		if(friend == null)
+		{
+			Stream<Entity> stream = StreamSupport
+				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
-		friend = stream
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
-			.orElse(null);
+			friend = stream
+				.min(Comparator
+					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.orElse(null);
+		}
+		
 		pathFinder = new EntityPathFinder(friend, distanceF);
 		
 		EVENTS.add(UpdateListener.class, this);
@@ -176,8 +180,13 @@ public final class ProtectHack extends Hack
 		ticksProcessing = 0;
 		PathProcessor.releaseControls();
 		
+		enemy = null;
+		
 		if(friend != null)
+		{
 			MC.options.keyForward.setPressed(false);
+			friend = null;
+		}
 	}
 	
 	@Override
