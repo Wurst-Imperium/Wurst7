@@ -123,9 +123,13 @@ public final class ClickAuraHack extends Hack
 	public void onEnable()
 	{
 		// disable other killauras
-		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
+		// WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
+		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);

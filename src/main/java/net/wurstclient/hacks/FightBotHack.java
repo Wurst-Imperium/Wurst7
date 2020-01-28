@@ -141,9 +141,9 @@ public final class FightBotHack extends Hack
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
 		// WURST.getHax().multiAuraHack.setEnabled(false);
-		// WURST.getHax().protectHack.setEnabled(false);
-		// WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
+		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		pathFinder = new EntityPathFinder(MC.player);
 		
