@@ -354,6 +354,9 @@ public final class ProtectHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		if(!useAi.isChecked())
+			return;
+		
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
 	}
