@@ -123,7 +123,7 @@ public final class HackList implements UpdateListener
 	// public final PlayerFinderHack playerFinderHack = new PlayerFinderHack();
 	// public final PotionSaverHack potionSaverHack = new PotionSaverHack();
 	// public final ProphuntEspHack prophuntEspHack = new ProphuntEspHack();
-	// public final ProtectHack protectHack = new ProtectHack();
+	public final ProtectHack protectHack = new ProtectHack();
 	public final RadarHack radarHack = new RadarHack();
 	public final RainbowUiHack rainbowUiHack = new RainbowUiHack();
 	public final ReachHack reachHack = new ReachHack();
