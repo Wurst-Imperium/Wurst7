@@ -81,7 +81,7 @@ public final class HackList implements UpdateListener
 	public final FreecamHack freecamHack = new FreecamHack();
 	public final FullbrightHack fullbrightHack = new FullbrightHack();
 	// public final GhostHandHack ghostHandHack = new GhostHandHack();
-	// public final GlideHack glideHack = new GlideHack();
+	public final GlideHack glideHack = new GlideHack();
 	public final HeadRollHack headRollHack = new HeadRollHack();
 	// public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	public final HighJumpHack highJumpHack = new HighJumpHack();
