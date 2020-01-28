@@ -62,9 +62,10 @@ public final class GlideHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
+		Vec3d v = player.getVelocity();
 		
 		if(player.onGround || player.isTouchingWater() || player.isInLava()
-			|| player.isClimbing() || player.getVelocity().y >= 0)
+			|| player.isClimbing() || v.y >= 0)
 			return;
 		
 		if(minHeight.getValue() > 0)
@@ -85,8 +86,7 @@ public final class GlideHack extends Hack implements UpdateListener
 				return;
 		}
 		
-		player.addVelocity(0,
-			Math.max(player.getVelocity().y, -fallSpeed.getValue()), 0);
+		player.setVelocity(v.x, Math.max(v.y, -fallSpeed.getValue()), v.z);
 		player.flyingSpeed *= moveSpeed.getValueF();
 	}
 }
