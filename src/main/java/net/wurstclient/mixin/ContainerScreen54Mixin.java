@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.ingame.ContainerProvider;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.container.Container;
 import net.minecraft.container.GenericContainer;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
@@ -96,7 +97,19 @@ public abstract class ContainerScreen54Mixin
 			Slot slot = container.slots.get(i);
 			if(slot.getStack().isEmpty())
 				continue;
+			boolean can = false;
+			for (int e = mode == 1 ? rows * 9 : 0; e < (mode == 1 ? rows * 9 + 27 : 27); e++) 
+			{
+				if (Container.canInsertItemIntoSlot(container.slots.get(e), slot.getStack(), true)) 
+				{ 
+					can = true;
+					break;
+				}
+			}
 			
+			if (!can) {
+				break;
+			}
 			waitForDelay();
 			if(this.mode != mode || minecraft.currentScreen == null)
 				break;
