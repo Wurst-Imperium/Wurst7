@@ -25,9 +25,9 @@ public class FluidRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
+			"method_3344(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
 		cancellable = true)
-	private static void onIsSideCovered(BlockView blockView_1,
+	private static void onMethod_3344(BlockView blockView_1,
 		BlockPos blockPos_1, Direction direction_1, float float_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{

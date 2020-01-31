@@ -273,7 +273,7 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enable();
+				GuiLighting.enableForItems();
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				GuiLighting.disable();
@@ -300,7 +300,7 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				GuiLighting.enable();
+				GuiLighting.enableForItems();
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
 				GuiLighting.disable();
 				

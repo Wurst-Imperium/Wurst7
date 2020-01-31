@@ -39,6 +39,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -184,7 +185,7 @@ public final class ProtectHack extends Hack
 		
 		if(friend != null)
 		{
-			MC.options.keyForward.setPressed(false);
+			((IKeyBinding)MC.options.keyForward).setPressed(false);
 			friend = null;
 		}
 	}
@@ -311,32 +312,33 @@ public final class ProtectHack extends Hack
 				MC.player.jump();
 			
 			// swim up if necessary
-			if(MC.player.isInsideWater() && MC.player.getY() < target.getY())
+			if(MC.player.isInsideWater() && MC.player.y < target.y)
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying
 			if(!MC.player.onGround
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
-				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
-					target.getZ()) <= MC.player.squaredDistanceTo(
-						MC.player.getX(), target.getY(), MC.player.getZ()))
+				&& MC.player.squaredDistanceTo(target.x, MC.player.y,
+					target.z) <= MC.player.squaredDistanceTo(MC.player.x,
+						target.y, MC.player.z))
 			{
-				if(MC.player.getY() > target.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
-				else if(MC.player.getY() < target.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+				if(MC.player.y > target.y + 1D)
+					((IKeyBinding)MC.options.keySneak).setPressed(true);
+				else if(MC.player.y < target.y - 1D)
+					((IKeyBinding)MC.options.keyJump).setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				((IKeyBinding)MC.options.keySneak).setPressed(false);
+				((IKeyBinding)MC.options.keyJump).setPressed(false);
 			}
 			
 			// follow target
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
-			MC.options.keyForward.setPressed(MC.player.distanceTo(
-				target) > (target == friend ? distanceF : distanceE));
+			((IKeyBinding)MC.options.keyForward)
+				.setPressed(MC.player.distanceTo(
+					target) > (target == friend ? distanceF : distanceE));
 		}
 		
 		if(target == enemy)

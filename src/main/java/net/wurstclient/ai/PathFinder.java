@@ -59,9 +59,8 @@ public class PathFinder
 	public PathFinder(BlockPos goal)
 	{
 		if(WurstClient.MC.player.onGround)
-			start = new PathPos(new BlockPos(WurstClient.MC.player.getX(),
-				WurstClient.MC.player.getY() + 0.5,
-				WurstClient.MC.player.getZ()));
+			start = new PathPos(new BlockPos(WurstClient.MC.player.x,
+				WurstClient.MC.player.y + 0.5, WurstClient.MC.player.z));
 		else
 			start = new PathPos(new BlockPos(WurstClient.MC.player));
 		this.goal = goal;
@@ -247,7 +246,7 @@ public class PathFinder
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
-		if(!WurstClient.MC.world.isChunkLoaded(pos))
+		if(!WurstClient.MC.world.isBlockLoaded(pos))
 			return false;
 		
 		// check if solid

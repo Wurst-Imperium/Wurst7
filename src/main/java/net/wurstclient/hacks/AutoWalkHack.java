@@ -35,12 +35,13 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 		EVENTS.remove(UpdateListener.class, this);
 		
 		KeyBinding forwardKey = MC.options.keyForward;
-		forwardKey.setPressed(((IKeyBinding)forwardKey).isActallyPressed());
+		((IKeyBinding)forwardKey)
+			.setPressed(((IKeyBinding)forwardKey).isActallyPressed());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		MC.options.keyForward.setPressed(true);
+		((IKeyBinding)MC.options.keyForward).setPressed(true);
 	}
 }

@@ -291,9 +291,9 @@ public final class KillauraLegitHack extends Hack
 		float green = 2 - red;
 		
 		GL11.glTranslated(
-			target.prevX + (target.getX() - target.prevX) * partialTicks,
-			target.prevY + (target.getY() - target.prevY) * partialTicks,
-			target.prevZ + (target.getZ() - target.prevZ) * partialTicks);
+			target.prevX + (target.x - target.prevX) * partialTicks,
+			target.prevY + (target.y - target.prevY) * partialTicks,
+			target.prevZ + (target.z - target.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);

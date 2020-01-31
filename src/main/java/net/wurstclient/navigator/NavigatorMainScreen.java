@@ -50,7 +50,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		children.add(searchBar);
 		setInitialFocus(searchBar);
-		searchBar.setSelected(true);
+		searchBar.method_1876(true);
 		
 		searchBar.x = middleX - 100;
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);

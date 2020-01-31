@@ -41,6 +41,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -161,7 +162,7 @@ public final class TunnellerHack extends Hack
 		KeyBinding[] bindings = {gs.keyForward, gs.keyBack, gs.keyLeft,
 			gs.keyRight, gs.keyJump, gs.keySneak};
 		for(KeyBinding binding : bindings)
-			binding.setPressed(false);
+			((IKeyBinding)binding).setPressed(false);
 		
 		for(Task task : tasks)
 		{
@@ -371,7 +372,7 @@ public final class TunnellerHack extends Hack
 			Vec3d vec = new Vec3d(base).add(0.5, 0.5, 0.5);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 			
-			MC.options.keyForward.setPressed(true);
+			((IKeyBinding)MC.options.keyForward).setPressed(true);
 		}
 	}
 	
@@ -388,7 +389,7 @@ public final class TunnellerHack extends Hack
 			
 			blocks.clear();
 			for(BlockPos pos : BlockUtils.getAllInBox(from, to))
-				if(!BlockUtils.getState(pos).isFullCube(MC.world, pos))
+				if(!BlockUtils.getState(pos).method_21743(MC.world, pos))
 					blocks.add(pos);
 				
 			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
@@ -415,7 +416,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			MC.options.keySneak.setPressed(true);
+			((IKeyBinding)MC.options.keySneak).setPressed(true);
 			Vec3d velocity = MC.player.getVelocity();
 			MC.player.setVelocity(0, velocity.y, 0);
 			
@@ -502,7 +503,7 @@ public final class TunnellerHack extends Hack
 						liquids.add(pos2);
 				}
 				
-				if(BlockUtils.getState(pos).isFullCube(MC.world, pos))
+				if(BlockUtils.getState(pos).method_21743(MC.world, pos))
 					continue;
 				
 				// check next blocks
@@ -554,7 +555,7 @@ public final class TunnellerHack extends Hack
 			{
 				WURST.getRotationFaker()
 					.faceVectorClientIgnorePitch(toVec3d(pos1));
-				forward.setPressed(true);
+				((IKeyBinding)forward).setPressed(true);
 				return;
 			}
 			
@@ -563,14 +564,14 @@ public final class TunnellerHack extends Hack
 			{
 				WURST.getRotationFaker()
 					.faceVectorClientIgnorePitch(toVec3d(pos2));
-				forward.setPressed(true);
+				((IKeyBinding)forward).setPressed(true);
 				MC.player.setSprinting(true);
 				return;
 			}
 			
 			BlockPos pos3 = start.offset(direction, length + 1);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(toVec3d(pos3));
-			forward.setPressed(false);
+			((IKeyBinding)forward).setPressed(false);
 			MC.player.setSprinting(false);
 			
 			if(disableTimer > 0)
@@ -633,7 +634,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			MC.options.keySneak.setPressed(true);
+			((IKeyBinding)MC.options.keySneak).setPressed(true);
 			placeBlockSimple(nextTorch);
 			
 			if(BlockUtils.getBlock(nextTorch) instanceof TorchBlock)
@@ -791,7 +792,7 @@ public final class TunnellerHack extends Hack
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
 		
 		// damage block
-		if(!MC.interactionManager.updateBlockBreakingProgress(pos, side))
+		if(!MC.interactionManager.method_2902(pos, side))
 			return false;
 		
 		// swing arm

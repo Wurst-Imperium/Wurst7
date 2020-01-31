@@ -59,7 +59,7 @@ public final class SneakHack extends Hack
 		{
 			case LEGIT:
 			IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
-			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
+			sneakKey.setPressed(sneakKey.isActallyPressed());
 			break;
 			
 			case PACKET:
@@ -76,11 +76,12 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			sneakKey.setPressed(true);
+			((IKeyBinding)sneakKey).setPressed(true);
 			break;
 			
 			case PACKET:
-			sneakKey.setPressed(((IKeyBinding)sneakKey).isActallyPressed());
+			((IKeyBinding)sneakKey)
+				.setPressed(((IKeyBinding)sneakKey).isActallyPressed());
 			sendSneakPacket(Mode.START_SNEAKING);
 			sendSneakPacket(Mode.STOP_SNEAKING);
 			break;

@@ -72,7 +72,8 @@ public final class FreecamHack extends Hack
 			gs.keyRight, gs.keyJump, gs.keySneak};
 		
 		for(KeyBinding binding : bindings)
-			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
+			((IKeyBinding)binding)
+				.setPressed(((IKeyBinding)binding).isActallyPressed());
 		
 		playerBox = GL11.glGenLists(1);
 		GL11.glNewList(playerBox, GL11.GL_COMPILE);
@@ -112,7 +113,7 @@ public final class FreecamHack extends Hack
 		player.setVelocity(Vec3d.ZERO);
 		
 		player.onGround = false;
-		player.flyingSpeed = speed.getValueF();
+		player.field_6281 = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
@@ -182,8 +183,7 @@ public final class FreecamHack extends Hack
 		
 		// box
 		GL11.glPushMatrix();
-		GL11.glTranslated(fakePlayer.getX(), fakePlayer.getY(),
-			fakePlayer.getZ());
+		GL11.glTranslated(fakePlayer.x, fakePlayer.y, fakePlayer.z);
 		GL11.glScaled(fakePlayer.getWidth() + 0.1, fakePlayer.getHeight() + 0.1,
 			fakePlayer.getWidth() + 0.1);
 		GL11.glCallList(playerBox);

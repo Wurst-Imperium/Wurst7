@@ -63,7 +63,7 @@ public final class HackListHUD implements UpdateListener
 		// drawString("YesCheat+: " + yesCheatSpf.getProfile().getName());
 		
 		int height = posY + activeHax.size() * 9;
-		Window sr = WurstClient.MC.getWindow();
+		Window sr = WurstClient.MC.window;
 		
 		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
 			drawCounter();
@@ -135,7 +135,7 @@ public final class HackListHUD implements UpdateListener
 			posX = 2;
 		else
 		{
-			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
+			int screenWidth = WurstClient.MC.window.getScaledWidth();
 			int stringWidth = tr.getStringWidth(s);
 			
 			posX = screenWidth - stringWidth - 2;
@@ -160,7 +160,7 @@ public final class HackListHUD implements UpdateListener
 			posX = 2 - 5 * offset;
 		else
 		{
-			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
+			int screenWidth = WurstClient.MC.window.getScaledWidth();
 			int stringWidth = tr.getStringWidth(s);
 			
 			posX = screenWidth - stringWidth - 2 + 5 * offset;

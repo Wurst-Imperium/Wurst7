@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -32,9 +33,8 @@ public class WalkPathProcessor extends PathProcessor
 		// get positions
 		BlockPos pos;
 		if(WurstClient.MC.player.onGround)
-			pos = new BlockPos(WurstClient.MC.player.getX(),
-				WurstClient.MC.player.getY() + 0.5,
-				WurstClient.MC.player.getZ());
+			pos = new BlockPos(WurstClient.MC.player.x,
+				WurstClient.MC.player.y + 0.5, WurstClient.MC.player.z);
 		else
 			pos = new BlockPos(WurstClient.MC.player);
 		PathPos nextPos = path.get(index);
@@ -77,27 +77,27 @@ public class WalkPathProcessor extends PathProcessor
 		if(WURST.getHax().jesusHack.isEnabled())
 		{
 			// wait for Jesus to swim up
-			if(WurstClient.MC.player.getY() < nextPos.getY()
+			if(WurstClient.MC.player.y < nextPos.getY()
 				&& (WurstClient.MC.player.isInsideWater()
 					|| WurstClient.MC.player.isInLava()))
 				return;
 			
 			// manually swim down if using Jesus
-			if(WurstClient.MC.player.getY() - nextPos.getY() > 0.5
+			if(WurstClient.MC.player.y - nextPos.getY() > 0.5
 				&& (WurstClient.MC.player.isInsideWater()
 					|| WurstClient.MC.player.isInLava()
 					|| WURST.getHax().jesusHack.isOverLiquid()))
-				MC.options.keySneak.setPressed(true);
+				((IKeyBinding)MC.options.keySneak).setPressed(true);
 		}
 		
 		// horizontal movement
 		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
 		{
-			MC.options.keyForward.setPressed(true);
+			((IKeyBinding)MC.options.keyForward).setPressed(true);
 			
 			if(index > 0 && path.get(index - 1).isJumping()
 				|| pos.getY() < nextPos.getY())
-				MC.options.keyJump.setPressed(true);
+				((IKeyBinding)MC.options.keyJump).setPressed(true);
 			
 			// vertical movement
 		}else if(pos.getY() != nextPos.getY())
@@ -112,7 +112,7 @@ public class WalkPathProcessor extends PathProcessor
 					WURST.getRotationFaker().faceVectorClientIgnorePitch(
 						BlockUtils.getBoundingBox(pos).getCenter());
 					
-					MC.options.keyForward.setPressed(true);
+					((IKeyBinding)MC.options.keyForward).setPressed(true);
 					
 				}else
 				{
@@ -122,7 +122,7 @@ public class WalkPathProcessor extends PathProcessor
 						index++;
 					
 					// jump up
-					MC.options.keyJump.setPressed(true);
+					((IKeyBinding)MC.options.keyJump).setPressed(true);
 				}
 				
 				// go down
@@ -135,7 +135,7 @@ public class WalkPathProcessor extends PathProcessor
 				
 				// walk off the edge
 				if(WurstClient.MC.player.onGround)
-					MC.options.keyForward.setPressed(true);
+					((IKeyBinding)MC.options.keyForward).setPressed(true);
 			}
 	}
 }

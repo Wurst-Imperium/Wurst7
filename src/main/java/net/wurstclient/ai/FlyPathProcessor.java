@@ -14,6 +14,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.util.RotationUtils;
 
 public class FlyPathProcessor extends PathProcessor
@@ -121,13 +122,13 @@ public class FlyPathProcessor extends PathProcessor
 				return;
 			}
 			
-			MC.options.keyForward.setPressed(true);
+			((IKeyBinding)MC.options.keyForward).setPressed(true);
 			
 			if(MC.player.horizontalCollision)
 				if(posVec.y > nextBox.maxY)
-					MC.options.keySneak.setPressed(true);
+					((IKeyBinding)MC.options.keySneak).setPressed(true);
 				else if(posVec.y < nextBox.minY)
-					MC.options.keyJump.setPressed(true);
+					((IKeyBinding)MC.options.keyJump).setPressed(true);
 				
 			// vertical movement
 		}else if(y)
@@ -140,14 +141,14 @@ public class FlyPathProcessor extends PathProcessor
 			}
 			
 			if(posVec.y < nextBox.minY)
-				MC.options.keyJump.setPressed(true);
+				((IKeyBinding)MC.options.keyJump).setPressed(true);
 			else
-				MC.options.keySneak.setPressed(true);
+				((IKeyBinding)MC.options.keySneak).setPressed(true);
 			
 			if(MC.player.verticalCollision)
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyForward.setPressed(true);
+				((IKeyBinding)MC.options.keySneak).setPressed(false);
+				((IKeyBinding)MC.options.keyForward).setPressed(true);
 			}
 		}
 	}

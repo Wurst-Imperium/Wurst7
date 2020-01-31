@@ -54,7 +54,7 @@ public final class EditBlockScreen extends Screen
 		
 		children.add(blockField);
 		setInitialFocus(blockField);
-		blockField.setSelected(true);
+		blockField.method_1876(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
 		addButton(doneButton);
@@ -152,7 +152,7 @@ public final class EditBlockScreen extends Screen
 		double scale = large ? 1.5 : 0.75;
 		GL11.glScaled(scale, scale, scale);
 		
-		GuiLighting.enable();
+		GuiLighting.enableForItems();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);

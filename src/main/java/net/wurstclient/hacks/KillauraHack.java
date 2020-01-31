@@ -265,11 +265,11 @@ public final class KillauraHack extends Hack
 		
 		GL11.glTranslated(
 			renderTarget.prevX
-				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
+				+ (renderTarget.x - renderTarget.prevX) * partialTicks,
 			renderTarget.prevY
-				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
+				+ (renderTarget.y - renderTarget.prevY) * partialTicks,
 			renderTarget.prevZ
-				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
+				+ (renderTarget.z - renderTarget.prevZ) * partialTicks);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());

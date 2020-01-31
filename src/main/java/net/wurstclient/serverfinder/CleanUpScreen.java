@@ -115,9 +115,9 @@ public class CleanUpScreen extends Screen
 			((IServerList)prevScreen.getServerList()).clear();
 			prevScreen.getServerList().saveFile();
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
-				.setSelected(null);
+				.method_20122(null);
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
-				.setServers(prevScreen.getServerList());
+				.method_20125(prevScreen.getServerList());
 			minecraft.openScreen(prevScreen);
 			return;
 		}
@@ -135,9 +135,9 @@ public class CleanUpScreen extends Screen
 				prevScreen.getServerList().remove(server);
 				prevScreen.getServerList().saveFile();
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setSelected(null);
+					.method_20122(null);
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setServers(prevScreen.getServerList());
+					.method_20125(prevScreen.getServerList());
 			}
 		}
 		
@@ -148,9 +148,9 @@ public class CleanUpScreen extends Screen
 				server.name = "Grief me #" + (i + 1);
 				prevScreen.getServerList().saveFile();
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setSelected(null);
+					.method_20122(null);
 				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setServers(prevScreen.getServerList());
+					.method_20125(prevScreen.getServerList());
 			}
 		
 		minecraft.openScreen(prevScreen);

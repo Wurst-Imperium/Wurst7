@@ -54,7 +54,7 @@ public class WurstServerPinger
 			failed = true;
 		}
 		
-		pinger.cancel();
+		pinger.method_3004();
 		done = true;
 	}
 	

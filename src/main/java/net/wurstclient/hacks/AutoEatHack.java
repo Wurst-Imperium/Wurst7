@@ -31,6 +31,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 
@@ -112,7 +113,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		MC.player.inventory.selectedSlot = bestSlot;
 		
 		// eat food
-		MC.options.keyUse.setPressed(true);
+		((IKeyBinding)MC.options.keyUse).setPressed(true);
 		IMC.getInteractionManager().rightClickItem();
 	}
 	
@@ -218,7 +219,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(!isEating())
 			return;
 		
-		MC.options.keyUse.setPressed(false);
+		((IKeyBinding)MC.options.keyUse).setPressed(false);
 		
 		MC.player.inventory.selectedSlot = oldSlot;
 		oldSlot = -1;

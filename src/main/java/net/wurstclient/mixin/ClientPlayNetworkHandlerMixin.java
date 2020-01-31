@@ -678,16 +678,8 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onPlayerActionResponse(BlockPlayerActionS2CPacket var1)
+	public void method_21707(BlockPlayerActionS2CPacket var1)
 	{
-		
-	}
-	
-	@Override
-	public void method_21707(
-		BlockPlayerActionS2CPacket blockPlayerActionS2CPacket)
-	{
-		// TODO Auto-generated method stub
 		
 	}
 }

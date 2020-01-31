@@ -38,6 +38,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -312,34 +313,34 @@ public final class FollowHack extends Hack
 				MC.player.jump();
 			
 			// swim up if necessary
-			if(MC.player.isInsideWater() && MC.player.getY() < entity.getY())
+			if(MC.player.isInsideWater() && MC.player.y < entity.y)
 				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
 			
 			// control height if flying
 			if(!MC.player.onGround
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
-				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
-					entity.getZ()) <= MC.player.squaredDistanceTo(
-						MC.player.getX(), entity.getY(), MC.player.getZ()))
+				&& MC.player.squaredDistanceTo(entity.x, MC.player.y,
+					entity.z) <= MC.player.squaredDistanceTo(MC.player.x,
+						entity.y, MC.player.z))
 			{
-				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
-				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+				if(MC.player.y > entity.y + 1D)
+					((IKeyBinding)MC.options.keySneak).setPressed(true);
+				else if(MC.player.y < entity.y - 1D)
+					((IKeyBinding)MC.options.keyJump).setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				((IKeyBinding)MC.options.keySneak).setPressed(false);
+				((IKeyBinding)MC.options.keyJump).setPressed(false);
 			}
 			
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			MC.options.keyForward
-				.setPressed(MC.player.squaredDistanceTo(entity.getX(),
-					MC.player.getY(), entity.getZ()) > distanceSq);
+			((IKeyBinding)MC.options.keyForward)
+				.setPressed(MC.player.squaredDistanceTo(entity.x, MC.player.y,
+					entity.z) > distanceSq);
 		}
 	}
 	

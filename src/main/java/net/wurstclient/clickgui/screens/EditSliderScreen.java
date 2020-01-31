@@ -50,7 +50,7 @@ public final class EditSliderScreen extends Screen
 		
 		children.add(valueField);
 		setInitialFocus(valueField);
-		valueField.setSelected(true);
+		valueField.method_1876(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
 		addButton(doneButton);

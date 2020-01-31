@@ -329,7 +329,7 @@ public final class ExcavatorHack extends Hack
 		TextRenderer tr = MC.textRenderer;
 		
 		// translate to center
-		Window sr = MC.getWindow();
+		Window sr = MC.window;
 		int msgWidth = tr.getStringWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
@@ -367,8 +367,8 @@ public final class ExcavatorHack extends Hack
 	private void handlePositionSelection()
 	{
 		// continue with next step
-		if(step.pos != null && InputUtil
-			.isKeyPressed(MC.getWindow().getHandle(), GLFW.GLFW_KEY_ENTER))
+		if(step.pos != null && InputUtil.isKeyPressed(MC.window.getHandle(),
+			GLFW.GLFW_KEY_ENTER))
 		{
 			step = Step.values()[step.ordinal() + 1];
 			

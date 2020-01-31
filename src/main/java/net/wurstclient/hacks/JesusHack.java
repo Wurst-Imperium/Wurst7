@@ -158,7 +158,7 @@ public final class JesusHack extends Hack
 		
 		// check collision boxes below player
 		ArrayList<Box> blockCollisions = MC.world
-			.getBlockCollisions(MC.player,
+			.method_20812(MC.player,
 				MC.player.getBoundingBox().offset(0, -0.5, 0))
 			.map(VoxelShape::getBoundingBox)
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));

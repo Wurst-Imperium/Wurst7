@@ -106,14 +106,12 @@ public final class RadarComponent extends Component
 		GL11.glBegin(GL11.GL_POINTS);
 		for(Entity e : hack.getEntities())
 		{
-			double diffX =
-				e.prevRenderX + (e.getX() - e.prevRenderX) * partialTicks
-					- (player.prevRenderX
-						+ (player.getX() - player.prevRenderX) * partialTicks);
-			double diffZ =
-				e.prevRenderZ + (e.getZ() - e.prevRenderZ) * partialTicks
-					- (player.prevRenderZ
-						+ (player.getZ() - player.prevRenderZ) * partialTicks);
+			double diffX = e.prevRenderX + (e.x - e.prevRenderX) * partialTicks
+				- (player.prevRenderX
+					+ (player.x - player.prevRenderX) * partialTicks);
+			double diffZ = e.prevRenderZ + (e.z - e.prevRenderZ) * partialTicks
+				- (player.prevRenderZ
+					+ (player.z - player.prevRenderZ) * partialTicks);
 			double distance = Math.sqrt(diffX * diffX + diffZ * diffZ)
 				* (getWidth() * 0.5 / hack.getRadius());
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));

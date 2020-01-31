@@ -19,12 +19,20 @@ import net.wurstclient.mixinterface.IKeyBinding;
 public class KeyBindingMixin implements IKeyBinding
 {
 	@Shadow
+	private boolean pressed;
+	@Shadow
 	private InputUtil.KeyCode keyCode;
+	
+	@Override
+	public void setPressed(boolean pressed)
+	{
+		this.pressed = pressed;
+	}
 	
 	@Override
 	public boolean isActallyPressed()
 	{
-		long handle = WurstClient.MC.getWindow().getHandle();
+		long handle = WurstClient.MC.window.getHandle();
 		int code = keyCode.getKeyCode();
 		return InputUtil.isKeyPressed(handle, code);
 	}

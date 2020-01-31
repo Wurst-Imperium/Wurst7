@@ -127,12 +127,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 				.getAdditionalJumpMotion();
 	}
 	
-	@Override
-	protected boolean clipAtLedge()
-	{
-		return super.clipAtLedge()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
-	}
+	// TODO:
+	// @Override
+	// protected boolean clipAtLedge()
+	// {
+	// return super.clipAtLedge()
+	// || WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+	// }
 	
 	@Override
 	public void setNoClip(boolean noClip)

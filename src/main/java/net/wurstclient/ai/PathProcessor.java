@@ -65,7 +65,7 @@ public abstract class PathProcessor
 	{
 		// disable keys
 		for(KeyBinding key : CONTROLS)
-			key.setPressed(false);
+			((IKeyBinding)key).setPressed(false);
 		
 		// disable sprinting
 		WurstClient.MC.player.setSprinting(false);
@@ -75,6 +75,7 @@ public abstract class PathProcessor
 	{
 		// reset keys
 		for(KeyBinding key : CONTROLS)
-			key.setPressed(((IKeyBinding)key).isActallyPressed());
+			((IKeyBinding)key)
+				.setPressed(((IKeyBinding)key).isActallyPressed());
 	}
 }
