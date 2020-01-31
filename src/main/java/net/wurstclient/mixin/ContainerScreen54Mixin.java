@@ -108,7 +108,7 @@ public abstract class ContainerScreen54Mixin
 			}
 			
 			if (!can) {
-				break;
+				continue;
 			}
 			waitForDelay();
 			if(this.mode != mode || minecraft.currentScreen == null)
