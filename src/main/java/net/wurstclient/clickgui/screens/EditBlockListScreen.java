@@ -22,7 +22,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.BlockListSetting;
@@ -270,7 +269,7 @@ public final class EditBlockListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
+				return "\u00a7ounknown block\u00a7r";
 				
 			}else
 			{

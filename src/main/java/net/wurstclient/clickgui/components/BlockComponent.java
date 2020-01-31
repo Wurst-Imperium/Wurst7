@@ -13,7 +13,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -162,7 +161,7 @@ public final class BlockComponent extends Component
 	private String getBlockName(ItemStack stack)
 	{
 		if(stack.isEmpty())
-			return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
+			return "\u00a7ounknown block\u00a7r";
 		else
 			return stack.getName().asFormattedString();
 	}
