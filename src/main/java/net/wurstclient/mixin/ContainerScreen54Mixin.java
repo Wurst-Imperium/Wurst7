@@ -98,7 +98,7 @@ public abstract class ContainerScreen54Mixin
 			if(slot.getStack().isEmpty())
 				continue;
 			boolean can = false;
-			for (int e = (mode == 1 ? rows * 9 : 0); e < (mode == 1 ? rows * 9 + 43 : rows * 9); e++)
+			for (int e = (mode == 1 ? rows * 9 : 0); e < (mode == 1 ? rows * 9 + 36 : rows * 9); e++)
 			{
 				if (Container.canInsertItemIntoSlot(container.slots.get(e), slot.getStack(), true)) 
 				{ 
