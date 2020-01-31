@@ -110,9 +110,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean isTouchingWater()
+	public boolean isInsideWater()
 	{
-		boolean inWater = super.isTouchingWater();
+		boolean inWater = super.isInsideWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		

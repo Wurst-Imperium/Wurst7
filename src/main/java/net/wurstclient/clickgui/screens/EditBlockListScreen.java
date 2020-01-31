@@ -21,7 +21,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.BlockListSetting;
@@ -253,10 +253,10 @@ public final class EditBlockListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				DiffuseLighting.enable();
+				GuiLighting.enable();
 				mc.getItemRenderer()
 					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				DiffuseLighting.disable();
+				GuiLighting.disable();
 				GL11.glPopMatrix();
 				
 				GL11.glPushMatrix();
@@ -280,9 +280,9 @@ public final class EditBlockListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				DiffuseLighting.enable();
+				GuiLighting.enable();
 				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
-				DiffuseLighting.disable();
+				GuiLighting.disable();
 				
 				GL11.glPopMatrix();
 				

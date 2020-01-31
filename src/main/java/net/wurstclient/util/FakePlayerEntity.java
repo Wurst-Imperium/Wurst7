@@ -42,8 +42,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	{
 		DataTracker fromTracker = from.getDataTracker();
 		DataTracker toTracker = to.getDataTracker();
-		Byte playerModel = fromTracker.get(PlayerEntity.PLAYER_MODEL_PARTS);
-		toTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
+		Byte playerModel = fromTracker.get(PlayerEntity.PLAYER_MODEL_BIT_MASK);
+		toTracker.set(PlayerEntity.PLAYER_MODEL_BIT_MASK, playerModel);
 	}
 	
 	private void copyRotation()
@@ -71,6 +71,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void resetPlayerPosition()
 	{
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+		player.setPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
 	}
 }

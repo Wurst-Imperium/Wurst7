@@ -20,7 +20,7 @@ import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.util.SystemUtil;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
@@ -51,7 +51,7 @@ public enum WurstClient
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
 	public static final String VERSION = "7.0pre25";
-	public static final String MC_VERSION = "1.15.2";
+	public static final String MC_VERSION = "1.14.4";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -170,7 +170,8 @@ public enum WurstClient
 		try
 		{
 			Files.createDirectories(encFolder);
-			if(Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS)
+			if(SystemUtil
+				.getOperatingSystem() == SystemUtil.OperatingSystem.WINDOWS)
 				Files.setAttribute(encFolder, "dos:hidden", true);
 			
 			Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");

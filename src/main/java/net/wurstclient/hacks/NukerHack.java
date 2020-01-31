@@ -183,11 +183,11 @@ public final class NukerHack extends Hack
 		if(mode.getSelected() != Mode.ID)
 			return;
 		
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
+		if(MC.hitResult == null
+			|| MC.hitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		BlockHitResult blockHitResult = (BlockHitResult)MC.crosshairTarget;
+		BlockHitResult blockHitResult = (BlockHitResult)MC.hitResult;
 		BlockPos pos = new BlockPos(blockHitResult.getBlockPos());
 		id = BlockUtils.getName(pos);
 	}

@@ -16,10 +16,10 @@ import java.util.stream.StreamSupport;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -213,7 +213,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// teleport
-		player.updatePosition(entity.getX() + random.nextInt(3) * 2 - 2,
+		player.setPosition(entity.getX() + random.nextInt(3) * 2 - 2,
 			entity.getY(), entity.getZ() + random.nextInt(3) * 2 - 2);
 		
 		// check cooldown

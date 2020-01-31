@@ -187,7 +187,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onCloseContainer(CloseContainerS2CPacket var1)
+	public void onGuiClose(GuiCloseS2CPacket var1)
 	{
 		
 	}
@@ -201,21 +201,21 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenHorseContainer(OpenHorseContainerS2CPacket var1)
+	public void onGuiOpen(GuiOpenS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerPropertyUpdate(ContainerPropertyUpdateS2CPacket var1)
+	public void onGuiUpdate(GuiUpdateS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerSlotUpdate(ContainerSlotUpdateS2CPacket var1)
+	public void onGuiSlotUpdate(GuiSlotUpdateS2CPacket var1)
 	{
 		
 	}
@@ -649,28 +649,28 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerS2CPacket var1)
+	public void onOpenContainer(OpenContainerPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onSetTradeOffers(SetTradeOffersS2CPacket var1)
+	public void onSetTradeOffers(SetTradeOffersPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
+	public void handleChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onChunkRenderDistanceCenter(
+	public void handleChunkRenderDistanceCenter(
 		ChunkRenderDistanceCenterS2CPacket var1)
 	{
 		
@@ -678,8 +678,16 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onPlayerActionResponse(PlayerActionResponseS2CPacket var1)
+	public void onPlayerActionResponse(BlockPlayerActionS2CPacket var1)
 	{
+		
+	}
+	
+	@Override
+	public void method_21707(
+		BlockPlayerActionS2CPacket blockPlayerActionS2CPacket)
+	{
+		// TODO Auto-generated method stub
 		
 	}
 }
