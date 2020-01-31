@@ -83,7 +83,7 @@ public abstract class AltEditorScreen extends Screen
 				stars += "*";
 			return stars;
 		});
-		passwordBox.setMaxLength(64);
+		passwordBox.setMaxLength(256);
 		children.add(passwordBox);
 		
 		setInitialFocus(emailBox);
