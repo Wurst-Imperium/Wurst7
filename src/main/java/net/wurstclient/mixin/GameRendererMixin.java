@@ -85,8 +85,7 @@ public abstract class GameRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F",
 			ordinal = 0),
-		method = {
-			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+		method = {"applyCameraTransformations(F)V"})
 	private float wurstNauseaLerp(float delta, float first, float second)
 	{
 		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
