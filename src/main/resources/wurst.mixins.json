@@ -13,6 +13,7 @@
   	"BlockStateMixin",
   	"ButtonWidgetMixin",
   	"CactusBlockMixin",
+  	"CameraMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
   	"ClientConnectionMixin",
