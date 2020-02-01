@@ -21,17 +21,18 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"AutoPotion", "auto potion", "auto splash potion"})
-public final class AutoSplashPotHack extends Hack implements UpdateListener
+@SearchTags({"AutoPotion", "auto potion", "AutoSplashPotion",
+	"auto splash potion"})
+public final class AutoPotionHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health =
 		new SliderSetting("Health", 6, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL);
 	
 	private int timer;
 	
-	public AutoSplashPotHack()
+	public AutoPotionHack()
 	{
-		super("AutoSplashPot",
+		super("AutoPotion",
 			"Automatically throws instant health splash potions if your health is lower than or equal to\n"
 				+ "the set value.");
 		
