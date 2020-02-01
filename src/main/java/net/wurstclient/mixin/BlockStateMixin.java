@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityContext;
 import net.minecraft.state.AbstractState;
 import net.minecraft.state.State;
@@ -30,7 +29,6 @@ import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOc
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
-import net.wurstclient.util.BlockUtils;
 
 @Mixin(BlockState.class)
 public class BlockStateMixin extends AbstractState<Block, BlockState>
@@ -84,10 +82,7 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 			return;
 		
 		HandNoClipHack handNoClipHack = hax.handNoClipHack;
-		if(!handNoClipHack.isEnabled())
-			return;
-		
-		if(BlockUtils.getBlock(pos) == Blocks.CHEST)
+		if(!handNoClipHack.isEnabled() || handNoClipHack.isBlockInList(pos))
 			return;
 		
 		cir.setReturnValue(VoxelShapes.empty());
