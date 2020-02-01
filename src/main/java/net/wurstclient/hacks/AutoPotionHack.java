@@ -127,7 +127,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	private boolean hasEffect(ItemStack stack, StatusEffect effect)
 	{
 		for(StatusEffectInstance effectInstance : PotionUtil
-			.getCustomPotionEffects(stack))
+			.getPotionEffects(stack))
 		{
 			if(effectInstance.getEffectType() != effect)
 				continue;
