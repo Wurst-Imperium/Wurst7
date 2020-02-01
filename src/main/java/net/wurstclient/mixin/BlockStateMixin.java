@@ -29,7 +29,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
-import net.wurstclient.hacks.GhostHandHack;
+import net.wurstclient.hacks.HandNoClipHack;
 import net.wurstclient.util.BlockUtils;
 
 @Mixin(BlockState.class)
@@ -83,8 +83,8 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 		if(hax == null)
 			return;
 		
-		GhostHandHack ghostHandHack = hax.ghostHandHack;
-		if(!ghostHandHack.isEnabled())
+		HandNoClipHack handNoClipHack = hax.handNoClipHack;
+		if(!handNoClipHack.isEnabled())
 			return;
 		
 		if(BlockUtils.getBlock(pos) == Blocks.CHEST)

@@ -11,14 +11,14 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"ghost hand"})
-public final class GhostHandHack extends Hack
+@SearchTags({"hand noclip", "hand no clip"})
+public final class HandNoClipHack extends Hack
 {
-	public GhostHandHack()
+	public HandNoClipHack()
 	{
-		super("GhostHand",
-			"Allows you to reach specific blocks through walls.\n"
-				+ "Type \u00a7l.ghosthand id <block_id>\u00a7r or \u00a7l.ghosthand name <block_name>\u00a7r to specify it.");
+		super("HandNoClip",
+			"Allows you to reach specific blocks through walls.");
+		
 		setCategory(Category.BLOCKS);
 	}
 }
