@@ -44,7 +44,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			+ "soup directly refills your health. If the server you are\n"
 			+ "playing on is not configured to do that, use AutoEat instead.");
 		
-		setCategory(Category.OTHER);
+		setCategory(Category.COMBAT);
 		addSetting(health);
 	}
 	
