@@ -36,7 +36,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			"Automatically throws instant health splash potions if your health is lower than or equal to\n"
 				+ "the set value.");
 		
-		setCategory(Category.OTHER);
+		setCategory(Category.COMBAT);
 		addSetting(health);
 	}
 	
