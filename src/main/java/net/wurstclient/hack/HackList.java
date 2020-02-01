@@ -40,7 +40,7 @@ public final class HackList implements UpdateListener
 	public final AutoPotionHack autoPotionHack = new AutoPotionHack();
 	public final AutoRespawnHack autoRespawnHack = new AutoRespawnHack();
 	public final AutoSignHack autoSignHack = new AutoSignHack();
-	// public final AutoSoupHack autoSoupHack = new AutoSoupHack();
+	public final AutoSoupHack autoSoupHack = new AutoSoupHack();
 	public final AutoSprintHack autoSprintHack = new AutoSprintHack();
 	public final AutoStealHack autoStealHack = new AutoStealHack();
 	public final AutoSwimHack autoSwimHack = new AutoSwimHack();
