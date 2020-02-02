@@ -150,7 +150,7 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		arrowMotionZ /= arrowMotion;
 		
 		// apply bow charge
-		if(item instanceof BowItem)
+		if(item instanceof RangedWeaponItem)
 		{
 			float bowPower = (72000 - player.getItemUseTimeLeft()) / 20.0f;
 			bowPower = (bowPower * bowPower + bowPower * 2.0f) / 3.0f;
