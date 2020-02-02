@@ -20,8 +20,13 @@ import net.wurstclient.settings.EnumSetting;
 @SearchTags({"Crits"})
 public final class CriticalsHack extends Hack implements LeftClickListener
 {
-	private final EnumSetting<Mode> mode =
-		new EnumSetting<>("Mode", Mode.values(), Mode.PACKET);
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lPacket\u00a7r mode sends packets to server without actually\n"
+			+ "moving you at all.\n\n"
+			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to\n"
+			+ "get a critical hit.\n\n"
+			+ "\u00a7lFull Jump\u00a7r mode makes you jump normally.",
+		Mode.values(), Mode.PACKET);
 	
 	public CriticalsHack()
 	{
@@ -67,23 +72,30 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 		
 		switch(mode.getSelected())
 		{
-			case JUMP:
-			MC.player.addVelocity(0, 0.1, 0);
-			MC.player.fallDistance = 0.1F;
-			MC.player.onGround = false;
+			case PACKET:
+			doPacketJump();
 			break;
 			
-			case PACKET:
-			double posX = MC.player.getX();
-			double posY = MC.player.getY();
-			double posZ = MC.player.getZ();
+			case MINI_JUMP:
+			doMiniJump();
+			break;
 			
-			sendPos(posX, posY + 0.0625D, posZ, true);
-			sendPos(posX, posY, posZ, false);
-			sendPos(posX, posY + 1.1E-5D, posZ, false);
-			sendPos(posX, posY, posZ, false);
+			case FULL_JUMP:
+			doFullJump();
 			break;
 		}
+	}
+	
+	private void doPacketJump()
+	{
+		double posX = MC.player.getX();
+		double posY = MC.player.getY();
+		double posZ = MC.player.getZ();
+		
+		sendPos(posX, posY + 0.0625D, posZ, true);
+		sendPos(posX, posY, posZ, false);
+		sendPos(posX, posY + 1.1E-5D, posZ, false);
+		sendPos(posX, posY, posZ, false);
 	}
 	
 	private void sendPos(double x, double y, double z, boolean onGround)
@@ -92,11 +104,23 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
 	}
 	
+	private void doMiniJump()
+	{
+		MC.player.addVelocity(0, 0.1, 0);
+		MC.player.fallDistance = 0.1F;
+		MC.player.onGround = false;
+	}
+	
+	private void doFullJump()
+	{
+		MC.player.jump();
+	}
+	
 	private enum Mode
 	{
-		JUMP("Jump"),
-		
-		PACKET("Packet");
+		PACKET("Packet"),
+		MINI_JUMP("Mini Jump"),
+		FULL_JUMP("Full Jump");
 		
 		private final String name;
 		
