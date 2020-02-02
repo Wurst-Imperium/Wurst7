@@ -44,8 +44,10 @@ public final class AutoTranslateHack extends Hack
 	
 	public AutoTranslateHack()
 	{
-		super("AutoTranslate", "Translate every chat into another language.");
+		super("AutoTranslate",
+			"Translates chat messages using Google Translate.");
 		setCategory(Category.CHAT);
+		
 		addSetting(mychat);
 		addSetting(otherchat);
 		addSetting(translate_my);
