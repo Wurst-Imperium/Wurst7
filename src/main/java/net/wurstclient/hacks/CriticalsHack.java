@@ -36,6 +36,12 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	}
 	
 	@Override
+	public String getRenderName()
+	{
+		return getName() + " [" + mode.getSelected() + "]";
+	}
+	
+	@Override
 	public void onEnable()
 	{
 		EVENTS.add(LeftClickListener.class, this);
