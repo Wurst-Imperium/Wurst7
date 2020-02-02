@@ -105,7 +105,7 @@ public final class BowAimbotHack extends Hack
 	
 	public BowAimbotHack()
 	{
-		super("BowAimbot", "Automatically aims your bow.");
+		super("BowAimbot", "Automatically aims your bow or crossbow.");
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
