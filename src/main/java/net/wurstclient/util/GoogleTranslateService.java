@@ -1,4 +1,4 @@
-package net.wurstclient.services;
+package net.wurstclient.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-public class GoogleService
+public class GoogleTranslateService
 {
 	
 	public static enum Language
