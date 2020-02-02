@@ -153,7 +153,8 @@ public final class HackList implements UpdateListener
 	public final TrueSightHack trueSightHack = new TrueSightHack();
 	public final TunnellerHack tunnellerHack = new TunnellerHack();
 	public final XRayHack xRayHack = new XRayHack();
-	public final AutoTranslateChatHack autoTranslateChatHack = new AutoTranslateChatHack();
+	public final AutoTranslateChatHack autoTranslateChatHack =
+		new AutoTranslateChatHack();
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
