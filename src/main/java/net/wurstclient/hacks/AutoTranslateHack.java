@@ -20,7 +20,6 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.GoogleTranslateService;
-import net.wurstclient.util.GoogleTranslateService.Language;
 
 @SearchTags({"auto translate", "GoogleTranslate", "google translate"})
 public final class AutoTranslateHack extends Hack
@@ -124,5 +123,47 @@ public final class AutoTranslateHack extends Hack
 			}
 		}
 		
+	}
+	
+	public static enum Language
+	{
+		AUTO_DETECT("AUTO_DETECT", "auto"),
+		ARABIC("ARABIC", "ar"),
+		CHINESE_SIMPLIFIED("CHINESE_SIMPLIFIED", "zh-CN"),
+		CHINESE_TRADITIONAL("CHINESE_TRADITIONAL", "zh-TW"),
+		ENGLISH("ENGLISH", "en"),
+		FILIPINO("FILIPINO", "tl"),
+		FRENCH("FRENCH", "fr"),
+		GERMAN("GERMAN", "de"),
+		GREEK("GREEK", "el"),
+		INDONESIAN("INDONESIAN", "id"),
+		IRISH("IRISH", "ga"),
+		ITALIAN("ITALIAN", "it"),
+		JAPANESE("JAPANESE", "ja"),
+		JAVANESE("JAVANESE", "jw"),
+		KOREAN("KOREAN", "ko"),
+		LATIN("LATIN", "la"),
+		POLISH("POLISH", "pl"),
+		PORTUGUESE("PORTUGUESE", "pt"),
+		RUSSIAN("RUSSIAN", "ru"),
+		SPANISH("SPANISH", "es"),
+		SWEDISH("SWEDISH", "sv"),
+		THAI("THAI", "th"),
+		VIETNAMESE("VIETNAMESE", "vi");
+		
+		public final String name;
+		public final String value;
+		
+		private Language(String name, String value)
+		{
+			this.name = name;
+			this.value = value;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }

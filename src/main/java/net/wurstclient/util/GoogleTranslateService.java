@@ -19,50 +19,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class GoogleTranslateService
 {
-	
-	public static enum Language
-	{
-		
-		AUTO_DETECT("AUTO_DETECT", "auto"),
-		ARABIC("ARABIC", "ar"),
-		CHINESE_SIMPLIFIED("CHINESE_SIMPLIFIED", "zh-CN"),
-		CHINESE_TRADITIONAL("CHINESE_TRADITIONAL", "zh-TW"),
-		ENGLISH("ENGLISH", "en"),
-		FILIPINO("FILIPINO", "tl"),
-		FRENCH("FRENCH", "fr"),
-		GERMAN("GERMAN", "de"),
-		GREEK("GREEK", "el"),
-		INDONESIAN("INDONESIAN", "id"),
-		IRISH("IRISH", "ga"),
-		ITALIAN("ITALIAN", "it"),
-		JAPANESE("JAPANESE", "ja"),
-		JAVANESE("JAVANESE", "jw"),
-		KOREAN("KOREAN", "ko"),
-		LATIN("LATIN", "la"),
-		POLISH("POLISH", "pl"),
-		PORTUGUESE("PORTUGUESE", "pt"),
-		RUSSIAN("RUSSIAN", "ru"),
-		SPANISH("SPANISH", "es"),
-		SWEDISH("SWEDISH", "sv"),
-		THAI("THAI", "th"),
-		VIETNAMESE("VIETNAMESE", "vi");
-		
-		public final String name;
-		public final String value;
-		
-		private Language(String name, String value)
-		{
-			this.name = name;
-			this.value = value;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
-	}
-	
 	public String translate(String textToTranslate, String translateFrom,
 		String translateTo) throws Exception
 	{
