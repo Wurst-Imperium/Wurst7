@@ -23,7 +23,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"AutoTranslate", "Translate"})
-public final class AutoTranslateChatHack extends Hack
+public final class AutoTranslateHack extends Hack
 	implements ChatInputListener, ChatOutputListener
 {
 	
@@ -44,7 +44,7 @@ public final class AutoTranslateChatHack extends Hack
 	private final EnumSetting<Language> translate_my = new EnumSetting<>(
 		"Translate my own chat to?", Language.values(), Language.JAPANESE);
 	
-	public AutoTranslateChatHack()
+	public AutoTranslateHack()
 	{
 		super("AutoTranslate", "Translate every chat into another language.");
 		setCategory(Category.CHAT);
