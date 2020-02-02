@@ -31,6 +31,8 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
@@ -143,22 +145,25 @@ public final class BowAimbotHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		// check if using item
-		if(!MC.options.keyUse.isPressed())
+		// check if item is ranged weapon
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		Item item = stack.getItem();
+		if(!(item instanceof BowItem || item instanceof CrossbowItem))
 		{
 			target = null;
 			return;
 		}
 		
-		if(!player.isUsingItem())
+		// check if using bow
+		if(item instanceof BowItem && !MC.options.keyUse.isPressed()
+			&& !player.isUsingItem())
 		{
 			target = null;
 			return;
 		}
 		
-		// check if item is bow
-		ItemStack item = MC.player.inventory.getMainHandStack();
-		if(item == null || !(item.getItem() instanceof BowItem))
+		// check if crossbow is loaded
+		if(item instanceof CrossbowItem && !CrossbowItem.isCharged(stack))
 		{
 			target = null;
 			return;
