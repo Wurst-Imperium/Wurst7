@@ -355,7 +355,7 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		MC.textRenderer.draw(message, 2, -1, 0xffffffff);
+		MC.textRenderer.draw(message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		
