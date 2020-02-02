@@ -22,11 +22,10 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.GoogleTranslateService;
 import net.wurstclient.util.GoogleTranslateService.Language;
 
-@SearchTags({"AutoTranslate", "Translate"})
+@SearchTags({"auto translate", "GoogleTranslate", "google translate"})
 public final class AutoTranslateHack extends Hack
 	implements ChatInputListener, ChatOutputListener
 {
-	
 	public static GoogleTranslateService google = new GoogleTranslateService();;
 	
 	private final CheckboxSetting mychat =
