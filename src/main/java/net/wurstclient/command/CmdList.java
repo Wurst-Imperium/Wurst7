@@ -54,7 +54,6 @@ public final class CmdList
 	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
-	// public final ThrowCmd throwCmd = new ThrowCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
