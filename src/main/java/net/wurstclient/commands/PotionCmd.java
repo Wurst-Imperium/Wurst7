@@ -141,6 +141,7 @@ public final class PotionCmd extends Command
 		CompoundTag nbt = new CompoundTag();
 		nbt.put("CustomPotionEffects", newEffects);
 		stack.setTag(nbt);
+		ChatUtils.message("Effect removed.");
 	}
 	
 	private int parseEffectId(String input) throws CmdSyntaxError
