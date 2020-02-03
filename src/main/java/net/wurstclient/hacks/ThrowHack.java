@@ -7,13 +7,15 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.RightClickListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-public final class ThrowHack extends Hack implements UpdateListener
+public final class ThrowHack extends Hack implements RightClickListener
 {
 	private final SliderSetting amount = new SliderSetting("Amount",
 		"Amount of uses per click.", 16, 2, 1000000, 1, ValueDisplay.INTEGER);
@@ -22,8 +24,8 @@ public final class ThrowHack extends Hack implements UpdateListener
 	{
 		super("Throw",
 			"Uses an item multiple times. Can be used to throw\n"
-				+ "snowballs and eggs, spawn mobs, place minecarts, etc. in\n"
-				+ "very large quantities.\n\n"
+				+ "snowballs and eggs, spawn mobs, place minecarts, etc.\n"
+				+ "in very large quantities.\n\n"
 				+ "This can cause a lot of lag and even crash a server.");
 		
 		setCategory(Category.OTHER);
@@ -39,17 +41,17 @@ public final class ThrowHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RightClickListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RightClickListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
+	public void onRightClick(RightClickEvent event)
 	{
 		if(IMC.getItemUseCooldown() > 0)
 			return;
@@ -58,6 +60,16 @@ public final class ThrowHack extends Hack implements UpdateListener
 			return;
 		
 		for(int i = 0; i < amount.getValueI(); i++)
-			IMC.rightClick();
+		{
+			if(MC.crosshairTarget.getType() == HitResult.Type.BLOCK)
+			{
+				BlockHitResult hitResult = (BlockHitResult)MC.crosshairTarget;
+				IMC.getInteractionManager().rightClickBlock(
+					hitResult.getBlockPos(), hitResult.getSide(),
+					hitResult.getPos());
+			}
+			
+			IMC.getInteractionManager().rightClickItem();
+		}
 	}
 }
