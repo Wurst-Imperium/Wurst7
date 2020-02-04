@@ -105,7 +105,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			return;
 		
 		// find best weapon
-		float bestValue = 0;
+		float bestValue = Integer.MIN_VALUE;
 		int bestSlot = -1;
 		for(int i = 0; i < 9; i++)
 		{
@@ -160,7 +160,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			break;
 		}
 		
-		return 0;
+		return Integer.MIN_VALUE;
 	}
 	
 	private void resetSlot()
