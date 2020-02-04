@@ -166,7 +166,7 @@ public final class NukerLegitHack extends Hack
 		
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
-			.filter(validator)
+			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
@@ -202,6 +202,7 @@ public final class NukerLegitHack extends Hack
 			
 			// face block
 			WURST.getRotationFaker().faceVectorClient(hitVec);
+			WURST.getHax().autoToolHack.equipIfEnabled(currentBlock);
 			
 			// if attack key is down but nothing happens, release it for one
 			// tick
