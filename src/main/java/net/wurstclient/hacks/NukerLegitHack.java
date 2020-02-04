@@ -79,7 +79,7 @@ public final class NukerLegitHack extends Hack
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
-		// WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		// add listeners

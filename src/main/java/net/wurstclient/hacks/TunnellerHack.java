@@ -109,7 +109,7 @@ public final class TunnellerHack extends Hack
 		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
-		// WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
 		
 		// add listeners
 		EVENTS.add(UpdateListener.class, this);
