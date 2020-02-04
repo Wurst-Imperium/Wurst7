@@ -11,14 +11,14 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.item.MiningToolItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMiningToolItem;
+import net.wurstclient.mixinterface.ISwordItem;
 
-@Mixin(MiningToolItem.class)
-public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
+@Mixin(SwordItem.class)
+public class SwordItemMixin extends ToolItem implements ISwordItem
 {
 	@Shadow
 	@Final
@@ -28,16 +28,10 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	@Final
 	protected float attackSpeed;
 	
-	private MiningToolItemMixin(WurstClient wurst, ToolMaterial material,
+	private SwordItemMixin(WurstClient wurst, ToolMaterial material,
 		Settings settings)
 	{
 		super(material, settings);
-	}
-	
-	@Override
-	public float getAttackDamage()
-	{
-		return attackDamage;
 	}
 	
 	@Override

@@ -7,9 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-public interface IMiningToolItem
+public interface ISwordItem
 {
-	public float getAttackDamage();
-	
 	public float getAttackSpeed();
 }

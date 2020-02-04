@@ -19,12 +19,17 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IMiningToolItem;
+import net.wurstclient.mixinterface.ISwordItem;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
 {
+	private final EnumSetting<Priority> priority =
+		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
+	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
 		"Switch back", "Switches back to the previously selected slot\n"
 			+ "after \u00a7lRelease time\u00a7r has passed.",
@@ -44,7 +49,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		super("AutoSword",
 			"Automatically uses the best weapon in your hotbar to attack entities.\n"
 				+ "Tip: This works with Killaura.");
+		
 		setCategory(Category.COMBAT);
+		
+		addSetting(priority);
 		addSetting(switchBack);
 		addSetting(releaseTime);
 	}
@@ -97,7 +105,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			return;
 		
 		// find best weapon
-		float bestDamage = 0;
+		float bestValue = 0;
 		int bestSlot = -1;
 		for(int i = 0; i < 9; i++)
 		{
@@ -108,16 +116,12 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			Item item = MC.player.inventory.getInvStack(i).getItem();
 			
 			// get damage
-			float damage = 0;
-			if(item instanceof SwordItem)
-				damage = ((SwordItem)item).getAttackDamage();
-			else if(item instanceof MiningToolItem)
-				damage = ((IMiningToolItem)item).getAttackDamage();
+			float value = getValue(item);
 			
 			// compare with previous best weapon
-			if(damage > bestDamage)
+			if(value > bestValue)
 			{
-				bestDamage = damage;
+				bestValue = value;
 				bestSlot = i;
 			}
 		}
@@ -137,6 +141,28 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		timer = releaseTime.getValueI();
 	}
 	
+	private float getValue(Item item)
+	{
+		switch(priority.getSelected())
+		{
+			case SPEED:
+			if(item instanceof SwordItem)
+				return ((ISwordItem)item).getAttackSpeed();
+			else if(item instanceof MiningToolItem)
+				return ((IMiningToolItem)item).getAttackSpeed();
+			break;
+			
+			case DAMAGE:
+			if(item instanceof SwordItem)
+				return ((SwordItem)item).getAttackDamage();
+			else if(item instanceof MiningToolItem)
+				return ((IMiningToolItem)item).getAttackDamage();
+			break;
+		}
+		
+		return 0;
+	}
+	
 	private void resetSlot()
 	{
 		if(!switchBack.isChecked())
@@ -149,6 +175,25 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		{
 			MC.player.inventory.selectedSlot = oldSlot;
 			oldSlot = -1;
+		}
+	}
+	
+	private enum Priority
+	{
+		SPEED("Speed (swords)"),
+		DAMAGE("Damage (axes)");
+		
+		private final String name;
+		
+		private Priority(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
 		}
 	}
 }
