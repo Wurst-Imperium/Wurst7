@@ -222,6 +222,8 @@ public final class KillauraHack extends Hack
 		if(target == null)
 			return;
 		
+		WURST.getHax().autoSwordHack.setSlot();
+		
 		WURST.getRotationFaker()
 			.faceVectorPacket(target.getBoundingBox().getCenter());
 	}

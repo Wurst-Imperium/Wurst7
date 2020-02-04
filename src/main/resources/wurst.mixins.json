@@ -33,6 +33,7 @@
     "KeyboardMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
+    "MiningToolItemMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
     "PlayerInventoryMixin",

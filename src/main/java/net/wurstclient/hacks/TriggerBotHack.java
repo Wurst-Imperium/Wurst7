@@ -135,6 +135,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		if(!isCorrectEntity(target))
 			return;
 		
+		WURST.getHax().autoSwordHack.setSlot();
+		
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 	}

@@ -234,6 +234,8 @@ public final class FightBotHack extends Hack
 		if(entity == null)
 			return;
 		
+		WURST.getHax().autoSwordHack.setSlot();
+		
 		if(useAi.isChecked())
 		{
 			// reset pathfinder

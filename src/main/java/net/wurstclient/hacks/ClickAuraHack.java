@@ -236,6 +236,8 @@ public final class ClickAuraHack extends Hack
 		if(target == null)
 			return;
 		
+		WURST.getHax().autoSwordHack.setSlot();
+		
 		// face entity
 		Rotation rotation = RotationUtils
 			.getNeededRotations(target.getBoundingBox().getCenter());

@@ -219,6 +219,8 @@ public final class KillauraLegitHack extends Hack
 		if(target == null)
 			return;
 		
+		WURST.getHax().autoSwordHack.setSlot();
+		
 		// face entity
 		if(!faceEntityClient(target))
 			return;
