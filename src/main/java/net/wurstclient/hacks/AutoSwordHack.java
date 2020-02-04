@@ -36,7 +36,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
 		10, 1, 200, 1, v -> (int)v + " ticks");
 	
-	private int oldSlot = -1;
+	private int oldSlot;
 	private int timer;
 	
 	public AutoSwordHack()
@@ -52,6 +52,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		oldSlot = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
