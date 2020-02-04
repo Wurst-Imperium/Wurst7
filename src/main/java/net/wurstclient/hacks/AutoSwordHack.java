@@ -7,20 +7,21 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IMiningToolItem;
 
 @SearchTags({"auto sword"})
-public final class AutoSwordHack extends Hack
-	implements LeftClickListener, UpdateListener
+public final class AutoSwordHack extends Hack implements UpdateListener
 {
 	private int oldSlot = -1;
 	private int timer;
@@ -36,13 +37,13 @@ public final class AutoSwordHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		EVENTS.add(LeftClickListener.class, this);
+		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		EVENTS.remove(LeftClickListener.class, this);
+		EVENTS.remove(UpdateListener.class, this);
 		
 		// reset slot
 		if(oldSlot != -1)
@@ -55,6 +56,16 @@ public final class AutoSwordHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		if(MC.crosshairTarget != null
+			&& MC.crosshairTarget.getType() == HitResult.Type.ENTITY)
+		{
+			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
+			
+			if(entity instanceof LivingEntity
+				&& ((LivingEntity)entity).getHealth() > 0)
+				setSlot();
+		}
+		
 		// update timer
 		if(timer > 0)
 		{
@@ -68,18 +79,6 @@ public final class AutoSwordHack extends Hack
 			MC.player.inventory.selectedSlot = oldSlot;
 			oldSlot = -1;
 		}
-		EVENTS.remove(UpdateListener.class, this);
-	}
-	
-	@Override
-	public void onLeftClick(LeftClickEvent event)
-	{
-		// check hitResult
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY)
-			return;
-		
-		setSlot();
 	}
 	
 	public void setSlot()
@@ -131,6 +130,5 @@ public final class AutoSwordHack extends Hack
 		
 		// start timer
 		timer = 10;
-		EVENTS.add(UpdateListener.class, this);
 	}
 }
