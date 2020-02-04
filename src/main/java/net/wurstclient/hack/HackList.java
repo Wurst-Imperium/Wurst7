@@ -82,8 +82,7 @@ public final class HackList implements UpdateListener
 	public final HeadRollHack headRollHack = new HeadRollHack();
 	public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	public final HighJumpHack highJumpHack = new HighJumpHack();
-	// public final InstantBunkerHack instantBunkerHack = new
-	// InstantBunkerHack();
+	public final InstantBunkerHack instantBunkerHack = new InstantBunkerHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
 	public final ItemGeneratorHack itemGeneratorHack = new ItemGeneratorHack();
 	public final JesusHack jesusHack = new JesusHack();
