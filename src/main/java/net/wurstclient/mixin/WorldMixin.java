@@ -48,7 +48,7 @@ public abstract class WorldMixin implements IWorld, AutoCloseable
 		NoWeatherHack noWeatherHack =
 			WurstClient.INSTANCE.getHax().noWeatherHack;
 		
-		if(noWeatherHack.isTimeChanged())
+		if(noWeatherHack.isMoonPhaseChanged())
 			return noWeatherHack.getChangedMoonPhase();
 		
 		return getDimension().getMoonPhase(getLevelProperties().getTimeOfDay());
