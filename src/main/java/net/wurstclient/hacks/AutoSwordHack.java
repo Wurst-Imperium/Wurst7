@@ -130,7 +130,7 @@ public final class AutoSwordHack extends Hack
 		MC.player.inventory.selectedSlot = bestSlot;
 		
 		// start timer
-		timer = 4;
+		timer = 10;
 		EVENTS.add(UpdateListener.class, this);
 	}
 }
