@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -93,6 +94,10 @@ public final class SpeedNukerHack extends Hack
 		Iterable<BlockPos> validBlocks =
 			getValidBlocks(range.getValue(), mode.getSelected().validator);
 		
+		Iterator<BlockPos> autoToolIterator = validBlocks.iterator();
+		if(autoToolIterator.hasNext())
+			WURST.getHax().autoToolHack.equipIfEnabled(autoToolIterator.next());
+		
 		// break all blocks
 		BlockBreaker.breakBlocksWithPacketSpam(validBlocks);
 	}
@@ -144,7 +149,8 @@ public final class SpeedNukerHack extends Hack
 		
 		ID("ID",
 			() -> "IDSpeedNuker [" + WURST.getHax().nukerHack.getId() + "]",
-			pos -> WURST.getHax().nukerHack.getId() == BlockUtils.getName(pos)),
+			pos -> WURST.getHax().nukerHack.getId()
+				.equals(BlockUtils.getName(pos))),
 		
 		FLAT("Flat", () -> "FlatSpeedNuker",
 			pos -> pos.getY() >= MC.player.getY()),
