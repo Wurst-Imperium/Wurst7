@@ -140,7 +140,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private void resetSlot()
 	{
 		if(!switchBack.isChecked())
+		{
+			oldSlot = -1;
 			return;
+		}
 		
 		if(oldSlot != -1)
 		{
