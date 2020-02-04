@@ -19,14 +19,21 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IMiningToolItem;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting switchBack = new CheckboxSetting(
+		"Switch back", "Switches back to the previously selected slot\n"
+			+ "after \u00a7lRelease time\u00a7r has passed.",
+		true);
+	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
 		"Time until AutoSword will switch back from\n"
-			+ "the weapon to the previously selected slot.",
+			+ "the weapon to the previously selected slot.\n\n"
+			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
 		10, 1, 200, 1, v -> (int)v + " ticks");
 	
 	private int oldSlot = -1;
@@ -38,6 +45,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			"Automatically uses the best weapon in your hotbar to attack entities.\n"
 				+ "Tip: This works with Killaura.");
 		setCategory(Category.COMBAT);
+		addSetting(switchBack);
 		addSetting(releaseTime);
 	}
 	
@@ -51,13 +59,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		
-		// reset slot
-		if(oldSlot != -1)
-		{
-			MC.player.inventory.selectedSlot = oldSlot;
-			oldSlot = -1;
-		}
+		resetSlot();
 	}
 	
 	@Override
@@ -80,12 +82,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		// reset slot
-		if(oldSlot != -1)
-		{
-			MC.player.inventory.selectedSlot = oldSlot;
-			oldSlot = -1;
-		}
+		resetSlot();
 	}
 	
 	public void setSlot()
@@ -137,5 +134,17 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// start timer
 		timer = releaseTime.getValueI();
+	}
+	
+	private void resetSlot()
+	{
+		if(!switchBack.isChecked())
+			return;
+		
+		if(oldSlot != -1)
+		{
+			MC.player.inventory.selectedSlot = oldSlot;
+			oldSlot = -1;
+		}
 	}
 }
