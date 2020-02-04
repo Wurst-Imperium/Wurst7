@@ -42,7 +42,8 @@
     "SignEditScreenMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",
-    "TitleScreenMixin"
+    "TitleScreenMixin",
+    "WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1
