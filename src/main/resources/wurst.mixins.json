@@ -42,6 +42,7 @@
     "SignEditScreenMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",
+    "TextRendererMixin",
     "TitleScreenMixin",
     "WorldMixin"
   ],
