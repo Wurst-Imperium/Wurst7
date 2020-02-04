@@ -240,6 +240,16 @@ public final class NukerHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+	
 	private enum Mode
 	{
 		NORMAL("Normal", n -> n.getName(), (n, p) -> true),

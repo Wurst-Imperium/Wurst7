@@ -109,7 +109,7 @@ public final class HackList implements UpdateListener
 	public final NoWeatherHack noWeatherHack = new NoWeatherHack();
 	public final NoWebHack noWebHack = new NoWebHack();
 	public final NukerHack nukerHack = new NukerHack();
-	// public final NukerLegitHack nukerLegitHack = new NukerLegitHack();
+	public final NukerLegitHack nukerLegitHack = new NukerLegitHack();
 	public final OverlayHack overlayHack = new OverlayHack();
 	public final PanicHack panicHack = new PanicHack();
 	public final ParkourHack parkourHack = new ParkourHack();
