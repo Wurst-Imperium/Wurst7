@@ -101,7 +101,7 @@ public final class HackList implements UpdateListener
 	public final NameProtectHack nameProtectHack = new NameProtectHack();
 	public final NameTagsHack nameTagsHack = new NameTagsHack();
 	public final NavigatorHack navigatorHack = new NavigatorHack();
-	// public final NoClipHack noClipHack = new NoClipHack();
+	public final NoClipHack noClipHack = new NoClipHack();
 	public final NoFallHack noFallHack = new NoFallHack();
 	public final NoHurtcamHack noHurtcamHack = new NoHurtcamHack();
 	// public final NoOverlayHack noOverlayHack = new NoOverlayHack();
