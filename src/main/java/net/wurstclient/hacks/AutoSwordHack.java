@@ -19,10 +19,16 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IMiningToolItem;
+import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
 {
+	private final SliderSetting releaseTime = new SliderSetting("Release time",
+		"Time until AutoSword will switch back from\n"
+			+ "the weapon to the previously selected slot.",
+		10, 1, 200, 1, v -> (int)v + " ticks");
+	
 	private int oldSlot = -1;
 	private int timer;
 	
@@ -32,6 +38,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			"Automatically uses the best weapon in your hotbar to attack entities.\n"
 				+ "Tip: This works with Killaura.");
 		setCategory(Category.COMBAT);
+		addSetting(releaseTime);
 	}
 	
 	@Override
@@ -129,6 +136,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		MC.player.inventory.selectedSlot = bestSlot;
 		
 		// start timer
-		timer = 10;
+		timer = releaseTime.getValueI();
 	}
 }
