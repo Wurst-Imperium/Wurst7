@@ -17,9 +17,11 @@ import net.wurstclient.WurstClient;
 @Mixin(TextRenderer.class)
 public abstract class TextRendererMixin implements AutoCloseable
 {
-	@ModifyArg(at = @At("HEAD"),
+	@ModifyArg(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/font/TextRenderer;drawInternal(Ljava/lang/String;FFIZLnet/minecraft/client/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I",
+		ordinal = 0),
 		method = {
-			"drawInternal(Ljava/lang/String;FFIZLnet/minecraft/client/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"},
+			"draw(Ljava/lang/String;FFIZLnet/minecraft/client/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"},
 		index = 0)
 	private String adjustText(String text)
 	{
