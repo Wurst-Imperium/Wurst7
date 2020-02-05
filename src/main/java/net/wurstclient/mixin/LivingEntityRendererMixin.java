@@ -22,7 +22,7 @@ public abstract class LivingEntityRendererMixin
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/LivingEntity;canSeePlayer(Lnet/minecraft/entity/player/PlayerEntity;)Z",
 		ordinal = 0),
-		method = {"method_4054(Lnet/minecraft/entity/LivingEntity;DDDFF)V"})
+		method = {"render(Lnet/minecraft/entity/LivingEntity;FFFFFF)V"})
 	private boolean canWurstSeePlayer(LivingEntity e, PlayerEntity player)
 	{
 		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
