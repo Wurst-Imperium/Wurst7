@@ -59,7 +59,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
-		boolean bl = entity.isInSneakingPose() || nameTagsHack.isEnabled();
+		boolean bl = entity.isInSneakingPose() && !nameTagsHack.isEnabled();
 		float f = this.renderManager.cameraYaw;
 		float g = this.renderManager.cameraPitch;
 		float h = entity.getHeight() + 0.5F - (bl ? 0.25F : 0.0F);
