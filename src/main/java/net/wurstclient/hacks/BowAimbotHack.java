@@ -8,12 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
-import java.util.Random;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.WaterCreatureEntity;
@@ -28,12 +30,15 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
-import net.minecraft.util.Hand;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
+import net.wurstclient.events.GUIRenderListener;
+import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -41,16 +46,13 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"TpAura", "tp aura", "EnderAura", "Ender-Aura", "ender aura"})
-public final class TpAuraHack extends Hack implements UpdateListener
+@SearchTags({"bow aimbot"})
+public final class BowAimbotHack extends Hack
+	implements UpdateListener, RenderListener, GUIRenderListener
 {
-	private Random random = new Random();
-	
-	private final SliderSetting range =
-		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
-	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -95,13 +97,17 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
 	
-	public TpAuraHack()
+	private static final Box TARGET_BOX =
+		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
+	
+	private Entity target;
+	private float velocity;
+	
+	public BowAimbotHack()
 	{
-		super("TP-Aura", "Automatically attacks the closest valid entity\n"
-			+ "while teleporting around it.");
-		setCategory(Category.COMBAT);
+		super("BowAimbot", "Automatically aims your bow or crossbow.");
 		
-		addSetting(range);
+		setCategory(Category.COMBAT);
 		addSetting(priority);
 		
 		addSetting(filterPlayers);
@@ -121,21 +127,16 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		// disable other killauras
-		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
-		WURST.getHax().killauraHack.setEnabled(false);
-		WURST.getHax().multiAuraHack.setEnabled(false);
-		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
-		
+		EVENTS.add(GUIRenderListener.class, this);
+		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
+		EVENTS.remove(GUIRenderListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
 	}
 	
@@ -144,13 +145,35 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		// set entity
-		double rangeSq = Math.pow(range.getValue(), 2);
+		// check if item is ranged weapon
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		Item item = stack.getItem();
+		if(!(item instanceof BowItem || item instanceof CrossbowItem))
+		{
+			target = null;
+			return;
+		}
+		
+		// check if using bow
+		if(item instanceof BowItem && !MC.options.keyUse.isPressed()
+			&& !player.isUsingItem())
+		{
+			target = null;
+			return;
+		}
+		
+		// check if crossbow is loaded
+		if(item instanceof CrossbowItem && !CrossbowItem.isCharged(stack))
+		{
+			target = null;
+			return;
+		}
+		
+		// set target
 		Stream<LivingEntity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
 			.filter(e -> !e.removed && e.getHealth() > 0)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e != player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
@@ -207,30 +230,140 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
 		
-		Entity entity =
-			stream.min(priority.getSelected().comparator).orElse(null);
-		if(entity == null)
+		target = stream.min(priority.getSelected().comparator).orElse(null);
+		if(target == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		// set velocity
+		velocity = (72000 - player.getItemUseTimeLeft()) / 20F;
+		velocity = (velocity * velocity + velocity * 2) / 3;
+		if(velocity > 1)
+			velocity = 1;
 		
-		// teleport
-		player.setPosition(entity.x + random.nextInt(3) * 2 - 2, entity.y,
-			entity.z + random.nextInt(3) * 2 - 2);
+		// set position to aim at
+		double d = RotationUtils.getEyesPos()
+			.distanceTo(target.getBoundingBox().getCenter());
+		double posX = target.x + (target.x - target.prevRenderX) * d - player.x;
+		double posY = target.y + (target.y - target.prevRenderY) * d
+			+ target.getHeight() * 0.5 - player.y
+			- player.getEyeHeight(player.getPose());
+		double posZ = target.z + (target.z - target.prevRenderZ) * d - player.z;
 		
-		// check cooldown
-		if(player.getAttackCooldownProgress(0) < 1)
+		// set yaw
+		MC.player.yaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
+		
+		// calculate needed pitch
+		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
+		double hDistanceSq = hDistance * hDistance;
+		float g = 0.006F;
+		float velocitySq = velocity * velocity;
+		float velocityPow4 = velocitySq * velocitySq;
+		float neededPitch = (float)-Math.toDegrees(Math.atan((velocitySq - Math
+			.sqrt(velocityPow4 - g * (g * hDistanceSq + 2 * posY * velocitySq)))
+			/ (g * hDistance)));
+		
+		// set pitch
+		if(Float.isNaN(neededPitch))
+			WURST.getRotationFaker()
+				.faceVectorClient(target.getBoundingBox().getCenter());
+		else
+			MC.player.pitch = neededPitch;
+	}
+	
+	@Override
+	public void onRender(float partialTicks)
+	{
+		if(target == null)
 			return;
 		
-		// attack entity
-		RotationUtils.Rotation rotations = RotationUtils
-			.getNeededRotations(entity.getBoundingBox().getCenter());
-		WurstClient.MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
-				rotations.getPitch(), MC.player.onGround));
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_LINE_SMOOTH);
+		GL11.glLineWidth(2);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
-		MC.interactionManager.attackEntity(player, entity);
-		player.swingHand(Hand.MAIN_HAND);
+		GL11.glPushMatrix();
+		RenderUtils.applyRenderOffset();
+		
+		// set position
+		GL11.glTranslated(target.x, target.y, target.z);
+		
+		// set size
+		double boxWidth = target.getWidth() + 0.1;
+		double boxHeight = target.getHeight() + 0.1;
+		GL11.glScaled(boxWidth, boxHeight, boxWidth);
+		
+		// move to center
+		GL11.glTranslated(0, 0.5, 0);
+		
+		double v = 1 / velocity;
+		GL11.glScaled(v, v, v);
+		
+		// draw outline
+		GL11.glColor4d(1, 0, 0, 0.5F * velocity);
+		RenderUtils.drawOutlinedBox(TARGET_BOX);
+		
+		// draw box
+		GL11.glColor4d(1, 0, 0, 0.25F * velocity);
+		RenderUtils.drawSolidBox(TARGET_BOX);
+		
+		GL11.glPopMatrix();
+		
+		// GL resets
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	@Override
+	public void onRenderGUI(float partialTicks)
+	{
+		if(target == null)
+			return;
+		
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		
+		GL11.glPushMatrix();
+		
+		String message;
+		if(velocity < 1)
+			message = "Charging: " + (int)(velocity * 100) + "%";
+		else
+			message = "Ready To Shoot";
+		
+		// translate to center
+		Window sr = MC.window;
+		int msgWidth = MC.textRenderer.getStringWidth(message);
+		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
+			sr.getScaledHeight() / 2 + 1, 0);
+		
+		// background
+		GL11.glColor4f(0, 0, 0, 0.5F);
+		GL11.glBegin(GL11.GL_QUADS);
+		{
+			GL11.glVertex2d(0, 0);
+			GL11.glVertex2d(msgWidth + 3, 0);
+			GL11.glVertex2d(msgWidth + 3, 10);
+			GL11.glVertex2d(0, 10);
+		}
+		GL11.glEnd();
+		
+		// text
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		MC.textRenderer.draw(message, 2, 1, 0xffffffff);
+		
+		GL11.glPopMatrix();
+		
+		// GL resets
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	private enum Priority

@@ -81,6 +81,10 @@ public final class NukerHack extends Hack
 	protected void onEnable()
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
+		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
@@ -238,6 +242,16 @@ public final class NukerHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 	
 	private enum Mode

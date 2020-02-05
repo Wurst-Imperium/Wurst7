@@ -145,7 +145,7 @@ public final class ProtectHack extends Hack
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
-		// WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
@@ -343,6 +343,8 @@ public final class ProtectHack extends Hack
 		
 		if(target == enemy)
 		{
+			WURST.getHax().autoSwordHack.setSlot();
+			
 			// check cooldown
 			if(MC.player.getAttackCooldownProgress(0) < 1)
 				return;

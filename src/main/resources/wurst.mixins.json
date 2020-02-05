@@ -13,6 +13,7 @@
   	"BlockStateMixin",
   	"ButtonWidgetMixin",
   	"CactusBlockMixin",
+  	"CameraMixin",
   	"ChatHudMixin",
   	"ChunkOcclusionGraphBuilderMixin",
   	"ClientConnectionMixin",
@@ -32,14 +33,18 @@
     "KeyboardMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
+    "MiningToolItemMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
     "PlayerInventoryMixin",
     "RenderTickCounterMixin",
     "ServerListMixin",
     "SignEditScreenMixin",
+    "SwordItemMixin",
     "TerrainRenderContextMixin",
-    "TitleScreenMixin"
+    "TextRendererMixin",
+    "TitleScreenMixin",
+    "WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

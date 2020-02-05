@@ -94,6 +94,15 @@ public abstract class GameRendererMixin
 		return 0;
 	}
 	
+	@Inject(at = {@At("HEAD")},
+		method = {"bobViewWhenHurt(F)V"},
+		cancellable = true)
+	private void onBobViewWhenHurt(float f, CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
+			ci.cancel();
+	}
+	
 	@Shadow
 	private void bobView(float partalTicks)
 	{

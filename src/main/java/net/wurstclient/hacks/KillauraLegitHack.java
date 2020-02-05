@@ -127,7 +127,7 @@ public final class KillauraLegitHack extends Hack
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
-		// WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
@@ -218,6 +218,8 @@ public final class KillauraLegitHack extends Hack
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
+		
+		WURST.getHax().autoSwordHack.setSlot();
 		
 		// face entity
 		if(!faceEntityClient(target))

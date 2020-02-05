@@ -107,7 +107,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
-		// WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
@@ -133,6 +133,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		Entity target = ((EntityHitResult)MC.hitResult).getEntity();
 		if(!isCorrectEntity(target))
 			return;
+		
+		WURST.getHax().autoSwordHack.setSlot();
 		
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);

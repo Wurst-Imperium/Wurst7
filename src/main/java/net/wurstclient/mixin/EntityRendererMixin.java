@@ -21,6 +21,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.NameTagsHack;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin<T extends Entity>
@@ -33,37 +34,39 @@ public abstract class EntityRendererMixin<T extends Entity>
 		method = {
 			"renderLabel(Lnet/minecraft/entity/Entity;Ljava/lang/String;DDDI)V"},
 		cancellable = true)
-	private void onRenderLabel(T entity, String text, double x, double y,
+	private void onRenderLabel(T entity, String string, double x, double y,
 		double z, int maxDistance, CallbackInfo ci)
 	{
-		if(!(entity instanceof LivingEntity))
-			return;
+		if(entity instanceof LivingEntity)
+			string = WurstClient.INSTANCE.getHax().healthTagsHack
+				.addHealth((LivingEntity)entity, string);
 		
-		String healthTag = WurstClient.INSTANCE.getHax().healthTagsHack
-			.addHealth((LivingEntity)entity, text);
-		
-		wurstRenderLabel(entity, healthTag, x, y, z, maxDistance);
+		wurstRenderLabel(entity, string, x, y, z, maxDistance);
 		ci.cancel();
 	}
 	
 	/**
 	 * Copy of renderLabel() since calling the original would result in
-	 * an infinite loop.
+	 * an infinite loop. Also makes it easier to modify.
 	 */
-	protected void wurstRenderLabel(T entity, String text, double x, double y,
+	protected void wurstRenderLabel(T entity, String string, double x, double y,
 		double z, int maxDistance)
 	{
-		double d = entity.squaredDistanceTo(this.renderManager.camera.getPos());
-		if(d <= maxDistance * maxDistance)
-		{
-			boolean bl = entity.isInSneakingPose();
-			float f = this.renderManager.cameraYaw;
-			float g = this.renderManager.cameraPitch;
-			float h = entity.getHeight() + 0.5F - (bl ? 0.25F : 0.0F);
-			int i = "deadmau5".equals(text) ? -10 : 0;
-			GameRenderer.renderFloatingText(this.getFontRenderer(), text,
-				(float)x, (float)y + h, (float)z, i, f, g, bl);
-		}
+		double d = entity.squaredDistanceTo(renderManager.camera.getPos());
+		
+		if(d > maxDistance * maxDistance)
+			return;
+		
+		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		
+		boolean bl = entity.isInSneakingPose() || nameTagsHack.isEnabled();
+		float f = this.renderManager.cameraYaw;
+		float g = this.renderManager.cameraPitch;
+		float h = entity.getHeight() + 0.5F - (bl ? 0.25F : 0.0F);
+		int i = "deadmau5".equals(string) ? -10 : 0;
+		
+		GameRenderer.renderFloatingText(this.getFontRenderer(), string,
+			(float)x, (float)y + h, (float)z, i, f, g, bl);
 	}
 	
 	@Shadow
