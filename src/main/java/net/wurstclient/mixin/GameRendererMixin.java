@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.SynchronousResourceReloadListener;
@@ -24,6 +27,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
+import net.wurstclient.hacks.NameTagsHack;
 import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
@@ -101,6 +105,32 @@ public abstract class GameRendererMixin
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();
+	}
+	
+	@Inject(
+		at = @At(value = "INVOKE",
+			target = "Lcom/mojang/blaze3d/platform/GlStateManager;scalef(FFF)V",
+			ordinal = 0),
+		method = {
+			"renderFloatingText(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;FFFIFFZ)V"})
+	private static void onRenderFloatingText(TextRenderer textRenderer,
+		String text, float x, float y, float z, int verticalOffset, float yaw,
+		float pitch, boolean translucent, CallbackInfo ci)
+	{
+		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		if(!nameTagsHack.isEnabled())
+			return;
+		
+		float scale = 0.025F;
+		double distance = Math.sqrt(x * x + y * y + z * z);
+		
+		if(distance > 10)
+			scale *= distance / 10;
+		
+		GlStateManager.scalef(-scale, -scale, scale);
+		
+		// undo vanilla scaling
+		GlStateManager.scalef(-40, -40, 40);
 	}
 	
 	@Shadow
