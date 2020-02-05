@@ -176,7 +176,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
 			return false;
 		
-		if(isClickable(MC.crosshairTarget))
+		if(isClickable(MC.hitResult))
 			return false;
 		
 		return true;
@@ -189,14 +189,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		if(hitResult instanceof EntityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
+			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
 			return entity instanceof VillagerEntity
 				|| entity instanceof TameableEntity;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
 		{
-			BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+			BlockPos pos = ((BlockHitResult)MC.hitResult).getBlockPos();
 			if(pos == null)
 				return false;
 			

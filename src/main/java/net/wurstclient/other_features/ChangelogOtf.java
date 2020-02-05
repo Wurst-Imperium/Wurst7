@@ -7,7 +7,7 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.util.Util;
+import net.minecraft.util.SystemUtil;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_feature.OtherFeature;
@@ -32,6 +32,6 @@ public final class ChangelogOtf extends OtherFeature
 	public void doPrimaryAction()
 	{
 		String link = new Version(WurstClient.VERSION).getChangelogLink();
-		Util.getOperatingSystem().open(link);
+		SystemUtil.getOperatingSystem().open(link);
 	}
 }

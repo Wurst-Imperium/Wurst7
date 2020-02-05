@@ -61,9 +61,9 @@ public final class ThrowHack extends Hack implements RightClickListener
 		
 		for(int i = 0; i < amount.getValueI(); i++)
 		{
-			if(MC.crosshairTarget.getType() == HitResult.Type.BLOCK)
+			if(MC.hitResult.getType() == HitResult.Type.BLOCK)
 			{
-				BlockHitResult hitResult = (BlockHitResult)MC.crosshairTarget;
+				BlockHitResult hitResult = (BlockHitResult)MC.hitResult;
 				IMC.getInteractionManager().rightClickBlock(
 					hitResult.getBlockPos(), hitResult.getSide(),
 					hitResult.getPos());

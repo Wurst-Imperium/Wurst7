@@ -56,9 +56,9 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	@Override
 	public void onLeftClick(LeftClickEvent event)
 	{
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY
-			|| !(((EntityHitResult)MC.crosshairTarget)
+		if(MC.hitResult == null
+			|| MC.hitResult.getType() != HitResult.Type.ENTITY
+			|| !(((EntityHitResult)MC.hitResult)
 				.getEntity() instanceof LivingEntity))
 			return;
 		
@@ -73,7 +73,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 		if(!MC.player.onGround)
 			return;
 		
-		if(MC.player.isTouchingWater() || MC.player.isInLava())
+		if(MC.player.isInsideWater() || MC.player.isInLava())
 			return;
 		
 		switch(mode.getSelected())

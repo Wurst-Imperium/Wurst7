@@ -17,8 +17,8 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityContext;
-import net.minecraft.state.AbstractState;
-import net.minecraft.state.State;
+import net.minecraft.state.AbstractPropertyContainer;
+import net.minecraft.state.PropertyContainer;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -31,8 +31,9 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
 @Mixin(BlockState.class)
-public class BlockStateMixin extends AbstractState<Block, BlockState>
-	implements State<BlockState>
+public class BlockStateMixin
+	extends AbstractPropertyContainer<Block, BlockState>
+	implements PropertyContainer<BlockState>
 {
 	private BlockStateMixin(WurstClient wurst, Block object_1,
 		ImmutableMap<Property<?>, Comparable<?>> immutableMap_1)

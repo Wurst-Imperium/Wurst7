@@ -116,16 +116,16 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			return path;
 		
 		// calculate starting position
-		double arrowPosX = player.lastRenderX
-			+ (player.getX() - player.lastRenderX) * partialTicks
+		double arrowPosX = player.prevRenderX
+			+ (player.getX() - player.prevRenderX) * partialTicks
 			- Math.cos(Math.toRadians(player.yaw)) * 0.16;
 		
-		double arrowPosY = player.lastRenderY
-			+ (player.getY() - player.lastRenderY) * partialTicks
+		double arrowPosY = player.prevRenderY
+			+ (player.getY() - player.prevRenderY) * partialTicks
 			+ player.getStandingEyeHeight() - 0.1;
 		
-		double arrowPosZ = player.lastRenderZ
-			+ (player.getZ() - player.lastRenderZ) * partialTicks
+		double arrowPosZ = player.prevRenderZ
+			+ (player.getZ() - player.prevRenderZ) * partialTicks
 			- Math.sin(Math.toRadians(player.yaw)) * 0.16;
 		
 		// Motion factor. Arrows go faster than snowballs and all that...

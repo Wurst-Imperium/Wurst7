@@ -300,12 +300,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		ArrayList<Box> minecartBoxes = new ArrayList<>(minecarts.size());
 		
 		minecarts.forEach(e -> {
-			double offsetX = -(e.getX() - e.lastRenderX)
-				+ (e.getX() - e.lastRenderX) * partialTicks;
-			double offsetY = -(e.getY() - e.lastRenderY)
-				+ (e.getY() - e.lastRenderY) * partialTicks;
-			double offsetZ = -(e.getZ() - e.lastRenderZ)
-				+ (e.getZ() - e.lastRenderZ) * partialTicks;
+			double offsetX = -(e.getX() - e.prevRenderX)
+				+ (e.getX() - e.prevRenderX) * partialTicks;
+			double offsetY = -(e.getY() - e.prevRenderY)
+				+ (e.getY() - e.prevRenderY) * partialTicks;
+			double offsetZ = -(e.getZ() - e.prevRenderZ)
+				+ (e.getZ() - e.prevRenderZ) * partialTicks;
 			minecartBoxes
 				.add(e.getBoundingBox().offset(offsetX, offsetY, offsetZ));
 		});
@@ -318,8 +318,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(box.x1, box.y1, box.z1);
-			GL11.glScaled(box.x2 - box.x1, box.y2 - box.y1, box.z2 - box.z1);
+			GL11.glTranslated(box.minX, box.minY, box.minZ);
+			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
+				box.maxZ - box.minZ);
 			GL11.glCallList(displayList);
 			GL11.glPopMatrix();
 		}

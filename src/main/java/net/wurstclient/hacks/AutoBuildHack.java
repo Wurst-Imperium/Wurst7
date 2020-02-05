@@ -284,7 +284,7 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.crosshairTarget;
+		HitResult hitResult = MC.hitResult;
 		if(hitResult == null || hitResult.getPos() == null
 			|| hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult))

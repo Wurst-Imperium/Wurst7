@@ -18,10 +18,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -243,12 +243,12 @@ public final class BowAimbotHack extends Hack
 		// set position to aim at
 		double d = RotationUtils.getEyesPos()
 			.distanceTo(target.getBoundingBox().getCenter());
-		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
+		double posX = target.getX() + (target.getX() - target.prevRenderX) * d
 			- player.getX();
-		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
+		double posY = target.getY() + (target.getY() - target.prevRenderY) * d
 			+ target.getHeight() * 0.5 - player.getY()
 			- player.getEyeHeight(player.getPose());
-		double posZ = target.getZ() + (target.getZ() - target.lastRenderZ) * d
+		double posZ = target.getZ() + (target.getZ() - target.prevRenderZ) * d
 			- player.getZ();
 		
 		// set yaw

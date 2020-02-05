@@ -59,15 +59,15 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	
 	private void setCurrentBlockFromHitResult()
 	{
-		if(MC.crosshairTarget == null || MC.crosshairTarget.getPos() == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK
-			|| !(MC.crosshairTarget instanceof BlockHitResult))
+		if(MC.hitResult == null || MC.hitResult.getPos() == null
+			|| MC.hitResult.getType() != HitResult.Type.BLOCK
+			|| !(MC.hitResult instanceof BlockHitResult))
 		{
 			stopMiningAndResetProgress();
 			return;
 		}
 		
-		currentBlock = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+		currentBlock = ((BlockHitResult)MC.hitResult).getBlockPos();
 	}
 	
 	private void breakCurrentBlock()

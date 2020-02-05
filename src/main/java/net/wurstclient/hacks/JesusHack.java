@@ -69,7 +69,7 @@ public final class JesusHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		// move up in water
-		if(player.isTouchingWater())
+		if(player.isInsideWater())
 		{
 			Vec3d velocity = player.getVelocity();
 			player.setVelocity(velocity.x, 0.11, velocity.z);
@@ -103,7 +103,7 @@ public final class JesusHack extends Hack
 			return;
 		
 		// check inWater
-		if(MC.player.isTouchingWater())
+		if(MC.player.isInsideWater())
 			return;
 		
 		// check fall distance
@@ -180,6 +180,6 @@ public final class JesusHack extends Hack
 	public boolean shouldBeSolid()
 	{
 		return isEnabled() && MC.player != null && MC.player.fallDistance <= 3
-			&& !MC.options.keySneak.isPressed() && !MC.player.isTouchingWater();
+			&& !MC.options.keySneak.isPressed() && !MC.player.isInsideWater();
 	}
 }
