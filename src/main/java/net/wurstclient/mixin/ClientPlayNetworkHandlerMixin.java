@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.packet.*;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
@@ -348,7 +348,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onRemoveEntityEffect(RemoveEntityEffectS2CPacket var1)
+	public void onRemoveEntityEffect(RemoveEntityStatusEffectS2CPacket var1)
 	{
 		
 	}
@@ -488,7 +488,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onEntityPotionEffect(EntityPotionEffectS2CPacket var1)
+	public void onEntityPotionEffect(EntityStatusEffectS2CPacket var1)
 	{
 		
 	}
