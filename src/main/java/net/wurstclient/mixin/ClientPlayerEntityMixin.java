@@ -102,7 +102,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"getLastAutoJump()Z"})
+	@Inject(at = {@At("HEAD")},
+		method = {"getLastAutoJump()Z"},
+		cancellable = true)
 	private void onGetLastAutoJump(CallbackInfoReturnable<Boolean> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
