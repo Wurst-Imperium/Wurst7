@@ -25,10 +25,12 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
@@ -40,7 +42,8 @@ import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"remote view"})
 @DontSaveState
-public final class RemoteViewHack extends Hack implements UpdateListener
+public final class RemoteViewHack extends Hack
+	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't view other players.", false);
@@ -203,6 +206,7 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		
 		// add listener
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PacketOutputListener.class, this);
 	}
 	
 	@Override
@@ -210,6 +214,7 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 	{
 		// remove listener
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PacketOutputListener.class, this);
 		
 		// reset entity
 		if(entity != null)
@@ -271,9 +276,20 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		
 		// update position, rotation, etc.
 		MC.player.copyPositionAndRotation(entity);
+		MC.player.resetPosition(entity.getX(),
+			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
+				+ entity.getEyeHeight(entity.getPose()),
+			entity.getZ());
 		MC.player.setVelocity(Vec3d.ZERO);
 		
 		// set entity invisible
 		entity.setInvisible(true);
+	}
+	
+	@Override
+	public void onSentPacket(PacketOutputEvent event)
+	{
+		if(event.getPacket() instanceof PlayerMoveC2SPacket)
+			event.cancel();
 	}
 }
