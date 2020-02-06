@@ -223,8 +223,11 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		MC.player.noClip = false;
 		
 		// remove fake player
-		fakePlayer.resetPlayerPosition();
-		fakePlayer.despawn();
+		if(fakePlayer != null)
+		{
+			fakePlayer.resetPlayerPosition();
+			fakePlayer.despawn();
+		}
 	}
 	
 	public void onToggledByCommand(String viewName)
