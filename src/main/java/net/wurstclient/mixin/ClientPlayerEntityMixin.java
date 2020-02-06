@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
@@ -99,6 +100,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Inject(at = {@At("HEAD")}, method = {"getLastAutoJump()Z"})
+	private void onGetLastAutoJump(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
+			cir.setReturnValue(false);
 	}
 	
 	@Override
