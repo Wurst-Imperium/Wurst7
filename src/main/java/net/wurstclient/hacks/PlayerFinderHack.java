@@ -101,7 +101,6 @@ public final class PlayerFinderHack extends Hack
 		{
 			// set start position
 			Vec3d start = RotationUtils.getClientLookVec()
-				.add(0, MC.player.getEyeHeight(MC.player.getPose()), 0)
 				.add(RenderUtils.getCameraPos());
 			
 			// set end position
