@@ -134,7 +134,8 @@ public final class TabGui implements KeyPressListener
 			(int)(width * factor), (int)(height * factor));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
-		int textY = -2;
+		int textY = 1;
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		for(int i = 0; i < tabs.size(); i++)
 		{
 			String tabName = tabs.get(i).name;
@@ -144,6 +145,7 @@ public final class TabGui implements KeyPressListener
 			WurstClient.MC.textRenderer.draw(tabName, 2, textY, 0xffffffff);
 			textY += 10;
 		}
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
@@ -164,7 +166,8 @@ public final class TabGui implements KeyPressListener
 				(int)(tab.width * factor), (int)(tab.height * factor));
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			
-			int tabTextY = -2;
+			int tabTextY = 1;
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < tab.features.size(); i++)
 			{
 				Feature feature = tab.features.get(i);
@@ -180,6 +183,7 @@ public final class TabGui implements KeyPressListener
 					0xffffffff);
 				tabTextY += 10;
 			}
+			GL11.glEnable(GL11.GL_BLEND);
 			
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			
