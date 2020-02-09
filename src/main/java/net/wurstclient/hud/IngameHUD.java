@@ -18,7 +18,7 @@ public final class IngameHUD implements GUIRenderListener
 {
 	private final WurstLogo wurstLogo = new WurstLogo();
 	private final HackListHUD modList = new HackListHUD();
-	// private static final TabGui tabGui = new TabGui();
+	private final TabGui tabGui = new TabGui();
 	
 	@Override
 	public void onRenderGUI(float partialTicks)
@@ -37,7 +37,7 @@ public final class IngameHUD implements GUIRenderListener
 		
 		wurstLogo.render();
 		modList.render(partialTicks);
-		// tabGui.render(partialTicks);
+		tabGui.render(partialTicks);
 		
 		// pinned windows
 		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
