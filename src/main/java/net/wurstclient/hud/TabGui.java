@@ -71,6 +71,9 @@ public final class TabGui implements KeyPressListener
 	@Override
 	public void onKeyPress(KeyPressEvent event)
 	{
+		if(event.getAction() != GLFW.GLFW_PRESS)
+			return;
+		
 		if(tabGuiOtf.isHidden())
 			return;
 		
