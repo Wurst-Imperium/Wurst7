@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.StatsListener;
 import net.minecraft.client.gui.screen.StatsScreen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -27,14 +29,23 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"createButtons()V"})
+	@Inject(at = {@At("TAIL")}, method = {"createButtons()V"})
 	private void onCreateButtons(CallbackInfo ci)
 	{
-		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 154,
+		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 152,
 			height - 28, 150, 20, "", this::toggleWurst);
 		
 		updateWurstButtonText(toggleWurstButton);
 		addButton(toggleWurstButton);
+		
+		for(AbstractButtonWidget button : buttons)
+		{
+			if(!button.getMessage().equals(I18n.translate("gui.done")))
+				continue;
+			
+			button.x = width / 2 + 2;
+			button.setWidth(150);
+		}
 	}
 	
 	private void toggleWurst(ButtonWidget button)
