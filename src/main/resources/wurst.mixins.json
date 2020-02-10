@@ -37,6 +37,7 @@
     "MouseMixin",
     "MultiplayerScreenMixin",
     "PlayerInventoryMixin",
+    "PlayerSkinProviderMixin",
     "RenderTickCounterMixin",
     "ServerListMixin",
     "SignEditScreenMixin",
