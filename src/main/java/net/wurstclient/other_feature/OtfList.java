@@ -13,19 +13,13 @@ import java.util.TreeMap;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
-import net.wurstclient.other_features.ChangelogOtf;
-import net.wurstclient.other_features.CleanUpOtf;
-import net.wurstclient.other_features.HackListOtf;
-import net.wurstclient.other_features.ServerFinderOtf;
-import net.wurstclient.other_features.TabGuiOtf;
-import net.wurstclient.other_features.WurstLogoOtf;
-import net.wurstclient.other_features.ZoomOtf;
+import net.wurstclient.other_features.*;
 
 public final class OtfList
 {
 	public final ChangelogOtf changelogOtf = new ChangelogOtf();
 	public final CleanUpOtf cleanUpOtf = new CleanUpOtf();
-	// public final DisableOtf disableOtf = new DisableOtf();
+	public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();
 	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
