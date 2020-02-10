@@ -272,6 +272,12 @@ public enum WurstClient
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		
+		if(!enabled)
+		{
+			hax.panicHack.setEnabled(true);
+			hax.panicHack.onUpdate();
+		}
 	}
 	
 	public WurstUpdater getUpdater()
