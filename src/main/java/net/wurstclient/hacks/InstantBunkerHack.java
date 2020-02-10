@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.network.packet.HandSwingC2SPacket;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -24,6 +27,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -45,6 +49,7 @@ public final class InstantBunkerHack extends Hack
 	
 	private int blockIndex;
 	private boolean building;
+	private int startTimer;
 	
 	public InstantBunkerHack()
 	{
@@ -56,6 +61,25 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		if(!MC.player.onGround)
+		{
+			ChatUtils.error("Can't build this in mid-air.");
+			setEnabled(false);
+			return;
+		}
+		
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		
+		if(!(stack.getItem() instanceof BlockItem))
+		{
+			ChatUtils.error("You must have blocks in the main hand.");
+			setEnabled(false);
+			return;
+		}
+		
+		if(stack.getCount() < 57 && !MC.player.isCreative())
+			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
+		
 		// get start pos and facings
 		BlockPos startPos = new BlockPos(MC.player);
 		Direction facing = MC.player.getHorizontalFacing();
@@ -75,6 +99,9 @@ public final class InstantBunkerHack extends Hack
 			IMC.setItemUseCooldown(4);
 		}
 		
+		startTimer = 2;
+		MC.player.jump();
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -90,15 +117,26 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		if(startTimer > 0)
+		{
+			startTimer--;
+			return;
+		}
+		
 		// build instantly
-		if(!building)
+		if(!building && startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			setEnabled(false);
-			return;
+			
+			if(MC.player.onGround)
+			{
+				setEnabled(false);
+				return;
+			}
 		}
 		
 		// place next block

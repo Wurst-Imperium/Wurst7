@@ -84,9 +84,8 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			window.setMinimized(true);
-			
-		// TODO: Radar
-		// windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
+		
+		windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
 		
 		int x = 5;
 		int y = 5;
@@ -592,16 +591,15 @@ public final class ClickGui
 		opacity = clickGui.getOpacity();
 		bgColor = clickGui.getBgColor();
 		
-		// TODO: RainbowUI
-		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
-		// {
-		// float x = System.currentTimeMillis() % 2000 / 1000F;
-		// acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
-		// acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
-		// acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
-		//
-		// }else
-		acColor = clickGui.getAcColor();
+		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
+		{
+			float x = System.currentTimeMillis() % 2000 / 1000F;
+			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
+			acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
+			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
+			
+		}else
+			acColor = clickGui.getAcColor();
 	}
 	
 	private void renderWindow(Window window, int mouseX, int mouseY,

@@ -130,6 +130,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		tr.draw(value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

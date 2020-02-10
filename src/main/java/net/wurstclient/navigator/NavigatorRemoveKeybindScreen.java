@@ -7,12 +7,6 @@
  */
 package net.wurstclient.navigator;
 
-import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
@@ -68,6 +62,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			new ArrayList<>(Arrays.asList(oldCommands.replace(";", "\u00a7")
 				.replace("\u00a7\u00a7", ";").split("\u00a7")));
 		
+		for(int i = 0; i < commandsList.size(); i++)
+			commandsList.set(i, commandsList.get(i).trim());
+		
 		String command = existingKeybinds.get(selectedKey).getCommand();
 		while(commandsList.contains(command))
 			commandsList.remove(command);
@@ -116,10 +113,11 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	protected void onRender(int mouseX, int mouseY, float partialTicks)
 	{
 		// title bar
-		GL11.glEnable(GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		drawCenteredString(minecraft.textRenderer, "Remove Keybind", middleX,
 			32, 0xffffff);
-		glDisable(GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -130,7 +128,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
 			bgy2 - (buttons.isEmpty() ? 0 : 24));
-		glEnable(GL_SCISSOR_TEST);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
 		hoveredKey = "";
@@ -152,37 +150,39 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			{
 				hoveredKey = key;
 				if(key.equals(selectedKey))
-					glColor4f(0F, 1F, 0F, 0.375F);
+					GL11.glColor4f(0F, 1F, 0F, 0.375F);
 				else
-					glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
+					GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
 			}else if(key.equals(selectedKey))
-				glColor4f(0F, 1F, 0F, 0.25F);
+				GL11.glColor4f(0F, 1F, 0F, 0.25F);
 			else
-				glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
 			drawBox(x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawString(minecraft.textRenderer, key.replace("key.keyboard.", "")
 				+ ": " + keybind.getDescription(), x1 + 1, y1 + 1, 0xffffff);
 			drawString(minecraft.textRenderer, keybind.getCommand(), x1 + 1,
 				y1 + 1 + minecraft.textRenderer.fontHeight, 0xffffff);
-			glDisable(GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// text
-		GL11.glEnable(GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
 			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
 			textY += minecraft.textRenderer.fontHeight;
 		}
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		// scissor box
-		glDisable(GL_SCISSOR_TEST);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
 		for(AbstractButtonWidget button : buttons)
@@ -195,21 +195,22 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// color
 			if(!button.active)
-				glColor4f(0F, 0F, 0F, 0.25F);
+				GL11.glColor4f(0F, 0F, 0F, 0.25F);
 			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
 				&& mouseY <= y2)
-				glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				GL11.glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			glDisable(GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			drawBox(x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(minecraft.textRenderer, button.getMessage(),
 				(x1 + x2) / 2, y1 + 4, 0xffffff);
+			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}
 	

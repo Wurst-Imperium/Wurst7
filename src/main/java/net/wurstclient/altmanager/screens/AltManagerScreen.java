@@ -157,8 +157,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		String error = LoginManager.login(alt.getEmail(), alt.getPassword());
+		
 		if(!error.isEmpty())
+		{
 			errorTimer = 8;
+			return;
+		}
 		
 		altManager.setChecked(listGui.selected,
 			minecraft.getSession().getUsername());

@@ -8,8 +8,9 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.server.network.packet.ClientCommandC2SPacket;
-import net.minecraft.server.network.packet.ClientCommandC2SPacket.Mode;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -58,7 +59,7 @@ public final class SneakHack extends Hack
 		{
 			case LEGIT:
 			IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
-			sneakKey.setPressed(sneakKey.isActallyPressed());
+			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
 			break;
 			
 			case PACKET:
@@ -70,7 +71,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
+		KeyBinding sneakKey = MC.options.keySneak;
 		
 		switch(mode.getSelected())
 		{
@@ -79,7 +80,7 @@ public final class SneakHack extends Hack
 			break;
 			
 			case PACKET:
-			sneakKey.setPressed(sneakKey.isActallyPressed());
+			sneakKey.setPressed(((IKeyBinding)sneakKey).isActallyPressed());
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;

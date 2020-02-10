@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -23,7 +22,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.packet.ClickWindowC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClickWindowC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -43,14 +42,13 @@ public final class AutoArmorHack extends Hack
 			+ "enchantment when calculating armor strength.",
 		true);
 	
-	private final CheckboxSetting swapWhileMoving =
-		new CheckboxSetting("Swap while moving",
-			"Whether or not to swap armor pieces\n"
-				+ "while the player is moving.\n\n" + TextFormat.RED
-				+ TextFormat.BOLD + "WARNING:" + TextFormat.RESET
-				+ " This would not be possible\n"
-				+ "without cheats. It may raise suspicion.",
-			false);
+	private final CheckboxSetting swapWhileMoving = new CheckboxSetting(
+		"Swap while moving",
+		"Whether or not to swap armor pieces\n"
+			+ "while the player is moving.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r" + " This would not be possible\n"
+			+ "without cheats. It may raise suspicion.",
+		false);
 	
 	private final SliderSetting delay =
 		new SliderSetting("Delay",
@@ -95,7 +93,7 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.currentScreen instanceof AbstractContainerScreen
+		if(MC.currentScreen instanceof ContainerScreen
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
 		

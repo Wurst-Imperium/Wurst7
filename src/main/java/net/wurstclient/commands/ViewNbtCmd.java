@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -30,10 +31,11 @@ public final class ViewNbtCmd extends Command
 	{
 		ClientPlayerEntity player = MC.player;
 		ItemStack stack = player.inventory.getMainHandStack();
-		if(stack == null)
+		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		String nbt = stack.getTag().asString();
+		CompoundTag tag = stack.getTag();
+		String nbt = tag == null ? "" : tag.asString();
 		
 		switch(String.join(" ", args).toLowerCase())
 		{
