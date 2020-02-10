@@ -7,6 +7,12 @@
  */
 package net.wurstclient.mixin;
 
+import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,17 +23,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.options.WurstOptionsScreen;
-import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
 	private static final Identifier wurstTexture =
 		new Identifier("wurst", "wurst_128.png");
+	
+	private ButtonWidget wurstOptionsButton;
 	
 	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -43,14 +46,18 @@ public abstract class GameMenuScreenMixin extends Screen
 		addWurstOptionsButton();
 		removeFeedbackAndBugReportButtons();
 	}
-
-	private ButtonWidget wurstOptionsButton;
-
+	
 	private void addWurstOptionsButton()
 	{
-		wurstOptionsButton = addButton(new ButtonWidget(width / 2 - 102, height / 4 + 56, 204, 20,
-			"            Options",
-			b -> minecraft.openScreen(new WurstOptionsScreen(this))));
+		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
+			204, 20, "            Options", b -> openWurstOptions());
+		
+		addButton(wurstOptionsButton);
+	}
+	
+	private void openWurstOptions()
+	{
+		minecraft.openScreen(new WurstOptionsScreen(this));
 	}
 	
 	private void removeFeedbackAndBugReportButtons()
@@ -65,8 +72,9 @@ public abstract class GameMenuScreenMixin extends Screen
 			return false;
 		
 		AbstractButtonWidget button = (AbstractButtonWidget)element;
-
-		return button.getMessage().equals(I18n.translate("menu.sendFeedback")) || button.getMessage().equals(I18n.translate("menu.reportBugs"));
+		
+		return button.getMessage().equals(I18n.translate("menu.sendFeedback"))
+			|| button.getMessage().equals(I18n.translate("menu.reportBugs"));
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"render(IIF)V"})
