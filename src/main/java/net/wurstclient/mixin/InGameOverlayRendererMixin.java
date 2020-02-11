@@ -30,4 +30,16 @@ public class InGameOverlayRendererMixin
 		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.isEnabled())
 			ci.cancel();
 	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"renderUnderwaterOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V"},
+		cancellable = true)
+	private static void onRenderUnderwaterOverlay(
+		MinecraftClient minecraftClient, MatrixStack matrixStack,
+		CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
+			ci.cancel();
+	}
 }
