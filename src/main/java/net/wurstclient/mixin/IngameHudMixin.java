@@ -31,4 +31,13 @@ public class IngameHudMixin extends DrawableHelper
 		GUIRenderEvent event = new GUIRenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"renderPumpkinOverlay()V"},
+		cancellable = true)
+	private void onRenderPumpkinOverlay(CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+			ci.cancel();
+	}
 }

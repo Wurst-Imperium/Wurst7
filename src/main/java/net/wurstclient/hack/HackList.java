@@ -105,6 +105,7 @@ public final class HackList implements UpdateListener
 	public final NoFallHack noFallHack = new NoFallHack();
 	public final NoHurtcamHack noHurtcamHack = new NoHurtcamHack();
 	// public final NoOverlayHack noOverlayHack = new NoOverlayHack();
+	public final NoPumpkinHack noPumpkinHack = new NoPumpkinHack();
 	// public final NoSlowdownHack noSlowdownHack = new NoSlowdownHack();
 	public final NoWeatherHack noWeatherHack = new NoWeatherHack();
 	public final NoWebHack noWebHack = new NoWebHack();
