@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -79,6 +80,17 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
+	}
+	
+	@Redirect(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
+		ordinal = 0), method = "tickMovement()V")
+	private boolean wurstIsUsingItem(ClientPlayerEntity player)
+	{
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
+			return false;
+		
+		return player.isUsingItem();
 	}
 	
 	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
