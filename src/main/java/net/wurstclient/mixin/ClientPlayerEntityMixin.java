@@ -130,6 +130,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
+	public boolean isTouchingWaterBypass()
+	{
+		return super.isTouchingWater();
+	}
+	
+	@Override
 	protected float getJumpVelocity()
 	{
 		return super.getJumpVelocity()

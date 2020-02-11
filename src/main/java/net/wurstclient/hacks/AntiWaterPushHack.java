@@ -24,16 +24,11 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 			+ "Some servers consider this a speedhack.",
 		false);
 	
-	private final CheckboxSetting allowJump =
-		new CheckboxSetting("Allow jumping", "Allows you to jump underwater.\n"
-			+ "Some servers consider this a speedhack", false);
-	
 	public AntiWaterPushHack()
 	{
 		super("AntiWaterPush", "Prevents you from getting pushed by water.");
 		setCategory(Category.MOVEMENT);
 		addSetting(preventSlowdown);
-		addSetting(allowJump);
 	}
 	
 	@Override
@@ -55,7 +50,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		if(!allowJump.isChecked())
+		if(!preventSlowdown.isChecked())
 			return;
 		
 		if(!MC.options.keyJump.isPressed())
@@ -64,7 +59,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 		if(!MC.player.onGround)
 			return;
 		
-		if(!MC.player.isTouchingWater())
+		if(!IMC.getPlayer().isTouchingWaterBypass())
 			return;
 		
 		MC.player.jump();
