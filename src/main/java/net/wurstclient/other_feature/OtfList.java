@@ -22,6 +22,7 @@ public final class OtfList
 	public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();
 	public final LastServerOtf lastServerOtf = new LastServerOtf();
+	public final ReconnectOtf reconnectOtf = new ReconnectOtf();
 	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
 	public final WurstCapesOtf wurstCapesOtf = new WurstCapesOtf();

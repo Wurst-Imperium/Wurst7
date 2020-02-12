@@ -25,6 +25,7 @@
     "FluidRendererMixin",
     "DeathScreenMixin",
     "DirectConnectScreenMixin",
+    "DisconnectedScreenMixin",
     "EntityMixin",
     "EntityRendererMixin",
     "GameMenuScreenMixin",
