@@ -19,11 +19,16 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.AutoReconnectHack;
 import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(DisconnectedScreen.class)
 public class DisconnectedScreenMixin extends Screen
 {
+	private int autoReconnectTimer;
+	
+	private ButtonWidget autoReconnectButton;
+	
 	@Shadow
 	@Final
 	private Screen parent;
@@ -48,5 +53,47 @@ public class DisconnectedScreenMixin extends Screen
 		
 		addButton(new ButtonWidget(backButtonX, backButtonY + 24, 200, 20,
 			"Reconnect", b -> LastServerRememberer.reconnect(parent)));
+		
+		autoReconnectButton =
+			addButton(new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
+				"AutoReconnect", b -> pressAutoReconnect()));
+		
+		if(WurstClient.INSTANCE.getHax().autoReconnectHack.isEnabled())
+			autoReconnectTimer = 100;
+	}
+	
+	private void pressAutoReconnect()
+	{
+		AutoReconnectHack autoReconnect =
+			WurstClient.INSTANCE.getHax().autoReconnectHack;
+		
+		autoReconnect.setEnabled(!autoReconnect.isEnabled());
+		
+		if(autoReconnect.isEnabled())
+			autoReconnectTimer = 100;
+	}
+	
+	@Override
+	public void tick()
+	{
+		AutoReconnectHack autoReconnect =
+			WurstClient.INSTANCE.getHax().autoReconnectHack;
+		
+		if(!autoReconnect.isEnabled())
+		{
+			autoReconnectButton.setMessage("AutoReconnect");
+			return;
+		}
+		
+		autoReconnectButton.setMessage("AutoReconnect ("
+			+ (int)Math.ceil(autoReconnectTimer / 20.0) + ")");
+		
+		if(autoReconnectTimer > 0)
+		{
+			autoReconnectTimer--;
+			return;
+		}
+		
+		LastServerRememberer.reconnect(parent);
 	}
 }
