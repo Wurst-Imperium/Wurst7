@@ -31,6 +31,8 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	@Shadow
 	protected MultiplayerServerListWidget serverListWidget;
 	
+	private ButtonWidget lastServerButton;
+	
 	private MultiplayerScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
@@ -54,6 +56,10 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
+		lastServerButton = addButton(new ButtonWidget(width / 2 - 154, 10, 100,
+			20, "Last Server", b -> LastServerRememberer
+				.joinLastServer((MultiplayerScreen)(Object)this)));
+		
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
 			"Server Finder", b -> minecraft.openScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
@@ -61,6 +67,12 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
 			"Clean Up", b -> minecraft.openScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
+	}
+	
+	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
+	public void onTick(CallbackInfo ci)
+	{
+		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	
 	@Inject(at = {@At("HEAD")},
