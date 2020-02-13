@@ -28,6 +28,8 @@ import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.ForceOpDialog;
+import net.wurstclient.util.MultiProcessingUtils;
 
 @SearchTags({"Force OP", "AuthMe Cracker", "AuthMeCracker", "auth me cracker",
 	"admin hack", "AuthMe password cracker"})
@@ -69,6 +71,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	public boolean forceOPDontWait = false;
 	public int forceOPDelay = 1000;
 	public String forceOPList = WURST.getWurstFolder().toString();
+	private Process process;
 	
 	public ForceOpHack()
 	{
@@ -87,7 +90,17 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	@Override
 	public void onEnable()
 	{
-		new Thread(() -> createDialog()).start();
+		// new Thread(() -> createDialog()).start();
+		
+		try
+		{
+			process = MultiProcessingUtils.startProcess(ForceOpDialog.class);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
 		EVENTS.add(ChatInputListener.class, this);
 	}
 	
@@ -95,13 +108,25 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	public void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
-		new Thread(() -> {
-			if(dialog != null)
-				dialog.dispose();
-		}).start();
+		
+		// new Thread(() -> {
+		// if(dialog != null)
+		// dialog.dispose();
+		// }).start();
+		
+		if(process != null)
+			try
+			{
+				process.destroyForcibly();
+				process.waitFor();
+				
+			}catch(InterruptedException e)
+			{
+				throw new RuntimeException(e);
+			}
 	}
 	
-	private void createDialog()
+	public void createDialog()
 	{
 		lastPW = -1;
 		dialog = new JDialog((JFrame)null, ForceOpHack.this.getName(), false);
