@@ -141,7 +141,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				WURST.getHax().forceOpHack.setEnabled(false);
+				setEnabled(false);
 			}
 		});
 		
@@ -329,14 +329,14 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		update();
 		for(int i = 0; i < passwords.length; i++)
 		{
-			if(!WURST.getHax().forceOpHack.isEnabled())
+			if(!isEnabled())
 				return;
 			if(!cbDontWait.isSelected())
 				gotWrongPWMSG = false;
 			while(!cbDontWait.isSelected() && !hasGotWrongPWMSG()
 				|| MC.player == null)
 			{
-				if(!WURST.getHax().forceOpHack.isEnabled())
+				if(!isEnabled())
 					return;
 				try
 				{
