@@ -8,6 +8,8 @@
 package net.wurstclient.util;
 
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -38,7 +40,15 @@ public class ForceOpDialog extends JDialog
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setLayout(null);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 		
 		addListSection();
 		
