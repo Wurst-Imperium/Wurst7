@@ -200,12 +200,7 @@ public class ForceOpDialog extends JDialog
 	private void startForceOP()
 	{
 		components.forEach(c -> c.setEnabled(false));
-		new Thread(() -> runForceOP(), "ForceOP").start();
-	}
-	
-	private void runForceOP()
-	{
-		// TODO
+		System.out.println("start");
 	}
 	
 	private void update()

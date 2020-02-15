@@ -15,7 +15,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -94,7 +96,10 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		
 		try
 		{
-			process = MultiProcessingUtils.startProcess(ForceOpDialog.class);
+			process =
+				MultiProcessingUtils.startProcessWithIO(ForceOpDialog.class);
+			
+			new Thread(() -> handleDialogIO(), "ForceOP dialog IO").start();
 			
 		}catch(IOException e)
 		{
@@ -102,6 +107,29 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		}
 		
 		EVENTS.add(ChatInputListener.class, this);
+	}
+	
+	private void handleDialogIO()
+	{
+		try(BufferedReader bf =
+			new BufferedReader(new InputStreamReader(process.getInputStream(),
+				StandardCharsets.UTF_8)))
+		{
+			for(String line = ""; (line = bf.readLine()) != null;)
+				messageFromDialog(line);
+			
+			setEnabled(false);
+			
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private void messageFromDialog(String msg)
+	{
+		if("start".equals(msg))
+			new Thread(this::runForceOP, "ForceOP").start();
 	}
 	
 	@Override
