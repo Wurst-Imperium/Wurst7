@@ -147,7 +147,7 @@ public class ForceOpDialog extends JDialog
 		components.add(lDelay2);
 		
 		JCheckBox cbDontWait = new JCheckBox(
-			"<html>Don't wait for \"<span style=\"color: rgb(192, 0, 0);\"><b>Wrong password!</b></span>\" messages</html>",
+			"<html>Don't wait for \"<span style=\"color: red;\"><b>Wrong password!</b></span>\" messages</html>",
 			false);
 		cbDontWait
 			.setToolTipText("Increases the speed but can cause inaccuracy.");
