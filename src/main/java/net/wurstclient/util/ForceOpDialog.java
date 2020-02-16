@@ -84,6 +84,15 @@ public class ForceOpDialog extends JDialog
 		bBrowse.setEnabled(rbTXTList.isSelected());
 		bBrowse.addActionListener(e -> browsePwList());
 		add(bBrowse);
+		
+		rbDefaultList.addActionListener(e -> {
+			bBrowse.setEnabled(false);
+			System.out.println("list default");
+		});
+		
+		rbTXTList.addActionListener(e -> {
+			bBrowse.setEnabled(true);
+		});
 	}
 	
 	private void browsePwList()
