@@ -75,10 +75,7 @@ public class ForceOpDialog extends JDialog
 	
 	private void addListSection()
 	{
-		JLabel lPWList = new JLabel("Password list");
-		lPWList.setLocation(4, 4);
-		lPWList.setSize(lPWList.getPreferredSize());
-		add(lPWList);
+		addLabel("Password list", 4, 4);
 		
 		JRadioButton rbDefaultList = new JRadioButton("default", true);
 		rbDefaultList.setLocation(4, 24);
@@ -110,15 +107,8 @@ public class ForceOpDialog extends JDialog
 	
 	private void addSpeedSection()
 	{
-		JLabel lSpeed = new JLabel("Speed");
-		lSpeed.setLocation(4, 64);
-		lSpeed.setSize(lSpeed.getPreferredSize());
-		add(lSpeed);
-		
-		JLabel lDelay1 = new JLabel("Delay between attempts:");
-		lDelay1.setLocation(4, 84);
-		lDelay1.setSize(lDelay1.getPreferredSize());
-		add(lDelay1);
+		addLabel("Speed", 4, 64);
+		JLabel lDelay1 = addLabel("Delay between attempts:", 4, 84);
 		
 		JSpinner spDelay = new JSpinner();
 		spDelay.setToolTipText("<html>"
@@ -130,10 +120,7 @@ public class ForceOpDialog extends JDialog
 		spDelay.setSize(60, (int)spDelay.getPreferredSize().getHeight());
 		add(spDelay);
 		
-		JLabel lDelay2 = new JLabel("ms");
-		lDelay2.setLocation(spDelay.getX() + spDelay.getWidth() + 4, 84);
-		lDelay2.setSize(lDelay2.getPreferredSize());
-		add(lDelay2);
+		addLabel("ms", spDelay.getX() + spDelay.getWidth() + 4, 84);
 		
 		JCheckBox cbDontWait = new JCheckBox(
 			"<html>Don't wait for \"<span style=\"color: red;\"><b>Wrong password!</b></span>\" messages</html>",
@@ -147,25 +134,10 @@ public class ForceOpDialog extends JDialog
 	
 	private void addStartSection()
 	{
-		JLabel lName = new JLabel("Username: error");
-		lName.setLocation(4, 140);
-		lName.setSize(lName.getPreferredSize());
-		add(lName);
-		
-		JLabel lPasswords = new JLabel("Passwords: error");
-		lPasswords.setLocation(4, 160);
-		lPasswords.setSize(lPasswords.getPreferredSize());
-		add(lPasswords);
-		
-		JLabel lTime = new JLabel("Estimated time: error");
-		lTime.setLocation(4, 180);
-		lTime.setSize(lTime.getPreferredSize());
-		add(lTime);
-		
-		JLabel lAttempts = new JLabel("Attempts: error");
-		lAttempts.setLocation(4, 200);
-		lAttempts.setSize(lAttempts.getPreferredSize());
-		add(lAttempts);
+		addLabel("Username: error", 4, 140);
+		addLabel("Passwords: error", 4, 160);
+		addLabel("Estimated time: error", 4, 180);
+		addLabel("Attempts: error", 4, 200);
 		
 		JButton bStart = new JButton("Start");
 		bStart.setFont(new Font(bStart.getFont().getName(), Font.BOLD, 18));
@@ -173,6 +145,16 @@ public class ForceOpDialog extends JDialog
 		bStart.setSize(192, 66);
 		bStart.addActionListener(e -> startForceOP());
 		add(bStart);
+	}
+	
+	private JLabel addLabel(String text, int x, int y)
+	{
+		JLabel label = new JLabel(text);
+		label.setLocation(x, y);
+		label.setSize(label.getPreferredSize());
+		
+		add(label);
+		return label;
 	}
 	
 	@Override
