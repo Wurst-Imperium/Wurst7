@@ -8,7 +8,10 @@
 package net.wurstclient.util;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Font;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -87,7 +90,23 @@ public class ForceOpDialog extends JDialog
 		bHowTo.setFont(new Font(bHowTo.getFont().getName(), Font.BOLD, 16));
 		bHowTo.setSize(bHowTo.getPreferredSize());
 		bHowTo.setLocation(506 - bHowTo.getWidth() - 32, 12);
+		bHowTo.addActionListener(e -> openHowToUseLink());
 		add(bHowTo);
+	}
+	
+	private void openHowToUseLink()
+	{
+		try
+		{
+			String howToLink =
+				"https://www.wurstclient.net/Mods/Force_OP_(AuthMeCracker)/";
+			
+			Desktop.getDesktop().browse(URI.create(howToLink));
+			
+		}catch(IOException e2)
+		{
+			throw new RuntimeException(e2);
+		}
 	}
 	
 	private void addDelaySelector()
