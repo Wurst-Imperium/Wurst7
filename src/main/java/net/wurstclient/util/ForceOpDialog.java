@@ -9,8 +9,6 @@ package net.wurstclient.util;
 
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -19,15 +17,7 @@ public class ForceOpDialog extends JDialog
 {
 	public static void main(String[] args)
 	{
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			
-		}catch(ReflectiveOperationException | UnsupportedLookAndFeelException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
+		SwingUtils.setLookAndFeel();
 		new ForceOpDialog();
 	}
 	
@@ -41,7 +31,7 @@ public class ForceOpDialog extends JDialog
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setLayout(null);
-		setExitOnClose();
+		SwingUtils.setExitOnClose(this);
 		
 		addLabel("Password list", 4, 4);
 		addPwListSelector();
@@ -161,19 +151,6 @@ public class ForceOpDialog extends JDialog
 	{
 		components.add(comp);
 		return super.add(comp);
-	}
-	
-	private void setExitOnClose()
-	{
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosing(WindowEvent e)
-			{
-				System.exit(0);
-			}
-		});
 	}
 	
 	private void loadPWList()
