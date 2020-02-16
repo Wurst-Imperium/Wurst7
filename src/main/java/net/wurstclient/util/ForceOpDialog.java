@@ -26,6 +26,7 @@ public class ForceOpDialog extends JDialog
 	}
 	
 	private final ArrayList<Component> components = new ArrayList<>();
+	private JLabel lPasswords;
 	
 	public ForceOpDialog()
 	{
@@ -50,13 +51,12 @@ public class ForceOpDialog extends JDialog
 		addSeparator(4, 132, 498, 4);
 		
 		addLabel("Username: error", 4, 140);
-		addLabel("Passwords: error", 4, 160);
+		lPasswords = addLabel("Passwords: error", 4, 160);
 		addLabel("Estimated time: error", 4, 180);
 		addLabel("Attempts: error", 4, 200);
 		addStartButton();
 		
-		loadPWList();
-		update();
+		setNumPasswords(50);
 		setVisible(true);
 		toFront();
 	}
@@ -206,19 +206,14 @@ public class ForceOpDialog extends JDialog
 		return super.add(comp);
 	}
 	
-	private void loadPWList()
+	private void setNumPasswords(int numPasswords)
 	{
-		// TODO
+		lPasswords.setText("Passwords: " + numPasswords);
 	}
 	
 	private void startForceOP()
 	{
 		components.forEach(c -> c.setEnabled(false));
 		System.out.println("start");
-	}
-	
-	private void update()
-	{
-		// TODO
 	}
 }
