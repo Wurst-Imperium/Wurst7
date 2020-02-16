@@ -52,19 +52,9 @@ public class ForceOpDialog extends JDialog
 		});
 		
 		addListSection();
-		
-		JSeparator sepListSpeed = new JSeparator();
-		sepListSpeed.setLocation(4, 56);
-		sepListSpeed.setSize(498, 4);
-		add(sepListSpeed);
-		
+		addSeparator(4, 56, 498, 4);
 		addSpeedSection();
-		
-		JSeparator sepSpeedStart = new JSeparator();
-		sepSpeedStart.setLocation(4, 132);
-		sepSpeedStart.setSize(498, 4);
-		add(sepSpeedStart);
-		
+		addSeparator(4, 132, 498, 4);
 		addStartSection();
 		
 		loadPWList();
@@ -155,6 +145,14 @@ public class ForceOpDialog extends JDialog
 		
 		add(label);
 		return label;
+	}
+	
+	private void addSeparator(int x, int y, int width, int height)
+	{
+		JSeparator sepSpeedStart = new JSeparator();
+		sepSpeedStart.setLocation(x, y);
+		sepSpeedStart.setSize(width, height);
+		add(sepSpeedStart);
 	}
 	
 	@Override
