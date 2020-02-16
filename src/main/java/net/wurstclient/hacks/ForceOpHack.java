@@ -476,8 +476,8 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			gotWrongPWMSG = true;
 		else if(message.toLowerCase().contains("success")// English & Italian
 			|| message.toLowerCase().contains("erfolg")// Deutsch!
-			|| message.toLowerCase().contains("succès")// French
-			|| message.toLowerCase().contains("éxito")// Spanish
+			|| message.toLowerCase().contains("succ\u00e8s")// French
+			|| message.toLowerCase().contains("\u00e9xito")// Spanish
 		)
 		{
 			String password;
