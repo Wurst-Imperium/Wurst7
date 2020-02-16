@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -26,7 +27,16 @@ public class ForceOpDialog extends JDialog
 	}
 	
 	private final ArrayList<Component> components = new ArrayList<>();
+	
+	private JSpinner spDelay;
+	private JCheckBox cbDontWait;
+	
 	private JLabel lPasswords;
+	private JLabel lTime;
+	private JLabel lAttempts;
+	
+	private int numPW = 50;
+	private int lastPW = -1;
 	
 	public ForceOpDialog(String username)
 	{
@@ -52,11 +62,11 @@ public class ForceOpDialog extends JDialog
 		
 		addLabel("Username: " + username, 4, 140);
 		lPasswords = addLabel("Passwords: error", 4, 160);
-		addLabel("Estimated time: error", 4, 180);
-		addLabel("Attempts: error", 4, 200);
+		lTime = addLabel("Estimated time: error", 4, 180);
+		lAttempts = addLabel("Attempts: error", 4, 200);
 		addStartButton();
 		
-		setNumPasswords(50);
+		updateNumPasswords();
 		setVisible(true);
 		toFront();
 	}
@@ -147,7 +157,7 @@ public class ForceOpDialog extends JDialog
 	{
 		JLabel lDelay1 = addLabel("Delay between attempts:", 4, 84);
 		
-		JSpinner spDelay = new JSpinner();
+		spDelay = new JSpinner();
 		spDelay.setToolTipText("<html>"
 			+ "50ms: Fastest, doesn't bypass AntiSpam plugins<br>"
 			+ "1000ms: Recommended, bypasses most AntiSpam plugins<br>"
@@ -155,6 +165,7 @@ public class ForceOpDialog extends JDialog
 		spDelay.setModel(new SpinnerNumberModel(1000, 50, 10000, 50));
 		spDelay.setLocation(lDelay1.getX() + lDelay1.getWidth() + 4, 84);
 		spDelay.setSize(60, (int)spDelay.getPreferredSize().getHeight());
+		spDelay.addChangeListener(e -> updateTimeLabel());
 		add(spDelay);
 		
 		addLabel("ms", spDelay.getX() + spDelay.getWidth() + 4, 84);
@@ -162,13 +173,15 @@ public class ForceOpDialog extends JDialog
 	
 	private void addDontWaitCheckbox()
 	{
-		JCheckBox cb = new JCheckBox("<html>Don't wait for "
+		cbDontWait = new JCheckBox("<html>Don't wait for "
 			+ "\"<span style=\"color: red;\"><b>Wrong password!</b></span>\" "
 			+ "messages</html>", false);
-		cb.setToolTipText("Increases the speed but can cause inaccuracy.");
-		cb.setLocation(4, 104);
-		cb.setSize(cb.getPreferredSize());
-		add(cb);
+		cbDontWait
+			.setToolTipText("Increases the speed but can cause inaccuracy.");
+		cbDontWait.setLocation(4, 104);
+		cbDontWait.setSize(cbDontWait.getPreferredSize());
+		cbDontWait.addActionListener(e -> updateTimeLabel());
+		add(cbDontWait);
 	}
 	
 	private void addStartButton()
@@ -206,9 +219,57 @@ public class ForceOpDialog extends JDialog
 		return super.add(comp);
 	}
 	
-	private void setNumPasswords(int numPasswords)
+	private void updateNumPasswords()
 	{
-		lPasswords.setText("Passwords: " + numPasswords);
+		updatePasswordsLabel();
+		updateTimeLabel();
+		updateAttemptsLabel();
+	}
+	
+	private void updatePasswordsLabel()
+	{
+		lPasswords.setText("Passwords: " + numPW);
+		lPasswords.setSize(lPasswords.getPreferredSize());
+	}
+	
+	private void updateTimeLabel()
+	{
+		int remainingPW = numPW - (lastPW + 1);
+		long timeMS = remainingPW * (int)spDelay.getValue();
+		
+		// AutoReconnect time (5s every 30s)
+		timeMS += (int)(timeMS / 30000 * 5000);
+		
+		// "wrong password" wait time (estimated 50ms per password)
+		// actual value varies with lag, which cannot be predicted
+		if(!cbDontWait.isSelected())
+			timeMS += remainingPW * 50;
+		
+		String timeString = getTimeString(timeMS);
+		
+		lTime.setText("Estimated time: " + timeString);
+		lTime.setSize(lTime.getPreferredSize());
+	}
+	
+	private String getTimeString(long ms)
+	{
+		TimeUnit uDays = TimeUnit.DAYS;
+		TimeUnit uHours = TimeUnit.HOURS;
+		TimeUnit uMin = TimeUnit.MINUTES;
+		TimeUnit uMS = TimeUnit.MILLISECONDS;
+		
+		long days = uMS.toDays(ms);
+		long hours = uMS.toHours(ms) - uDays.toHours(days);
+		long minutes = uMS.toMinutes(ms) - uHours.toMinutes(uMS.toHours(ms));
+		long seconds = uMS.toSeconds(ms) - uMin.toSeconds(uMS.toMinutes(ms));
+		
+		return days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+	}
+	
+	private void updateAttemptsLabel()
+	{
+		lAttempts.setText("Attempts: " + (lastPW + 1) + "/" + numPW);
+		lAttempts.setSize(lAttempts.getPreferredSize());
 	}
 	
 	private void startForceOP()
