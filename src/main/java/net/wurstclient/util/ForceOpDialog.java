@@ -41,21 +41,25 @@ public class ForceOpDialog extends JDialog
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setLayout(null);
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosing(WindowEvent e)
-			{
-				System.exit(0);
-			}
-		});
+		setExitOnClose();
 		
-		addListSection();
+		addLabel("Password list", 4, 4);
+		addPwListSelector();
+		addHowToUseButton();
+		
 		addSeparator(4, 56, 498, 4);
-		addSpeedSection();
+		
+		addLabel("Speed", 4, 64);
+		addDelaySelector();
+		addDontWaitCheckbox();
+		
 		addSeparator(4, 132, 498, 4);
-		addStartSection();
+		
+		addLabel("Username: error", 4, 140);
+		addLabel("Passwords: error", 4, 160);
+		addLabel("Estimated time: error", 4, 180);
+		addLabel("Attempts: error", 4, 200);
+		addStartButton();
 		
 		loadPWList();
 		update();
@@ -63,10 +67,8 @@ public class ForceOpDialog extends JDialog
 		toFront();
 	}
 	
-	private void addListSection()
+	private void addPwListSelector()
 	{
-		addLabel("Password list", 4, 4);
-		
 		JRadioButton rbDefaultList = new JRadioButton("default", true);
 		rbDefaultList.setLocation(4, 24);
 		rbDefaultList.setSize(rbDefaultList.getPreferredSize());
@@ -78,16 +80,19 @@ public class ForceOpDialog extends JDialog
 		rbTXTList.setSize(rbTXTList.getPreferredSize());
 		add(rbTXTList);
 		
-		ButtonGroup bgList = new ButtonGroup();
-		bgList.add(rbDefaultList);
-		bgList.add(rbTXTList);
+		ButtonGroup rbGroup = new ButtonGroup();
+		rbGroup.add(rbDefaultList);
+		rbGroup.add(rbTXTList);
 		
 		JButton bTXTList = new JButton("browse");
 		bTXTList.setLocation(rbTXTList.getX() + rbTXTList.getWidth() + 4, 24);
 		bTXTList.setSize(bTXTList.getPreferredSize());
 		bTXTList.setEnabled(rbTXTList.isSelected());
 		add(bTXTList);
-		
+	}
+	
+	private void addHowToUseButton()
+	{
 		JButton bHowTo = new JButton("How to use");
 		bHowTo.setFont(new Font(bHowTo.getFont().getName(), Font.BOLD, 16));
 		bHowTo.setSize(bHowTo.getPreferredSize());
@@ -95,9 +100,8 @@ public class ForceOpDialog extends JDialog
 		add(bHowTo);
 	}
 	
-	private void addSpeedSection()
+	private void addDelaySelector()
 	{
-		addLabel("Speed", 4, 64);
 		JLabel lDelay1 = addLabel("Delay between attempts:", 4, 84);
 		
 		JSpinner spDelay = new JSpinner();
@@ -111,24 +115,21 @@ public class ForceOpDialog extends JDialog
 		add(spDelay);
 		
 		addLabel("ms", spDelay.getX() + spDelay.getWidth() + 4, 84);
-		
-		JCheckBox cbDontWait = new JCheckBox(
-			"<html>Don't wait for \"<span style=\"color: red;\"><b>Wrong password!</b></span>\" messages</html>",
-			false);
-		cbDontWait
-			.setToolTipText("Increases the speed but can cause inaccuracy.");
-		cbDontWait.setLocation(4, 104);
-		cbDontWait.setSize(cbDontWait.getPreferredSize());
-		add(cbDontWait);
 	}
 	
-	private void addStartSection()
+	private void addDontWaitCheckbox()
 	{
-		addLabel("Username: error", 4, 140);
-		addLabel("Passwords: error", 4, 160);
-		addLabel("Estimated time: error", 4, 180);
-		addLabel("Attempts: error", 4, 200);
-		
+		JCheckBox cb = new JCheckBox("<html>Don't wait for "
+			+ "\"<span style=\"color: red;\"><b>Wrong password!</b></span>\" "
+			+ "messages</html>", false);
+		cb.setToolTipText("Increases the speed but can cause inaccuracy.");
+		cb.setLocation(4, 104);
+		cb.setSize(cb.getPreferredSize());
+		add(cb);
+	}
+	
+	private void addStartButton()
+	{
 		JButton bStart = new JButton("Start");
 		bStart.setFont(new Font(bStart.getFont().getName(), Font.BOLD, 18));
 		bStart.setLocation(506 - 192 - 12, 144);
@@ -160,6 +161,19 @@ public class ForceOpDialog extends JDialog
 	{
 		components.add(comp);
 		return super.add(comp);
+	}
+	
+	private void setExitOnClose()
+	{
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 	}
 	
 	private void loadPWList()
