@@ -15,6 +15,7 @@ import java.net.URI;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ForceOpDialog extends JDialog
 {
@@ -77,11 +78,35 @@ public class ForceOpDialog extends JDialog
 		rbGroup.add(rbDefaultList);
 		rbGroup.add(rbTXTList);
 		
-		JButton bTXTList = new JButton("browse");
-		bTXTList.setLocation(rbTXTList.getX() + rbTXTList.getWidth() + 4, 24);
-		bTXTList.setSize(bTXTList.getPreferredSize());
-		bTXTList.setEnabled(rbTXTList.isSelected());
-		add(bTXTList);
+		JButton bBrowse = new JButton("browse");
+		bBrowse.setLocation(rbTXTList.getX() + rbTXTList.getWidth() + 4, 24);
+		bBrowse.setSize(bBrowse.getPreferredSize());
+		bBrowse.setEnabled(rbTXTList.isSelected());
+		bBrowse.addActionListener(e -> browsePwList());
+		add(bBrowse);
+	}
+	
+	private void browsePwList()
+	{
+		JFileChooser fsTXTList = new JFileChooser();
+		fsTXTList.setAcceptAllFileFilterUsed(false);
+		fsTXTList.addChoosableFileFilter(
+			new FileNameExtensionFilter("TXT files", new String[]{"txt"}));
+		fsTXTList.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		
+		int action = fsTXTList.showOpenDialog(this);
+		if(action != JFileChooser.APPROVE_OPTION)
+			return;
+		
+		if(!fsTXTList.getSelectedFile().exists())
+		{
+			JOptionPane.showMessageDialog(this, "File does not exist!", "Error",
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		String pwList = fsTXTList.getSelectedFile().getPath();
+		System.out.println("list " + pwList);
 	}
 	
 	private void addHowToUseButton()
