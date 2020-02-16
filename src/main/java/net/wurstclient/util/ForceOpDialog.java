@@ -22,13 +22,13 @@ public class ForceOpDialog extends JDialog
 	public static void main(String[] args)
 	{
 		SwingUtils.setLookAndFeel();
-		new ForceOpDialog();
+		new ForceOpDialog(args[0]);
 	}
 	
 	private final ArrayList<Component> components = new ArrayList<>();
 	private JLabel lPasswords;
 	
-	public ForceOpDialog()
+	public ForceOpDialog(String username)
 	{
 		super((JFrame)null, "ForceOP", false);
 		setAlwaysOnTop(true);
@@ -50,7 +50,7 @@ public class ForceOpDialog extends JDialog
 		
 		addSeparator(4, 132, 498, 4);
 		
-		addLabel("Username: error", 4, 140);
+		addLabel("Username: " + username, 4, 140);
 		lPasswords = addLabel("Passwords: error", 4, 160);
 		addLabel("Estimated time: error", 4, 180);
 		addLabel("Attempts: error", 4, 200);

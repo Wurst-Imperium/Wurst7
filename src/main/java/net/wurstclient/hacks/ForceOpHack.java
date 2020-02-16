@@ -96,8 +96,8 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		
 		try
 		{
-			process =
-				MultiProcessingUtils.startProcessWithIO(ForceOpDialog.class);
+			process = MultiProcessingUtils.startProcessWithIO(
+				ForceOpDialog.class, MC.getSession().getUsername());
 			
 			new Thread(() -> handleDialogIO(), "ForceOP dialog IO").start();
 			
