@@ -10,8 +10,11 @@ package net.wurstclient.util;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Font;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +72,31 @@ public class ForceOpDialog extends JDialog
 		updateNumPasswords();
 		setVisible(true);
 		toFront();
+		
+		new Thread(() -> handleDialogInput(), "ForceOP dialog input").start();
+	}
+	
+	private void handleDialogInput()
+	{
+		try(BufferedReader bf = new BufferedReader(
+			new InputStreamReader(System.in, StandardCharsets.UTF_8)))
+		{
+			for(String line = ""; (line = bf.readLine()) != null;)
+				messageFromWurst(line);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private void messageFromWurst(String line)
+	{
+		if(line.startsWith("numPW "))
+		{
+			numPW = Integer.parseInt(line.substring(6));
+			updateNumPasswords();
+		}
 	}
 	
 	private void addPwListSelector()

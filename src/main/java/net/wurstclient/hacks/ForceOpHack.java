@@ -16,9 +16,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
@@ -92,14 +96,13 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	@Override
 	public void onEnable()
 	{
-		// new Thread(() -> createDialog()).start();
-		
 		try
 		{
 			process = MultiProcessingUtils.startProcessWithIO(
 				ForceOpDialog.class, MC.getSession().getUsername());
 			
-			new Thread(() -> handleDialogIO(), "ForceOP dialog IO").start();
+			new Thread(() -> handleDialogOutput(), "ForceOP dialog output")
+				.start();
 			
 		}catch(IOException e)
 		{
@@ -109,7 +112,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		EVENTS.add(ChatInputListener.class, this);
 	}
 	
-	private void handleDialogIO()
+	private void handleDialogOutput()
 	{
 		try(BufferedReader bf =
 			new BufferedReader(new InputStreamReader(process.getInputStream(),
@@ -129,18 +132,51 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	private void messageFromDialog(String msg)
 	{
 		if("start".equals(msg))
+		{
 			new Thread(this::runForceOP, "ForceOP").start();
+			return;
+		}
+		
+		if(msg.startsWith("list "))
+		{
+			loadPwList(msg.substring(5));
+			sendNumPwToDialog();
+		}
+	}
+	
+	private void loadPwList(String list)
+	{
+		if("default".equals(list))
+		{
+			passwords = defaultList;
+			return;
+		}
+		
+		try
+		{
+			List<String> loadedPWs =
+				Files.readAllLines(Paths.get(list), StandardCharsets.UTF_8);
+			passwords = loadedPWs.toArray(new String[loadedPWs.size()]);
+			
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+			passwords = defaultList;
+		}
+	}
+	
+	private void sendNumPwToDialog()
+	{
+		String numPW = "numPW " + (passwords.length + 1);
+		PrintWriter pw = new PrintWriter(process.getOutputStream());
+		pw.println(numPW);
+		pw.flush();
 	}
 	
 	@Override
 	public void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
-		
-		// new Thread(() -> {
-		// if(dialog != null)
-		// dialog.dispose();
-		// }).start();
 		
 		if(process != null)
 			try
