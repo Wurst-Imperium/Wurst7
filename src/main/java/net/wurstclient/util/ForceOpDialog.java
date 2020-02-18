@@ -65,8 +65,8 @@ public class ForceOpDialog extends JDialog
 		
 		addLabel("Username: " + username, 4, 140);
 		lPasswords = addLabel("Passwords: error", 4, 160);
-		lTime = addLabel("Estimated time: error", 4, 180);
-		lAttempts = addLabel("Attempts: error", 4, 200);
+		lTime = addPersistentLabel("Estimated time: error", 4, 180);
+		lAttempts = addPersistentLabel("Attempts: error", 4, 200);
 		addStartButton();
 		
 		updateNumPasswords();
@@ -232,11 +232,26 @@ public class ForceOpDialog extends JDialog
 	
 	private JLabel addLabel(String text, int x, int y)
 	{
+		JLabel label = makeLabel(text, x, y);
+		add(label);
+		return label;
+	}
+	
+	/**
+	 * Adds a label that won't be disabled when the Start button is pressed.
+	 */
+	private JLabel addPersistentLabel(String text, int x, int y)
+	{
+		JLabel label = makeLabel(text, x, y);
+		super.add(label);
+		return label;
+	}
+	
+	private JLabel makeLabel(String text, int x, int y)
+	{
 		JLabel label = new JLabel(text);
 		label.setLocation(x, y);
 		label.setSize(label.getPreferredSize());
-		
-		add(label);
 		return label;
 	}
 	
