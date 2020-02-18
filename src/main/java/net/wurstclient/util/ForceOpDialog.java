@@ -303,6 +303,9 @@ public class ForceOpDialog extends JDialog
 	private void startForceOP()
 	{
 		components.forEach(c -> c.setEnabled(false));
-		System.out.println("start");
+		
+		int delay = (int)spDelay.getValue();
+		boolean waitForMsg = !cbDontWait.isSelected();
+		System.out.println("start " + delay + " " + waitForMsg);
 	}
 }
