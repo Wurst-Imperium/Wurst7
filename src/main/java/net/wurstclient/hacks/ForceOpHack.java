@@ -16,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.swing.UIManager;
-
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -52,14 +50,6 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		super("ForceOP",
 			"Cracks AuthMe passwords.\n" + "Can be used to get OP.");
 		setCategory(Category.CHAT);
-		
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
