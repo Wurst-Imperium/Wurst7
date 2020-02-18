@@ -149,6 +149,14 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		pw.flush();
 	}
 	
+	private void sendIndexToDialog()
+	{
+		String index = "index " + lastPW;
+		PrintWriter pw = new PrintWriter(process.getOutputStream());
+		pw.println(index);
+		pw.flush();
+	}
+	
 	@Override
 	public void onDisable()
 	{
@@ -170,7 +178,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	{
 		MC.player.sendChatMessage("/login " + MC.getSession().getUsername());
 		lastPW = 0;
-		// update();
+		sendIndexToDialog();
 		
 		for(int i = 0; i < passwords.length; i++)
 		{
@@ -207,7 +215,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 				}
 			
 			lastPW = i + 1;
-			// update();
+			sendIndexToDialog();
 		}
 		
 		ChatUtils.message("\u00a7c[\u00a74\u00a7lFAILURE\u00a7c]\u00a7f All "

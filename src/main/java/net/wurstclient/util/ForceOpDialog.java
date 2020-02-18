@@ -96,6 +96,14 @@ public class ForceOpDialog extends JDialog
 		{
 			numPW = Integer.parseInt(line.substring(6));
 			updateNumPasswords();
+			return;
+		}
+		
+		if(line.startsWith("index "))
+		{
+			lastPW = Integer.parseInt(line.substring(6));
+			updateTimeLabel();
+			updateAttemptsLabel();
 		}
 	}
 	
