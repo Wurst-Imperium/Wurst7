@@ -31,7 +31,7 @@
     "EntityRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
-    "HeldItemRendererMixin"
+    "HeldItemRendererMixin",
     "IngameHudMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
