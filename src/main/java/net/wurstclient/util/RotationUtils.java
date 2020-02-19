@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -96,6 +96,12 @@ public enum RotationUtils
 		float diffPitch = lastReportedPitch - needed.pitch;
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+	}
+	
+	public static float getHorizontalAngleToLookVec(Vec3d vec)
+	{
+		Rotation needed = getNeededRotations(vec);
+		return MathHelper.wrapDegrees(WurstClient.MC.player.yaw) - needed.yaw;
 	}
 	
 	public static final class Rotation

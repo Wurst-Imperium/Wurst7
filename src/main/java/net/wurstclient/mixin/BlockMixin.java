@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
@@ -36,5 +37,18 @@ public abstract class BlockMixin implements ItemConvertible
 		
 		if(event.isRendered() != null)
 			cir.setReturnValue(event.isRendered());
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"getVelocityMultiplier()F"},
+		cancellable = true)
+	private void onGetVelocityMultiplier(CallbackInfoReturnable<Float> cir)
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.noSlowdownHack.isEnabled())
+			return;
+		
+		if(cir.getReturnValueF() < 1)
+			cir.setReturnValue(1F);
 	}
 }

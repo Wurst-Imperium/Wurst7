@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -140,7 +140,7 @@ public final class JesusHack extends Hack
 			y += 0.05;
 		
 		// create new packet
-		Packet newPacket;
+		Packet<?> newPacket;
 		if(packet instanceof PlayerMoveC2SPacket.PositionOnly)
 			newPacket = new PlayerMoveC2SPacket.PositionOnly(x, y, z, true);
 		else

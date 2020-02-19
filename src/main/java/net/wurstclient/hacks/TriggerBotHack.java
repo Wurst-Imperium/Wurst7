@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -104,8 +104,12 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
+		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 	}
@@ -130,6 +134,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		Entity target = ((EntityHitResult)MC.crosshairTarget).getEntity();
 		if(!isCorrectEntity(target))
 			return;
+		
+		WURST.getHax().autoSwordHack.setSlot();
 		
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);

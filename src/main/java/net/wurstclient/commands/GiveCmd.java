@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.network.packet.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -47,7 +48,7 @@ public final class GiveCmd extends Command
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
-		Item item = Registry.ITEM.get(new Identifier(args[0]));
+		Item item = getItem(args[0]);
 		
 		if(item == Items.AIR && MathUtils.isInteger(args[0]))
 			item = Item.byRawId(Integer.parseInt(args[0]));
@@ -67,10 +68,8 @@ public final class GiveCmd extends Command
 			if(amount < 1)
 				throw new CmdError("Amount cannot be less than 1.");
 			
-			if(amount > item.getMaxCount())
-				throw new CmdError(
-					"Amount is larger than the maximum stack size. ("
-						+ item.getMaxCount() + ")");
+			if(amount > 64)
+				throw new CmdError("Amount cannot be more than 64.");
 		}
 		
 		// nbt data
@@ -97,6 +96,18 @@ public final class GiveCmd extends Command
 			ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
 		else
 			throw new CmdError("Please clear a slot in your hotbar.");
+	}
+	
+	private Item getItem(String id) throws CmdSyntaxError
+	{
+		try
+		{
+			return Registry.ITEM.get(new Identifier(id));
+			
+		}catch(InvalidIdentifierException e)
+		{
+			throw new CmdSyntaxError("Invalid item: " + id);
+		}
 	}
 	
 	private boolean placeStackInHotbar(ItemStack stack)

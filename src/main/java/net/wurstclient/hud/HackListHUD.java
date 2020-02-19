@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -44,15 +44,16 @@ public final class HackListHUD implements UpdateListener
 			posY = 22;
 		else
 			posY = 2;
-			
+		
 		// color
-		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
-		// {
-		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		// textColor = 0x04 << 24 | (int)(acColor[0] * 256) << 16
-		// | (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
-		// }else
-		textColor = 0x04ffffff;
+		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
+		{
+			float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+			textColor = 0x04 << 24 | (int)(acColor[0] * 256) << 16
+				| (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
+			
+		}else
+			textColor = 0x04ffffff;
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
@@ -201,6 +202,12 @@ public final class HackListHUD implements UpdateListener
 			
 			HackListEntry other = (HackListEntry)obj;
 			return hack == other.hack;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return hack.hashCode();
 		}
 	}
 }

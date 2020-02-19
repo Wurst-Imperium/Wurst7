@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,15 +19,7 @@ import net.wurstclient.mixinterface.IKeyBinding;
 public class KeyBindingMixin implements IKeyBinding
 {
 	@Shadow
-	private boolean pressed;
-	@Shadow
 	private InputUtil.KeyCode keyCode;
-	
-	@Override
-	public void setPressed(boolean pressed)
-	{
-		this.pressed = pressed;
-	}
 	
 	@Override
 	public boolean isActallyPressed()

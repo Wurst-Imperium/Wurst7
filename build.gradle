@@ -21,6 +21,14 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	
+	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
+	// which uses javax.annotation.concurrent.Immutable, which is part of
+	// the JSR305 library.
+	//
+	// In other words, Wurst won't compile without this library,
+	// even though it's Minecraft that actually uses it.
+	modCompile 'com.google.code.findbugs:jsr305:3.0.2'
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
