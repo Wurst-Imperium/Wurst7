@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -174,10 +173,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glColor4f(1, 1, 0, 0.5F);
 		
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(ItemEntity e : items)

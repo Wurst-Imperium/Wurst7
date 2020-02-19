@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -39,6 +40,7 @@ public final class FileSetting extends Setting
 		super(name, description);
 		folder = WurstClient.INSTANCE.getWurstFolder().resolve(folderName);
 		this.createDefaultFiles = createDefaultFiles;
+		setSelectedFileToDefault();
 	}
 	
 	public Path getFolder()
@@ -68,6 +70,37 @@ public final class FileSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
+	private void setSelectedFileToDefault()
+	{
+		ArrayList<Path> files = listFiles();
+		
+		if(files.isEmpty())
+			files = createDefaultFiles();
+		
+		selectedFile = "" + files.get(0).getFileName();
+	}
+	
+	private ArrayList<Path> createDefaultFiles()
+	{
+		try
+		{
+			Files.createDirectories(folder);
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		createDefaultFiles.accept(folder);
+		
+		ArrayList<Path> files = listFiles();
+		if(files.isEmpty())
+			throw new IllegalStateException(
+				"Created default files but folder is still empty!");
+		
+		return files;
+	}
+	
 	public void resetFolder()
 	{
 		for(Path path : listFiles())
@@ -80,49 +113,18 @@ public final class FileSetting extends Setting
 				throw new RuntimeException(e);
 			}
 		
-		generateDefaultFiles();
+		setSelectedFileToDefault();
 		WurstClient.INSTANCE.saveSettings();
-	}
-	
-	private void generateDefaultFiles()
-	{
-		createFolderIfNeeded();
-		ArrayList<Path> files = listFiles();
-		
-		if(files.isEmpty())
-		{
-			createDefaultFiles.accept(folder);
-			files = listFiles();
-			
-			if(files.isEmpty())
-				throw new IllegalStateException(
-					"Couldn't generate default files!");
-		}
-		
-		selectedFile = "" + files.get(0).getFileName();
-	}
-	
-	private void createFolderIfNeeded()
-	{
-		if(Files.isDirectory(folder))
-			return;
-		
-		try
-		{
-			Files.deleteIfExists(folder);
-			Files.createDirectories(folder);
-			
-		}catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 	
 	public ArrayList<Path> listFiles()
 	{
-		try
+		if(!Files.isDirectory(folder))
+			return new ArrayList<>();
+		
+		try(Stream<Path> files = Files.list(folder))
 		{
-			return Files.list(folder).filter(Files::isRegularFile)
+			return files.filter(Files::isRegularFile)
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 			
 		}catch(IOException e)
@@ -151,7 +153,7 @@ public final class FileSetting extends Setting
 			
 		}catch(JsonException e)
 		{
-			generateDefaultFiles();
+			e.printStackTrace();
 		}
 	}
 	

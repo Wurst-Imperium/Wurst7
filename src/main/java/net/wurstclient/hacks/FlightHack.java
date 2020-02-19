@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,8 +26,9 @@ public final class FlightHack extends Hack
 	
 	public FlightHack()
 	{
-		super("Flight", "Allows you to you fly.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("Flight",
+			"Allows you to you fly.\n\n" + "\u00a7c\u00a7lWARNING:\u00a7r"
+				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
 	}
@@ -35,6 +36,8 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().jetpackHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);
 	}

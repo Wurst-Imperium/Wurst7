@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,5 +30,14 @@ public class IngameHudMixin extends DrawableHelper
 		
 		GUIRenderEvent event = new GUIRenderEvent(partialTicks);
 		WurstClient.INSTANCE.getEventManager().fire(event);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"renderPumpkinOverlay()V"},
+		cancellable = true)
+	private void onRenderPumpkinOverlay(CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+			ci.cancel();
 	}
 }

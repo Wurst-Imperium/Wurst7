@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -105,6 +105,7 @@ public final class BlockListEditButton extends Component
 		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
 		fr.draw("Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override
