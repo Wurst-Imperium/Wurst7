@@ -16,7 +16,7 @@ import net.minecraft.client.render.item.HeldItemRenderer;
 import net.wurstclient.WurstClient;
 
 @Mixin(HeldItemRenderer.class)
-public class InGameOverlayRendererMixin
+public class HeldItemRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {"renderFireOverlay()V"},
