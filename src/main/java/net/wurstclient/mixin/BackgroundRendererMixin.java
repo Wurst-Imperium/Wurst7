@@ -43,7 +43,7 @@ public class BackgroundRendererMixin
 		ordinal = 0),
 		method = {
 			"applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V"})
-	private static FluidState wurstGetSubmergedFluidState(Camera camera)
+	private FluidState wurstGetSubmergedFluidState(Camera camera)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			return Fluids.EMPTY.getDefaultState();
