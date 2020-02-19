@@ -74,10 +74,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.hitResult != null
-			&& MC.hitResult.getType() == HitResult.Type.ENTITY)
+		if(MC.crosshairTarget != null
+			&& MC.crosshairTarget.getType() == HitResult.Type.ENTITY)
 		{
-			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
+			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
 			
 			if(entity instanceof LivingEntity
 				&& ((LivingEntity)entity).getHealth() > 0)

@@ -15,7 +15,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.server.network.packet.CreativeInventoryActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -137,14 +137,13 @@ public final class ModifyCmd extends Command
 		{
 			String part = parts[i];
 			
-			if(!base.containsKey(part)
-				|| !(base.getTag(part) instanceof CompoundTag))
+			if(!base.contains(part) || !(base.get(part) instanceof CompoundTag))
 				return null;
 			
 			base = base.getCompound(part);
 		}
 		
-		if(!base.containsKey(parts[parts.length - 1]))
+		if(!base.contains(parts[parts.length - 1]))
 			return null;
 		
 		return new NbtPath(base, parts[parts.length - 1]);

@@ -384,15 +384,16 @@ public final class ExcavatorHack extends Hack
 			return;
 		}
 		
-		if(MC.hitResult != null && MC.hitResult instanceof BlockHitResult)
+		if(MC.crosshairTarget != null
+			&& MC.crosshairTarget instanceof BlockHitResult)
 		{
 			// set posLookingAt
-			posLookingAt = ((BlockHitResult)MC.hitResult).getBlockPos();
+			posLookingAt = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
 			
 			// offset if sneaking
 			if(MC.options.keySneak.isPressed())
 				posLookingAt = posLookingAt
-					.offset(((BlockHitResult)MC.hitResult).getSide());
+					.offset(((BlockHitResult)MC.crosshairTarget).getSide());
 			
 		}else
 			posLookingAt = null;

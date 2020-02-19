@@ -99,7 +99,7 @@ public final class AntiAfkHack extends Hack
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
 					((IKeyBinding)MC.options.keyJump)
-						.setPressed(MC.player.isInsideWater());
+						.setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
@@ -162,7 +162,7 @@ public final class AntiAfkHack extends Hack
 			
 			// swim up
 			((IKeyBinding)MC.options.keyJump)
-				.setPressed(MC.player.isInsideWater());
+				.setPressed(MC.player.isTouchingWater());
 			
 			// update timer
 			if(timer > 0)

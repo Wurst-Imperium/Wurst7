@@ -301,11 +301,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		minecarts.forEach(e -> {
 			double offsetX =
-				-(e.x - e.prevRenderX) + (e.x - e.prevRenderX) * partialTicks;
+				-(e.x - e.lastRenderX) + (e.x - e.lastRenderX) * partialTicks;
 			double offsetY =
-				-(e.y - e.prevRenderY) + (e.y - e.prevRenderY) * partialTicks;
+				-(e.y - e.lastRenderY) + (e.y - e.lastRenderY) * partialTicks;
 			double offsetZ =
-				-(e.z - e.prevRenderZ) + (e.z - e.prevRenderZ) * partialTicks;
+				-(e.z - e.lastRenderZ) + (e.z - e.lastRenderZ) * partialTicks;
 			minecartBoxes
 				.add(e.getBoundingBox().offset(offsetX, offsetY, offsetZ));
 		});
@@ -318,9 +318,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(box.minX, box.minY, box.minZ);
-			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
-				box.maxZ - box.minZ);
+			GL11.glTranslated(box.x1, box.y1, box.z1);
+			GL11.glScaled(box.x2 - box.x1, box.y2 - box.y1, box.z2 - box.z1);
 			GL11.glCallList(displayList);
 			GL11.glPopMatrix();
 		}

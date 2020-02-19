@@ -145,7 +145,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return false;
 		
 		// check for clickable objects
-		if(isClickable(MC.hitResult))
+		if(isClickable(MC.crosshairTarget))
 			return false;
 		
 		return true;
@@ -158,14 +158,14 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		
 		if(hitResult instanceof EntityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
+			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
 			return entity instanceof VillagerEntity
 				|| entity instanceof TameableEntity;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
 		{
-			BlockPos pos = ((BlockHitResult)MC.hitResult).getBlockPos();
+			BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
 			if(pos == null)
 				return false;
 			

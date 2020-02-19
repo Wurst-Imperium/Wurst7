@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -284,7 +284,7 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.hitResult;
+		HitResult hitResult = MC.crosshairTarget;
 		if(hitResult == null || hitResult.getPos() == null
 			|| hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult))

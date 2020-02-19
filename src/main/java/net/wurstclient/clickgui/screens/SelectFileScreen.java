@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 
 public final class SelectFileScreen extends Screen
@@ -62,7 +62,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openFolder()
 	{
-		SystemUtil.getOperatingSystem().open(setting.getFolder().toFile());
+		Util.getOperatingSystem().open(setting.getFolder().toFile());
 	}
 	
 	private void openPrevScreen()

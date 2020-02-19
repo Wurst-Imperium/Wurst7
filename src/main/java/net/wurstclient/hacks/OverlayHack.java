@@ -41,11 +41,11 @@ public final class OverlayHack extends Hack implements RenderListener
 	@Override
 	public void onRender(float partialTicks)
 	{
-		if(MC.hitResult == null
-			|| MC.hitResult.getType() != HitResult.Type.BLOCK)
+		if(MC.crosshairTarget == null
+			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		BlockHitResult blockHitResult = (BlockHitResult)MC.hitResult;
+		BlockHitResult blockHitResult = (BlockHitResult)MC.crosshairTarget;
 		BlockPos pos = new BlockPos(blockHitResult.getBlockPos());
 		
 		// check if hitting block

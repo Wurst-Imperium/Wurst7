@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -260,8 +260,8 @@ public final class KillauraHack extends Hack
 		RenderUtils.applyRenderOffset();
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = (renderTarget.getHealthMaximum() - renderTarget.getHealth())
-			/ renderTarget.getHealthMaximum();
+		float p = (renderTarget.getMaximumHealth() - renderTarget.getHealth())
+			/ renderTarget.getMaximumHealth();
 		float red = p * 2F;
 		float green = 2 - red;
 		

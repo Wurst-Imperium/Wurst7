@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -91,7 +91,7 @@ public abstract class AltEditorScreen extends Screen
 	private void openSkinFolder()
 	{
 		createSkinFolder();
-		SystemUtil.getOperatingSystem().open(skinFolder.toFile());
+		Util.getOperatingSystem().open(skinFolder.toFile());
 	}
 	
 	private void createSkinFolder()

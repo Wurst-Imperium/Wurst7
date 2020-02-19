@@ -42,7 +42,7 @@ public final class AutoSwimHack extends Hack implements UpdateListener
 		if(player.horizontalCollision || player.isSneaking())
 			return;
 		
-		if(!player.isInsideWater())
+		if(!player.isTouchingWater())
 			return;
 		
 		if(player.forwardSpeed > 0)

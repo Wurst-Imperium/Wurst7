@@ -125,11 +125,12 @@ public final class SpeedNukerHack extends Hack
 	public void onLeftClick(LeftClickEvent event)
 	{
 		// check hitResult
-		if(MC.hitResult == null || !(MC.hitResult instanceof BlockHitResult))
+		if(MC.crosshairTarget == null
+			|| !(MC.crosshairTarget instanceof BlockHitResult))
 			return;
 		
 		// check pos
-		BlockPos pos = ((BlockHitResult)MC.hitResult).getBlockPos();
+		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
 		if(pos == null
 			|| BlockUtils.getState(pos).getMaterial() == Material.AIR)
 			return;

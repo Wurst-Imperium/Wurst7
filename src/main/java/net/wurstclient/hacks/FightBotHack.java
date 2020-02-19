@@ -14,10 +14,10 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -273,7 +273,7 @@ public final class FightBotHack extends Hack
 				MC.player.jump();
 			
 			// swim up if necessary
-			if(MC.player.isInsideWater() && MC.player.y < entity.y)
+			if(MC.player.isTouchingWater() && MC.player.y < entity.y)
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying

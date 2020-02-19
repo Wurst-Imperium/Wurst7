@@ -42,7 +42,7 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		if(player.horizontalCollision || player.isSneaking())
 			return;
 		
-		if(player.isTouchingWater() || player.isInWater())
+		if(player.isWet() || player.isSubmergedInWater())
 			return;
 		
 		if(player.forwardSpeed > 0)

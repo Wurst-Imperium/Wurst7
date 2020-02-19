@@ -34,7 +34,7 @@ public final class TpCmd extends Command
 		BlockPos pos = argsToPos(args);
 		
 		ClientPlayerEntity player = MC.player;
-		player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		player.updatePosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
