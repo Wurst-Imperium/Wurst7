@@ -68,10 +68,8 @@ public final class GiveCmd extends Command
 			if(amount < 1)
 				throw new CmdError("Amount cannot be less than 1.");
 			
-			if(amount > item.getMaxCount())
-				throw new CmdError(
-					"Amount is larger than the maximum stack size. ("
-						+ item.getMaxCount() + ")");
+			if(amount > 64)
+				throw new CmdError("Amount cannot be more than 64.");
 		}
 		
 		// nbt data

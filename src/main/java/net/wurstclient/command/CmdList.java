@@ -37,7 +37,7 @@ public final class CmdList
 	public final GoToCmd goToCmd = new GoToCmd();
 	public final HelpCmd helpCmd = new HelpCmd();
 	public final InvseeCmd invseeCmd = new InvseeCmd();
-	// public final IpCmd ipCmd = new IpCmd();
+	public final IpCmd ipCmd = new IpCmd();
 	public final JumpCmd jumpCmd = new JumpCmd();
 	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
@@ -46,8 +46,8 @@ public final class CmdList
 	public final ProtectCmd protectCmd = new ProtectCmd();
 	public final RenameCmd renameCmd = new RenameCmd();
 	public final RepairCmd repairCmd = new RepairCmd();
-	// public final RvCmd rvCmd = new RvCmd();
-	// public final SvCmd svCmd = new SvCmd();
+	public final RvCmd rvCmd = new RvCmd();
+	public final SvCmd svCmd = new SvCmd();
 	public final SayCmd sayCmd = new SayCmd();
 	public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
 	public final SetModeCmd setModeCmd = new SetModeCmd();

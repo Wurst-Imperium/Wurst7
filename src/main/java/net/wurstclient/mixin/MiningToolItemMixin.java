@@ -35,13 +35,13 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	}
 	
 	@Override
-	public float getAttackDamage()
+	public float fuckMcAfee1()
 	{
 		return attackDamage;
 	}
 	
 	@Override
-	public float getAttackSpeed()
+	public float fuckMcAfee2()
 	{
 		return attackSpeed;
 	}

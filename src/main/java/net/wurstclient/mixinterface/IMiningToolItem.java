@@ -9,7 +9,15 @@ package net.wurstclient.mixinterface;
 
 public interface IMiningToolItem
 {
-	public float getAttackDamage();
+	/**
+	 * Returns the attack damage. Calling it getAttackDamage() causes a false
+	 * positive from McAfee GW Edition.
+	 */
+	public float fuckMcAfee1();
 	
-	public float getAttackSpeed();
+	/**
+	 * Returns the attack speed. Calling it getAttackSpeed() causes a false
+	 * positive from McAfee GW Edition.
+	 */
+	public float fuckMcAfee2();
 }

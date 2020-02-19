@@ -9,5 +9,9 @@ package net.wurstclient.mixinterface;
 
 public interface ISwordItem
 {
-	public float getAttackSpeed();
+	/**
+	 * Returns the attack speed. Calling it getAttackSpeed() causes a false
+	 * positive from McAfee GW Edition.
+	 */
+	public float fuckMcAfee();
 }

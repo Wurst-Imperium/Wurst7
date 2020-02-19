@@ -17,17 +17,21 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.serverfinder.CleanUpScreen;
 import net.wurstclient.serverfinder.ServerFinderScreen;
+import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(MultiplayerScreen.class)
 public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 {
 	@Shadow
 	protected MultiplayerServerListWidget serverListWidget;
+	
+	private ButtonWidget lastServerButton;
 	
 	private MultiplayerScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -40,11 +44,21 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		return serverListWidget;
 	}
 	
+	@Override
+	public void connectToServer(ServerInfo server)
+	{
+		connect(server);
+	}
+	
 	@Inject(at = {@At("TAIL")}, method = {"init()V"})
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
+		
+		lastServerButton = addButton(new ButtonWidget(width / 2 - 154, 10, 100,
+			20, "Last Server", b -> LastServerRememberer
+				.joinLastServer((MultiplayerScreen)(Object)this)));
 		
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
 			"Server Finder", b -> minecraft.openScreen(
@@ -53,5 +67,24 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
 			"Clean Up", b -> minecraft.openScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
+	}
+	
+	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
+	public void onTick(CallbackInfo ci)
+	{
+		lastServerButton.active = LastServerRememberer.getLastServer() != null;
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"connect(Lnet/minecraft/client/network/ServerInfo;)V"})
+	private void onConnect(ServerInfo entry, CallbackInfo ci)
+	{
+		LastServerRememberer.setLastServer(entry);
+	}
+	
+	@Shadow
+	private void connect(ServerInfo entry)
+	{
+		
 	}
 }

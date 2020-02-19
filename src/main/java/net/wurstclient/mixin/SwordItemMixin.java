@@ -35,7 +35,7 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 	}
 	
 	@Override
-	public float getAttackSpeed()
+	public float fuckMcAfee()
 	{
 		return attackSpeed;
 	}
