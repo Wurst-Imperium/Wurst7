@@ -21,7 +21,7 @@ public class HeldItemRendererMixin
 	@Inject(at = {@At("HEAD")},
 		method = {"renderFireOverlay()V"},
 		cancellable = true)
-	private static void onRenderFireOverlay(CallbackInfo ci)
+	private void onRenderFireOverlay(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.isEnabled())
 			ci.cancel();
@@ -30,7 +30,7 @@ public class HeldItemRendererMixin
 	@Inject(at = {@At("HEAD")},
 		method = {"renderWaterOverlay(F)V"},
 		cancellable = true)
-	private static void onRenderUnderwaterOverlay(float f, CallbackInfo ci)
+	private void onRenderUnderwaterOverlay(float f, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			ci.cancel();
