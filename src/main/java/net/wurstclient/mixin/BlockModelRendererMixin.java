@@ -30,15 +30,15 @@ public abstract class BlockModelRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"tesselateSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z",
-			"tesselateFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z"},
+			"tesselateSmooth(Lnet/minecraft/world/ExtendedBlockView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z",
+			"tesselateFlat(Lnet/minecraft/world/ExtendedBlockView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z"},
 		cancellable = true)
-	private void onTesselateSmoothOrFlat(ExtendedBlockView view,
-		BakedModel model, BlockState state, BlockPos pos, BufferBuilder buffer,
-		boolean testSides, Random random, long l,
+	private void onTesselateSmoothOrFlat(ExtendedBlockView extendedBlockView,
+		BakedModel bakedModel, BlockState blockState, BlockPos blockPos,
+		BufferBuilder bufferBuilder, boolean depthTest, Random random, long l,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		TesselateBlockEvent event = new TesselateBlockEvent(state);
+		TesselateBlockEvent event = new TesselateBlockEvent(blockState);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
 		if(event.isCancelled())
@@ -47,21 +47,22 @@ public abstract class BlockModelRendererMixin
 			return;
 		}
 		
-		if(!testSides)
+		if(!depthTest)
 			return;
 		
-		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState);
 		WurstClient.INSTANCE.getEventManager().fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;
 		
-		tesselateSmooth(view, model, state, pos, buffer, false, random, l);
+		tesselateSmooth(extendedBlockView, bakedModel, blockState, blockPos,
+			bufferBuilder, false, random, l);
 	}
 	
 	@Shadow
-	public boolean tesselateSmooth(ExtendedBlockView view, BakedModel model,
-		BlockState state, BlockPos pos, BufferBuilder buffer, boolean testSides,
-		Random random, long l)
+	public boolean tesselateSmooth(ExtendedBlockView extendedBlockView,
+		BakedModel bakedModel, BlockState blockState, BlockPos blockPos,
+		BufferBuilder bufferBuilder, boolean bl, Random random, long l)
 	{
 		return false;
 	}
