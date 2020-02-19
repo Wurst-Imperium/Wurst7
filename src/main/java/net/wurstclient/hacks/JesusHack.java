@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.Material;
@@ -15,7 +16,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
@@ -157,13 +158,13 @@ public final class JesusHack extends Hack
 		boolean foundSolid = false;
 		
 		// check collision boxes below player
-		ArrayList<Box> blockCollisions = MC.world
-			.method_20812(MC.player,
-				MC.player.getBoundingBox().offset(0, -0.5, 0))
+		ArrayList<BoundingBox> blockCollisions = MC.world
+			.getCollisionShapes(MC.player,
+				MC.player.getBoundingBox().offset(0, -0.5, 0), new HashSet<>())
 			.map(VoxelShape::getBoundingBox)
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 		
-		for(Box bb : blockCollisions)
+		for(BoundingBox bb : blockCollisions)
 		{
 			BlockPos pos = new BlockPos(bb.getCenter());
 			Material material = BlockUtils.getState(pos).getMaterial();

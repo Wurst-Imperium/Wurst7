@@ -23,7 +23,7 @@ import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 
@@ -42,7 +42,7 @@ public final class EditBlockListScreen extends Screen
 	
 	public EditBlockListScreen(Screen prevScreen, BlockListSetting blockList)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		this.blockList = blockList;
 	}
@@ -77,8 +77,8 @@ public final class EditBlockListScreen extends Screen
 				if(b2)
 					blockList.resetToDefaults();
 				minecraft.openScreen(EditBlockListScreen.this);
-			}, new LiteralText("Reset to Defaults"),
-				new LiteralText("Are you sure?")))));
+			}, new TextComponent("Reset to Defaults"),
+				new TextComponent("Are you sure?")))));
 		
 		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28,
 			200, 20, "Done", b -> minecraft.openScreen(prevScreen)));
@@ -287,7 +287,7 @@ public final class EditBlockListScreen extends Screen
 				
 				GL11.glPopMatrix();
 				
-				return stack.getName().asFormattedString();
+				return stack.getCustomName().getFormattedText();
 			}
 		}
 	}

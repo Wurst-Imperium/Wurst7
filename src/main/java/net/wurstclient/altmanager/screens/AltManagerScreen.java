@@ -22,7 +22,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.Alt;
@@ -49,7 +49,7 @@ public final class AltManagerScreen extends Screen
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
-		super(new LiteralText("Alt Manager"));
+		super(new TextComponent("Alt Manager"));
 		this.prevScreen = prevScreen;
 		this.altManager = altManager;
 	}
@@ -61,7 +61,7 @@ public final class AltManagerScreen extends Screen
 		
 		if(altManager.getList().isEmpty() && shouldAsk)
 			minecraft.openScreen(new ConfirmScreen(this::confirmGenerate,
-				new LiteralText("Your alt list is empty."), new LiteralText(
+				new TextComponent("Your alt list is empty."), new TextComponent(
 					"Would you like some random alts to get started?")));
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
@@ -184,11 +184,11 @@ public final class AltManagerScreen extends Screen
 	
 	private void pressDelete()
 	{
-		LiteralText text =
-			new LiteralText("Are you sure you want to remove this alt?");
+		TextComponent text =
+			new TextComponent("Are you sure you want to remove this alt?");
 		
 		String altName = listGui.getSelectedAlt().getNameOrEmail();
-		LiteralText message = new LiteralText(
+		TextComponent message = new TextComponent(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,

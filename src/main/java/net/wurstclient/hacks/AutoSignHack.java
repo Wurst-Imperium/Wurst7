@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.DontSaveState;
@@ -17,7 +17,7 @@ import net.wurstclient.hack.Hack;
 @DontSaveState
 public final class AutoSignHack extends Hack
 {
-	private Text[] signText;
+	private Component[] signText;
 	
 	public AutoSignHack()
 	{
@@ -34,12 +34,12 @@ public final class AutoSignHack extends Hack
 		signText = null;
 	}
 	
-	public Text[] getSignText()
+	public Component[] getSignText()
 	{
 		return signText;
 	}
 	
-	public void setSignText(Text[] signText)
+	public void setSignText(Component[] signText)
 	{
 		if(isEnabled() && this.signText == null)
 			this.signText = signText;

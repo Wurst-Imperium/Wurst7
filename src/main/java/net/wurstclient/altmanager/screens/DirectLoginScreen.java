@@ -9,14 +9,14 @@ package net.wurstclient.altmanager.screens;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.altmanager.LoginManager;
 
 public final class DirectLoginScreen extends AltEditorScreen
 {
 	public DirectLoginScreen(Screen prevScreen)
 	{
-		super(prevScreen, new LiteralText("Direct Login"));
+		super(prevScreen, new TextComponent("Direct Login"));
 	}
 	
 	@Override

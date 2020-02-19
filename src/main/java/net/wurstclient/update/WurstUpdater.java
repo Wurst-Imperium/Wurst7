@@ -7,9 +7,9 @@
  */
 package net.wurstclient.update;
 
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.util.ChatUtils;
@@ -22,7 +22,7 @@ public final class WurstUpdater implements UpdateListener
 {
 	private Thread thread;
 	private boolean outdated;
-	private Text component;
+	private Component component;
 	
 	@Override
 	public void onUpdate()
@@ -101,7 +101,7 @@ public final class WurstUpdater implements UpdateListener
 	
 	private void showLink(String text, String url)
 	{
-		component = new LiteralText(text);
+		component = new TextComponent(text);
 		
 		ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
 		component.getStyle().setClickEvent(event);

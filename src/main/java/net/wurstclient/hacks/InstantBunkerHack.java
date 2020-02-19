@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.packet.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -128,7 +128,8 @@ public final class InstantBunkerHack extends Hack
 		{
 			for(BlockPos pos : positions)
 				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
-					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
+					&& !MC.player.getBoundingBox()
+						.intersects(new BoundingBox(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
 			

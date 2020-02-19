@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 
@@ -19,7 +19,8 @@ public enum RenderUtils
 {
 	;
 	
-	private static final Box DEFAULT_AABB = new Box(0, 0, 0, 1, 1, 1);
+	private static final BoundingBox DEFAULT_AABB =
+		new BoundingBox(0, 0, 0, 1, 1, 1);
 	
 	public static void scissorBox(int startX, int startY, int endX, int endY)
 	{
@@ -61,7 +62,7 @@ public enum RenderUtils
 		drawSolidBox(DEFAULT_AABB);
 	}
 	
-	public static void drawSolidBox(Box bb)
+	public static void drawSolidBox(BoundingBox bb)
 	{
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
@@ -101,7 +102,7 @@ public enum RenderUtils
 		drawOutlinedBox(DEFAULT_AABB);
 	}
 	
-	public static void drawOutlinedBox(Box bb)
+	public static void drawOutlinedBox(BoundingBox bb)
 	{
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
@@ -147,7 +148,7 @@ public enum RenderUtils
 		drawCrossBox(DEFAULT_AABB);
 	}
 	
-	public static void drawCrossBox(Box bb)
+	public static void drawCrossBox(BoundingBox bb)
 	{
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
@@ -188,7 +189,7 @@ public enum RenderUtils
 		GL11.glEnd();
 	}
 	
-	public static void drawNode(Box bb)
+	public static void drawNode(BoundingBox bb)
 	{
 		double midX = (bb.minX + bb.maxX) / 2;
 		double midY = (bb.minY + bb.maxY) / 2;

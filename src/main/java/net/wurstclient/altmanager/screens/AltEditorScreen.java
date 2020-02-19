@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.SystemUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
@@ -41,7 +41,7 @@ public abstract class AltEditorScreen extends Screen
 	protected String message = "";
 	private int errorTimer;
 	
-	public AltEditorScreen(Screen prevScreen, Text title)
+	public AltEditorScreen(Screen prevScreen, Component title)
 	{
 		super(title);
 		this.prevScreen = prevScreen;

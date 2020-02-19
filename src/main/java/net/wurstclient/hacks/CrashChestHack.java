@@ -11,7 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -58,7 +58,7 @@ public final class CrashChestHack extends Hack
 			nbtList.add(new ListTag());
 		nbtCompound.put("www.wurstclient.net", nbtList);
 		stack.setTag(nbtCompound);
-		stack.setCustomName(new LiteralText("Copy Me"));
+		stack.setCustomName(new TextComponent("Copy Me"));
 		
 		// give item
 		MC.player.inventory.armor.set(0, stack);

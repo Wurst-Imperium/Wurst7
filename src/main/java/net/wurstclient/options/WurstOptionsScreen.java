@@ -15,7 +15,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.SystemUtil;
 import net.minecraft.util.SystemUtil.OperatingSystem;
 import net.wurstclient.WurstClient;
@@ -30,7 +30,7 @@ public class WurstOptionsScreen extends Screen
 	
 	public WurstOptionsScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 	}
 	

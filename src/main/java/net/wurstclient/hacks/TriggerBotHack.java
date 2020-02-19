@@ -27,7 +27,7 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -167,7 +167,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 				if(!(e instanceof PlayerEntity))
 					return true;
 				
-				Box box = e.getBoundingBox();
+				BoundingBox box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 				return world.doesNotCollide(box);
 			});

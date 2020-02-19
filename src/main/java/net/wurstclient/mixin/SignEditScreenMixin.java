@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoSignHack;
 
@@ -26,7 +26,7 @@ public abstract class SignEditScreenMixin extends Screen
 	@Shadow
 	private SignBlockEntity sign;
 	
-	private SignEditScreenMixin(WurstClient wurst, Text text_1)
+	private SignEditScreenMixin(WurstClient wurst, Component text_1)
 	{
 		super(text_1);
 	}
@@ -36,7 +36,7 @@ public abstract class SignEditScreenMixin extends Screen
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
 		
-		Text[] autoSignText = autoSignHack.getSignText();
+		Component[] autoSignText = autoSignHack.getSignText();
 		if(autoSignText == null)
 			return;
 		

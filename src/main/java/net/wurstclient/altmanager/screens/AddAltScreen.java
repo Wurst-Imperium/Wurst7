@@ -8,7 +8,7 @@
 package net.wurstclient.altmanager.screens;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.altmanager.AltManager;
 
 public final class AddAltScreen extends AltEditorScreen
@@ -17,7 +17,7 @@ public final class AddAltScreen extends AltEditorScreen
 	
 	public AddAltScreen(Screen prevScreen, AltManager altManager)
 	{
-		super(prevScreen, new LiteralText("New Alt"));
+		super(prevScreen, new TextComponent("New Alt"));
 		this.altManager = altManager;
 	}
 	

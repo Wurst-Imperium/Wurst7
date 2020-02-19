@@ -31,7 +31,7 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -176,7 +176,7 @@ public final class KillauraLegitHack extends Hack
 				if(!(e instanceof PlayerEntity))
 					return true;
 				
-				Box box = e.getBoundingBox();
+				BoundingBox box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 				return world.doesNotCollide(box);
 			});
@@ -237,7 +237,7 @@ public final class KillauraLegitHack extends Hack
 		Vec3d lookVec = RotationUtils.getServerLookVec();
 		
 		// try to face center of boundingBox
-		Box bb = entity.getBoundingBox();
+		BoundingBox bb = entity.getBoundingBox();
 		if(faceVectorClient(bb.getCenter()))
 			return true;
 		
@@ -286,7 +286,7 @@ public final class KillauraLegitHack extends Hack
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		Box box = new Box(BlockPos.ORIGIN);
+		BoundingBox box = new BoundingBox(BlockPos.ORIGIN);
 		float p = (target.getHealthMaximum() - target.getHealth())
 			/ target.getHealthMaximum();
 		float red = p * 2F;

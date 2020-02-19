@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
@@ -31,7 +31,7 @@ public final class KeybindManagerScreen extends Screen
 	
 	public KeybindManagerScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 	}
 	
@@ -59,8 +59,9 @@ public final class KeybindManagerScreen extends Screen
 					WurstClient.INSTANCE.getKeybinds()
 						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
 				minecraft.openScreen(this);
-			}, new LiteralText("Are you sure you want to reset your keybinds?"),
-				new LiteralText("This cannot be undone!")))));
+			}, new TextComponent(
+				"Are you sure you want to reset your keybinds?"),
+				new TextComponent("This cannot be undone!")))));
 	}
 	
 	private void edit()

@@ -19,7 +19,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.SystemUtil;
 import net.wurstclient.settings.FileSetting;
 
@@ -33,7 +33,7 @@ public final class SelectFileScreen extends Screen
 	
 	public SelectFileScreen(Screen prevScreen, FileSetting blockList)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		setting = blockList;
 	}
@@ -84,9 +84,9 @@ public final class SelectFileScreen extends Screen
 	
 	private void askToConfirmReset()
 	{
-		LiteralText title = new LiteralText("Reset Folder");
+		TextComponent title = new TextComponent("Reset Folder");
 		
-		LiteralText message = new LiteralText(
+		TextComponent message = new TextComponent(
 			"This will empty the '" + setting.getFolder().getFileName()
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");

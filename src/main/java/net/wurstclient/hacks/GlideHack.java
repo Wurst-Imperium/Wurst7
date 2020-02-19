@@ -14,7 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
@@ -72,7 +72,7 @@ public final class GlideHack extends Hack implements UpdateListener
 		
 		if(minHeight.getValue() > 0)
 		{
-			Box box = player.getBoundingBox();
+			BoundingBox box = player.getBoundingBox();
 			box = box.union(box.offset(0, -minHeight.getValue(), 0));
 			if(!MC.world.doesNotCollide(box))
 				return;

@@ -18,13 +18,13 @@ import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 
 @Mixin(StatsScreen.class)
 public abstract class StatsScreenMixin extends Screen implements StatsListener
 {
-	private StatsScreenMixin(WurstClient wurst, Text text_1)
+	private StatsScreenMixin(WurstClient wurst, Component text_1)
 	{
 		super(text_1);
 	}

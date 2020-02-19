@@ -8,12 +8,13 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
@@ -83,18 +84,20 @@ public final class StepHack extends Hack implements UpdateListener
 		if(player.input.jumping)
 			return;
 		
-		Box box = player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
+		BoundingBox box =
+			player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
 		
 		if(!MC.world.doesNotCollide(player, box.offset(0, 1, 0)))
 			return;
 		
 		double stepHeight = -1;
 		
-		ArrayList<Box> blockCollisions =
-			MC.world.method_20812(player, box).map(VoxelShape::getBoundingBox)
+		ArrayList<BoundingBox> blockCollisions =
+			MC.world.getCollisionShapes(player, box, new HashSet<>())
+				.map(VoxelShape::getBoundingBox)
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 		
-		for(Box bb : blockCollisions)
+		for(BoundingBox bb : blockCollisions)
 			if(bb.maxY > stepHeight)
 				stepHeight = bb.maxY;
 			

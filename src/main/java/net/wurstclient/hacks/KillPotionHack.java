@@ -11,8 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.packet.CreativeInventoryActionC2SPacket;
-import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -55,7 +55,7 @@ public final class KillPotionHack extends Hack
 		nbt.put("CustomPotionEffects", effects);
 		stack.setTag(nbt);
 		String name = "\u00a7rSplash Potion of \u00a74\u00a7lINSTANT DEATH";
-		stack.setCustomName(new LiteralText(name));
+		stack.setCustomName(new TextComponent(name));
 		
 		// give potion
 		if(placeStackInHotbar(stack))

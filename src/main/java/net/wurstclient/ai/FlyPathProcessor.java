@@ -10,7 +10,7 @@ package net.wurstclient.ai;
 import java.util.ArrayList;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -35,9 +35,9 @@ public class FlyPathProcessor extends PathProcessor
 		Vec3d posVec = MC.player.getPos();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
-		Box nextBox = new Box(nextPos.getX() + 0.3, nextPos.getY(),
-			nextPos.getZ() + 0.3, nextPos.getX() + 0.7, nextPos.getY() + 0.2,
-			nextPos.getZ() + 0.7);
+		BoundingBox nextBox = new BoundingBox(nextPos.getX() + 0.3,
+			nextPos.getY(), nextPos.getZ() + 0.3, nextPos.getX() + 0.7,
+			nextPos.getY() + 0.2, nextPos.getZ() + 0.7);
 		
 		if(posIndex == -1)
 			ticksOffPath++;

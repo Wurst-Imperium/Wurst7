@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.DeathListener.DeathEvent;
 
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen
 {
-	private DeathScreenMixin(WurstClient wurst, Text text_1)
+	private DeathScreenMixin(WurstClient wurst, Component text_1)
 	{
 		super(text_1);
 	}

@@ -163,6 +163,6 @@ public final class BlockComponent extends Component
 		if(stack.isEmpty())
 			return "\u00a7ounknown block\u00a7r";
 		else
-			return stack.getName().asFormattedString();
+			return stack.getCustomName().getFormattedText();
 	}
 }

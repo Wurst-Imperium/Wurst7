@@ -19,7 +19,7 @@ import net.minecraft.container.GenericContainer;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
@@ -37,7 +37,7 @@ public abstract class ContainerScreen54Mixin
 	private int mode;
 	
 	public ContainerScreen54Mixin(WurstClient wurst, GenericContainer container,
-		PlayerInventory playerInventory, Text name)
+		PlayerInventory playerInventory, Component name)
 	{
 		super(container, playerInventory, name);
 	}

@@ -26,7 +26,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -139,7 +139,7 @@ public final class RemoteViewHack extends Hack
 					if(!(e instanceof PlayerEntity))
 						return true;
 					
-					Box box = e.getBoundingBox();
+					BoundingBox box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 					return MC.world.doesNotCollide(box);
 				});
@@ -202,7 +202,7 @@ public final class RemoteViewHack extends Hack
 		fakePlayer = new FakePlayerEntity();
 		
 		// success message
-		ChatUtils.message("Now viewing " + entity.getName().asString() + ".");
+		ChatUtils.message("Now viewing " + entity.getName().getText() + ".");
 		
 		// add listener
 		EVENTS.add(UpdateListener.class, this);
@@ -220,7 +220,7 @@ public final class RemoteViewHack extends Hack
 		if(entity != null)
 		{
 			ChatUtils.message(
-				"No longer viewing " + entity.getName().asString() + ".");
+				"No longer viewing " + entity.getName().getText() + ".");
 			entity.setInvisible(wasInvisible);
 			entity = null;
 		}
@@ -247,7 +247,7 @@ public final class RemoteViewHack extends Hack
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> viewName.equalsIgnoreCase(e.getName().asString()))
+				.filter(e -> viewName.equalsIgnoreCase(e.getName().getText()))
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);

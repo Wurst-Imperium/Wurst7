@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -22,8 +22,8 @@ import net.wurstclient.util.RenderUtils;
 @SearchTags({"prophunt esp"})
 public final class ProphuntEspHack extends Hack implements RenderListener
 {
-	private static final Box FAKE_BLOCK_BOX =
-		new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+	private static final BoundingBox FAKE_BLOCK_BOX =
+		new BoundingBox(-0.5, 0, -0.5, 0.5, 1, 0.5);
 	
 	public ProphuntEspHack()
 	{

@@ -28,7 +28,7 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -132,7 +132,7 @@ public final class ProtectHack extends Hack
 	public String getRenderName()
 	{
 		if(friend != null)
-			return "Protecting " + friend.getName().asString();
+			return "Protecting " + friend.getName().getText();
 		else
 			return "Protect";
 	}
@@ -226,7 +226,7 @@ public final class ProtectHack extends Hack
 				if(!(e instanceof PlayerEntity))
 					return true;
 				
-				Box box = e.getBoundingBox();
+				BoundingBox box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 				return MC.world.doesNotCollide(box);
 			});

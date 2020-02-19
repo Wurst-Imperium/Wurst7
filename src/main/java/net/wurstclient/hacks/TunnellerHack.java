@@ -28,7 +28,7 @@ import net.minecraft.server.network.packet.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -213,7 +213,7 @@ public final class TunnellerHack extends Hack
 				GL11.glTranslated(-0.5, -0.5, -0.5);
 			}
 			
-			Box box2 = new Box(BlockPos.ORIGIN);
+			BoundingBox box2 = new BoundingBox(BlockPos.ORIGIN);
 			GL11.glColor4f(red, green, 0, 0.25F);
 			RenderUtils.drawSolidBox(box2);
 			GL11.glColor4f(red, green, 0, 0.5F);
@@ -240,7 +240,8 @@ public final class TunnellerHack extends Hack
 		
 		GL11.glColor4f(0, 1, 1, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
-		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
+		RenderUtils
+			.drawNode(new BoundingBox(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
 		GL11.glEnd();
 		
 		RenderUtils.drawArrow(new Vec3d(direction.getVector()).multiply(0.25),
@@ -301,7 +302,7 @@ public final class TunnellerHack extends Hack
 			Collections.reverse(blocks);
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			BoundingBox box = new BoundingBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			GL11.glColor4f(0, 1, 0, 0.5F);
 			for(BlockPos pos : blocks)
 			{
@@ -399,7 +400,7 @@ public final class TunnellerHack extends Hack
 					blocks.add(pos);
 				
 			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			BoundingBox box = new BoundingBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			GL11.glColor4f(1, 1, 0, 0.5F);
 			for(BlockPos pos : blocks)
 			{
@@ -533,7 +534,7 @@ public final class TunnellerHack extends Hack
 			ChatUtils.error("The tunnel is flooded, cannot continue.");
 			
 			GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			BoundingBox box = new BoundingBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			GL11.glColor4f(1, 0, 0, 0.5F);
 			for(BlockPos pos : liquids)
 			{

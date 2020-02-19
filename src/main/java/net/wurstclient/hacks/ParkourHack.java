@@ -7,9 +7,10 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.HashSet;
 import java.util.stream.Stream;
 
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
@@ -49,11 +50,12 @@ public final class ParkourHack extends Hack implements UpdateListener
 		if(MC.player.isSneaking() || MC.options.keySneak.isPressed())
 			return;
 		
-		Box box = MC.player.getBoundingBox();
-		Box adjustedBox = box.offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
+		BoundingBox box = MC.player.getBoundingBox();
+		BoundingBox adjustedBox =
+			box.offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
 		
-		Stream<VoxelShape> blockCollisions =
-			MC.world.method_20812(MC.player, adjustedBox);
+		Stream<VoxelShape> blockCollisions = MC.world
+			.getCollisionShapes(MC.player, adjustedBox, new HashSet<>());
 		
 		if(blockCollisions.findAny().isPresent())
 			return;

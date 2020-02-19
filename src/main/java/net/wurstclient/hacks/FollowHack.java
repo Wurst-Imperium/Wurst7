@@ -27,7 +27,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -132,7 +132,7 @@ public final class FollowHack extends Hack
 	public String getRenderName()
 	{
 		if(entity != null)
-			return "Following " + entity.getName().asString();
+			return "Following " + entity.getName().getText();
 		else
 			return "Follow";
 	}
@@ -162,7 +162,7 @@ public final class FollowHack extends Hack
 					if(!(e instanceof PlayerEntity))
 						return true;
 					
-					Box box = e.getBoundingBox();
+					BoundingBox box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 					return MC.world.doesNotCollide(box);
 				});
@@ -217,7 +217,7 @@ public final class FollowHack extends Hack
 		pathFinder = new EntityPathFinder();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		ChatUtils.message("Now following " + entity.getName().asString());
+		ChatUtils.message("Now following " + entity.getName().getText());
 	}
 	
 	@Override
@@ -233,7 +233,7 @@ public final class FollowHack extends Hack
 		
 		if(entity != null)
 			ChatUtils
-				.message("No longer following " + entity.getName().asString());
+				.message("No longer following " + entity.getName().getText());
 		
 		entity = null;
 	}
@@ -259,8 +259,8 @@ public final class FollowHack extends Hack
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> entity.getName().asString()
-					.equalsIgnoreCase(e.getName().asString()))
+				.filter(e -> entity.getName().getText()
+					.equalsIgnoreCase(e.getName().getText()))
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);

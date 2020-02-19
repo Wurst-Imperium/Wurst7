@@ -227,7 +227,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		String message = event.getComponent().asString();
+		String message = event.getComponent().getText();
 		if(message.startsWith("\u00a7c[\u00a76Wurst\u00a7c]\u00a7f "))
 			return;
 		

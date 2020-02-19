@@ -34,7 +34,7 @@ import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
@@ -97,8 +97,8 @@ public final class BowAimbotHack extends Hack
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
 	
-	private static final Box TARGET_BOX =
-		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
+	private static final BoundingBox TARGET_BOX =
+		new BoundingBox(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
 	
 	private Entity target;
 	private float velocity;
@@ -191,7 +191,7 @@ public final class BowAimbotHack extends Hack
 				if(!(e instanceof PlayerEntity))
 					return true;
 				
-				Box box = e.getBoundingBox();
+				BoundingBox box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 				return MC.world.doesNotCollide(box);
 			});

@@ -10,7 +10,7 @@ package net.wurstclient.options;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 
 public final class KeybindEditorScreen extends Screen
@@ -26,7 +26,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		
 		key = "NONE";
@@ -36,7 +36,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen, String key, String commands)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		this.prevScreen = prevScreen;
 		
 		this.key = key;

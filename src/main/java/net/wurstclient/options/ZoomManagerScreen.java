@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.ZoomOtf;
 import net.wurstclient.settings.CheckboxSetting;
@@ -25,7 +25,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	
 	public ZoomManagerScreen(Screen par1GuiScreen)
 	{
-		super(new LiteralText(""));
+		super(new TextComponent(""));
 		prevScreen = par1GuiScreen;
 	}
 	
@@ -35,8 +35,8 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
-		String zoomKeyName = WurstClient.INSTANCE.getZoomKey().getBoundKey()
-			.getName().replace("key.keyboard.", "");
+		String zoomKeyName = WurstClient.INSTANCE.getZoomKey().getName()
+			.replace("key.keyboard.", "");
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
 			20, "Back", b -> minecraft.openScreen(prevScreen)));

@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
 import net.wurstclient.util.LastServerRememberer;
@@ -36,7 +36,7 @@ public class DisconnectedScreenMixin extends Screen
 	@Shadow
 	private int reasonHeight;
 	
-	private DisconnectedScreenMixin(WurstClient wurst, Text text_1)
+	private DisconnectedScreenMixin(WurstClient wurst, Component text_1)
 	{
 		super(text_1);
 	}

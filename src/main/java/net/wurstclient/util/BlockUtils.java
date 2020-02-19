@@ -16,7 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -75,7 +75,7 @@ public enum BlockUtils
 		return getState(pos).getOutlineShape(MC.world, pos);
 	}
 	
-	public static Box getBoundingBox(BlockPos pos)
+	public static BoundingBox getBoundingBox(BlockPos pos)
 	{
 		return getOutlineShape(pos).getBoundingBox().offset(pos);
 	}
