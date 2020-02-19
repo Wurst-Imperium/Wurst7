@@ -99,6 +99,17 @@ public abstract class GameRendererMixin
 		return 0;
 	}
 	
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"bobViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V"},
+		cancellable = true)
+	private void onBobViewWhenHurt(MatrixStack matrixStack, float f,
+		CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
+			ci.cancel();
+	}
+	
 	@Shadow
 	private void bobView(MatrixStack matrixStack, float partalTicks)
 	{

@@ -22,7 +22,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.BlockListSetting;
@@ -164,6 +163,7 @@ public final class EditBlockListScreen extends Screen
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
+		GL11.glTranslated(0, 0, 300);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
 			drawString(minecraft.textRenderer, "block name or ID", 68,
@@ -176,7 +176,7 @@ public final class EditBlockListScreen extends Screen
 		fill(244, height - 56, 246, height - 36, 0xffa0a0a0);
 		fill(214, height - 55, 243, height - 52, 0xff000000);
 		fill(214, height - 40, 243, height - 37, 0xff000000);
-		fill(215, height - 55, 216, height - 37, 0xff000000);
+		fill(214, height - 55, 216, height - 37, 0xff000000);
 		fill(242, height - 55, 245, height - 37, 0xff000000);
 		listGui.renderIconAndGetName(new ItemStack(blockToAdd), 52, height - 52,
 			false);
@@ -270,7 +270,7 @@ public final class EditBlockListScreen extends Screen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
-				return TextFormat.ITALIC + "unknown block" + TextFormat.RESET;
+				return "\u00a7ounknown block\u00a7r";
 				
 			}else
 			{

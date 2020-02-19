@@ -18,4 +18,6 @@ public interface IClientPlayerEntity
 	public float getLastPitch();
 	
 	public void setMovementMultiplier(Vec3d movementMultiplier);
+	
+	public boolean isTouchingWaterBypass();
 }

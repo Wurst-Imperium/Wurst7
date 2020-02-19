@@ -98,6 +98,12 @@ public enum RotationUtils
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
 	
+	public static float getHorizontalAngleToLookVec(Vec3d vec)
+	{
+		Rotation needed = getNeededRotations(vec);
+		return MathHelper.wrapDegrees(WurstClient.MC.player.yaw) - needed.yaw;
+	}
+	
 	public static final class Rotation
 	{
 		private final float yaw;

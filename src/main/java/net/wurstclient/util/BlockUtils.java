@@ -85,9 +85,14 @@ public enum BlockUtils
 		return getOutlineShape(pos) != VoxelShapes.empty();
 	}
 	
-	public static ArrayList<BlockPos> getAllInBox(BlockPos min, BlockPos max)
+	public static ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)
 	{
 		ArrayList<BlockPos> blocks = new ArrayList<>();
+		
+		BlockPos min = new BlockPos(Math.min(from.getX(), to.getX()),
+			Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
+		BlockPos max = new BlockPos(Math.max(from.getX(), to.getX()),
+			Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
 		
 		for(int x = min.getX(); x <= max.getX(); x++)
 			for(int y = min.getY(); y <= max.getY(); y++)

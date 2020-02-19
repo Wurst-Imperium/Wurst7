@@ -62,6 +62,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			new ArrayList<>(Arrays.asList(oldCommands.replace(";", "\u00a7")
 				.replace("\u00a7\u00a7", ";").split("\u00a7")));
 		
+		for(int i = 0; i < commandsList.size(); i++)
+			commandsList.set(i, commandsList.get(i).trim());
+		
 		String command = existingKeybinds.get(selectedKey).getCommand();
 		while(commandsList.contains(command))
 			commandsList.remove(command);

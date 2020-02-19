@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,15 +48,12 @@ public final class NukerHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		TextFormat.BOLD + "Normal" + TextFormat.RESET
-			+ " mode simply breaks everything\n" + "around you.\n"
-			+ TextFormat.BOLD + "ID" + TextFormat.RESET
-			+ " mode only breaks the selected block\n"
-			+ "type. Left-click on a block to select it.\n" + TextFormat.BOLD
-			+ "Flat" + TextFormat.RESET
-			+ " mode flattens the area around you,\n" + "but won't dig down.\n"
-			+ TextFormat.BOLD + "Smash" + TextFormat.RESET
-			+ " mode only breaks blocks that\n"
+		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
+			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
+			+ "type. Left-click on a block to select it.\n"
+			+ "\u00a7lFlat\u00a7r mode flattens the area around you,\n"
+			+ "but won't dig down.\n"
+			+ "\u00a7lSmash\u00a7r mode only breaks blocks that\n"
 			+ "can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	
@@ -85,6 +81,10 @@ public final class NukerHack extends Hack
 	protected void onEnable()
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
+		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
@@ -242,6 +242,16 @@ public final class NukerHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 	
 	private enum Mode

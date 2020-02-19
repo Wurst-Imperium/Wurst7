@@ -91,7 +91,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		if(!hasAppliedNightVision)
 			return;
 		
-		MC.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+		MC.player.removeStatusEffectInternal(StatusEffects.NIGHT_VISION);
 		hasAppliedNightVision = false;
 	}
 	

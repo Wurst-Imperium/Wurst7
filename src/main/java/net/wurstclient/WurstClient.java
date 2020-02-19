@@ -50,7 +50,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.0pre24";
+	public static final String VERSION = "7.0";
 	public static final String MC_VERSION = "1.15.1";
 	
 	private WurstAnalytics analytics;
@@ -136,6 +136,7 @@ public enum WurstClient
 		zoomKey =
 			FabricKeyBinding.Builder.create(new Identifier("wurst", "zoom"),
 				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "Zoom").build();
+		KeyBindingRegistry.INSTANCE.addCategory("Zoom");
 		KeyBindingRegistry.INSTANCE.register(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
@@ -271,6 +272,12 @@ public enum WurstClient
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		
+		if(!enabled)
+		{
+			hax.panicHack.setEnabled(true);
+			hax.panicHack.onUpdate();
+		}
 	}
 	
 	public WurstUpdater getUpdater()

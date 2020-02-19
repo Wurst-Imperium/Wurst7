@@ -99,6 +99,15 @@ public final class AutoToolHack extends Hack
 		prevSelectedSlot = -1;
 	}
 	
+	public void equipIfEnabled(BlockPos pos)
+	{
+		if(!isEnabled())
+			return;
+		
+		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
+			repairMode.isChecked());
+	}
+	
 	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
 		boolean repairMode)
 	{
