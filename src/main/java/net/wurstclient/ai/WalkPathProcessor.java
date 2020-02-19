@@ -78,13 +78,13 @@ public class WalkPathProcessor extends PathProcessor
 		{
 			// wait for Jesus to swim up
 			if(WurstClient.MC.player.getY() < nextPos.getY()
-				&& (WurstClient.MC.player.isInsideWater()
+				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()))
 				return;
 			
 			// manually swim down if using Jesus
 			if(WurstClient.MC.player.getY() - nextPos.getY() > 0.5
-				&& (WurstClient.MC.player.isInsideWater()
+				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()
 					|| WURST.getHax().jesusHack.isOverLiquid()))
 				MC.options.keySneak.setPressed(true);

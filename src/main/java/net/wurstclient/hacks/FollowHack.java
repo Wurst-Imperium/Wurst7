@@ -312,7 +312,7 @@ public final class FollowHack extends Hack
 				MC.player.jump();
 			
 			// swim up if necessary
-			if(MC.player.isInsideWater() && MC.player.getY() < entity.getY())
+			if(MC.player.isTouchingWater() && MC.player.getY() < entity.getY())
 				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
 			
 			// control height if flying

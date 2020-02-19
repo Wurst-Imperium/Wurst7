@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -73,7 +73,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 		if(!MC.player.onGround)
 			return;
 		
-		if(MC.player.isInsideWater() || MC.player.isInLava())
+		if(MC.player.isTouchingWater() || MC.player.isInLava())
 			return;
 		
 		switch(mode.getSelected())

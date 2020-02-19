@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;

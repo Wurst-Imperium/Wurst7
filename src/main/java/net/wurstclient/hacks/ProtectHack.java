@@ -311,7 +311,7 @@ public final class ProtectHack extends Hack
 				MC.player.jump();
 			
 			// swim up if necessary
-			if(MC.player.isInsideWater() && MC.player.getY() < target.getY())
+			if(MC.player.isTouchingWater() && MC.player.getY() < target.getY())
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying

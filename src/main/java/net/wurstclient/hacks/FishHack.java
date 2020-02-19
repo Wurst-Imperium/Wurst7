@@ -41,7 +41,7 @@ public final class FishHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		if(!player.isTouchingWater() || player.isSneaking())
+		if(!player.isWet() || player.isSneaking())
 			return;
 		
 		Vec3d velocity = player.getVelocity();
