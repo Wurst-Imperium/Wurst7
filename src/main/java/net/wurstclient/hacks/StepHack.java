@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
@@ -72,7 +72,7 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!player.horizontalCollision)
 			return;
 		
-		if(!player.onGround || player.isClimbing() || player.isTouchingWater()
+		if(!player.onGround || player.isClimbing() || player.isInsideWater()
 			|| player.isInLava())
 			return;
 		
@@ -113,7 +113,7 @@ public final class StepHack extends Hack implements UpdateListener
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
 			player.onGround));
 		
-		player.updatePosition(player.getX(), player.getY() + 1 * stepHeight,
+		player.setPosition(player.getX(), player.getY() + 1 * stepHeight,
 			player.getZ());
 	}
 	

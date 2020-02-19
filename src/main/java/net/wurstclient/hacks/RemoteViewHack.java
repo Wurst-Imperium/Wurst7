@@ -25,7 +25,7 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -193,7 +193,7 @@ public final class RemoteViewHack extends Hack
 		}
 		
 		// save old data
-		wasInvisible = entity.isInvisibleTo(MC.player);
+		wasInvisible = entity.canSeePlayer(MC.player);
 		
 		// enable NoClip
 		MC.player.noClip = true;

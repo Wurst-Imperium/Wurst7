@@ -29,6 +29,6 @@ public abstract class LivingEntityRendererMixin
 		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
 			return false;
 		
-		return e.isInvisibleTo(player);
+		return e.canSeePlayer(player);
 	}
 }

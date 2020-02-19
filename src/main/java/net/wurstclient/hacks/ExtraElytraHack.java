@@ -11,7 +11,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.server.network.packet.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -77,7 +77,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		if(MC.player.isFallFlying())
 		{
-			if(stopInWater.isChecked() && MC.player.isTouchingWater())
+			if(stopInWater.isChecked() && MC.player.isInsideWater())
 			{
 				sendStartStopPacket();
 				return;
