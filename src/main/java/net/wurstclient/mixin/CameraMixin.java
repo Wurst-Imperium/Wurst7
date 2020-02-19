@@ -19,7 +19,7 @@ import net.wurstclient.WurstClient;
 public abstract class CameraMixin
 {
 	@Inject(at = {@At("HEAD")},
-		method = {"clipToSpace(D)D"},
+		method = {"method_19318(D)D"},
 		cancellable = true)
 	private void onClipToSpace(double desiredCameraDistance,
 		CallbackInfoReturnable<Double> cir)
