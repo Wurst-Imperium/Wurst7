@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -87,13 +87,13 @@ public final class TacoCmd extends Command
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
-		// TODO: RainbowUI
-		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
-		// {
-		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		// GL11.glColor4f(acColor[0], acColor[1], acColor[2], 1);
-		// }else
-		GL11.glColor4f(1, 1, 1, 1);
+		if(WURST.getHax().rainbowUiHack.isEnabled())
+		{
+			float[] acColor = WURST.getGui().getAcColor();
+			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 1);
+			
+		}else
+			GL11.glColor4f(1, 1, 1, 1);
 		
 		MC.getTextureManager().bindTexture(tacos[ticks / 8]);
 		Window sr = MC.window;

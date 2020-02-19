@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -58,9 +58,9 @@ public final class MobSpawnEspHack extends Hack
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n"
-				+ "\u00a7eyellow\u00a7r - mobs can spawn at night\n"
-				+ "\u00a7cred\u00a7r - mobs can always spawn");
+			"Highlights areas where mobs can spawn.\n" + "\u00a7eyellow\u00a7r"
+				+ " - mobs can spawn at night\n" + "\u00a7cred\u00a7r"
+				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
@@ -176,7 +176,7 @@ public final class MobSpawnEspHack extends Hack
 		if(player == null || world == null)
 			return;
 		
-		Packet packet = event.getPacket();
+		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
 		if(packet instanceof BlockUpdateS2CPacket)
@@ -254,7 +254,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	private class ChunkScanner
 	{
-		public Future future;
+		public Future<?> future;
 		private final Chunk chunk;
 		private final Set<BlockPos> red = new HashSet<>();
 		private final Set<BlockPos> yellow = new HashSet<>();

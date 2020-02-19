@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,16 +20,16 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
 
 @Mixin(ClientConnection.class)
-public class ClientConnectionMixin
+public abstract class ClientConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/network/ClientConnection;handlePacket(Lnet/minecraft/network/Packet;Lnet/minecraft/network/listener/PacketListener;)V",
 		ordinal = 0)},
 		method = {
-			"method_10770(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V"},
+			"channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V"},
 		cancellable = true)
-	private void onMethod_10770(ChannelHandlerContext channelHandlerContext,
+	private void onChannelRead0(ChannelHandlerContext channelHandlerContext,
 		Packet<?> packet, CallbackInfo ci)
 	{
 		PacketInputEvent event = new PacketInputEvent(packet);
@@ -37,12 +37,5 @@ public class ClientConnectionMixin
 		
 		if(event.isCancelled())
 			ci.cancel();
-	}
-	
-	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, Packet<?> msg)
-		throws Exception
-	{
-		throw new RuntimeException();
 	}
 }

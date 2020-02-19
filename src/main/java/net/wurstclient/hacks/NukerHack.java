@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -81,6 +81,10 @@ public final class NukerHack extends Hack
 	protected void onEnable()
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
+		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
@@ -238,6 +242,16 @@ public final class NukerHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 	
 	private enum Mode

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,8 +7,9 @@
  */
 package net.wurstclient.mixin;
 
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -34,5 +35,24 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 		
 		if(!event.isCancelled())
 			entity.setVelocity(velocity);
+	}
+	
+	@Redirect(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/entity/Entity;isSneaking()Z",
+			opcode = Opcodes.INVOKEVIRTUAL,
+			ordinal = 0),
+		method = {
+			"adjustMovementForSneaking(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/MovementType;)Lnet/minecraft/util/math/Vec3d;"})
+	private boolean isSafeWalkSneaking(Entity entity)
+	{
+		return entity.isSneaking()
+			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+	}
+	
+	@Shadow
+	public boolean isSneaking()
+	{
+		return false;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,8 @@
  */
 package net.wurstclient.other_features;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.GameOptions;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.MouseScrollListener;
 import net.wurstclient.other_feature.OtherFeature;
@@ -27,6 +29,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		true);
 	
 	private Double currentLevel;
+	private Double defaultMouseSensitivity;
 	
 	public ZoomOtf()
 	{
@@ -40,14 +43,32 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	public double changeFovBasedOnZoom(double fov)
 	{
+		GameOptions gameOptions = MinecraftClient.getInstance().options;
+		
 		if(currentLevel == null)
 			currentLevel = level.getValue();
 		
 		if(!WURST.getZoomKey().isPressed())
 		{
 			currentLevel = level.getValue();
+			
+			if(defaultMouseSensitivity != null)
+			{
+				gameOptions.mouseSensitivity = defaultMouseSensitivity;
+				defaultMouseSensitivity = null;
+			}
+			
 			return fov;
 		}
+		
+		if(defaultMouseSensitivity == null)
+			defaultMouseSensitivity = gameOptions.mouseSensitivity;
+			
+		// Adjust mouse sensitivity in relation to zoom level.
+		// (fov / currentLevel) / fov is a value between 0.02 (50x zoom)
+		// and 1 (no zoom).
+		gameOptions.mouseSensitivity =
+			defaultMouseSensitivity * (fov / currentLevel / fov);
 		
 		return fov / currentLevel;
 	}

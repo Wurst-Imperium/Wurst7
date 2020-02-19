@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -36,9 +36,19 @@ public enum RenderUtils
 	
 	public static void applyRenderOffset()
 	{
-		GL11.glTranslated(-BlockEntityRenderDispatcher.renderOffsetX,
-			-BlockEntityRenderDispatcher.renderOffsetY,
-			-BlockEntityRenderDispatcher.renderOffsetZ);
+		applyCameraRotationOnly();
+		Vec3d camPos = getCameraPos();
+		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
+	}
+	
+	public static void applyCameraRotationOnly()
+	{
+		
+	}
+	
+	public static Vec3d getCameraPos()
+	{
+		return BlockEntityRenderDispatcher.INSTANCE.cameraEntity.getPos();
 	}
 	
 	public static void drawSolidBox()

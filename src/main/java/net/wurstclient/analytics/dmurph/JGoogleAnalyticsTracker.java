@@ -259,12 +259,10 @@ public class JGoogleAnalyticsTracker
 	{
 		if(proxyAddr != null)
 		{
-			Scanner s = new Scanner(proxyAddr);
-			
 			// Split into "proxyAddr:proxyPort".
 			proxyAddr = null;
 			int proxyPort = 8080;
-			try
+			try(Scanner s = new Scanner(proxyAddr))
 			{
 				s.findInLine("(http://|)([^:/]+)(:|)([0-9]*)(/|)");
 				MatchResult m = s.match();
@@ -274,9 +272,6 @@ public class JGoogleAnalyticsTracker
 				
 				if(m.groupCount() >= 4 && !(m.group(4).length() == 0))
 					proxyPort = Integer.parseInt(m.group(4));
-			}finally
-			{
-				s.close();
 			}
 			
 			if(proxyAddr != null)

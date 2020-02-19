@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,12 +30,15 @@ public final class WurstLogo
 		// draw version background
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		// if(WurstClient.INSTANCE.getHax().rainbowUiHack.isActive())
-		// {
-		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		// GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		// }else
-		GL11.glColor4f(1, 1, 1, 0.5F);
+		
+		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
+		{
+			float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+			
+		}else
+			GL11.glColor4f(1, 1, 1, 0.5F);
+		
 		drawQuads(0, 6, tr.getStringWidth(version) + 76, 17);
 		
 		// draw version string
@@ -46,6 +49,7 @@ public final class WurstLogo
 		
 		// draw Wurst logo
 		GL11.glColor4f(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_BLEND);
 		WurstClient.MC.getTextureManager().bindTexture(texture);
 		DrawableHelper.blit(0, 3, 0, 0, 72, 18, 72, 18);
 	}

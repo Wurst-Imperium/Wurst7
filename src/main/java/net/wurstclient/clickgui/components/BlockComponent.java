@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -104,6 +104,7 @@ public final class BlockComponent extends Component
 		renderIcon(stack, x3, y1, true);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override
@@ -152,6 +153,7 @@ public final class BlockComponent extends Component
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		tr.drawWithShadow("?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_BLEND);
 		
 		GL11.glPopMatrix();
 	}

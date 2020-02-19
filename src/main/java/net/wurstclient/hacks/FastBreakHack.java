@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,6 +38,15 @@ public final class FastBreakHack extends Hack
 			+ "Tip: This works with Nuker.");
 		setCategory(Category.BLOCKS);
 		addSetting(legitMode);
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		if(legitMode.isChecked())
+			return getName() + "Legit";
+		else
+			return getName();
 	}
 	
 	@Override

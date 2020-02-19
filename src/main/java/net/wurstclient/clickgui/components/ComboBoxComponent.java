@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,14 +21,14 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.EnumSetting;
 
-public final class ComboBoxComponent<T extends Enum> extends Component
+public final class ComboBoxComponent<T extends Enum<T>> extends Component
 {
 	private final ClickGui gui = WurstClient.INSTANCE.getGui();
 	private final TextRenderer tr = WurstClient.MC.textRenderer;
 	
 	private final EnumSetting<T> setting;
 	private final int popupWidth;
-	private ComboBoxPopup popup;
+	private ComboBoxPopup<T> popup;
 	
 	public ComboBoxComponent(EnumSetting<T> setting)
 	{
@@ -228,6 +228,7 @@ public final class ComboBoxComponent<T extends Enum> extends Component
 		tr.draw(value, x4 + 2, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

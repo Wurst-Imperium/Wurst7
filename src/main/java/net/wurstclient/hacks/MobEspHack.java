@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,6 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -89,7 +88,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		mobs.clear();
 		
 		Stream<MobEntity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
 				.filter(e -> e instanceof MobEntity).map(e -> (MobEntity)e)
 				.filter(e -> !e.removed && e.getHealth() > 0);
 		
@@ -163,10 +162,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private void renderTracers(double partialTicks)
 	{
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(MobEntity e : mobs)

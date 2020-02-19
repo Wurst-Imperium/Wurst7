@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -68,13 +68,12 @@ public final class FreecamHack extends Hack
 		fakePlayer = new FakePlayerEntity();
 		
 		GameOptions gs = MC.options;
-		IKeyBinding[] bindings =
-			{(IKeyBinding)gs.keyForward, (IKeyBinding)gs.keyBack,
-				(IKeyBinding)gs.keyLeft, (IKeyBinding)gs.keyRight,
-				(IKeyBinding)gs.keyJump, (IKeyBinding)gs.keySneak};
+		KeyBinding[] bindings = {gs.keyForward, gs.keyBack, gs.keyLeft,
+			gs.keyRight, gs.keyJump, gs.keySneak};
 		
-		for(IKeyBinding binding : bindings)
-			binding.setPressed(binding.isActallyPressed());
+		for(KeyBinding binding : bindings)
+			((IKeyBinding)binding)
+				.setPressed(((IKeyBinding)binding).isActallyPressed());
 		
 		playerBox = GL11.glGenLists(1);
 		GL11.glNewList(playerBox, GL11.GL_COMPILE);
@@ -191,10 +190,8 @@ public final class FreecamHack extends Hack
 		GL11.glPopMatrix();
 		
 		// line
-		Vec3d start = RotationUtils.getClientLookVec().add(
-			BlockEntityRenderDispatcher.renderOffsetX,
-			BlockEntityRenderDispatcher.renderOffsetY,
-			BlockEntityRenderDispatcher.renderOffsetZ);
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		Vec3d end = fakePlayer.getBoundingBox().getCenter();
 		
 		GL11.glBegin(GL11.GL_LINES);

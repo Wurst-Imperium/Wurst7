@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2019 | Wurst-Imperium | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -123,9 +123,13 @@ public final class ClickAuraHack extends Hack
 	public void onEnable()
 	{
 		// disable other killauras
-		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
+		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
@@ -231,6 +235,8 @@ public final class ClickAuraHack extends Hack
 			stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
+		
+		WURST.getHax().autoSwordHack.setSlot();
 		
 		// face entity
 		Rotation rotation = RotationUtils
