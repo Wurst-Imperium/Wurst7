@@ -649,14 +649,14 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerS2CPacket var1)
+	public void onOpenContainer(OpenContainerPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onSetTradeOffers(SetTradeOffersS2CPacket var1)
+	public void onSetTradeOffers(SetTradeOffersPacket var1)
 	{
 		
 	}
@@ -678,7 +678,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onPlayerActionResponse(PlayerActionResponseS2CPacket var1)
+	public void handlePlayerActionResponse(PlayerActionResponseS2CPacket var1)
 	{
 		
 	}
