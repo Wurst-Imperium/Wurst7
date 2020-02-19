@@ -9,6 +9,7 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -48,7 +49,11 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return BlockEntityRenderDispatcher.INSTANCE.cameraEntity.getPos();
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.cameraEntity;
+		if(camera == null)
+			return Vec3d.ZERO;
+		
+		return camera.getPos();
 	}
 	
 	public static void drawSolidBox()
