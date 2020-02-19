@@ -20,7 +20,7 @@ import net.wurstclient.WurstClient;
 public abstract class LivingEntityRendererMixin
 {
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;canSeePlayer(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
 		ordinal = 0),
 		method = {"render(Lnet/minecraft/entity/LivingEntity;FFFFFF)V"})
 	private boolean canWurstSeePlayer(LivingEntity e, PlayerEntity player)
