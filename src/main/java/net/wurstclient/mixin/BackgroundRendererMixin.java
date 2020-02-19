@@ -41,8 +41,7 @@ public class BackgroundRendererMixin
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/Camera;getSubmergedFluidState()Lnet/minecraft/fluid/FluidState;",
 		ordinal = 0),
-		method = {
-			"applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V"})
+		method = {"applyFog(Lnet/minecraft/client/render/Camera;I)V"})
 	private FluidState wurstGetSubmergedFluidState(Camera camera)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
