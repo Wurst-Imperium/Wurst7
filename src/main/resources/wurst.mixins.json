@@ -45,6 +45,7 @@
     "RenderTickCounterMixin",
     "ServerListMixin",
     "SignEditScreenMixin",
+    "SoulSandBlockMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
