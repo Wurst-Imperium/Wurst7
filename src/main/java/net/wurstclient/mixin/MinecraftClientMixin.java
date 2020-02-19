@@ -55,7 +55,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;hitResult:Lnet/minecraft/util/hit/HitResult;",
+		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
 		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
 	private void onDoAttack(CallbackInfo ci)
 	{
