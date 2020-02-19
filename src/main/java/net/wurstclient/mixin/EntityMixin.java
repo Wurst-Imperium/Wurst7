@@ -43,7 +43,7 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 			opcode = Opcodes.INVOKEVIRTUAL,
 			ordinal = 0),
 		method = {
-			"adjustMovementForSneaking(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/MovementType;)Lnet/minecraft/util/math/Vec3d;"})
+			"clipSneakingMovement(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/MovementType;)Lnet/minecraft/util/math/Vec3d;"})
 	private boolean isSafeWalkSneaking(Entity entity)
 	{
 		return entity.isSneaking()
