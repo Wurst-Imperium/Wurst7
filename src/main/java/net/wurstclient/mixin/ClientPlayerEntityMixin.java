@@ -156,9 +156,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	protected boolean clipAtLedge()
+	protected boolean method_21825()
 	{
-		return super.clipAtLedge()
+		return super.method_21825()
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
