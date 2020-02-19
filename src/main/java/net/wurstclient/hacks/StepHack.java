@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
@@ -72,7 +72,7 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!player.horizontalCollision)
 			return;
 		
-		if(!player.onGround || player.isClimbing() || player.isTouchingWater()
+		if(!player.onGround || player.isClimbing() || player.isInsideWater()
 			|| player.isInLava())
 			return;
 		
@@ -95,8 +95,8 @@ public final class StepHack extends Hack implements UpdateListener
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 		
 		for(Box bb : blockCollisions)
-			if(bb.y2 > stepHeight)
-				stepHeight = bb.y2;
+			if(bb.maxY > stepHeight)
+				stepHeight = bb.maxY;
 			
 		stepHeight = stepHeight - player.y;
 		
@@ -111,7 +111,7 @@ public final class StepHack extends Hack implements UpdateListener
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(player.x,
 			player.y + 0.753 * stepHeight, player.z, player.onGround));
 		
-		player.updatePosition(player.x, player.y + 1 * stepHeight, player.z);
+		player.setPosition(player.x, player.y + 1 * stepHeight, player.z);
 	}
 	
 	public boolean isAutoJumpAllowed()

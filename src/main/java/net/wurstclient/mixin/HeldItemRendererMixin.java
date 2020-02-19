@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.item.HeldItemRenderer;
+import net.minecraft.client.render.FirstPersonRenderer;
 import net.wurstclient.WurstClient;
 
-@Mixin(HeldItemRenderer.class)
+@Mixin(FirstPersonRenderer.class)
 public class HeldItemRendererMixin
 {
 	@Inject(at = {@At("HEAD")},

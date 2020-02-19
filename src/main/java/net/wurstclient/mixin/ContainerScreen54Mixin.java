@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.ContainerProvider;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.ContainerScreen54;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.container.GenericContainer;
 import net.minecraft.container.Slot;
@@ -23,9 +23,9 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
-@Mixin(GenericContainerScreen.class)
+@Mixin(ContainerScreen54.class)
 public abstract class ContainerScreen54Mixin
-	extends ContainerScreen<GenericContainer>
+	extends AbstractContainerScreen<GenericContainer>
 	implements ContainerProvider<GenericContainer>
 {
 	@Shadow
@@ -52,11 +52,11 @@ public abstract class ContainerScreen54Mixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			addButton(new ButtonWidget(x + containerWidth - 108, y + 4, 50, 12,
-				"Steal", b -> steal()));
+			addButton(new ButtonWidget(left + containerWidth - 108, top + 4, 50,
+				12, "Steal", b -> steal()));
 			
-			addButton(new ButtonWidget(x + containerWidth - 56, y + 4, 50, 12,
-				"Store", b -> store()));
+			addButton(new ButtonWidget(left + containerWidth - 56, top + 4, 50,
+				12, "Store", b -> store()));
 		}
 		
 		if(autoSteal.isEnabled())
@@ -93,7 +93,7 @@ public abstract class ContainerScreen54Mixin
 		
 		for(int i = from; i < to; i++)
 		{
-			Slot slot = container.slots.get(i);
+			Slot slot = container.slotList.get(i);
 			if(slot.getStack().isEmpty())
 				continue;
 			

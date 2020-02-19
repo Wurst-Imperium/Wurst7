@@ -11,9 +11,9 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.wurstclient.WurstClient;
@@ -106,12 +106,12 @@ public final class RadarComponent extends Component
 		GL11.glBegin(GL11.GL_POINTS);
 		for(Entity e : hack.getEntities())
 		{
-			double diffX = e.lastRenderX + (e.x - e.lastRenderX) * partialTicks
-				- (player.lastRenderX
-					+ (player.x - player.lastRenderX) * partialTicks);
-			double diffZ = e.lastRenderZ + (e.z - e.lastRenderZ) * partialTicks
-				- (player.lastRenderZ
-					+ (player.z - player.lastRenderZ) * partialTicks);
+			double diffX = e.prevRenderX + (e.x - e.prevRenderX) * partialTicks
+				- (player.prevRenderX
+					+ (player.x - player.prevRenderX) * partialTicks);
+			double diffZ = e.prevRenderZ + (e.z - e.prevRenderZ) * partialTicks
+				- (player.prevRenderZ
+					+ (player.z - player.prevRenderZ) * partialTicks);
 			double distance = Math.sqrt(diffX * diffX + diffZ * diffZ)
 				* (getWidth() * 0.5 / hack.getRadius());
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));

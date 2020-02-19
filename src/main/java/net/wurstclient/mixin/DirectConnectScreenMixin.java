@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.screen.DirectConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.options.ServerEntry;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.LastServerRememberer;
@@ -26,7 +26,7 @@ public class DirectConnectScreenMixin extends Screen
 {
 	@Shadow
 	@Final
-	private ServerInfo serverEntry;
+	private ServerEntry serverEntry;
 	
 	private DirectConnectScreenMixin(WurstClient wurst, Text text_1)
 	{

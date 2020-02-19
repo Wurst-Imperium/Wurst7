@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.options.ServerEntry;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
@@ -45,7 +45,7 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	}
 	
 	@Override
-	public void connectToServer(ServerInfo server)
+	public void connectToServer(ServerEntry server)
 	{
 		connect(server);
 	}
@@ -77,13 +77,13 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	
 	@Inject(at = {@At("HEAD")},
 		method = {"connect(Lnet/minecraft/client/network/ServerInfo;)V"})
-	private void onConnect(ServerInfo entry, CallbackInfo ci)
+	private void onConnect(ServerEntry entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
 	}
 	
 	@Shadow
-	private void connect(ServerInfo entry)
+	private void connect(ServerEntry entry)
 	{
 		
 	}

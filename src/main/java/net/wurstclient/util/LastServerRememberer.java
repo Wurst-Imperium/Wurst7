@@ -10,7 +10,7 @@ package net.wurstclient.util;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.options.ServerEntry;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 
@@ -22,14 +22,14 @@ public enum LastServerRememberer
 {
 	;
 	
-	private static ServerInfo lastServer;
+	private static ServerEntry lastServer;
 	
-	public static ServerInfo getLastServer()
+	public static ServerEntry getLastServer()
 	{
 		return lastServer;
 	}
 	
-	public static void setLastServer(ServerInfo server)
+	public static void setLastServer(ServerEntry server)
 	{
 		lastServer = server;
 	}

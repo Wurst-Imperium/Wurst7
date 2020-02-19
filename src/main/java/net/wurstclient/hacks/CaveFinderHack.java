@@ -27,11 +27,11 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
+import net.minecraft.client.network.packet.ChunkDataS2CPacket;
+import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -151,7 +151,7 @@ public final class CaveFinderHack extends Hack
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
 			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
-			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
+			chunk = world.method_8497(chunkData.getX(), chunkData.getZ());
 			
 		}else
 			return;
@@ -232,7 +232,7 @@ public final class CaveFinderHack extends Hack
 	{
 		int chunkX = eyesPos.getX() >> 4;
 		int chunkZ = eyesPos.getZ() >> 4;
-		return MC.world.getChunk(chunkX, chunkZ).getPos();
+		return MC.world.method_8497(chunkX, chunkZ).getPos();
 	}
 	
 	private void addSearchersInRange(ChunkPos center, int chunkRange,
@@ -255,7 +255,7 @@ public final class CaveFinderHack extends Hack
 		
 		for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
 			for(int z = center.z - chunkRange; z <= center.z + chunkRange; z++)
-				chunksInRange.add(MC.world.getChunk(x, z));
+				chunksInRange.add(MC.world.method_8497(x, z));
 			
 		return chunksInRange;
 	}

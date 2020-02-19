@@ -22,7 +22,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.server.network.packet.ChatMessageC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
@@ -132,9 +132,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean isTouchingWater()
+	public boolean isInsideWater()
 	{
-		boolean inWater = super.isTouchingWater();
+		boolean inWater = super.isInsideWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
 		WurstClient.INSTANCE.getEventManager().fire(event);
 		
@@ -144,7 +144,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Override
 	public boolean isTouchingWaterBypass()
 	{
-		return super.isTouchingWater();
+		return super.isInsideWater();
 	}
 	
 	@Override

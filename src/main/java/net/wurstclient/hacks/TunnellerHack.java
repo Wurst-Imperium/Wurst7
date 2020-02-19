@@ -24,7 +24,7 @@ import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.server.network.packet.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -395,7 +395,7 @@ public final class TunnellerHack extends Hack
 			
 			blocks.clear();
 			for(BlockPos pos : BlockUtils.getAllInBox(from, to))
-				if(!BlockUtils.getState(pos).method_21743(MC.world, pos))
+				if(!BlockUtils.getState(pos).isFullOpaque(MC.world, pos))
 					blocks.add(pos);
 				
 			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
@@ -509,7 +509,7 @@ public final class TunnellerHack extends Hack
 						liquids.add(pos2);
 				}
 				
-				if(BlockUtils.getState(pos).method_21743(MC.world, pos))
+				if(BlockUtils.getState(pos).isFullOpaque(MC.world, pos))
 					continue;
 				
 				// check next blocks

@@ -153,7 +153,7 @@ public final class PotionCmd extends Command
 		else
 		{
 			StatusEffect effect =
-				Registry.STATUS_EFFECT.get(new Identifier(input));
+				Registry.MOB_EFFECT.get(new Identifier(input));
 			
 			id = StatusEffect.getRawId(effect);
 		}

@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.options.ServerEntry;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -47,7 +47,7 @@ public final class IpCmd extends Command
 	
 	private String getIP()
 	{
-		ServerInfo lastServer = LastServerRememberer.getLastServer();
+		ServerEntry lastServer = LastServerRememberer.getLastServer();
 		if(lastServer == null || MC.isIntegratedServerRunning())
 			return "127.0.0.1:25565";
 		

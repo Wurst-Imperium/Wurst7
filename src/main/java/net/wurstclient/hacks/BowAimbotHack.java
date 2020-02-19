@@ -18,10 +18,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -243,11 +243,11 @@ public final class BowAimbotHack extends Hack
 		// set position to aim at
 		double d = RotationUtils.getEyesPos()
 			.distanceTo(target.getBoundingBox().getCenter());
-		double posX = target.x + (target.x - target.lastRenderX) * d - player.x;
-		double posY = target.y + (target.y - target.lastRenderY) * d
+		double posX = target.x + (target.x - target.prevRenderX) * d - player.x;
+		double posY = target.y + (target.y - target.prevRenderY) * d
 			+ target.getHeight() * 0.5 - player.y
 			- player.getEyeHeight(player.getPose());
-		double posZ = target.z + (target.z - target.lastRenderZ) * d - player.z;
+		double posZ = target.z + (target.z - target.prevRenderZ) * d - player.z;
 		
 		// set yaw
 		MC.player.yaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;

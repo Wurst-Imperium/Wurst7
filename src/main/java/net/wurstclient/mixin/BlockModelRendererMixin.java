@@ -20,7 +20,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.world.ExtendedBlockView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
@@ -33,9 +33,10 @@ public abstract class BlockModelRendererMixin
 			"tesselateSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z",
 			"tesselateFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/BufferBuilder;ZLjava/util/Random;J)Z"},
 		cancellable = true)
-	private void onTesselateSmoothOrFlat(BlockRenderView view, BakedModel model,
-		BlockState state, BlockPos pos, BufferBuilder buffer, boolean testSides,
-		Random random, long l, CallbackInfoReturnable<Boolean> cir)
+	private void onTesselateSmoothOrFlat(ExtendedBlockView view,
+		BakedModel model, BlockState state, BlockPos pos, BufferBuilder buffer,
+		boolean testSides, Random random, long l,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(state);
 		WurstClient.INSTANCE.getEventManager().fire(event);
@@ -58,7 +59,7 @@ public abstract class BlockModelRendererMixin
 	}
 	
 	@Shadow
-	public boolean tesselateSmooth(BlockRenderView view, BakedModel model,
+	public boolean tesselateSmooth(ExtendedBlockView view, BakedModel model,
 		BlockState state, BlockPos pos, BufferBuilder buffer, boolean testSides,
 		Random random, long l)
 	{

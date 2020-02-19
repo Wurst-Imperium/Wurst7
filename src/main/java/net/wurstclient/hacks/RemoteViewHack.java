@@ -13,10 +13,10 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.WaterCreatureEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -25,7 +25,7 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -193,7 +193,7 @@ public final class RemoteViewHack extends Hack
 		}
 		
 		// save old data
-		wasInvisible = entity.isInvisibleTo(MC.player);
+		wasInvisible = entity.canSeePlayer(MC.player);
 		
 		// enable NoClip
 		MC.player.noClip = true;
@@ -281,7 +281,7 @@ public final class RemoteViewHack extends Hack
 				+ entity.getEyeHeight(entity.getPose());
 		MC.player.y = adjustedY;
 		MC.player.prevY = adjustedY;
-		MC.player.lastRenderY = adjustedY;
+		MC.player.prevRenderY = adjustedY;
 		MC.player.setVelocity(Vec3d.ZERO);
 		
 		// set entity invisible

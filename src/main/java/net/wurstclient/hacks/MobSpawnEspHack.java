@@ -22,11 +22,11 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
+import net.minecraft.client.network.packet.ChunkDataS2CPacket;
+import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
@@ -107,7 +107,7 @@ public final class MobSpawnEspHack extends Hack
 		ArrayList<Chunk> chunks = new ArrayList<>();
 		for(int x = chunkX - chunkRange; x <= chunkX + chunkRange; x++)
 			for(int z = chunkZ - chunkRange; z <= chunkZ + chunkRange; z++)
-				chunks.add(world.getChunk(x, z));
+				chunks.add(world.method_8497(x, z));
 			
 		// create & start scanners for new chunks
 		for(Chunk chunk : chunks)
@@ -200,7 +200,7 @@ public final class MobSpawnEspHack extends Hack
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
 			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
-			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
+			chunk = world.method_8497(chunkData.getX(), chunkData.getZ());
 			
 		}else
 			return;
@@ -208,7 +208,7 @@ public final class MobSpawnEspHack extends Hack
 		ArrayList<Chunk> chunks = new ArrayList<>();
 		for(int x = chunk.getPos().x - 1; x <= chunk.getPos().x + 1; x++)
 			for(int z = chunk.getPos().z - 1; z <= chunk.getPos().z + 1; z++)
-				chunks.add(world.getChunk(x, z));
+				chunks.add(world.method_8497(x, z));
 			
 		for(Chunk chunk2 : chunks)
 		{

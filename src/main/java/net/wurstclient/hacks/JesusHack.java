@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -69,7 +69,7 @@ public final class JesusHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		// move up in water
-		if(player.isTouchingWater())
+		if(player.isInsideWater())
 		{
 			Vec3d velocity = player.getVelocity();
 			player.setVelocity(velocity.x, 0.11, velocity.z);
@@ -103,7 +103,7 @@ public final class JesusHack extends Hack
 			return;
 		
 		// check inWater
-		if(MC.player.isTouchingWater())
+		if(MC.player.isInsideWater())
 			return;
 		
 		// check fall distance
@@ -148,7 +148,7 @@ public final class JesusHack extends Hack
 				packet.getPitch(0), true);
 		
 		// send new packet
-		MC.player.networkHandler.getConnection().send(newPacket);
+		MC.player.networkHandler.getClientConnection().send(newPacket);
 	}
 	
 	public boolean isOverLiquid()
@@ -180,6 +180,6 @@ public final class JesusHack extends Hack
 	public boolean shouldBeSolid()
 	{
 		return isEnabled() && MC.player != null && MC.player.fallDistance <= 3
-			&& !MC.options.keySneak.isPressed() && !MC.player.isTouchingWater();
+			&& !MC.options.keySneak.isPressed() && !MC.player.isInsideWater();
 	}
 }

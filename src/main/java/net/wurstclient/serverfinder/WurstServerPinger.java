@@ -10,13 +10,13 @@ package net.wurstclient.serverfinder;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.minecraft.client.network.MultiplayerServerListPinger;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.network.ServerEntryNetworkPart;
+import net.minecraft.client.options.ServerEntry;
 
 public class WurstServerPinger
 {
 	private static final AtomicInteger threadNumber = new AtomicInteger(0);
-	private ServerInfo server;
+	private ServerEntry server;
 	private boolean done = false;
 	private boolean failed = false;
 	
@@ -27,7 +27,7 @@ public class WurstServerPinger
 	
 	public void ping(String ip, int port)
 	{
-		server = new ServerInfo("", ip + ":" + port, false);
+		server = new ServerEntry("", ip + ":" + port, false);
 		
 		new Thread(() -> pingInCurrentThread(ip, port),
 			"Wurst Server Pinger #" + threadNumber.incrementAndGet()).start();
@@ -35,12 +35,12 @@ public class WurstServerPinger
 	
 	private void pingInCurrentThread(String ip, int port)
 	{
-		MultiplayerServerListPinger pinger = new MultiplayerServerListPinger();
+		ServerEntryNetworkPart pinger = new ServerEntryNetworkPart();
 		System.out.println("Pinging " + ip + ":" + port + "...");
 		
 		try
 		{
-			pinger.add(server);
+			pinger.method_3003(server);
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)

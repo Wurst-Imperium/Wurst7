@@ -14,10 +14,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.ClientConnection;
+import net.minecraft.client.network.packet.*;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
@@ -42,13 +41,6 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	public void onDisconnected(Text var1)
 	{
 		
-	}
-	
-	@Shadow
-	@Override
-	public ClientConnection getConnection()
-	{
-		return null;
 	}
 	
 	@Shadow
@@ -187,7 +179,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onCloseContainer(CloseContainerS2CPacket var1)
+	public void onGuiClose(GuiCloseS2CPacket var1)
 	{
 		
 	}
@@ -201,21 +193,21 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenHorseContainer(OpenHorseContainerS2CPacket var1)
+	public void onGuiOpen(GuiOpenS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerPropertyUpdate(ContainerPropertyUpdateS2CPacket var1)
+	public void onGuiUpdate(GuiUpdateS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerSlotUpdate(ContainerSlotUpdateS2CPacket var1)
+	public void onGuiSlotUpdate(GuiSlotUpdateS2CPacket var1)
 	{
 		
 	}
@@ -348,7 +340,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onRemoveEntityEffect(RemoveEntityStatusEffectS2CPacket var1)
+	public void onRemoveEntityEffect(RemoveEntityEffectS2CPacket var1)
 	{
 		
 	}
@@ -488,7 +480,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onEntityPotionEffect(EntityStatusEffectS2CPacket var1)
+	public void onEntityPotionEffect(EntityPotionEffectS2CPacket var1)
 	{
 		
 	}
@@ -586,7 +578,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onCraftFailedResponse(CraftFailedResponseS2CPacket var1)
+	public void onCraftResponse(CraftResponseS2CPacket var1)
 	{
 		
 	}
@@ -649,35 +641,30 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerS2CPacket var1)
+	public void onOpenContainer(OpenContainerPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onSetTradeOffers(SetTradeOffersS2CPacket var1)
+	public void onSetTradeOffers(SetTradeOffersPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
+	public void handleChunkLoadDistance(ChunkLoadDistanceS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onChunkRenderDistanceCenter(
+	public void handleChunkRenderDistanceCenter(
 		ChunkRenderDistanceCenterS2CPacket var1)
 	{
 		
 	}
-	
-	@Shadow
-	@Override
-	public void method_21707(PlayerActionResponseS2CPacket var1)
-	{}
 }
