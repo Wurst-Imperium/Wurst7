@@ -29,8 +29,8 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"createButtons()V"})
-	private void onCreateButtons(CallbackInfo ci)
+	@Inject(at = {@At("TAIL")}, method = {"method_2267()V"})
+	private void onMethod_2267(CallbackInfo ci)
 	{
 		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 152,
 			height - 28, 150, 20, "", this::toggleWurst);
