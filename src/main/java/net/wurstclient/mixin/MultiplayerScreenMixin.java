@@ -76,7 +76,7 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"connect(Lnet/minecraft/client/network/ServerInfo;)V"})
+		method = {"connect(Lnet/minecraft/client/options/ServerEntry;)V"})
 	private void onConnect(ServerEntry entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
