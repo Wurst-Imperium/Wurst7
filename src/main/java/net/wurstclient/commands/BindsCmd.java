@@ -7,6 +7,8 @@
  */
 package net.wurstclient.commands;
 
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
+import net.wurstclient.util.json.JsonException;
 
 public final class BindsCmd extends Command
 {
@@ -26,9 +29,11 @@ public final class BindsCmd extends Command
 	{
 		super("binds", "Allows you to manage keybinds through the chat.",
 			".binds add <key> <hacks>", ".binds add <key> <commands>",
-			".binds remove <key>", ".binds list [<page>]", ".binds remove-all",
-			".binds reset",
-			"Multiple hacks/commands must be separated by ';'.");
+			".binds remove <key>", ".binds list [<page>]",
+			".binds load <profile>", ".binds save <profile>",
+			".binds remove-all", ".binds reset",
+			"Multiple hacks/commands must be separated by ';'.",
+			"Profiles are saved in '.minecraft/wurst/keybinds'.");
 	}
 	
 	@Override
@@ -49,6 +54,14 @@ public final class BindsCmd extends Command
 			
 			case "list":
 			list(args);
+			break;
+			
+			case "load":
+			load(args);
+			break;
+			
+			case "save":
+			save(args);
 			break;
 			
 			case "remove-all":
@@ -159,5 +172,62 @@ public final class BindsCmd extends Command
 	{
 		WURST.getKeybinds().setKeybinds(KeybindList.DEFAULT_KEYBINDS);
 		ChatUtils.message("All keybinds reset to defaults.");
+	}
+	
+	private void load(String[] args) throws CmdException
+	{
+		if(args.length != 2)
+			throw new CmdSyntaxError();
+		
+		String name = parseFileName(args[1]);
+		
+		try
+		{
+			WURST.getKeybinds().loadProfile(name);
+			ChatUtils.message("Keybinds loaded: " + name);
+			
+		}catch(NoSuchFileException e)
+		{
+			throw new CmdError("Profile '" + name + "' doesn't exist.");
+			
+		}catch(JsonException e)
+		{
+			e.printStackTrace();
+			throw new CmdError(
+				"Profile '" + name + "' is corrupted: " + e.getMessage());
+			
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+			throw new CmdError("Couldn't load profile: " + e.getMessage());
+		}
+	}
+	
+	private void save(String[] args) throws CmdException
+	{
+		if(args.length != 2)
+			throw new CmdSyntaxError();
+		
+		String name = parseFileName(args[1]);
+		
+		try
+		{
+			WURST.getKeybinds().saveProfile(name);
+			ChatUtils.message("Keybinds saved: " + name);
+			
+		}catch(IOException | JsonException e)
+		{
+			e.printStackTrace();
+			throw new CmdError("Couldn't save profile: " + e.getMessage());
+		}
+	}
+	
+	private String parseFileName(String input)
+	{
+		String fileName = input;
+		if(!fileName.endsWith(".json"))
+			fileName += ".json";
+		
+		return fileName;
 	}
 }

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.keybinds;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +15,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.wurstclient.WurstClient;
+import net.wurstclient.util.json.JsonException;
+
 public final class KeybindList
 {
 	public static final Set<Keybind> DEFAULT_KEYBINDS = createDefaultKeybinds();
+	private final ArrayList<Keybind> keybinds = new ArrayList<>();
 	
 	private final KeybindsFile keybindsFile;
-	private final ArrayList<Keybind> keybinds = new ArrayList<>();
+	private final Path profilesFolder =
+		WurstClient.INSTANCE.getWurstFolder().resolve("keybinds");
 	
 	public KeybindList(Path keybindsFile)
 	{
@@ -71,6 +77,16 @@ public final class KeybindList
 	{
 		keybinds.clear();
 		keybindsFile.save(this);
+	}
+	
+	public void loadProfile(String fileName) throws IOException, JsonException
+	{
+		keybindsFile.loadProfile(this, profilesFolder.resolve(fileName));
+	}
+	
+	public void saveProfile(String fileName) throws IOException, JsonException
+	{
+		keybindsFile.saveProfile(this, profilesFolder.resolve(fileName));
 	}
 	
 	private static Set<Keybind> createDefaultKeybinds()
