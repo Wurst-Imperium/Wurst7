@@ -12,12 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.render.BackgroundRenderer;
-import net.minecraft.client.render.Camera;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.wurstclient.WurstClient;
 
 @Mixin(BackgroundRenderer.class)
@@ -37,18 +34,5 @@ public class BackgroundRendererMixin
 			return false;
 		
 		return entity.hasStatusEffect(effect);
-	}
-	
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/Camera;getSubmergedFluidState()Lnet/minecraft/fluid/FluidState;",
-		ordinal = 0),
-		method = {
-			"applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V"})
-	private static FluidState wurstGetSubmergedFluidState(Camera camera)
-	{
-		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
-			return Fluids.EMPTY.getDefaultState();
-		
-		return camera.getSubmergedFluidState();
 	}
 }
