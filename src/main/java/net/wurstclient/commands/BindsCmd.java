@@ -9,6 +9,8 @@ package net.wurstclient.commands;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,8 +33,8 @@ public final class BindsCmd extends Command
 			".binds add <key> <hacks>", ".binds add <key> <commands>",
 			".binds remove <key>", ".binds list [<page>]",
 			".binds load-profile <file>", ".binds save-profile <file>",
-			".binds remove-all", ".binds reset",
-			"Multiple hacks/commands must be separated by ';'.",
+			".binds list-profiles [<page>]", ".binds remove-all",
+			".binds reset", "Multiple hacks/commands must be separated by ';'.",
 			"Profiles are saved in '.minecraft/wurst/keybinds'.");
 	}
 	
@@ -62,6 +64,10 @@ public final class BindsCmd extends Command
 			
 			case "save-profile":
 			saveProfile(args);
+			break;
+			
+			case "list-profiles":
+			listProfiles(args);
 			break;
 			
 			case "remove-all":
@@ -229,5 +235,31 @@ public final class BindsCmd extends Command
 			fileName += ".json";
 		
 		return fileName;
+	}
+	
+	private void listProfiles(String[] args) throws CmdException
+	{
+		if(args.length > 2)
+			throw new CmdSyntaxError();
+		
+		ArrayList<Path> files = WURST.getKeybinds().listProfiles();
+		int page = parsePage(args);
+		int pages = (int)Math.ceil(files.size() / 8.0);
+		pages = Math.max(pages, 1);
+		
+		if(page > pages || page < 1)
+			throw new CmdSyntaxError("Invalid page: " + page);
+		
+		String total = "Total: " + files.size() + " profile";
+		total += files.size() != 1 ? "s" : "";
+		ChatUtils.message(total);
+		
+		int start = (page - 1) * 8;
+		int end = Math.min(page * 8, files.size());
+		
+		ChatUtils
+			.message("Keybind profile list (page " + page + "/" + pages + ")");
+		for(int i = start; i < end; i++)
+			ChatUtils.message(files.get(i).getFileName().toString());
 	}
 }
