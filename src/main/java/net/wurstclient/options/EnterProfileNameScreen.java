@@ -55,7 +55,10 @@ public final class EnterProfileNameScreen extends Screen
 	
 	private void done()
 	{
-		callback.accept(valueField.getText());
+		String value = valueField.getText();
+		if(!value.isEmpty())
+			callback.accept(value);
+		
 		minecraft.openScreen(prevScreen);
 	}
 	
@@ -86,7 +89,7 @@ public final class EnterProfileNameScreen extends Screen
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground();
-		drawCenteredString(minecraft.textRenderer, "Name Your New Profile",
+		drawCenteredString(minecraft.textRenderer, "Name your new profile",
 			width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(mouseX, mouseY, partialTicks);
