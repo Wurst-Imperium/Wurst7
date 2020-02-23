@@ -30,7 +30,7 @@ public final class BindsCmd extends Command
 		super("binds", "Allows you to manage keybinds through the chat.",
 			".binds add <key> <hacks>", ".binds add <key> <commands>",
 			".binds remove <key>", ".binds list [<page>]",
-			".binds load <profile>", ".binds save <profile>",
+			".binds load-profile <file>", ".binds save-profile <file>",
 			".binds remove-all", ".binds reset",
 			"Multiple hacks/commands must be separated by ';'.",
 			"Profiles are saved in '.minecraft/wurst/keybinds'.");
@@ -56,12 +56,12 @@ public final class BindsCmd extends Command
 			list(args);
 			break;
 			
-			case "load":
-			load(args);
+			case "load-profile":
+			loadProfile(args);
 			break;
 			
-			case "save":
-			save(args);
+			case "save-profile":
+			saveProfile(args);
 			break;
 			
 			case "remove-all":
@@ -174,7 +174,7 @@ public final class BindsCmd extends Command
 		ChatUtils.message("All keybinds reset to defaults.");
 	}
 	
-	private void load(String[] args) throws CmdException
+	private void loadProfile(String[] args) throws CmdException
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
@@ -203,7 +203,7 @@ public final class BindsCmd extends Command
 		}
 	}
 	
-	private void save(String[] args) throws CmdException
+	private void saveProfile(String[] args) throws CmdException
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
