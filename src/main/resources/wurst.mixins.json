@@ -43,6 +43,7 @@
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "RenderTickCounterMixin",
+    "ScreenMixin",
     "ServerListMixin",
     "SignEditScreenMixin",
     "StatsScreenMixin",
