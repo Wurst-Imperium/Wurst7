@@ -36,7 +36,7 @@ public final class TooManyHaxHack extends Hack
 	public TooManyHaxHack()
 	{
 		super("TooManyHax",
-			"Hides and disables features that you don't want.\n"
+			"Hides and blocks features that you don't want.\n"
 				+ "For those who want to \"only hack a little bit\".\n\n"
 				+ "Use the \u00a76.toomanyhax\u00a7r command to choose\n"
 				+ "which features to hide.\n"
