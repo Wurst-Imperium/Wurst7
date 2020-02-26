@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,8 +85,12 @@ public final class TooManyHaxHack extends Hack
 	public void setHidden(Feature feature, boolean hidden)
 	{
 		if(hidden)
+		{
 			hiddenFeatures.add(feature);
-		else
+			hiddenFeatures
+				.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
+			
+		}else
 			hiddenFeatures.remove(feature);
 		
 		file.save();

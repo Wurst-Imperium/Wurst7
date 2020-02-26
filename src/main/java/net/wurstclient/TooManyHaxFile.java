@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import com.google.gson.JsonArray;
 
@@ -72,6 +73,9 @@ public final class TooManyHaxFile
 			if(feature != null && feature.isSafeToHide())
 				hiddenFeatures.add(feature);
 		}
+		
+		hiddenFeatures
+			.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
 	}
 	
 	public void save()
