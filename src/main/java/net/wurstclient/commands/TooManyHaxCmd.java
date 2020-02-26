@@ -150,24 +150,24 @@ public final class TooManyHaxCmd extends Command
 			throw new CmdSyntaxError();
 		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
-		List<Feature> binds = tooManyHax.getHiddenFeatures();
+		List<Feature> hidden = tooManyHax.getHiddenFeatures();
 		int page = parsePage(args);
-		int pages = (int)Math.ceil(binds.size() / 8.0);
+		int pages = (int)Math.ceil(hidden.size() / 8.0);
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
 			throw new CmdSyntaxError("Invalid page: " + page);
 		
-		String total = "Total: " + binds.size() + " hidden feature";
-		total += binds.size() != 1 ? "s" : "";
+		String total = "Total: " + hidden.size() + " hidden feature";
+		total += hidden.size() != 1 ? "s" : "";
 		ChatUtils.message(total);
 		
 		int start = (page - 1) * 8;
-		int end = Math.min(page * 8, binds.size());
+		int end = Math.min(page * 8, hidden.size());
 		
 		ChatUtils.message("TooManyHax list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
-			ChatUtils.message(binds.get(i).toString());
+			ChatUtils.message(hidden.get(i).getName());
 	}
 	
 	private int parsePage(String[] args) throws CmdSyntaxError
