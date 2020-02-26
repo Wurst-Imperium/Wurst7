@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.client.util.InputUtil;
+import net.wurstclient.DontHide;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -25,6 +26,7 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
 
+@DontHide
 public final class BindsCmd extends Command
 {
 	public BindsCmd()

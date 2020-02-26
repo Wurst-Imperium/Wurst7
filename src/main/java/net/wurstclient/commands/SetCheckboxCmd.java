@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import java.util.stream.Stream;
 
+import net.wurstclient.DontHide;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -17,6 +18,7 @@ import net.wurstclient.command.Command;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
 
+@DontHide
 public final class SetCheckboxCmd extends Command
 {
 	public SetCheckboxCmd()

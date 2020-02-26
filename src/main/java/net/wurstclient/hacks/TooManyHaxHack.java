@@ -8,10 +8,12 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
+import net.wurstclient.DontHide;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"too many hax", "TooManyHacks", "too many hacks"})
+@DontHide
 public final class TooManyHaxHack extends Hack
 {
 	public TooManyHaxHack()

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontHide;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -14,6 +15,7 @@ import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"ArrayList", "ModList", "CheatList", "mod list", "array list",
 	"hack list", "cheat list"})
+@DontHide
 public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",

@@ -7,10 +7,12 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontHide;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 
 @SearchTags({"Clean Up"})
+@DontHide
 public final class CleanUpOtf extends OtherFeature
 {
 	public CleanUpOtf()

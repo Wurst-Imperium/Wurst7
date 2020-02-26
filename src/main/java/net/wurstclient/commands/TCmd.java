@@ -7,12 +7,14 @@
  */
 package net.wurstclient.commands;
 
+import net.wurstclient.DontHide;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
 
+@DontHide
 public final class TCmd extends Command
 {
 	public TCmd()
