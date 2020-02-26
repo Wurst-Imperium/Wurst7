@@ -32,7 +32,8 @@ public final class TooManyHaxCmd extends Command
 	public TooManyHaxCmd()
 	{
 		super("toomanyhax",
-			"Allows to manage which hacks should be hidden when TooManyHax is enabled.",
+			"Allows to manage which hacks should be hidden\n"
+				+ "when TooManyHax is enabled.",
 			".toomanyhax hide <feature>", ".toomanyhax unhide <feature>",
 			".toomanyhax list [<page>]", ".toomanyhax load-profile <file>",
 			".toomanyhax save-profile <file>",
