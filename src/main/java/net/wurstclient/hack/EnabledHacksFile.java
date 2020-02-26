@@ -8,6 +8,7 @@
 package net.wurstclient.hack;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -48,11 +49,24 @@ public final class EnabledHacksFile
 		save(hackList);
 	}
 	
+	public void loadProfile(HackList hax, Path profilePath)
+		throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		WsonArray wson = JsonUtils.parseFileToArray(profilePath);
+		enableHacks(hax, wson);
+	}
+	
 	private void enableHacks(HackList hax, WsonArray wson)
 	{
 		try
 		{
 			disableSaving = true;
+			
+			for(Hack hack : hax.getAllHax())
+				hack.setEnabled(false);
 			
 			for(String name : wson.getAllStrings())
 			{
@@ -85,6 +99,17 @@ public final class EnabledHacksFile
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
 		}
+	}
+	
+	public void saveProfile(HackList hax, Path profilePath)
+		throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		JsonArray json = createJson(hax);
+		Files.createDirectories(profilePath.getParent());
+		JsonUtils.toJson(json, profilePath);
 	}
 	
 	private JsonArray createJson(HackList hax)
