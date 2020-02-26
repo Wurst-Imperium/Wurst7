@@ -57,6 +57,12 @@ public final class TooManyHaxHack extends Hack
 	}
 	
 	@Override
+	public String getRenderName()
+	{
+		return getName() + " [" + blockedFeatures.size() + " blocked]";
+	}
+	
+	@Override
 	protected void onEnable()
 	{
 		disableBlockedHacks();
