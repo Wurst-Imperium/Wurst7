@@ -91,6 +91,12 @@ public final class TooManyHaxHack extends Hack
 		file.save();
 	}
 	
+	public void unhideAll()
+	{
+		hiddenFeatures.clear();
+		file.save();
+	}
+	
 	public List<Feature> getHiddenFeatures()
 	{
 		return Collections.unmodifiableList(hiddenFeatures);

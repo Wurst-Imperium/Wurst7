@@ -35,7 +35,8 @@ public final class TooManyHaxCmd extends Command
 			"Allows to manage which hacks should be hidden\n"
 				+ "when TooManyHax is enabled.",
 			".toomanyhax hide <feature>", ".toomanyhax unhide <feature>",
-			".toomanyhax list [<page>]", ".toomanyhax load-profile <file>",
+			".toomanyhax unhide-all", ".toomanyhax list [<page>]",
+			".toomanyhax load-profile <file>",
 			".toomanyhax save-profile <file>",
 			".toomanyhax list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/toomanyhax'.");
@@ -55,6 +56,10 @@ public final class TooManyHaxCmd extends Command
 			
 			case "unhide":
 			unhide(args);
+			break;
+			
+			case "unhide-all":
+			unhideAll();
 			break;
 			
 			case "list":
@@ -118,6 +123,12 @@ public final class TooManyHaxCmd extends Command
 		
 		tooManyHax.setHidden(feature, false);
 		ChatUtils.message("Removed " + typeAndName + " from TooManyHax list.");
+	}
+	
+	private void unhideAll()
+	{
+		WURST.getHax().tooManyHaxHack.unhideAll();
+		ChatUtils.message("All hidden features made visible.");
 	}
 	
 	private Feature parseFeature(String name) throws CmdSyntaxError
