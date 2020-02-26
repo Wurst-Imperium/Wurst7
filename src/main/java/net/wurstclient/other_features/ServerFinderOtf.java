@@ -7,12 +7,12 @@
  */
 package net.wurstclient.other_features;
 
-import net.wurstclient.DontHide;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 
 @SearchTags({"Server Finder"})
-@DontHide
+@DontBlock
 public final class ServerFinderOtf extends OtherFeature
 {
 	public ServerFinderOtf()

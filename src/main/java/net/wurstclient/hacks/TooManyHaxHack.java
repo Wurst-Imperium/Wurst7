@@ -18,28 +18,29 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.wurstclient.Category;
-import net.wurstclient.DontHide;
+import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.SearchTags;
 import net.wurstclient.TooManyHaxFile;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.json.JsonException;
 
-@SearchTags({"too many hax", "TooManyHacks", "too many hacks"})
-@DontHide
+@SearchTags({"too many hax", "TooManyHacks", "too many hacks", "YesCheat+",
+	"YesCheatPlus", "yes cheat plus"})
+@DontBlock
 public final class TooManyHaxHack extends Hack
 {
-	private final ArrayList<Feature> hiddenFeatures = new ArrayList<>();
+	private final ArrayList<Feature> blockedFeatures = new ArrayList<>();
 	private final Path profilesFolder;
 	private final TooManyHaxFile file;
 	
 	public TooManyHaxHack()
 	{
 		super("TooManyHax",
-			"Hides and blocks features that you don't want.\n"
+			"Blocks features that you don't want.\n"
 				+ "For those who want to \"only hack a little bit\".\n\n"
 				+ "Use the \u00a76.toomanyhax\u00a7r command to choose\n"
-				+ "which features to hide.\n"
+				+ "which features to block.\n"
 				+ "Type \u00a76.help toomanyhax\u00a7r for more info.");
 		setCategory(Category.OTHER);
 		
@@ -47,10 +48,10 @@ public final class TooManyHaxHack extends Hack
 		profilesFolder = wurstFolder.resolve("toomanyhax");
 		
 		Path filePath = wurstFolder.resolve("toomanyhax.json");
-		file = new TooManyHaxFile(filePath, hiddenFeatures);
+		file = new TooManyHaxFile(filePath, blockedFeatures);
 	}
 	
-	public void loadHiddenHacksFile()
+	public void loadBlockedHacksFile()
 	{
 		file.load();
 	}
@@ -58,12 +59,12 @@ public final class TooManyHaxHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		disableHacks();
+		disableBlockedHacks();
 	}
 	
-	private void disableHacks()
+	private void disableBlockedHacks()
 	{
-		for(Feature feature : hiddenFeatures)
+		for(Feature feature : blockedFeatures)
 		{
 			if(!(feature instanceof Hack))
 				continue;
@@ -91,7 +92,7 @@ public final class TooManyHaxHack extends Hack
 	public void loadProfile(String fileName) throws IOException, JsonException
 	{
 		file.loadProfile(profilesFolder.resolve(fileName));
-		disableHacks();
+		disableBlockedHacks();
 	}
 	
 	public void saveProfile(String fileName) throws IOException, JsonException
@@ -99,36 +100,36 @@ public final class TooManyHaxHack extends Hack
 		file.saveProfile(profilesFolder.resolve(fileName));
 	}
 	
-	public boolean isHidden(Feature feature)
+	public boolean isBlocked(Feature feature)
 	{
-		return hiddenFeatures.contains(feature);
+		return blockedFeatures.contains(feature);
 	}
 	
-	public void setHidden(Feature feature, boolean hidden)
+	public void setBlocked(Feature feature, boolean blocked)
 	{
-		if(hidden)
+		if(blocked)
 		{
-			if(!feature.isSafeToHide())
+			if(!feature.isSafeToBlock())
 				throw new IllegalArgumentException();
 			
-			hiddenFeatures.add(feature);
-			hiddenFeatures
+			blockedFeatures.add(feature);
+			blockedFeatures
 				.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
 			
 		}else
-			hiddenFeatures.remove(feature);
+			blockedFeatures.remove(feature);
 		
 		file.save();
 	}
 	
-	public void unhideAll()
+	public void unblockAll()
 	{
-		hiddenFeatures.clear();
+		blockedFeatures.clear();
 		file.save();
 	}
 	
-	public List<Feature> getHiddenFeatures()
+	public List<Feature> getBlockedFeatures()
 	{
-		return Collections.unmodifiableList(hiddenFeatures);
+		return Collections.unmodifiableList(blockedFeatures);
 	}
 }

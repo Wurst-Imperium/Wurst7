@@ -71,7 +71,7 @@ public abstract class Hack extends Feature
 			return;
 		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
-		if(enabled && tooManyHax.isEnabled() && tooManyHax.isHidden(this))
+		if(enabled && tooManyHax.isEnabled() && tooManyHax.isBlocked(this))
 			return;
 		
 		this.enabled = enabled;

@@ -7,10 +7,10 @@
  */
 package net.wurstclient.other_features;
 
-import net.wurstclient.DontHide;
+import net.wurstclient.DontBlock;
 import net.wurstclient.other_feature.OtherFeature;
 
-@DontHide
+@DontBlock
 public final class ReconnectOtf extends OtherFeature
 {
 	public ReconnectOtf()

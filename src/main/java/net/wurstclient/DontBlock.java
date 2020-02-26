@@ -14,14 +14,14 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
- * Prevents the TooManyHax hack from hiding and disabling this feature.
+ * Prevents the TooManyHax hack from blocking this feature.
  * <p>
- * Use if hiding and disabling this feature...
+ * Use if blocking this feature...
  * <ul>
  * <li>wouldn't actually do anything (e.g. ServerFinder button wouldn't be
- * removed by disabling its feature)
- * <li>would break other features in potentially unexpected ways (e.g. disabling
- * Panic would break Disable Wurst, disabling .setslider would break keybinds,
+ * removed by blocking its feature)
+ * <li>would break other features in potentially unexpected ways (e.g. blocking
+ * Panic would break Disable Wurst, blocking .setslider would break keybinds,
  * etc.)
  * <li>would potentially brick the whole client (e.g. ClickGUI)
  * <li>would get the feature stuck in its current state rather than turning it
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface DontHide
+public @interface DontBlock
 {
 	
 }

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.wurstclient.DontHide;
+import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -26,16 +26,16 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
 
-@DontHide
+@DontBlock
 public final class TooManyHaxCmd extends Command
 {
 	public TooManyHaxCmd()
 	{
 		super("toomanyhax",
-			"Allows to manage which hacks should be hidden\n"
+			"Allows to manage which hacks should be blocked\n"
 				+ "when TooManyHax is enabled.",
-			".toomanyhax hide <feature>", ".toomanyhax unhide <feature>",
-			".toomanyhax unhide-all", ".toomanyhax list [<page>]",
+			".toomanyhax block <feature>", ".toomanyhax unblock <feature>",
+			".toomanyhax unblock-all", ".toomanyhax list [<page>]",
 			".toomanyhax load-profile <file>",
 			".toomanyhax save-profile <file>",
 			".toomanyhax list-profiles [<page>]",
@@ -50,16 +50,16 @@ public final class TooManyHaxCmd extends Command
 		
 		switch(args[0].toLowerCase())
 		{
-			case "hide":
-			hide(args);
+			case "block":
+			block(args);
 			break;
 			
-			case "unhide":
-			unhide(args);
+			case "unblock":
+			unblock(args);
 			break;
 			
-			case "unhide-all":
-			unhideAll();
+			case "unblock-all":
+			unblockAll();
 			break;
 			
 			case "list":
@@ -83,7 +83,7 @@ public final class TooManyHaxCmd extends Command
 		}
 	}
 	
-	private void hide(String[] args) throws CmdException
+	private void block(String[] args) throws CmdException
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
@@ -92,13 +92,13 @@ public final class TooManyHaxCmd extends Command
 		Feature feature = parseFeature(name);
 		String typeAndName = getType(feature) + " '" + name + "'";
 		
-		if(!feature.isSafeToHide())
-			throw new CmdError("The " + typeAndName + " is not safe to hide.");
+		if(!feature.isSafeToBlock())
+			throw new CmdError("The " + typeAndName + " is not safe to block.");
 		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
-		if(tooManyHax.isHidden(feature))
+		if(tooManyHax.isBlocked(feature))
 		{
-			ChatUtils.error("The " + typeAndName + " is already hidden.");
+			ChatUtils.error("The " + typeAndName + " is already blocked.");
 			
 			if(!tooManyHax.isEnabled())
 				ChatUtils.message("Enable TooManyHax to see the effect.");
@@ -106,11 +106,11 @@ public final class TooManyHaxCmd extends Command
 			return;
 		}
 		
-		tooManyHax.setHidden(feature, true);
+		tooManyHax.setBlocked(feature, true);
 		ChatUtils.message("Added " + typeAndName + " to TooManyHax list.");
 	}
 	
-	private void unhide(String[] args) throws CmdException
+	private void unblock(String[] args) throws CmdException
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
@@ -120,18 +120,17 @@ public final class TooManyHaxCmd extends Command
 		String typeAndName = getType(feature) + " '" + name + "'";
 		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
-		if(!tooManyHax.isHidden(feature))
-			throw new CmdError(
-				"The " + typeAndName + " is already not hidden.");
+		if(!tooManyHax.isBlocked(feature))
+			throw new CmdError("The " + typeAndName + " is not blocked.");
 		
-		tooManyHax.setHidden(feature, false);
+		tooManyHax.setBlocked(feature, false);
 		ChatUtils.message("Removed " + typeAndName + " from TooManyHax list.");
 	}
 	
-	private void unhideAll()
+	private void unblockAll()
 	{
-		WURST.getHax().tooManyHaxHack.unhideAll();
-		ChatUtils.message("All hidden features made visible.");
+		WURST.getHax().tooManyHaxHack.unblockAll();
+		ChatUtils.message("All features unblocked.");
 	}
 	
 	private Feature parseFeature(String name) throws CmdSyntaxError
@@ -164,24 +163,24 @@ public final class TooManyHaxCmd extends Command
 			throw new CmdSyntaxError();
 		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
-		List<Feature> hidden = tooManyHax.getHiddenFeatures();
+		List<Feature> blocked = tooManyHax.getBlockedFeatures();
 		int page = parsePage(args);
-		int pages = (int)Math.ceil(hidden.size() / 8.0);
+		int pages = (int)Math.ceil(blocked.size() / 8.0);
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
 			throw new CmdSyntaxError("Invalid page: " + page);
 		
-		String total = "Total: " + hidden.size() + " hidden feature";
-		total += hidden.size() != 1 ? "s" : "";
+		String total = "Total: " + blocked.size() + " blocked feature";
+		total += blocked.size() != 1 ? "s" : "";
 		ChatUtils.message(total);
 		
 		int start = (page - 1) * 8;
-		int end = Math.min(page * 8, hidden.size());
+		int end = Math.min(page * 8, blocked.size());
 		
 		ChatUtils.message("TooManyHax list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
-			ChatUtils.message(hidden.get(i).getName());
+			ChatUtils.message(blocked.get(i).getName());
 	}
 	
 	private int parsePage(String[] args) throws CmdSyntaxError

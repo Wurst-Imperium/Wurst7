@@ -9,7 +9,7 @@ package net.wurstclient.other_features;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
-import net.wurstclient.DontHide;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.MouseScrollListener;
 import net.wurstclient.other_feature.OtherFeature;
@@ -19,7 +19,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
 
 @SearchTags({"telescope", "optifine"})
-@DontHide
+@DontBlock
 public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 {
 	private final SliderSetting level = new SliderSetting("Zoom level", 3, 1,

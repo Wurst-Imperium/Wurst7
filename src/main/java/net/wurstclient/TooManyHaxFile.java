@@ -23,12 +23,12 @@ import net.wurstclient.util.json.WsonArray;
 public final class TooManyHaxFile
 {
 	private final Path path;
-	private final ArrayList<Feature> hiddenFeatures;
+	private final ArrayList<Feature> blockedFeatures;
 	
-	public TooManyHaxFile(Path path, ArrayList<Feature> hiddenFeatures)
+	public TooManyHaxFile(Path path, ArrayList<Feature> blockedFeatures)
 	{
 		this.path = path;
-		this.hiddenFeatures = hiddenFeatures;
+		this.blockedFeatures = blockedFeatures;
 	}
 	
 	public void load()
@@ -36,7 +36,7 @@ public final class TooManyHaxFile
 		try
 		{
 			WsonArray wson = JsonUtils.parseFileToArray(path);
-			setHiddenFeatures(wson);
+			setBlockedFeatures(wson);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -57,24 +57,24 @@ public final class TooManyHaxFile
 			throw new IllegalArgumentException();
 		
 		WsonArray wson = JsonUtils.parseFileToArray(profilePath);
-		setHiddenFeatures(wson);
+		setBlockedFeatures(wson);
 		
 		save();
 	}
 	
-	private void setHiddenFeatures(WsonArray wson)
+	private void setBlockedFeatures(WsonArray wson)
 	{
-		hiddenFeatures.clear();
+		blockedFeatures.clear();
 		
 		for(String name : wson.getAllStrings())
 		{
 			Feature feature = WurstClient.INSTANCE.getFeatureByName(name);
 			
-			if(feature != null && feature.isSafeToHide())
-				hiddenFeatures.add(feature);
+			if(feature != null && feature.isSafeToBlock())
+				blockedFeatures.add(feature);
 		}
 		
-		hiddenFeatures
+		blockedFeatures
 			.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
 	}
 	
@@ -106,7 +106,7 @@ public final class TooManyHaxFile
 	private JsonArray createJson()
 	{
 		JsonArray json = new JsonArray();
-		hiddenFeatures.stream().filter(Feature::isSafeToHide)
+		blockedFeatures.stream().filter(Feature::isSafeToBlock)
 			.map(Feature::getName).forEach(name -> json.add(name));
 		
 		return json;

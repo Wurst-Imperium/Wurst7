@@ -82,7 +82,7 @@ public final class KeybindProcessor implements KeyPressListener
 			}
 			
 			if(!hack.isEnabled() && hax.tooManyHaxHack.isEnabled()
-				&& hax.tooManyHaxHack.isHidden(hack))
+				&& hax.tooManyHaxHack.isBlocked(hack))
 			{
 				ChatUtils.error(hack.getName() + " is blocked by TooManyHax.");
 				return;

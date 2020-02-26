@@ -35,8 +35,8 @@ public abstract class Feature
 		getClass().isAnnotationPresent(SearchTags.class) ? String.join("\u00a7",
 			getClass().getAnnotation(SearchTags.class).value()) : "";
 	
-	private final boolean safeToHide =
-		!getClass().isAnnotationPresent(DontHide.class);
+	private final boolean safeToBlock =
+		!getClass().isAnnotationPresent(DontBlock.class);
 	
 	public abstract String getName();
 	
@@ -91,8 +91,8 @@ public abstract class Feature
 		return searchTags;
 	}
 	
-	public final boolean isSafeToHide()
+	public final boolean isSafeToBlock()
 	{
-		return safeToHide;
+		return safeToBlock;
 	}
 }
