@@ -48,6 +48,10 @@ public final class TooManyHaxHack extends Hack
 		
 		Path filePath = wurstFolder.resolve("toomanyhax.json");
 		file = new TooManyHaxFile(filePath, hiddenFeatures);
+	}
+	
+	public void loadHiddenHacksFile()
+	{
 		file.load();
 	}
 	
