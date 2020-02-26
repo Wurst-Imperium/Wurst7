@@ -19,7 +19,9 @@ import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.events.KeyPressListener;
+import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.other_features.TabGuiOtf;
+import net.wurstclient.util.ChatUtils;
 
 public final class TabGui implements KeyPressListener
 {
@@ -319,9 +321,25 @@ public final class TabGui implements KeyPressListener
 				break;
 				
 				case GLFW.GLFW_KEY_ENTER:
-				features.get(selected).doPrimaryAction();
+				onEnter();
 				break;
 			}
+		}
+		
+		private void onEnter()
+		{
+			Feature feature = features.get(selected);
+			
+			TooManyHaxHack tooManyHax =
+				WurstClient.INSTANCE.getHax().tooManyHaxHack;
+			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
+			{
+				ChatUtils
+					.error(feature.getName() + " is blocked by TooManyHax.");
+				return;
+			}
+			
+			feature.doPrimaryAction();
 		}
 		
 		public void add(Feature feature)
