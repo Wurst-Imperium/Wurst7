@@ -92,6 +92,9 @@ public final class TooManyHaxCmd extends Command
 		Feature feature = parseFeature(name);
 		String typeAndName = getType(feature) + " '" + name + "'";
 		
+		if(!feature.isSafeToHide())
+			throw new CmdError("The " + typeAndName + " is not safe to hide.");
+		
 		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
 		if(tooManyHax.isHidden(feature))
 		{

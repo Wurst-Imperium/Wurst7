@@ -86,6 +86,9 @@ public final class TooManyHaxHack extends Hack
 	{
 		if(hidden)
 		{
+			if(!feature.isSafeToHide())
+				throw new IllegalArgumentException();
+			
 			hiddenFeatures.add(feature);
 			hiddenFeatures
 				.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
