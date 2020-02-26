@@ -51,6 +51,18 @@ public final class TooManyHaxHack extends Hack
 		file.load();
 	}
 	
+	@Override
+	protected void onEnable()
+	{
+		for(Feature feature : hiddenFeatures)
+		{
+			if(!(feature instanceof Hack))
+				continue;
+			
+			((Hack)feature).setEnabled(false);
+		}
+	}
+	
 	public ArrayList<Path> listProfiles()
 	{
 		if(!Files.isDirectory(profilesFolder))
