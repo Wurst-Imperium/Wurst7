@@ -58,6 +58,11 @@ public final class TooManyHaxHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		disableHacks();
+	}
+	
+	private void disableHacks()
+	{
 		for(Feature feature : hiddenFeatures)
 		{
 			if(!(feature instanceof Hack))
@@ -86,6 +91,7 @@ public final class TooManyHaxHack extends Hack
 	public void loadProfile(String fileName) throws IOException, JsonException
 	{
 		file.loadProfile(profilesFolder.resolve(fileName));
+		disableHacks();
 	}
 	
 	public void saveProfile(String fileName) throws IOException, JsonException
