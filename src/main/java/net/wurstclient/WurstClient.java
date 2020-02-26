@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -42,6 +45,7 @@ import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
+import net.wurstclient.util.json.JsonException;
 
 public enum WurstClient
 {
@@ -60,6 +64,7 @@ public enum WurstClient
 	private CmdList cmds;
 	private OtfList otfs;
 	private SettingsFile settingsFile;
+	private Path settingsProfileFolder;
 	private KeybindList keybinds;
 	private ClickGui gui;
 	private Navigator navigator;
@@ -96,6 +101,7 @@ public enum WurstClient
 		otfs = new OtfList();
 		
 		Path settingsFile = wurstFolder.resolve("settings.json");
+		settingsProfileFolder = wurstFolder.resolve("settings");
 		this.settingsFile = new SettingsFile(settingsFile, hax, cmds, otfs);
 		this.settingsFile.load();
 		
@@ -206,6 +212,34 @@ public enum WurstClient
 	public void saveSettings()
 	{
 		settingsFile.save();
+	}
+	
+	public ArrayList<Path> listSettingsProfiles()
+	{
+		if(!Files.isDirectory(settingsProfileFolder))
+			return new ArrayList<>();
+		
+		try(Stream<Path> files = Files.list(settingsProfileFolder))
+		{
+			return files.filter(Files::isRegularFile)
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void loadSettingsProfile(String fileName)
+		throws IOException, JsonException
+	{
+		settingsFile.loadProfile(settingsProfileFolder.resolve(fileName));
+	}
+	
+	public void saveSettingsProfile(String fileName)
+		throws IOException, JsonException
+	{
+		settingsFile.saveProfile(settingsProfileFolder.resolve(fileName));
 	}
 	
 	public HackList getHax()
