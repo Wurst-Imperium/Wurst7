@@ -15,9 +15,6 @@ import java.util.ArrayList;
 
 import com.google.gson.JsonArray;
 
-import net.wurstclient.command.Command;
-import net.wurstclient.hack.Hack;
-import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
@@ -25,11 +22,12 @@ import net.wurstclient.util.json.WsonArray;
 public final class TooManyHaxFile
 {
 	private final Path path;
-	private final ArrayList<Feature> hiddenFeatures = new ArrayList<>();
+	private final ArrayList<Feature> hiddenFeatures;
 	
-	public TooManyHaxFile(Path path)
+	public TooManyHaxFile(Path path, ArrayList<Feature> hiddenFeatures)
 	{
 		this.path = path;
+		this.hiddenFeatures = hiddenFeatures;
 	}
 	
 	public void load()
@@ -69,30 +67,11 @@ public final class TooManyHaxFile
 		
 		for(String name : wson.getAllStrings())
 		{
-			Feature feature = getFeatureByName(name);
+			Feature feature = WurstClient.INSTANCE.getFeatureByName(name);
 			
 			if(feature != null && feature.isSafeToHide())
 				hiddenFeatures.add(feature);
 		}
-	}
-	
-	private Feature getFeatureByName(String name)
-	{
-		WurstClient wurst = WurstClient.INSTANCE;
-		
-		Hack hack = wurst.getHax().getHackByName(name);
-		if(hack != null)
-			return hack;
-		
-		Command cmd = wurst.getCmds().getCmdByName(name);
-		if(cmd != null)
-			return cmd;
-		
-		OtherFeature otf = wurst.getOtfs().getOtfByName(name);
-		if(otf != null)
-			return otf;
-		
-		return null;
 	}
 	
 	public void save()

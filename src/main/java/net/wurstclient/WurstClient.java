@@ -29,6 +29,7 @@ import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
+import net.wurstclient.command.Command;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.GUIRenderListener;
@@ -36,6 +37,7 @@ import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
@@ -43,6 +45,7 @@ import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
+import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
@@ -255,6 +258,23 @@ public enum WurstClient
 	public OtfList getOtfs()
 	{
 		return otfs;
+	}
+	
+	public Feature getFeatureByName(String name)
+	{
+		Hack hack = getHax().getHackByName(name);
+		if(hack != null)
+			return hack;
+		
+		Command cmd = getCmds().getCmdByName(name);
+		if(cmd != null)
+			return cmd;
+		
+		OtherFeature otf = getOtfs().getOtfByName(name);
+		if(otf != null)
+			return otf;
+		
+		return null;
 	}
 	
 	public KeybindList getKeybinds()

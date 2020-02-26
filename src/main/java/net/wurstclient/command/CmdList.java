@@ -57,8 +57,9 @@ public final class CmdList
 	public final SettingsCmd settingsCmd = new SettingsCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
-	public final UnbindCmd unbindCmd = new UnbindCmd();
+	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
 	public final TpCmd tpCmd = new TpCmd();
+	public final UnbindCmd unbindCmd = new UnbindCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	

@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.wurstclient.Category;
 import net.wurstclient.DontHide;
+import net.wurstclient.Feature;
 import net.wurstclient.SearchTags;
 import net.wurstclient.TooManyHaxFile;
 import net.wurstclient.hack.Hack;
@@ -25,6 +28,7 @@ import net.wurstclient.util.json.JsonException;
 @DontHide
 public final class TooManyHaxHack extends Hack
 {
+	private final ArrayList<Feature> hiddenFeatures = new ArrayList<>();
 	private final Path profilesFolder;
 	private final TooManyHaxFile file;
 	
@@ -42,7 +46,7 @@ public final class TooManyHaxHack extends Hack
 		profilesFolder = wurstFolder.resolve("toomanyhax");
 		
 		Path filePath = wurstFolder.resolve("toomanyhax.json");
-		file = new TooManyHaxFile(filePath);
+		file = new TooManyHaxFile(filePath, hiddenFeatures);
 		file.load();
 	}
 	
@@ -70,5 +74,25 @@ public final class TooManyHaxHack extends Hack
 	public void saveProfile(String fileName) throws IOException, JsonException
 	{
 		file.saveProfile(profilesFolder.resolve(fileName));
+	}
+	
+	public boolean isHidden(Feature feature)
+	{
+		return hiddenFeatures.contains(feature);
+	}
+	
+	public void setHidden(Feature feature, boolean hidden)
+	{
+		if(hidden)
+			hiddenFeatures.add(feature);
+		else
+			hiddenFeatures.remove(feature);
+		
+		file.save();
+	}
+	
+	public List<Feature> getHiddenFeatures()
+	{
+		return Collections.unmodifiableList(hiddenFeatures);
 	}
 }
