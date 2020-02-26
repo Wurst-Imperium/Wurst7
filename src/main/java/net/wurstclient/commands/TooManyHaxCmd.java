@@ -190,7 +190,7 @@ public final class TooManyHaxCmd extends Command
 		
 		try
 		{
-			WURST.getKeybinds().loadProfile(name);
+			WURST.getHax().tooManyHaxHack.loadProfile(name);
 			ChatUtils.message("TooManyHax profile loaded: " + name);
 			
 		}catch(NoSuchFileException e)
@@ -219,7 +219,7 @@ public final class TooManyHaxCmd extends Command
 		
 		try
 		{
-			WURST.getKeybinds().saveProfile(name);
+			WURST.getHax().tooManyHaxHack.saveProfile(name);
 			ChatUtils.message("TooManyHax profile saved: " + name);
 			
 		}catch(IOException | JsonException e)
