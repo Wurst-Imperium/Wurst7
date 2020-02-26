@@ -90,6 +90,8 @@ public final class SettingsFile
 		
 		WsonObject wson = JsonUtils.parseFileToObject(profilePath);
 		loadSettings(wson);
+		
+		save();
 	}
 	
 	private void loadSettings(WsonObject wson)

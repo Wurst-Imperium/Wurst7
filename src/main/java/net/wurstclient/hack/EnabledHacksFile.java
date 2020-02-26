@@ -57,6 +57,8 @@ public final class EnabledHacksFile
 		
 		WsonArray wson = JsonUtils.parseFileToArray(profilePath);
 		enableHacks(hax, wson);
+		
+		save(hax);
 	}
 	
 	private void enableHacks(HackList hax, WsonArray wson)
