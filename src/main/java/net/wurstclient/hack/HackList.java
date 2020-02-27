@@ -7,11 +7,16 @@
  */
 package net.wurstclient.hack;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -19,6 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hacks.*;
+import net.wurstclient.util.json.JsonException;
 
 public final class HackList implements UpdateListener
 {
@@ -139,6 +145,7 @@ public final class HackList implements UpdateListener
 	public final ThrowHack throwHack = new ThrowHack();
 	public final TimerHack timerHack = new TimerHack();
 	public final TiredHack tiredHack = new TiredHack();
+	public final TooManyHaxHack tooManyHaxHack = new TooManyHaxHack();
 	public final TpAuraHack tpAuraHack = new TpAuraHack();
 	public final TrajectoriesHack trajectoriesHack = new TrajectoriesHack();
 	public final TriggerBotHack triggerBotHack = new TriggerBotHack();
@@ -149,7 +156,11 @@ public final class HackList implements UpdateListener
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+	
 	private final EnabledHacksFile enabledHacksFile;
+	private final Path profilesFolder =
+		WurstClient.INSTANCE.getWurstFolder().resolve("enabled hacks");
+	
 	private final EventManager eventManager =
 		WurstClient.INSTANCE.getEventManager();
 	
@@ -203,5 +214,31 @@ public final class HackList implements UpdateListener
 	public int countHax()
 	{
 		return hax.size();
+	}
+	
+	public ArrayList<Path> listProfiles()
+	{
+		if(!Files.isDirectory(profilesFolder))
+			return new ArrayList<>();
+		
+		try(Stream<Path> files = Files.list(profilesFolder))
+		{
+			return files.filter(Files::isRegularFile)
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void loadProfile(String fileName) throws IOException, JsonException
+	{
+		enabledHacksFile.loadProfile(this, profilesFolder.resolve(fileName));
+	}
+	
+	public void saveProfile(String fileName) throws IOException, JsonException
+	{
+		enabledHacksFile.saveProfile(this, profilesFolder.resolve(fileName));
 	}
 }

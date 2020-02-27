@@ -8,6 +8,7 @@
 package net.wurstclient.keybinds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -34,20 +35,7 @@ public final class KeybindsFile
 	{
 		try
 		{
-			WsonObject wson = JsonUtils.parseFileToObject(path);
-			Set<Keybind> newKeybinds = new HashSet<>();
-			
-			for(Entry<String, String> entry : wson.getAllStrings().entrySet())
-			{
-				String keyName = entry.getKey();
-				String commands = entry.getValue();
-				
-				if(!isValidKeyName(keyName))
-					continue;
-				
-				Keybind keybind = new Keybind(keyName, commands);
-				newKeybinds.add(keybind);
-			}
+			Set<Keybind> newKeybinds = parseFile(path);
 			
 			if(newKeybinds.isEmpty())
 				newKeybinds = KeybindList.DEFAULT_KEYBINDS;
@@ -65,6 +53,34 @@ public final class KeybindsFile
 			
 			list.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
 		}
+	}
+	
+	public void loadProfile(KeybindList list, Path profilePath)
+		throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		list.setKeybinds(parseFile(profilePath));
+	}
+	
+	private Set<Keybind> parseFile(Path path) throws IOException, JsonException
+	{
+		WsonObject wson = JsonUtils.parseFileToObject(path);
+		Set<Keybind> newKeybinds = new HashSet<>();
+		
+		for(Entry<String, String> entry : wson.getAllStrings().entrySet())
+		{
+			String keyName = entry.getKey();
+			String commands = entry.getValue();
+			
+			if(!isValidKeyName(keyName))
+				continue;
+			
+			Keybind keybind = new Keybind(keyName, commands);
+			newKeybinds.add(keybind);
+		}
+		return newKeybinds;
 	}
 	
 	private boolean isValidKeyName(String key)
@@ -93,6 +109,17 @@ public final class KeybindsFile
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
 		}
+	}
+	
+	public void saveProfile(KeybindList list, Path profilePath)
+		throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		JsonObject json = createJson(list);
+		Files.createDirectories(profilePath.getParent());
+		JsonUtils.toJson(json, profilePath);
 	}
 	
 	private JsonObject createJson(KeybindList list)

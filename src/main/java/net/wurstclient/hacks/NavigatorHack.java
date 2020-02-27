@@ -7,14 +7,16 @@
  */
 package net.wurstclient.hacks;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.navigator.NavigatorMainScreen;
 
+@DontSaveState
+@DontBlock
 @SearchTags({"ClickGUI", "click gui", "SearchGUI", "search gui", "HackMenu",
 	"hack menu"})
-@DontSaveState
 public final class NavigatorHack extends Hack
 {
 	public NavigatorHack()

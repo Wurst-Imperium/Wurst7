@@ -61,6 +61,9 @@ public final class KeybindManagerScreen extends Screen
 				minecraft.openScreen(this);
 			}, new LiteralText("Are you sure you want to reset your keybinds?"),
 				new LiteralText("This cannot be undone!")))));
+		
+		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Profiles...",
+			b -> minecraft.openScreen(new KeybindProfilesScreen(this))));
 	}
 	
 	private void edit()

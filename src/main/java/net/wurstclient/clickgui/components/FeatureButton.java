@@ -19,6 +19,8 @@ import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.SettingsWindow;
 import net.wurstclient.clickgui.Window;
+import net.wurstclient.hacks.TooManyHaxHack;
+import net.wurstclient.util.ChatUtils;
 
 public final class FeatureButton extends Component
 {
@@ -52,6 +54,14 @@ public final class FeatureButton extends Component
 			else
 				openSettingsWindow();
 			
+			return;
+		}
+		
+		TooManyHaxHack tooManyHax =
+			WurstClient.INSTANCE.getHax().tooManyHaxHack;
+		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
+		{
+			ChatUtils.error(feature.getName() + " is blocked by TooManyHax.");
 			return;
 		}
 		

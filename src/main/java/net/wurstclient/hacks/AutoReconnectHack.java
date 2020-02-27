@@ -8,10 +8,12 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"auto reconnect", "AutoRejoin", "auto rejoin"})
+@DontBlock
 public final class AutoReconnectHack extends Hack
 {
 	public AutoReconnectHack()

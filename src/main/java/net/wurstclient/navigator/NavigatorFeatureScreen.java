@@ -36,9 +36,11 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 
 public final class NavigatorFeatureScreen extends NavigatorScreen
@@ -83,7 +85,18 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		{
 			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
 				hasHelp ? 149 : 302, 18, primaryAction, b -> {
+					
+					TooManyHaxHack tooManyHax =
+						WurstClient.INSTANCE.getHax().tooManyHaxHack;
+					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
+					{
+						ChatUtils.error(
+							feature.getName() + " is blocked by TooManyHax.");
+						return;
+					}
+					
 					feature.doPrimaryAction();
+					
 					primaryButton.setMessage(feature.getPrimaryAction());
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());

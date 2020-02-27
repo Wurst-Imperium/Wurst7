@@ -14,6 +14,7 @@ import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener;
+import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.util.ChatUtils;
 
 public final class CmdProcessor implements ChatOutputListener
@@ -44,6 +45,15 @@ public final class CmdProcessor implements ChatOutputListener
 		try
 		{
 			Command cmd = parseCmd(input);
+			
+			TooManyHaxHack tooManyHax =
+				WurstClient.INSTANCE.getHax().tooManyHaxHack;
+			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(cmd))
+			{
+				ChatUtils.error(cmd.getName() + " is blocked by TooManyHax.");
+				return;
+			}
+			
 			runCmd(cmd, input);
 			
 		}catch(CmdNotFoundException e)

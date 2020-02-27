@@ -17,6 +17,7 @@ import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.util.ChatUtils;
 
 public final class KeybindProcessor implements KeyPressListener
 {
@@ -74,10 +75,20 @@ public final class KeybindProcessor implements KeyPressListener
 		{
 			Hack hack = hax.getHackByName(cmd);
 			
-			if(hack != null)
-				hack.setEnabled(!hack.isEnabled());
-			else
+			if(hack == null)
+			{
 				cmdProcessor.process(cmd);
+				return;
+			}
+			
+			if(!hack.isEnabled() && hax.tooManyHaxHack.isEnabled()
+				&& hax.tooManyHaxHack.isBlocked(hack))
+			{
+				ChatUtils.error(hack.getName() + " is blocked by TooManyHax.");
+				return;
+			}
+			
+			hack.setEnabled(!hack.isEnabled());
 		}
 	}
 }

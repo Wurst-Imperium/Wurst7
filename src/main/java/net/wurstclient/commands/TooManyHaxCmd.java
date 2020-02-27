@@ -11,33 +11,35 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.client.util.InputUtil;
 import net.wurstclient.DontBlock;
+import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
-import net.wurstclient.keybinds.Keybind;
-import net.wurstclient.keybinds.KeybindList;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.TooManyHaxHack;
+import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
 
 @DontBlock
-public final class BindsCmd extends Command
+public final class TooManyHaxCmd extends Command
 {
-	public BindsCmd()
+	public TooManyHaxCmd()
 	{
-		super("binds", "Allows you to manage keybinds through the chat.",
-			".binds add <key> <hacks>", ".binds add <key> <commands>",
-			".binds remove <key>", ".binds list [<page>]",
-			".binds load-profile <file>", ".binds save-profile <file>",
-			".binds list-profiles [<page>]", ".binds remove-all",
-			".binds reset", "Multiple hacks/commands must be separated by ';'.",
-			"Profiles are saved in '.minecraft/wurst/keybinds'.");
+		super("toomanyhax",
+			"Allows to manage which hacks should be blocked\n"
+				+ "when TooManyHax is enabled.",
+			".toomanyhax block <feature>", ".toomanyhax unblock <feature>",
+			".toomanyhax unblock-all", ".toomanyhax list [<page>]",
+			".toomanyhax load-profile <file>",
+			".toomanyhax save-profile <file>",
+			".toomanyhax list-profiles [<page>]",
+			"Profiles are saved in '.minecraft/wurst/toomanyhax'.");
 	}
 	
 	@Override
@@ -48,12 +50,16 @@ public final class BindsCmd extends Command
 		
 		switch(args[0].toLowerCase())
 		{
-			case "add":
-			add(args);
+			case "block":
+			block(args);
 			break;
 			
-			case "remove":
-			remove(args);
+			case "unblock":
+			unblock(args);
+			break;
+			
+			case "unblock-all":
+			unblockAll();
 			break;
 			
 			case "list":
@@ -72,66 +78,83 @@ public final class BindsCmd extends Command
 			listProfiles(args);
 			break;
 			
-			case "remove-all":
-			removeAll();
-			break;
-			
-			case "reset":
-			reset();
-			break;
-			
 			default:
 			throw new CmdSyntaxError();
 		}
 	}
 	
-	private void add(String[] args) throws CmdException
-	{
-		if(args.length < 3)
-			throw new CmdSyntaxError();
-		
-		String displayKey = args[1];
-		String key = parseKey(displayKey);
-		String[] cmdArgs = Arrays.copyOfRange(args, 2, args.length);
-		String commands = String.join(" ", cmdArgs);
-		
-		WURST.getKeybinds().add(key, commands);
-		ChatUtils.message("Keybind set: " + displayKey + " -> " + commands);
-	}
-	
-	private void remove(String[] args) throws CmdException
+	private void block(String[] args) throws CmdException
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		String displayKey = args[1];
-		String key = parseKey(displayKey);
+		String name = args[1];
+		Feature feature = parseFeature(name);
+		String typeAndName = getType(feature) + " '" + name + "'";
 		
-		String commands = WURST.getKeybinds().getCommands(key);
-		if(commands == null)
-			throw new CmdError("Nothing to remove.");
+		if(!feature.isSafeToBlock())
+			throw new CmdError("The " + typeAndName + " is not safe to block.");
 		
-		WURST.getKeybinds().remove(key);
-		ChatUtils.message("Keybind removed: " + displayKey + " -> " + commands);
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		if(tooManyHax.isBlocked(feature))
+		{
+			ChatUtils.error("The " + typeAndName + " is already blocked.");
+			
+			if(!tooManyHax.isEnabled())
+				ChatUtils.message("Enable TooManyHax to see the effect.");
+			
+			return;
+		}
+		
+		tooManyHax.setBlocked(feature, true);
+		ChatUtils.message("Added " + typeAndName + " to TooManyHax list.");
 	}
 	
-	private String parseKey(String displayKey) throws CmdSyntaxError
+	private void unblock(String[] args) throws CmdException
 	{
-		String key = displayKey.toLowerCase();
+		if(args.length != 2)
+			throw new CmdSyntaxError();
 		
-		String prefix = "key.keyboard.";
-		if(!key.startsWith(prefix))
-			key = prefix + key;
+		String name = args[1];
+		Feature feature = parseFeature(name);
+		String typeAndName = getType(feature) + " '" + name + "'";
 		
-		try
-		{
-			InputUtil.fromName(key);
-			return key;
-			
-		}catch(IllegalArgumentException e)
-		{
-			throw new CmdSyntaxError("Unknown key: " + displayKey);
-		}
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		if(!tooManyHax.isBlocked(feature))
+			throw new CmdError("The " + typeAndName + " is not blocked.");
+		
+		tooManyHax.setBlocked(feature, false);
+		ChatUtils.message("Removed " + typeAndName + " from TooManyHax list.");
+	}
+	
+	private void unblockAll()
+	{
+		WURST.getHax().tooManyHaxHack.unblockAll();
+		ChatUtils.message("All features unblocked.");
+	}
+	
+	private Feature parseFeature(String name) throws CmdSyntaxError
+	{
+		Feature feature = WURST.getFeatureByName(name);
+		if(feature == null)
+			throw new CmdSyntaxError(
+				"A feature named '" + name + "' could not be found");
+		
+		return feature;
+	}
+	
+	private String getType(Feature feature)
+	{
+		if(feature instanceof Hack)
+			return "hack";
+		
+		if(feature instanceof Command)
+			return "command";
+		
+		if(feature instanceof OtherFeature)
+			return "feature";
+		
+		throw new IllegalStateException();
 	}
 	
 	private void list(String[] args) throws CmdException
@@ -139,24 +162,25 @@ public final class BindsCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		List<Keybind> binds = WURST.getKeybinds().getAllKeybinds();
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		List<Feature> blocked = tooManyHax.getBlockedFeatures();
 		int page = parsePage(args);
-		int pages = (int)Math.ceil(binds.size() / 8.0);
+		int pages = (int)Math.ceil(blocked.size() / 8.0);
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
 			throw new CmdSyntaxError("Invalid page: " + page);
 		
-		String total = "Total: " + binds.size() + " keybind";
-		total += binds.size() != 1 ? "s" : "";
+		String total = "Total: " + blocked.size() + " blocked feature";
+		total += blocked.size() != 1 ? "s" : "";
 		ChatUtils.message(total);
 		
 		int start = (page - 1) * 8;
-		int end = Math.min(page * 8, binds.size());
+		int end = Math.min(page * 8, blocked.size());
 		
-		ChatUtils.message("Keybind list (page " + page + "/" + pages + ")");
+		ChatUtils.message("TooManyHax list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
-			ChatUtils.message(binds.get(i).toString());
+			ChatUtils.message(blocked.get(i).getName());
 	}
 	
 	private int parsePage(String[] args) throws CmdSyntaxError
@@ -170,18 +194,6 @@ public final class BindsCmd extends Command
 		return Integer.parseInt(args[1]);
 	}
 	
-	private void removeAll()
-	{
-		WURST.getKeybinds().removeAll();
-		ChatUtils.message("All keybinds removed.");
-	}
-	
-	private void reset()
-	{
-		WURST.getKeybinds().setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-		ChatUtils.message("All keybinds reset to defaults.");
-	}
-	
 	private void loadProfile(String[] args) throws CmdException
 	{
 		if(args.length != 2)
@@ -191,8 +203,8 @@ public final class BindsCmd extends Command
 		
 		try
 		{
-			WURST.getKeybinds().loadProfile(name);
-			ChatUtils.message("Keybinds loaded: " + name);
+			WURST.getHax().tooManyHaxHack.loadProfile(name);
+			ChatUtils.message("TooManyHax profile loaded: " + name);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -220,8 +232,8 @@ public final class BindsCmd extends Command
 		
 		try
 		{
-			WURST.getKeybinds().saveProfile(name);
-			ChatUtils.message("Keybinds saved: " + name);
+			WURST.getHax().tooManyHaxHack.saveProfile(name);
+			ChatUtils.message("TooManyHax profile saved: " + name);
 			
 		}catch(IOException | JsonException e)
 		{
@@ -259,8 +271,8 @@ public final class BindsCmd extends Command
 		int start = (page - 1) * 8;
 		int end = Math.min(page * 8, files.size());
 		
-		ChatUtils
-			.message("Keybind profile list (page " + page + "/" + pages + ")");
+		ChatUtils.message(
+			"TooManyHax profile list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
 			ChatUtils.message(files.get(i).getFileName().toString());
 	}

@@ -18,6 +18,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.hacks.TooManyHaxHack;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 
 public final class NavigatorMainScreen extends NavigatorScreen
@@ -93,6 +95,15 @@ public final class NavigatorMainScreen extends NavigatorScreen
 					expanding = true;
 				else
 				{
+					TooManyHaxHack tooManyHax =
+						WurstClient.INSTANCE.getHax().tooManyHaxHack;
+					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
+					{
+						ChatUtils.error(
+							feature.getName() + " is blocked by TooManyHax.");
+						return;
+					}
+					
 					feature.doPrimaryAction();
 					WurstClient wurst = WurstClient.INSTANCE;
 					wurst.getNavigator().addPreference(feature.getName());

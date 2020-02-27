@@ -7,11 +7,13 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 
 @SearchTags({"turn off", "hide wurst logo", "ghost mode", "stealth mode",
 	"vanilla Minecraft"})
+@DontBlock
 public final class DisableOtf extends OtherFeature
 {
 	public DisableOtf()

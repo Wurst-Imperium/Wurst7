@@ -35,6 +35,9 @@ public abstract class Feature
 		getClass().isAnnotationPresent(SearchTags.class) ? String.join("\u00a7",
 			getClass().getAnnotation(SearchTags.class).value()) : "";
 	
+	private final boolean safeToBlock =
+		!getClass().isAnnotationPresent(DontBlock.class);
+	
 	public abstract String getName();
 	
 	public abstract String getDescription();
@@ -78,13 +81,18 @@ public abstract class Feature
 		possibleKeybinds.add(new PossibleKeybind(command, description));
 	}
 	
+	public final Set<PossibleKeybind> getPossibleKeybinds()
+	{
+		return Collections.unmodifiableSet(possibleKeybinds);
+	}
+	
 	public final String getSearchTags()
 	{
 		return searchTags;
 	}
 	
-	public final Set<PossibleKeybind> getPossibleKeybinds()
+	public final boolean isSafeToBlock()
 	{
-		return Collections.unmodifiableSet(possibleKeybinds);
+		return safeToBlock;
 	}
 }
