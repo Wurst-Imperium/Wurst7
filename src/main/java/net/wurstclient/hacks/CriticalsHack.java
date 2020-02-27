@@ -70,7 +70,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 		if(!isEnabled())
 			return;
 		
-		if(!MC.player.onGround)
+		if(!MC.player.method_24828())
 			return;
 		
 		if(MC.player.isTouchingWater() || MC.player.isInLava())
@@ -114,7 +114,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	{
 		MC.player.addVelocity(0, 0.1, 0);
 		MC.player.fallDistance = 0.1F;
-		MC.player.onGround = false;
+		MC.player.method_24830(false);
 	}
 	
 	private void doFullJump()

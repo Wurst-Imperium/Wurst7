@@ -61,7 +61,7 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		if(!MC.player.onGround)
+		if(!MC.player.method_24828())
 		{
 			ChatUtils.error("Can't build this in mid-air.");
 			setEnabled(false);
@@ -132,7 +132,7 @@ public final class InstantBunkerHack extends Hack
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
 			
-			if(MC.player.onGround)
+			if(MC.player.method_24828())
 			{
 				setEnabled(false);
 				return;

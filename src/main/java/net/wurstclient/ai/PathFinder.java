@@ -58,7 +58,7 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		if(WurstClient.MC.player.onGround)
+		if(WurstClient.MC.player.method_24828())
 			start = new PathPos(new BlockPos(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ()));

@@ -66,8 +66,8 @@ public final class GlideHack extends Hack implements UpdateListener
 		ClientPlayerEntity player = MC.player;
 		Vec3d v = player.getVelocity();
 		
-		if(player.onGround || player.isTouchingWater() || player.isInLava()
-			|| player.isClimbing() || v.y >= 0)
+		if(player.method_24828() || player.isTouchingWater()
+			|| player.isInLava() || player.isClimbing() || v.y >= 0)
 			return;
 		
 		if(minHeight.getValue() > 0)

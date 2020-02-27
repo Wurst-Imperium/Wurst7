@@ -308,7 +308,7 @@ public final class FollowHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.onGround)
+			if(MC.player.horizontalCollision && MC.player.method_24828())
 				MC.player.jump();
 			
 			// swim up if necessary
@@ -316,7 +316,7 @@ public final class FollowHack extends Hack
 				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
 			
 			// control height if flying
-			if(!MC.player.onGround
+			if(!MC.player.method_24828()
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),

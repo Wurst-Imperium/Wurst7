@@ -159,7 +159,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onChatMessage(ChatMessageS2CPacket var1)
+	public void onGameMessage(GameMessageS2CPacket var1)
 	{
 		
 	}

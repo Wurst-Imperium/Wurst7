@@ -82,14 +82,14 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			MC.player.inventory.selectedSlot = potionInHotbar;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw, 90,
-					MC.player.onGround));
+					MC.player.method_24828()));
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
 			MC.player.inventory.selectedSlot = oldSlot;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw,
-					MC.player.pitch, MC.player.onGround));
+					MC.player.pitch, MC.player.method_24828()));
 			
 			// reset timer
 			timer = 10;

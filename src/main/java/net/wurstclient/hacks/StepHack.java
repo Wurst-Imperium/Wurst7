@@ -72,8 +72,8 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!player.horizontalCollision)
 			return;
 		
-		if(!player.onGround || player.isClimbing() || player.isTouchingWater()
-			|| player.isInLava())
+		if(!player.method_24828() || player.isClimbing()
+			|| player.isTouchingWater() || player.isInLava())
 			return;
 		
 		if(player.input.movementForward == 0
@@ -107,11 +107,11 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
 			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
-			player.onGround));
+			player.method_24828()));
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
-			player.onGround));
+			player.method_24828()));
 		
 		player.updatePosition(player.getX(), player.getY() + 1 * stepHeight,
 			player.getZ());

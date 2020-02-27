@@ -264,7 +264,7 @@ public final class AutoBuildHack extends Hack
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookOnly packet =
 				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
-					rotation.getPitch(), MC.player.onGround);
+					rotation.getPitch(), MC.player.method_24828());
 			MC.player.networkHandler.sendPacket(packet);
 			
 			// place block
