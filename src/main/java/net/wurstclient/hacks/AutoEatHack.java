@@ -189,14 +189,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		if(hitResult instanceof EntityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
+			Entity entity = ((EntityHitResult)hitResult).getEntity();
 			return entity instanceof VillagerEntity
 				|| entity instanceof TameableEntity;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
 		{
-			BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+			BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
 			if(pos == null)
 				return false;
 			
