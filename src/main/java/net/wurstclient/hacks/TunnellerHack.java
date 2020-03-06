@@ -617,7 +617,7 @@ public final class TunnellerHack extends Hack
 			
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 			GL11.glColor4f(1, 1, 0, 0.5F);
-			Vec3d torchVec = new Vec3d(nextTorch).add(0.5, 0, 0.5);
+			Vec3d torchVec = Vec3d.method_24955(nextTorch);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			
