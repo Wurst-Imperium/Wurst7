@@ -128,7 +128,8 @@ public final class AutoFarmHack extends Hack
 		int blockRange = (int)Math.ceil(range.getValue());
 		
 		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec
+				.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.canBeClicked(pos))
 			.collect(Collectors.toList());
 		
@@ -139,21 +140,21 @@ public final class AutoFarmHack extends Hack
 		
 		if(!WURST.getHax().freecamHack.isEnabled())
 		{
-			blocksToHarvest =
-				blocks.parallelStream().filter(this::shouldBeHarvested)
-					.sorted(Comparator.comparingDouble(
-						pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
-					.collect(Collectors.toList());
+			blocksToHarvest = blocks.parallelStream()
+				.filter(this::shouldBeHarvested)
+				.sorted(Comparator.comparingDouble(
+					pos -> eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
+				.collect(Collectors.toList());
 			
 			blocksToReplant = getBlockStream(eyesBlock, blockRange)
-				.filter(
-					pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+				.filter(pos -> eyesVec
+					.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
 				.filter(pos -> BlockUtils.getState(pos).getMaterial()
 					.isReplaceable())
 				.filter(pos -> plants.containsKey(pos))
 				.filter(this::canBeReplanted)
 				.sorted(Comparator.comparingDouble(
-					pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+					pos -> eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
 				.collect(Collectors.toList());
 		}
 		
@@ -348,8 +349,8 @@ public final class AutoFarmHack extends Hack
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
-			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+			hitVecs[i] = posVec
+				.add(Vec3d.method_24954(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{

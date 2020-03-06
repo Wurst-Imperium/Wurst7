@@ -35,7 +35,7 @@ public enum BlockBreaker
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d relCenter = BlockUtils.getState(pos)
 			.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
-		Vec3d center = new Vec3d(pos).add(relCenter);
+		Vec3d center = Vec3d.method_24954(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
@@ -102,8 +102,8 @@ public enum BlockBreaker
 			
 			for(Direction side : Direction.values())
 			{
-				Vec3d hitVec =
-					posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+				Vec3d hitVec = posVec
+					.add(Vec3d.method_24954(side.getVector()).multiply(0.5));
 				
 				// check if side is facing towards player
 				if(eyesPos.squaredDistanceTo(hitVec) >= distanceSqPosVec)

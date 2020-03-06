@@ -140,10 +140,11 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec
+				.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
 			.filter(validator)
 			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+				pos -> eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	
@@ -177,7 +178,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		for(Direction side : Direction.values())
 		{
 			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+				posVec.add(Vec3d.method_24954(side.getVector()).multiply(0.5));
 			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
 			
 			// check if hitVec is within range (4.25 blocks)
@@ -219,7 +220,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		for(Direction side : Direction.values())
 		{
 			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+				posVec.add(Vec3d.method_24954(side.getVector()).multiply(0.5));
 			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
 			
 			// check if hitVec is within range (6 blocks)

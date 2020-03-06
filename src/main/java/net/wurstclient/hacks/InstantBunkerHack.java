@@ -179,8 +179,8 @@ public final class InstantBunkerHack extends Hack
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
-			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+			hitVecs[i] = posVec
+				.add(Vec3d.method_24954(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{

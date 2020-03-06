@@ -241,7 +241,7 @@ public final class AutoBuildHack extends Hack
 				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d dirVec = new Vec3d(side.getVector());
+			Vec3d dirVec = Vec3d.method_24954(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
 			// check if hitVec is within range
@@ -326,7 +326,7 @@ public final class AutoBuildHack extends Hack
 				if(!BlockUtils.canBeClicked(neighbor))
 					continue;
 				
-				Vec3d sideVec = new Vec3d(side.getVector());
+				Vec3d sideVec = Vec3d.method_24954(side.getVector());
 				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
 				
 				// check if hitVec is within range
