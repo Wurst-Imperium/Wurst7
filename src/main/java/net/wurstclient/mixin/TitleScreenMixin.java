@@ -36,7 +36,7 @@ public abstract class TitleScreenMixin extends Screen
 			return;
 		
 		addButton(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98, 20,
-			"Alt Manager", b -> minecraft.openScreen(new AltManagerScreen(this,
+			"Alt Manager", b -> client.openScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 		
 		for(AbstractButtonWidget button : buttons)

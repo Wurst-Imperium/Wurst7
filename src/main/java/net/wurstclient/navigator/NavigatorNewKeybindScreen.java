@@ -132,7 +132,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	{
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(minecraft.textRenderer, "New Keybind", middleX, 32,
+		drawCenteredString(client.textRenderer, "New Keybind", middleX, 32,
 			0xffffff);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -182,10 +182,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				
 				// text
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				drawString(minecraft.textRenderer, pkb.getDescription(), x1 + 1,
+				drawString(client.textRenderer, pkb.getDescription(), x1 + 1,
 					y1 + 1, 0xffffff);
-				drawString(minecraft.textRenderer, pkb.getCommand(), x1 + 1,
-					y1 + 1 + minecraft.textRenderer.fontHeight, 0xffffff);
+				drawString(client.textRenderer, pkb.getCommand(), x1 + 1,
+					y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_BLEND);
 			}
@@ -196,8 +196,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
-			textY += minecraft.textRenderer.fontHeight;
+			drawString(client.textRenderer, line, bgx1 + 2, textY, 0xffffff);
+			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -228,7 +228,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, button.getMessage(),
+			drawCenteredString(client.textRenderer, button.getMessage(),
 				(x1 + x2) / 2, y1 + 4, 0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}

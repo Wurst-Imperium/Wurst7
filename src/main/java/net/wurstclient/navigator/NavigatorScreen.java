@@ -197,7 +197,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected final int getStringHeight(String s)
 	{
-		int fontHeight = minecraft.textRenderer.fontHeight;
+		int fontHeight = client.textRenderer.fontHeight;
 		int height = fontHeight;
 		
 		for(int i = 0; i < s.length(); i++)

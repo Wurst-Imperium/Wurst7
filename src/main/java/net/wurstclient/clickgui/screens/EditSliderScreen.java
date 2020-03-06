@@ -40,7 +40,7 @@ public final class EditSliderScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		ValueDisplay vd = ValueDisplay.DECIMAL;
 		String valueString = vd.getValueString(slider.getValue());
 		
@@ -63,7 +63,7 @@ public final class EditSliderScreen extends Screen
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -76,7 +76,7 @@ public final class EditSliderScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			break;
 		}
 		
@@ -93,8 +93,8 @@ public final class EditSliderScreen extends Screen
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground();
-		drawCenteredString(minecraft.textRenderer, slider.getName(), width / 2,
-			20, 0xFFFFFF);
+		drawCenteredString(client.textRenderer, slider.getName(), width / 2, 20,
+			0xFFFFFF);
 		
 		valueField.render(mouseX, mouseY, partialTicks);
 		super.render(mouseX, mouseY, partialTicks);

@@ -57,10 +57,10 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, altManager.getList());
+		listGui = new ListGui(client, this, altManager.getList());
 		
 		if(altManager.getList().isEmpty() && shouldAsk)
-			minecraft.openScreen(new ConfirmScreen(this::confirmGenerate,
+			client.openScreen(new ConfirmScreen(this::confirmGenerate,
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
@@ -69,10 +69,10 @@ public final class AltManagerScreen extends Screen
 		
 		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			"Direct Login",
-			b -> minecraft.openScreen(new DirectLoginScreen(this))));
+			b -> client.openScreen(new DirectLoginScreen(this))));
 		
 		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20, "Add",
-			b -> minecraft.openScreen(new AddAltScreen(this, altManager))));
+			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
 		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
 			75, 20, "Star", b -> pressStar()));
@@ -84,7 +84,7 @@ public final class AltManagerScreen extends Screen
 			74, 20, "Delete", b -> pressDelete()));
 		
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			"Cancel", b -> minecraft.openScreen(prevScreen)));
+			"Cancel", b -> client.openScreen(prevScreen)));
 		
 		addButton(new ButtonWidget(8, 8, 100, 20, "Import Alts",
 			b -> pressImportAlts()));
@@ -152,7 +152,7 @@ public final class AltManagerScreen extends Screen
 		if(alt.isCracked())
 		{
 			LoginManager.changeCrackedName(alt.getEmail());
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			return;
 		}
 		
@@ -165,8 +165,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		altManager.setChecked(listGui.selected,
-			minecraft.getSession().getUsername());
-		minecraft.openScreen(prevScreen);
+			client.getSession().getUsername());
+		client.openScreen(prevScreen);
 	}
 	
 	private void pressStar()
@@ -179,7 +179,7 @@ public final class AltManagerScreen extends Screen
 	private void pressEdit()
 	{
 		Alt alt = listGui.getSelectedAlt();
-		minecraft.openScreen(new EditAltScreen(this, altManager, alt));
+		client.openScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -193,7 +193,7 @@ public final class AltManagerScreen extends Screen
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
 			message, "Delete", "Cancel");
-		minecraft.openScreen(screen);
+		client.openScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -248,7 +248,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -256,7 +256,7 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	@Override
@@ -278,12 +278,13 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredString(font, "Alt Manager", width / 2, 4, 16777215);
-		drawCenteredString(font, "Alts: " + altManager.getList().size(),
+		drawCenteredString(textRenderer, "Alt Manager", width / 2, 4, 16777215);
+		drawCenteredString(textRenderer, "Alts: " + altManager.getList().size(),
 			width / 2, 14, 10526880);
-		drawCenteredString(font, "premium: " + altManager.getNumPremium()
-			+ ", cracked: " + altManager.getNumCracked(), width / 2, 24,
-			10526880);
+		drawCenteredString(
+			textRenderer, "premium: " + altManager.getNumPremium()
+				+ ", cracked: " + altManager.getNumCracked(),
+			width / 2, 24, 10526880);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -374,7 +375,7 @@ public final class AltManagerScreen extends Screen
 			Alt alt = list.get(id);
 			
 			// green glow when logged in
-			if(minecraft.getSession().getUsername().equals(alt.getName()))
+			if(client.getSession().getUsername().equals(alt.getName()))
 			{
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
@@ -405,7 +406,7 @@ public final class AltManagerScreen extends Screen
 				isSelectedItem(id));
 			
 			// name / email
-			minecraft.textRenderer.draw("Name: " + alt.getNameOrEmail(), x + 31,
+			client.textRenderer.draw("Name: " + alt.getNameOrEmail(), x + 31,
 				y + 3, 10526880);
 			
 			// tags
@@ -414,7 +415,7 @@ public final class AltManagerScreen extends Screen
 				tags += "\u00a7r, \u00a7estarred";
 			if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
-			minecraft.textRenderer.draw(tags, x + 31, y + 15, 10526880);
+			client.textRenderer.draw(tags, x + 31, y + 15, 10526880);
 		}
 	}
 }

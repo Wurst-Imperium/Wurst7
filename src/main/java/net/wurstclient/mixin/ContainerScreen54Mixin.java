@@ -98,7 +98,7 @@ public abstract class ContainerScreen54Mixin
 				continue;
 			
 			waitForDelay();
-			if(this.mode != mode || minecraft.currentScreen == null)
+			if(this.mode != mode || client.currentScreen == null)
 				break;
 			
 			onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);

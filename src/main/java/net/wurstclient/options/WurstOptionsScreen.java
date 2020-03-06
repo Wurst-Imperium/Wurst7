@@ -38,7 +38,7 @@ public class WurstOptionsScreen extends Screen
 	public void init()
 	{
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, "Back", b -> client.openScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -71,7 +71,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "Keybinds",
 			"Keybinds allow you to toggle any hack\n"
 				+ "or command by simply pressing a\n" + "button.",
-			b -> minecraft.openScreen(new KeybindManagerScreen(this)));
+			b -> client.openScreen(new KeybindManagerScreen(this)));
 		
 		new WurstOptionsButton(-50, 48, () -> "X-Ray Blocks",
 			"Manager for the blocks\n" + "that X-Ray will show.",
@@ -81,7 +81,7 @@ public class WurstOptionsScreen extends Screen
 			"The Zoom Manager allows you to\n"
 				+ "change the zoom key, how far it\n"
 				+ "will zoom in and more.",
-			b -> minecraft.openScreen(new ZoomManagerScreen(this)));
+			b -> client.openScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()
@@ -114,7 +114,7 @@ public class WurstOptionsScreen extends Screen
 	
 	private void renderTitles()
 	{
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;

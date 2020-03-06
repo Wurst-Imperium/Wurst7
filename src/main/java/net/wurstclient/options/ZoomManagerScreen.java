@@ -39,11 +39,11 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.getName().replace("key.keyboard.", "");
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, "Back", b -> client.openScreen(prevScreen)));
 		
 		addButton(keyButton = new ButtonWidget(width / 2 - 79,
 			height / 4 + 24 - 16, 158, 20, "Zoom Key: " + zoomKeyName,
-			b -> minecraft.openScreen(new PressAKeyScreen(this))));
+			b -> client.openScreen(new PressAKeyScreen(this))));
 		
 		addButton(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16, 50, 20,
 			"More", b -> level.increaseValue()));
@@ -82,8 +82,9 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground();
-		drawCenteredString(font, "Zoom Manager", width / 2, 40, 0xffffff);
-		drawString(font, "Zoom Level: " + level.getValueString(),
+		drawCenteredString(textRenderer, "Zoom Manager", width / 2, 40,
+			0xffffff);
+		drawString(textRenderer, "Zoom Level: " + level.getValueString(),
 			width / 2 - 75, height / 4 + 44, 0xcccccc);
 		
 		super.render(mouseX, mouseY, partialTicks);
@@ -93,7 +94,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	public void setKey(String key)
 	{
 		WurstClient.INSTANCE.getZoomKey().setKeyCode(InputUtil.fromName(key));
-		minecraft.options.write();
+		client.options.write();
 		KeyBinding.updateKeysByCode();
 		keyButton.setMessage("Zoom Key: " + key);
 	}

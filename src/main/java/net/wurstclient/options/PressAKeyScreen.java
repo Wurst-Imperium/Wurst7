@@ -33,7 +33,7 @@ public class PressAKeyScreen extends Screen
 		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(getKeyName(keyCode, scanCode));
 		
-		minecraft.openScreen((Screen)prevScreen);
+		client.openScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
 	
@@ -52,8 +52,8 @@ public class PressAKeyScreen extends Screen
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground();
-		drawCenteredString(font, "Press a key", width / 2, height / 4 + 48,
-			16777215);
+		drawCenteredString(textRenderer, "Press a key", width / 2,
+			height / 4 + 48, 16777215);
 		super.render(mouseX, mouseY, partialTicks);
 	}
 }

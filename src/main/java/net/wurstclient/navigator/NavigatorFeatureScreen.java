@@ -227,36 +227,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						minecraft.openScreen(new NavigatorRemoveKeybindScreen(
+						client.openScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
 				addKeybindButton.x -= 16;
 			}
 		}
-		
-		// see also
-		// Feature[] seeAlso = feature.getSeeAlso();
-		// if(seeAlso.length != 0)
-		// {
-		// text += "\n\nSee also:";
-		// for(Feature seeAlsoFeature : seeAlso)
-		// {
-		// int y = 60 + getTextHeight() + 2;
-		// String name = seeAlsoFeature.getName();
-		// text += "\n- " + name;
-		// buttonDatas.add(new ButtonData(middleX - 148, y,
-		// Fonts.segoe15.getStringWidth(name) + 1, 8, "", 0x404040)
-		// {
-		// @Override
-		// public void press()
-		// {
-		// mc.displayGuiScreen(
-		// new NavigatorFeatureScreen(seeAlsoFeature, parent));
-		// }
-		// });
-		// }
-		// }
 		
 		// text height
 		setContentHeight(getStringHeight(text));
@@ -268,7 +245,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(keyCode == GLFW.GLFW_KEY_ESCAPE)
 		{
 			parent.setExpanding(false);
-			minecraft.openScreen(parent);
+			client.openScreen(parent);
 		}
 	}
 	
@@ -287,7 +264,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons
 		if(activeButton != null)
 		{
-			minecraft.getSoundManager().play(
+			client.getSoundManager().play(
 				PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1));
 			activeButton.press();
 			WurstClient.INSTANCE.getNavigator()
@@ -324,8 +301,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	{
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(minecraft.textRenderer, feature.getName(), middleX,
-			32, 0xffffff);
+		drawCenteredString(client.textRenderer, feature.getName(), middleX, 32,
+			0xffffff);
 		glDisable(GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -454,7 +431,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, buttonData.buttonText,
+			drawCenteredString(client.textRenderer, buttonData.buttonText,
 				(x1 + x2) / 2, y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
 			glDisable(GL_TEXTURE_2D);
@@ -466,8 +443,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
-			textY += minecraft.textRenderer.fontHeight;
+			drawString(client.textRenderer, line, bgx1 + 2, textY, 0xffffff);
+			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -509,7 +486,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, button.getMessage(),
+			drawCenteredString(client.textRenderer, button.getMessage(),
 				(x1 + x2) / 2, y1 + 4, 0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}

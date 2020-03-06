@@ -56,9 +56,9 @@ public final class EditBlockListScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, blockList.getBlockNames());
+		listGui = new ListGui(client, this, blockList.getBlockNames());
 		
-		blockNameField = new TextFieldWidget(minecraft.textRenderer,
+		blockNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, "");
 		children.add(blockNameField);
 		
@@ -73,15 +73,15 @@ public final class EditBlockListScreen extends Screen
 				"Remove Selected", b -> blockList.remove(listGui.selected)));
 		
 		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
-			b -> minecraft.openScreen(new ConfirmScreen(b2 -> {
+			b -> client.openScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
-				minecraft.openScreen(EditBlockListScreen.this);
+				client.openScreen(EditBlockListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
 		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28,
-			200, 20, "Done", b -> minecraft.openScreen(prevScreen)));
+			200, 20, "Done", b -> client.openScreen(prevScreen)));
 	}
 	
 	@Override
@@ -154,7 +154,7 @@ public final class EditBlockListScreen extends Screen
 		renderBackground();
 		listGui.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(minecraft.textRenderer,
+		drawCenteredString(client.textRenderer,
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
@@ -166,8 +166,8 @@ public final class EditBlockListScreen extends Screen
 		GL11.glTranslated(0, 0, 300);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
-			drawString(minecraft.textRenderer, "block name or ID", 68,
-				height - 50, 0x808080);
+			drawString(client.textRenderer, "block name or ID", 68, height - 50,
+				0x808080);
 		
 		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(49, height - 55, 64, height - 37, 0xff000000);

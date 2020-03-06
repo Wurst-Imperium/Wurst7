@@ -45,7 +45,7 @@ public final class EditBlockScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		String valueString = setting.getBlockName();
 		
 		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, "");
@@ -68,7 +68,7 @@ public final class EditBlockScreen extends Screen
 		if(block != null)
 			setting.setBlock(block);
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public final class EditBlockScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			break;
 		}
 		
@@ -97,7 +97,7 @@ public final class EditBlockScreen extends Screen
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		
 		renderBackground();
 		drawCenteredString(tr, setting.getName(), width / 2, 20, 0xFFFFFF);

@@ -303,8 +303,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				{
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 					String buttonText = feature.getName();
-					minecraft.textRenderer.draw(buttonText, area.x + 4,
-						area.y + 4, 0xffffff);
+					client.textRenderer.draw(buttonText, area.x + 4, area.y + 4,
+						0xffffff);
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					GL11.glEnable(GL11.GL_BLEND);
 				}
@@ -316,7 +316,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(tooltip != null)
 		{
 			String[] lines = tooltip.split("\n");
-			TextRenderer fr = minecraft.textRenderer;
+			TextRenderer fr = client.textRenderer;
 			
 			int tw = 0;
 			int th = lines.length * fr.fontHeight;
@@ -326,8 +326,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				if(lw > tw)
 					tw = lw;
 			}
-			int sw = minecraft.currentScreen.width;
-			int sh = minecraft.currentScreen.height;
+			int sw = client.currentScreen.width;
+			int sh = client.currentScreen.height;
 			
 			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
 			int xt2 = xt1 + tw + 3;

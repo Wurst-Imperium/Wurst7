@@ -38,11 +38,11 @@ public final class KeybindManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, width, height, 36, height - 56, 30);
+		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addButton(addButton =
-			new ButtonWidget(width / 2 - 102, height - 52, 100, 20, "Add",
-				b -> minecraft.openScreen(new KeybindEditorScreen(this))));
+		addButton(
+			addButton = new ButtonWidget(width / 2 - 102, height - 52, 100, 20,
+				"Add", b -> client.openScreen(new KeybindEditorScreen(this))));
 		
 		addButton(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
 			20, "Edit", b -> edit()));
@@ -51,26 +51,26 @@ public final class KeybindManagerScreen extends Screen
 			100, 20, "Remove", b -> remove()));
 		
 		addButton(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, "Back", b -> client.openScreen(prevScreen)));
 		
 		addButton(new ButtonWidget(8, 8, 100, 20, "Reset Keybinds",
-			b -> minecraft.openScreen(new ConfirmScreen(confirmed -> {
+			b -> client.openScreen(new ConfirmScreen(confirmed -> {
 				if(confirmed)
 					WurstClient.INSTANCE.getKeybinds()
 						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-				minecraft.openScreen(this);
+				client.openScreen(this);
 			}, new LiteralText("Are you sure you want to reset your keybinds?"),
 				new LiteralText("This cannot be undone!")))));
 		
 		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Profiles...",
-			b -> minecraft.openScreen(new KeybindProfilesScreen(this))));
+			b -> client.openScreen(new KeybindProfilesScreen(this))));
 	}
 	
 	private void edit()
 	{
 		Keybind keybind = WurstClient.INSTANCE.getKeybinds().getAllKeybinds()
 			.get(listGui.selected);
-		minecraft.openScreen(new KeybindEditorScreen(this, keybind.getKey(),
+		client.openScreen(new KeybindEditorScreen(this, keybind.getKey(),
 			keybind.getCommands()));
 	}
 	
@@ -152,8 +152,9 @@ public final class KeybindManagerScreen extends Screen
 		renderBackground();
 		listGui.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(font, "Keybind Manager", width / 2, 8, 0xffffff);
-		drawCenteredString(font, "Keybinds: " + listGui.getItemCount(),
+		drawCenteredString(textRenderer, "Keybind Manager", width / 2, 8,
+			0xffffff);
+		drawCenteredString(textRenderer, "Keybinds: " + listGui.getItemCount(),
 			width / 2, 20, 0xffffff);
 		
 		super.render(mouseX, mouseY, partialTicks);
@@ -210,10 +211,10 @@ public final class KeybindManagerScreen extends Screen
 			Keybind keybind =
 				WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(index);
 			
-			minecraft.textRenderer.draw(
+			client.textRenderer.draw(
 				"Key: " + keybind.getKey().replace("key.keyboard.", ""), x + 3,
 				y + 3, 0xa0a0a0);
-			minecraft.textRenderer.draw("Commands: " + keybind.getCommands(),
+			client.textRenderer.draw("Commands: " + keybind.getCommands(),
 				x + 3, y + 15, 0xa0a0a0);
 		}
 	}

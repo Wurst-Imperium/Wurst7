@@ -48,16 +48,16 @@ public final class KeybindEditorScreen extends Screen
 	public void init()
 	{
 		addButton(new ButtonWidget(width / 2 - 100, 60, 200, 20, "Change Key",
-			b -> minecraft.openScreen(new PressAKeyScreen(this))));
+			b -> client.openScreen(new PressAKeyScreen(this))));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200, 20,
 			"Save", b -> save()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200, 20,
-			"Cancel", b -> minecraft.openScreen(prevScreen)));
+			"Cancel", b -> client.openScreen(prevScreen)));
 		
-		commandField =
-			new TextFieldWidget(font, width / 2 - 100, 100, 200, 20, "");
+		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
+			200, 20, "");
 		commandField.setMaxLength(65536);
 		children.add(commandField);
 		setInitialFocus(commandField);
@@ -73,7 +73,7 @@ public final class KeybindEditorScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
 		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getText());
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -94,13 +94,14 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground();
 		
-		drawCenteredString(font, (oldKey != null ? "Edit" : "Add") + " Keybind",
-			width / 2, 20, 0xffffff);
+		drawCenteredString(textRenderer,
+			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
+			0xffffff);
 		
-		drawString(font, "Key: " + key.replace("key.keyboard.", ""),
+		drawString(textRenderer, "Key: " + key.replace("key.keyboard.", ""),
 			width / 2 - 100, 47, 0xa0a0a0);
-		drawString(font, "Commands (separated by ';')", width / 2 - 100, 87,
-			0xa0a0a0);
+		drawString(textRenderer, "Commands (separated by ';')", width / 2 - 100,
+			87, 0xa0a0a0);
 		
 		commandField.render(mouseX, mouseY, partialTicks);
 		super.render(mouseX, mouseY, partialTicks);

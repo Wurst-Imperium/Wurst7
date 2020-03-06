@@ -46,7 +46,7 @@ public class CleanUpScreen extends Screen
 	public void init()
 	{
 		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-			() -> "Cancel", "", b -> minecraft.openScreen(prevScreen)));
+			() -> "Cancel", "", b -> client.openScreen(prevScreen)));
 		
 		addButton(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -118,7 +118,7 @@ public class CleanUpScreen extends Screen
 				.setSelected(null);
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
 				.setServers(prevScreen.getServerList());
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			return;
 		}
 		
@@ -153,7 +153,7 @@ public class CleanUpScreen extends Screen
 					.setServers(prevScreen.getServerList());
 			}
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -169,8 +169,8 @@ public class CleanUpScreen extends Screen
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground();
-		drawCenteredString(font, "Clean Up", width / 2, 20, 16777215);
-		drawCenteredString(font,
+		drawCenteredString(textRenderer, "Clean Up", width / 2, 20, 16777215);
+		drawCenteredString(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		super.render(mouseX, mouseY, partialTicks);

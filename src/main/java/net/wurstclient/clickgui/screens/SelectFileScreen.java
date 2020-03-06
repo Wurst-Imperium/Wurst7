@@ -47,7 +47,7 @@ public final class SelectFileScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, setting.listFiles());
+		listGui = new ListGui(client, this, setting.listFiles());
 		
 		addButton(
 			new ButtonWidget(8, 8, 100, 20, "Open Folder", b -> openFolder()));
@@ -67,7 +67,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	private void done()
@@ -91,7 +91,7 @@ public final class SelectFileScreen extends Screen
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
-		minecraft.openScreen(
+		client.openScreen(
 			new ConfirmScreen(c -> confirmReset(c), title, message));
 	}
 	
@@ -100,7 +100,7 @@ public final class SelectFileScreen extends Screen
 		if(confirmed)
 			setting.resetFolder();
 		
-		minecraft.openScreen(SelectFileScreen.this);
+		client.openScreen(SelectFileScreen.this);
 	}
 	
 	@Override
@@ -165,7 +165,7 @@ public final class SelectFileScreen extends Screen
 		renderBackground();
 		listGui.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(minecraft.textRenderer, setting.getName(), width / 2,
+		drawCenteredString(client.textRenderer, setting.getName(), width / 2,
 			12, 0xffffff);
 		
 		super.render(mouseX, mouseY, partialTicks);
@@ -224,8 +224,8 @@ public final class SelectFileScreen extends Screen
 			
 			Path path = list.get(index);
 			fr.draw("" + path.getFileName(), x + 28, y, 0xf0f0f0);
-			fr.draw("" + minecraft.runDirectory.toPath().relativize(path),
-				x + 28, y + 9, 0xa0a0a0);
+			fr.draw("" + client.runDirectory.toPath().relativize(path), x + 28,
+				y + 9, 0xa0a0a0);
 		}
 	}
 }

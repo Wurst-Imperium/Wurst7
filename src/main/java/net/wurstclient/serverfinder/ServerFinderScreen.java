@@ -54,15 +54,15 @@ public class ServerFinderScreen extends Screen
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, "Back", b -> client.openScreen(prevScreen)));
 		
-		ipBox = new TextFieldWidget(font, width / 2 - 100, height / 4 + 34, 200,
-			20, "");
+		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
+			height / 4 + 34, 200, 20, "");
 		ipBox.setMaxLength(200);
 		ipBox.setSelected(true);
 		children.add(ipBox);
 		
-		maxThreadsBox = new TextFieldWidget(font, width / 2 - 32,
+		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
 			height / 4 + 58, 26, 12, "");
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
@@ -210,30 +210,32 @@ public class ServerFinderScreen extends Screen
 	{
 		renderBackground();
 		
-		drawCenteredString(font, "Server Finder", width / 2, 20, 16777215);
-		drawCenteredString(font,
+		drawCenteredString(textRenderer, "Server Finder", width / 2, 20,
+			16777215);
+		drawCenteredString(textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
 			10526880);
-		drawCenteredString(font, "to the IP you type into the field below.",
-			width / 2, 50, 10526880);
-		drawCenteredString(font,
+		drawCenteredString(textRenderer,
+			"to the IP you type into the field below.", width / 2, 50,
+			10526880);
+		drawCenteredString(textRenderer,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, 10526880);
 		
-		drawString(font, "Server address:", width / 2 - 100, height / 4 + 24,
-			10526880);
+		drawString(textRenderer, "Server address:", width / 2 - 100,
+			height / 4 + 24, 10526880);
 		ipBox.render(mouseX, mouseY, partialTicks);
 		
-		drawString(font, "Max. threads:", width / 2 - 100, height / 4 + 60,
-			10526880);
+		drawString(textRenderer, "Max. threads:", width / 2 - 100,
+			height / 4 + 60, 10526880);
 		maxThreadsBox.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(font, state.toString(), width / 2, height / 4 + 73,
-			10526880);
+		drawCenteredString(textRenderer, state.toString(), width / 2,
+			height / 4 + 73, 10526880);
 		
-		drawString(font, "Checked: " + checked + " / 1792", width / 2 - 100,
-			height / 4 + 84, 10526880);
-		drawString(font, "Working: " + working, width / 2 - 100,
+		drawString(textRenderer, "Checked: " + checked + " / 1792",
+			width / 2 - 100, height / 4 + 84, 10526880);
+		drawString(textRenderer, "Working: " + working, width / 2 - 100,
 			height / 4 + 94, 10526880);
 		
 		super.render(mouseX, mouseY, partialTicks);

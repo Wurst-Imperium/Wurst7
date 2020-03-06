@@ -39,7 +39,7 @@ public final class EnterProfileNameScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		
 		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, "");
 		valueField.setText("");
@@ -59,7 +59,7 @@ public final class EnterProfileNameScreen extends Screen
 		if(!value.isEmpty())
 			callback.accept(value);
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ public final class EnterProfileNameScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			break;
 		}
 		
@@ -89,7 +89,7 @@ public final class EnterProfileNameScreen extends Screen
 	public void render(int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground();
-		drawCenteredString(minecraft.textRenderer, "Name your new profile",
+		drawCenteredString(client.textRenderer, "Name your new profile",
 			width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(mouseX, mouseY, partialTicks);

@@ -40,14 +40,14 @@ public final class KeybindProfilesScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this,
+		listGui = new ListGui(client, this,
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
 		addButton(
 			new ButtonWidget(8, 8, 100, 20, "Open Folder", b -> openFolder()));
 		
 		addButton(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			"New Profile", b -> minecraft.openScreen(
+			"New Profile", b -> client.openScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
 		loadButton = addButton(new ButtonWidget(width / 2 - 50, height - 48,
@@ -103,7 +103,7 @@ public final class KeybindProfilesScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -168,8 +168,8 @@ public final class KeybindProfilesScreen extends Screen
 		renderBackground();
 		listGui.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(minecraft.textRenderer, "Keybind Profiles",
-			width / 2, 12, 0xffffff);
+		drawCenteredString(client.textRenderer, "Keybind Profiles", width / 2,
+			12, 0xffffff);
 		
 		super.render(mouseX, mouseY, partialTicks);
 		
@@ -227,8 +227,8 @@ public final class KeybindProfilesScreen extends Screen
 			
 			Path path = list.get(index);
 			fr.draw("" + path.getFileName(), x + 28, y, 0xf0f0f0);
-			fr.draw("" + minecraft.runDirectory.toPath().relativize(path),
-				x + 28, y + 9, 0xa0a0a0);
+			fr.draw("" + client.runDirectory.toPath().relativize(path), x + 28,
+				y + 9, 0xa0a0a0);
 		}
 	}
 }

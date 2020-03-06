@@ -58,9 +58,9 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, itemList.getItemNames());
+		listGui = new ListGui(client, this, itemList.getItemNames());
 		
-		itemNameField = new TextFieldWidget(minecraft.textRenderer,
+		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, "");
 		children.add(itemNameField);
 		
@@ -75,15 +75,15 @@ public final class EditItemListScreen extends Screen
 				20, "Remove Selected", b -> itemList.remove(listGui.selected)));
 		
 		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
-			b -> minecraft.openScreen(new ConfirmScreen(b2 -> {
+			b -> client.openScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
-				minecraft.openScreen(EditItemListScreen.this);
+				client.openScreen(EditItemListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
 		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28,
-			200, 20, "Done", b -> minecraft.openScreen(prevScreen)));
+			200, 20, "Done", b -> client.openScreen(prevScreen)));
 	}
 	
 	@Override
@@ -168,7 +168,7 @@ public final class EditItemListScreen extends Screen
 		renderBackground();
 		listGui.render(mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(minecraft.textRenderer,
+		drawCenteredString(client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
@@ -182,8 +182,8 @@ public final class EditItemListScreen extends Screen
 		{
 			GL11.glPushMatrix();
 			GL11.glTranslated(0, 0, 300);
-			drawString(minecraft.textRenderer, "item name or ID", 68,
-				height - 50, 0x808080);
+			drawString(client.textRenderer, "item name or ID", 68, height - 50,
+				0x808080);
 			GL11.glPopMatrix();
 		}
 		

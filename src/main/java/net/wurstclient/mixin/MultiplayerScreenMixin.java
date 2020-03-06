@@ -61,11 +61,11 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 				.joinLastServer((MultiplayerScreen)(Object)this)));
 		
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
-			"Server Finder", b -> minecraft.openScreen(
+			"Server Finder", b -> client.openScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
 		
 		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
-			"Clean Up", b -> minecraft.openScreen(
+			"Clean Up", b -> client.openScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 	

@@ -55,7 +55,7 @@ public abstract class AltEditorScreen extends Screen
 				200, 20, getDoneButtonText(), b -> pressDoneButton()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, "Cancel", b -> minecraft.openScreen(prevScreen)));
+			20, "Cancel", b -> client.openScreen(prevScreen)));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200,
 			20, "Random Name",
@@ -68,14 +68,15 @@ public abstract class AltEditorScreen extends Screen
 		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
 			20, "Open Skin Folder", b -> openSkinFolder()));
 		
-		emailBox = new TextFieldWidget(font, width / 2 - 100, 60, 200, 20, "");
+		emailBox =
+			new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200, 20, "");
 		emailBox.setMaxLength(48);
 		emailBox.setSelected(true);
 		emailBox.setText(getDefaultEmail());
 		children.add(emailBox);
 		
-		passwordBox =
-			new TextFieldWidget(font, width / 2 - 100, 100, 200, 20, "");
+		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
+			200, 20, "");
 		passwordBox.setText(getDefaultPassword());
 		passwordBox.setRenderTextProvider((text, int_1) -> {
 			String stars = "";
@@ -134,7 +135,7 @@ public abstract class AltEditorScreen extends Screen
 	
 	protected String getDefaultEmail()
 	{
-		return minecraft.getSession().getUsername();
+		return client.getSession().getUsername();
 	}
 	
 	protected String getDefaultPassword()
@@ -206,9 +207,10 @@ public abstract class AltEditorScreen extends Screen
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
-		drawString(font, "Name or E-Mail", width / 2 - 100, 47, 10526880);
-		drawString(font, "Password", width / 2 - 100, 87, 10526880);
-		drawCenteredString(font, message, width / 2, 142, 16777215);
+		drawString(textRenderer, "Name or E-Mail", width / 2 - 100, 47,
+			10526880);
+		drawString(textRenderer, "Password", width / 2 - 100, 87, 10526880);
+		drawCenteredString(textRenderer, message, width / 2, 142, 16777215);
 		
 		// text boxes
 		emailBox.render(mouseX, mouseY, partialTicks);

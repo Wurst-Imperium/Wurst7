@@ -57,7 +57,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void openWurstOptions()
 	{
-		minecraft.openScreen(new WurstOptionsScreen(this));
+		client.openScreen(new WurstOptionsScreen(this));
 	}
 	
 	private void removeFeedbackAndBugReportButtons()
@@ -92,7 +92,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1, 1, 1, 1);
 		
-		minecraft.getTextureManager().bindTexture(wurstTexture);
+		client.getTextureManager().bindTexture(wurstTexture);
 		
 		int x = wurstOptionsButton.x + 34;
 		int y = wurstOptionsButton.y + 2;
