@@ -167,7 +167,7 @@ public final class PlayerFinderHack extends Hack
 			return;
 		
 		// check distance to player
-		BlockPos playerPos = new BlockPos(MC.player);
+		BlockPos playerPos = new BlockPos(MC.player.getPos());
 		if(Math.abs(playerPos.getX() - newPos.getX()) > 256
 			|| Math.abs(playerPos.getZ() - newPos.getZ()) > 256)
 			pos = newPos;

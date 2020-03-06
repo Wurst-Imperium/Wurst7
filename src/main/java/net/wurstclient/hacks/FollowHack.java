@@ -360,7 +360,7 @@ public final class FollowHack extends Hack
 	{
 		public EntityPathFinder()
 		{
-			super(new BlockPos(entity));
+			super(new BlockPos(entity.getPos()));
 			setThinkTime(1);
 		}
 		

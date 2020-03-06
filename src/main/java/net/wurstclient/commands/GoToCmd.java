@@ -101,12 +101,12 @@ public final class GoToCmd extends Command
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		return new BlockPos(entity);
+		return new BlockPos(entity.getPos());
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = new BlockPos(MC.player);
+		BlockPos playerPos = new BlockPos(MC.player.getPos());
 		int[] player =
 			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];

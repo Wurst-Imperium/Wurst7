@@ -107,8 +107,9 @@ public final class BuildRandomHack extends Hack
 		do
 		{
 			// generate random position
-			pos = new BlockPos(MC.player).add(random.nextInt(bound) - range,
-				random.nextInt(bound) - range, random.nextInt(bound) - range);
+			pos = new BlockPos(MC.player.getPos()).add(
+				random.nextInt(bound) - range, random.nextInt(bound) - range,
+				random.nextInt(bound) - range);
 			attempts++;
 			
 		}while(attempts < 128 && !tryToPlaceBlock(legitMode, pos));

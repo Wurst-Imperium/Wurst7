@@ -63,7 +63,7 @@ public class PathFinder
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ()));
 		else
-			start = new PathPos(new BlockPos(WurstClient.MC.player));
+			start = new PathPos(new BlockPos(WurstClient.MC.player.getPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);

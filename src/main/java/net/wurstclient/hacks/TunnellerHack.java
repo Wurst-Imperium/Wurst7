@@ -119,7 +119,7 @@ public final class TunnellerHack extends Hack
 			displayLists[i] = GL11.glGenLists(1);
 		
 		ClientPlayerEntity player = MC.player;
-		start = new BlockPos(player);
+		start = new BlockPos(player.getPos());
 		direction = player.getHorizontalFacing();
 		length = 0;
 		
@@ -276,7 +276,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			int distance = getDistance(player, base);
 			
@@ -364,7 +364,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			
 			return getDistance(player, base) > 1;
@@ -388,7 +388,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos from = offsetFloor(player, size.getSelected().from);
 			BlockPos to = offsetFloor(player, size.getSelected().to);
 			
@@ -548,7 +548,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			KeyBinding forward = MC.options.keyForward;
 			
 			Vec3d diffVec = new Vec3d(player.subtract(start));
@@ -605,7 +605,7 @@ public final class TunnellerHack extends Hack
 			if(!torches.isChecked())
 			{
 				lastTorch = null;
-				nextTorch = new BlockPos(MC.player);
+				nextTorch = new BlockPos(MC.player.getPos());
 				GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 				GL11.glEndList();
 				return false;
