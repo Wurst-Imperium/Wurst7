@@ -501,9 +501,8 @@ public final class ExcavatorHack extends Hack
 		
 		if(pathFinder == null)
 		{
-			Comparator<BlockPos> cDistance =
-				Comparator.comparingDouble(pos -> MC.player
-					.squaredDistanceTo(new Vec3d(pos).add(0.5, 0.5, 0.5)));
+			Comparator<BlockPos> cDistance = Comparator.comparingDouble(
+				pos -> MC.player.squaredDistanceTo(Vec3d.method_24953(pos)));
 			Comparator<BlockPos> cAltitude =
 				Comparator.comparingInt(pos -> -pos.getY());
 			BlockPos closestBlock =

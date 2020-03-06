@@ -104,7 +104,7 @@ public final class PlayerFinderHack extends Hack
 				.add(RenderUtils.getCameraPos());
 			
 			// set end position
-			Vec3d end = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d end = Vec3d.method_24953(pos);
 			
 			// draw line
 			GL11.glVertex3d(start.x, start.y, start.z);

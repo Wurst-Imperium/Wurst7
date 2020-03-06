@@ -174,7 +174,7 @@ public final class InstantBunkerHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.method_24953(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];

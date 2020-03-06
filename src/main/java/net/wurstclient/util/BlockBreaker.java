@@ -97,7 +97,7 @@ public enum BlockBreaker
 		
 		for(BlockPos pos : blocks)
 		{
-			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d posVec = Vec3d.method_24953(pos);
 			double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 			
 			for(Direction side : Direction.values())

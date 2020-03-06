@@ -108,16 +108,15 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			Direction side2 = side.getOpposite();
 			
 			// check if side is visible (facing away from player)
-			if(eyesPos
-				.squaredDistanceTo(new Vec3d(pos).add(0.5, 0.5, 0.5)) >= eyesPos
-					.squaredDistanceTo(new Vec3d(neighbor).add(0.5, 0.5, 0.5)))
+			if(eyesPos.squaredDistanceTo(Vec3d.method_24953(pos)) >= eyesPos
+				.squaredDistanceTo(Vec3d.method_24953(neighbor)))
 				continue;
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d hitVec = new Vec3d(neighbor).add(0.5, 0.5, 0.5)
+			Vec3d hitVec = Vec3d.method_24953(neighbor)
 				.add(new Vec3d(side2.getVector()).multiply(0.5));
 			
 			// check if hitVec is within range (4.25 blocks)

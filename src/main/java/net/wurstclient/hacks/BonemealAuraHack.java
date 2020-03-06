@@ -171,7 +171,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.method_24953(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
@@ -213,7 +213,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private boolean rightClickBlockSimple(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.method_24953(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())

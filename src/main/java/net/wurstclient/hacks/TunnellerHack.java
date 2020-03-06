@@ -374,7 +374,7 @@ public final class TunnellerHack extends Hack
 		public void run()
 		{
 			BlockPos base = start.offset(direction, length);
-			Vec3d vec = new Vec3d(base).add(0.5, 0.5, 0.5);
+			Vec3d vec = Vec3d.method_24953(base);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 			
 			MC.options.keyForward.setPressed(true);
@@ -590,7 +590,7 @@ public final class TunnellerHack extends Hack
 		
 		private Vec3d toVec3d(BlockPos pos)
 		{
-			return new Vec3d(pos).add(0.5, 0.5, 0.5);
+			return Vec3d.method_24953(pos);
 		}
 	}
 	
@@ -674,7 +674,7 @@ public final class TunnellerHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.method_24953(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];

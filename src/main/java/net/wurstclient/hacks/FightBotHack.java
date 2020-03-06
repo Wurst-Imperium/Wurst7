@@ -334,8 +334,9 @@ public final class FightBotHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done = entity.squaredDistanceTo(new Vec3d(current).add(0.5,
-				0.5, 0.5)) <= Math.pow(distance.getValue(), 2);
+			return done =
+				entity.squaredDistanceTo(Vec3d.method_24953(current)) <= Math
+					.pow(distance.getValue(), 2);
 		}
 		
 		@Override

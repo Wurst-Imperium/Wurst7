@@ -149,12 +149,11 @@ public final class AntiAfkHack extends Hack
 			}
 			
 			// face block
-			WURST.getRotationFaker().faceVectorClientIgnorePitch(
-				new Vec3d(nextBlock).add(0.5, 0.5, 0.5));
+			WURST.getRotationFaker()
+				.faceVectorClientIgnorePitch(Vec3d.method_24953(nextBlock));
 			
 			// walk
-			if(MC.player.squaredDistanceTo(
-				new Vec3d(nextBlock).add(0.5, 0.5, 0.5)) > 0.5)
+			if(MC.player.squaredDistanceTo(Vec3d.method_24953(nextBlock)) > 0.5)
 				MC.options.keyForward.setPressed(true);
 			else
 				MC.options.keyForward.setPressed(false);
