@@ -78,7 +78,8 @@ public final class FlightHack extends Hack
 			if (fly_ticks <= 0)
 			{
 				fly_ticks = 40;
-				player.setVelocity(velocity.subtract(0, velocity.y+0.05, 0));
+				if (velocity.y >= 0)
+					player.setVelocity(velocity.subtract(0, velocity.y+0.05, 0));
 			}
 		}
 	}
