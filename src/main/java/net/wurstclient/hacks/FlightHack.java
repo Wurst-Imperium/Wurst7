@@ -14,6 +14,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
@@ -24,6 +25,9 @@ public final class FlightHack extends Hack
 	public final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
 	
+	public final CheckboxSetting anti_flykick = new CheckboxSetting("Anti Flykick", "Bypass the Fly check on Vanilla Servers.", false);
+	
+	private int fly_ticks = 0;
 	public FlightHack()
 	{
 		super("Flight",
@@ -31,6 +35,7 @@ public final class FlightHack extends Hack
 				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
+		addSetting(anti_flykick);
 	}
 	
 	@Override
@@ -58,13 +63,24 @@ public final class FlightHack extends Hack
 		player.flyingSpeed = speed.getValueF();
 		
 		player.setVelocity(0, 0, 0);
-		Vec3d velcity = player.getVelocity();
+		Vec3d velocity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
-			player.setVelocity(velcity.add(0, speed.getValue(), 0));
+			player.setVelocity(velocity.add(0, speed.getValue(), 0));
 		
 		if(MC.options.keySneak.isPressed())
-			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
+			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
+		
+		// If enabled, fly down 0.02 blocks every 2 seconds to prevent kicks
+		if (anti_flykick.isChecked())
+		{
+			fly_ticks--;
+			if (fly_ticks <= 0)
+			{
+				fly_ticks = 40;
+				player.setVelocity(velocity.subtract(0, velocity.y+0.05, 0));
+			}
+		}
 	}
 	
 	@Override
