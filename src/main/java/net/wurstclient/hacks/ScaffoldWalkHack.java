@@ -69,8 +69,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			// filter out non-solid blocks
 			Block block = Block.getBlockFromItem(stack.getItem());
 			BlockState state = block.getDefaultState();
-			if(!block.isFullOpaque(state, EmptyBlockView.INSTANCE,
-				BlockPos.ORIGIN))
+			if(!Block.isShapeFullCube(state
+				.getCullingShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN)))
 				continue;
 			
 			// filter out blocks that would fall
