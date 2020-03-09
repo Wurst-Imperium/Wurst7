@@ -68,13 +68,15 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private boolean isFeedbackOrBugReportButton(Element element)
 	{
-		if(!(element instanceof AbstractButtonWidget))
+		if(element == null || !(element instanceof AbstractButtonWidget))
 			return false;
 		
 		AbstractButtonWidget button = (AbstractButtonWidget)element;
+		String message = button.getMessage();
 		
-		return button.getMessage().equals(I18n.translate("menu.sendFeedback"))
-			|| button.getMessage().equals(I18n.translate("menu.reportBugs"));
+		return message != null
+			&& (message.equals(I18n.translate("menu.sendFeedback"))
+				|| message.equals(I18n.translate("menu.reportBugs")));
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"render(IIF)V"})
