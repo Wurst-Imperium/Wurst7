@@ -504,6 +504,7 @@ public class PathFinder
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
 		GL11.glPushMatrix();

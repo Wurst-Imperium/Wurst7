@@ -27,6 +27,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	private static final ArrayList<Feature> navigatorDisplayList =
 		new ArrayList<>();
 	private TextFieldWidget searchBar;
+	private String lastSearchText = "";
 	private String tooltip;
 	private int hoveredFeature = -1;
 	private boolean hoveringArrow;
@@ -64,20 +65,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(keyCode == 1)
 			if(clickTimer == -1)
 				WurstClient.MC.openScreen((Screen)null);
-			
-		if(clickTimer == -1)
-		{
-			String newText = searchBar.getText();
-			Navigator navigator = WurstClient.INSTANCE.getNavigator();
-			if(newText.isEmpty())
-				navigator.copyNavigatorList(navigatorDisplayList);
-			else
-			{
-				newText = newText.toLowerCase().trim();
-				navigator.getSearchResults(navigatorDisplayList, newText);
-			}
-			setContentHeight(navigatorDisplayList.size() / 3 * 20);
-		}
 	}
 	
 	@Override
@@ -126,6 +113,21 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onUpdate()
 	{
 		searchBar.tick();
+		
+		String newText = searchBar.getText();
+		if(clickTimer == -1 && !newText.equals(lastSearchText))
+		{
+			Navigator navigator = WurstClient.INSTANCE.getNavigator();
+			if(newText.isEmpty())
+				navigator.copyNavigatorList(navigatorDisplayList);
+			else
+			{
+				newText = newText.toLowerCase().trim();
+				navigator.getSearchResults(navigatorDisplayList, newText);
+			}
+			setContentHeight(navigatorDisplayList.size() / 3 * 20);
+			lastSearchText = newText;
+		}
 		
 		if(expanding)
 			if(clickTimer < 4)

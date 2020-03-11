@@ -75,6 +75,13 @@ public abstract class NavigatorScreen extends Screen
 				scroll = 0;
 			else if(scroll < maxScroll)
 				scroll = maxScroll;
+			
+			if(maxScroll == 0)
+				scrollKnobPosition = 0;
+			else
+				scrollKnobPosition =
+					(int)((height - 131) * scroll / (float)maxScroll);
+			scrollKnobPosition += 2;
 		}
 		
 		onMouseDrag(mouseX, mouseY, mouseButton, double_3, double_4);
@@ -213,6 +220,9 @@ public abstract class NavigatorScreen extends Screen
 		if(maxScroll > 0)
 			maxScroll = 0;
 		showScrollbar = maxScroll != 0;
+		
+		if(scroll < maxScroll)
+			scroll = maxScroll;
 	}
 	
 	protected final void drawQuads(int x1, int y1, int x2, int y2)
