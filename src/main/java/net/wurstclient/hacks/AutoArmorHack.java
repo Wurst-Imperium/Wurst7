@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -93,7 +93,7 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.currentScreen instanceof ContainerScreen
+		if(MC.currentScreen instanceof ScreenWithHandler
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
 		

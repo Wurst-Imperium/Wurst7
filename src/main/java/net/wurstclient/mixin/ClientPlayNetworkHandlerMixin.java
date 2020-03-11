@@ -187,7 +187,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onCloseContainer(CloseContainerS2CPacket var1)
+	public void onCloseScreen(CloseScreenS2CPacket var1)
 	{
 		
 	}
@@ -201,21 +201,22 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenHorseContainer(OpenHorseContainerS2CPacket var1)
+	public void onOpenHorseScreen(OpenHorseScreenS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerPropertyUpdate(ContainerPropertyUpdateS2CPacket var1)
+	public void onScreenHandlerPropertyUpdate(
+		ScreenHandlerPropertyUpdateS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerSlotUpdate(ContainerSlotUpdateS2CPacket var1)
+	public void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket var1)
 	{
 		
 	}
@@ -649,7 +650,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerS2CPacket var1)
+	public void onOpenScreen(OpenScreenS2CPacket var1)
 	{
 		
 	}

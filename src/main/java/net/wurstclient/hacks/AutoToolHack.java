@@ -176,7 +176,7 @@ public final class AutoToolHack extends Hack
 	
 	private float getMiningSpeed(ItemStack stack, BlockState state)
 	{
-		float speed = stack.getMiningSpeed(state);
+		float speed = stack.getMiningSpeedMultiplier(state);
 		
 		if(speed > 1)
 		{
