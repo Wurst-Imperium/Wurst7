@@ -75,6 +75,13 @@ public abstract class NavigatorScreen extends Screen
 				scroll = 0;
 			else if(scroll < maxScroll)
 				scroll = maxScroll;
+			
+			if(maxScroll == 0)
+				scrollKnobPosition = 0;
+			else
+				scrollKnobPosition =
+					(int)((height - 131) * scroll / (float)maxScroll);
+			scrollKnobPosition += 2;
 		}
 		
 		onMouseDrag(mouseX, mouseY, mouseButton, double_3, double_4);
