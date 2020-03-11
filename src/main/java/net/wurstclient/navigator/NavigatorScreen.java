@@ -220,6 +220,9 @@ public abstract class NavigatorScreen extends Screen
 		if(maxScroll > 0)
 			maxScroll = 0;
 		showScrollbar = maxScroll != 0;
+		
+		if(scroll < maxScroll)
+			scroll = maxScroll;
 	}
 	
 	protected final void drawQuads(int x1, int y1, int x2, int y2)
