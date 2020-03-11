@@ -361,6 +361,7 @@ public final class AutoBuildHack extends Hack
 		GL11.glLineWidth(2F);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glColor4f(0F, 0F, 0F, 0.5F);
 		
 		GL11.glPushMatrix();

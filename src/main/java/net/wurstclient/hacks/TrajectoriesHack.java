@@ -18,7 +18,7 @@ import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
 	"arrow trajectories"})
-public class TrajectoriesHack extends Hack implements RenderListener
+public final class TrajectoriesHack extends Hack implements RenderListener
 {
 	public TrajectoriesHack()
 	{
@@ -50,6 +50,7 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		RenderUtils.applyCameraRotationOnly();
 		

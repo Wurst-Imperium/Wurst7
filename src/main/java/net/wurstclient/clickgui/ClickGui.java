@@ -621,6 +621,7 @@ public final class ClickGui
 		
 		if(!window.isMinimized())
 		{
+			window.setMaxHeight(187);
 			window.validate();
 			
 			// scrollbar

@@ -177,11 +177,12 @@ public final class SearchHack extends Hack
 		
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
+		int dimensionId = MC.player.dimension.getRawId();
 		
-		addSearchersInRange(center, range, currentBlock);
+		addSearchersInRange(center, range, currentBlock, dimensionId);
 		removeSearchersOutOfRange(center, range);
-		replaceSearchersWithDifferentBlock(currentBlock);
-		replaceSearchersWithChunkUpdate(currentBlock);
+		replaceSearchersWithDifferences(currentBlock, dimensionId);
+		replaceSearchersWithChunkUpdate(currentBlock, dimensionId);
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -215,6 +216,7 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -250,7 +252,7 @@ public final class SearchHack extends Hack
 	}
 	
 	private void addSearchersInRange(ChunkPos center, int chunkRange,
-		Block block)
+		Block block, int dimensionId)
 	{
 		ArrayList<Chunk> chunksInRange = getChunksInRange(center, chunkRange);
 		
@@ -259,7 +261,7 @@ public final class SearchHack extends Hack
 			if(searchers.containsKey(chunk))
 				continue;
 			
-			addSearcher(chunk, block);
+			addSearcher(chunk, block, dimensionId);
 		}
 	}
 	
@@ -286,19 +288,22 @@ public final class SearchHack extends Hack
 		}
 	}
 	
-	private void replaceSearchersWithDifferentBlock(Block currentBlock)
+	private void replaceSearchersWithDifferences(Block currentBlock,
+		int dimensionId)
 	{
 		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
 		{
-			if(currentBlock.equals(oldSearcher.block))
+			if(currentBlock.equals(oldSearcher.block)
+				&& dimensionId == oldSearcher.dimensionId)
 				continue;
 			
 			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.chunk, currentBlock);
+			addSearcher(oldSearcher.chunk, currentBlock, dimensionId);
 		}
 	}
 	
-	private void replaceSearchersWithChunkUpdate(Block currentBlock)
+	private void replaceSearchersWithChunkUpdate(Block currentBlock,
+		int dimensionId)
 	{
 		synchronized(chunksToUpdate)
 		{
@@ -314,17 +319,17 @@ public final class SearchHack extends Hack
 					continue;
 				
 				removeSearcher(oldSearcher);
-				addSearcher(chunk, currentBlock);
+				addSearcher(chunk, currentBlock, dimensionId);
 				itr.remove();
 			}
 		}
 	}
 	
-	private void addSearcher(Chunk chunk, Block block)
+	private void addSearcher(Chunk chunk, Block block, int dimensionId)
 	{
 		stopPool2Tasks();
 		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block);
+		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
 		searchers.put(chunk, searcher);
 		searcher.startSearching(pool1);
 	}
@@ -513,14 +518,16 @@ public final class SearchHack extends Hack
 	{
 		private final Chunk chunk;
 		private final Block block;
+		private final int dimensionId;
 		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
 		private Status status = Status.IDLE;
 		private Future<?> future;
 		
-		public ChunkSearcher(Chunk chunk, Block block)
+		public ChunkSearcher(Chunk chunk, Block block, int dimensionId)
 		{
 			this.chunk = chunk;
 			this.block = block;
+			this.dimensionId = dimensionId;
 		}
 		
 		public void startSearching(ExecutorService pool)
