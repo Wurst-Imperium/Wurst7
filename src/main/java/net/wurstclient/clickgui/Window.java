@@ -39,6 +39,7 @@ public class Window
 	private boolean invisible;
 	
 	private int innerHeight;
+	private int maxHeight;
 	private int scrollOffset;
 	private boolean scrollingEnabled;
 	
@@ -128,10 +129,10 @@ public class Window
 			childrenHeight += c.getHeight() + 2;
 		childrenHeight += 2;
 		
-		if(childrenHeight > 200)
+		if(childrenHeight > maxHeight + 13 && maxHeight > 0)
 		{
 			setWidth(Math.max(maxChildWidth + 3, titleBarWidth));
-			setHeight(200);
+			setHeight(maxHeight + 13);
 			
 		}else
 		{
@@ -159,9 +160,19 @@ public class Window
 		
 		innerHeight = offsetY;
 		
+		if(maxHeight == 0)
+			setHeight(innerHeight + 13);
+		else if(height > maxHeight + 13)
+			setHeight(maxHeight + 13);
+		else if(height < maxHeight + 13)
+			setHeight(Math.min(maxHeight + 13, innerHeight + 13));
+		
 		scrollingEnabled = innerHeight > height - 13;
 		if(scrollingEnabled)
 			cWidth -= 3;
+		
+		scrollOffset = Math.min(scrollOffset, 0);
+		scrollOffset = Math.max(scrollOffset, -innerHeight + height - 13);
 		
 		for(Component c : children)
 			c.setWidth(cWidth);
@@ -303,6 +314,14 @@ public class Window
 	public final int getInnerHeight()
 	{
 		return innerHeight;
+	}
+	
+	public final void setMaxHeight(int maxHeight)
+	{
+		if(this.maxHeight != maxHeight)
+			invalidate();
+		
+		this.maxHeight = maxHeight;
 	}
 	
 	public final int getScrollOffset()
