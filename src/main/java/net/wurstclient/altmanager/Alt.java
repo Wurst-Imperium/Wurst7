@@ -68,8 +68,9 @@ public final class Alt implements Comparable<Alt>
 		{
 			cracked = true;
 			return "";
-		}else
-			return password;
+		}
+		
+		return password;
 	}
 	
 	public boolean isCracked()
