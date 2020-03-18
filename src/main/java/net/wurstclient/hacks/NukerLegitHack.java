@@ -204,8 +204,10 @@ public final class NukerLegitHack extends Hack
 			
 			// face block
 			WURST.getRotationFaker().faceVectorClient(hitVec);
-			WURST.getHax().autoToolHack.equipIfEnabled(currentBlock);
 			
+			if(currentBlock != null)
+				WURST.getHax().autoToolHack.equipIfEnabled(currentBlock);
+				
 			// if attack key is down but nothing happens, release it for one
 			// tick
 			if(MC.options.keyAttack.isPressed()
