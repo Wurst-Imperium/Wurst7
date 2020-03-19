@@ -25,7 +25,7 @@ public final class JumpCmd extends Command
 		if(args.length != 0)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.method_24828() && !WURST.getHax().jetpackHack.isEnabled())
+		if(!MC.player.isOnGround() && !WURST.getHax().jetpackHack.isEnabled())
 			throw new CmdError("Can't jump in mid-air.");
 		
 		MC.player.jump();

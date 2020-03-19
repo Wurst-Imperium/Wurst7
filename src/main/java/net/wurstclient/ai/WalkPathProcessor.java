@@ -31,7 +31,7 @@ public class WalkPathProcessor extends PathProcessor
 	{
 		// get positions
 		BlockPos pos;
-		if(WurstClient.MC.player.method_24828())
+		if(WurstClient.MC.player.isOnGround())
 			pos = new BlockPos(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
@@ -133,7 +133,7 @@ public class WalkPathProcessor extends PathProcessor
 					index++;
 				
 				// walk off the edge
-				if(WurstClient.MC.player.method_24828())
+				if(WurstClient.MC.player.isOnGround())
 					MC.options.keyForward.setPressed(true);
 			}
 	}

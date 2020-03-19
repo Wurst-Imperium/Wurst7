@@ -43,7 +43,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(!MC.player.method_24828() || MC.options.keyJump.isPressed())
+		if(!MC.player.isOnGround() || MC.options.keyJump.isPressed())
 			return;
 		
 		if(MC.player.isSneaking() || MC.options.keySneak.isPressed())

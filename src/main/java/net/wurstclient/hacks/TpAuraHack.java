@@ -227,7 +227,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			.getNeededRotations(entity.getBoundingBox().getCenter());
 		WurstClient.MC.player.networkHandler
 			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
-				rotations.getPitch(), MC.player.method_24828()));
+				rotations.getPitch(), MC.player.isOnGround()));
 		
 		MC.interactionManager.attackEntity(player, entity);
 		player.swingHand(Hand.MAIN_HAND);

@@ -104,6 +104,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		blit(x, y, u, v, w, h, fw, fh);
+		drawTexture(x, y, u, v, w, h, fw, fh);
 	}
 }

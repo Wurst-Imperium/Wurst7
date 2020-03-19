@@ -101,7 +101,7 @@ public final class TacoCmd extends Command
 		int y = sr.getScaledHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		DrawableHelper.blit(x, y, 0, 0, w, h, w, h);
+		DrawableHelper.drawTexture(x, y, 0, 0, w, h, w, h);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);

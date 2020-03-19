@@ -235,7 +235,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			
 			WurstClient.MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
-					rotations.getPitch(), MC.player.method_24828()));
+					rotations.getPitch(), MC.player.isOnGround()));
 			
 			MC.interactionManager.attackEntity(player, entity);
 		}

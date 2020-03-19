@@ -127,7 +127,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookOnly packet =
 				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
-					rotation.getPitch(), MC.player.method_24828());
+					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);

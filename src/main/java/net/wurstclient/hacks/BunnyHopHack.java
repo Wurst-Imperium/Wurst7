@@ -51,7 +51,7 @@ public final class BunnyHopHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		if(!player.method_24828() || player.isSneaking())
+		if(!player.isOnGround() || player.isSneaking())
 			return;
 		
 		if(jumpIf.getSelected().condition.test(player))

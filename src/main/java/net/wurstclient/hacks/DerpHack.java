@@ -50,6 +50,6 @@ public final class DerpHack extends Hack implements UpdateListener
 		float pitch = random.nextFloat() * 180F - 90F;
 		
 		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			yaw, pitch, MC.player.method_24828()));
+			yaw, pitch, MC.player.isOnGround()));
 	}
 }

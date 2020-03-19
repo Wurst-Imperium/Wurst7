@@ -27,12 +27,12 @@ public abstract class ButtonWidgetMixin extends AbstractPressableButtonWidget
 	protected void renderBg(MinecraftClient client, int mouseX, int mouseY)
 	{
 		int i = getYImage(isHovered());
-		blit(x, y, 0, 46 + i * 20, width / 2, height / 2);
-		blit(x + width / 2, y, 200 - width / 2, 46 + i * 20, width / 2,
+		drawTexture(x, y, 0, 46 + i * 20, width / 2, height / 2);
+		drawTexture(x + width / 2, y, 200 - width / 2, 46 + i * 20, width / 2,
 			height / 2);
-		blit(x, y + height / 2, 0, 46 + i * 20 + 20 - height / 2, width / 2,
-			height / 2);
-		blit(x + width / 2, y + height / 2, 200 - width / 2,
+		drawTexture(x, y + height / 2, 0, 46 + i * 20 + 20 - height / 2,
+			width / 2, height / 2);
+		drawTexture(x + width / 2, y + height / 2, 200 - width / 2,
 			46 + i * 20 + 20 - height / 2, width / 2, height / 2);
 	}
 }

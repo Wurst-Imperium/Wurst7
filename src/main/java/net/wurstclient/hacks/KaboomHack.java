@@ -57,7 +57,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// check fly-kick
-		if(!MC.player.abilities.creativeMode && !MC.player.method_24828())
+		if(!MC.player.abilities.creativeMode && !MC.player.isOnGround())
 			return;
 		
 		// do explosion particles

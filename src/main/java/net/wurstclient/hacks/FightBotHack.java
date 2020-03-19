@@ -268,7 +268,7 @@ public final class FightBotHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.method_24828())
+			if(MC.player.horizontalCollision && MC.player.isOnGround())
 				MC.player.jump();
 			
 			// swim up if necessary
@@ -276,7 +276,7 @@ public final class FightBotHack extends Hack
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying
-			if(!MC.player.method_24828()
+			if(!MC.player.isOnGround()
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
