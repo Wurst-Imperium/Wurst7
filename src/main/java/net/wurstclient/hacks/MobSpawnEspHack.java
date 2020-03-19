@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
@@ -294,7 +295,8 @@ public final class MobSpawnEspHack extends Hack
 							continue;
 						
 						BlockState stateDown = world.getBlockState(pos.down());
-						if(!stateDown.isFullOpaque(world, pos.down()))
+						if(!stateDown.allowsSpawning(world, pos.down(),
+							EntityType.ZOMBIE))
 							continue;
 						
 						blocks.add(pos);

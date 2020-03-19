@@ -5,12 +5,12 @@
   "mixins": [
   ],
   "client": [
+  	"AbstractBlockStateMixin",
     "ArmorItemMixin",
     "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
-  	"BlockStateMixin",
   	"ButtonWidgetMixin",
   	"CactusBlockMixin",
   	"CameraMixin",

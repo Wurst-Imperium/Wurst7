@@ -466,8 +466,7 @@ public final class TunnellerHack extends Hack
 				
 				// filter out non-solid blocks
 				BlockState state = block.getDefaultState();
-				if(!block.isFullOpaque(state, EmptyBlockView.INSTANCE,
-					BlockPos.ORIGIN))
+				if(!state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
 					continue;
 				
 				// filter out blocks that would fall

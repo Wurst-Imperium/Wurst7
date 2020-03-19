@@ -31,7 +31,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 {
 	@Shadow
 	@Final
-	protected EntityRenderDispatcher renderManager;
+	protected EntityRenderDispatcher dispatcher;
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
@@ -58,7 +58,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 		int i)
 	{
-		double d = this.renderManager.getSquaredDistanceToCamera(entity);
+		double d = this.dispatcher.getSquaredDistanceToCamera(entity);
 		
 		if(d > 4096)
 			return;
@@ -71,7 +71,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		matrixStack.push();
 		matrixStack.translate(0.0D, f, 0.0D);
-		matrixStack.multiply(this.renderManager.getRotation());
+		matrixStack.multiply(this.dispatcher.getRotation());
 		
 		float scale = 0.025F;
 		if(nameTagsHack.isEnabled())

@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.collect.ImmutableMap;
 
+import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityContext;
@@ -25,16 +26,17 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
-@Mixin(BlockState.class)
-public class BlockStateMixin extends AbstractState<Block, BlockState>
+@Mixin(AbstractBlockState.class)
+public class AbstractBlockStateMixin extends AbstractState<Block, BlockState>
 	implements State<BlockState>
 {
-	private BlockStateMixin(WurstClient wurst, Block object_1,
+	private AbstractBlockStateMixin(WurstClient wurst, Block object_1,
 		ImmutableMap<Property<?>, Comparable<?>> immutableMap_1)
 	{
 		super(object_1, immutableMap_1);
@@ -42,12 +44,16 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 	
 	@Inject(at = {@At("TAIL")},
 		method = {
-			"isSimpleFullBlock(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
+			"method_26216(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
 		cancellable = true)
-	private void onIsSimpleFullBlock(CallbackInfoReturnable<Boolean> cir)
+	private void onMethod_26216(CallbackInfoReturnable<Boolean> cir)
 	{
+		EventManager eventManager = WurstClient.INSTANCE.getEventManager();
+		if(eventManager == null)
+			return;
+		
 		IsNormalCubeEvent event = new IsNormalCubeEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		eventManager.fire(event);
 		
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
