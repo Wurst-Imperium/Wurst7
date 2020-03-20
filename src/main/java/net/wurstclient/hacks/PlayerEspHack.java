@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,6 +17,8 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -50,6 +53,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible players.", false);
 	
+	private final CheckboxSetting armorColor = new CheckboxSetting(
+		"Armor Color", "Line color will be set to what a player is wearing.", false);
+	
 	private int playerBox;
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
@@ -63,6 +69,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		addSetting(boxSize);
 		addSetting(filterSleeping);
 		addSetting(filterInvisible);
+		addSetting(armorColor);
 	}
 	
 	@Override
@@ -139,6 +146,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		if(style.getSelected().boxes)
 			renderBoxes(partialTicks);
 		
+		// draw lines
 		if(style.getSelected().lines)
 			renderTracers(partialTicks);
 		
@@ -195,12 +203,50 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 					.subtract(e.prevX, e.prevY, e.prevZ)
 					.multiply(1 - partialTicks));
 			
-			if(WURST.getFriends().contains(e.getEntityName()))
-				GL11.glColor4f(0, 0, 1, 0.5F);
-			else
+			// set color
+			if(armorColor.isChecked()) 
 			{
-				float f = MC.player.distanceTo(e) / 20F;
-				GL11.glColor4f(2 - f, f, 0, 0.5F);
+				float red = 0;
+				float green = 0;
+				float blue = 0;
+				boolean colorFound = false;
+				
+				for(ItemStack items : e.inventory.armor)
+				{		
+					CompoundTag compoundTag = items.getSubTag("display");
+					
+					// Returns a decimal color code
+				    int color = compoundTag != null && compoundTag.contains("color", 99) ? compoundTag.getInt("color") : -1;
+				    // no color found
+					if(color == -1)
+						continue;
+				    
+					// Convert decimal color to RGB value (Integer: 0-255) then convert to percentage as float (0F - 1F)
+					Color c = new Color(color);
+					red = (float)c.getRed()/255;
+					green = (float)c.getGreen()/255;
+					blue = (float)c.getBlue()/255;
+					
+					colorFound = true;
+				}
+				
+				if(colorFound)
+					GL11.glColor4f(red, green, blue, 0.5F);
+				else
+				{
+					// The player is not wearing any dyed armor
+					// Render no line
+					GL11.glColor4f(0F, 0F, 0F, 0F);
+				}
+			}else
+			{
+				if(WURST.getFriends().contains(e.getEntityName()))
+					GL11.glColor4f(0, 0, 1, 0.5F);
+				else
+				{
+					float f = MC.player.distanceTo(e) / 20F;
+					GL11.glColor4f(2 - f, f, 0, 0.5F);
+				}
 			}
 			
 			GL11.glVertex3d(start.x, start.y, start.z);
