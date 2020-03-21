@@ -33,8 +33,20 @@ public enum BlockBreaker
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d relCenter = BlockUtils.getState(pos)
-			.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
+		Vec3d relCenter;
+		try
+		{
+			relCenter = BlockUtils.getState(pos)
+					.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
+
+		}catch (UnsupportedOperationException e)
+		{
+			System.out.println(
+					"WARNING! BlockBreaker.breakOneBlock(); failed with the following exception:");
+			e.printStackTrace();
+			return false;
+		}
+
 		Vec3d center = new Vec3d(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
