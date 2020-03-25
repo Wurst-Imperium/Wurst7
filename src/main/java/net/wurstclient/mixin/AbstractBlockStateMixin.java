@@ -44,9 +44,10 @@ public class AbstractBlockStateMixin extends AbstractState<Block, BlockState>
 	
 	@Inject(at = {@At("TAIL")},
 		method = {
-			"method_26216(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
+			"isFullCube(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
 		cancellable = true)
-	private void onMethod_26216(CallbackInfoReturnable<Boolean> cir)
+	private void onIsFullCube(BlockView world, BlockPos pos,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		EventManager eventManager = WurstClient.INSTANCE.getEventManager();
 		if(eventManager == null)
@@ -75,7 +76,7 @@ public class AbstractBlockStateMixin extends AbstractState<Block, BlockState>
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/EntityContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetOutlineShape(BlockView view, BlockPos pos,
 		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
