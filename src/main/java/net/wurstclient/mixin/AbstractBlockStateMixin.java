@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityContext;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.state.AbstractState;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
@@ -78,9 +78,9 @@ public class AbstractBlockStateMixin extends AbstractState<Block, BlockState>
 			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/EntityContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetOutlineShape(BlockView view, BlockPos pos,
-		EntityContext context, CallbackInfoReturnable<VoxelShape> cir)
+		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
 	{
-		if(context == EntityContext.absent())
+		if(context == ShapeContext.absent())
 			return;
 		
 		HackList hax = WurstClient.INSTANCE.getHax();

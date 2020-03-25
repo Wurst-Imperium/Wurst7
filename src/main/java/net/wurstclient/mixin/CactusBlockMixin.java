@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
-import net.minecraft.entity.EntityContext;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -37,7 +37,7 @@ public abstract class CactusBlockMixin extends Block
 		cancellable = true)
 	private void onGetCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,
-		EntityContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
+		ShapeContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
 	{
 		EventManager events = WurstClient.INSTANCE.getEventManager();
 		if(events == null)
