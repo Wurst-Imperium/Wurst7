@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -85,8 +84,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		matrixStack.scale(-scale, -scale, scale);
 		
 		Matrix4f matrix4f = matrixStack.peek().getModel();
-		float g = MinecraftClient.getInstance().options
-			.getTextBackgroundOpacity(0.25F);
+		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
 		int k = (int)(g * 255.0F) << 24;
 		
 		TextRenderer textRenderer = this.getFontRenderer();
