@@ -311,7 +311,7 @@ public final class AutoFarmHack extends Hack
 			if(slot == player.inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = player.inventory.getInvStack(slot);
+			ItemStack stack = player.inventory.getStack(slot);
 			if(stack.isEmpty() || stack.getItem() != neededItem)
 				continue;
 			

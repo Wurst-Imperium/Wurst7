@@ -62,7 +62,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-block items
-			ItemStack stack = MC.player.inventory.getInvStack(i);
+			ItemStack stack = MC.player.inventory.getStack(i);
 			if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 				continue;
 			

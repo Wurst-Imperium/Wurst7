@@ -458,7 +458,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.inventory.getInvStack(slot);
+				ItemStack stack = MC.player.inventory.getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				
@@ -653,7 +653,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.inventory.getInvStack(slot);
+				ItemStack stack = MC.player.inventory.getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				

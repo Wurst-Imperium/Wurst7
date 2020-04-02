@@ -124,7 +124,7 @@ public final class AutoArmorHack extends Hack
 		// search inventory for better armor
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
 				continue;

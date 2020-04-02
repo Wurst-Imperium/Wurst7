@@ -155,7 +155,7 @@ public final class AutoToolHack extends Hack
 			if(slot == inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			float speed = getMiningSpeed(stack, state);
 			if(speed <= bestSpeed)
@@ -232,7 +232,7 @@ public final class AutoToolHack extends Hack
 			if(slot == inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			if(!isDamageable(stack))
 				return slot;

@@ -110,7 +110,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.inventory.getInvStack(i);
+			ItemStack stack = MC.player.inventory.getStack(i);
 			
 			// filter out non-splash potion items
 			if(stack.getItem() != Items.SPLASH_POTION)
