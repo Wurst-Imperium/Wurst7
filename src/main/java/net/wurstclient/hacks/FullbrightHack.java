@@ -34,7 +34,10 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		"Slowly fades between brightness and darkness.\n"
 			+ "Only works if \u00a76Method\u00a7r is set to \u00a76Gamma\u00a7r.",
 		true);
-	
+
+
+	private SmoothGamma smoothGamma = SmoothGamma.STOPPED;
+
 	private boolean hasAppliedNightVision;
 	
 	public FullbrightHack()
@@ -46,14 +49,23 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		
 		EVENTS.add(UpdateListener.class, this);
 	}
-	
+
+	private static double gamma;
+
 	@Override
 	public void onUpdate()
 	{
+		if (!isEnabled()) {
+			if (MC.options.gamma <= 1 && smoothGamma == SmoothGamma.STOPPED) {
+				gamma = MC.options.gamma;
+			}
+		}
+
 		if(isEnabled() && method.getSelected() == Method.GAMMA)
 			approachGamma(16);
 		else
-			approachGamma(0.5);
+			if (MC.options.gamma > gamma)
+			approachGamma(gamma);
 		
 		if(isEnabled() && method.getSelected() == Method.NIGHT_VISION)
 			applyNightVision();
@@ -70,9 +82,10 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		if(!doFade || Math.abs(options.gamma - target) <= 0.5)
 		{
 			options.gamma = target;
+			smoothGamma = SmoothGamma.STOPPED;
 			return;
 		}
-		
+		smoothGamma = SmoothGamma.RUNNING;
 		if(options.gamma < target)
 			options.gamma += 0.5;
 		else
@@ -112,5 +125,10 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		{
 			return name;
 		}
+	}
+
+	private static enum SmoothGamma {
+		RUNNING,
+		STOPPED
 	}
 }
