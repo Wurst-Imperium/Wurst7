@@ -35,8 +35,8 @@ public final class TooManyHaxCmd extends Command
 			"Allows to manage which hacks should be blocked\n"
 				+ "when TooManyHax is enabled.",
 			".toomanyhax block <feature>", ".toomanyhax unblock <feature>",
-			".toomanyhax unblock-all", ".toomanyhax list [<page>]",
-			".toomanyhax load-profile <file>",
+			".toomanyhax block-all", ".toomanyhax unblock-all",
+			".toomanyhax list [<page>]", ".toomanyhax load-profile <file>",
 			".toomanyhax save-profile <file>",
 			".toomanyhax list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/toomanyhax'.");
@@ -56,6 +56,10 @@ public final class TooManyHaxCmd extends Command
 			
 			case "unblock":
 			unblock(args);
+			break;
+			
+			case "block-all":
+			blockAll();
 			break;
 			
 			case "unblock-all":
@@ -125,6 +129,15 @@ public final class TooManyHaxCmd extends Command
 		
 		tooManyHax.setBlocked(feature, false);
 		ChatUtils.message("Removed " + typeAndName + " from TooManyHax list.");
+	}
+	
+	private void blockAll()
+	{
+		WURST.getHax().tooManyHaxHack.blockAll();
+		ChatUtils.message("All* features blocked.");
+		ChatUtils
+			.message("*Note: A few features cannot be blocked because they");
+		ChatUtils.message("are required for Wurst to work properly.");
 	}
 	
 	private void unblockAll()
