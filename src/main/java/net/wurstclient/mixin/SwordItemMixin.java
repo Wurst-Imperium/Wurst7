@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.google.common.collect.Multimap;
 
-import net.minecraft.class_5134;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
@@ -42,7 +42,7 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 	@Override
 	public float fuckMcAfee()
 	{
-		return (float)field_23745.get(class_5134.field_23723).iterator().next()
-			.getAmount();
+		return (float)field_23745.get(EntityAttributes.GENERIC_ATTACK_SPEED)
+			.iterator().next().getAmount();
 	}
 }

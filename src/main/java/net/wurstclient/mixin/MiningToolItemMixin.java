@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.google.common.collect.Multimap;
 
-import net.minecraft.class_5134;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
@@ -48,7 +48,7 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	@Override
 	public float fuckMcAfee2()
 	{
-		return (float)field_23742.get(class_5134.field_23723).iterator().next()
-			.getAmount();
+		return (float)field_23742.get(EntityAttributes.GENERIC_ATTACK_SPEED)
+			.iterator().next().getAmount();
 	}
 }
