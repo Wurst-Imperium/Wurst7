@@ -8,7 +8,6 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"HUD"})
 public final class HUDHack extends Hack 
 {
-	private final CheckboxSetting tps = new CheckboxSetting("TPS","Display the current TPS", true);
 	private final CheckboxSetting fps = new CheckboxSetting("FPS","Display your current FPS", true);
 	private final CheckboxSetting speed = new CheckboxSetting("Speed","Display your current speed", true);
 	private final CheckboxSetting coords = new CheckboxSetting("Coordinates","Display your current coordinates", true);
@@ -17,7 +16,6 @@ public final class HUDHack extends Hack
 	public HUDHack() {
 		super("HUD", "Display useful information on your screen");
 		setCategory(Category.OTHER);
-		addSetting(tps);
 		addSetting(fps);
 		addSetting(speed);
 		addSetting(coords);

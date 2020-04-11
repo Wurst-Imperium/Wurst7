@@ -88,10 +88,6 @@ public class InfoHUD {
 			drawText(WurstClient.MC.fpsDebugString.split(" fps")[0]+" FPS", xPos, yPos, 0xffffffff);
 			yPos -= yOffset;
 		}
-		if(((CheckboxSetting)settings.get("tps")).isChecked()) {
-			double tps = Math.round((1/(WurstClient.MC.getServer().getTickTime()/1000))*100)/100.0;
-			drawText((tps<20?tps:"20.0")+ " TPS", xPos, yPos, 0xffffffff);
-		}
 	}
 
 	public void drawText(String s, int x, int y, int color) {
