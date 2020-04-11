@@ -18,7 +18,6 @@ public final class IngameHUD implements GUIRenderListener
 {
 	private final WurstLogo wurstLogo = new WurstLogo();
 	private final HackListHUD hackList = new HackListHUD();
-	private final InfoHUD infoHUD = new InfoHUD();
 	private TabGui tabGui;
 	
 	@Override
@@ -42,9 +41,6 @@ public final class IngameHUD implements GUIRenderListener
 		wurstLogo.render();
 		hackList.render(partialTicks);
 		tabGui.render(partialTicks);
-
-		if(WurstClient.INSTANCE.getHax().hudHack.isEnabled())
-			infoHUD.renderer(partialTicks);
 		
 		// pinned windows
 		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
