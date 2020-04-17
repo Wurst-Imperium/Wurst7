@@ -18,23 +18,24 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 	"no knockback", "AntiKB", "anti kb"})
 public final class AntiKnockbackHack extends Hack implements KnockbackListener
 {
-	private final SliderSetting verticalStrength =
-		new SliderSetting("Vertical Strength",
-			"How far to reduce vertical knockback.\n" + "100% = no knockback",
-			1, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
-	
-	private final SliderSetting horizontalStrength =
+	private final SliderSetting hStrength =
 		new SliderSetting("Horizonal Strength",
 			"How far to reduce horizontal knockback.\n" + "100% = no knockback",
+			1, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
+	
+	private final SliderSetting vStrength =
+		new SliderSetting("Vertical Strength",
+			"How far to reduce vertical knockback.\n" + "100% = no knockback",
 			1, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	public AntiKnockbackHack()
 	{
 		super("AntiKnockback",
 			"Prevents you from getting pushed by players and mobs.");
+		
 		setCategory(Category.COMBAT);
-		addSetting(verticalStrength);
-		addSetting(horizontalStrength);
+		addSetting(hStrength);
+		addSetting(vStrength);
 	}
 	
 	@Override
@@ -52,8 +53,9 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 	@Override
 	public void onKnockback(KnockbackEvent event)
 	{
-		double verticalMultiplier = 1 - verticalStrength.getValue();
-		double horizontalMultiplier = 1 - horizontalStrength.getValue();
+		double verticalMultiplier = 1 - vStrength.getValue();
+		double horizontalMultiplier = 1 - hStrength.getValue();
+		
 		event.setX(event.getDefaultX() * horizontalMultiplier);
 		event.setY(event.getDefaultY() * verticalMultiplier);
 		event.setZ(event.getDefaultZ() * horizontalMultiplier);
