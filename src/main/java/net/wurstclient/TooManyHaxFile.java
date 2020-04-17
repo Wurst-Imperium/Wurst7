@@ -5,13 +5,14 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.hack;
+package net.wurstclient;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import com.google.gson.JsonArray;
 
@@ -19,22 +20,23 @@ import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
 
-public final class EnabledHacksFile
+public final class TooManyHaxFile
 {
 	private final Path path;
-	private boolean disableSaving;
+	private final ArrayList<Feature> blockedFeatures;
 	
-	public EnabledHacksFile(Path path)
+	public TooManyHaxFile(Path path, ArrayList<Feature> blockedFeatures)
 	{
 		this.path = path;
+		this.blockedFeatures = blockedFeatures;
 	}
 	
-	public void load(HackList hackList)
+	public void load()
 	{
 		try
 		{
 			WsonArray wson = JsonUtils.parseFileToArray(path);
-			enableHacks(hackList, wson);
+			setBlockedFeatures(wson);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -46,51 +48,39 @@ public final class EnabledHacksFile
 			e.printStackTrace();
 		}
 		
-		save(hackList);
+		save();
 	}
 	
-	public void loadProfile(HackList hax, Path profilePath)
-		throws IOException, JsonException
+	public void loadProfile(Path profilePath) throws IOException, JsonException
 	{
 		if(!profilePath.getFileName().toString().endsWith(".json"))
 			throw new IllegalArgumentException();
 		
 		WsonArray wson = JsonUtils.parseFileToArray(profilePath);
-		enableHacks(hax, wson);
+		setBlockedFeatures(wson);
 		
-		save(hax);
+		save();
 	}
 	
-	private void enableHacks(HackList hax, WsonArray wson)
+	private void setBlockedFeatures(WsonArray wson)
 	{
-		try
+		blockedFeatures.clear();
+		
+		for(String name : wson.getAllStrings())
 		{
-			disableSaving = true;
+			Feature feature = WurstClient.INSTANCE.getFeatureByName(name);
 			
-			for(Hack hack : hax.getAllHax())
-				hack.setEnabled(false);
-			
-			for(String name : wson.getAllStrings())
-			{
-				Hack hack = hax.getHackByName(name);
-				if(hack == null || !hack.isStateSaved())
-					continue;
-				
-				hack.setEnabled(true);
-			}
-			
-		}finally
-		{
-			disableSaving = false;
+			if(feature != null && feature.isSafeToBlock())
+				blockedFeatures.add(feature);
 		}
+		
+		blockedFeatures
+			.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
 	}
 	
-	public void save(HackList hax)
+	public void save()
 	{
-		if(disableSaving)
-			return;
-		
-		JsonArray json = createJson(hax);
+		JsonArray json = createJson();
 		
 		try
 		{
@@ -103,24 +93,21 @@ public final class EnabledHacksFile
 		}
 	}
 	
-	public void saveProfile(HackList hax, Path profilePath)
-		throws IOException, JsonException
+	public void saveProfile(Path profilePath) throws IOException, JsonException
 	{
 		if(!profilePath.getFileName().toString().endsWith(".json"))
 			throw new IllegalArgumentException();
 		
-		JsonArray json = createJson(hax);
+		JsonArray json = createJson();
 		Files.createDirectories(profilePath.getParent());
 		JsonUtils.toJson(json, profilePath);
 	}
 	
-	private JsonArray createJson(HackList hax)
+	private JsonArray createJson()
 	{
-		Stream<Hack> enabledHax = hax.getAllHax().stream()
-			.filter(Hack::isEnabled).filter(Hack::isStateSaved);
-		
 		JsonArray json = new JsonArray();
-		enabledHax.map(Hack::getName).forEach(name -> json.add(name));
+		blockedFeatures.stream().filter(Feature::isSafeToBlock)
+			.map(Feature::getName).forEach(name -> json.add(name));
 		
 		return json;
 	}

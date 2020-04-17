@@ -8,11 +8,13 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"legit", "disable"})
+@DontBlock
 public final class PanicHack extends Hack implements UpdateListener
 {
 	public PanicHack()

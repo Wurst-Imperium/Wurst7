@@ -7,8 +7,10 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.other_feature.OtherFeature;
 
+@DontBlock
 public final class WurstCapesOtf extends OtherFeature
 {
 	public WurstCapesOtf()

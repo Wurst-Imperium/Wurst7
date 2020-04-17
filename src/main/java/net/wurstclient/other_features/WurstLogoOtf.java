@@ -9,11 +9,13 @@ package net.wurstclient.other_features;
 
 import java.util.function.BooleanSupplier;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"wurst logo", "top left corner"})
+@DontBlock
 public final class WurstLogoOtf extends OtherFeature
 {
 	private final EnumSetting<Visibility> visibility =

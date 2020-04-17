@@ -7,12 +7,14 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"tab gui", "HackMenu", "hack menu", "SideBar", "side bar",
 	"blocks movement combat render chat fun items other"})
+@DontBlock
 public final class TabGuiOtf extends OtherFeature
 {
 	private final EnumSetting<Status> status =

@@ -7,12 +7,16 @@
  */
 package net.wurstclient.commands;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.TooManyHaxHack;
+import net.wurstclient.util.ChatUtils;
 
+@DontBlock
 public final class TCmd extends Command
 {
 	public TCmd()
@@ -32,20 +36,33 @@ public final class TCmd extends Command
 			throw new CmdError("Unknown hack: " + args[0]);
 		
 		if(args.length == 1)
-			hack.setEnabled(!hack.isEnabled());
+			setEnabled(hack, !hack.isEnabled());
 		else
 			switch(args[1].toLowerCase())
 			{
 				case "on":
-				hack.setEnabled(true);
+				setEnabled(hack, true);
 				break;
 				
 				case "off":
-				hack.setEnabled(false);
+				setEnabled(hack, false);
 				break;
 				
 				default:
 				throw new CmdSyntaxError();
 			}
+	}
+	
+	private void setEnabled(Hack hack, boolean enabled)
+	{
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		if(!hack.isEnabled() && tooManyHax.isEnabled()
+			&& tooManyHax.isBlocked(hack))
+		{
+			ChatUtils.error(hack.getName() + " is blocked by TooManyHax.");
+			return;
+		}
+		
+		hack.setEnabled(enabled);
 	}
 }

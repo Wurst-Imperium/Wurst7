@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import java.util.stream.Stream;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -18,6 +19,7 @@ import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.MathUtils;
 
+@DontBlock
 public final class SetSliderCmd extends Command
 {
 	public SetSliderCmd()

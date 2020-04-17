@@ -7,19 +7,28 @@
  */
 package net.wurstclient.keybinds;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import net.wurstclient.WurstClient;
+import net.wurstclient.util.json.JsonException;
 
 public final class KeybindList
 {
 	public static final Set<Keybind> DEFAULT_KEYBINDS = createDefaultKeybinds();
+	private final ArrayList<Keybind> keybinds = new ArrayList<>();
 	
 	private final KeybindsFile keybindsFile;
-	private final ArrayList<Keybind> keybinds = new ArrayList<>();
+	private final Path profilesFolder =
+		WurstClient.INSTANCE.getWurstFolder().resolve("keybinds");
 	
 	public KeybindList(Path keybindsFile)
 	{
@@ -71,6 +80,37 @@ public final class KeybindList
 	{
 		keybinds.clear();
 		keybindsFile.save(this);
+	}
+	
+	public Path getProfilesFolder()
+	{
+		return profilesFolder;
+	}
+	
+	public ArrayList<Path> listProfiles()
+	{
+		if(!Files.isDirectory(profilesFolder))
+			return new ArrayList<>();
+		
+		try(Stream<Path> files = Files.list(profilesFolder))
+		{
+			return files.filter(Files::isRegularFile)
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			
+		}catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void loadProfile(String fileName) throws IOException, JsonException
+	{
+		keybindsFile.loadProfile(this, profilesFolder.resolve(fileName));
+	}
+	
+	public void saveProfile(String fileName) throws IOException, JsonException
+	{
+		keybindsFile.saveProfile(this, profilesFolder.resolve(fileName));
 	}
 	
 	private static Set<Keybind> createDefaultKeybinds()

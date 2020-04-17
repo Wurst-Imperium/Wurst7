@@ -9,12 +9,14 @@ package net.wurstclient.commands;
 
 import java.util.ArrayList;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
+@DontBlock
 public final class HelpCmd extends Command
 {
 	private static final int CMDS_PER_PAGE = 8;
