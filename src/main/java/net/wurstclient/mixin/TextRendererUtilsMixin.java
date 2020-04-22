@@ -11,19 +11,19 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.class_5223;
 import net.wurstclient.WurstClient;
 
-@Mixin(TextRenderer.class)
-public abstract class TextRendererMixin implements AutoCloseable
+@Mixin(class_5223.class)
+public abstract class TextRendererUtilsMixin
 {
 	@ModifyArg(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/font/TextRenderer;drawInternal(Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I",
+		target = "Lnet/minecraft/class_5223;method_27473(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/class_5223$class_5224;)Z",
 		ordinal = 0),
 		method = {
-			"draw(Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"},
+			"method_27472(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/class_5223$class_5224;)Z"},
 		index = 0)
-	private String adjustText(String text)
+	private static String adjustText(String text)
 	{
 		return WurstClient.INSTANCE.getHax().nameProtectHack.protect(text);
 	}
