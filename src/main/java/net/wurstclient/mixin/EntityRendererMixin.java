@@ -36,7 +36,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"renderLabelIfPresent(Lnet/minecraft/entity/Entity;Ljava/lang/String;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"},
+			"renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"},
 		cancellable = true)
 	private void onRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
