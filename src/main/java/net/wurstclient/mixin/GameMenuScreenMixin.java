@@ -82,7 +82,8 @@ public abstract class GameMenuScreenMixin extends Screen
 				|| message.equals(I18n.translate("menu.reportBugs")));
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"render(IIF)V"})
+	@Inject(at = {@At("TAIL")},
+		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"})
 	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
