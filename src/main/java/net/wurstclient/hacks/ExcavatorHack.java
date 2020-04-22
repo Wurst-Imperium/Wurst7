@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -316,7 +317,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -353,7 +354,7 @@ public final class ExcavatorHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		tr.draw(message, 2, 1, 0xffffffff);
+		tr.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		

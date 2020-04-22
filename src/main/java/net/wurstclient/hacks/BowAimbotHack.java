@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.AmbientEntity;
@@ -322,7 +323,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -360,7 +361,7 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		MC.textRenderer.draw(message, 2, 1, 0xffffffff);
+		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		
