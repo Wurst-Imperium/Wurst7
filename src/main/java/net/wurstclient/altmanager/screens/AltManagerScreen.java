@@ -273,9 +273,9 @@ public final class AltManagerScreen extends Screen
 			&& listGui.getSelectedSlot() < altManager.getList().size())
 		{
 			Alt alt = listGui.getSelectedAlt();
-			AltRenderer.drawAltBack(alt.getNameOrEmail(),
+			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(alt.getNameOrEmail(),
+			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
@@ -406,8 +406,8 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			AltRenderer.drawAltFace(alt.getNameOrEmail(), x + 1, y + 1, 24, 24,
-				isSelectedItem(id));
+			AltRenderer.drawAltFace(matrixStack, alt.getNameOrEmail(), x + 1,
+				y + 1, 24, 24, isSelectedItem(id));
 			
 			// name / email
 			client.textRenderer.draw(matrixStack,

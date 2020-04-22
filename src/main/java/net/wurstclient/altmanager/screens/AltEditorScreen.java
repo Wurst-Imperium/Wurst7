@@ -205,9 +205,9 @@ public abstract class AltEditorScreen extends Screen
 		renderBackground(matrixStack);
 		
 		// skin preview
-		AltRenderer.drawAltBack(emailBox.getText(), (width / 2 - 100) / 2 - 64,
-			height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(emailBox.getText(),
+		AltRenderer.drawAltBack(matrixStack, emailBox.getText(),
+			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
+		AltRenderer.drawAltBody(matrixStack, emailBox.getText(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
