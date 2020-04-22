@@ -19,6 +19,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
@@ -50,7 +52,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void addWurstOptionsButton()
 	{
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
-			204, 20, "            Options", b -> openWurstOptions());
+			204, 20, new LiteralText("            Options"),
+			b -> openWurstOptions());
 		
 		addButton(wurstOptionsButton);
 	}
@@ -72,7 +75,7 @@ public abstract class GameMenuScreenMixin extends Screen
 			return false;
 		
 		AbstractButtonWidget button = (AbstractButtonWidget)element;
-		String message = button.getMessage();
+		String message = button.getMessage().getString();
 		
 		return message != null
 			&& (message.equals(I18n.translate("menu.sendFeedback"))
@@ -80,8 +83,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"render(IIF)V"})
-	private void onRender(int mouseX, int mouseY, float partialTicks,
-		CallbackInfo ci)
+	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
@@ -104,6 +107,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		drawTexture(x, y, u, v, w, h, fw, fh);
+		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
 	}
 }
