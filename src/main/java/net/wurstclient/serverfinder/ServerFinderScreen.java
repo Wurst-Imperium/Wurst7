@@ -22,6 +22,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
+import net.wurstclient.serverfinder.ServerFinderScreen.ServerFinderState;
 import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
