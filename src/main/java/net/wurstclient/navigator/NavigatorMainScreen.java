@@ -15,6 +15,8 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -47,7 +49,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onResize()
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		searchBar = new TextFieldWidget(tr, 0, 32, 200, 20, "");
+		searchBar =
+			new TextFieldWidget(tr, 0, 32, 200, 20, new LiteralText(""));
 		searchBar.setHasBorder(false);
 		searchBar.setMaxLength(128);
 		
@@ -144,7 +147,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(int mouseX, int mouseY, float partialTicks)
+	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
@@ -158,9 +162,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(clickTimerNotRunning)
 		{
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			WurstClient.MC.textRenderer.draw("Search: ", middleX - 150, 32,
-				0xffffff);
-			searchBar.render(mouseX, mouseY, partialTicks);
+			WurstClient.MC.textRenderer.draw(matrixStack, "Search: ",
+				middleX - 150, 32, 0xffffff);
+			searchBar.render(matrixStack, mouseX, mouseY, partialTicks);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
@@ -305,8 +309,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				{
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 					String buttonText = feature.getName();
-					client.textRenderer.draw(buttonText, area.x + 4, area.y + 4,
-						0xffffff);
+					client.textRenderer.draw(matrixStack, buttonText,
+						area.x + 4, area.y + 4, 0xffffff);
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					GL11.glEnable(GL11.GL_BLEND);
 				}
@@ -358,8 +362,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < lines.length; i++)
-				fr.draw(lines[i], xt1 + 2, yt1 + 1 + i * fr.fontHeight,
-					0xffffff);
+				fr.draw(matrixStack, lines[i], xt1 + 2,
+					yt1 + 1 + i * fr.fontHeight, 0xffffff);
 		}
 	}
 	
