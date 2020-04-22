@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -65,29 +66,30 @@ public final class AltManagerScreen extends Screen
 					"Would you like some random alts to get started?")));
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, "Use", b -> pressUse()));
+			100, 20, new LiteralText("Use"), b -> pressUse()));
 		
 		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
-			"Direct Login",
+			new LiteralText("Direct Login"),
 			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20, "Add",
+		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+			new LiteralText("Add"),
 			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
 		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, "Star", b -> pressStar()));
+			75, 20, new LiteralText("Star"), b -> pressStar()));
 		
 		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, "Edit", b -> pressEdit()));
+			20, new LiteralText("Edit"), b -> pressEdit()));
 		
 		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, "Delete", b -> pressDelete()));
+			74, 20, new LiteralText("Delete"), b -> pressDelete()));
 		
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			"Cancel", b -> client.openScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 100, 20, "Import Alts",
-			b -> pressImportAlts()));
+		addButton(new ButtonWidget(8, 8, 100, 20,
+			new LiteralText("Import Alts"), b -> pressImportAlts()));
 	}
 	
 	@Override
@@ -192,7 +194,7 @@ public final class AltManagerScreen extends Screen
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
-			message, "Delete", "Cancel");
+			message, new LiteralText("Delete"), new LiteralText("Cancel"));
 		client.openScreen(screen);
 	}
 	
@@ -260,10 +262,11 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
@@ -278,11 +281,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredString(textRenderer, "Alt Manager", width / 2, 4, 16777215);
-		drawCenteredString(textRenderer, "Alts: " + altManager.getList().size(),
-			width / 2, 14, 10526880);
+		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
+			4, 16777215);
+		drawCenteredString(matrixStack, textRenderer,
+			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
 		drawCenteredString(
-			textRenderer, "premium: " + altManager.getNumPremium()
+			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);
 		
@@ -310,7 +314,7 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	public static final class ListGui extends ListWidget
@@ -369,8 +373,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int id, int x, int y, int var4, int var5,
-			int var6, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int id, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			Alt alt = list.get(id);
 			
@@ -406,8 +410,8 @@ public final class AltManagerScreen extends Screen
 				isSelectedItem(id));
 			
 			// name / email
-			client.textRenderer.draw("Name: " + alt.getNameOrEmail(), x + 31,
-				y + 3, 10526880);
+			client.textRenderer.draw(matrixStack,
+				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
 			
 			// tags
 			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
@@ -415,7 +419,8 @@ public final class AltManagerScreen extends Screen
 				tags += "\u00a7r, \u00a7estarred";
 			if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
-			client.textRenderer.draw(tags, x + 31, y + 15, 10526880);
+			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
+				10526880);
 		}
 	}
 }
