@@ -840,7 +840,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
-				.asString();
+			.getString();
 		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

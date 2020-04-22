@@ -93,7 +93,7 @@ public final class GoToCmd extends Command
 			.filter(e -> !e.removed && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().asString()))
+			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
 			.min(
 				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 			.orElse(null);

@@ -131,7 +131,7 @@ public final class FollowHack extends Hack
 	public String getRenderName()
 	{
 		if(entity != null)
-			return "Following " + entity.getName().asString();
+			return "Following " + entity.getName().getString();
 		else
 			return "Follow";
 	}
@@ -217,7 +217,7 @@ public final class FollowHack extends Hack
 		pathFinder = new EntityPathFinder();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		ChatUtils.message("Now following " + entity.getName().asString());
+		ChatUtils.message("Now following " + entity.getName().getString());
 	}
 	
 	@Override
@@ -233,7 +233,7 @@ public final class FollowHack extends Hack
 		
 		if(entity != null)
 			ChatUtils
-				.message("No longer following " + entity.getName().asString());
+				.message("No longer following " + entity.getName().getString());
 		
 		entity = null;
 	}
@@ -259,8 +259,8 @@ public final class FollowHack extends Hack
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> entity.getName().asString()
-					.equalsIgnoreCase(e.getName().asString()))
+				.filter(e -> entity.getName().getString()
+					.equalsIgnoreCase(e.getName().getString()))
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);

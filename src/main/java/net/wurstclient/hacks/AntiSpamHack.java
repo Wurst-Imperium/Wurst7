@@ -133,6 +133,6 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		
 		if(spamCounter > 1)
 			event.setComponent(new LiteralText(
-				event.getComponent().asString() + " [x" + spamCounter + "]"));
+				event.getComponent().getString() + " [x" + spamCounter + "]"));
 	}
 }

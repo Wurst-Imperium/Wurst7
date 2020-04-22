@@ -291,7 +291,7 @@ public final class EditBlockListScreen extends Screen
 				
 				GL11.glPopMatrix();
 				
-				return stack.getName().asString();
+				return stack.getName().getString();
 			}
 		}
 	}

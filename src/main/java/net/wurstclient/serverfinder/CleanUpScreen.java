@@ -129,7 +129,7 @@ public class CleanUpScreen extends Screen
 			ServerInfo server = prevScreen.getServerList().get(i);
 			if(cleanupUnknown
 				&& "\u00a74Can\'t resolve hostname"
-					.equals(server.label.asString())
+					.equals(server.label.getString())
 				|| cleanupOutdated && server.protocolVersion != SharedConstants
 					.getGameVersion().getProtocolVersion()
 				|| cleanupFailed && server.ping != -2L && server.ping < 0L

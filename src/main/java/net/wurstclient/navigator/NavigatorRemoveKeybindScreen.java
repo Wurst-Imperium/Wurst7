@@ -215,7 +215,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(matrixStack, client.textRenderer,
-				button.getMessage().asString(), (x1 + x2) / 2, y1 + 4,
+				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}

@@ -42,7 +42,7 @@ public final class SvCmd extends Command
 			throw new IllegalStateException(
 				"LastServerRememberer doesn't remember the last server!");
 		
-		return lastServer.version.asString();
+		return lastServer.version.getString();
 	}
 	
 	@Override
