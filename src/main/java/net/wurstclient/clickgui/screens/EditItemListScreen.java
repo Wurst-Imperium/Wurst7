@@ -21,6 +21,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
@@ -61,20 +62,21 @@ public final class EditItemListScreen extends Screen
 		listGui = new ListGui(client, this, itemList.getItemNames());
 		
 		itemNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 55, 150, 18, "");
+			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		children.add(itemNameField);
 		
-		addButton(addButton =
-			new ButtonWidget(width / 2 - 2, height - 56, 30, 20, "Add", b -> {
+		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
+			20, new LiteralText("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
 			}));
 		
-		addButton(
-			removeButton = new ButtonWidget(width / 2 + 52, height - 56, 100,
-				20, "Remove Selected", b -> itemList.remove(listGui.selected)));
+		addButton(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
+			100, 20, new LiteralText("Remove Selected"),
+			b -> itemList.remove(listGui.selected)));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
+		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+			new LiteralText("Reset to Defaults"),
 			b -> client.openScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
@@ -82,8 +84,9 @@ public final class EditItemListScreen extends Screen
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
-		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28,
-			200, 20, "Done", b -> client.openScreen(prevScreen)));
+		addButton(
+			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
+				new LiteralText("Done"), b -> client.openScreen(prevScreen)));
 	}
 	
 	@Override
@@ -163,17 +166,18 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(client.textRenderer,
+		drawCenteredString(matrixStack, client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
-		itemNameField.render(mouseX, mouseY, partialTicks);
-		super.render(mouseX, mouseY, partialTicks);
+		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
@@ -182,22 +186,22 @@ public final class EditItemListScreen extends Screen
 		{
 			GL11.glPushMatrix();
 			GL11.glTranslated(0, 0, 300);
-			drawString(client.textRenderer, "item name or ID", 68, height - 50,
-				0x808080);
+			drawString(matrixStack, client.textRenderer, "item name or ID", 68,
+				height - 50, 0x808080);
 			GL11.glPopMatrix();
 		}
 		
-		fill(48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(49, height - 55, 64, height - 37, 0xff000000);
-		fill(214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(214, height - 55, 243, height - 52, 0xff000000);
-		fill(214, height - 40, 243, height - 37, 0xff000000);
-		fill(215, height - 55, 216, height - 37, 0xff000000);
-		fill(242, height - 55, 245, height - 37, 0xff000000);
-		listGui.renderIconAndGetName(new ItemStack(itemToAdd), 52, height - 52,
-			false);
+		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
+		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
+		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
+		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
+		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
+		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
+		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
+		fill(matrixStack, 215, height - 55, 216, height - 37, 0xff000000);
+		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
+		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd), 52,
+			height - 52, false);
 		
 		GL11.glPopMatrix();
 	}
@@ -245,8 +249,8 @@ public final class EditItemListScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int index, int x, int y, int var4, int var5,
-			int var6, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int index, int x,
+			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
 			Item item = Registry.ITEM.get(new Identifier(name));
@@ -254,15 +258,15 @@ public final class EditItemListScreen extends Screen
 			TextRenderer fr = mc.textRenderer;
 			
 			String displayName =
-				renderIconAndGetName(stack, x + 1, y + 1, true);
-			fr.draw(displayName, x + 28, y, 0xf0f0f0);
-			fr.draw(name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw("ID: " + Registry.ITEM.getId(item).toString(), x + 28,
-				y + 18, 0xa0a0a0);
+				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
+			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
+			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
+			fr.draw(matrixStack, "ID: " + Registry.ITEM.getId(item).toString(),
+				x + 28, y + 18, 0xa0a0a0);
 		}
 		
-		private String renderIconAndGetName(ItemStack stack, int x, int y,
-			boolean large)
+		private String renderIconAndGetName(MatrixStack matrixStack,
+			ItemStack stack, int x, int y, boolean large)
 		{
 			if(stack.isEmpty())
 			{
@@ -285,7 +289,7 @@ public final class EditItemListScreen extends Screen
 					GL11.glScaled(2, 2, 2);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				TextRenderer fr = mc.textRenderer;
-				fr.drawWithShadow("?", 3, 2, 0xf0f0f0);
+				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				GL11.glPopMatrix();
 				
@@ -306,7 +310,7 @@ public final class EditItemListScreen extends Screen
 				
 				GL11.glPopMatrix();
 				
-				return stack.getName().asFormattedString();
+				return stack.getName().asString();
 			}
 		}
 	}

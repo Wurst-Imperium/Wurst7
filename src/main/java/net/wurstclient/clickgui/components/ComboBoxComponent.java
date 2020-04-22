@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ComboBoxPopup;
@@ -93,7 +94,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -116,7 +118,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		drawSeparator(x3, y1, y2);
 		drawArrow(x2, x3, y1, y2, hBox);
 		
-		drawNameAndValue(x1, x4, y1);
+		drawNameAndValue(matrixStack, x1, x4, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -215,7 +217,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		GL11.glEnd();
 	}
 	
-	private void drawNameAndValue(int x1, int x4, int y1)
+	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
+		int y1)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -224,8 +227,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		String value = "" + setting.getSelected();
 		int color = 0xF0F0F0;
 		
-		tr.draw(name, x1, y1 + 2, color);
-		tr.draw(value, x4 + 2, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, color);
+		tr.draw(matrixStack, value, x4 + 2, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);

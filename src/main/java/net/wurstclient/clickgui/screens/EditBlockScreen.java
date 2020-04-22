@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
@@ -48,7 +49,8 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		String valueString = setting.getBlockName();
 		
-		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, "");
+		blockField =
+			new TextFieldWidget(tr, x1, y1, 178, 18, new LiteralText(""));
 		blockField.setText(valueString);
 		blockField.setSelectionStart(0);
 		
@@ -56,7 +58,8 @@ public final class EditBlockScreen extends Screen
 		setInitialFocus(blockField);
 		blockField.setSelected(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
+		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+			b -> done());
 		addButton(doneButton);
 	}
 	
@@ -95,15 +98,17 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground();
-		drawCenteredString(tr, setting.getName(), width / 2, 20, 0xFFFFFF);
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, tr, setting.getName(), width / 2, 20,
+			0xFFFFFF);
 		
-		blockField.render(mouseX, mouseY, partialTicks);
-		super.render(mouseX, mouseY, partialTicks);
+		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 100, 115, 0);
@@ -114,20 +119,20 @@ public final class EditBlockScreen extends Screen
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		drawString(tr, lblText, lblX, lblY, lblColor);
+		drawString(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
-		fill(48, -56, 64, -36, 0xffa0a0a0);
-		fill(49, -55, 64, -37, 0xff000000);
-		fill(214, -56, 244, -55, 0xffa0a0a0);
-		fill(214, -37, 244, -36, 0xffa0a0a0);
-		fill(244, -56, 246, -36, 0xffa0a0a0);
-		fill(214, -55, 243, -52, 0xff000000);
-		fill(214, -40, 243, -37, 0xff000000);
-		fill(215, -55, 216, -37, 0xff000000);
-		fill(242, -55, 245, -37, 0xff000000);
+		fill(matrixStack, 48, -56, 64, -36, 0xffa0a0a0);
+		fill(matrixStack, 49, -55, 64, -37, 0xff000000);
+		fill(matrixStack, 214, -56, 244, -55, 0xffa0a0a0);
+		fill(matrixStack, 214, -37, 244, -36, 0xffa0a0a0);
+		fill(matrixStack, 244, -56, 246, -36, 0xffa0a0a0);
+		fill(matrixStack, 214, -55, 243, -52, 0xff000000);
+		fill(matrixStack, 214, -40, 243, -37, 0xff000000);
+		fill(matrixStack, 215, -55, 216, -37, 0xff000000);
+		fill(matrixStack, 242, -55, 245, -37, 0xff000000);
 		
 		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
-		renderIcon(new ItemStack(blockToAdd), 52, -52, false);
+		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
 		
 		GL11.glPopMatrix();
 	}
@@ -144,7 +149,8 @@ public final class EditBlockScreen extends Screen
 		return false;
 	}
 	
-	private void renderIcon(ItemStack stack, int x, int y, boolean large)
+	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
+		int y, boolean large)
 	{
 		GL11.glPushMatrix();
 		
@@ -161,10 +167,11 @@ public final class EditBlockScreen extends Screen
 		GL11.glPopMatrix();
 		
 		if(stack.isEmpty())
-			renderQuestionMark(x, y, large);
+			renderQuestionMark(matrixStack, x, y, large);
 	}
 	
-	private void renderQuestionMark(int x, int y, boolean large)
+	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
+		boolean large)
 	{
 		GL11.glPushMatrix();
 		
@@ -174,7 +181,7 @@ public final class EditBlockScreen extends Screen
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		tr.drawWithShadow("?", 3, 2, 0xf0f0f0);
+		tr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		GL11.glPopMatrix();

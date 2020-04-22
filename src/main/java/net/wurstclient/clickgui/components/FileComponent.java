@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -45,7 +46,8 @@ public final class FileComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
@@ -108,8 +110,9 @@ public final class FileComponent extends Component
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		String text = setting.getName() + ": ";
-		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw(setting.getSelectedFileName(), x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, setting.getSelectedFileName(), x3 + 2, y1 + 2,
+			0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

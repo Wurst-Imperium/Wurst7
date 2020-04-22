@@ -25,6 +25,8 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -443,7 +445,8 @@ public final class ClickGui
 		}
 	}
 	
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		updateColors();
 		
@@ -477,18 +480,19 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			renderWindow(window, mouseX, mouseY, partialTicks);
+			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
 		}
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		renderPopupsAndTooltip(mouseX, mouseY);
+		renderPopupsAndTooltip(matrixStack, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopupsAndTooltip(int mouseX, int mouseY)
+	public void renderPopupsAndTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
 	{
 		// popups
 		for(Popup popup : popups)
@@ -505,7 +509,7 @@ public final class ClickGui
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
-			popup.render(cMouseX, cMouseY);
+			popup.render(matrixStack, cMouseX, cMouseY);
 			
 			GL11.glPopMatrix();
 		}
@@ -557,15 +561,15 @@ public final class ClickGui
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < lines.length; i++)
-				fr.draw(lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
-					0xffffff);
+				fr.draw(matrixStack, lines[i], xt1 + 2,
+					yt1 + 2 + i * fr.fontHeight, 0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 			
 			GL11.glPopMatrix();
 		}
 	}
 	
-	public void renderPinnedWindows(float partialTicks)
+	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
 	{
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -576,8 +580,8 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
-				renderWindow(window, Integer.MIN_VALUE, Integer.MIN_VALUE,
-					partialTicks);
+				renderWindow(matrixStack, window, Integer.MIN_VALUE,
+					Integer.MIN_VALUE, partialTicks);
 			
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -602,8 +606,8 @@ public final class ClickGui
 			acColor = clickGui.getAcColor();
 	}
 	
-	private void renderWindow(Window window, int mouseX, int mouseY,
-		float partialTicks)
+	private void renderWindow(MatrixStack matrixStack, Window window,
+		int mouseX, int mouseY, float partialTicks)
 	{
 		int x1 = window.getX();
 		int y1 = window.getY();
@@ -751,7 +755,8 @@ public final class ClickGui
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y4;
 			for(int i = 0; i < window.countChildren(); i++)
-				window.getChild(i).render(cMouseX, cMouseY, partialTicks);
+				window.getChild(i).render(matrixStack, cMouseX, cMouseY,
+					partialTicks);
 			
 			GL11.glPopMatrix();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -833,8 +838,10 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(1, 1, 1, 1);
 		TextRenderer fr = MC.textRenderer;
-		String title = fr.trimToWidth(window.getTitle(), x3 - x1);
-		fr.draw(title, x1 + 2, y1 + 3, 0xf0f0f0);
+		String title =
+			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
+				.asString();
+		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

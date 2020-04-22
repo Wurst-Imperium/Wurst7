@@ -13,6 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -44,7 +45,8 @@ public final class EditSliderScreen extends Screen
 		ValueDisplay vd = ValueDisplay.DECIMAL;
 		String valueString = vd.getValueString(slider.getValue());
 		
-		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, "");
+		valueField =
+			new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
 		valueField.setText(valueString);
 		valueField.setSelectionStart(0);
 		
@@ -52,7 +54,8 @@ public final class EditSliderScreen extends Screen
 		setInitialFocus(valueField);
 		valueField.setSelected(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
+		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+			b -> done());
 		addButton(doneButton);
 	}
 	
@@ -90,14 +93,15 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		drawCenteredString(client.textRenderer, slider.getName(), width / 2, 20,
-			0xFFFFFF);
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, client.textRenderer, slider.getName(),
+			width / 2, 20, 0xFFFFFF);
 		
-		valueField.render(mouseX, mouseY, partialTicks);
-		super.render(mouseX, mouseY, partialTicks);
+		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

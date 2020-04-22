@@ -13,6 +13,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -51,7 +52,8 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
@@ -99,9 +101,9 @@ public final class BlockComponent extends Component
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
 		
-		renderIcon(stack, x3, y1, true);
+		renderIcon(matrixStack, stack, x3, y1, true);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -121,7 +123,8 @@ public final class BlockComponent extends Component
 		return BLOCK_WITDH;
 	}
 	
-	private void renderIcon(ItemStack stack, int x, int y, boolean large)
+	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
+		int y, boolean large)
 	{
 		GL11.glPushMatrix();
 		
@@ -138,10 +141,11 @@ public final class BlockComponent extends Component
 		GL11.glPopMatrix();
 		
 		if(stack.isEmpty())
-			renderQuestionMark(x, y, large);
+			renderQuestionMark(matrixStack, x, y, large);
 	}
 	
-	private void renderQuestionMark(int x, int y, boolean large)
+	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
+		boolean large)
 	{
 		GL11.glPushMatrix();
 		
@@ -151,7 +155,7 @@ public final class BlockComponent extends Component
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		tr.drawWithShadow("?", 3, 2, 0xf0f0f0);
+		tr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -163,6 +167,6 @@ public final class BlockComponent extends Component
 		if(stack.isEmpty())
 			return "\u00a7ounknown block\u00a7r";
 		else
-			return stack.getName().asFormattedString();
+			return stack.getName().asString();
 	}
 }
