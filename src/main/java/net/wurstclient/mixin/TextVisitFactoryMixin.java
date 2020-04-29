@@ -15,7 +15,7 @@ import net.minecraft.client.font.TextVisitFactory;
 import net.wurstclient.WurstClient;
 
 @Mixin(TextVisitFactory.class)
-public abstract class TextRendererUtilsMixin
+public abstract class TextVisitFactoryMixin
 {
 	@ModifyArg(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/class_5223;method_27473(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/class_5223$class_5224;)Z",

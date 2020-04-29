@@ -49,7 +49,7 @@
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",
-    "TextRendererUtilsMixin",
+    "TextVisitFactoryMixin",
     "TitleScreenMixin",
     "WorldMixin"
   ],
