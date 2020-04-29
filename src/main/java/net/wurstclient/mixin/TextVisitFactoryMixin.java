@@ -18,10 +18,10 @@ import net.wurstclient.WurstClient;
 public abstract class TextVisitFactoryMixin
 {
 	@ModifyArg(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/class_5223;method_27473(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/class_5223$class_5224;)Z",
+		target = "Lnet/minecraft/client/font/TextVisitFactory;visitFormatted(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/client/font/TextVisitFactory$CharacterVisitor;)Z",
 		ordinal = 0),
 		method = {
-			"method_27472(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/class_5223$class_5224;)Z"},
+			"visitFormatted(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/client/font/TextVisitFactory$CharacterVisitor;)Z"},
 		index = 0)
 	private static String adjustText(String text)
 	{
