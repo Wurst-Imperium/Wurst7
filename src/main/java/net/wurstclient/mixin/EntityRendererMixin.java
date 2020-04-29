@@ -90,7 +90,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		int k = (int)(g * 255.0F) << 24;
 		
 		TextRenderer textRenderer = this.getFontRenderer();
-		float h = -textRenderer.method_27525(text) / 2;
+		float h = -textRenderer.getWidth(text) / 2;
 		
 		textRenderer.draw(text, h, j, 553648127, false, matrix4f,
 			vertexConsumerProvider, bl, k, i);

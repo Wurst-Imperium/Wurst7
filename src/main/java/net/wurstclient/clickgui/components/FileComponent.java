@@ -36,7 +36,7 @@ public final class FileComponent extends Component
 			return;
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
@@ -55,7 +55,7 @@ public final class FileComponent extends Component
 		float opacity = gui.getOpacity();
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -123,9 +123,9 @@ public final class FileComponent extends Component
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		
 		String text = setting.getName() + ": ";
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
-		return fr.getStringWidth(text) + buttonWidth + 6;
+		return fr.getWidth(text) + buttonWidth + 6;
 	}
 	
 	@Override

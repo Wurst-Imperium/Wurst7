@@ -44,7 +44,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	{
 		Stream<T> values = Arrays.stream(setting.getValues());
 		Stream<String> vNames = values.map(T::toString);
-		IntStream vWidths = vNames.mapToInt(s -> tr.getStringWidth(s));
+		IntStream vWidths = vNames.mapToInt(s -> tr.getWidth(s));
 		return vWidths.max().getAsInt();
 	}
 	
@@ -237,7 +237,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return tr.getStringWidth(setting.getName()) + popupWidth + 17;
+		return tr.getWidth(setting.getName()) + popupWidth + 17;
 	}
 	
 	@Override

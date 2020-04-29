@@ -524,7 +524,7 @@ public final class ClickGui
 			int th = lines.length * fr.fontHeight;
 			for(String line : lines)
 			{
-				int lw = fr.getStringWidth(line);
+				int lw = fr.getWidth(line);
 				if(lw > tw)
 					tw = lw;
 			}
@@ -840,7 +840,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
-			.getString();
+				.getString();
 		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

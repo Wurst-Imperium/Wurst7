@@ -40,7 +40,7 @@ public final class WurstLogo
 		}else
 			GL11.glColor4f(1, 1, 1, 0.5F);
 		
-		drawQuads(0, 6, tr.getStringWidth(version) + 76, 17);
+		drawQuads(0, 6, tr.getWidth(version) + 76, 17);
 		
 		// draw version string
 		GL11.glEnable(GL11.GL_TEXTURE_2D);

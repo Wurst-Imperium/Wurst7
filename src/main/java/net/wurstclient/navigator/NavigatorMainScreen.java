@@ -328,7 +328,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int th = lines.length * fr.fontHeight;
 			for(String line : lines)
 			{
-				int lw = fr.getStringWidth(line);
+				int lw = fr.getWidth(line);
 				if(lw > tw)
 					tw = lw;
 			}

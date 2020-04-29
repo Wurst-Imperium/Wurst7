@@ -137,7 +137,7 @@ public final class HackListHUD implements UpdateListener
 		else
 		{
 			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
-			int stringWidth = tr.getStringWidth(s);
+			int stringWidth = tr.getWidth(s);
 			
 			posX = screenWidth - stringWidth - 2;
 		}
@@ -163,7 +163,7 @@ public final class HackListHUD implements UpdateListener
 		else
 		{
 			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
-			int stringWidth = tr.getStringWidth(s);
+			int stringWidth = tr.getWidth(s);
 			
 			posX = screenWidth - stringWidth - 2 + 5 * offset;
 		}

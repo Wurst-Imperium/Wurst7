@@ -277,7 +277,7 @@ public final class SliderComponent extends Component
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
 		String value = setting.getValueString();
-		int valueWidth = tr.getStringWidth(value);
+		int valueWidth = tr.getWidth(value);
 		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
 		tr.draw(matrixStack, name, x1, y1 + 2, color);
 		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
@@ -290,8 +290,8 @@ public final class SliderComponent extends Component
 	public int getDefaultWidth()
 	{
 		TextRenderer tr = MC.textRenderer;
-		int nameWitdh = tr.getStringWidth(setting.getName());
-		int valueWidth = tr.getStringWidth(setting.getValueString());
+		int nameWitdh = tr.getWidth(setting.getName());
+		int valueWidth = tr.getWidth(setting.getValueString());
 		return nameWitdh + valueWidth + 6;
 	}
 	

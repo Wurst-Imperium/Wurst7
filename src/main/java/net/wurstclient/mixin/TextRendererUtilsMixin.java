@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import net.minecraft.class_5223;
+import net.minecraft.client.font.TextVisitFactory;
 import net.wurstclient.WurstClient;
 
-@Mixin(class_5223.class)
+@Mixin(TextVisitFactory.class)
 public abstract class TextRendererUtilsMixin
 {
 	@ModifyArg(at = @At(value = "INVOKE",

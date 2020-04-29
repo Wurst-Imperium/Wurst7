@@ -114,7 +114,7 @@ public final class BlockComponent extends Component
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		return tr.getStringWidth(text) + BLOCK_WITDH + 4;
+		return tr.getWidth(text) + BLOCK_WITDH + 4;
 	}
 	
 	@Override

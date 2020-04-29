@@ -194,7 +194,7 @@ public final class CheckboxComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return MC.textRenderer.getStringWidth(setting.getName()) + 13;
+		return MC.textRenderer.getWidth(setting.getName()) + 13;
 	}
 	
 	@Override

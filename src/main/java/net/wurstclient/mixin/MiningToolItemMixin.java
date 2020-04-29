@@ -49,6 +49,6 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	public float fuckMcAfee2()
 	{
 		return (float)field_23742.get(EntityAttributes.GENERIC_ATTACK_SPEED)
-			.iterator().next().getAmount();
+			.iterator().next().getValue();
 	}
 }

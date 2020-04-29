@@ -63,8 +63,7 @@ public final class TabGui implements KeyPressListener
 		width = 64;
 		for(Tab tab : tabs)
 		{
-			int tabWidth =
-				WurstClient.MC.textRenderer.getStringWidth(tab.name) + 10;
+			int tabWidth = WurstClient.MC.textRenderer.getWidth(tab.name) + 10;
 			if(tabWidth > width)
 				width = tabWidth;
 		}
@@ -296,8 +295,9 @@ public final class TabGui implements KeyPressListener
 			width = 64;
 			for(Feature feature : features)
 			{
-				int fWidth = WurstClient.MC.textRenderer
-					.getStringWidth(feature.getName()) + 10;
+				int fWidth =
+					WurstClient.MC.textRenderer.getWidth(feature.getName())
+						+ 10;
 				if(fWidth > width)
 					width = fWidth;
 			}

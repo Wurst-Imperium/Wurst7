@@ -337,7 +337,7 @@ public final class ExcavatorHack extends Hack
 		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = tr.getStringWidth(message);
+		int msgWidth = tr.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		

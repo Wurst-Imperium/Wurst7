@@ -255,7 +255,7 @@ public final class FeatureButton extends Component
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = feature.getName();
-		int nameWidth = tr.getStringWidth(name);
+		int nameWidth = tr.getWidth(name);
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
@@ -270,7 +270,7 @@ public final class FeatureButton extends Component
 	{
 		String name = feature.getName();
 		TextRenderer tr = MC.textRenderer;
-		int width = tr.getStringWidth(name) + 4;
+		int width = tr.getWidth(name) + 4;
 		if(hasSettings)
 			width += 11;
 		

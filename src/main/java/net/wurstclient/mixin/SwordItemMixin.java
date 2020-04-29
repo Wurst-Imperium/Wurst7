@@ -43,6 +43,6 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 	public float fuckMcAfee()
 	{
 		return (float)field_23745.get(EntityAttributes.GENERIC_ATTACK_SPEED)
-			.iterator().next().getAmount();
+			.iterator().next().getValue();
 	}
 }

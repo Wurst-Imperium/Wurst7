@@ -344,7 +344,7 @@ public final class BowAimbotHack extends Hack
 		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getStringWidth(message);
+		int msgWidth = MC.textRenderer.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		

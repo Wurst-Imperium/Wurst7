@@ -27,7 +27,7 @@ public final class BlockListEditButton extends Component
 		this.setting = setting;
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		buttonWidth = fr.getStringWidth("Edit...");
+		buttonWidth = fr.getWidth("Edit...");
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
@@ -115,7 +115,7 @@ public final class BlockListEditButton extends Component
 	{
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getBlockNames().size();
-		return fr.getStringWidth(text) + buttonWidth + 6;
+		return fr.getWidth(text) + buttonWidth + 6;
 	}
 	
 	@Override
