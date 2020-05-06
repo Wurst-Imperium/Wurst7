@@ -3,6 +3,8 @@
 ## Downloads (for users)
 
 https://www.wurstclient.net/download/
+(NOTE: This does not include MountBypass, you'll have to compile this git yourself)
+
 
 ## Setup (for developers) (using Windows 10 & Eclipse)
 
