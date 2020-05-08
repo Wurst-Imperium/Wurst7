@@ -18,6 +18,10 @@ import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.MarkerManager;
+import static org.apache.logging.log4j.LogManager.getLogger;
+
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
@@ -54,6 +58,8 @@ public enum WurstClient
 {
 	INSTANCE;
 	
+	final Logger LOGGER = getLogger();
+	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
@@ -85,7 +91,7 @@ public enum WurstClient
 	
 	public void initialize()
 	{
-		System.out.println("Starting Wurst Client...");
+		LOGGER.info(MarkerManager.getMarker("Wurst"),"Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
 		
