@@ -48,8 +48,8 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
+		GL11.glEnable(GL11.GL_POINT_SMOOTH);
+		GL11.glPointSize(5);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		RenderUtils.applyCameraRotationOnly();
@@ -70,18 +70,25 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		GL11.glDisable(GL11.GL_POINT_SMOOTH);
 		GL11.glPopMatrix();
 	}
 	
 	private void drawLine(ArrayList<Vec3d> path, Vec3d camPos)
 	{
-		GL11.glBegin(GL11.GL_LINE_STRIP);
-		GL11.glColor4f(0, 1, 0, 0.75F);
-		
-		for(Vec3d point : path)
+		GL11.glBegin(GL11.GL_POINTS);
+//		GL11.glColor4f(0, 1, 0, 0.75F);
+
+		int flag = 0;
+		for(Vec3d point : path) {
+			if (flag == 0)
+				GL11.glColor4f(0, 0, 1, 0.75F);
+			else
+				GL11.glColor4f(1, 0, 0, 0.75F);
 			GL11.glVertex3d(point.x - camPos.x, point.y - camPos.y,
-				point.z - camPos.z);
+					point.z - camPos.z);
+			flag = 1 - flag;
+		}
 		
 		GL11.glEnd();
 	}
@@ -170,28 +177,32 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			arrowMotionY *= 1.5;
 			arrowMotionZ *= 1.5;
 		}
-		
+
+		arrowMotionX += (player.getX() - player.lastRenderX);
+		arrowMotionY += (player.getY() - player.lastRenderY);
+		arrowMotionZ += (player.getZ() - player.lastRenderZ);
+
 		double gravity = getProjectileGravity(item);
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		
-		for(int i = 0; i < 1000; i++)
+		for(int i = 0; i < 100; i++)
 		{
 			// add to path
 			Vec3d arrowPos = new Vec3d(arrowPosX, arrowPosY, arrowPosZ);
 			path.add(arrowPos);
 			
 			// apply motion
-			arrowPosX += arrowMotionX * 0.1;
-			arrowPosY += arrowMotionY * 0.1;
-			arrowPosZ += arrowMotionZ * 0.1;
+			arrowPosX += arrowMotionX;
+			arrowPosY += arrowMotionY;
+			arrowPosZ += arrowMotionZ;
 			
-			// apply air friction
-			arrowMotionX *= 0.999;
-			arrowMotionY *= 0.999;
-			arrowMotionZ *= 0.999;
+			// apply air friction(of Bow)
+			arrowMotionX *= 0.99;
+			arrowMotionY *= 0.99;
+			arrowMotionZ *= 0.99;
 			
 			// apply gravity
-			arrowMotionY -= gravity * 0.1;
+			arrowMotionY -= gravity;
 			
 			// check for collision
 			RayTraceContext context = new RayTraceContext(eyesPos, arrowPos,
