@@ -227,20 +227,21 @@ public class ServerFinderScreen extends Screen
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, 10526880);
 		
-		drawString(matrixStack, textRenderer, "Server address:",
+		drawStringWithShadow(matrixStack, textRenderer, "Server address:",
 			width / 2 - 100, height / 4 + 24, 10526880);
 		ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawString(matrixStack, textRenderer, "Max. threads:", width / 2 - 100,
-			height / 4 + 60, 10526880);
+		drawStringWithShadow(matrixStack, textRenderer, "Max. threads:",
+			width / 2 - 100, height / 4 + 60, 10526880);
 		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		drawCenteredString(matrixStack, textRenderer, state.toString(),
 			width / 2, height / 4 + 73, 10526880);
 		
-		drawString(matrixStack, textRenderer, "Checked: " + checked + " / 1792",
-			width / 2 - 100, height / 4 + 84, 10526880);
-		drawString(matrixStack, textRenderer, "Working: " + working,
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
+			10526880);
+		drawStringWithShadow(matrixStack, textRenderer, "Working: " + working,
 			width / 2 - 100, height / 4 + 94, 10526880);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

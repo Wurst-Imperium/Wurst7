@@ -128,12 +128,11 @@ public final class NukerHack extends Hack
 		Stream<BlockPos> stream = blocks.parallelStream();
 		
 		List<BlockPos> blocks2 = stream
-			.filter(pos -> eyesPos
-				.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
+			.filter(pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.canBeClicked(pos))
 			.filter(mode.getSelected().getValidator(this))
 			.sorted(Comparator.comparingDouble(
-				pos -> eyesPos.squaredDistanceTo(Vec3d.method_24954(pos))))
+				pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toList());
 		
 		if(player.abilities.creativeMode)

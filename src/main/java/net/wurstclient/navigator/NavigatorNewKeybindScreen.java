@@ -185,10 +185,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				
 				// text
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				drawString(matrixStack, client.textRenderer,
+				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getDescription(), x1 + 1, y1 + 1, 0xffffff);
-				drawString(matrixStack, client.textRenderer, pkb.getCommand(),
-					x1 + 1, y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
+				drawStringWithShadow(matrixStack, client.textRenderer,
+					pkb.getCommand(), x1 + 1,
+					y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_BLEND);
 			}
@@ -199,8 +200,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(matrixStack, client.textRenderer, line, bgx1 + 2, textY,
-				0xffffff);
+			drawStringWithShadow(matrixStack, client.textRenderer, line,
+				bgx1 + 2, textY, 0xffffff);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);

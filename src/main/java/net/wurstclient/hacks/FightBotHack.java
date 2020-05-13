@@ -335,7 +335,7 @@ public final class FightBotHack extends Hack
 		protected boolean checkDone()
 		{
 			return done =
-				entity.squaredDistanceTo(Vec3d.method_24953(current)) <= Math
+				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= Math
 					.pow(distance.getValue(), 2);
 		}
 		

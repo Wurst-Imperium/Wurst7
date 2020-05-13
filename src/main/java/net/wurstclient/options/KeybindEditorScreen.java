@@ -101,11 +101,11 @@ public final class KeybindEditorScreen extends Screen
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		drawString(matrixStack, textRenderer,
+		drawStringWithShadow(matrixStack, textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		drawString(matrixStack, textRenderer, "Commands (separated by ';')",
-			width / 2 - 100, 87, 0xa0a0a0);
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
 		
 		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

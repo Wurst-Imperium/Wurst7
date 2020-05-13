@@ -367,7 +367,7 @@ public final class FollowHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			Vec3d center = Vec3d.method_24953(current);
+			Vec3d center = Vec3d.ofCenter(current);
 			double distanceSq = Math.pow(distance.getValue(), 2);
 			return done = entity.squaredDistanceTo(center) <= distanceSq;
 		}

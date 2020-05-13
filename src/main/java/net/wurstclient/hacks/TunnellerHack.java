@@ -243,10 +243,8 @@ public final class TunnellerHack extends Hack
 		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
 		GL11.glEnd();
 		
-		RenderUtils.drawArrow(
-			Vec3d.method_24954(direction.getVector()).multiply(0.25),
-			Vec3d.method_24954(direction.getVector())
-				.multiply(Math.max(0.5, length)));
+		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
+			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
 		
 		GL11.glPopMatrix();
 		GL11.glEndList();
@@ -377,7 +375,7 @@ public final class TunnellerHack extends Hack
 		public void run()
 		{
 			BlockPos base = start.offset(direction, length);
-			Vec3d vec = Vec3d.method_24953(base);
+			Vec3d vec = Vec3d.ofCenter(base);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 			
 			MC.options.keyForward.setPressed(true);
@@ -431,7 +429,7 @@ public final class TunnellerHack extends Hack
 			Vec3d eyes = RotationUtils.getEyesPos().add(-0.5, -0.5, -0.5);
 			Comparator<BlockPos> comparator =
 				Comparator.<BlockPos> comparingDouble(
-					p -> eyes.squaredDistanceTo(Vec3d.method_24954(p)));
+					p -> eyes.squaredDistanceTo(Vec3d.of(p)));
 			
 			BlockPos pos = blocks.stream().max(comparator).get();
 			
@@ -553,8 +551,8 @@ public final class TunnellerHack extends Hack
 			BlockPos player = new BlockPos(MC.player.getPos());
 			KeyBinding forward = MC.options.keyForward;
 			
-			Vec3d diffVec = Vec3d.method_24954(player.subtract(start));
-			Vec3d dirVec = Vec3d.method_24954(direction.getVector());
+			Vec3d diffVec = Vec3d.of(player.subtract(start));
+			Vec3d dirVec = Vec3d.of(direction.getVector());
 			double dotProduct = diffVec.dotProduct(dirVec);
 			
 			BlockPos pos1 = start.offset(direction, (int)dotProduct);
@@ -592,7 +590,7 @@ public final class TunnellerHack extends Hack
 		
 		private Vec3d toVec3d(BlockPos pos)
 		{
-			return Vec3d.method_24953(pos);
+			return Vec3d.ofCenter(pos);
 		}
 	}
 	
@@ -619,7 +617,7 @@ public final class TunnellerHack extends Hack
 			
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 			GL11.glColor4f(1, 1, 0, 0.5F);
-			Vec3d torchVec = Vec3d.method_24955(nextTorch);
+			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			
@@ -676,13 +674,13 @@ public final class TunnellerHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.method_24953(pos);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
-			hitVecs[i] = posVec
-				.add(Vec3d.method_24954(sides[i].getVector()).multiply(0.5));
+			hitVecs[i] =
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
@@ -752,7 +750,7 @@ public final class TunnellerHack extends Hack
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d relCenter = BlockUtils.getBoundingBox(pos)
 			.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter();
-		Vec3d center = Vec3d.method_24954(pos).add(relCenter);
+		Vec3d center = Vec3d.of(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)

@@ -128,8 +128,7 @@ public final class AutoFarmHack extends Hack
 		int blockRange = (int)Math.ceil(range.getValue());
 		
 		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec
-				.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.canBeClicked(pos))
 			.collect(Collectors.toList());
 		
@@ -140,21 +139,21 @@ public final class AutoFarmHack extends Hack
 		
 		if(!WURST.getHax().freecamHack.isEnabled())
 		{
-			blocksToHarvest = blocks.parallelStream()
-				.filter(this::shouldBeHarvested)
-				.sorted(Comparator.comparingDouble(
-					pos -> eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
-				.collect(Collectors.toList());
+			blocksToHarvest =
+				blocks.parallelStream().filter(this::shouldBeHarvested)
+					.sorted(Comparator.comparingDouble(
+						pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+					.collect(Collectors.toList());
 			
 			blocksToReplant = getBlockStream(eyesBlock, blockRange)
-				.filter(pos -> eyesVec
-					.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
+				.filter(
+					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 				.filter(pos -> BlockUtils.getState(pos).getMaterial()
 					.isReplaceable())
 				.filter(pos -> plants.containsKey(pos))
 				.filter(this::canBeReplanted)
 				.sorted(Comparator.comparingDouble(
-					pos -> eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
+					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 				.collect(Collectors.toList());
 		}
 		
@@ -345,13 +344,13 @@ public final class AutoFarmHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.method_24953(pos);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
-			hitVecs[i] = posVec
-				.add(Vec3d.method_24954(sides[i].getVector()).multiply(0.5));
+			hitVecs[i] =
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{

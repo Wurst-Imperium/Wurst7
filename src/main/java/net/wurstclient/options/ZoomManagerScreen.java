@@ -89,7 +89,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		renderBackground(matrixStack);
 		drawCenteredString(matrixStack, textRenderer, "Zoom Manager", width / 2,
 			40, 0xffffff);
-		drawString(matrixStack, textRenderer,
+		drawStringWithShadow(matrixStack, textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,
 			height / 4 + 44, 0xcccccc);
 		

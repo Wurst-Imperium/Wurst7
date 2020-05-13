@@ -384,8 +384,8 @@ public final class ProtectHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done = entity
-				.squaredDistanceTo(Vec3d.method_24953(current)) <= distanceSq;
+			return done =
+				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= distanceSq;
 		}
 		
 		@Override

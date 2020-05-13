@@ -87,10 +87,9 @@ public final class KaboomHack extends Hack implements UpdateListener
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec
-				.squaredDistanceTo(Vec3d.method_24954(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.sorted(Comparator.comparingDouble(
-				pos -> -eyesVec.squaredDistanceTo(Vec3d.method_24954(pos))))
+				pos -> -eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 }

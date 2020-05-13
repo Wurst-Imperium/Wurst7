@@ -186,8 +186,8 @@ public final class EditItemListScreen extends Screen
 		{
 			GL11.glPushMatrix();
 			GL11.glTranslated(0, 0, 300);
-			drawString(matrixStack, client.textRenderer, "item name or ID", 68,
-				height - 50, 0x808080);
+			drawStringWithShadow(matrixStack, client.textRenderer,
+				"item name or ID", 68, height - 50, 0x808080);
 			GL11.glPopMatrix();
 		}
 		

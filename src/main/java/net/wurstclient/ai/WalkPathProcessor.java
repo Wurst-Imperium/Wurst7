@@ -70,7 +70,7 @@ public class WalkPathProcessor extends PathProcessor
 		// face next position
 		facePosition(nextPos);
 		if(MathHelper.wrapDegrees(Math.abs(RotationUtils
-			.getHorizontalAngleToLookVec(Vec3d.method_24953(nextPos)))) > 90)
+			.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 90)
 			return;
 		
 		if(WURST.getHax().jesusHack.isEnabled())

@@ -170,8 +170,8 @@ public final class EditBlockListScreen extends Screen
 		GL11.glTranslated(0, 0, 300);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
-			drawString(matrixStack, client.textRenderer, "block name or ID", 68,
-				height - 50, 0x808080);
+			drawStringWithShadow(matrixStack, client.textRenderer,
+				"block name or ID", 68, height - 50, 0x808080);
 		
 		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);

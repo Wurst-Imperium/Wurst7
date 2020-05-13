@@ -119,7 +119,7 @@ public final class EditBlockScreen extends Screen
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		drawString(matrixStack, tr, lblText, lblX, lblY, lblColor);
+		drawStringWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
 		fill(matrixStack, 48, -56, 64, -36, 0xffa0a0a0);
 		fill(matrixStack, 49, -55, 64, -37, 0xff000000);

@@ -81,7 +81,7 @@ public class FlyPathProcessor extends PathProcessor
 		{
 			facePosition(nextPos);
 			if(Math.abs(MathHelper.wrapDegrees(RotationUtils
-				.getHorizontalAngleToLookVec(Vec3d.method_24953(nextPos)))) > 1)
+				.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 1)
 				return;
 		}
 		

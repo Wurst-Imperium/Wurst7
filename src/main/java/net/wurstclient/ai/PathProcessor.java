@@ -58,7 +58,7 @@ public abstract class PathProcessor
 	protected final void facePosition(BlockPos pos)
 	{
 		WURST.getRotationFaker()
-			.faceVectorClientIgnorePitch(Vec3d.method_24953(pos));
+			.faceVectorClientIgnorePitch(Vec3d.ofCenter(pos));
 	}
 	
 	public static final void lockControls()

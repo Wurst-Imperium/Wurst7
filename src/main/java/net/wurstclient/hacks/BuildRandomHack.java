@@ -192,7 +192,7 @@ public final class BuildRandomHack extends Hack
 	private boolean placeBlockLegit(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.method_24953(pos);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
@@ -203,7 +203,7 @@ public final class BuildRandomHack extends Hack
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d dirVec = Vec3d.method_24954(side.getVector());
+			Vec3d dirVec = Vec3d.of(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
 			// check if hitVec is within range (4.25 blocks)
@@ -244,7 +244,7 @@ public final class BuildRandomHack extends Hack
 	private boolean placeBlockSimple_old(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.method_24953(pos);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		
 		for(Direction side : Direction.values())
 		{
@@ -254,8 +254,7 @@ public final class BuildRandomHack extends Hack
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d hitVec =
-				posVec.add(Vec3d.method_24954(side.getVector()).multiply(0.5));
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 			
 			// check if hitVec is within range (6 blocks)
 			if(eyesPos.squaredDistanceTo(hitVec) > 36)

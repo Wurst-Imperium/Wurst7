@@ -448,8 +448,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(matrixStack, client.textRenderer, line, bgx1 + 2, textY,
-				0xffffff);
+			drawStringWithShadow(matrixStack, client.textRenderer, line,
+				bgx1 + 2, textY, 0xffffff);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);

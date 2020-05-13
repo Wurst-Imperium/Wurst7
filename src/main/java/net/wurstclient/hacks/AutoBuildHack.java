@@ -229,7 +229,7 @@ public final class AutoBuildHack extends Hack
 	
 	private boolean tryToPlace(BlockPos pos, Vec3d eyesPos, double rangeSq)
 	{
-		Vec3d posVec = Vec3d.method_24953(pos);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
@@ -241,7 +241,7 @@ public final class AutoBuildHack extends Hack
 				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d dirVec = Vec3d.method_24954(side.getVector());
+			Vec3d dirVec = Vec3d.of(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
 			// check if hitVec is within range
@@ -316,7 +316,7 @@ public final class AutoBuildHack extends Hack
 			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d posVec = Vec3d.method_24953(pos);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			
 			for(Direction side : Direction.values())
 			{
@@ -326,7 +326,7 @@ public final class AutoBuildHack extends Hack
 				if(!BlockUtils.canBeClicked(neighbor))
 					continue;
 				
-				Vec3d sideVec = Vec3d.method_24954(side.getVector());
+				Vec3d sideVec = Vec3d.of(side.getVector());
 				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
 				
 				// check if hitVec is within range
@@ -380,7 +380,7 @@ public final class AutoBuildHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			Vec3d posVec = Vec3d.method_24953(pos);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			
 			if(eyesPos.squaredDistanceTo(posVec) <= rangeSq)
 				drawGreenBox();

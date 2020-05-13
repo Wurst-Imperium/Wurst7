@@ -150,10 +150,10 @@ public final class AntiAfkHack extends Hack
 			
 			// face block
 			WURST.getRotationFaker()
-				.faceVectorClientIgnorePitch(Vec3d.method_24953(nextBlock));
+				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
 			
 			// walk
-			if(MC.player.squaredDistanceTo(Vec3d.method_24953(nextBlock)) > 0.5)
+			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
 				MC.options.keyForward.setPressed(true);
 			else
 				MC.options.keyForward.setPressed(false);
