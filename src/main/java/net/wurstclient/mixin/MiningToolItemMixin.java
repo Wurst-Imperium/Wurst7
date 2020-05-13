@@ -31,7 +31,7 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	
 	@Shadow
 	@Final
-	private Multimap<EntityAttribute, EntityAttributeModifier> field_23742;
+	private Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 	
 	private MiningToolItemMixin(WurstClient wurst, ToolMaterial material,
 		Settings settings)
@@ -48,7 +48,8 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	@Override
 	public float fuckMcAfee2()
 	{
-		return (float)field_23742.get(EntityAttributes.GENERIC_ATTACK_SPEED)
-			.iterator().next().getValue();
+		return (float)attributeModifiers
+			.get(EntityAttributes.GENERIC_ATTACK_SPEED).iterator().next()
+			.getValue();
 	}
 }
