@@ -177,7 +177,6 @@ public abstract class AltEditorScreen extends Screen
 			
 			InputStream in = u.toURL().openStream();
 			
-			// TODO finish this
 			Files.copy(in, path);
 			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
 		}catch(IOException e)
