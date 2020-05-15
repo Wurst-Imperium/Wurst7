@@ -1,6 +1,6 @@
 # Wurst Client v7
 
-##Added Features
+## Added Features
 Allows you to stop Minecraft without crashing it. Type .stop to acivate it (time is in seconds)
 Also allows you to change the title of a book with .title<title>.
 
