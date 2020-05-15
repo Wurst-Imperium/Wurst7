@@ -7,18 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayDeque;
-
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
-import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.BlinkHack.TimedPacket;
-import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
 public final class BlinkReplayHack extends Hack
