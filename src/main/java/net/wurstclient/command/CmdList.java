@@ -58,6 +58,7 @@ public final class CmdList
 	public final StopCmd stopCmd = new StopCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
+	public final TitleCmd titleCmd = new TitleCmd();
 	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final UnbindCmd unbindCmd = new UnbindCmd();
