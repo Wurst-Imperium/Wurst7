@@ -7,9 +7,13 @@
  */
 package net.wurstclient.hacks;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 
+import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.PacketByteBuf;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
@@ -27,8 +31,14 @@ public final class BlinkHack extends Hack
 			+ "have been suspended.\n\n" + "0 = no limit",
 		0, 0, 500, 1, v -> v == 0 ? "disabled" : (int)v + "");
 	
-	private final ArrayDeque<PlayerMoveC2SPacket> packets = new ArrayDeque<>();
+	private final ArrayDeque<TimedPacket> packets = new ArrayDeque<>();
 	private FakePlayerEntity fakePlayer;
+	public long startTime;
+	public boolean sendPackets;
+
+	public ArrayDeque<TimedPacket> getPackets() {
+		return packets;
+	}
 	
 	public BlinkHack()
 	{
@@ -51,6 +61,7 @@ public final class BlinkHack extends Hack
 	public void onEnable()
 	{
 		fakePlayer = new FakePlayerEntity();
+		startTime = System.currentTimeMillis();
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketOutputListener.class, this);
@@ -63,7 +74,10 @@ public final class BlinkHack extends Hack
 		EVENTS.remove(PacketOutputListener.class, this);
 		
 		fakePlayer.despawn();
-		packets.forEach(p -> MC.player.networkHandler.sendPacket(p));
+		if (sendPackets) {
+			packets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
+		}
+		sendPackets = false;
 		packets.clear();
 	}
 	
@@ -88,8 +102,13 @@ public final class BlinkHack extends Hack
 		
 		event.cancel();
 		
-		PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket)event.getPacket();
-		PlayerMoveC2SPacket prevPacket = packets.peekLast();
+		TimedPacket timedPacket = new TimedPacket((PlayerMoveC2SPacket)event.getPacket());
+		TimedPacket prevTimedPacket = packets.peekLast();
+		
+		PlayerMoveC2SPacket prevPacket = null;
+		if (prevTimedPacket != null)
+			prevPacket = prevTimedPacket.packet;
+		PlayerMoveC2SPacket packet = timedPacket.packet;
 		
 		if(prevPacket != null && packet.isOnGround() == prevPacket.isOnGround()
 			&& packet.getYaw(-1) == prevPacket.getYaw(-1)
@@ -99,7 +118,7 @@ public final class BlinkHack extends Hack
 			&& packet.getZ(-1) == prevPacket.getZ(-1))
 			return;
 		
-		packets.addLast(packet);
+		packets.addLast(timedPacket);
 	}
 	
 	public void cancel()
@@ -107,5 +126,32 @@ public final class BlinkHack extends Hack
 		packets.clear();
 		fakePlayer.resetPlayerPosition();
 		setEnabled(false);
+	}
+	
+	protected final class TimedPacket implements Packet<ServerPlayPacketListener> {
+		public long recordedTime;
+		public boolean sent;
+		public PlayerMoveC2SPacket packet;
+		
+		public TimedPacket(PlayerMoveC2SPacket packet) {
+			this.packet = packet;
+			this.recordedTime = System.currentTimeMillis();
+			this.sent = false;
+		}
+
+		@Override
+		public void read(PacketByteBuf buf) throws IOException {
+			packet.read(buf);
+		}
+
+		@Override
+		public void write(PacketByteBuf buf) throws IOException {
+			packet.write(buf);
+		}
+
+		@Override
+		public void apply(ServerPlayPacketListener listener) {
+			packet.apply(listener);
+		}
 	}
 }
