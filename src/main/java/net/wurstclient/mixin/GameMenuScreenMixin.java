@@ -8,8 +8,11 @@
 package net.wurstclient.mixin;
 
 import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.TranslatableText;
+import net.wurstclient.serverfinder.WurstServerPinger;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -133,6 +136,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		WurstClient.MC.world.disconnect();
 		if(WurstClient.MC.isInSingleplayer())
 			WurstClient.MC.disconnect(new SaveLevelScreen(new TranslatableText("menu.savingLevel")));
-		WurstClient.MC.openScreen(new ConnectScreen(this, WurstClient.MC, entry));
+		else
+			WurstClient.MC.disconnect();
+		WurstClient.MC.openScreen(new ConnectScreen(new MultiplayerScreen(new TitleScreen()), WurstClient.MC, entry));
 	}
 }
