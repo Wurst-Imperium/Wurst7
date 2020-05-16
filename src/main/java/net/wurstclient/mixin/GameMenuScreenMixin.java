@@ -133,7 +133,8 @@ public abstract class GameMenuScreenMixin extends Screen
 
 	private void connect(ServerInfo entry)
 	{
-		WurstClient.MC.world.disconnect();
+		if(WurstClient.MC.world != null)
+			WurstClient.MC.world.disconnect();
 		if(WurstClient.MC.isInSingleplayer())
 			WurstClient.MC.disconnect(new SaveLevelScreen(new TranslatableText("menu.savingLevel")));
 		else
