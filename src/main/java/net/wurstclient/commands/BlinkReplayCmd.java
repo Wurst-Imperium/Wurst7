@@ -11,6 +11,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.hacks.BlinkHack;
 import net.wurstclient.hacks.BlinkReplayHack;
 
 public final class BlinkReplayCmd extends Command
@@ -30,27 +31,24 @@ public final class BlinkReplayCmd extends Command
 		
 		if(args.length == 0)
 		{
-			blinkReplayHack.setEnabled(!blinkReplayHack.isEnabled());
+			enable(blinkReplayHack);
 			return;
 		}
-		
-		switch(args[0].toLowerCase())
-		{
-			default:
-			throw new CmdSyntaxError();
-			
-			case "on":
-			blinkReplayHack.setEnabled(true);
-			break;
-			
-			case "off":
-			blinkReplayHack.setEnabled(false);
-			break;
-			
-			case "cancel":
-			cancel(blinkReplayHack);
-			break;
+	}
+
+	private void enable(BlinkReplayHack blinkReplayHack) throws CmdException
+	{
+		BlinkHack blinkHack = WURST.getHax().blinkHack;
+
+		if(!blinkHack.isEnabled())
+			throw new CmdError("Cannot trigger BlinkReplay without Blink enabled.");
+
+		if(blinkReplayHack.isEnabled()) {
+			blinkReplayHack.appendPackets();
+			throw new CmdError("BlinkReplay already active, appending new packets...");
 		}
+
+		blinkReplayHack.setEnabled(true);
 	}
 	
 	private void cancel(BlinkReplayHack blinkReplayHack) throws CmdException
