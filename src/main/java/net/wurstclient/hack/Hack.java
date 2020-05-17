@@ -89,13 +89,13 @@ public abstract class Hack extends Feature
 	}
 	
 	@Override
-	public final String getPrimaryAction()
+	public String getPrimaryAction()
 	{
 		return enabled ? "Disable" : "Enable";
 	}
 	
 	@Override
-	public final void doPrimaryAction()
+	public void doPrimaryAction()
 	{
 		setEnabled(!enabled);
 	}

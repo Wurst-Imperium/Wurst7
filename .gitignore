@@ -4,6 +4,9 @@
 build/
 out/
 classes/
+build.gradle
+gradle.properties
+gradle/
 
 # idea
 

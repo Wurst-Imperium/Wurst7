@@ -34,7 +34,7 @@ public final class BlinkReplayHack extends Hack
 	private int packetLength;
 	private long recordingDuration;
 	private BlinkHack blinkHack;
-	
+
 	public BlinkReplayHack()
 	{
 		super("BlinkReplay", "Replays packets captured with blink to the server in real time.");
@@ -130,6 +130,22 @@ public final class BlinkReplayHack extends Hack
 		if (!blinkHack.isEnabled()) {
 			if (event.getPacket() instanceof PlayerMoveC2SPacket)
 				event.cancel();
+		}
+	}
+
+	@Override
+	public final String getPrimaryAction()
+	{
+		return "Trigger";
+	}
+
+	@Override
+	public final void doPrimaryAction()
+	{
+		if (this.isEnabled()) {
+			appendPackets();
+		} else {
+			this.setEnabled(true);
 		}
 	}
 	
