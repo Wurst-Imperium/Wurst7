@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -121,6 +122,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
 			cir.setReturnValue(false);
+	}
+	
+	@Redirect(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/screen/Screen;isPauseScreen()Z",
+		ordinal = 0),
+		method = {"updateNausea()V"})
+	private boolean onUpdateNausea(Screen screen)
+	{
+		if(WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
+			return false;
+		
+		return screen.isPauseScreen();
 	}
 	
 	@Override
