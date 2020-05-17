@@ -131,7 +131,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private boolean onUpdateNausea(Screen screen)
 	{
 		if(WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
-			return false;
+			return true;
 		
 		return screen.isPauseScreen();
 	}
