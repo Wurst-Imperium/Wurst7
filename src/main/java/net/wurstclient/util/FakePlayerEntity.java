@@ -7,6 +7,8 @@
  */
 package net.wurstclient.util;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -16,6 +18,9 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.BlinkHack;
@@ -24,6 +29,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 {
 	private final ClientPlayerEntity player = WurstClient.MC.player;
 	private final ClientWorld world = WurstClient.MC.world;
+	public String wurstName;
 
 	public FakePlayerEntity(FakePlayerEntity fakePlayer) {
 		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
@@ -34,7 +40,10 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		copyRotation(fakePlayer);
 		resetCapeMovement();
 
+		setName(this.getGameProfile().getName());
 		spawn();
+
+
 
 	}
 
@@ -94,6 +103,36 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		this.limbDistance += (g - this.limbDistance) * 0.4F;
 		this.limbAngle += this.limbDistance / 100;
 	}
+
+	@Environment(EnvType.CLIENT)
+	public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
+		double d = this.getX() - cameraX;
+		double e = this.getY() - cameraY;
+		double f = this.getZ() - cameraZ;
+		double g = d * d + e * e + f * f;
+		return this.shouldRender(g);
+	}
+
+	@Environment(EnvType.CLIENT)
+	public boolean shouldRender(double distance) {
+		boolean inRange = super.shouldRender(distance);
+		if (!inRange)
+			return false;
+		return distance > 3.3D; // 3 block so it does not block your view
+	}
+
+	// Override name rendering
+	public void setName(String name) {
+		this.wurstName = name;
+	}
+
+	public Text getName() {
+		return new LiteralText(this.wurstName);
+	}
+
+	public String getEntityName() { return this.wurstName; }
+
+	public Text getDisplayName() { return new LiteralText(this.wurstName); }
 
 	protected void tickCramming() {
 		// Dont interact with the player

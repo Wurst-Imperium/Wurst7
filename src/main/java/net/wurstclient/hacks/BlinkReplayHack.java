@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketOutputListener;
@@ -16,13 +15,9 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.BlinkHack.TimedPacket;
 import net.wurstclient.util.FakePlayerEntity;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 @DontSaveState
 public final class BlinkReplayHack extends Hack
@@ -37,10 +32,11 @@ public final class BlinkReplayHack extends Hack
 
 	public BlinkReplayHack()
 	{
-		super("BlinkReplay", "Replays packets captured with blink to the server in real time.");
+		super("BlinkReplay", "Replays packets captured with blink to the server in real time.", false);
 		setCategory(Category.MOVEMENT);
 		this.packetLength = 0;
 		this.packets = new ArrayList<>();
+		addPossibleKeybind(this.getName(), "Trigger " + this.getName());
 	}
 	
 	@Override
@@ -73,11 +69,7 @@ public final class BlinkReplayHack extends Hack
 			return;
 
 		fakePlayer = new FakePlayerEntity(blinkHack.fakePlayer);
-
-		blinkHack.packetBlackList = new ArrayList<>(); // Clear the blacklist
-		blinkHack.sendPackets = false;
-		blinkHack.setEnabled(false);
-		blinkHack.setEnabled(true);
+		fakePlayer.setName("Replaying...");
 
 		EVENTS.add(PacketOutputListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -89,7 +81,8 @@ public final class BlinkReplayHack extends Hack
 		packetLength = 0;
 		packetsSent = 0;
 
-		fakePlayer.despawn();
+		if (fakePlayer != null)
+			fakePlayer.despawn();
 
 		EVENTS.remove(PacketOutputListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
@@ -159,6 +152,11 @@ public final class BlinkReplayHack extends Hack
 			packets.add(packet);
 		}
 		packetLength += blinkHack.getPackets().size();
+
+		blinkHack.packetBlackList = new ArrayList<>(); // Clear the blacklist
+		blinkHack.sendPackets = false;
+		blinkHack.setEnabled(false); // Restart blink at the current position
+		blinkHack.setEnabled(true);
 	}
 
 	private void updateFakePlayerPos(PlayerMoveC2SPacket packet, boolean interpolate) {

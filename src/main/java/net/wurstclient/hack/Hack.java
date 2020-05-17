@@ -23,12 +23,18 @@ public abstract class Hack extends Feature
 	private boolean enabled;
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
-	
+
 	public Hack(String name, String description)
+	{
+		this(name, description, true);
+	}
+
+	public Hack(String name, String description, boolean addKeybind)
 	{
 		this.name = Objects.requireNonNull(name);
 		this.description = Objects.requireNonNull(description);
-		addPossibleKeybind(name, "Toggle " + name);
+		if (addKeybind)
+			addPossibleKeybind(name, "Toggle " + name);
 	}
 	
 	@Override

@@ -14,19 +14,16 @@ import net.wurstclient.command.Command;
 import net.wurstclient.hacks.BlinkHack;
 import net.wurstclient.hacks.BlinkReplayHack;
 
-public final class BlinkReplayCmd extends Command
+public final class ReplayCmd extends Command
 {
-	public BlinkReplayCmd()
+	public ReplayCmd()
 	{
-		super("blinkreplay", "Triggers BlinkReplay", ".replay");
+		super("replay", "Triggers BlinkReplay", ".replay");
 	}
 	
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(args.length > 1)
-			throw new CmdSyntaxError();
-		
 		BlinkReplayHack blinkReplayHack = WURST.getHax().blinkReplayHack;
 		
 		if(args.length == 0)
@@ -34,6 +31,8 @@ public final class BlinkReplayCmd extends Command
 			enable(blinkReplayHack);
 			return;
 		}
+
+		throw new CmdSyntaxError();
 	}
 
 	private void enable(BlinkReplayHack blinkReplayHack) throws CmdException

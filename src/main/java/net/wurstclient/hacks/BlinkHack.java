@@ -17,6 +17,7 @@ import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Position;
@@ -68,6 +69,7 @@ public final class BlinkHack extends Hack
 	public void onEnable()
 	{
 		fakePlayer = new FakePlayerEntity();
+		fakePlayer.setName("Blinking...");
 		startTime = System.currentTimeMillis();
 		
 		EVENTS.add(UpdateListener.class, this);
