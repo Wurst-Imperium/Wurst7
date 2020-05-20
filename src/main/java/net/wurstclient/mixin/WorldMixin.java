@@ -39,7 +39,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			noWeatherHack.isTimeChanged() ? noWeatherHack.getChangedTime()
 				: getLevelProperties().getTimeOfDay();
 		
-		return getDimension().getSkyAngle(timeOfDay, tickDelta);
+		return getDimension().method_28528(timeOfDay);
 	}
 	
 	@Override
@@ -51,6 +51,6 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 		if(noWeatherHack.isMoonPhaseChanged())
 			return noWeatherHack.getChangedMoonPhase();
 		
-		return getDimension().getMoonPhase(getLevelProperties().getTimeOfDay());
+		return getDimension().method_28531(getLevelProperties().getTimeOfDay());
 	}
 }
