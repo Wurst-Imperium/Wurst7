@@ -12,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
 @Mixin(World.class)
-public abstract class WorldMixin implements IWorld, AutoCloseable
+public abstract class WorldMixin implements WorldAccess, AutoCloseable
 {
 	@Inject(at = {@At("HEAD")},
 		method = {"getRainGradient(F)F"},

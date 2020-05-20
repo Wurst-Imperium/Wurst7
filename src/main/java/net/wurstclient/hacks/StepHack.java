@@ -95,8 +95,8 @@ public final class StepHack extends Hack implements UpdateListener
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 		
 		for(Box bb : blockCollisions)
-			if(bb.y2 > stepHeight)
-				stepHeight = bb.y2;
+			if(bb.maxY > stepHeight)
+				stepHeight = bb.maxY;
 			
 		stepHeight = stepHeight - player.getY();
 		

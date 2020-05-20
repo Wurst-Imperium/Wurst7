@@ -77,8 +77,10 @@ public final class GlideHack extends Hack implements UpdateListener
 			if(!MC.world.doesNotCollide(box))
 				return;
 			
-			BlockPos min = new BlockPos(new Vec3d(box.x1, box.y1, box.z1));
-			BlockPos max = new BlockPos(new Vec3d(box.x2, box.y2, box.z2));
+			BlockPos min =
+				new BlockPos(new Vec3d(box.minX, box.minY, box.minZ));
+			BlockPos max =
+				new BlockPos(new Vec3d(box.maxX, box.maxY, box.maxZ));
 			Stream<BlockPos> stream = StreamSupport
 				.stream(BlockUtils.getAllInBox(min, max).spliterator(), true);
 			

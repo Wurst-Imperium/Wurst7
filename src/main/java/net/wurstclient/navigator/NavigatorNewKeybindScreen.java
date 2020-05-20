@@ -78,7 +78,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	{
 		if(choosingKey)
 		{
-			selectedKey = InputUtil.getKeyCode(keyCode, scanCode).getName();
+			selectedKey =
+				InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
 		}else if(keyCode == 1)

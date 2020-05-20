@@ -40,7 +40,7 @@ public class PressAKeyScreen extends Screen
 	
 	private String getKeyName(int keyCode, int scanCode)
 	{
-		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 	}
 	
 	@Override
