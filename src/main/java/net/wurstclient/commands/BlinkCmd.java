@@ -51,6 +51,9 @@ public final class BlinkCmd extends Command
 			case "cancel":
 			cancel(blinkHack);
 			break;
+
+			case "replay":
+			replay(blinkHack, args);
 		}
 	}
 	
@@ -60,5 +63,13 @@ public final class BlinkCmd extends Command
 			throw new CmdError("Cannot cancel, Blink is already turned off!");
 		
 		blinkHack.cancel();
+	}
+
+	private void replay(BlinkHack blinkHack, String[] args) throws CmdException
+	{
+		if(!blinkHack.isEnabled())
+			throw new CmdError("Cannot trigger BlinkReplay without Blink enabled.");
+
+		blinkHack.replay();
 	}
 }
