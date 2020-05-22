@@ -41,6 +41,7 @@
     "MouseMixin",
     "MultiplayerScreenMixin",
     "PlayerInventoryMixin",
+    "PlayerMoveC2SPacketMixin",
     "PlayerSkinProviderMixin",
     "RenderTickCounterMixin",
     "ServerListMixin",

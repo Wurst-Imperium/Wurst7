@@ -9,11 +9,9 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketOutputListener;
@@ -23,6 +21,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IPlayerMoveC2SPacket;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.FakePlayerEntity;
+import org.apache.logging.log4j.Logger;
 
 @DontSaveState
 public final class BlinkHack extends Hack
@@ -33,11 +32,9 @@ public final class BlinkHack extends Hack
 			+ "have been suspended.\n\n" + "0 = no limit",
 		0, 0, 500, 1, v -> v == 0 ? "disabled" : (int)v + "");
 
-	private final ArrayList<Class> packetWhitelist = new ArrayList<>();
-	private final ArrayDeque<PlayerMoveC2SPacket> blinkedMovementPackets = new ArrayDeque<>();
-	private final ArrayDeque<Packet> blinkedOtherPackets = new ArrayDeque<>();
-	private final ArrayList<ReplayPacketContainer> replayingPackets = new ArrayList<>();
-	private ArrayList<Packet> sentPackets = new ArrayList<>();
+	private final ArrayDeque<PacketContainer> blinkedMovementPackets = new ArrayDeque<>();
+	private final ArrayDeque<PacketContainer> blinkedOtherPackets = new ArrayDeque<>();
+	private final ArrayList<PacketContainer> replayingPackets = new ArrayList<>();
 
 	private FakePlayerEntity blinkPlayer;
 	private FakePlayerEntity replayPlayer;
@@ -46,8 +43,9 @@ public final class BlinkHack extends Hack
 	private int packetsSent;
 	private long startTime;
 	private long recordingDuration;
-
 	private boolean replaying;
+
+	private static Logger LOGGER;
 
 	public int getBlinkedPacketsSize() { return blinkedMovementPackets.size() + blinkedOtherPackets.size(); }
 
@@ -57,10 +55,6 @@ public final class BlinkHack extends Hack
 		setCategory(Category.MOVEMENT);
 		addSetting(limit);
 		this.replaying = false;
-
-		// Packet types to operate on
-		this.packetWhitelist.add(ClientCommandC2SPacket.class);
-		this.packetWhitelist.add(PlayerInputC2SPacket.class);
 	}
 	
 	@Override
@@ -112,8 +106,8 @@ public final class BlinkHack extends Hack
 		if (replayPlayer != null)
 			replayPlayer.despawn();
 		if (flushPackets) {
-			blinkedMovementPackets.forEach(p -> MC.player.networkHandler.sendPacket(p));
-			blinkedOtherPackets.forEach(p -> MC.player.networkHandler.sendPacket(p));
+			blinkedMovementPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
+			blinkedOtherPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
 		}
 		blinkedMovementPackets.clear();
 		blinkedOtherPackets.clear();
@@ -130,10 +124,10 @@ public final class BlinkHack extends Hack
 
 		if (limit.getValueI() != 0 &&getBlinkedPacketsSize() >= limit.getValueI())
 		{
-			reset();
+			reset(true);
 		}
 	}
-	
+
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
@@ -142,16 +136,15 @@ public final class BlinkHack extends Hack
 		if (packet instanceof PlayerMoveC2SPacket)
 		{
 			PlayerMoveC2SPacket movementPacket = (PlayerMoveC2SPacket) packet;
-			PlayerMoveC2SPacket prevMovementPacket = blinkedMovementPackets.peekLast();
+			PacketContainer prevPacket = blinkedMovementPackets.peekLast();
 
 			// To save on packets, only add if the player has moved
-			if (prevMovementPacket == null || !movementPacketsChanged(movementPacket, prevMovementPacket))
+			if (prevPacket == null || !movementPacketsChanged(movementPacket, (PlayerMoveC2SPacket) prevPacket.packet))
 			{
-				blinkedMovementPackets.addLast(movementPacket);
+				blinkedMovementPackets.addLast(new PacketContainer(movementPacket));
 			}
-		}
-		else if (packetWhitelist.contains(packet.getClass())) {
-			blinkedOtherPackets.addLast(packet);
+		} else if (packet instanceof ClientCommandC2SPacket) {
+			blinkedOtherPackets.addLast(new PacketContainer(packet));
 		} else return;
 
 		// Only cancel if it is a movement packet or it is whitelisted
@@ -162,24 +155,28 @@ public final class BlinkHack extends Hack
 		boolean sentAllPackets = true;
 		long currentTime = System.currentTimeMillis();
 		EVENTS.remove(PacketOutputListener.class, this);
-		for (ReplayPacketContainer container : replayingPackets)
+		for (PacketContainer container : replayingPackets)
 		{
 			if (!container.sent)
 			{ // Not sent
-				System.out.println("not sent");
 				sentAllPackets = false;
-				if (currentTime - container.sendTime >= recordingDuration) { // The packet is due to be sent
-					MC.player.networkHandler.sendPacket(container.packet);
+				if (currentTime - container.sendTime >= recordingDuration)
+				{ // The packet is due to be sent
+					Packet packet = container.packet;
 					container.sent = true;
-					if (container.packet instanceof PlayerMoveC2SPacket) // Visualize the packet using the fake player
-						updateFakePlayerPos(replayPlayer, (PlayerMoveC2SPacket) container.packet, true);
+					packetsSent++;
+					MC.player.networkHandler.sendPacket(container.packet);
+					if (packet instanceof PlayerMoveC2SPacket) // Visualize the packet using the fake player
+						updateFakePlayerPos(replayPlayer, (PlayerMoveC2SPacket) packet, true);
 				}
-				packetsSent++;
 			}
 		}
 		EVENTS.add(PacketOutputListener.class, this);
-		if (sentAllPackets)
+		if (sentAllPackets) {
 			replaying = false;
+			replayingPackets.clear();
+			packetsSent = 0;
+		}
 	}
 
 	private boolean movementPacketsChanged(PlayerMoveC2SPacket packet, PlayerMoveC2SPacket prevPacket) {
@@ -191,7 +188,6 @@ public final class BlinkHack extends Hack
 				&& packet.getZ(-1) == prevPacket.getZ(-1);
 	}
 
-	public void reset() { reset(true); } // Flush by default
 	public void reset(boolean flushPackets) {
 		disable(flushPackets);
 		enable();
@@ -206,27 +202,25 @@ public final class BlinkHack extends Hack
 
 	public void replay()
 	{
-		replaying = true;
-		recordingDuration = System.currentTimeMillis() - startTime;
-
 		// Add the packets
-		for (Packet packet : blinkedMovementPackets)
-		{
-			ReplayPacketContainer container = new ReplayPacketContainer(packet);
-			replayingPackets.add(container);
-		}
-		for (Packet packet : blinkedOtherPackets)
-		{
-			ReplayPacketContainer container = new ReplayPacketContainer(packet);
-			replayingPackets.add(container);
+		replayingPackets.addAll(blinkedMovementPackets);
+		replayingPackets.addAll(blinkedOtherPackets);
+
+		if (replayingPackets.size() == 0)
+			return;
+
+		if (!replaying)
+		{ // Dont override if already replaying
+			recordingDuration = System.currentTimeMillis() - startTime;
+			replayPlayer = new FakePlayerEntity(blinkPlayer);
+			replayPlayer.setName("Replaying...");
 		}
 
-		replayPlayer = new FakePlayerEntity(blinkPlayer);
-		replayPlayer.setName("Replaying...");
+		replaying = true;
 		reset(false); // Restart blink at the current position
 	}
 
-	private void updateFakePlayerPos(FakePlayerEntity player, PlayerMoveC2SPacket cringePacket, boolean interpolate) {
+	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket, boolean interpolate) {
 
 		IPlayerMoveC2SPacket packet = (IPlayerMoveC2SPacket) cringePacket;
 
@@ -237,19 +231,23 @@ public final class BlinkHack extends Hack
 		float yaw = packet.getYaw();
 		float pitch = packet.getPitch();
 
-		if (x == 0 && y == 0 && z == 0)
+		if (x == 0 && y == 0 && z == 0) {
+			System.out.println("cringe");
 			return; // Don't animate
+		}
+		System.out.println("not cringe");
 
-		player.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
-		player.updateTrackedHeadRotation(yaw, 3);
+		fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
+		fakePlayer.updateTrackedHeadRotation(yaw, 3);
 	}
 
-	private final class ReplayPacketContainer
+	private final class PacketContainer
 	{
 		protected long sendTime;
 		protected boolean sent;
 		protected Packet packet;
-		public ReplayPacketContainer (Packet packetIn)
+
+		public PacketContainer(Packet packetIn)
 		{
 			this.packet = packetIn;
 			this.sendTime = System.currentTimeMillis();
