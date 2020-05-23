@@ -12,7 +12,10 @@ group = project.maven_group
 
 minecraft {
 }
-
+configurations {
+	// configuration that holds jars to include in the jar
+	shadowDep
+}
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -34,10 +37,19 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 
 	// The Altening API's for authentication and generating accounts.
-	implementation 'com.thealtening.api:api:4.0.1'
-	implementation 'com.thealtening.auth:auth:3.0.2'
+	shadowDep('com.thealtening.api:api:4.0.1') {
+		exclude group: 'com.google.code.gson', module: 'gson'
+	}
+	shadowDep ('com.thealtening.auth:auth:3.0.2'){
+		exclude group: 'com.google.code.gson', module: 'gson'
+	}
+	configurations.implementation.extendsFrom(configurations.shadowDep)
 }
-
+jar {
+	from {
+		configurations.shadowDep.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}
 processResources {
 	inputs.property "version", project.version
 
