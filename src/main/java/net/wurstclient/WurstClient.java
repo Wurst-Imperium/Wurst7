@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.thealtening.auth.TheAlteningAuthentication;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
@@ -56,7 +57,8 @@ public enum WurstClient
 	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
-	
+
+
 	public static final String VERSION = "7.2";
 	public static final String MC_VERSION = "1.15.2";
 	
@@ -80,7 +82,9 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
-	
+	private final TheAlteningAuthentication theAlteningAuthentication = TheAlteningAuthentication.mojang();
+
+
 	private FabricKeyBinding zoomKey;
 	
 	public void initialize()
@@ -353,5 +357,9 @@ public enum WurstClient
 	public AltManager getAltManager()
 	{
 		return altManager;
+	}
+
+	public TheAlteningAuthentication getTheAlteningAuthentication() {
+		return theAlteningAuthentication;
 	}
 }

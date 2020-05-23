@@ -15,6 +15,7 @@ import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
+import com.thealtening.auth.service.AlteningServiceType;
 import net.minecraft.client.util.Session;
 import net.wurstclient.WurstClient;
 
@@ -25,7 +26,18 @@ public final class LoginManager
 		YggdrasilUserAuthentication auth =
 			(YggdrasilUserAuthentication)new YggdrasilAuthenticationService(
 				Proxy.NO_PROXY, "").createUserAuthentication(Agent.MINECRAFT);
-		
+
+		/*
+		  Automatically changing the status from mojang/thealtening, depending on the account format
+		  It won't update the service, if it's the same though.
+		 */
+		if(email.contains("@alt.com") && email.contains("-")) {
+			WurstClient.INSTANCE.getTheAlteningAuthentication().updateService(AlteningServiceType.THEALTENING);
+			password = "anything";
+		} else {
+			WurstClient.INSTANCE.getTheAlteningAuthentication().updateService(AlteningServiceType.MOJANG);
+		}
+
 		auth.setUsername(email);
 		auth.setPassword(password);
 		

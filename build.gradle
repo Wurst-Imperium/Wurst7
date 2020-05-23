@@ -32,6 +32,10 @@ dependencies {
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
+
+	// The Altening API's for authentication and generating accounts.
+	implementation 'com.thealtening.api:api:4.0.1'
+	implementation 'com.thealtening.auth:auth:3.0.2'
 }
 
 processResources {

@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.wurstclient.altmanager.screens.thealtening.TheAlteningScreen;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -88,6 +89,8 @@ public final class AltManagerScreen extends Screen
 		
 		addButton(new ButtonWidget(8, 8, 100, 20, "Import Alts",
 			b -> pressImportAlts()));
+
+		addButton(new ButtonWidget(width - 105, 8, 100, 20, "The Altening", b -> minecraft.openScreen(new TheAlteningScreen(this))));
 	}
 	
 	@Override
