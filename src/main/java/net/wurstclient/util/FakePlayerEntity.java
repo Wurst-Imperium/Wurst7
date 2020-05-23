@@ -121,18 +121,9 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		return distance > 3.3D; // 3 block so it does not block your view
 	}
 
-	// Override name rendering
 	public void setName(String name) {
-		this.wurstName = name;
+		setCustomName(new LiteralText(name));
 	}
-
-	public Text getName() {
-		return new LiteralText(this.wurstName);
-	}
-
-	public String getEntityName() { return this.wurstName; }
-
-	public Text getDisplayName() { return new LiteralText(this.wurstName); }
 
 	protected void tickCramming() {
 		// Dont interact with the player
