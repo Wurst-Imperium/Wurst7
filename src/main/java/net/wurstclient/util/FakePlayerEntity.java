@@ -21,6 +21,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.BlinkHack;
@@ -122,7 +123,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	}
 
 	public void setName(String name) {
-		setCustomName(new LiteralText(name));
+		setCustomName(new TranslatableText(name));
 	}
 
 	protected void tickCramming() {
