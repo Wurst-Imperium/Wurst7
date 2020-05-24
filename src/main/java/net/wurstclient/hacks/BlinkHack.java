@@ -45,8 +45,6 @@ public final class BlinkHack extends Hack
 	private long recordingDuration;
 	private boolean replaying;
 
-	private static Logger LOGGER;
-
 	public int getBlinkedPacketsSize() { return blinkedMovementPackets.size() + blinkedOtherPackets.size(); }
 
 	public BlinkHack()
@@ -97,14 +95,16 @@ public final class BlinkHack extends Hack
 		EVENTS.remove(PacketOutputListener.class, this);
 
 		replaying = false;
-		disable(true);
-	}
 
-	private void disable(boolean flushPackets) {
 		if (blinkPlayer != null)
 			blinkPlayer.despawn();
 		if (replayPlayer != null)
 			replayPlayer.despawn();
+		
+		disable(true);
+	}
+
+	private void disable(boolean flushPackets) {
 		if (flushPackets) {
 			blinkedMovementPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
 			blinkedOtherPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
@@ -117,10 +117,7 @@ public final class BlinkHack extends Hack
 	public void onUpdate()
 	{
 		if (replaying)
-		{
 			sendTimedPackets();
-			replayPlayer.animateLimbs();
-		}
 
 		if (limit.getValueI() != 0 &&getBlinkedPacketsSize() >= limit.getValueI())
 		{
@@ -209,8 +206,8 @@ public final class BlinkHack extends Hack
 		if (replayingPackets.size() == 0)
 			return;
 
-		if (!replaying)
-		{ // Dont override if already replaying
+		if (!replaying) // Dont override if already replaying
+		{
 			recordingDuration = System.currentTimeMillis() - startTime;
 			replayPlayer = new FakePlayerEntity(blinkPlayer);
 			replayPlayer.setName("Replaying...");
@@ -220,25 +217,21 @@ public final class BlinkHack extends Hack
 		reset(false); // Restart blink at the current position
 	}
 
-	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket, boolean interpolate) {
-
+	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket, boolean interpolate)
+	{
 		IPlayerMoveC2SPacket packet = (IPlayerMoveC2SPacket) cringePacket;
 
 		double x = packet.getX();
 		double y = packet.getY();
 		double z = packet.getZ();
-
 		float yaw = packet.getYaw();
 		float pitch = packet.getPitch();
 
-		if (x == 0 && y == 0 && z == 0) {
-			System.out.println("cringe");
+		if (x == 0 && y == 0 && z == 0)
 			return; // Don't animate
-		}
-		System.out.println("not cringe");
 
 		fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
-		fakePlayer.updateTrackedHeadRotation(yaw, 3);
+		fakePlayer.updatePositionAndAngles(x, y, z, yaw, pitch);
 	}
 
 	private final class PacketContainer
