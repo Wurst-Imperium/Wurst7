@@ -17,8 +17,8 @@ public final class BlinkCmd extends Command
 {
 	public BlinkCmd()
 	{
-		super("blink", "Enables, disables or cancels Blink.", ".blink [on|off]",
-			".blink cancel");
+		super("blink", "Enables, disables or cancels Blink and manages replay.",
+				".blink [on|off|reset|replay|cancel]");
 	}
 	
 	@Override
@@ -54,6 +54,9 @@ public final class BlinkCmd extends Command
 
 			case "replay":
 			replay(blinkHack, args);
+
+			case "reset":
+			reset(blinkHack, args);
 		}
 	}
 	
@@ -68,8 +71,16 @@ public final class BlinkCmd extends Command
 	private void replay(BlinkHack blinkHack, String[] args) throws CmdException
 	{
 		if(!blinkHack.isEnabled())
-			throw new CmdError("Cannot trigger BlinkReplay without Blink enabled.");
+			throw new CmdError("Cannot begin replay without Blink enabled.");
 
 		blinkHack.replay();
+	}
+
+	private void reset(BlinkHack blinkHack, String[] args) throws CmdException
+	{
+		if(!blinkHack.isEnabled())
+			throw new CmdError("Cannot reset without Blink enabled.");
+
+		blinkHack.reset();
 	}
 }

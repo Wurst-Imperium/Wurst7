@@ -187,6 +187,14 @@ public final class BlinkHack extends Hack
 				&& packet.getZ(-1) == prevPacket.getZ(-1);
 	}
 
+	// .blink reset
+	public void reset() {
+		blinkedMovementPackets.clear();
+		blinkedOtherPackets.clear();
+		blinkPlayer.resetPlayerPosition();
+	}
+
+	// internal method
 	private void reset(boolean flushPackets) {
 		disable(flushPackets);
 		enable();
