@@ -88,17 +88,23 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 
 	// Override name rendering
 	public void setName(String name) { this.fakeName = name; }
-//	public Text getName() { return new LiteralText(this.fakeName); }
-//	public String getEntityName() { return this.fakeName; }
-//	public Text getDisplayName() { return new LiteralText(this.fakeName); }
-//
-//	// This stops it from pushing other entities and also tells the shouldRender function
-//	protected void tickCramming() // to not render if the real player is intersecting it
-//	{
-//		List<Entity> list = this.world.getEntities((Entity)this, this.getBoundingBox(), (p -> p == WurstClient.MC.player));
-//		if (!list.isEmpty())
-//			this.shouldRender = false;
-//	}
+	public Text getName() { return new LiteralText(this.fakeName); }
+	public String getEntityName() { return this.fakeName; }
+	public Text getDisplayName() { return new LiteralText(this.fakeName); }
+
+	// This stops it from pushing other entities and also tells the shouldRender function
+	protected void tickCramming() // to not render if the real player is intersecting it
+	{
+		List<Entity> list = this.world.getEntities((Entity)this, this.getBoundingBox(), (p -> p == WurstClient.MC.player));
+		if (!list.isEmpty())
+			this.shouldRender = false;
+	}
+
+	// Public version of identical Protected method
+	public void setRotation(float yaw, float pitch) {
+		this.yaw = yaw % 360.0F;
+		this.pitch = pitch % 360.0F;
+	}
 	
 	private void spawn() { world.addEntity(getEntityId(), this); }
 	public void despawn() { removed = true; }

@@ -96,15 +96,14 @@ public final class BlinkHack extends Hack
 
 		replaying = false;
 
-		if (blinkPlayer != null)
-			blinkPlayer.despawn();
 		if (replayPlayer != null)
 			replayPlayer.despawn();
-		
 		disable(true);
 	}
 
 	private void disable(boolean flushPackets) {
+		if (blinkPlayer != null)
+			blinkPlayer.despawn();
 		if (flushPackets) {
 			blinkedMovementPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
 			blinkedOtherPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
@@ -119,7 +118,10 @@ public final class BlinkHack extends Hack
 		if (replaying)
 			sendTimedPackets();
 
-		if (limit.getValueI() != 0 &&getBlinkedPacketsSize() >= limit.getValueI())
+		if (replayPlayer != null)
+			System.out.println(replayPlayer.removed);
+
+		if (limit.getValueI() != 0 && getBlinkedPacketsSize() >= limit.getValueI())
 		{
 			reset(true);
 		}
@@ -162,9 +164,9 @@ public final class BlinkHack extends Hack
 					Packet packet = container.packet;
 					container.sent = true;
 					packetsSent++;
-					MC.player.networkHandler.sendPacket(container.packet);
+					MC.player.networkHandler.sendPacket(packet);
 					if (packet instanceof PlayerMoveC2SPacket) // Visualize the packet using the fake player
-						updateFakePlayerPos(replayPlayer, (PlayerMoveC2SPacket) packet, true);
+						updateFakePlayerPos(replayPlayer, (PlayerMoveC2SPacket) packet);
 				}
 			}
 		}
@@ -185,7 +187,7 @@ public final class BlinkHack extends Hack
 				&& packet.getZ(-1) == prevPacket.getZ(-1);
 	}
 
-	public void reset(boolean flushPackets) {
+	private void reset(boolean flushPackets) {
 		disable(flushPackets);
 		enable();
 	}
@@ -193,6 +195,8 @@ public final class BlinkHack extends Hack
 	public void cancel()
 	{
 		blinkedMovementPackets.clear();
+		blinkedOtherPackets.clear();
+		replayingPackets.clear();
 		blinkPlayer.resetPlayerPosition();
 		setEnabled(false);
 	}
@@ -207,17 +211,18 @@ public final class BlinkHack extends Hack
 			return;
 
 		if (!replaying) // Dont override if already replaying
-		{
 			recordingDuration = System.currentTimeMillis() - startTime;
+
+		if (replayPlayer == null || replayPlayer.removed)
 			replayPlayer = new FakePlayerEntity(blinkPlayer);
-			replayPlayer.setName("Replaying...");
-		}
+
+		replayPlayer.setName("Replaying...");
 
 		replaying = true;
 		reset(false); // Restart blink at the current position
 	}
 
-	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket, boolean interpolate)
+	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket)
 	{
 		IPlayerMoveC2SPacket packet = (IPlayerMoveC2SPacket) cringePacket;
 
@@ -227,11 +232,12 @@ public final class BlinkHack extends Hack
 		float yaw = packet.getYaw();
 		float pitch = packet.getPitch();
 
-		if (x == 0 && y == 0 && z == 0)
-			return; // Don't animate
-
-		fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
-		fakePlayer.updatePositionAndAngles(x, y, z, yaw, pitch);
+		if (cringePacket instanceof PlayerMoveC2SPacket.PositionOnly)
+			fakePlayer.updatePosition(x, y, z);
+		else if (cringePacket instanceof PlayerMoveC2SPacket.LookOnly)
+			fakePlayer.setRotation(yaw, pitch); // setRotation is protected (cringe)
+		else
+			fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
 	}
 
 	private final class PacketContainer
