@@ -12,24 +12,19 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameRules;
 import net.wurstclient.WurstClient;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class FakePlayerEntity extends OtherClientPlayerEntity
 {
 	private final ClientWorld world = WurstClient.MC.world;
 	public String fakeName = "";
-	private boolean shouldRender = false;
+	private boolean touchingPlayer = false;
 
 	public FakePlayerEntity() { this(WurstClient.MC.player); }
 	public FakePlayerEntity(PlayerEntity player) {
@@ -83,21 +78,21 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 //	}
 
 	// Don't render if touching to the real player (see FakePlayerEntity.tickCramming())
-//	@Environment(EnvType.CLIENT)
-//	public boolean shouldRender(double distance) { return super.shouldRender(distance) && shouldRender; }
+	@Environment(EnvType.CLIENT)
+	public boolean shouldRender(double distance) { return super.shouldRender(distance) && touchingPlayer; }
 
 	// Override name rendering
 	public void setName(String name) { this.fakeName = name; }
 	public Text getName() { return new LiteralText(this.fakeName); }
-	public String getEntityName() { return this.fakeName; }
-	public Text getDisplayName() { return new LiteralText(this.fakeName); }
 
 	// This stops it from pushing other entities and also tells the shouldRender function
 	protected void tickCramming() // to not render if the real player is intersecting it
 	{
-		List<Entity> list = this.world.getEntities((Entity)this, this.getBoundingBox(), (p -> p == WurstClient.MC.player));
-		if (!list.isEmpty())
-			this.shouldRender = false;
+		List<Entity> list = this.world.getEntities(this, this.getBoundingBox(), (p -> p.getName().asString() == WurstClient.MC.player.getName().asString()));
+		if (list.size() > 0)
+			touchingPlayer = false;
+		else
+			touchingPlayer = true;
 	}
 
 	// Public version of identical Protected method

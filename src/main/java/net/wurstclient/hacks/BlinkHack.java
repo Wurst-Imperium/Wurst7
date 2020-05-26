@@ -175,6 +175,7 @@ public final class BlinkHack extends Hack
 			replaying = false;
 			replayingPackets.clear();
 			packetsSent = 0;
+			replayPlayer.despawn();
 		}
 	}
 
@@ -240,12 +241,21 @@ public final class BlinkHack extends Hack
 		float yaw = packet.getYaw();
 		float pitch = packet.getPitch();
 
-		if (cringePacket instanceof PlayerMoveC2SPacket.PositionOnly)
-			fakePlayer.updatePosition(x, y, z);
-		else if (cringePacket instanceof PlayerMoveC2SPacket.LookOnly)
-			fakePlayer.setRotation(yaw, pitch); // setRotation is protected (cringe)
-		else
-			fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
+		if (yaw == 0 && pitch == 0)
+		{
+			yaw = fakePlayer.getYaw(1.0F);
+			pitch = fakePlayer.getPitch(1.0F);
+		}
+
+		if (x == 0 && y == 0 && z == 0)
+		{
+			x = fakePlayer.getX();
+			y = fakePlayer.getY();
+			z = fakePlayer.getZ();
+		}
+
+		fakePlayer.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, 3, true);
+		fakePlayer.updateTrackedHeadRotation(yaw, 3);
 	}
 
 	private final class PacketContainer
