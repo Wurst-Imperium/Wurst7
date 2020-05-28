@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.ArrayDeque;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -16,11 +17,9 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IPlayerMoveC2SPacket;
+
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.FakePlayerEntity;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 
 @DontSaveState
 public final class BlinkHack extends Hack
@@ -33,11 +32,10 @@ public final class BlinkHack extends Hack
 	
 	private final ArrayDeque<PacketContainer> blinkedMovementPackets = new ArrayDeque<>();
 	private final ArrayDeque<PacketContainer> blinkedOtherPackets = new ArrayDeque<>();
-	private final ArrayList<PacketContainer> replayingPackets = new ArrayList<>();
+	private final ArrayDeque<PacketContainer> replayingPackets = new ArrayDeque<>();
 	
 	private FakePlayerEntity blinkPlayer;
 	private FakePlayerEntity replayPlayer;
-	private ArrayList<FakePlayerEntity> checkpointPlayers;
 	
 	private int packetsSent;
 	private long startTime;
@@ -127,7 +125,10 @@ public final class BlinkHack extends Hack
 			System.out.println(replayPlayer.removed);
 		
 		if(limit.getValueI() != 0 && getBlinkedPacketsSize() >= limit.getValueI())
-			restart(true);
+		{
+			disable(true);
+			enable();
+		}
 	}
 	
 	@Override
@@ -200,13 +201,6 @@ public final class BlinkHack extends Hack
 		blinkPlayer.resetPlayerPosition();
 	}
 	
-	// internal method
-	private void restart(boolean flushPackets)
-	{
-		disable(flushPackets);
-		enable();
-	}
-	
 	public void cancel()
 	{
 		blinkedMovementPackets.clear();
@@ -234,7 +228,8 @@ public final class BlinkHack extends Hack
 		replayPlayer.setName("Replaying...");
 		
 		replaying = true;
-		restart(false); // Restart blink at the current position
+		disable(false);
+		enable();
 	}
 	
 	private void updateFakePlayerPos(FakePlayerEntity fakePlayer, PlayerMoveC2SPacket cringePacket)
