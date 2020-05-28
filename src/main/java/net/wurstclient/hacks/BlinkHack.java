@@ -121,9 +121,6 @@ public final class BlinkHack extends Hack
 		if(replaying)
 			sendTimedPackets();
 		
-		if(replayPlayer != null)
-			System.out.println(replayPlayer.removed);
-		
 		if(limit.getValueI() != 0 && getBlinkedPacketsSize() >= limit.getValueI())
 		{
 			disable(true);
