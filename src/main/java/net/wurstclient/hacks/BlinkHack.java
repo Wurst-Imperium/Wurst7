@@ -21,7 +21,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IPlayerMoveC2SPacket;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.FakePlayerEntity;
-import org.apache.logging.log4j.Logger;
 
 @DontSaveState
 public final class BlinkHack extends Hack
@@ -54,7 +53,7 @@ public final class BlinkHack extends Hack
 		addSetting(limit);
 		this.replaying = false;
 	}
-	
+
 	@Override
 	public String getRenderName()
 	{
@@ -71,7 +70,7 @@ public final class BlinkHack extends Hack
 
 		return output;
 	}
-	
+
 	@Override
 	public void onEnable()
 	{
@@ -87,7 +86,7 @@ public final class BlinkHack extends Hack
 		blinkPlayer.setName("Blinking...");
 		startTime = System.currentTimeMillis();
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
@@ -104,14 +103,15 @@ public final class BlinkHack extends Hack
 	private void disable(boolean flushPackets) {
 		if (blinkPlayer != null)
 			blinkPlayer.despawn();
-		if (flushPackets) {
+		if (flushPackets)
+		{
 			blinkedMovementPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
 			blinkedOtherPackets.forEach(p -> MC.player.networkHandler.sendPacket(p.packet));
 		}
 		blinkedMovementPackets.clear();
 		blinkedOtherPackets.clear();
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -122,9 +122,7 @@ public final class BlinkHack extends Hack
 			System.out.println(replayPlayer.removed);
 
 		if (limit.getValueI() != 0 && getBlinkedPacketsSize() >= limit.getValueI())
-		{
 			reset(true);
-		}
 	}
 
 	@Override
@@ -139,12 +137,10 @@ public final class BlinkHack extends Hack
 
 			// To save on packets, only add if the player has moved
 			if (prevPacket == null || !movementPacketsChanged(movementPacket, (PlayerMoveC2SPacket) prevPacket.packet))
-			{
 				blinkedMovementPackets.addLast(new PacketContainer(movementPacket));
-			}
-		} else if (packet instanceof ClientCommandC2SPacket) {
+		} else if (packet instanceof ClientCommandC2SPacket)
 			blinkedOtherPackets.addLast(new PacketContainer(packet));
-		} else return;
+		else return;
 
 		// Only cancel if it is a movement packet or it is whitelisted
 		event.cancel();
@@ -171,7 +167,8 @@ public final class BlinkHack extends Hack
 			}
 		}
 		EVENTS.add(PacketOutputListener.class, this);
-		if (sentAllPackets) {
+		if (sentAllPackets)
+		{
 			replaying = false;
 			replayingPackets.clear();
 			packetsSent = 0;
@@ -189,18 +186,20 @@ public final class BlinkHack extends Hack
 	}
 
 	// .blink reset
-	public void reset() {
+	public void reset()
+	{
 		blinkedMovementPackets.clear();
 		blinkedOtherPackets.clear();
 		blinkPlayer.resetPlayerPosition();
 	}
 
 	// internal method
-	private void reset(boolean flushPackets) {
+	private void reset(boolean flushPackets)
+	{
 		disable(flushPackets);
 		enable();
 	}
-	
+
 	public void cancel()
 	{
 		blinkedMovementPackets.clear();

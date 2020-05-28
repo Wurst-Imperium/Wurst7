@@ -27,7 +27,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	private boolean touchingPlayer = false;
 
 	public FakePlayerEntity() { this(WurstClient.MC.player); }
-	public FakePlayerEntity(PlayerEntity player) {
+	public FakePlayerEntity(PlayerEntity player)
+	{
 		super(WurstClient.MC.world, player.getGameProfile());
 
 		copyPositionAndRotation(player);
@@ -39,7 +40,10 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		spawn();
 	}
 
-	private void copyInventory(PlayerEntity player) { inventory.clone(player.inventory); }
+	private void copyInventory(PlayerEntity player)
+	{
+		inventory.clone(player.inventory);
+	}
 
 	private void copyPlayerModel(Entity from)
 	{
@@ -62,33 +66,29 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		field_7499 = getZ();
 	}
 
-	// The limbs don't render normally for some reason
-//	public void animateLimbs()
-//	{
-//		this.lastLimbDistance = this.limbDistance;
-//		double d = this.getX() - this.prevX;
-//		double z = this.getZ() - this.prevZ;
-//		float g = MathHelper.sqrt(d * d + z * z) * 4.0F;
-//		if (g > 1.0F) {
-//			g = 1.0F;
-//		}
-//
-//		this.limbDistance += (g - this.limbDistance) * 0.4F;
-//		this.limbAngle += this.limbDistance / 100;
-//	}
-
 	// Don't render if touching to the real player (see FakePlayerEntity.tickCramming())
 	@Environment(EnvType.CLIENT)
-	public boolean shouldRender(double distance) { return super.shouldRender(distance) && touchingPlayer; }
+	public boolean shouldRender(double distance)
+	{
+		return super.shouldRender(distance) && touchingPlayer;
+	}
 
 	// Override name rendering
-	public void setName(String name) { this.fakeName = name; }
-	public Text getName() { return new LiteralText(this.fakeName); }
+	public void setName(String name)
+	{
+		this.fakeName = name;
+	}
+
+	public Text getName()
+	{
+		return new LiteralText(this.fakeName);
+	}
 
 	// This stops it from pushing other entities and also tells the shouldRender function
 	protected void tickCramming() // to not render if the real player is intersecting it
 	{
-		List<Entity> list = this.world.getEntities(this, this.getBoundingBox(), (p -> p.getName().asString() == WurstClient.MC.player.getName().asString()));
+		List<Entity> list = this.world.getEntities(this, this.getBoundingBox(),
+				(p -> p.getName().asString() == WurstClient.MC.player.getName().asString()));
 		if (list.size() > 0)
 			touchingPlayer = false;
 		else
@@ -100,11 +100,23 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		this.yaw = yaw % 360.0F;
 		this.pitch = pitch % 360.0F;
 	}
-	
-	private void spawn() { world.addEntity(getEntityId(), this); }
-	public void despawn() { removed = true; }
+
+	private void spawn()
+	{
+		world.addEntity(getEntityId(), this);
+	}
+
+	public void despawn()
+	{
+		removed = true;
+	}
 
 	// Teleport the real player to the fake player
-	public void resetPlayerPosition(PlayerEntity player) { player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch); }
 	public void resetPlayerPosition() { resetPlayerPosition(WurstClient.MC.player); }
+	public void resetPlayerPosition(PlayerEntity player)
+	{
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+	}
+
+
 }
