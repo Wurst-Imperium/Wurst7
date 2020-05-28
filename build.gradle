@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.2.7-SNAPSHOT'
+	id 'fabric-loom' version '0.2.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -14,13 +14,14 @@ minecraft {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:1.15.2"
-    mappings "net.fabricmc:yarn:1.15.2+build.15:v2"
-    modImplementation "net.fabricmc:fabric-loader:0.8.3+build.196"
-            
-    //Fabric api
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.10.8+build.310-1.15"
-    
+	//to change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	
 	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
 	// which uses javax.annotation.concurrent.Immutable, which is part of
 	// the JSR305 library.
