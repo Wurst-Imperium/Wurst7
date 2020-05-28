@@ -20,67 +20,67 @@ public final class BlinkCmd extends Command
 		super("blink", "Enables, disables or cancels Blink and manages replay.",
 				".blink [on|off|reset|replay|cancel]");
 	}
-
+	
 	@Override
 	public void call(String[] args) throws CmdException
 	{
 		if(args.length > 1)
 			throw new CmdSyntaxError();
-
+		
 		BlinkHack blinkHack = WURST.getHax().blinkHack;
-
+		
 		if(args.length == 0)
 		{
 			blinkHack.setEnabled(!blinkHack.isEnabled());
 			return;
 		}
-
+		
 		switch(args[0].toLowerCase())
 		{
 			default:
-			throw new CmdSyntaxError();
-
+				throw new CmdSyntaxError();
+			
 			case "on":
-			blinkHack.setEnabled(true);
-			break;
-
+				blinkHack.setEnabled(true);
+				break;
+			
 			case "off":
-			blinkHack.setEnabled(false);
-			break;
-
+				blinkHack.setEnabled(false);
+				break;
+			
 			case "cancel":
-			cancel(blinkHack);
-			break;
-
+				cancel(blinkHack);
+				break;
+			
 			case "replay":
-			replay(blinkHack);
-
+				replay(blinkHack);
+			
 			case "reset":
-			reset(blinkHack);
+				reset(blinkHack);
 		}
 	}
-
+	
 	private void cancel(BlinkHack blinkHack) throws CmdException
 	{
 		if(!blinkHack.isEnabled())
 			throw new CmdError("Cannot cancel, Blink is already turned off!");
-
+		
 		blinkHack.cancel();
 	}
-
+	
 	private void replay(BlinkHack blinkHack) throws CmdException
 	{
 		if(!blinkHack.isEnabled())
 			throw new CmdError("Cannot begin replay without Blink enabled.");
-
+		
 		blinkHack.replay();
 	}
-
+	
 	private void reset(BlinkHack blinkHack) throws CmdException
 	{
 		if(!blinkHack.isEnabled())
 			throw new CmdError("Cannot reset without Blink enabled.");
-
+		
 		blinkHack.reset();
 	}
 }
