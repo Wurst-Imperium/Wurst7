@@ -57,12 +57,13 @@ public final class BlinkHack extends Hack
 	@Override
 	public String getRenderName()
 	{
+		String output = "";
+		
 		// Blink
-		String format = "%s [%s";
-		if(limit.getValueI() > 0)
-			format += "/%s";
-		format += "]";
-		String output = String.format(format, getName(), getBlinkedPacketsSize(), limit.getValueI());
+		if(limit.getValueI() == 0)
+			output += getName() + " [" + getBlinkedPacketsSize() + "]";
+		else
+			output += getName() + " [" + getBlinkedPacketsSize() + "/" + limit.getValueI() + "]";
 		
 		// Replay
 		if(replaying)
