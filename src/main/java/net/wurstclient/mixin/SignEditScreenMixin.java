@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoSignHack;
+import net.wurstclient.mixinterface.ISignBlockEntity;
 
 @Mixin(SignEditScreen.class)
 public abstract class SignEditScreenMixin extends Screen
@@ -49,8 +50,7 @@ public abstract class SignEditScreenMixin extends Screen
 	@Inject(at = {@At("HEAD")}, method = {"finishEditing()V"})
 	private void onFinishEditing(CallbackInfo ci)
 	{
-		Text[] allRows = new Text[]{sign.getTextOnRow(0), sign.getTextOnRow(1),
-			sign.getTextOnRow(2), sign.getTextOnRow(3)};
+		Text[] allRows = ((ISignBlockEntity)sign).getTextOnAllRows();
 		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(allRows);
 	}
 	
