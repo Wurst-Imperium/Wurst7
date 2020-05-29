@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
@@ -53,7 +54,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<Text> newLines = ChatMessages.breakRenderedChatMessageLines(
+		List<class_5348> newLines = ChatMessages.breakRenderedChatMessageLines(
 			event.getComponent(), maxTextLength, MC.textRenderer);
 		
 		int spamCounter = 1;
@@ -61,11 +62,12 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		
 		for(int i = chatLines.size() - 1; i >= 0; i--)
 		{
-			String oldLine = chatLines.get(i).getText().getString();
+			String oldLine = ((Text)chatLines.get(i).getText()).getString();
 			
 			if(matchingLines <= newLines.size() - 1)
 			{
-				String newLine = newLines.get(matchingLines).getString();
+				String newLine =
+					((Text)newLines.get(matchingLines)).getString();
 				
 				if(matchingLines < newLines.size() - 1)
 				{
@@ -85,8 +87,8 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				
 				if(i > 0 && matchingLines == newLines.size() - 1)
 				{
-					String twoLines =
-						oldLine + chatLines.get(i - 1).getText().getString();
+					String twoLines = oldLine
+						+ ((Text)chatLines.get(i - 1).getText()).getString();
 					String addedText = twoLines.substring(newLine.length());
 					
 					if(addedText.startsWith(" [x") && addedText.endsWith("]"))
