@@ -131,6 +131,11 @@ public final class KeybindList
 		addKB(set, "u", "freecam");
 		addKB(set, "x", "x-ray");
 		addKB(set, "y", "sneak");
+		addKB(set, "keypad.9", "waypoints");
+		addKB(set, "keypad.add", "addwaypoint");
+		addKB(set, "keypad.subtract", "delwaypoint");
+		addKB(set, "keypad.multiply", "wpselectup");
+		addKB(set, "keypad.divide", "wpselectdown");
 		return Collections.unmodifiableSet(set);
 	}
 	

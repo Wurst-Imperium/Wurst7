@@ -21,7 +21,7 @@ public class Window
 	private int height;
 	
 	private boolean valid;
-	private final ArrayList<Component> children = new ArrayList<>();
+	protected final ArrayList<Component> children = new ArrayList<>();
 	
 	private boolean dragging;
 	private int dragOffsetX;
@@ -41,7 +41,7 @@ public class Window
 	private int innerHeight;
 	private int maxHeight;
 	private int scrollOffset;
-	private boolean scrollingEnabled;
+	protected boolean scrollingEnabled;
 	
 	private boolean draggingScrollbar;
 	private int scrollbarDragOffsetY;

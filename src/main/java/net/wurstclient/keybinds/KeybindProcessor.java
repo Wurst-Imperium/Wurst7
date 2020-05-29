@@ -42,7 +42,7 @@ public final class KeybindProcessor implements KeyPressListener
 		Screen screen = WurstClient.MC.currentScreen;
 		if(screen != null && !(screen instanceof ClickGuiScreen))
 			return;
-		
+
 		String keyName = getKeyName(event);
 		String cmds = keybinds.getCommands(keyName);
 		processCmds(cmds);
@@ -73,6 +73,10 @@ public final class KeybindProcessor implements KeyPressListener
 			cmdProcessor.process(cmd);
 		else
 		{
+			for(Hack h : hax.getAllHax()) {
+				if(h.processCmd(cmd)) return;
+			}
+
 			Hack hack = hax.getHackByName(cmd);
 			
 			if(hack == null)

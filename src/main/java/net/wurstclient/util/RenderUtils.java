@@ -292,4 +292,87 @@ public enum RenderUtils
 		
 		GL11.glPopMatrix();
 	}
+
+	public static void drawDiamond(Vec3d vec, double scale)
+	{
+		GL11.glLineWidth(2);
+		GL11.glBegin(GL11.GL_TRIANGLES);
+
+		//DownLeft
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x, vec.y-scale*2, vec.z);
+		//DownFront
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x, vec.y-scale*2, vec.z);
+		//DownRight
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x, vec.y-scale*2, vec.z);
+		//DownBack
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x, vec.y-scale*2, vec.z);
+		//UpLeft
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x, vec.y+scale*2, vec.z);
+		//UpFront
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x, vec.y+scale*2, vec.z);
+		//UpRight
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x, vec.y+scale*2, vec.z);
+		//UpBack
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x, vec.y+scale*2, vec.z);
+		GL11.glEnd();
+		//Center Square
+		GL11.glBegin(GL11.GL_QUADS);
+		//Clockwise
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		//Counter-Clockwise
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z+scale);
+		GL11.glVertex3d(vec.x-scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z-scale);
+		GL11.glVertex3d(vec.x+scale, vec.y, vec.z+scale);
+		GL11.glEnd();
+
+		//Lines
+		drawOutlinedDiamond(vec, scale);
+	}
+
+	public static void drawOutlinedDiamond(Vec3d vec, double scale)
+	{
+		double[][] array = {
+				{vec.x - scale, vec.y, vec.z + scale},
+				{vec.x + scale, vec.y, vec.z + scale},
+				{vec.x, vec.y + (scale * 2), vec.z},
+				{vec.x - scale, vec.y, vec.z - scale},
+				{vec.x - scale, vec.y, vec.z + scale},
+				{vec.x, vec.y + (scale * 2), vec.z},
+				{vec.x + scale, vec.y, vec.z - scale},
+				{vec.x + scale, vec.y, vec.z + scale},
+				{vec.x, vec.y - (scale * 2), vec.z},
+				{vec.x - scale, vec.y, vec.z - scale},
+				{vec.x + scale, vec.y, vec.z - scale},
+				{vec.x, vec.y - (scale * 2), vec.z},
+				{vec.x - scale, vec.y, vec.z + scale}
+		};
+		GL11.glBegin(GL11.GL_LINES);
+		for(int i=1; i<array.length; i++)
+		{
+			GL11.glVertex3d(array[i-1][0], array[i-1][1], array[i-1][2]);
+			GL11.glVertex3d(array[i][0], array[i][1], array[i][2]);
+		}
+		GL11.glEnd();
+
+	}
 }

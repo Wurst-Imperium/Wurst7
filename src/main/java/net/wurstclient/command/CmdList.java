@@ -60,6 +60,7 @@ public final class CmdList
 	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
 	public final TpCmd tpCmd = new TpCmd();
 	public final UnbindCmd unbindCmd = new UnbindCmd();
+	public final WaypointsCmd waypointsCmd = new WaypointsCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	

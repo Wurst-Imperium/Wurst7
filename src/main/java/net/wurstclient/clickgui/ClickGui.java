@@ -81,6 +81,9 @@ public final class ClickGui
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
 		windows.add(uiSettings);
+
+		WaypointWindow waypointWindow = WaypointWindow.getWindow();
+		windows.add(waypointWindow);
 		
 		for(Window window : windows)
 			window.setMinimized(true);

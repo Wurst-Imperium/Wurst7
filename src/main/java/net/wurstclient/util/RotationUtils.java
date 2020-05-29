@@ -103,6 +103,17 @@ public enum RotationUtils
 		Rotation needed = getNeededRotations(vec);
 		return MathHelper.wrapDegrees(WurstClient.MC.player.yaw) - needed.yaw;
 	}
+
+	//Returns a Vec3d representing the point at given distance from origin along
+	//the line from origin to destination
+	public static Vec3d getPointAtDistanceTo(Vec3d origin, Vec3d destination, double distance)
+	{
+		double dist = origin.distanceTo(destination);
+		Vec3d v = destination.subtract(origin);
+		Vec3d ret = new Vec3d(v.x/dist, v.y/dist, v.z/dist);
+		ret = origin.add(ret.multiply(distance));
+		return ret;
+	}
 	
 	public static final class Rotation
 	{
