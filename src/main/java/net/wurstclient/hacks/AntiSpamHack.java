@@ -8,13 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.util.List;
+import java.util.Optional;
 
 import net.minecraft.class_5348;
+import net.minecraft.class_5348.Visitor;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -51,6 +52,26 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		if(chatLines.isEmpty())
 			return;
 		
+		/**
+		 * A {@link Visitor} to completely bypass Mojang's visitor system and
+		 * just get the damn {@link String} out of a {@link ChatHudLine}.
+		 *
+		 * <p>
+		 * Is this seriously the replacement for <code>getString()</code>? What
+		 * were they thinking?!
+		 */
+		class JustGiveMeTheStringVisitor implements Visitor<Object>
+		{
+			String s = "";
+			
+			@Override
+			public Optional<Object> accept(String asString)
+			{
+				s += asString;
+				return Optional.empty();
+			}
+		}
+		
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
@@ -62,12 +83,17 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		
 		for(int i = chatLines.size() - 1; i >= 0; i--)
 		{
-			String oldLine = ((Text)chatLines.get(i).getText()).getString();
+			JustGiveMeTheStringVisitor oldLineVS =
+				new JustGiveMeTheStringVisitor();
+			chatLines.get(i).getText().visit(oldLineVS);
+			String oldLine = oldLineVS.s;
 			
 			if(matchingLines <= newLines.size() - 1)
 			{
-				String newLine =
-					((Text)newLines.get(matchingLines)).getString();
+				JustGiveMeTheStringVisitor newLineVS =
+					new JustGiveMeTheStringVisitor();
+				newLines.get(matchingLines).visit(newLineVS);
+				String newLine = newLineVS.s;
 				
 				if(matchingLines < newLines.size() - 1)
 				{
@@ -87,8 +113,12 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				
 				if(i > 0 && matchingLines == newLines.size() - 1)
 				{
-					String twoLines = oldLine
-						+ ((Text)chatLines.get(i - 1).getText()).getString();
+					JustGiveMeTheStringVisitor nextOldLineVS =
+						new JustGiveMeTheStringVisitor();
+					chatLines.get(i - 1).getText().visit(nextOldLineVS);
+					String nextOldLine = nextOldLineVS.s;
+					
+					String twoLines = oldLine + nextOldLine;
 					String addedText = twoLines.substring(newLine.length());
 					
 					if(addedText.startsWith(" [x") && addedText.endsWith("]"))
