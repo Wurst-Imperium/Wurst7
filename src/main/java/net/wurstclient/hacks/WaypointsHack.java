@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.world.World;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.Component;
@@ -28,7 +29,7 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 public class WaypointsHack extends Hack implements UpdateListener, RenderListener {
 	private List<Waypoint> activeWaypoints;
 	public Waypoint selectedWaypoint;
-	private DimensionType current;
+	private World current;
 	private boolean openFlag;
 	private final boolean voxelMap = FabricLoader.getInstance().isModLoaded("voxelmap");
 
@@ -66,10 +67,10 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 			openWaypointScreen();
 			openFlag = false;
 		}
-		if(MC.world == null || MC.world.dimension.getType() == current)
+		if(MC.world == null || (MC.world == current && MC.world.dimension.getType() == current.dimension.getType()))
 			return;
 		assert MC.player != null;
-		current = MC.player.world.dimension.getType();
+		current = MC.player.world;
 		WURST.getWaypointList().getWpLists().computeIfAbsent(getWorldId(), k -> new ArrayList<>());
 		activeWaypoints = WURST.getWaypointList().getWpLists().get(getWorldId());
 		repopulateWindow();
@@ -93,9 +94,9 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 	public String getWorldId() {
 		String ret = "";
 		if(MC.isInSingleplayer())
-			ret+=WaypointList.toWorldId("singleplayer", current);
+			ret+=WaypointList.toWorldId("singleplayer", current.dimension.getType());
 		else
-			ret+= WaypointList.toWorldId(MC.getCurrentServerEntry().address, current);
+			ret+= WaypointList.toWorldId(MC.getCurrentServerEntry().address, current.dimension.getType());
 
 		return ret;
 	}
