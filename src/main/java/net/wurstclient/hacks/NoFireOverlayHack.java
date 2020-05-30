@@ -16,14 +16,14 @@ import net.wurstclient.settings.EnumSetting;
 public final class NoFireOverlayHack extends Hack
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lLower\u00a7r mode shrinks the fire overlay.\n"
-			+ "\u00a7lNone\u00a7r mode removes the overlay.",
+		"\u00a7lLower\u00a7r mode lowers the overlay.\n"
+			+ "\u00a7lRemove\u00a7r mode removes the overlay.",
 		Mode.values(), Mode.LOWER);
 	
 	public NoFireOverlayHack()
 	{
 		super("NoFireOverlay",
-			"Blocks the overlay when you are on fire.\n\n"
+			"Lowers or blocks the overlay when you are on fire.\n\n"
 				+ "\u00a7c\u00a7lWARNING:\u00a7r This can cause you to burn\n"
 				+ "to death without noticing.");
 		
@@ -33,7 +33,7 @@ public final class NoFireOverlayHack extends Hack
 	
 	public boolean shouldCancelOverlay()
 	{
-		return isEnabled() && mode.getSelected() == Mode.NONE;
+		return isEnabled() && mode.getSelected() == Mode.REMOVE;
 	}
 	
 	public boolean shouldLowerOverlay()
@@ -44,6 +44,6 @@ public final class NoFireOverlayHack extends Hack
 	private enum Mode
 	{
 		LOWER,
-		NONE;
+		REMOVE;
 	}
 }
