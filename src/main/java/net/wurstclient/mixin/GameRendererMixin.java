@@ -14,10 +14,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.resource.SynchronousResourceReloadListener;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -97,6 +99,16 @@ public abstract class GameRendererMixin
 			return MathHelper.lerp(delta, first, second);
 		
 		return 0;
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F"},
+		cancellable = true)
+	private static void onNightVisionStrength(LivingEntity en, float f, CallbackInfoReturnable<Float> cir)
+	{
+		if(WurstClient.INSTANCE.getHax().fullbrightHack.isNightVisionActive())
+			cir.setReturnValue(1F);
 	}
 	
 	@Inject(at = {@At("HEAD")},

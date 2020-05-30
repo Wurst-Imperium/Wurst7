@@ -8,8 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.options.GameOptions;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -35,8 +33,6 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			+ "Only works if \u00a76Method\u00a7r is set to \u00a76Gamma\u00a7r.",
 		true);
 	
-	private boolean hasAppliedNightVision;
-	
 	public FullbrightHack()
 	{
 		super("Fullbright", "Allows you to see in the dark.");
@@ -54,11 +50,6 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			approachGamma(16);
 		else
 			approachGamma(0.5);
-		
-		if(isEnabled() && method.getSelected() == Method.NIGHT_VISION)
-			applyNightVision();
-		else
-			clearNightVision();
 	}
 	
 	private void approachGamma(double target)
@@ -79,20 +70,9 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			options.gamma -= 0.5;
 	}
 	
-	private void applyNightVision()
+	public boolean isNightVisionActive()
 	{
-		MC.player.addStatusEffect(new StatusEffectInstance(
-			StatusEffects.NIGHT_VISION, 16360, 0, false, false));
-		hasAppliedNightVision = true;
-	}
-	
-	private void clearNightVision()
-	{
-		if(!hasAppliedNightVision)
-			return;
-		
-		MC.player.removeStatusEffectInternal(StatusEffects.NIGHT_VISION);
-		hasAppliedNightVision = false;
+		return isEnabled() && method.getSelected() == Method.NIGHT_VISION;
 	}
 	
 	private static enum Method
