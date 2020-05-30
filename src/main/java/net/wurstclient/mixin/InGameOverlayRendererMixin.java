@@ -9,7 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
@@ -27,8 +29,18 @@ public class InGameOverlayRendererMixin
 	private static void onRenderFireOverlay(MinecraftClient minecraftClient,
 		MatrixStack matrixStack, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldCancelOverlay())
 			ci.cancel();
+	}
+	
+	@ModifyConstant(method =
+		"renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
+		constant = @Constant(doubleValue = -0.30000001192092896D))
+	private static double getFireOffset(double orig)
+	{
+		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldLowerOverlay())
+			return -0.5;
+		return orig;
 	}
 	
 	@Inject(at = {@At("HEAD")},

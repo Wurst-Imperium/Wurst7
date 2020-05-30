@@ -10,10 +10,16 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"no fire overlay"})
 public final class NoFireOverlayHack extends Hack
 {
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lLower\u00a7r mode shrinks the fire overlay.\n"
+			+ "\u00a7lNone\u00a7r mode removes the overlay.",
+		Mode.values(), Mode.LOWER);
+	
 	public NoFireOverlayHack()
 	{
 		super("NoFireOverlay",
@@ -22,5 +28,22 @@ public final class NoFireOverlayHack extends Hack
 				+ "to death without noticing.");
 		
 		setCategory(Category.RENDER);
+		addSetting(mode);
+	}
+	
+	public boolean shouldCancelOverlay()
+	{
+		return isEnabled() && mode.getSelected() == Mode.NONE;
+	}
+	
+	public boolean shouldLowerOverlay()
+	{
+		return isEnabled() && mode.getSelected() == Mode.LOWER;
+	}
+	
+	private enum Mode
+	{
+		LOWER,
+		NONE;
 	}
 }
