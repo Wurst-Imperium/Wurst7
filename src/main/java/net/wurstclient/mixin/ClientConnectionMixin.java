@@ -8,16 +8,20 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
+import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
 @Mixin(ClientConnection.class)
 public abstract class ClientConnectionMixin
@@ -37,5 +41,25 @@ public abstract class ClientConnectionMixin
 		
 		if(event.isCancelled())
 			ci.cancel();
+	}
+	
+	@Inject(at = {@At(value = "HEAD")},
+		method = {
+			"send(Lnet/minecraft/network/Packet;)V"},
+		cancellable = true)
+	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
+	{
+		PacketOutputEvent event = new PacketOutputEvent(packet);
+		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
+		packet = event.getPacket();
+		if(!event.isCancelled())
+			shadow$send(packet, null);
+		ci.cancel();
+	}
+	
+	@Shadow
+	private void shadow$send(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback)
+	{
+		
 	}
 }
