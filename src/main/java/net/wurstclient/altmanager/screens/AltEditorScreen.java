@@ -15,16 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -163,16 +161,16 @@ public abstract class AltEditorScreen extends Screen
 	
 	private final String stealSkin(String name)
 	{
-
+		
 		createSkinFolder();
-		Path path = skinFolder.resolve(name+".png");
+		Path path = skinFolder.resolve(name + ".png");
 		
-		if(path.toFile().exists()) { //Skin already exists, no need to download skin again.
+		if(path.toFile().exists())
 			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
-		}
 		
-		try{
-
+		try
+		{
+			
 			URI u = getSkinUrl(name);
 			
 			InputStream in = u.toURL().openStream();
@@ -183,69 +181,84 @@ public abstract class AltEditorScreen extends Screen
 		{
 			e.printStackTrace();
 			return "\u00a74\u00a7lSkin could not be saved.";
-		}catch(NullPointerException iu) {
+		}catch(NullPointerException iu)
+		{
 			iu.printStackTrace();
 			return "\u00a74\u00a7lPlayer does not exist.";
 		}
 	}
 	
-	public URI getSkinUrl(String username) throws MalformedURLException, IOException {
+	public URI getSkinUrl(String username)
+		throws MalformedURLException, IOException
+	{
 		/*
 		 * Will get a url using the username.
-		 * 
-		 * First it needs to grabe the UUID of the username. It will be able to do this by going to 
+		 *
+		 * First it needs to grabe the UUID of the username. It will be able to
+		 * do this by going to
 		 * this url https://api.mojang.com/users/profiles/minecraft/<username>
-		 * 
-		 * When you get the uuid then you have to go to 
-		 * https://sessionserver.mojang.com/session/minecraft/profile/<UUID> and grab the value of textures witch is
+		 *
+		 * When you get the uuid then you have to go to
+		 * https://sessionserver.mojang.com/session/minecraft/profile/<UUID> and
+		 * grab the value of textures witch is
 		 * a base64 encoded text of another JSON queary
-		 * 
+		 *
 		 * looking something like this
-		 * 
+		 *
 		 * {
-		 *	  "timestamp" : number,
-		 *	  "profileId" : "uuid",
-		 *	  "profileName" : "username",
-		 *	  "textures" : {
-		 *	    "SKIN" : {
-		 *	      "url" : "url to skin",
-		 *	      "metadata" : {
-		 *	        "model" : "slim"
-		 *	      }
-		 *	    }
-		 *	  }
-		 *	}
-		 * 
-		 * And we return the url 
-		 * 
+		 * "timestamp" : number,
+		 * "profileId" : "uuid",
+		 * "profileName" : "username",
+		 * "textures" : {
+		 * "SKIN" : {
+		 * "url" : "url to skin",
+		 * "metadata" : {
+		 * "model" : "slim"
+		 * }
+		 * }
+		 * }
+		 * }
+		 *
+		 * And we return the url
+		 *
 		 */
 		
-		//Getting players uuid
-		URI UUID_url = URI.create("https://api.mojang.com/users/profiles/minecraft/").resolve(username);
+		// Getting players uuid
+		URI UUID_url =
+			URI.create("https://api.mojang.com/users/profiles/minecraft/")
+				.resolve(username);
 		InputStream UUIDinputStream = UUID_url.toURL().openStream();
 		
-		JsonObject uuidJsonObj = new Gson().fromJson(IOUtils.toString(UUIDinputStream, StandardCharsets.UTF_8), JsonObject.class);
+		JsonObject uuidJsonObj = new Gson().fromJson(
+			IOUtils.toString(UUIDinputStream, StandardCharsets.UTF_8),
+			JsonObject.class);
 		String uuid = uuidJsonObj.get("id").getAsString();
 		
-		
-		//Getting base64 test with uuid
-		URI sessionURL = URI.create("https://sessionserver.mojang.com/session/minecraft/profile/").resolve(uuid);
+		// Getting base64 test with uuid
+		URI sessionURL = URI
+			.create(
+				"https://sessionserver.mojang.com/session/minecraft/profile/")
+			.resolve(uuid);
 		InputStream sessionInputStream = sessionURL.toURL().openStream();
-		JsonObject sessionJsonObj = new Gson().fromJson(IOUtils.toString(sessionInputStream, StandardCharsets.UTF_8), JsonObject.class);
-		JsonArray propJArray = sessionJsonObj.get("properties").getAsJsonArray();
+		JsonObject sessionJsonObj = new Gson().fromJson(
+			IOUtils.toString(sessionInputStream, StandardCharsets.UTF_8),
+			JsonObject.class);
+		JsonArray propJArray =
+			sessionJsonObj.get("properties").getAsJsonArray();
 		JsonObject zeroJObj = propJArray.get(0).getAsJsonObject();
-		String jB64 = zeroJObj.get("value").toString();	
+		String jB64 = zeroJObj.get("value").toString();
 		
-		//Decode to string
+		// Decode to string
 		byte[] valueDecoded = Base64.decodeBase64(jB64.getBytes());
 		
-		//Grab url for skin
-		JsonObject bDecode = new Gson().fromJson(new String(valueDecoded), JsonObject.class);
+		// Grab url for skin
+		JsonObject bDecode =
+			new Gson().fromJson(new String(valueDecoded), JsonObject.class);
 		JsonObject tJObj = bDecode.get("textures").getAsJsonObject();
 		JsonObject skinJObj = tJObj.get("SKIN").getAsJsonObject();
 		String skin = skinJObj.get("url").getAsString();
 		
-		//converts the string into a url
+		// converts the string into a url
 		URI skinUrl = URI.create(skin);
 		return skinUrl;
 	}
