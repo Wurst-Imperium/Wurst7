@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -167,38 +168,38 @@ public abstract class AltEditorScreen extends Screen
 		
 		try
 		{
-			
-			URI u = getSkinUrl(name);
-			
-			InputStream in = u.toURL().openStream();
+			URL url = getSkinUrl(name);
+			InputStream in = url.openStream();
 			
 			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
+			
 		}catch(IOException e)
 		{
 			e.printStackTrace();
 			return "\u00a74\u00a7lSkin could not be saved.";
-		}catch(NullPointerException iu)
+			
+		}catch(NullPointerException e)
 		{
-			iu.printStackTrace();
+			e.printStackTrace();
 			return "\u00a74\u00a7lPlayer does not exist.";
 		}
 	}
 	
-	public URI getSkinUrl(String username)
+	public URL getSkinUrl(String username)
 		throws MalformedURLException, IOException
 	{
 		/*
-		 * Will get a url using the username.
+		 * Will get a URL using the username.
 		 *
-		 * First it needs to grabe the UUID of the username. It will be able to
-		 * do this by going to
-		 * this url https://api.mojang.com/users/profiles/minecraft/<username>
+		 * First it needs to grab the UUID of the username. It will be able to
+		 * do this by going to this URL:
+		 * https://api.mojang.com/users/profiles/minecraft/<username>
 		 *
-		 * When you get the uuid then you have to go to
+		 * When you get the UUID then you have to go to
 		 * https://sessionserver.mojang.com/session/minecraft/profile/<UUID> and
-		 * grab the value of textures witch is
-		 * a base64 encoded text of another JSON queary
+		 * grab the value of textures witch is a base64 encoded text of another
+		 * JSON query
 		 *
 		 * looking something like this
 		 *
@@ -216,7 +217,7 @@ public abstract class AltEditorScreen extends Screen
 		 * }
 		 * }
 		 *
-		 * And we return the url
+		 * And we return the URL.
 		 *
 		 */
 		
@@ -256,7 +257,7 @@ public abstract class AltEditorScreen extends Screen
 		String skin = skinJObj.get("url").getAsString();
 		
 		// converts the string into a url
-		URI skinUrl = URI.create(skin);
+		URL skinUrl = URI.create(skin).toURL();
 		return skinUrl;
 	}
 	
