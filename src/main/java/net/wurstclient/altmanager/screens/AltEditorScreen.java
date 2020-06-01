@@ -14,6 +14,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -161,12 +162,8 @@ public abstract class AltEditorScreen extends Screen
 	
 	private final String stealSkin(String name)
 	{
-		
 		createSkinFolder();
 		Path path = skinFolder.resolve(name + ".png");
-		
-		if(path.toFile().exists())
-			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
 		
 		try
 		{
@@ -175,7 +172,7 @@ public abstract class AltEditorScreen extends Screen
 			
 			InputStream in = u.toURL().openStream();
 			
-			Files.copy(in, path);
+			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
 		}catch(IOException e)
 		{
