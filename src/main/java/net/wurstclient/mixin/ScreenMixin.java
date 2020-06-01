@@ -8,32 +8,30 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.wurstclient.WurstClient;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin
 {
-	@Shadow
-	protected MinecraftClient minecraft;
-	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
 		ordinal = 0),
-		method = {
-			"sendMessage(Ljava/lang/String;Z)V"},
+		method = {"sendMessage(Ljava/lang/String;Z)V"},
 		cancellable = true)
-	private void onSendChatMessage(String message, boolean toHud, CallbackInfo ci)
+	private void onSendChatMessage(String message, boolean toHud,
+		CallbackInfo ci)
 	{
 		if(toHud)
 			return;
-		minecraft.getNetworkHandler().sendPacket(new ChatMessageC2SPacket(message));
+		
+		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
+		WurstClient.MC.getNetworkHandler().sendPacket(packet);
 		ci.cancel();
 	}
 }
