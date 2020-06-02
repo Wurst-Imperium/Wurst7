@@ -17,7 +17,7 @@ import net.wurstclient.hack.Hack;
 @DontSaveState
 public final class AutoSignHack extends Hack
 {
-	private Text[] signText;
+	private String[] signText;
 	
 	public AutoSignHack()
 	{
@@ -34,12 +34,12 @@ public final class AutoSignHack extends Hack
 		signText = null;
 	}
 	
-	public Text[] getSignText()
+	public String[] getSignText()
 	{
 		return signText;
 	}
 	
-	public void setSignText(Text[] signText)
+	public void setSignText(String[] signText)
 	{
 		if(isEnabled() && this.signText == null)
 			this.signText = signText;

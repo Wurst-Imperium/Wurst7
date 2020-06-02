@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +27,9 @@ public abstract class SignEditScreenMixin extends Screen
 {
 	@Shadow
 	private SignBlockEntity sign;
+
+	@Shadow @Final
+	private String[] field_24285;
 	
 	private SignEditScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -37,12 +41,12 @@ public abstract class SignEditScreenMixin extends Screen
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
 		
-		Text[] autoSignText = autoSignHack.getSignText();
+		String[] autoSignText = autoSignHack.getSignText();
 		if(autoSignText == null)
 			return;
 		
 		for(int i = 0; i < 4; i++)
-			sign.setTextOnRow(i, autoSignText[i]);
+			field_24285[i] = autoSignText[i];
 		
 		finishEditing();
 	}
@@ -50,8 +54,7 @@ public abstract class SignEditScreenMixin extends Screen
 	@Inject(at = {@At("HEAD")}, method = {"finishEditing()V"})
 	private void onFinishEditing(CallbackInfo ci)
 	{
-		Text[] allRows = ((ISignBlockEntity)sign).getTextOnAllRows();
-		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(allRows);
+		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(field_24285);
 	}
 	
 	@Shadow
