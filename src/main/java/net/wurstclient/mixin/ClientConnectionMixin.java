@@ -8,9 +8,9 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -27,6 +27,8 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
+	private PacketOutputEvent event;
+	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/network/ClientConnection;handlePacket(Lnet/minecraft/network/Packet;Lnet/minecraft/network/listener/PacketListener;)V",
 		ordinal = 0)},
@@ -43,23 +45,23 @@ public abstract class ClientConnectionMixin
 			ci.cancel();
 	}
 	
+    @ModifyVariable(method = "send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", at = @At("HEAD"))
+    public Packet<?> onSendPacket(Packet<?> packet)
+    {
+    	PacketOutputEvent event = new PacketOutputEvent(packet);
+		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
+		this.event = event;
+		return event.getPacket();
+    }
+	
 	@Inject(at = {@At(value = "HEAD")},
 		method = {
-			"send(Lnet/minecraft/network/Packet;)V"},
+			"send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V"},
 		cancellable = true)
-	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
+	private void onSendPacket(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback, CallbackInfo ci)
 	{
-		PacketOutputEvent event = new PacketOutputEvent(packet);
-		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
-		packet = event.getPacket();
-		if(!event.isCancelled())
-			shadow$send(packet, null);
-		ci.cancel();
-	}
-	
-	@Shadow
-	private void shadow$send(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback)
-	{
-		
+		if(event.isCancelled())
+			ci.cancel();
+		event = null;
 	}
 }
