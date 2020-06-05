@@ -49,9 +49,9 @@ public abstract class ClientConnectionMixin
     public Packet<?> onSendPacket(Packet<?> packet)
     {
     	PacketOutputEvent event = new PacketOutputEvent(packet);
-		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
-		this.event = event;
-		return event.getPacket();
+    	WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
+    	this.event = event;
+    	return event.getPacket();
     }
 	
 	@Inject(at = {@At(value = "HEAD")},
