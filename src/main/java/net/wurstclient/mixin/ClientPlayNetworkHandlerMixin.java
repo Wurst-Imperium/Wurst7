@@ -67,13 +67,6 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onEntitySpawnGlobal(EntitySpawnGlobalS2CPacket var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
 	public void onMobSpawn(MobSpawnS2CPacket var1)
 	{
 		
