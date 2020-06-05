@@ -45,14 +45,14 @@ public abstract class ClientConnectionMixin
 			ci.cancel();
 	}
 	
-    @ModifyVariable(method = "send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", at = @At("HEAD"))
-    public Packet<?> onSendPacket(Packet<?> packet)
-    {
-    	PacketOutputEvent event = new PacketOutputEvent(packet);
-    	WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
-    	this.event = event;
-    	return event.getPacket();
-    }
+	@ModifyVariable(method = "send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", at = @At("HEAD"))
+	public Packet<?> onSendPacket(Packet<?> packet)
+	{
+		PacketOutputEvent event = new PacketOutputEvent(packet);
+		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
+		this.event = event;
+		return event.getPacket();
+	}
 	
 	@Inject(at = {@At(value = "HEAD")},
 		method = {
