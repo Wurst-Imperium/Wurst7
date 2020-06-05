@@ -181,7 +181,7 @@ public final class SearchHack extends Hack
 		// 20w21a: Assuming class_5321 is the new Dimension and using its
 		// toString() as an ID. Not sure why it has two Identifiers, but the
 		// combination should be unique for every dimension.
-		int dimensionId = MC.world.method_27983().toString().hashCode();
+		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
 		addSearchersInRange(center, range, currentBlock, dimensionId);
 		removeSearchersOutOfRange(center, range);

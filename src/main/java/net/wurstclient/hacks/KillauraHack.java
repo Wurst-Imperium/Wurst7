@@ -261,8 +261,8 @@ public final class KillauraHack extends Hack
 		RenderUtils.applyRenderOffset();
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = (renderTarget.getMaximumHealth() - renderTarget.getHealth())
-			/ renderTarget.getMaximumHealth();
+		float p = (renderTarget.getMaxHealth() - renderTarget.getHealth())
+			/ renderTarget.getMaxHealth();
 		float red = p * 2F;
 		float green = 2 - red;
 		
