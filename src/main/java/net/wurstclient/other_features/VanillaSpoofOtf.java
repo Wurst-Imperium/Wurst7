@@ -38,7 +38,6 @@ public final class VanillaSpoofOtf extends OtherFeature
 			return;
 		
 		CustomPayloadC2SPacketAccessor packet = (CustomPayloadC2SPacketAccessor)event.getPacket();
-		System.out.println(packet.getChannel());
 		if(packet.getChannel().getNamespace().equals("minecraft") && packet.getChannel().getPath().equals("register"))
 			event.cancel();
 		
