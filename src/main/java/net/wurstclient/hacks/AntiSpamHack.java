@@ -10,12 +10,12 @@ package net.wurstclient.hacks;
 import java.util.List;
 import java.util.Optional;
 
-import net.minecraft.class_5348;
-import net.minecraft.class_5348.Visitor;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringRenderable.Visitor;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -75,8 +75,9 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<class_5348> newLines = ChatMessages.breakRenderedChatMessageLines(
-			event.getComponent(), maxTextLength, MC.textRenderer);
+		List<StringRenderable> newLines =
+			ChatMessages.breakRenderedChatMessageLines(event.getComponent(),
+				maxTextLength, MC.textRenderer);
 		
 		int spamCounter = 1;
 		int matchingLines = 0;

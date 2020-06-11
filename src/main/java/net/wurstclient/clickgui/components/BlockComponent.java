@@ -135,7 +135,8 @@ public final class BlockComponent extends Component
 		DiffuseLighting.enable();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
-		WurstClient.MC.getItemRenderer().renderGuiItem(renderStack, 0, 0);
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
+			0, 0);
 		DiffuseLighting.disable();
 		
 		GL11.glPopMatrix();

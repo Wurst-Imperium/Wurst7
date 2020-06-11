@@ -278,8 +278,8 @@ public final class EditItemListScreen extends Screen
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
 				DiffuseLighting.enable();
-				mc.getItemRenderer()
-					.renderGuiItem(new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
+				mc.getItemRenderer().renderInGuiWithOverrides(
+					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disable();
 				GL11.glPopMatrix();
 				
@@ -305,7 +305,7 @@ public final class EditItemListScreen extends Screen
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
 				DiffuseLighting.enable();
-				mc.getItemRenderer().renderGuiItem(stack, 0, 0);
+				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
 				DiffuseLighting.disable();
 				
 				GL11.glPopMatrix();

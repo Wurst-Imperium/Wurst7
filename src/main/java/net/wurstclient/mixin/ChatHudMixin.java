@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
@@ -59,8 +59,8 @@ public class ChatHudMixin extends DrawableHelper
 	}
 	
 	@Shadow
-	private void shadow$addMessage(class_5348 arg, int messageId, int timestamp,
-		boolean bl)
+	private void shadow$addMessage(StringRenderable arg, int messageId,
+		int timestamp, boolean bl)
 	{
 		
 	}
