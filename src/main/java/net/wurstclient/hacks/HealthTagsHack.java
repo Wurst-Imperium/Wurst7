@@ -23,6 +23,9 @@ public final class HealthTagsHack extends Hack
 	{
 		super("HealthTags", "Shows the health of players in their nametags.");
 
+		addSetting(showMaxHealth);
+		addSetting(colorByPercentage);
+
 		setCategory(Category.RENDER);
 	}
 	
