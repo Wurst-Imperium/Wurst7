@@ -130,6 +130,29 @@ public final class TooManyHaxHack extends Hack
 		file.save();
 	}
 	
+	public void blockAll()
+	{
+		blockedFeatures.clear();
+		
+		ArrayList<Feature> features = new ArrayList<>();
+		features.addAll(WURST.getHax().getAllHax());
+		features.addAll(WURST.getCmds().getAllCmds());
+		features.addAll(WURST.getOtfs().getAllOtfs());
+		
+		for(Feature feature : features)
+		{
+			if(!feature.isSafeToBlock())
+				continue;
+			
+			blockedFeatures.add(feature);
+		}
+		
+		blockedFeatures
+			.sort(Comparator.comparing(f -> f.getName().toLowerCase()));
+		
+		file.save();
+	}
+	
 	public void unblockAll()
 	{
 		blockedFeatures.clear();

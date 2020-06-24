@@ -33,5 +33,9 @@
   },
   "suggests": {
     "flamingo": "*"
+  },
+  "breaks": {
+    "wi_zoom": "*",
+    "wi-zoom": "*"
   }
 }
