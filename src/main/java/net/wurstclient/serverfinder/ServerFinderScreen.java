@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
@@ -46,24 +47,26 @@ public class ServerFinderScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(searchButton = new ButtonWidget(width / 2 - 100,
-			height / 4 + 96 + 12, 200, 20, "Search", b -> searchOrCancel()));
+		addButton(searchButton =
+			new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20,
+				new LiteralText("Search"), b -> searchOrCancel()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, "Tutorial", b -> Util.getOperatingSystem().open(
+			20, new LiteralText("Tutorial"),
+			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		ipBox = new TextFieldWidget(font, width / 2 - 100, height / 4 + 34, 200,
-			20, "");
+		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
+			height / 4 + 34, 200, 20, new LiteralText(""));
 		ipBox.setMaxLength(200);
 		ipBox.setSelected(true);
 		children.add(ipBox);
 		
-		maxThreadsBox = new TextFieldWidget(font, width / 2 - 32,
-			height / 4 + 58, 26, 12, "");
+		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
+			height / 4 + 58, 26, 12, new LiteralText(""));
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
 		children.add(maxThreadsBox);
@@ -153,7 +156,8 @@ public class ServerFinderScreen extends Screen
 	{
 		ipBox.tick();
 		
-		searchButton.setMessage(state.isRunning() ? "Cancel" : "Search");
+		searchButton.setMessage(
+			new LiteralText(state.isRunning() ? "Cancel" : "Search"));
 		ipBox.active = !state.isRunning();
 		maxThreadsBox.active = !state.isRunning();
 		
@@ -206,37 +210,41 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
+		renderBackground(matrixStack);
 		
-		drawCenteredString(font, "Server Finder", width / 2, 20, 16777215);
-		drawCenteredString(font,
+		drawCenteredString(matrixStack, textRenderer, "Server Finder",
+			width / 2, 20, 16777215);
+		drawCenteredString(matrixStack, textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
 			10526880);
-		drawCenteredString(font, "to the IP you type into the field below.",
-			width / 2, 50, 10526880);
-		drawCenteredString(font,
+		drawCenteredString(matrixStack, textRenderer,
+			"to the IP you type into the field below.", width / 2, 50,
+			10526880);
+		drawCenteredString(matrixStack, textRenderer,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, 10526880);
 		
-		drawString(font, "Server address:", width / 2 - 100, height / 4 + 24,
+		drawStringWithShadow(matrixStack, textRenderer, "Server address:",
+			width / 2 - 100, height / 4 + 24, 10526880);
+		ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		
+		drawStringWithShadow(matrixStack, textRenderer, "Max. threads:",
+			width / 2 - 100, height / 4 + 60, 10526880);
+		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		
+		drawCenteredString(matrixStack, textRenderer, state.toString(),
+			width / 2, height / 4 + 73, 10526880);
+		
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
 			10526880);
-		ipBox.render(mouseX, mouseY, partialTicks);
+		drawStringWithShadow(matrixStack, textRenderer, "Working: " + working,
+			width / 2 - 100, height / 4 + 94, 10526880);
 		
-		drawString(font, "Max. threads:", width / 2 - 100, height / 4 + 60,
-			10526880);
-		maxThreadsBox.render(mouseX, mouseY, partialTicks);
-		
-		drawCenteredString(font, state.toString(), width / 2, height / 4 + 73,
-			10526880);
-		
-		drawString(font, "Checked: " + checked + " / 1792", width / 2 - 100,
-			height / 4 + 84, 10526880);
-		drawString(font, "Working: " + working, width / 2 - 100,
-			height / 4 + 94, 10526880);
-		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

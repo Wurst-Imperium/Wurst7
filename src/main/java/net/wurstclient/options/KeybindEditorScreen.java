@@ -10,6 +10,7 @@ package net.wurstclient.options;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 
@@ -47,17 +48,18 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, 60, 200, 20, "Change Key",
-			b -> minecraft.openScreen(new PressAKeyScreen(this))));
+		addButton(new ButtonWidget(width / 2 - 100, 60, 200, 20,
+			new LiteralText("Change Key"),
+			b -> client.openScreen(new PressAKeyScreen(this))));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200, 20,
-			"Save", b -> save()));
+			new LiteralText("Save"), b -> save()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200, 20,
-			"Cancel", b -> minecraft.openScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		commandField =
-			new TextFieldWidget(font, width / 2 - 100, 100, 200, 20, "");
+		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
+			200, 20, new LiteralText(""));
 		commandField.setMaxLength(65536);
 		children.add(commandField);
 		setInitialFocus(commandField);
@@ -73,7 +75,7 @@ public final class KeybindEditorScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
 		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getText());
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -90,20 +92,23 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
+		renderBackground(matrixStack);
 		
-		drawCenteredString(font, (oldKey != null ? "Edit" : "Add") + " Keybind",
-			width / 2, 20, 0xffffff);
+		drawCenteredString(matrixStack, textRenderer,
+			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
+			0xffffff);
 		
-		drawString(font, "Key: " + key.replace("key.keyboard.", ""),
-			width / 2 - 100, 47, 0xa0a0a0);
-		drawString(font, "Commands (separated by ';')", width / 2 - 100, 87,
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
 		
-		commandField.render(mouseX, mouseY, partialTicks);
-		super.render(mouseX, mouseY, partialTicks);
+		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

@@ -54,7 +54,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		ChatUtils.message("Now annoying " + target + ".");
 		
 		ClientPlayerEntity player = MC.player;
-		if(player != null && target.equals(player.getName().asString()))
+		if(player != null && target.equals(player.getName().getString()))
 			ChatUtils.warning("Annoying yourself is a bad idea!");
 		
 		EVENTS.add(ChatInputListener.class, this);

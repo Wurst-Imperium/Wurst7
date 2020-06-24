@@ -20,7 +20,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -177,7 +177,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -227,7 +227,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			.getNeededRotations(entity.getBoundingBox().getCenter());
 		WurstClient.MC.player.networkHandler
 			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
-				rotations.getPitch(), MC.player.onGround));
+				rotations.getPitch(), MC.player.isOnGround()));
 		
 		MC.interactionManager.attackEntity(player, entity);
 		player.swingHand(Hand.MAIN_HAND);

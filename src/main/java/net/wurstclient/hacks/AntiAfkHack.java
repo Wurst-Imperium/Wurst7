@@ -54,7 +54,7 @@ public final class AntiAfkHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		start = new BlockPos(MC.player);
+		start = new BlockPos(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
 		creativeFlying = MC.player.abilities.flying;
@@ -149,12 +149,11 @@ public final class AntiAfkHack extends Hack
 			}
 			
 			// face block
-			WURST.getRotationFaker().faceVectorClientIgnorePitch(
-				new Vec3d(nextBlock).add(0.5, 0.5, 0.5));
+			WURST.getRotationFaker()
+				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
 			
 			// walk
-			if(MC.player.squaredDistanceTo(
-				new Vec3d(nextBlock).add(0.5, 0.5, 0.5)) > 0.5)
+			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
 				MC.options.keyForward.setPressed(true);
 			else
 				MC.options.keyForward.setPressed(false);

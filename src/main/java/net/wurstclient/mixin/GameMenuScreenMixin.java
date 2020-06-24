@@ -19,6 +19,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
@@ -50,14 +52,15 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void addWurstOptionsButton()
 	{
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
-			204, 20, "            Options", b -> openWurstOptions());
+			204, 20, new LiteralText("            Options"),
+			b -> openWurstOptions());
 		
 		addButton(wurstOptionsButton);
 	}
 	
 	private void openWurstOptions()
 	{
-		minecraft.openScreen(new WurstOptionsScreen(this));
+		client.openScreen(new WurstOptionsScreen(this));
 	}
 	
 	private void removeFeedbackAndBugReportButtons()
@@ -72,16 +75,17 @@ public abstract class GameMenuScreenMixin extends Screen
 			return false;
 		
 		AbstractButtonWidget button = (AbstractButtonWidget)element;
-		String message = button.getMessage();
+		String message = button.getMessage().getString();
 		
 		return message != null
 			&& (message.equals(I18n.translate("menu.sendFeedback"))
 				|| message.equals(I18n.translate("menu.reportBugs")));
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"render(IIF)V"})
-	private void onRender(int mouseX, int mouseY, float partialTicks,
-		CallbackInfo ci)
+	@Inject(at = {@At("TAIL")},
+		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"})
+	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
@@ -94,7 +98,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1, 1, 1, 1);
 		
-		minecraft.getTextureManager().bindTexture(wurstTexture);
+		client.getTextureManager().bindTexture(wurstTexture);
 		
 		int x = wurstOptionsButton.x + 34;
 		int y = wurstOptionsButton.y + 2;
@@ -104,6 +108,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		blit(x, y, u, v, w, h, fw, fh);
+		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
 	}
 }

@@ -30,7 +30,7 @@ public class FlyPathProcessor extends PathProcessor
 	public void process()
 	{
 		// get positions
-		BlockPos pos = new BlockPos(MC.player);
+		BlockPos pos = new BlockPos(MC.player.getPos());
 		Vec3d posVec = MC.player.getPos();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
@@ -44,9 +44,10 @@ public class FlyPathProcessor extends PathProcessor
 			ticksOffPath = 0;
 		
 		// update index
-		if(posIndex > index || posVec.x >= nextBox.x1 && posVec.x <= nextBox.x2
-			&& posVec.y >= nextBox.y1 && posVec.y <= nextBox.y2
-			&& posVec.z >= nextBox.z1 && posVec.z <= nextBox.z2)
+		if(posIndex > index
+			|| posVec.x >= nextBox.minX && posVec.x <= nextBox.maxX
+				&& posVec.y >= nextBox.minY && posVec.y <= nextBox.maxY
+				&& posVec.z >= nextBox.minZ && posVec.z <= nextBox.maxZ)
 		{
 			if(posIndex > index)
 				index = posIndex + 1;
@@ -71,18 +72,17 @@ public class FlyPathProcessor extends PathProcessor
 		
 		lockControls();
 		MC.player.abilities.flying = creativeFlying;
-		boolean x = posVec.x < nextBox.x1 || posVec.x > nextBox.x2;
-		boolean y = posVec.y < nextBox.y1 || posVec.y > nextBox.y2;
-		boolean z = posVec.z < nextBox.z1 || posVec.z > nextBox.z2;
+		boolean x = posVec.x < nextBox.minX || posVec.x > nextBox.maxX;
+		boolean y = posVec.y < nextBox.minY || posVec.y > nextBox.maxY;
+		boolean z = posVec.z < nextBox.minZ || posVec.z > nextBox.maxZ;
 		boolean horizontal = x || z;
 		
 		// face next position
 		if(horizontal)
 		{
 			facePosition(nextPos);
-			if(Math.abs(MathHelper
-				.wrapDegrees(RotationUtils.getHorizontalAngleToLookVec(
-					new Vec3d(nextPos).add(0.5, 0.5, 0.5)))) > 1)
+			if(Math.abs(MathHelper.wrapDegrees(RotationUtils
+				.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 1)
 				return;
 		}
 		
@@ -123,9 +123,9 @@ public class FlyPathProcessor extends PathProcessor
 			MC.options.keyForward.setPressed(true);
 			
 			if(MC.player.horizontalCollision)
-				if(posVec.y > nextBox.y2)
+				if(posVec.y > nextBox.maxY)
 					MC.options.keySneak.setPressed(true);
-				else if(posVec.y < nextBox.y1)
+				else if(posVec.y < nextBox.minY)
 					MC.options.keyJump.setPressed(true);
 				
 			// vertical movement
@@ -138,7 +138,7 @@ public class FlyPathProcessor extends PathProcessor
 				return;
 			}
 			
-			if(posVec.y < nextBox.y1)
+			if(posVec.y < nextBox.minY)
 				MC.options.keyJump.setPressed(true);
 			else
 				MC.options.keySneak.setPressed(true);

@@ -19,7 +19,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -201,7 +201,7 @@ public final class ClickAuraHack extends Hack
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -242,7 +242,7 @@ public final class ClickAuraHack extends Hack
 		Rotation rotation = RotationUtils
 			.getNeededRotations(target.getBoundingBox().getCenter());
 		PlayerMoveC2SPacket.LookOnly packet = new PlayerMoveC2SPacket.LookOnly(
-			rotation.getYaw(), rotation.getPitch(), MC.player.onGround);
+			rotation.getYaw(), rotation.getPitch(), MC.player.isOnGround());
 		MC.player.networkHandler.sendPacket(packet);
 		
 		// attack entity

@@ -41,6 +41,6 @@ public final class TiredHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			MC.player.yaw, MC.player.age % 100, MC.player.onGround));
+			MC.player.yaw, MC.player.age % 100, MC.player.isOnGround()));
 	}
 }

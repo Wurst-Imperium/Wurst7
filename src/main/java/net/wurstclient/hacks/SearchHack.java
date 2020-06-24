@@ -177,7 +177,11 @@ public final class SearchHack extends Hack
 		
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
-		int dimensionId = MC.player.dimension.getRawId();
+		
+		// 20w21a: Assuming class_5321 is the new Dimension and using its
+		// toString() as an ID. Not sure why it has two Identifiers, but the
+		// combination should be unique for every dimension.
+		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
 		addSearchersInRange(center, range, currentBlock, dimensionId);
 		removeSearchersOutOfRange(center, range);

@@ -16,6 +16,8 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.RenderUtils;
@@ -42,13 +44,13 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	{
 		// OK button
 		removeButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
-			"Remove", b -> remove());
+			new LiteralText("Remove"), b -> remove());
 		removeButton.active = !selectedKey.isEmpty();
 		addButton(removeButton);
 		
 		// cancel button
 		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			"Cancel", b -> minecraft.openScreen(parent)));
+			new LiteralText("Cancel"), b -> client.openScreen(parent)));
 	}
 	
 	private void remove()
@@ -81,14 +83,14 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		WurstClient.INSTANCE.getNavigator()
 			.addPreference(parent.getFeature().getName());
 		
-		minecraft.openScreen(parent);
+		client.openScreen(parent);
 	}
 	
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
 		if(keyCode == 1)
-			minecraft.openScreen(parent);
+			client.openScreen(parent);
 	}
 	
 	@Override
@@ -110,12 +112,13 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(int mouseX, int mouseY, float partialTicks)
+	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(minecraft.textRenderer, "Remove Keybind", middleX,
-			32, 0xffffff);
+		drawCenteredString(matrixStack, client.textRenderer, "Remove Keybind",
+			middleX, 32, 0xffffff);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -163,10 +166,13 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawString(minecraft.textRenderer, key.replace("key.keyboard.", "")
-				+ ": " + keybind.getDescription(), x1 + 1, y1 + 1, 0xffffff);
-			drawString(minecraft.textRenderer, keybind.getCommand(), x1 + 1,
-				y1 + 1 + minecraft.textRenderer.fontHeight, 0xffffff);
+			drawStringWithShadow(matrixStack, client.textRenderer,
+				key.replace("key.keyboard.", "") + ": "
+					+ keybind.getDescription(),
+				x1 + 1, y1 + 1, 0xffffff);
+			drawStringWithShadow(matrixStack, client.textRenderer,
+				keybind.getCommand(), x1 + 1,
+				y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
@@ -176,8 +182,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
-			textY += minecraft.textRenderer.fontHeight;
+			drawStringWithShadow(matrixStack, client.textRenderer, line,
+				bgx1 + 2, textY, 0xffffff);
+			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -208,8 +215,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, button.getMessage(),
-				(x1 + x2) / 2, y1 + 4, 0xffffff);
+			drawCenteredString(matrixStack, client.textRenderer,
+				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
+				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}

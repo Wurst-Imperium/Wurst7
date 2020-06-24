@@ -10,6 +10,7 @@ package net.wurstclient.clickgui;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
@@ -60,7 +61,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -86,7 +87,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
 			drawValueBackground(x1, x2, yi1, yi2, hValue);
 			
-			drawValueName(x1, yi1, value);
+			drawValueName(matrixStack, x1, yi1, value);
 		}
 	}
 	
@@ -124,11 +125,12 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		GL11.glEnd();
 	}
 	
-	private void drawValueName(int x1, int yi1, Enum<?> value)
+	private void drawValueName(MatrixStack matrixStack, int x1, int yi1,
+		Enum<?> value)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		tr.draw(value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
+		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -33,14 +34,15 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 	private void onCreateButtons(CallbackInfo ci)
 	{
 		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 152,
-			height - 28, 150, 20, "", this::toggleWurst);
+			height - 28, 150, 20, new LiteralText(""), this::toggleWurst);
 		
 		updateWurstButtonText(toggleWurstButton);
 		addButton(toggleWurstButton);
 		
 		for(AbstractButtonWidget button : buttons)
 		{
-			if(!button.getMessage().equals(I18n.translate("gui.done")))
+			if(!button.getMessage().getString()
+				.equals(I18n.translate("gui.done")))
 				continue;
 			
 			button.x = width / 2 + 2;
@@ -60,6 +62,6 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		String text = (wurst.isEnabled() ? "Disable" : "Enable") + " Wurst";
-		button.setMessage(text);
+		button.setMessage(new LiteralText(text));
 	}
 }

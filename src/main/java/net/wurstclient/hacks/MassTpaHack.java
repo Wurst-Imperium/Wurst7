@@ -98,7 +98,7 @@ public final class MassTpaHack extends Hack
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		String message = event.getComponent().asString().toLowerCase();
+		String message = event.getComponent().getString().toLowerCase();
 		if(message.startsWith("\u00a7c[\u00a76wurst\u00a7c]"))
 			return;
 		

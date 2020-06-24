@@ -14,6 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -62,8 +63,7 @@ public final class TabGui implements KeyPressListener
 		width = 64;
 		for(Tab tab : tabs)
 		{
-			int tabWidth =
-				WurstClient.MC.textRenderer.getStringWidth(tab.name) + 10;
+			int tabWidth = WurstClient.MC.textRenderer.getWidth(tab.name) + 10;
 			if(tabWidth > width)
 				width = tabWidth;
 		}
@@ -113,7 +113,7 @@ public final class TabGui implements KeyPressListener
 			}
 	}
 	
-	public void render(float partialTicks)
+	public void render(MatrixStack matrixStack, float partialTicks)
 	{
 		if(tabGuiOtf.isHidden())
 			return;
@@ -147,7 +147,8 @@ public final class TabGui implements KeyPressListener
 			if(i == selected)
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
-			WurstClient.MC.textRenderer.draw(tabName, 2, textY, 0xffffffff);
+			WurstClient.MC.textRenderer.draw(matrixStack, tabName, 2, textY,
+				0xffffffff);
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -184,8 +185,8 @@ public final class TabGui implements KeyPressListener
 				if(i == tab.selected)
 					fName = ">" + fName;
 				
-				WurstClient.MC.textRenderer.draw(fName, 2, tabTextY,
-					0xffffffff);
+				WurstClient.MC.textRenderer.draw(matrixStack, fName, 2,
+					tabTextY, 0xffffffff);
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
@@ -294,8 +295,9 @@ public final class TabGui implements KeyPressListener
 			width = 64;
 			for(Feature feature : features)
 			{
-				int fWidth = WurstClient.MC.textRenderer
-					.getStringWidth(feature.getName()) + 10;
+				int fWidth =
+					WurstClient.MC.textRenderer.getWidth(feature.getName())
+						+ 10;
 				if(fWidth > width)
 					width = fWidth;
 			}
