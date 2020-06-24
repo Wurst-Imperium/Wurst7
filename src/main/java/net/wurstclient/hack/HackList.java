@@ -54,8 +54,6 @@ public final class HackList implements UpdateListener
 	public final AutoSwitchHack autoSwitchHack = new AutoSwitchHack();
 	public final AutoSwordHack autoSwordHack = new AutoSwordHack();
 	public final AutoToolHack autoToolHack = new AutoToolHack();
-	public final AutoTranslateHack autoTranslateChatHack =
-		new AutoTranslateHack();
 	public final AutoWalkHack autoWalkHack = new AutoWalkHack();
 	public final BaseFinderHack baseFinderHack = new BaseFinderHack();
 	public final BlinkHack blinkHack = new BlinkHack();
@@ -66,6 +64,8 @@ public final class HackList implements UpdateListener
 	public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
 	public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	public final CaveFinderHack caveFinderHack = new CaveFinderHack();
+	public final ChatTranslatorHack chatTranslatorHack =
+		new ChatTranslatorHack();
 	public final ChestEspHack chestEspHack = new ChestEspHack();
 	public final ClickAuraHack clickAuraHack = new ClickAuraHack();
 	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
