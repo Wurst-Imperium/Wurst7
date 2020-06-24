@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-public class GoogleTranslateService
+public class GoogleTranslate
 {
 	public String translate(String text, String langFrom, String langTo)
 	{
