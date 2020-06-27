@@ -44,7 +44,7 @@ public final class AutoTotemHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		if(MC.player.inventory.getInvStack(40).getItem() == Items.TOTEM_OF_UNDYING) {
+		if(MC.player.inventory.getStack(40).getItem() == Items.TOTEM_OF_UNDYING) {
 			return;
 		}
 
@@ -64,7 +64,7 @@ public final class AutoTotemHack extends Hack
 
 	  private OptionalInt findItem(final Item item) {
 		  for (int i = 0; i <= 36; i++) {
-			  if (MC.player.inventory.getInvStack(i).getItem() == item) {
+			  if (MC.player.inventory.getStack(i).getItem() == item) {
 				  return OptionalInt.of(i);
 			  }
 		  }
