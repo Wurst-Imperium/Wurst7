@@ -7,6 +7,7 @@
  */
 package net.wurstclient.options;
 
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.KeyBinding;
@@ -35,8 +36,9 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
-		String zoomKeyName = WurstClient.INSTANCE.getZoomKey().getBoundKey()
-			.getName().replace("key.keyboard.", "");
+		String zoomKeyName =
+			KeyBindingHelper.getBoundKeyOf(WurstClient.INSTANCE.getZoomKey())
+				.getName().replace("key.keyboard.", "");
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
 			20, "Back", b -> minecraft.openScreen(prevScreen)));
