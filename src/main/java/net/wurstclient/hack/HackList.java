@@ -108,6 +108,7 @@ public final class HackList implements UpdateListener
 	public final MileyCyrusHack mileyCyrusHack = new MileyCyrusHack();
 	public final MobEspHack mobEspHack = new MobEspHack();
 	public final MobSpawnEspHack mobSpawnEspHack = new MobSpawnEspHack();
+	public final MountBypassHack mountBypassHack = new MountBypassHack();
 	public final MultiAuraHack multiAuraHack = new MultiAuraHack();
 	public final NameProtectHack nameProtectHack = new NameProtectHack();
 	public final NameTagsHack nameTagsHack = new NameTagsHack();
