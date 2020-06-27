@@ -7,27 +7,33 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.OptionalInt;
-
-import net.minecraft.item.Item;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @SearchTags({"auto totem"})
 public final class AutoTotemHack extends Hack implements UpdateListener
 {
+	private int nextTickSlot;
+	
 	public AutoTotemHack()
 	{
-		super("AutoTotem", "Automatically moves totems to your off-hand.");
+		super("AutoTotem",
+			"Automatically moves totems of undying to your off-hand.");
 		setCategory(Category.COMBAT);
 	}
 	
 	@Override
 	public void onEnable()
 	{
+		nextTickSlot = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -40,30 +46,38 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.player.inventory.getStack(40).getItem() == Items.TOTEM_OF_UNDYING)
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		PlayerInventory inventory = MC.player.inventory;
+		
+		if(nextTickSlot != -1)
+		{
+			im.windowClick_PICKUP(nextTickSlot);
+			nextTickSlot = -1;
+		}
+		
+		ItemStack offhandStack = inventory.getStack(40);
+		if(offhandStack.getItem() == Items.TOTEM_OF_UNDYING)
 			return;
 		
-		if(MC.currentScreen != null)
+		if(MC.currentScreen instanceof HandledScreen
+			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
 			return;
 		
-		findItem(Items.TOTEM_OF_UNDYING).ifPresent(slot -> {
-			moveItem(slot, 45);
-		});
-	}
-	
-	public void moveItem(int slot1, int slot2)
-	{
-		IMC.getInteractionManager()
-			.windowClick_PICKUP(slot1 < 9 ? 36 + slot1 : slot1);
-		IMC.getInteractionManager().windowClick_PICKUP(slot2);
-	}
-	
-	private OptionalInt findItem(final Item item)
-	{
-		for(int i = 0; i <= 36; i++)
-			if(MC.player.inventory.getStack(i).getItem() == item)
-				return OptionalInt.of(i);
-		
-		return OptionalInt.empty();
+		for(int slot = 0; slot <= 36; slot++)
+		{
+			if(inventory.getStack(slot).getItem() != Items.TOTEM_OF_UNDYING)
+				continue;
+			
+			int newTotemSlot = slot < 9 ? slot + 36 : slot;
+			boolean offhandEmpty = offhandStack.isEmpty();
+			
+			im.windowClick_PICKUP(newTotemSlot);
+			im.windowClick_PICKUP(45);
+			
+			if(!offhandEmpty)
+				nextTickSlot = newTotemSlot;
+			
+			break;
+		}
 	}
 }
