@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -55,17 +55,17 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			nextTickSlot = -1;
 		}
 		
-		ItemStack offhandStack = inventory.getStack(40);
+		ItemStack offhandStack = inventory.getInvStack(40);
 		if(offhandStack.getItem() == Items.TOTEM_OF_UNDYING)
 			return;
 		
-		if(MC.currentScreen instanceof HandledScreen
+		if(MC.currentScreen instanceof ContainerScreen
 			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
 			return;
 		
 		for(int slot = 0; slot <= 36; slot++)
 		{
-			if(inventory.getStack(slot).getItem() != Items.TOTEM_OF_UNDYING)
+			if(inventory.getInvStack(slot).getItem() != Items.TOTEM_OF_UNDYING)
 				continue;
 			
 			int newTotemSlot = slot < 9 ? slot + 36 : slot;
