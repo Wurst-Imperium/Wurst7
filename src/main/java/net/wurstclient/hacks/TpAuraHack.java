@@ -94,6 +94,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting("Filter Armor Stands", "Won't attack armor stands", true);
 	
 	public TpAuraHack()
 	{
