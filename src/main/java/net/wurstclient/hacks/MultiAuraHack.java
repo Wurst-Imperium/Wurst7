@@ -94,6 +94,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting("Filter Armor Stands", "Won't attack armor stands", true);
 	
 	private int timer;
 	
@@ -219,6 +220,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		if (filterStands.isChecked()) stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		ArrayList<Entity> entities =
 			stream.collect(Collectors.toCollection(() -> new ArrayList<>()));
