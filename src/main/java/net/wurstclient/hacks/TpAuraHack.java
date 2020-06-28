@@ -207,6 +207,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		if (filterStands.isChecked()) stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		Entity entity =
 			stream.min(priority.getSelected().comparator).orElse(null);
