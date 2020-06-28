@@ -29,7 +29,9 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralText;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -84,7 +86,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(hasPrimaryAction)
 		{
 			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
-				hasHelp ? 149 : 302, 18, primaryAction, b -> {
+				hasHelp ? 149 : 302, 18, new LiteralText(primaryAction), b -> {
 					
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
@@ -97,7 +99,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					
 					feature.doPrimaryAction();
 					
-					primaryButton.setMessage(feature.getPrimaryAction());
+					primaryButton.setMessage(
+						new LiteralText(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
 				});
@@ -227,36 +230,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						minecraft.openScreen(new NavigatorRemoveKeybindScreen(
+						client.openScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
 				addKeybindButton.x -= 16;
 			}
 		}
-		
-		// see also
-		// Feature[] seeAlso = feature.getSeeAlso();
-		// if(seeAlso.length != 0)
-		// {
-		// text += "\n\nSee also:";
-		// for(Feature seeAlsoFeature : seeAlso)
-		// {
-		// int y = 60 + getTextHeight() + 2;
-		// String name = seeAlsoFeature.getName();
-		// text += "\n- " + name;
-		// buttonDatas.add(new ButtonData(middleX - 148, y,
-		// Fonts.segoe15.getStringWidth(name) + 1, 8, "", 0x404040)
-		// {
-		// @Override
-		// public void press()
-		// {
-		// mc.displayGuiScreen(
-		// new NavigatorFeatureScreen(seeAlsoFeature, parent));
-		// }
-		// });
-		// }
-		// }
 		
 		// text height
 		setContentHeight(getStringHeight(text));
@@ -268,7 +248,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(keyCode == GLFW.GLFW_KEY_ESCAPE)
 		{
 			parent.setExpanding(false);
-			minecraft.openScreen(parent);
+			client.openScreen(parent);
 		}
 	}
 	
@@ -287,7 +267,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons
 		if(activeButton != null)
 		{
-			minecraft.getSoundManager().play(
+			client.getSoundManager().play(
 				PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1));
 			activeButton.press();
 			WurstClient.INSTANCE.getNavigator()
@@ -320,12 +300,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(int mouseX, int mouseY, float partialTicks)
+	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(minecraft.textRenderer, feature.getName(), middleX,
-			32, 0xffffff);
+		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
+			middleX, 32, 0xffffff);
 		glDisable(GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -421,8 +402,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
-			window.getChild(i).render(mouseX - bgx1, mouseY - windowY,
-				partialTicks);
+			window.getChild(i).render(matrixStack, mouseX - bgx1,
+				mouseY - windowY, partialTicks);
 		GL11.glPopMatrix();
 		
 		// buttons
@@ -454,8 +435,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, buttonData.buttonText,
-				(x1 + x2) / 2, y1 + (buttonData.height - 10) / 2 + 1,
+			drawCenteredString(matrixStack, client.textRenderer,
+				buttonData.buttonText, (x1 + x2) / 2,
+				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
 			glDisable(GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -466,8 +448,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawString(minecraft.textRenderer, line, bgx1 + 2, textY, 0xffffff);
-			textY += minecraft.textRenderer.fontHeight;
+			drawStringWithShadow(matrixStack, client.textRenderer, line,
+				bgx1 + 2, textY, 0xffffff);
+			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -477,8 +460,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glPushMatrix();
 		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(mouseX - bgx1,
-			mouseY - bgy1 - scroll + 13);
+		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
+			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
 		GL11.glPopMatrix();
 		
 		// buttons below scissor box
@@ -509,8 +492,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(minecraft.textRenderer, button.getMessage(),
-				(x1 + x2) / 2, y1 + 4, 0xffffff);
+			drawCenteredString(matrixStack, client.textRenderer,
+				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
+				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		

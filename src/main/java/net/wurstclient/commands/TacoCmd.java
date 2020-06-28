@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.wurstclient.Category;
 import net.wurstclient.command.CmdException;
@@ -80,7 +81,7 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -101,7 +102,7 @@ public final class TacoCmd extends Command
 		int y = sr.getScaledHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		DrawableHelper.blit(x, y, 0, 0, w, h, w, h);
+		DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, w, h, w, h);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);

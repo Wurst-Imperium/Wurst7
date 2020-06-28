@@ -111,7 +111,7 @@ public final class FreecamHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		player.setVelocity(Vec3d.ZERO);
 		
-		player.onGround = false;
+		player.setOnGround(false);
 		player.flyingSpeed = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
 		

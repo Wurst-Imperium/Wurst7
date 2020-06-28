@@ -47,6 +47,6 @@ public final class EditAltScreen extends AltEditorScreen
 	protected void pressDoneButton()
 	{
 		altManager.edit(editedAlt, getEmail(), getPassword());
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 }

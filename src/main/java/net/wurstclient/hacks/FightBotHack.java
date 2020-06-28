@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -197,7 +197,7 @@ public final class FightBotHack extends Hack
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -268,7 +268,7 @@ public final class FightBotHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.onGround)
+			if(MC.player.horizontalCollision && MC.player.isOnGround())
 				MC.player.jump();
 			
 			// swim up if necessary
@@ -276,7 +276,7 @@ public final class FightBotHack extends Hack
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying
-			if(!MC.player.onGround
+			if(!MC.player.isOnGround()
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
@@ -326,7 +326,7 @@ public final class FightBotHack extends Hack
 		
 		public EntityPathFinder(Entity entity)
 		{
-			super(new BlockPos(entity));
+			super(new BlockPos(entity.getPos()));
 			this.entity = entity;
 			setThinkTime(1);
 		}
@@ -334,8 +334,9 @@ public final class FightBotHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done = entity.squaredDistanceTo(new Vec3d(current).add(0.5,
-				0.5, 0.5)) <= Math.pow(distance.getValue(), 2);
+			return done =
+				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= Math
+					.pow(distance.getValue(), 2);
 		}
 		
 		@Override

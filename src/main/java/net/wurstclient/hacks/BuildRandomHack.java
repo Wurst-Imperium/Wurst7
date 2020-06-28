@@ -107,8 +107,9 @@ public final class BuildRandomHack extends Hack
 		do
 		{
 			// generate random position
-			pos = new BlockPos(MC.player).add(random.nextInt(bound) - range,
-				random.nextInt(bound) - range, random.nextInt(bound) - range);
+			pos = new BlockPos(MC.player.getPos()).add(
+				random.nextInt(bound) - range, random.nextInt(bound) - range,
+				random.nextInt(bound) - range);
 			attempts++;
 			
 		}while(attempts < 128 && !tryToPlaceBlock(legitMode, pos));
@@ -191,7 +192,7 @@ public final class BuildRandomHack extends Hack
 	private boolean placeBlockLegit(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
@@ -202,7 +203,7 @@ public final class BuildRandomHack extends Hack
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d dirVec = new Vec3d(side.getVector());
+			Vec3d dirVec = Vec3d.of(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
 			// check if hitVec is within range (4.25 blocks)
@@ -225,7 +226,7 @@ public final class BuildRandomHack extends Hack
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookOnly packet =
 				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
-					rotation.getPitch(), MC.player.onGround);
+					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			
 			// place block
@@ -243,7 +244,7 @@ public final class BuildRandomHack extends Hack
 	private boolean placeBlockSimple_old(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		
 		for(Direction side : Direction.values())
 		{
@@ -253,8 +254,7 @@ public final class BuildRandomHack extends Hack
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 			
 			// check if hitVec is within range (6 blocks)
 			if(eyesPos.squaredDistanceTo(hitVec) > 36)

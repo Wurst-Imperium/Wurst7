@@ -16,13 +16,14 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -200,7 +201,7 @@ public final class BowAimbotHack extends Hack
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -322,7 +323,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -343,7 +344,7 @@ public final class BowAimbotHack extends Hack
 		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getStringWidth(message);
+		int msgWidth = MC.textRenderer.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
@@ -360,7 +361,7 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		MC.textRenderer.draw(message, 2, 1, 0xffffffff);
+		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		

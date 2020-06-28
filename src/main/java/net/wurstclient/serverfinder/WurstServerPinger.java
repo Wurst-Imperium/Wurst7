@@ -40,7 +40,7 @@ public class WurstServerPinger
 		
 		try
 		{
-			pinger.add(server);
+			pinger.add(server, () -> {});
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)

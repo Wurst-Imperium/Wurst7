@@ -21,7 +21,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -48,8 +48,11 @@ import net.wurstclient.util.RotationUtils;
 public final class KillauraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
-	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	private final SliderSetting range = new SliderSetting("Range",
+		"Determines how far Killaura will reach\n" + "to attack entitites.\n"
+			+ "Anything that is further away than the\n"
+			+ "specified value will not be attacked.",
+		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -61,33 +64,47 @@ public final class KillauraHack extends Hack
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+	
+	private final CheckboxSetting filterSleeping =
+		new CheckboxSetting("Filter sleeping",
+			"Won't attack sleeping players.\n\n"
+				+ "Useful for servers like Mineplex that place\n"
+				+ "sleeping players on the ground to make them\n"
+				+ "look like corpses.",
+			false);
+	
+	private final SliderSetting filterFlying = new SliderSetting(
+		"Filter flying",
+		"Won't attack players that are at least\n"
+			+ "the given distance above ground.\n\n"
+			+ "Useful for servers that place a flying\n"
+			+ "player behind you to try and detect\n" + "your Killaura.",
+		0, 0, 2, 0.05,
+		v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
+	
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
 		"Filter pigmen", "Won't attack zombie pigmen.", false);
+	
 	private final CheckboxSetting filterEndermen =
 		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals", "Won't attack pigs, cows, etc.", false);
+	
 	private final CheckboxSetting filterBabies =
 		new CheckboxSetting("Filter babies",
 			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
+	
 	private final CheckboxSetting filterPets =
 		new CheckboxSetting("Filter pets",
 			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
 	
 	private final CheckboxSetting filterVillagers = new CheckboxSetting(
 		"Filter villagers", "Won't attack villagers.", false);
+	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
@@ -187,7 +204,7 @@ public final class KillauraHack extends Hack
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -261,8 +278,8 @@ public final class KillauraHack extends Hack
 		RenderUtils.applyRenderOffset();
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = (renderTarget.getMaximumHealth() - renderTarget.getHealth())
-			/ renderTarget.getMaximumHealth();
+		float p = (renderTarget.getMaxHealth() - renderTarget.getHealth())
+			/ renderTarget.getMaxHealth();
 		float red = p * 2F;
 		float green = 2 - red;
 		

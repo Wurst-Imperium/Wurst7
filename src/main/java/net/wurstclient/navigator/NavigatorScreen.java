@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.awt.Rectangle;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 
@@ -133,7 +134,8 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(int mouseX, int mouseY, float partialTicks)
+	public final void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		// GL settings
 		glEnable(GL_BLEND);
@@ -172,7 +174,7 @@ public abstract class NavigatorScreen extends Screen
 				drawDownShadow(x1, y1, x2, y2);
 		}
 		
-		onRender(mouseX, mouseY, partialTicks);
+		onRender(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// GL resets
 		glEnable(GL_CULL_FACE);
@@ -199,12 +201,12 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(int mouseX, int mouseY,
-		float partialTicks);
+	protected abstract void onRender(MatrixStack matrixStack, int mouseX,
+		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)
 	{
-		int fontHeight = minecraft.textRenderer.fontHeight;
+		int fontHeight = client.textRenderer.fontHeight;
 		int height = fontHeight;
 		
 		for(int i = 0; i < s.length(); i++)

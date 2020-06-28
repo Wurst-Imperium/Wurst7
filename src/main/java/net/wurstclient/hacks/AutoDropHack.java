@@ -66,7 +66,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
-			ItemStack stack = MC.player.inventory.getInvStack(adjustedSlot);
+			ItemStack stack = MC.player.inventory.getStack(adjustedSlot);
 			
 			if(stack.isEmpty())
 				continue;
