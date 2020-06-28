@@ -461,6 +461,7 @@ public final class ExcavatorHack extends Hack
 			
 			// break all blocks
 			BlockBreaker.breakBlocksWithPacketSpam(validBlocks);
+			
 		}else
 		{
 			ArrayList<BlockPos> blocks = new ArrayList<>();
