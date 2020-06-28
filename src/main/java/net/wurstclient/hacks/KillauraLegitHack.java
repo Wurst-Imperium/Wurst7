@@ -96,6 +96,7 @@ public final class KillauraLegitHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", true);
+	private final CheckboxSetting filterStands = new CheckboxSetting("Filter Armor Stands", "Won't attack armor stands", true);
 	
 	private LivingEntity target;
 	
@@ -214,6 +215,7 @@ public final class KillauraLegitHack extends Hack
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		if (filterStands.isChecked()) stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
