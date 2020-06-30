@@ -8,6 +8,10 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -29,7 +33,7 @@ public final class HealthTagsHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	public String addHealth(LivingEntity entity, String nametag)
+	public Text addHealth(LivingEntity entity, Text nametag)
 	{
 		if(!isEnabled())
 			return nametag;
@@ -37,46 +41,47 @@ public final class HealthTagsHack extends Hack
 		float health = entity.getHealth();
 		float maxHealth = entity.getMaximumHealth();
 
+		int health = (int)entity.getHealth();
+
+		MutableText formattedHealth = new LiteralText(" ").append(Integer.toString(health)).formatted(getColor(health));
+		return ((MutableText)nametag).append(formattedHealth);
+
 		if (showMaxHealth.isChecked())
 			return nametag + " " + getColor(health, maxHealth) + (int)health + "/" + (int)maxHealth;
 
 		return nametag + " " + getColor(health, maxHealth) + (int)health;
 	}
 	
-	private String getColor(float health, float maxHealth)
+	private Formatting getColor(float health, float maxHealth)
 	{
-		final String colorDarkRed = "\u00a74";
-		final String colorGold = "\u00a76";
-		final String colorYellow = "\u00a7e";
-		final String colorGreen = "\u00a7a";
-
 		if (colorByPercentage.isChecked())
 		{
 			float percentage = health / maxHealth;
 
 			if (percentage <= 0.25)
-				return colorDarkRed;
+				return Formatting.DARK_RED;
 
 			if (percentage <= 0.5)
-				return colorGold;
+				return Formatting.GOLD;
 
 			if (percentage <= 0.75)
-				return colorYellow;
+				return Formatting.YELLOW;
 
-			return colorGreen;
 		}
 		else
 		{
-			if (health <= 5)
-				return "\u00a74";
+			if(health <= 5)
+				return Formatting.DARK_RED;
 
-			if (health <= 10)
-				return "\u00a76";
+			if(health <= 10)
+				return Formatting.GOLD;
 
-			if (health <= 15)
-				return "\u00a7e";
+			if(health <= 15)
+				return Formatting.YELLOW;
 
-			return "\u00a7a";
 		}
+		return Formatting.GREEN;
+
 	}
+
 }
