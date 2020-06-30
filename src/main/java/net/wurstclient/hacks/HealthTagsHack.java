@@ -38,18 +38,22 @@ public final class HealthTagsHack extends Hack
 		if(!isEnabled())
 			return nametag;
 
+		// Keep as float for more precise health color calculations.
 		float health = entity.getHealth();
-		float maxHealth = entity.getMaximumHealth();
+		float maxHealth = entity.getMaxHealth();
 
-		int health = (int)entity.getHealth();
 
-		MutableText formattedHealth = new LiteralText(" ").append(Integer.toString(health)).formatted(getColor(health));
-		return ((MutableText)nametag).append(formattedHealth);
-
+		MutableText formattedHealth;
 		if (showMaxHealth.isChecked())
-			return nametag + " " + getColor(health, maxHealth) + (int)health + "/" + (int)maxHealth;
+		{
+			formattedHealth = new LiteralText(" ").append(String.format("%.0f", health)).append("/").append(String.format("%.0f", maxHealth)).formatted(getColor(health, maxHealth));
+		}
+		else
+		{
+			formattedHealth = new LiteralText(" ").append(String.format("%.0f", health)).formatted(getColor(health, maxHealth));
+		}
 
-		return nametag + " " + getColor(health, maxHealth) + (int)health;
+		return ((MutableText)nametag).append(formattedHealth);
 	}
 	
 	private Formatting getColor(float health, float maxHealth)
