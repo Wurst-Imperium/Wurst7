@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.Monster;
@@ -33,7 +34,8 @@ public final class RadarComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();

@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -26,7 +27,7 @@ public final class BlockListEditButton extends Component
 		this.setting = setting;
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		buttonWidth = fr.getStringWidth("Edit...");
+		buttonWidth = fr.getWidth("Edit...");
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
@@ -46,7 +47,8 @@ public final class BlockListEditButton extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
@@ -102,8 +104,8 @@ public final class BlockListEditButton extends Component
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getBlockNames().size();
-		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw("Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
@@ -113,7 +115,7 @@ public final class BlockListEditButton extends Component
 	{
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getBlockNames().size();
-		return fr.getStringWidth(text) + buttonWidth + 6;
+		return fr.getWidth(text) + buttonWidth + 6;
 	}
 	
 	@Override

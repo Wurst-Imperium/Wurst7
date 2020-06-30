@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -35,7 +36,7 @@ public final class FileComponent extends Component
 			return;
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
@@ -45,7 +46,8 @@ public final class FileComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
@@ -53,7 +55,7 @@ public final class FileComponent extends Component
 		float opacity = gui.getOpacity();
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -108,8 +110,9 @@ public final class FileComponent extends Component
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		String text = setting.getName() + ": ";
-		fr.draw(text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw(setting.getSelectedFileName(), x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, setting.getSelectedFileName(), x3 + 2, y1 + 2,
+			0xf0f0f0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
@@ -120,9 +123,9 @@ public final class FileComponent extends Component
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		
 		String text = setting.getName() + ": ";
-		int buttonWidth = fr.getStringWidth(setting.getSelectedFileName());
+		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
 		
-		return fr.getStringWidth(text) + buttonWidth + 6;
+		return fr.getWidth(text) + buttonWidth + 6;
 	}
 	
 	@Override

@@ -13,11 +13,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
+import net.wurstclient.util.ListWidget;
 
 public final class KeybindManagerScreen extends Screen
 {
@@ -38,39 +39,42 @@ public final class KeybindManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, width, height, 36, height - 56, 30);
+		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addButton(addButton =
-			new ButtonWidget(width / 2 - 102, height - 52, 100, 20, "Add",
-				b -> minecraft.openScreen(new KeybindEditorScreen(this))));
+		addButton(addButton = new ButtonWidget(width / 2 - 102, height - 52,
+			100, 20, new LiteralText("Add"),
+			b -> client.openScreen(new KeybindEditorScreen(this))));
 		
 		addButton(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
-			20, "Edit", b -> edit()));
+			20, new LiteralText("Edit"), b -> edit()));
 		
 		addButton(removeButton = new ButtonWidget(width / 2 - 102, height - 28,
-			100, 20, "Remove", b -> remove()));
+			100, 20, new LiteralText("Remove"), b -> remove()));
 		
 		addButton(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 100, 20, "Reset Keybinds",
-			b -> minecraft.openScreen(new ConfirmScreen(confirmed -> {
-				if(confirmed)
-					WurstClient.INSTANCE.getKeybinds()
-						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-				minecraft.openScreen(this);
-			}, new LiteralText("Are you sure you want to reset your keybinds?"),
-				new LiteralText("This cannot be undone!")))));
+		addButton(
+			new ButtonWidget(8, 8, 100, 20, new LiteralText("Reset Keybinds"),
+				b -> client.openScreen(new ConfirmScreen(confirmed -> {
+					if(confirmed)
+						WurstClient.INSTANCE.getKeybinds()
+							.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
+					client.openScreen(this);
+				}, new LiteralText(
+					"Are you sure you want to reset your keybinds?"),
+					new LiteralText("This cannot be undone!")))));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Profiles...",
-			b -> minecraft.openScreen(new KeybindProfilesScreen(this))));
+		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+			new LiteralText("Profiles..."),
+			b -> client.openScreen(new KeybindProfilesScreen(this))));
 	}
 	
 	private void edit()
 	{
 		Keybind keybind = WurstClient.INSTANCE.getKeybinds().getAllKeybinds()
 			.get(listGui.selected);
-		minecraft.openScreen(new KeybindEditorScreen(this, keybind.getKey(),
+		client.openScreen(new KeybindEditorScreen(this, keybind.getKey(),
 			keybind.getCommands()));
 	}
 	
@@ -147,16 +151,18 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(font, "Keybind Manager", width / 2, 8, 0xffffff);
-		drawCenteredString(font, "Keybinds: " + listGui.getItemCount(),
-			width / 2, 20, 0xffffff);
+		drawCenteredString(matrixStack, textRenderer, "Keybind Manager",
+			width / 2, 8, 0xffffff);
+		drawCenteredString(matrixStack, textRenderer,
+			"Keybinds: " + listGui.getItemCount(), width / 2, 20, 0xffffff);
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -204,17 +210,17 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int index, int x, int y, int slotHeight,
-			int mouseX, int mouseY, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int index, int x,
+			int y, int slotHeight, int mouseX, int mouseY, float partialTicks)
 		{
 			Keybind keybind =
 				WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(index);
 			
-			minecraft.textRenderer.draw(
+			client.textRenderer.draw(matrixStack,
 				"Key: " + keybind.getKey().replace("key.keyboard.", ""), x + 3,
 				y + 3, 0xa0a0a0);
-			minecraft.textRenderer.draw("Commands: " + keybind.getCommands(),
-				x + 3, y + 15, 0xa0a0a0);
+			client.textRenderer.draw(matrixStack,
+				"Commands: " + keybind.getCommands(), x + 3, y + 15, 0xa0a0a0);
 		}
 	}
 }

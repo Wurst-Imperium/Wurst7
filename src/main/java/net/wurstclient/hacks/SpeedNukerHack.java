@@ -114,10 +114,10 @@ public final class SpeedNukerHack extends Hack
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	

@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
@@ -126,7 +126,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-food items
-			Item item = MC.player.inventory.getInvStack(i).getItem();
+			Item item = MC.player.inventory.getStack(i).getItem();
 			if(!item.isFood())
 				continue;
 			
@@ -152,7 +152,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
 		{
-			StatusEffect effect = pair.getLeft().getEffectType();
+			StatusEffect effect = pair.getFirst().getEffectType();
 			
 			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
 				return false;

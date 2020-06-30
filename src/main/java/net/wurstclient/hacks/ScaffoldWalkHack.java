@@ -51,7 +51,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		BlockPos belowPlayer = new BlockPos(MC.player).down();
+		BlockPos belowPlayer = new BlockPos(MC.player.getPos()).down();
 		
 		// check if block is already placed
 		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())
@@ -62,15 +62,14 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-block items
-			ItemStack stack = MC.player.inventory.getInvStack(i);
+			ItemStack stack = MC.player.inventory.getStack(i);
 			if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 				continue;
 			
 			// filter out non-solid blocks
 			Block block = Block.getBlockFromItem(stack.getItem());
 			BlockState state = block.getDefaultState();
-			if(!Block.isShapeFullCube(state
-				.getCullingShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN)))
+			if(!state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
 				continue;
 			
 			// filter out blocks that would fall
@@ -108,17 +107,16 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			Direction side2 = side.getOpposite();
 			
 			// check if side is visible (facing away from player)
-			if(eyesPos
-				.squaredDistanceTo(new Vec3d(pos).add(0.5, 0.5, 0.5)) >= eyesPos
-					.squaredDistanceTo(new Vec3d(neighbor).add(0.5, 0.5, 0.5)))
+			if(eyesPos.squaredDistanceTo(Vec3d.ofCenter(pos)) >= eyesPos
+				.squaredDistanceTo(Vec3d.ofCenter(neighbor)))
 				continue;
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d hitVec = new Vec3d(neighbor).add(0.5, 0.5, 0.5)
-				.add(new Vec3d(side2.getVector()).multiply(0.5));
+			Vec3d hitVec = Vec3d.ofCenter(neighbor)
+				.add(Vec3d.of(side2.getVector()).multiply(0.5));
 			
 			// check if hitVec is within range (4.25 blocks)
 			if(eyesPos.squaredDistanceTo(hitVec) > 18.0625)
@@ -128,7 +126,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookOnly packet =
 				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
-					rotation.getPitch(), MC.player.onGround);
+					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);

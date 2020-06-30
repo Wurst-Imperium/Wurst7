@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -131,7 +131,7 @@ public final class FollowHack extends Hack
 	public String getRenderName()
 	{
 		if(entity != null)
-			return "Following " + entity.getName().asString();
+			return "Following " + entity.getName().getString();
 		else
 			return "Follow";
 	}
@@ -170,7 +170,8 @@ public final class FollowHack extends Hack
 				stream = stream.filter(e -> !(e instanceof Monster));
 			
 			if(filterPigmen.isChecked())
-				stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+				stream =
+					stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 			
 			if(filterEndermen.isChecked())
 				stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -216,7 +217,7 @@ public final class FollowHack extends Hack
 		pathFinder = new EntityPathFinder();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		ChatUtils.message("Now following " + entity.getName().asString());
+		ChatUtils.message("Now following " + entity.getName().getString());
 	}
 	
 	@Override
@@ -232,7 +233,7 @@ public final class FollowHack extends Hack
 		
 		if(entity != null)
 			ChatUtils
-				.message("No longer following " + entity.getName().asString());
+				.message("No longer following " + entity.getName().getString());
 		
 		entity = null;
 	}
@@ -258,8 +259,8 @@ public final class FollowHack extends Hack
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> entity.getName().asString()
-					.equalsIgnoreCase(e.getName().asString()))
+				.filter(e -> entity.getName().getString()
+					.equalsIgnoreCase(e.getName().getString()))
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);
@@ -308,7 +309,7 @@ public final class FollowHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.onGround)
+			if(MC.player.horizontalCollision && MC.player.isOnGround())
 				MC.player.jump();
 			
 			// swim up if necessary
@@ -316,7 +317,7 @@ public final class FollowHack extends Hack
 				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
 			
 			// control height if flying
-			if(!MC.player.onGround
+			if(!MC.player.isOnGround()
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
@@ -359,14 +360,14 @@ public final class FollowHack extends Hack
 	{
 		public EntityPathFinder()
 		{
-			super(new BlockPos(entity));
+			super(new BlockPos(entity.getPos()));
 			setThinkTime(1);
 		}
 		
 		@Override
 		protected boolean checkDone()
 		{
-			Vec3d center = new Vec3d(current).add(0.5, 0.5, 0.5);
+			Vec3d center = Vec3d.ofCenter(current);
 			double distanceSq = Math.pow(distance.getValue(), 2);
 			return done = entity.squaredDistanceTo(center) <= distanceSq;
 		}

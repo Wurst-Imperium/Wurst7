@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.screens;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
@@ -18,10 +19,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.util.ListWidget;
 
 public final class SelectFileScreen extends Screen
 {
@@ -47,17 +49,17 @@ public final class SelectFileScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, setting.listFiles());
+		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addButton(
-			new ButtonWidget(8, 8, 100, 20, "Open Folder", b -> openFolder()));
-		addButton(new ButtonWidget(width - 108, 8, 100, 20, "Reset to Defaults",
-			b -> askToConfirmReset()));
+		addButton(new ButtonWidget(8, 8, 100, 20,
+			new LiteralText("Open Folder"), b -> openFolder()));
+		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
 		
 		doneButton = addButton(new ButtonWidget(width / 2 - 102, height - 48,
-			100, 20, "Done", b -> done()));
+			100, 20, new LiteralText("Done"), b -> done()));
 		addButton(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			"Cancel", b -> openPrevScreen()));
+			new LiteralText("Cancel"), b -> openPrevScreen()));
 	}
 	
 	private void openFolder()
@@ -67,7 +69,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	private void done()
@@ -91,7 +93,7 @@ public final class SelectFileScreen extends Screen
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
-		minecraft.openScreen(
+		client.openScreen(
 			new ConfirmScreen(c -> confirmReset(c), title, message));
 	}
 	
@@ -100,7 +102,7 @@ public final class SelectFileScreen extends Screen
 		if(confirmed)
 			setting.resetFolder();
 		
-		minecraft.openScreen(SelectFileScreen.this);
+		client.openScreen(SelectFileScreen.this);
 	}
 	
 	@Override
@@ -160,18 +162,21 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(minecraft.textRenderer, setting.getName(), width / 2,
-			12, 0xffffff);
+		drawCenteredString(matrixStack, client.textRenderer, setting.getName(),
+			width / 2, 12, 0xffffff);
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		if(doneButton.isHovered() && !doneButton.active)
-			renderTooltip("You must first select a file.", mouseX, mouseY);
+			renderTooltip(matrixStack,
+				Arrays.asList(new LiteralText("You must first select a file.")),
+				mouseX, mouseY);
 	}
 	
 	private static class ListGui extends ListWidget
@@ -217,15 +222,16 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int index, int x, int y, int var4, int var5,
-			int var6, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int index, int x,
+			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			TextRenderer fr = mc.textRenderer;
 			
 			Path path = list.get(index);
-			fr.draw("" + path.getFileName(), x + 28, y, 0xf0f0f0);
-			fr.draw("" + minecraft.runDirectory.toPath().relativize(path),
-				x + 28, y + 9, 0xa0a0a0);
+			fr.draw(matrixStack, "" + path.getFileName(), x + 28, y, 0xf0f0f0);
+			fr.draw(matrixStack,
+				"" + client.runDirectory.toPath().relativize(path), x + 28,
+				y + 9, 0xa0a0a0);
 		}
 	}
 }

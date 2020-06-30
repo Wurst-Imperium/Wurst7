@@ -5,12 +5,12 @@
   "mixins": [
   ],
   "client": [
+  	"AbstractBlockStateMixin",
     "ArmorItemMixin",
     "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
-  	"BlockStateMixin",
   	"ButtonWidgetMixin",
   	"CactusBlockMixin",
   	"CameraMixin",
@@ -45,12 +45,13 @@
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",
+    "SignBlockEntityMixin",
     "SignEditScreenMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",
-    "TextRendererMixin",
+    "TextVisitFactoryMixin",
     "TitleScreenMixin",
     "WorldMixin"
   ],

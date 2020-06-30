@@ -7,6 +7,8 @@
  */
 package net.wurstclient.clickgui;
 
+import net.minecraft.client.util.math.MatrixStack;
+
 public abstract class Component
 {
 	private int x;
@@ -21,7 +23,8 @@ public abstract class Component
 		
 	}
 	
-	public abstract void render(int mouseX, int mouseY, float partialTicks);
+	public abstract void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks);
 	
 	public abstract int getDefaultWidth();
 	

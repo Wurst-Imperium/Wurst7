@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
 public class PressAKeyScreen extends Screen
@@ -33,13 +34,13 @@ public class PressAKeyScreen extends Screen
 		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(getKeyName(keyCode, scanCode));
 		
-		minecraft.openScreen((Screen)prevScreen);
+		client.openScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
 	
 	private String getKeyName(int keyCode, int scanCode)
 	{
-		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 	}
 	
 	@Override
@@ -49,11 +50,12 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		drawCenteredString(font, "Press a key", width / 2, height / 4 + 48,
-			16777215);
-		super.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, textRenderer, "Press a key", width / 2,
+			height / 4 + 48, 16777215);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 }

@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -131,7 +131,7 @@ public final class ProtectHack extends Hack
 	public String getRenderName()
 	{
 		if(friend != null)
-			return "Protecting " + friend.getName().asString();
+			return "Protecting " + friend.getName().getString();
 		else
 			return "Protect";
 	}
@@ -234,7 +234,7 @@ public final class ProtectHack extends Hack
 			stream = stream.filter(e -> !(e instanceof Monster));
 		
 		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
@@ -307,7 +307,7 @@ public final class ProtectHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.onGround)
+			if(MC.player.horizontalCollision && MC.player.isOnGround())
 				MC.player.jump();
 			
 			// swim up if necessary
@@ -315,7 +315,7 @@ public final class ProtectHack extends Hack
 				MC.player.addVelocity(0, 0.04, 0);
 			
 			// control height if flying
-			if(!MC.player.onGround
+			if(!MC.player.isOnGround()
 				&& (MC.player.abilities.flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
@@ -375,7 +375,7 @@ public final class ProtectHack extends Hack
 		
 		public EntityPathFinder(Entity entity, double distance)
 		{
-			super(new BlockPos(entity));
+			super(new BlockPos(entity.getPos()));
 			this.entity = entity;
 			distanceSq = distance * distance;
 			setThinkTime(1);
@@ -384,8 +384,8 @@ public final class ProtectHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done = entity.squaredDistanceTo(
-				new Vec3d(current).add(0.5, 0.5, 0.5)) <= distanceSq;
+			return done =
+				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= distanceSq;
 		}
 		
 		@Override

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.screens.AltManagerScreen;
@@ -36,12 +37,14 @@ public abstract class TitleScreenMixin extends Screen
 			return;
 		
 		addButton(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98, 20,
-			"Alt Manager", b -> minecraft.openScreen(new AltManagerScreen(this,
+			new LiteralText("Alt Manager"),
+			b -> client.openScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 		
 		for(AbstractButtonWidget button : buttons)
 		{
-			if(!button.getMessage().equals(I18n.translate("menu.online")))
+			if(!button.getMessage().getString()
+				.equals(I18n.translate("menu.online")))
 				continue;
 			
 			button.setWidth(98);

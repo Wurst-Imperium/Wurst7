@@ -13,11 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 
+import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityContext;
-import net.minecraft.state.AbstractState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
@@ -25,29 +26,35 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
-@Mixin(BlockState.class)
-public class BlockStateMixin extends AbstractState<Block, BlockState>
-	implements State<BlockState>
+@Mixin(AbstractBlockState.class)
+public class AbstractBlockStateMixin extends State<Block, BlockState>
 {
-	private BlockStateMixin(WurstClient wurst, Block object_1,
-		ImmutableMap<Property<?>, Comparable<?>> immutableMap_1)
+	private AbstractBlockStateMixin(WurstClient wurst, Block object,
+		ImmutableMap<Property<?>, Comparable<?>> immutableMap,
+		MapCodec<BlockState> mapCodec)
 	{
-		super(object_1, immutableMap_1);
+		super(object, immutableMap, mapCodec);
 	}
 	
 	@Inject(at = {@At("TAIL")},
 		method = {
-			"isSimpleFullBlock(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
+			"isFullCube(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
 		cancellable = true)
-	private void onIsSimpleFullBlock(CallbackInfoReturnable<Boolean> cir)
+	private void onIsFullCube(BlockView world, BlockPos pos,
+		CallbackInfoReturnable<Boolean> cir)
 	{
+		EventManager eventManager = WurstClient.INSTANCE.getEventManager();
+		if(eventManager == null)
+			return;
+		
 		IsNormalCubeEvent event = new IsNormalCubeEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		eventManager.fire(event);
 		
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
@@ -69,12 +76,12 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/EntityContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetOutlineShape(BlockView view, BlockPos pos,
-		EntityContext context, CallbackInfoReturnable<VoxelShape> cir)
+		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
 	{
-		if(context == EntityContext.absent())
+		if(context == ShapeContext.absent())
 			return;
 		
 		HackList hax = WurstClient.INSTANCE.getHax();

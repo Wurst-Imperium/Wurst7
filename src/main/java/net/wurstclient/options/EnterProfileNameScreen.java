@@ -15,6 +15,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
 public final class EnterProfileNameScreen extends Screen
@@ -39,9 +40,10 @@ public final class EnterProfileNameScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		
-		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, "");
+		valueField =
+			new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
 		valueField.setText("");
 		valueField.setSelectionStart(0);
 		
@@ -49,7 +51,8 @@ public final class EnterProfileNameScreen extends Screen
 		setInitialFocus(valueField);
 		valueField.setSelected(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
+		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+			b -> done());
 		addButton(doneButton);
 	}
 	
@@ -59,7 +62,7 @@ public final class EnterProfileNameScreen extends Screen
 		if(!value.isEmpty())
 			callback.accept(value);
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -72,7 +75,7 @@ public final class EnterProfileNameScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			break;
 		}
 		
@@ -86,14 +89,15 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		drawCenteredString(minecraft.textRenderer, "Name your new profile",
-			width / 2, 20, 0xFFFFFF);
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, client.textRenderer,
+			"Name your new profile", width / 2, 20, 0xFFFFFF);
 		
-		valueField.render(mouseX, mouseY, partialTicks);
-		super.render(mouseX, mouseY, partialTicks);
+		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

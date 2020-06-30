@@ -54,7 +54,7 @@ public final class InvseeCmd extends Command implements RenderListener
 				continue;
 			
 			OtherClientPlayerEntity player = (OtherClientPlayerEntity)entity;
-			String otherPlayerName = player.getName().asString();
+			String otherPlayerName = player.getName().getString();
 			if(!otherPlayerName.equalsIgnoreCase(targetName))
 				continue;
 			
