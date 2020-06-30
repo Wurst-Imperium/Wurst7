@@ -43,8 +43,8 @@ public abstract class EntityRendererMixin<T extends Entity>
 		int i, CallbackInfo ci)
 	{
 		if(entity instanceof LivingEntity)
-			text = new LiteralText(WurstClient.INSTANCE.getHax().healthTagsHack
-				.addHealth((LivingEntity)entity, text.getString()));
+			text = WurstClient.INSTANCE.getHax().healthTagsHack
+				.addHealth((LivingEntity)entity, text);
 		
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
 			vertexConsumerProvider, i);
