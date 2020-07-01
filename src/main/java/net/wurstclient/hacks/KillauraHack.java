@@ -252,6 +252,7 @@ public final class KillauraHack extends Hack
 			return;
 		
 		ClientPlayerEntity player = MC.player;
+		if (WURST.getHax().criticalsHack.isEnabled()) WURST.getHax().criticalsHack.doCritical()
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 		
