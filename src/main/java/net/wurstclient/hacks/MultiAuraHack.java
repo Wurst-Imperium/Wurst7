@@ -230,6 +230,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
+			if (WURST.getHax().criticalsHack.isEnabled()) WURST.getHax().criticalsHack.doCritical()
 			RotationUtils.Rotation rotations = RotationUtils
 				.getNeededRotations(entity.getBoundingBox().getCenter());
 			
