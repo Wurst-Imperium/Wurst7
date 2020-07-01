@@ -29,7 +29,6 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			cir.setReturnValue(0F);
 	}
 	
-	@Override
 	public float getSkyAngle(float tickDelta)
 	{
 		NoWeatherHack noWeatherHack =
@@ -42,7 +41,6 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 		return getDimension().method_28528(timeOfDay);
 	}
 	
-	@Override
 	public int getMoonPhase()
 	{
 		NoWeatherHack noWeatherHack =
