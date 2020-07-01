@@ -228,7 +228,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WurstClient.MC.player.networkHandler
 			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
 				rotations.getPitch(), MC.player.isOnGround()));
-		if (WURST.getHax().criticalsHack.isEnabled()) WURST.getHax().criticalsHack.doCritical()
+		if (WURST.getHax().criticalsHack.isEnabled()) WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, entity);
 		player.swingHand(Hand.MAIN_HAND);
 	}
