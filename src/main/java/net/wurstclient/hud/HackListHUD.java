@@ -7,12 +7,6 @@
  */
 package net.wurstclient.hud;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,6 +16,12 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.other_features.HackListOtf;
 import net.wurstclient.other_features.HackListOtf.Mode;
 import net.wurstclient.other_features.HackListOtf.Position;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 public final class HackListHUD implements UpdateListener
 {
@@ -81,12 +81,32 @@ public final class HackListHUD implements UpdateListener
 	
 	private void drawHackList(MatrixStack matrixStack, float partialTicks)
 	{
+		TreeSet<Hack> hiddenHacks = WurstClient.INSTANCE.getCmds().hackListCmd.getHiddenHacks();
+
 		if(otf.isAnimations())
+		{
 			for(HackListEntry e : activeHax)
+			{
+				if (hiddenHacks.contains(e.hack))
+					continue;
+
 				drawWithOffset(matrixStack, e, partialTicks);
+			}
+		}
 		else
+		{
 			for(HackListEntry e : activeHax)
+			{
+				if (hiddenHacks.contains(e.hack))
+					continue;
+
 				drawString(matrixStack, e.hack.getRenderName());
+			}
+		}
+
+		if (hiddenHacks.size() > 0)
+			drawHiddenHacksCount(matrixStack, hiddenHacks);
+
 	}
 	
 	public void updateState(Hack hack)
@@ -172,6 +192,29 @@ public final class HackListHUD implements UpdateListener
 		tr.draw(matrixStack, s, posX + 1, posY + 1, 0x04000000 | alpha);
 		tr.draw(matrixStack, s, posX, posY, textColor | alpha);
 		
+		posY += 9;
+	}
+
+	private void drawHiddenHacksCount(MatrixStack matrixStack, TreeSet<Hack> hiddenHacks)
+	{
+		TextRenderer tr = WurstClient.MC.textRenderer;
+
+		String s = hiddenHacks.size() + " hidden hack" + (hiddenHacks.size() == 1 ? "" : "s");
+
+		int posX;
+
+		if(otf.getPosition() == Position.LEFT)
+			posX = 2;
+		else
+		{
+			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
+			int stringWidth = tr.getWidth(s);
+
+			posX = screenWidth - stringWidth - 2;
+		}
+		tr.draw(matrixStack, s, posX + 1, posY + 1, 0xff000000);
+		tr.draw(matrixStack, s, posX, posY, textColor | 0xff000000);
+
 		posY += 9;
 	}
 	
