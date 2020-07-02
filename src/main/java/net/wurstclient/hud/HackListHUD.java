@@ -199,7 +199,12 @@ public final class HackListHUD implements UpdateListener
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 
-		String s = hiddenHacks.size() + " hidden hack" + (hiddenHacks.size() == 1 ? "" : "s");
+		int enabledHacksCount = 0;
+		for (Hack hack : hiddenHacks)
+			if (hack.isEnabled())
+				enabledHacksCount++;
+
+		String s = hiddenHacks.size() + " hidden hack" + (hiddenHacks.size() == 1 ? "" : "s") + " (" + enabledHacksCount + " enabled)";
 
 		int posX;
 
