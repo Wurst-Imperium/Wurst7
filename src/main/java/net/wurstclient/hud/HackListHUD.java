@@ -83,6 +83,9 @@ public final class HackListHUD implements UpdateListener
 	{
 		TreeSet<Hack> hiddenHacks = WurstClient.INSTANCE.getCmds().hackListCmd.getHiddenHacks();
 
+		if (hiddenHacks.size() > 0)
+			drawHiddenHacksCount(matrixStack, hiddenHacks);
+
 		if(otf.isAnimations())
 		{
 			for(HackListEntry e : activeHax)
@@ -103,10 +106,6 @@ public final class HackListHUD implements UpdateListener
 				drawString(matrixStack, e.hack.getRenderName());
 			}
 		}
-
-		if (hiddenHacks.size() > 0)
-			drawHiddenHacksCount(matrixStack, hiddenHacks);
-
 	}
 	
 	public void updateState(Hack hack)

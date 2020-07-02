@@ -34,11 +34,15 @@ public class HackListCmd extends Command {
         if (args.length < 1)
             throw new CmdSyntaxError();
 
-        // Listing hacks doesn't need another parameter, so put it above the two-argument check.
-        if (args[0].toLowerCase().equals("list"))
-        {
-            listHiddenHacks();
-            return;
+        // Listing hacks and removing all doesn't need another parameter, so put it above the two-argument check.
+        switch (args[0].toLowerCase()) {
+            case "list":
+                listHiddenHacks();
+                return;
+
+            case "unhide-all":
+                unhideAllHacks();
+                return;
         }
 
         if (args.length < 2)
@@ -58,7 +62,7 @@ public class HackListCmd extends Command {
                 break;
 
             default:
-                throw new CmdSyntaxError("Only list, hide, and unhide/show subcommands are supported.");
+                throw new CmdSyntaxError("Only list, hide, unhide/show, and unhide-all subcommands are supported.");
         }
     }
 
@@ -68,6 +72,8 @@ public class HackListCmd extends Command {
 
         hiddenHacks.add(WURST.getHax().getHackByName(hackName));
         save();
+
+        ChatUtils.message(hackName + " was added to the hidden hacks list.");
     }
 
     private void unhideHack(String hackName)
@@ -76,6 +82,15 @@ public class HackListCmd extends Command {
 
         hiddenHacks.remove(WURST.getHax().getHackByName(hackName));
         save();
+
+        ChatUtils.message(hackName + " was removed to the hidden hacks list.");
+    }
+
+    private void unhideAllHacks()
+    {
+        hiddenHacks.clear();
+
+        ChatUtils.message("Removed all hacks from the hidden hacks list.");
     }
 
     private void listHiddenHacks()
