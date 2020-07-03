@@ -67,7 +67,7 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 			openWaypointScreen();
 			openFlag = false;
 		}
-		if(MC.world == null || (MC.world == current && MC.world.dimension.getType() == current.dimension.getType()))
+		if(MC.world == null || (MC.world == current && MC.world.getDimension() == current.getDimension()))
 			return;
 		assert MC.player != null;
 		current = MC.player.world;
@@ -94,9 +94,9 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 	public String getWorldId() {
 		String ret = "";
 		if(MC.isInSingleplayer())
-			ret+=WaypointList.toWorldId("singleplayer", current.dimension.getType());
+			ret += WaypointList.toWorldId("singleplayer", current.getDimensionRegistryKey());
 		else
-			ret+= WaypointList.toWorldId(MC.getCurrentServerEntry().address, current.dimension.getType());
+			ret += WaypointList.toWorldId(MC.getCurrentServerEntry().address, current.getDimensionRegistryKey());
 
 		return ret;
 	}
@@ -139,7 +139,7 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 	{
 		if(name.isEmpty()) {
 			int waypointCounter = 1;
-			boolean found = false;
+			boolean found;
 			while(true) {
 				found = false;
 				for(Waypoint point: activeWaypoints) {
@@ -148,13 +148,10 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 						break;
 					}
 				}
-				if(found == false) {
-					break;
-				}
+				if(!found) break;
 				waypointCounter++;
 			}
 			addWaypoint(new Waypoint("Waypoint " + waypointCounter, pos));
-			return true;
 		}
 		else {
 			for(Waypoint point : activeWaypoints) {
@@ -162,9 +159,9 @@ public class WaypointsHack extends Hack implements UpdateListener, RenderListene
 					return false;
 				}
 			}
-			addWaypoint(new Waypoint(name, MC.player.getPos()));
-			return true;
+			addWaypoint(new Waypoint(name, pos));
 		}
+		return true;
 	}
 
 	public void addWaypoint(Waypoint wp)

@@ -3,6 +3,7 @@ package net.wurstclient.waypoints;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.registry.RegistryKey;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.minecraft.world.dimension.DimensionType;
@@ -108,15 +109,8 @@ public class WaypointList {
 
 
 
-    public static String toWorldId(String serverName, DimensionType type) {
-        if(type == DimensionType.THE_NETHER)
-            return serverName + "::nether";
-        if(type == DimensionType.THE_END)
-            return serverName + "::end";
-        if(type == DimensionType.OVERWORLD)
-            return serverName + "::over";
-
-        else return null;
+    public static String toWorldId(String serverName, RegistryKey<DimensionType> type) {
+        return serverName + "::" + type.getValue();
     }
 
     public static String[] fromWorldId(String worldId) {

@@ -1,5 +1,6 @@
 package net.wurstclient.clickgui.components;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.WaypointWindow;
@@ -35,7 +36,7 @@ public class WaypointComponent extends Component
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         int x1 = getX();
         int x2 = x1 + getWidth();
@@ -51,7 +52,7 @@ public class WaypointComponent extends Component
 
         drawOutline(x1, x2, y1, y2);
 
-        drawName(x1, x3, y1);
+        drawName(matrixStack, x1, x3, y1);
 
     }
 
@@ -109,18 +110,18 @@ public class WaypointComponent extends Component
         GL11.glEnd();
     }
 
-    private void drawName(int x1, int x3, int y1)
+    private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
     {
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
         TextRenderer tr = MC.textRenderer;
         String name = point.getName();
-        int nameWidth = tr.getStringWidth(name);
+        int nameWidth = tr.getWidth(name);
         int tx = x1 + (x3 - x1 - nameWidth) / 2;
         int ty = y1 + 2;
 
-        tr.draw(name, tx, ty, 0xF0F0F0);
+        tr.draw(matrixStack, name, tx, ty, 0xF0F0F0);
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
@@ -131,7 +132,7 @@ public class WaypointComponent extends Component
     {
         String name = point.getName();
         TextRenderer tr = WurstClient.MC.textRenderer;
-        int width = tr.getStringWidth(name) + 4;
+        int width = tr.getWidth(name) + 4;
         return width;
     }
 

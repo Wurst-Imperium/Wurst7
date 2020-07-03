@@ -1,5 +1,6 @@
 package net.wurstclient.waypoints;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.clickgui.WaypointWindow;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.WaypointsHack;
@@ -42,16 +43,16 @@ public class WaypointNameScreen extends Screen {
             int y1 = 60;
             int y2 = height / 3 * 2;
 
-            TextRenderer tr = minecraft.textRenderer;
+            TextRenderer tr = client.textRenderer;
 
-            nameField = new TextFieldWidget(tr, x1, y1, 200, 20, "");
+            nameField = new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
             nameField.setSelectionStart(0);
 
             children.add(nameField);
             setInitialFocus(nameField);
             nameField.setSelected(true);
 
-            doneButton = new ButtonWidget(x1, y2, 200, 20, "Done", b -> done());
+            doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"), b -> done());
             addButton(doneButton);
         }
 
@@ -63,7 +64,7 @@ public class WaypointNameScreen extends Screen {
                 errorPoint = name;
                 return;
             }
-            minecraft.openScreen(prevScreen);
+            client.openScreen(prevScreen);
         }
 
         @Override
@@ -76,7 +77,7 @@ public class WaypointNameScreen extends Screen {
                     break;
 
                 case GLFW.GLFW_KEY_ESCAPE:
-                    minecraft.openScreen(prevScreen);
+                    client.openScreen(prevScreen);
                     break;
             }
 
@@ -90,17 +91,17 @@ public class WaypointNameScreen extends Screen {
         }
 
         @Override
-        public void render(int mouseX, int mouseY, float partialTicks)
+        public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
         {
-            renderBackground();
-            drawCenteredString(minecraft.textRenderer, "New Waypoint", width / 2,
+            renderBackground(matrixStack);
+            drawCenteredString(matrixStack, client.textRenderer, "New Waypoint", width / 2,
                     20, 0xFFFFFF);
 
-            nameField.render(mouseX, mouseY, partialTicks);
+            nameField.render(matrixStack, mouseX, mouseY, partialTicks);
             if(error)
-            drawCenteredString(minecraft.textRenderer, "Error: Waypoint '" + errorPoint + "' already exists on this world.", width/2, nameField.y - 22, 0xFF4444);
+            drawCenteredString(matrixStack, client.textRenderer, "Error: Waypoint '" + errorPoint + "' already exists on this world.", width/2, nameField.y - 22, 0xFF4444);
 
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
         }
 
         @Override

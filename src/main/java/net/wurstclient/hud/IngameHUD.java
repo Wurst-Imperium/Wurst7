@@ -53,7 +53,7 @@ public final class IngameHUD implements GUIRenderListener
 			clickGui.renderPinnedWindows(matrixStack, partialTicks);
 
 		//waypoint
-		drawWaypoint();
+		drawWaypoint(matrixStack);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -66,7 +66,7 @@ public final class IngameHUD implements GUIRenderListener
 			GL11.glDisable(GL11.GL_BLEND);
 	}
 
-	public void drawWaypoint() {
+	public void drawWaypoint(MatrixStack matrixStack) {
 		WaypointsHack waypoints = WurstClient.INSTANCE.getHax().waypointsHack;
 		if(waypoints.isEnabled() && waypoints.selectedWaypoint != null) {
 			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
@@ -74,8 +74,8 @@ public final class IngameHUD implements GUIRenderListener
 			String str = "Active Waypoint: " + waypoints.selectedWaypoint.getName();
 			String dist = "Distance: " + new DecimalFormat("##,###,###").format(waypoints.selectedWaypoint.getPos().
 					distanceTo(WurstClient.MC.player.getPos()));
-			tr.drawWithShadow(str, (screenWidth/2)-(tr.getStringWidth(str)/2), 2, 0xFFFFFF);
-			tr.drawWithShadow(dist, (screenWidth/2)-(tr.getStringWidth(dist)/2), 12, 0xFFFFFF);
+			tr.drawWithShadow(matrixStack, str, (screenWidth/2)-(tr.getWidth(str)/2), 2, 0xFFFFFF);
+			tr.drawWithShadow(matrixStack, dist, (screenWidth/2)-(tr.getWidth(dist)/2), 12, 0xFFFFFF);
 		}
 	}
 	
