@@ -26,6 +26,7 @@ public final class CmdList
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	public final DamageCmd damageCmd = new DamageCmd();
+	public final DigCmd digCmd = new DigCmd();
 	public final DropCmd dropCmd = new DropCmd();
 	public final EnabledHaxCmd enabledHaxCmd = new EnabledHaxCmd();
 	public final EnchantCmd enchantCmd = new EnchantCmd();

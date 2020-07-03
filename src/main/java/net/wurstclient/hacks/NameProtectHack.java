@@ -45,7 +45,7 @@ public final class NameProtectHack extends Hack
 		for(AbstractClientPlayerEntity player : MC.world.getPlayers())
 		{
 			i++;
-			String name = player.getName().asString();
+			String name = player.getName().getString();
 			
 			if(string.contains(name))
 				return string.replace(name, "\u00a7oPlayer" + i + "\u00a7r");

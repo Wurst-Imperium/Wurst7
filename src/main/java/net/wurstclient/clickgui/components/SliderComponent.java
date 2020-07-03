@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -66,7 +67,8 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -99,7 +101,7 @@ public final class SliderComponent extends Component
 		drawBackground(x1, x2, x3, x4, y1, y2, y4, y5);
 		drawRail(x3, x4, y4, y5, hSlider, renderAsDisabled);
 		drawKnob(x1, x2, y2, y3, hSlider, renderAsDisabled);
-		drawNameAndValue(x1, x2, y1, renderAsDisabled);
+		drawNameAndValue(matrixStack, x1, x2, y1, renderAsDisabled);
 	}
 	
 	private void handleDragging(int mouseX, int x3, int x4)
@@ -266,8 +268,8 @@ public final class SliderComponent extends Component
 		GL11.glEnd();
 	}
 	
-	private void drawNameAndValue(int x1, int x2, int y1,
-		boolean renderAsDisabled)
+	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
+		int y1, boolean renderAsDisabled)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -275,10 +277,10 @@ public final class SliderComponent extends Component
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
 		String value = setting.getValueString();
-		int valueWidth = tr.getStringWidth(value);
+		int valueWidth = tr.getWidth(value);
 		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
-		tr.draw(name, x1, y1 + 2, color);
-		tr.draw(value, x2 - valueWidth, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, color);
+		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -288,8 +290,8 @@ public final class SliderComponent extends Component
 	public int getDefaultWidth()
 	{
 		TextRenderer tr = MC.textRenderer;
-		int nameWitdh = tr.getStringWidth(setting.getName());
-		int valueWidth = tr.getStringWidth(setting.getValueString());
+		int nameWitdh = tr.getWidth(setting.getName());
+		int valueWidth = tr.getWidth(setting.getValueString());
 		return nameWitdh + valueWidth + 6;
 	}
 	

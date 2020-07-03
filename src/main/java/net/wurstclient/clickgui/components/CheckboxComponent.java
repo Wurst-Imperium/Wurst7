@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -46,7 +47,8 @@ public final class CheckboxComponent extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -68,7 +70,7 @@ public final class CheckboxComponent extends Component
 		if(setting.isChecked())
 			drawCheck(x1, y1, hovering);
 		
-		drawName(x3, y1);
+		drawName(matrixStack, x3, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -174,7 +176,7 @@ public final class CheckboxComponent extends Component
 		GL11.glEnd();
 	}
 	
-	private void drawName(int x3, int y1)
+	private void drawName(MatrixStack matrixStack, int x3, int y1)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -183,7 +185,7 @@ public final class CheckboxComponent extends Component
 		int tx = x3 + 2;
 		int ty = y1 + 2;
 		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
-		MC.textRenderer.draw(name, tx, ty, color);
+		MC.textRenderer.draw(matrixStack, name, tx, ty, color);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -192,7 +194,7 @@ public final class CheckboxComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return MC.textRenderer.getStringWidth(setting.getName()) + 13;
+		return MC.textRenderer.getWidth(setting.getName()) + 13;
 	}
 	
 	@Override

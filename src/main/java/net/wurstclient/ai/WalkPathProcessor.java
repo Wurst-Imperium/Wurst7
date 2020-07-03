@@ -31,12 +31,12 @@ public class WalkPathProcessor extends PathProcessor
 	{
 		// get positions
 		BlockPos pos;
-		if(WurstClient.MC.player.onGround)
+		if(WurstClient.MC.player.isOnGround())
 			pos = new BlockPos(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = new BlockPos(WurstClient.MC.player);
+			pos = new BlockPos(WurstClient.MC.player.getPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		
@@ -69,9 +69,8 @@ public class WalkPathProcessor extends PathProcessor
 		
 		// face next position
 		facePosition(nextPos);
-		if(MathHelper
-			.wrapDegrees(Math.abs(RotationUtils.getHorizontalAngleToLookVec(
-				new Vec3d(nextPos).add(0.5, 0.5, 0.5)))) > 90)
+		if(MathHelper.wrapDegrees(Math.abs(RotationUtils
+			.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 90)
 			return;
 		
 		if(WURST.getHax().jesusHack.isEnabled())
@@ -134,7 +133,7 @@ public class WalkPathProcessor extends PathProcessor
 					index++;
 				
 				// walk off the edge
-				if(WurstClient.MC.player.onGround)
+				if(WurstClient.MC.player.isOnGround())
 					MC.options.keyForward.setPressed(true);
 			}
 	}

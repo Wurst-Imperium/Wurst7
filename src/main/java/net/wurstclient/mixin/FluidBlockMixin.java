@@ -13,7 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.FluidDrainable;
-import net.minecraft.entity.EntityContext;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -32,7 +32,7 @@ public abstract class FluidBlockMixin extends Block implements FluidDrainable
 	@Override
 	public VoxelShape getCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,
-		EntityContext entityContext_1)
+		ShapeContext entityContext_1)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax != null && hax.jesusHack.shouldBeSolid())

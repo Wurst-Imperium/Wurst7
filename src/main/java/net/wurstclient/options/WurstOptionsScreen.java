@@ -15,7 +15,9 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
@@ -38,7 +40,7 @@ public class WurstOptionsScreen extends Screen
 	public void init()
 	{
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -71,7 +73,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "Keybinds",
 			"Keybinds allow you to toggle any hack\n"
 				+ "or command by simply pressing a\n" + "button.",
-			b -> minecraft.openScreen(new KeybindManagerScreen(this)));
+			b -> client.openScreen(new KeybindManagerScreen(this)));
 		
 		new WurstOptionsButton(-50, 48, () -> "X-Ray Blocks",
 			"Manager for the blocks\n" + "that X-Ray will show.",
@@ -81,7 +83,7 @@ public class WurstOptionsScreen extends Screen
 			"The Zoom Manager allows you to\n"
 				+ "change the zoom key, how far it\n"
 				+ "will zoom in and more.",
-			b -> minecraft.openScreen(new ZoomManagerScreen(this)));
+			b -> client.openScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()
@@ -104,29 +106,34 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		renderTitles();
-		super.render(mouseX, mouseY, partialTicks);
-		renderButtonTooltip(mouseX, mouseY);
+		renderBackground(matrixStack);
+		renderTitles(matrixStack);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(matrixStack, mouseX, mouseY);
 	}
 	
-	private void renderTitles()
+	private void renderTitles(MatrixStack matrixStack)
 	{
-		TextRenderer tr = minecraft.textRenderer;
+		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredString(tr, "Wurst Options", middleX, y1, 0xffffff);
+		drawCenteredString(matrixStack, tr, "Wurst Options", middleX, y1,
+			0xffffff);
 		
-		drawCenteredString(tr, "Settings", middleX - 104, y2, 0xcccccc);
-		drawCenteredString(tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredString(tr, "Links", middleX + 104, y2, 0xcccccc);
+		drawCenteredString(matrixStack, tr, "Settings", middleX - 104, y2,
+			0xcccccc);
+		drawCenteredString(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredString(matrixStack, tr, "Links", middleX + 104, y2,
+			0xcccccc);
 	}
 	
-	private void renderButtonTooltip(int mouseX, int mouseY)
+	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
 	{
 		for(AbstractButtonWidget button : buttons)
 		{
@@ -137,7 +144,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(woButton.tooltip, mouseX, mouseY);
+			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -145,7 +152,7 @@ public class WurstOptionsScreen extends Screen
 	private final class WurstOptionsButton extends ButtonWidget
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<String> tooltip;
+		private final List<Text> tooltip;
 		
 		public WurstOptionsButton(int xOffset, int yOffset,
 			Supplier<String> messageSupplier, String tooltip,
@@ -153,16 +160,21 @@ public class WurstOptionsScreen extends Screen
 		{
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
-				messageSupplier.get(), pressAction);
+				new LiteralText(messageSupplier.get()), pressAction);
 			
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new String[0]);
+				this.tooltip = Arrays.asList(new LiteralText[0]);
 			else
 			{
 				String[] lines = tooltip.split("\n");
-				this.tooltip = Arrays.asList(lines);
+				
+				LiteralText[] lines2 = new LiteralText[lines.length];
+				for(int i = 0; i < lines.length; i++)
+					lines2[i] = new LiteralText(lines[i]);
+				
+				this.tooltip = Arrays.asList(lines2);
 			}
 			
 			addButton(this);
@@ -172,7 +184,7 @@ public class WurstOptionsScreen extends Screen
 		public void onPress()
 		{
 			super.onPress();
-			setMessage(messageSupplier.get());
+			setMessage(new LiteralText(messageSupplier.get()));
 		}
 	}
 }

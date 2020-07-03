@@ -104,7 +104,7 @@ public final class WurstUpdater implements UpdateListener
 		component = new LiteralText(text);
 		
 		ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
-		component.getStyle().setClickEvent(event);
+		component.getStyle().withClickEvent(event);
 	}
 	
 	private boolean containsCompatibleAsset(WsonArray wsonArray)

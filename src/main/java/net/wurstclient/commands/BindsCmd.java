@@ -125,7 +125,7 @@ public final class BindsCmd extends Command
 		
 		try
 		{
-			InputUtil.fromName(key);
+			InputUtil.fromTranslationKey(key);
 			return key;
 			
 		}catch(IllegalArgumentException e)

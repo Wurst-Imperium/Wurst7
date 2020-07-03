@@ -87,7 +87,7 @@ public final class KeybindsFile
 	{
 		try
 		{
-			InputUtil.fromName(key);
+			InputUtil.fromTranslationKey(key);
 			return true;
 			
 		}catch(IllegalArgumentException e)

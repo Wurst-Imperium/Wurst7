@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.ZoomOtf;
@@ -35,28 +36,31 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
-		String zoomKeyName = WurstClient.INSTANCE.getZoomKey().getBoundKey()
-			.getName().replace("key.keyboard.", "");
+		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
+			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, "Back", b -> minecraft.openScreen(prevScreen)));
+			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		addButton(keyButton = new ButtonWidget(width / 2 - 79,
-			height / 4 + 24 - 16, 158, 20, "Zoom Key: " + zoomKeyName,
-			b -> minecraft.openScreen(new PressAKeyScreen(this))));
+		addButton(
+			keyButton = new ButtonWidget(width / 2 - 79, height / 4 + 24 - 16,
+				158, 20, new LiteralText("Zoom Key: " + zoomKeyName),
+				b -> client.openScreen(new PressAKeyScreen(this))));
 		
 		addButton(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16, 50, 20,
-			"More", b -> level.increaseValue()));
+			new LiteralText("More"), b -> level.increaseValue()));
 		
 		addButton(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16, 50, 20,
-			"Less", b -> level.decreaseValue()));
+			new LiteralText("Less"), b -> level.decreaseValue()));
 		
 		addButton(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16, 50, 20,
-			"Default", b -> level.setValue(level.getDefaultValue())));
+			new LiteralText("Default"),
+			b -> level.setValue(level.getDefaultValue())));
 		
 		addButton(scrollButton =
 			new ButtonWidget(width / 2 - 79, height / 4 + 96 - 16, 158, 20,
-				"Use Mouse Wheel: " + onOrOff(scroll.isChecked()),
+				new LiteralText(
+					"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
 				b -> toggleScroll()));
 	}
 	
@@ -66,8 +70,8 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		CheckboxSetting scroll = zoom.getScrollSetting();
 		
 		scroll.setChecked(!scroll.isChecked());
-		scrollButton
-			.setMessage("Use Mouse Wheel: " + onOrOff(scroll.isChecked()));
+		scrollButton.setMessage(
+			new LiteralText("Use Mouse Wheel: " + onOrOff(scroll.isChecked())));
 	}
 	
 	private String onOrOff(boolean on)
@@ -76,25 +80,29 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		
-		renderBackground();
-		drawCenteredString(font, "Zoom Manager", width / 2, 40, 0xffffff);
-		drawString(font, "Zoom Level: " + level.getValueString(),
-			width / 2 - 75, height / 4 + 44, 0xcccccc);
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, textRenderer, "Zoom Manager", width / 2,
+			40, 0xffffff);
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Zoom Level: " + level.getValueString(), width / 2 - 75,
+			height / 4 + 44, 0xcccccc);
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
 	public void setKey(String key)
 	{
-		WurstClient.INSTANCE.getZoomKey().setKeyCode(InputUtil.fromName(key));
-		minecraft.options.write();
+		WurstClient.INSTANCE.getZoomKey()
+			.setBoundKey(InputUtil.fromTranslationKey(key));
+		client.options.write();
 		KeyBinding.updateKeysByCode();
-		keyButton.setMessage("Zoom Key: " + key);
+		keyButton.setMessage(new LiteralText("Zoom Key: " + key));
 	}
 }

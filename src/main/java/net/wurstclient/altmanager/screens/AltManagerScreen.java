@@ -21,7 +21,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -31,6 +31,7 @@ import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.ImportAltsFileChooser;
 import net.wurstclient.altmanager.LoginManager;
 import net.wurstclient.altmanager.NameGenerator;
+import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 
 public final class AltManagerScreen extends Screen
@@ -57,37 +58,38 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, altManager.getList());
+		listGui = new ListGui(client, this, altManager.getList());
 		
 		if(altManager.getList().isEmpty() && shouldAsk)
-			minecraft.openScreen(new ConfirmScreen(this::confirmGenerate,
+			client.openScreen(new ConfirmScreen(this::confirmGenerate,
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, "Use", b -> pressUse()));
+			100, 20, new LiteralText("Use"), b -> pressUse()));
 		
 		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
-			"Direct Login",
-			b -> minecraft.openScreen(new DirectLoginScreen(this))));
+			new LiteralText("Direct Login"),
+			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20, "Add",
-			b -> minecraft.openScreen(new AddAltScreen(this, altManager))));
+		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+			new LiteralText("Add"),
+			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
 		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, "Star", b -> pressStar()));
+			75, 20, new LiteralText("Star"), b -> pressStar()));
 		
 		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, "Edit", b -> pressEdit()));
+			20, new LiteralText("Edit"), b -> pressEdit()));
 		
 		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, "Delete", b -> pressDelete()));
+			74, 20, new LiteralText("Delete"), b -> pressDelete()));
 		
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			"Cancel", b -> minecraft.openScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 100, 20, "Import Alts",
-			b -> pressImportAlts()));
+		addButton(new ButtonWidget(8, 8, 100, 20,
+			new LiteralText("Import Alts"), b -> pressImportAlts()));
 	}
 	
 	@Override
@@ -152,7 +154,7 @@ public final class AltManagerScreen extends Screen
 		if(alt.isCracked())
 		{
 			LoginManager.changeCrackedName(alt.getEmail());
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			return;
 		}
 		
@@ -165,8 +167,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		altManager.setChecked(listGui.selected,
-			minecraft.getSession().getUsername());
-		minecraft.openScreen(prevScreen);
+			client.getSession().getUsername());
+		client.openScreen(prevScreen);
 	}
 	
 	private void pressStar()
@@ -179,7 +181,7 @@ public final class AltManagerScreen extends Screen
 	private void pressEdit()
 	{
 		Alt alt = listGui.getSelectedAlt();
-		minecraft.openScreen(new EditAltScreen(this, altManager, alt));
+		client.openScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -192,8 +194,8 @@ public final class AltManagerScreen extends Screen
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
-			message, "Delete", "Cancel");
-		minecraft.openScreen(screen);
+			message, new LiteralText("Delete"), new LiteralText("Cancel"));
+		client.openScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -248,7 +250,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -256,34 +258,37 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
 		{
 			Alt alt = listGui.getSelectedAlt();
-			AltRenderer.drawAltBack(alt.getNameOrEmail(),
+			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(alt.getNameOrEmail(),
+			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		drawCenteredString(font, "Alt Manager", width / 2, 4, 16777215);
-		drawCenteredString(font, "Alts: " + altManager.getList().size(),
-			width / 2, 14, 10526880);
-		drawCenteredString(font, "premium: " + altManager.getNumPremium()
-			+ ", cracked: " + altManager.getNumCracked(), width / 2, 24,
-			10526880);
+		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
+			4, 16777215);
+		drawCenteredString(matrixStack, textRenderer,
+			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
+		drawCenteredString(
+			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
+				+ ", cracked: " + altManager.getNumCracked(),
+			width / 2, 24, 10526880);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -309,7 +314,7 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	public static final class ListGui extends ListWidget
@@ -368,13 +373,13 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int id, int x, int y, int var4, int var5,
-			int var6, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int id, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			Alt alt = list.get(id);
 			
 			// green glow when logged in
-			if(minecraft.getSession().getUsername().equals(alt.getName()))
+			if(client.getSession().getUsername().equals(alt.getName()))
 			{
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
@@ -401,12 +406,12 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			AltRenderer.drawAltFace(alt.getNameOrEmail(), x + 1, y + 1, 24, 24,
-				isSelectedItem(id));
+			AltRenderer.drawAltFace(matrixStack, alt.getNameOrEmail(), x + 1,
+				y + 1, 24, 24, isSelectedItem(id));
 			
 			// name / email
-			minecraft.textRenderer.draw("Name: " + alt.getNameOrEmail(), x + 31,
-				y + 3, 10526880);
+			client.textRenderer.draw(matrixStack,
+				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
 			
 			// tags
 			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
@@ -414,7 +419,8 @@ public final class AltManagerScreen extends Screen
 				tags += "\u00a7r, \u00a7estarred";
 			if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
-			minecraft.textRenderer.draw(tags, x + 31, y + 15, 10526880);
+			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
+				10526880);
 		}
 	}
 }

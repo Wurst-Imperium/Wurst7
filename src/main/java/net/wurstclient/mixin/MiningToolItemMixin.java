@@ -11,6 +11,11 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+import com.google.common.collect.Multimap;
+
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
@@ -26,7 +31,7 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	
 	@Shadow
 	@Final
-	protected float attackSpeed;
+	private Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 	
 	private MiningToolItemMixin(WurstClient wurst, ToolMaterial material,
 		Settings settings)
@@ -43,6 +48,8 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	@Override
 	public float fuckMcAfee2()
 	{
-		return attackSpeed;
+		return (float)attributeModifiers
+			.get(EntityAttributes.GENERIC_ATTACK_SPEED).iterator().next()
+			.getValue();
 	}
 }

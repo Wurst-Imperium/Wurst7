@@ -19,7 +19,9 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.mixinterface.IServerList;
@@ -46,7 +48,7 @@ public class CleanUpScreen extends Screen
 	public void init()
 	{
 		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-			() -> "Cancel", "", b -> minecraft.openScreen(prevScreen)));
+			() -> "Cancel", "", b -> client.openScreen(prevScreen)));
 		
 		addButton(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -118,7 +120,7 @@ public class CleanUpScreen extends Screen
 				.setSelected(null);
 			((IMultiplayerScreen)prevScreen).getServerListSelector()
 				.setServers(prevScreen.getServerList());
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			return;
 		}
 		
@@ -126,7 +128,8 @@ public class CleanUpScreen extends Screen
 		{
 			ServerInfo server = prevScreen.getServerList().get(i);
 			if(cleanupUnknown
-				&& "\u00a74Can\'t resolve hostname".equals(server.label)
+				&& "\u00a74Can\'t resolve hostname"
+					.equals(server.label.getString())
 				|| cleanupOutdated && server.protocolVersion != SharedConstants
 					.getGameVersion().getProtocolVersion()
 				|| cleanupFailed && server.ping != -2L && server.ping < 0L
@@ -153,7 +156,7 @@ public class CleanUpScreen extends Screen
 					.setServers(prevScreen.getServerList());
 			}
 		
-		minecraft.openScreen(prevScreen);
+		client.openScreen(prevScreen);
 	}
 	
 	@Override
@@ -166,18 +169,21 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		drawCenteredString(font, "Clean Up", width / 2, 20, 16777215);
-		drawCenteredString(font,
+		renderBackground(matrixStack);
+		drawCenteredString(matrixStack, textRenderer, "Clean Up", width / 2, 20,
+			16777215);
+		drawCenteredString(matrixStack, textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
-		super.render(mouseX, mouseY, partialTicks);
-		renderButtonTooltip(mouseX, mouseY);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(matrixStack, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(int mouseX, int mouseY)
+	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
 	{
 		for(AbstractButtonWidget button : buttons)
 		{
@@ -188,7 +194,7 @@ public class CleanUpScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(woButton.tooltip, mouseX, mouseY);
+			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -196,20 +202,26 @@ public class CleanUpScreen extends Screen
 	private final class CleanUpButton extends ButtonWidget
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<String> tooltip;
+		private final List<Text> tooltip;
 		
 		public CleanUpButton(int x, int y, Supplier<String> messageSupplier,
 			String tooltip, PressAction pressAction)
 		{
-			super(x, y, 200, 20, messageSupplier.get(), pressAction);
+			super(x, y, 200, 20, new LiteralText(messageSupplier.get()),
+				pressAction);
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new String[0]);
+				this.tooltip = Arrays.asList(new LiteralText[0]);
 			else
 			{
 				String[] lines = tooltip.split("\n");
-				this.tooltip = Arrays.asList(lines);
+				
+				LiteralText[] lines2 = new LiteralText[lines.length];
+				for(int i = 0; i < lines.length; i++)
+					lines2[i] = new LiteralText(lines[i]);
+				
+				this.tooltip = Arrays.asList(lines2);
 			}
 			
 			addButton(this);
@@ -219,7 +231,7 @@ public class CleanUpScreen extends Screen
 		public void onPress()
 		{
 			super.onPress();
-			setMessage(messageSupplier.get());
+			setMessage(new LiteralText(messageSupplier.get()));
 		}
 	}
 }

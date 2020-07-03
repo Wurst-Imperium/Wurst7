@@ -37,7 +37,7 @@ public final class DirectLoginScreen extends AltEditorScreen
 			message = LoginManager.login(getEmail(), getPassword());
 		
 		if(message.isEmpty())
-			minecraft.openScreen(new TitleScreen());
+			client.openScreen(new TitleScreen());
 		else
 			doErrorEffect();
 	}

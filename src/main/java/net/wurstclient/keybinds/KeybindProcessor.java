@@ -52,7 +52,7 @@ public final class KeybindProcessor implements KeyPressListener
 	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
-		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 	}
 	
 	private void processCmds(String cmds)

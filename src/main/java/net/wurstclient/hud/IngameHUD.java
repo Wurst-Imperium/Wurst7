@@ -12,6 +12,7 @@ import net.wurstclient.hacks.WaypointsHack;
 import net.wurstclient.waypoints.Waypoint;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -26,7 +27,7 @@ public final class IngameHUD implements GUIRenderListener
 	private TabGui tabGui;
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
@@ -43,13 +44,13 @@ public final class IngameHUD implements GUIRenderListener
 		
 		clickGui.updateColors();
 		
-		wurstLogo.render();
-		hackList.render(partialTicks);
-		tabGui.render(partialTicks);
+		wurstLogo.render(matrixStack);
+		hackList.render(matrixStack, partialTicks);
+		tabGui.render(matrixStack, partialTicks);
 		
 		// pinned windows
 		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
-			clickGui.renderPinnedWindows(partialTicks);
+			clickGui.renderPinnedWindows(matrixStack, partialTicks);
 
 		//waypoint
 		drawWaypoint();

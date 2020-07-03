@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
@@ -93,7 +93,7 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.currentScreen instanceof ContainerScreen
+		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
 		
@@ -124,7 +124,7 @@ public final class AutoArmorHack extends Hack
 		// search inventory for better armor
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
 				continue;

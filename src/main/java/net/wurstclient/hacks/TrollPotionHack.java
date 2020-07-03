@@ -69,7 +69,7 @@ public final class TrollPotionHack extends Hack
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getInvStack(i).isEmpty())
+			if(!MC.player.inventory.getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

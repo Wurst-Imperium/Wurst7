@@ -187,7 +187,7 @@ public final class AutoFishHack extends Hack
 	{
 		PlayerInventory inventory = MC.player.inventory;
 		int selectedSlot = inventory.selectedSlot;
-		ItemStack selectedStack = inventory.getInvStack(selectedSlot);
+		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
 		// start with selected rod
 		bestRodValue = getRodValue(selectedStack);
@@ -196,7 +196,7 @@ public final class AutoFishHack extends Hack
 		// search inventory for better rod
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			int rodValue = getRodValue(stack);
 			
 			if(rodValue > bestRodValue)

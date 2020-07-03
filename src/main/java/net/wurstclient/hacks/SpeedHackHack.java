@@ -51,7 +51,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 			MC.player.setSprinting(true);
 		
 		// activate mini jump if on ground
-		if(!MC.player.onGround)
+		if(!MC.player.isOnGround())
 			return;
 		
 		Vec3d v = MC.player.getVelocity();

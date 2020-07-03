@@ -116,7 +116,7 @@ public class Window
 		maxChildWidth += 4;
 		
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		int titleBarWidth = tr.getStringWidth(title) + 4;
+		int titleBarWidth = tr.getWidth(title) + 4;
 		if(minimizable)
 			titleBarWidth += 11;
 		if(pinnable)
