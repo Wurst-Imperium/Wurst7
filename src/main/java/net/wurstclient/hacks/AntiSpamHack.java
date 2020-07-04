@@ -14,6 +14,7 @@ import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.StringRenderable;
 import net.minecraft.text.StringRenderable.Visitor;
 import net.minecraft.util.math.MathHelper;
@@ -165,7 +166,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		}
 		
 		if(spamCounter > 1)
-			event.setComponent(new LiteralText(
-				event.getComponent().getString() + " [x" + spamCounter + "]"));
+			event.setComponent(
+					((MutableText)event.getComponent()).append(" [x" + spamCounter + "]"));
 	}
 }
