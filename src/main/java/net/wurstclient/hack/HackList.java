@@ -54,6 +54,7 @@ public final class HackList implements UpdateListener
 	public final AutoSwitchHack autoSwitchHack = new AutoSwitchHack();
 	public final AutoSwordHack autoSwordHack = new AutoSwordHack();
 	public final AutoToolHack autoToolHack = new AutoToolHack();
+	public final AutoTotemHack autoTotemHack = new AutoTotemHack();
 	public final AutoWalkHack autoWalkHack = new AutoWalkHack();
 	public final BaseFinderHack baseFinderHack = new BaseFinderHack();
 	public final BlinkHack blinkHack = new BlinkHack();
@@ -155,7 +156,6 @@ public final class HackList implements UpdateListener
 	public final TrueSightHack trueSightHack = new TrueSightHack();
 	public final TunnellerHack tunnellerHack = new TunnellerHack();
 	public final XRayHack xRayHack = new XRayHack();
-	public final AutoTotemHack autoTotemHack = new AutoTotemHack();
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
