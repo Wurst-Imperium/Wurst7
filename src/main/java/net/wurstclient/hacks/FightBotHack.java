@@ -45,7 +45,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 
-@SearchTags({"fight bot"})
+@SearchTags({"fight bot", "auto fight", "AutoFight"})
 @DontSaveState
 public final class FightBotHack extends Hack
 	implements UpdateListener, RenderListener
