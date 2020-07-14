@@ -36,12 +36,13 @@ public class TrailHack extends Hack implements UpdateListener, RenderListener{
 	private List<List<Vec3d>> trails = new ArrayList<>();
 	
 	private final SliderSetting size = new SliderSetting("Trail size",
-			"How long the trail should be\n"
+			"How long the trail should be"
 				+ "0 = infinite",
 			0, 0, 1000, 1, ValueDisplay.INTEGER);
 	
 	public TrailHack() {
-		super("Trail", "Shows a trail where you go");
+		super("Trail", "Shows a trail where you go\n\n"
+		     + "Credits to the BleachHack (created by BleachDrinker420)");
 		setCategory(Category.RENDER);
 		addSetting(size);
 	}
