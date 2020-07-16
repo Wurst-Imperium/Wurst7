@@ -10,6 +10,10 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 
+/**
+ * Credits: BleachDrinker420, creator of BleachHack.
+ * First version taken from BleachHack.
+ */
 @SearchTags({"crystal aura"})
 public class CrystalAuraHack extends Hack implements UpdateListener {
 
@@ -45,6 +49,8 @@ public class CrystalAuraHack extends Hack implements UpdateListener {
                     MC.player.attack(e);
                     MC.player.swingHand(Hand.MAIN_HAND);
                     delay=0;
+                }
+            }
         }
     }
-}}}
+}
