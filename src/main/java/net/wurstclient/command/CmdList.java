@@ -63,7 +63,7 @@ public final class CmdList
 	public final UnbindCmd unbindCmd = new UnbindCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
-	public final FaceCmd faceCmd = new FaceCmd;
+	public final FaceCmd faceCmd = new FaceCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));

@@ -72,13 +72,13 @@ public final class FaceCmd extends Command
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		BlockPos pos = new BlockPos(entity);
-		return RotationUtils.getNeededRotations(new Vec3d(pos));
+		BlockPos pos = new BlockPos(entity.getPos());
+		return RotationUtils.getNeededRotations(new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
 	}
 	
 	private Rotation argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = new BlockPos(MC.player);
+		BlockPos playerPos = new BlockPos(MC.player.getPos());
 		int[] player =
 			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
