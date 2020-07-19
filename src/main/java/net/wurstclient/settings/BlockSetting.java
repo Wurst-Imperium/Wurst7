@@ -28,8 +28,10 @@ public final class BlockSetting extends Setting
 {
 	private String blockName = "";
 	private final String defaultName;
+	private final boolean allowAir;
 	
-	public BlockSetting(String name, String description, String blockName)
+	public BlockSetting(String name, String description, String blockName,
+		boolean allowAir)
 	{
 		super(name, description);
 		
@@ -38,11 +40,12 @@ public final class BlockSetting extends Setting
 		this.blockName = BlockUtils.getName(block);
 		
 		defaultName = this.blockName;
+		this.allowAir = allowAir;
 	}
 	
-	public BlockSetting(String name, String blockName)
+	public BlockSetting(String name, String blockName, boolean allowAir)
 	{
-		this(name, "", blockName);
+		this(name, "", blockName, allowAir);
 	}
 	
 	public Block getBlock()
@@ -57,7 +60,10 @@ public final class BlockSetting extends Setting
 	
 	public void setBlock(Block block)
 	{
-		if(block == null || block instanceof AirBlock)
+		if(block == null)
+			return;
+		
+		if(!allowAir && block instanceof AirBlock)
 			return;
 		
 		String newName = Objects.requireNonNull(BlockUtils.getName(block));
@@ -97,7 +103,10 @@ public final class BlockSetting extends Setting
 			String newName = JsonUtils.getAsString(json);
 			
 			Block newBlock = BlockUtils.getBlockFromName(newName);
-			if(newBlock == null || newBlock instanceof AirBlock)
+			if(newBlock == null)
+				throw new JsonException();
+			
+			if(!allowAir && newBlock instanceof AirBlock)
 				throw new JsonException();
 			
 			blockName = BlockUtils.getName(newBlock);
