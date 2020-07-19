@@ -35,6 +35,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -63,6 +64,10 @@ public final class NukerHack extends Hack
 		new BlockSetting("ID", "The type of block to break in ID mode.\n"
 			+ "air = won't break anything", "minecraft:air", true);
 	
+	private final CheckboxSetting lockId =
+		new CheckboxSetting("Lock ID", "Prevent changing the ID by clicking\n"
+			+ "on blocks or restarting Nuker.", false);
+	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
 	private float progress;
@@ -75,6 +80,7 @@ public final class NukerHack extends Hack
 		addSetting(range);
 		addSetting(mode);
 		addSetting(id);
+		addSetting(lockId);
 	}
 	
 	@Override
@@ -112,7 +118,9 @@ public final class NukerHack extends Hack
 		}
 		
 		prevBlocks.clear();
-		id.setBlock(Blocks.AIR);
+		
+		if(!lockId.isChecked())
+			id.setBlock(Blocks.AIR);
 	}
 	
 	@Override
@@ -195,6 +203,9 @@ public final class NukerHack extends Hack
 	public void onLeftClick(LeftClickEvent event)
 	{
 		if(mode.getSelected() != Mode.ID)
+			return;
+		
+		if(lockId.isChecked())
 			return;
 		
 		if(MC.crosshairTarget == null
