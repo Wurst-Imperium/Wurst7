@@ -65,7 +65,7 @@ public final class NukerHack extends Hack
 			+ "air = won't break anything", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId =
-		new CheckboxSetting("Lock ID", "Prevent changing the ID by clicking\n"
+		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
 			+ "on blocks or restarting Nuker.", false);
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
