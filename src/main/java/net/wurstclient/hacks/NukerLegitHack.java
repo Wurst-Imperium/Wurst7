@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -29,6 +30,7 @@ import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -53,6 +55,10 @@ public final class NukerLegitHack extends Hack
 			+ "can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	
+	private final BlockSetting id =
+		new BlockSetting("ID", "The type of block to break in ID mode.\n"
+			+ "air = won't break anything", "minecraft:air", true);
+	
 	private BlockPos currentBlock;
 	
 	public NukerLegitHack()
@@ -64,12 +70,13 @@ public final class NukerLegitHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
+		addSetting(id);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().getRenderName(WURST.getHax().nukerHack);
+		return mode.getSelected().getRenderName(this);
 	}
 	
 	@Override
@@ -99,7 +106,7 @@ public final class NukerLegitHack extends Hack
 		// resets
 		MC.options.keyAttack.setPressed(false);
 		currentBlock = null;
-		WURST.getHax().nukerHack.setId(null);
+		id.setBlock(Blocks.AIR);
 	}
 	
 	@Override
@@ -121,22 +128,21 @@ public final class NukerLegitHack extends Hack
 			return;
 		
 		// set id
-		WURST.getHax().nukerHack.setId(BlockUtils.getName(pos));
+		id.setBlockName(BlockUtils.getName(pos));
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		// abort if using IDNuker without an ID being set
-		if(mode.getSelected() == Mode.ID
-			&& WURST.getHax().nukerHack.getId() == null)
+		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		currentBlock = null;
 		
 		// get valid blocks
 		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
-			mode.getSelected().getValidator(WURST.getHax().nukerHack));
+			mode.getSelected().getValidator(this));
 		
 		// find closest valid block
 		for(BlockPos pos : validBlocks)
@@ -286,8 +292,10 @@ public final class NukerLegitHack extends Hack
 	{
 		NORMAL("Normal", n -> "NukerLegit", (n, p) -> true),
 		
-		ID("ID", n -> "IDNukerLegit [" + n.getId() + "]",
-			(n, p) -> BlockUtils.getName(p).equals(n.getId())),
+		ID("ID",
+			n -> "IDNukerLegit ["
+				+ n.id.getBlockName().replace("minecraft:", "") + "]",
+			(n, p) -> BlockUtils.getName(p).equals(n.id.getBlockName())),
 		
 		FLAT("Flat", n -> "FlatNukerLegit",
 			(n, p) -> p.getY() >= MC.player.getPos().getY()),
@@ -296,11 +304,11 @@ public final class NukerLegitHack extends Hack
 			(n, p) -> BlockUtils.getHardness(p) >= 1);
 		
 		private final String name;
-		private final Function<NukerHack, String> renderName;
-		private final BiPredicate<NukerHack, BlockPos> validator;
+		private final Function<NukerLegitHack, String> renderName;
+		private final BiPredicate<NukerLegitHack, BlockPos> validator;
 		
-		private Mode(String name, Function<NukerHack, String> renderName,
-			BiPredicate<NukerHack, BlockPos> validator)
+		private Mode(String name, Function<NukerLegitHack, String> renderName,
+			BiPredicate<NukerLegitHack, BlockPos> validator)
 		{
 			this.name = name;
 			this.renderName = renderName;
@@ -313,12 +321,12 @@ public final class NukerLegitHack extends Hack
 			return name;
 		}
 		
-		public String getRenderName(NukerHack n)
+		public String getRenderName(NukerLegitHack n)
 		{
 			return renderName.apply(n);
 		}
 		
-		public Predicate<BlockPos> getValidator(NukerHack n)
+		public Predicate<BlockPos> getValidator(NukerLegitHack n)
 		{
 			return p -> validator.test(n, p);
 		}

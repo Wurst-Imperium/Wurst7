@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -33,6 +34,7 @@ import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -57,11 +59,14 @@ public final class NukerHack extends Hack
 			+ "can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	
+	private final BlockSetting id =
+		new BlockSetting("ID", "The type of block to break in ID mode.\n"
+			+ "air = won't break anything", "minecraft:air", true);
+	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
 	private float progress;
 	private float prevProgress;
-	private String id;
 	
 	public NukerHack()
 	{
@@ -69,6 +74,7 @@ public final class NukerHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
+		addSetting(id);
 	}
 	
 	@Override
@@ -106,12 +112,16 @@ public final class NukerHack extends Hack
 		}
 		
 		prevBlocks.clear();
-		id = null;
+		id.setBlock(Blocks.AIR);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		// abort if using IDNuker without an ID being set
+		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		
 		currentBlock = null;
@@ -193,7 +203,7 @@ public final class NukerHack extends Hack
 		
 		BlockHitResult blockHitResult = (BlockHitResult)MC.crosshairTarget;
 		BlockPos pos = new BlockPos(blockHitResult.getBlockPos());
-		id = BlockUtils.getName(pos);
+		id.setBlockName(BlockUtils.getName(pos));
 	}
 	
 	@Override
@@ -245,22 +255,14 @@ public final class NukerHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	public String getId()
-	{
-		return id;
-	}
-	
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	
 	private enum Mode
 	{
 		NORMAL("Normal", n -> n.getName(), (n, p) -> true),
 		
-		ID("ID", n -> "IDNuker [" + n.id + "]",
-			(n, p) -> BlockUtils.getName(p).equals(n.id)),
+		ID("ID",
+			n -> "IDNuker [" + n.id.getBlockName().replace("minecraft:", "")
+				+ "]",
+			(n, p) -> BlockUtils.getName(p).equals(n.id.getBlockName())),
 		
 		FLAT("Flat", n -> "FlatNuker",
 			(n, p) -> p.getY() >= MC.player.getPos().getY()),

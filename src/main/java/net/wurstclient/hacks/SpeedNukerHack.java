@@ -10,10 +10,12 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +25,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -40,6 +43,10 @@ public final class SpeedNukerHack extends Hack
 	private final EnumSetting<Mode> mode =
 		new EnumSetting<>("Mode", Mode.values(), Mode.NORMAL);
 	
+	private final BlockSetting id =
+		new BlockSetting("ID", "The type of block to break in ID mode.\n"
+			+ "air = won't break anything", "minecraft:air", true);
+	
 	public SpeedNukerHack()
 	{
 		super("SpeedNuker",
@@ -48,12 +55,13 @@ public final class SpeedNukerHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
+		addSetting(id);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().renderName.get();
+		return mode.getSelected().renderName.apply(id);
 	}
 	
 	@Override
@@ -79,20 +87,19 @@ public final class SpeedNukerHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		
 		// resets
-		WURST.getHax().nukerHack.setId(null);
+		id.setBlock(Blocks.AIR);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		// abort if using IDNuker without an ID being set
-		if(mode.getSelected() == Mode.ID
-			&& WURST.getHax().nukerHack.getId() == null)
+		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		// get valid blocks
-		Iterable<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), mode.getSelected().validator);
+		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
+			pos -> mode.getSelected().validator.test(id, pos));
 		
 		Iterator<BlockPos> autoToolIterator = validBlocks.iterator();
 		if(autoToolIterator.hasNext())
@@ -140,30 +147,30 @@ public final class SpeedNukerHack extends Hack
 			return;
 		
 		// set id
-		WURST.getHax().nukerHack.setId(BlockUtils.getName(pos));
+		id.setBlockName(BlockUtils.getName(pos));
 	}
 	
 	private enum Mode
 	{
-		NORMAL("Normal", () -> "SpeedNuker", pos -> true),
+		NORMAL("Normal", id -> "SpeedNuker", (id, pos) -> true),
 		
 		ID("ID",
-			() -> "IDSpeedNuker [" + WURST.getHax().nukerHack.getId() + "]",
-			pos -> WURST.getHax().nukerHack.getId()
-				.equals(BlockUtils.getName(pos))),
+			id -> "IDSpeedNuker [" + id.getBlockName().replace("minecraft:", "")
+				+ "]",
+			(id, pos) -> BlockUtils.getName(pos).equals(id.getBlockName())),
 		
-		FLAT("Flat", () -> "FlatSpeedNuker",
-			pos -> pos.getY() >= MC.player.getY()),
+		FLAT("Flat", id -> "FlatSpeedNuker",
+			(id, pos) -> pos.getY() >= MC.player.getY()),
 		
-		SMASH("Smash", () -> "SmashSpeedNuker",
-			pos -> BlockUtils.getHardness(pos) >= 1);
+		SMASH("Smash", id -> "SmashSpeedNuker",
+			(id, pos) -> BlockUtils.getHardness(pos) >= 1);
 		
 		private final String name;
-		private final Supplier<String> renderName;
-		private final Predicate<BlockPos> validator;
+		private final Function<BlockSetting, String> renderName;
+		private final BiPredicate<BlockSetting, BlockPos> validator;
 		
-		private Mode(String name, Supplier<String> renderName,
-			Predicate<BlockPos> validator)
+		private Mode(String name, Function<BlockSetting, String> renderName,
+			BiPredicate<BlockSetting, BlockPos> validator)
 		{
 			this.name = name;
 			this.renderName = renderName;
