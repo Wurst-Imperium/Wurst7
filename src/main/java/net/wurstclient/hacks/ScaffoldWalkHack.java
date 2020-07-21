@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (C) 2014 - 2020 | Alexander01998 | DarkMagicSource | All rights reserved.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,7 +33,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 {
   private final CheckboxSetting gravityScaffold = new CheckboxSetting("Gravity Scaffold", 
   "Allow use of gravity-affected blocks when scaffolding\n"
-      + "Useful for removing large bodies of lava", false)
+      + "Useful for removing large bodies of lava", false);
+  
 	public ScaffoldWalkHack()
 	{
 		super("ScaffoldWalk", "Automatically places blocks below your feet.");
