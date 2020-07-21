@@ -25,15 +25,20 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"scaffold walk", "BridgeWalk", "bridge walk", "AutoBridge",
 	"auto bridge", "tower"})
 public final class ScaffoldWalkHack extends Hack implements UpdateListener
 {
+  private final CheckboxSetting gravityScaffold = new CheckboxSetting("Gravity Scaffold", 
+  "Allow use of gravity-affected blocks when scaffolding\n"
+      + "Useful for removing large bodies of lava", false)
 	public ScaffoldWalkHack()
 	{
 		super("ScaffoldWalk", "Automatically places blocks below your feet.");
 		setCategory(Category.BLOCKS);
+    addSetting(gravityScaffold);
 	}
 	
 	@Override
@@ -73,9 +78,11 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 				continue;
 			
 			// filter out blocks that would fall
+      if (!gravityScaffold.isEnabled()) {
 			if(block instanceof FallingBlock && FallingBlock
 				.canFallThrough(BlockUtils.getState(belowPlayer.down())))
 				continue;
+      }
 			
 			newSlot = i;
 			break;
