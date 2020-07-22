@@ -506,7 +506,7 @@ public final class ClickGui
 				parent.getY() + 13 + parent.getScrollOffset() + owner.getY();
 			
 			GL11.glPushMatrix();
-			GL11.glTranslated(x1, y1, 0);
+			GL11.glTranslated(x1, y1, 300);
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;

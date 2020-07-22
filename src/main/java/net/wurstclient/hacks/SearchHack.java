@@ -54,7 +54,7 @@ public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
-		"The type of block to search for.", "minecraft:diamond_ore");
+		"The type of block to search for.", "minecraft:diamond_ore", false);
 	
 	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
