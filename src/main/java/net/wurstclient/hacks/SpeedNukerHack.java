@@ -10,10 +10,12 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +25,9 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.settings.BlockSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -37,8 +42,33 @@ public final class SpeedNukerHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Mode> mode =
-		new EnumSetting<>("Mode", Mode.values(), Mode.NORMAL);
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
+			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
+			+ "type. Left-click on a block to select it.\n"
+			+ "\u00a7lMultiID\u00a7r mode only breaks the block types\n"
+			+ "in your MultiID List.\n"
+			+ "\u00a7lFlat\u00a7r mode flattens the area around you,\n"
+			+ "but won't dig down.\n"
+			+ "\u00a7lSmash\u00a7r mode only breaks blocks that\n"
+			+ "can be destroyed instantly (e.g. tall grass).",
+		Mode.values(), Mode.NORMAL);
+	
+	private final BlockSetting id =
+		new BlockSetting("ID", "The type of block to break in ID mode.\n"
+			+ "air = won't break anything", "minecraft:air", true);
+	
+	private final CheckboxSetting lockId =
+		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
+			+ "on blocks or restarting Nuker.", false);
+	
+	private final BlockListSetting multiIdList = new BlockListSetting(
+		"MultiID List", "The types of blocks to break in MultiID mode.",
+		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
+		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
+		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
+		"minecraft:lapis_ore", "minecraft:nether_gold_ore",
+		"minecraft:nether_quartz_ore", "minecraft:redstone_ore");
 	
 	public SpeedNukerHack()
 	{
@@ -48,12 +78,15 @@ public final class SpeedNukerHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
+		addSetting(id);
+		addSetting(lockId);
+		addSetting(multiIdList);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().renderName.get();
+		return mode.getSelected().renderName.apply(this);
 	}
 	
 	@Override
@@ -79,20 +112,20 @@ public final class SpeedNukerHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		
 		// resets
-		WURST.getHax().nukerHack.setId(null);
+		if(!lockId.isChecked())
+			id.setBlock(Blocks.AIR);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		// abort if using IDNuker without an ID being set
-		if(mode.getSelected() == Mode.ID
-			&& WURST.getHax().nukerHack.getId() == null)
+		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		// get valid blocks
-		Iterable<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), mode.getSelected().validator);
+		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
+			pos -> mode.getSelected().validator.test(this, pos));
 		
 		Iterator<BlockPos> autoToolIterator = validBlocks.iterator();
 		if(autoToolIterator.hasNext())
@@ -124,6 +157,13 @@ public final class SpeedNukerHack extends Hack
 	@Override
 	public void onLeftClick(LeftClickEvent event)
 	{
+		// check mode
+		if(mode.getSelected() != Mode.ID)
+			return;
+		
+		if(lockId.isChecked())
+			return;
+		
 		// check hitResult
 		if(MC.crosshairTarget == null
 			|| !(MC.crosshairTarget instanceof BlockHitResult))
@@ -135,35 +175,38 @@ public final class SpeedNukerHack extends Hack
 			|| BlockUtils.getState(pos).getMaterial() == Material.AIR)
 			return;
 		
-		// check mode
-		if(mode.getSelected() != Mode.ID)
-			return;
-		
 		// set id
-		WURST.getHax().nukerHack.setId(BlockUtils.getName(pos));
+		id.setBlockName(BlockUtils.getName(pos));
 	}
 	
 	private enum Mode
 	{
-		NORMAL("Normal", () -> "SpeedNuker", pos -> true),
+		NORMAL("Normal", n -> "SpeedNuker", (n, pos) -> true),
 		
 		ID("ID",
-			() -> "IDSpeedNuker [" + WURST.getHax().nukerHack.getId() + "]",
-			pos -> WURST.getHax().nukerHack.getId()
-				.equals(BlockUtils.getName(pos))),
+			n -> "IDSpeedNuker ["
+				+ n.id.getBlockName().replace("minecraft:", "") + "]",
+			(n, pos) -> BlockUtils.getName(pos).equals(n.id.getBlockName())),
 		
-		FLAT("Flat", () -> "FlatSpeedNuker",
-			pos -> pos.getY() >= MC.player.getY()),
+		MULTI_ID("MultiID",
+			n -> "MultiIDNuker [" + n.multiIdList.getBlockNames().size()
+				+ (n.multiIdList.getBlockNames().size() == 1 ? " ID]"
+					: " IDs]"),
+			(n, p) -> n.multiIdList.getBlockNames()
+				.contains(BlockUtils.getName(p))),
 		
-		SMASH("Smash", () -> "SmashSpeedNuker",
-			pos -> BlockUtils.getHardness(pos) >= 1);
+		FLAT("Flat", n -> "FlatSpeedNuker",
+			(n, pos) -> pos.getY() >= MC.player.getY()),
+		
+		SMASH("Smash", n -> "SmashSpeedNuker",
+			(n, pos) -> BlockUtils.getHardness(pos) >= 1);
 		
 		private final String name;
-		private final Supplier<String> renderName;
-		private final Predicate<BlockPos> validator;
+		private final Function<SpeedNukerHack, String> renderName;
+		private final BiPredicate<SpeedNukerHack, BlockPos> validator;
 		
-		private Mode(String name, Supplier<String> renderName,
-			Predicate<BlockPos> validator)
+		private Mode(String name, Function<SpeedNukerHack, String> renderName,
+			BiPredicate<SpeedNukerHack, BlockPos> validator)
 		{
 			this.name = name;
 			this.renderName = renderName;
