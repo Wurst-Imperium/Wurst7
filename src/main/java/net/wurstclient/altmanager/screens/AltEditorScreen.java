@@ -25,12 +25,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.minecraft.class_5481;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
@@ -95,7 +96,7 @@ public abstract class AltEditorScreen extends Screen
 			String stars = "";
 			for(int i = 0; i < text.length(); i++)
 				stars += "*";
-			return StringRenderable.plain(stars);
+			return class_5481.method_30747(stars, Style.EMPTY);
 		});
 		children.add(passwordBox);
 		

@@ -253,7 +253,7 @@ public final class TunnellerHack extends Hack
 	private BlockPos offset(BlockPos pos, Vec3i vec)
 	{
 		return pos.offset(direction.rotateYCounterclockwise(), vec.getX())
-			.up(vec.getY());
+			.method_30930(vec.getY());
 	}
 	
 	private int getDistance(BlockPos pos1, BlockPos pos2)
@@ -519,7 +519,7 @@ public final class TunnellerHack extends Hack
 				// check ceiling blocks
 				if(pos.getY() == maxY)
 				{
-					BlockPos pos4 = pos.up();
+					BlockPos pos4 = pos.method_30931();
 					
 					if(!BlockUtils.getState(pos4).getFluidState().isEmpty())
 						liquids.add(pos4);

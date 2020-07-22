@@ -117,7 +117,7 @@ public class WalkPathProcessor extends PathProcessor
 				{
 					// directional jump
 					if(index < path.size() - 1
-						&& !nextPos.up().equals(path.get(index + 1)))
+						&& !nextPos.method_30931().equals(path.get(index + 1)))
 						index++;
 					
 					// jump up

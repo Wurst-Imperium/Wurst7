@@ -88,7 +88,7 @@ public final class InstantBunkerHack extends Hack
 		// set positions
 		positions.clear();
 		for(int[] pos : template)
-			positions.add(startPos.up(pos[1]).offset(facing, pos[2])
+			positions.add(startPos.method_30930(pos[1]).offset(facing, pos[2])
 				.offset(facing2, pos[0]));
 		
 		if(!"".isEmpty())// mode.getSelected() == 1)

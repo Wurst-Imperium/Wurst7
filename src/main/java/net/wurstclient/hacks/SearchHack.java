@@ -449,7 +449,7 @@ public final class SearchHack extends Hack
 			vertices.add(getVertex(pos, 0, 0, 1));
 		}
 		
-		if(!matchingBlocks.contains(pos.up()))
+		if(!matchingBlocks.contains(pos.method_30931()))
 		{
 			vertices.add(getVertex(pos, 0, 1, 0));
 			vertices.add(getVertex(pos, 0, 1, 1));

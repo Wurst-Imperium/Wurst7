@@ -144,7 +144,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
+			method_30901(matrixStack, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
