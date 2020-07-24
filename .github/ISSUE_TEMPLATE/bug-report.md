@@ -21,10 +21,10 @@ If applicable, add screenshots, videos or other files to help explain the proble
 ## Crash Report
 Please find your crash report file at "%appdata%/.minecraft/crash-reports", open the file in a text editor and copy-paste its content below.
 
-<!-- necessary formatting code, please ignore -->```
+```
 
 (crash report goes here)
 
-```<!-- necessary formatting code, please ignore -->
+```
 
 **Please note:** If the game did not crash, please hold down F3+C for 10 seconds to generate a crash report. Even when a bug doesn't cause the game to crash, this file still contains useful information that can help us to find and fix the problem. Because of this, please always include a crash report.
