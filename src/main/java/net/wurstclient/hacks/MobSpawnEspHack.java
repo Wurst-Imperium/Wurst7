@@ -192,7 +192,7 @@ public final class MobSpawnEspHack extends Hack
 				(ChunkDeltaUpdateS2CPacket)packet;
 			
 			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
-			change.method_30621((pos, state) -> changedBlocks.add(pos));
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
 			if(changedBlocks.isEmpty())
 				return;
 			

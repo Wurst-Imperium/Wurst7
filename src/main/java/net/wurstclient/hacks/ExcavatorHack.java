@@ -671,9 +671,9 @@ public final class ExcavatorHack extends Hack
 			BlockPos goal = getGoal();
 			
 			return done = goal.down(2).equals(current)
-				|| goal.method_30931().equals(current)
-				|| goal.north().equals(current) || goal.south().equals(current)
-				|| goal.west().equals(current) || goal.east().equals(current)
+				|| goal.up().equals(current) || goal.north().equals(current)
+				|| goal.south().equals(current) || goal.west().equals(current)
+				|| goal.east().equals(current)
 				|| goal.down().north().equals(current)
 				|| goal.down().south().equals(current)
 				|| goal.down().west().equals(current)

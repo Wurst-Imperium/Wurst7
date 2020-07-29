@@ -64,7 +64,7 @@ public final class AutoBuildTemplate
 		{
 			BlockPos pos = startPos;
 			pos = pos.offset(left, block[0]);
-			pos = pos.method_30930(block[1]);
+			pos = pos.up(block[1]);
 			pos = pos.offset(front, block[2]);
 			positions.add(pos);
 		}

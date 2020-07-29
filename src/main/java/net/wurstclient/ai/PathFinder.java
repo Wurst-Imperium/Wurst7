@@ -139,7 +139,7 @@ public class PathFinder
 		BlockPos southWest = south.west();
 		BlockPos northWest = north.west();
 		
-		BlockPos up = pos.method_30931();
+		BlockPos up = pos.up();
 		BlockPos down = pos.down();
 		
 		// flying
@@ -187,12 +187,12 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < 256 && canGoThrough(up.method_30931())
+		if(pos.getY() < 256 && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
 				|| canSafelyStandOn(south) || canSafelyStandOn(west))
-			&& (divingAllowed || BlockUtils.getState(up.method_30931())
+			&& (divingAllowed || BlockUtils.getState(up.up())
 				.getMaterial() != Material.WATER))
 			neighbors.add(new PathPos(up, onGround));
 		
@@ -230,9 +230,9 @@ public class PathFinder
 	
 	protected boolean isPassable(BlockPos pos)
 	{
-		return canGoThrough(pos) && canGoThrough(pos.method_30931())
+		return canGoThrough(pos) && canGoThrough(pos.up())
 			&& canGoAbove(pos.down()) && (divingAllowed || BlockUtils
-				.getState(pos.method_30931()).getMaterial() != Material.WATER);
+				.getState(pos.up()).getMaterial() != Material.WATER);
 	}
 	
 	protected boolean canBeSolid(BlockPos pos)
@@ -326,7 +326,7 @@ public class PathFinder
 				
 			// check if point is not part of this fall, meaning that the fall is
 			// too short to cause any damage
-			if(!pos.method_30930(i).equals(prevPos))
+			if(!pos.up(i).equals(prevPos))
 				return true;
 			
 			// check if block resets fall damage
@@ -359,7 +359,7 @@ public class PathFinder
 			return false;
 		
 		// check if any adjacent block is solid
-		BlockPos up = pos.method_30931();
+		BlockPos up = pos.up();
 		if(!canBeSolid(pos.north()) && !canBeSolid(pos.east())
 			&& !canBeSolid(pos.south()) && !canBeSolid(pos.west())
 			&& !canBeSolid(up.north()) && !canBeSolid(up.east())
@@ -380,8 +380,8 @@ public class PathFinder
 			return true;
 		
 		// check head
-		Block blockHead = BlockUtils.getBlock(pos.method_30931());
-		if(BlockUtils.getState(pos.method_30931()).getMaterial().isLiquid()
+		Block blockHead = BlockUtils.getBlock(pos.up());
+		if(BlockUtils.getState(pos.up()).getMaterial().isLiquid()
 			|| blockHead instanceof CobwebBlock)
 			return true;
 		
