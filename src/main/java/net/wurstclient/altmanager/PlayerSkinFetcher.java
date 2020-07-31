@@ -49,9 +49,17 @@ public class PlayerSkinFetcher extends ResourceTexture {
     public PlayerSkinFetcher(@Nullable File cacheFile, String username, boolean convertLegacy, @Nullable Runnable callback) throws IOException {
         super(DefaultSkinHelper.getTexture(AbstractClientPlayerEntity.getOfflinePlayerUuid(username)));
         this.cacheFile = cacheFile;
-        this.url = SkinUtils.getSkinUrl(username).toString();
         this.convertLegacy = convertLegacy;
         this.loadedCallback = callback;
+
+        // Check if the url exists in the first place, should prevent the following issue:
+        // https://github.com/Wurst-Imperium/Wurst7/pull/159#issuecomment-666946362
+        URL tempUrl = SkinUtils.getSkinUrl(username);
+        if(tempUrl == null){
+            this.url = null;
+            return;
+        }
+        this.url = tempUrl.toString();
     }
 
     private void onTextureLoaded(NativeImage image) {
@@ -91,6 +99,12 @@ public class PlayerSkinFetcher extends ResourceTexture {
 //            }
 //
 //        });
+
+        // Exit early if the skin url hasn't been found, either due to it being a Email or it just doesn't exist.
+        // https://github.com/Wurst-Imperium/Wurst7/pull/159#issuecomment-666946362
+        if(this.url == null) {
+            return;
+        }
 
         if (this.loader == null) {
             NativeImage nativeImage2;
