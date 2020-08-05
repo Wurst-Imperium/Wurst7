@@ -10,11 +10,11 @@ package net.wurstclient.hacks;
 import java.util.List;
 
 import net.minecraft.CharacterVisitor;
-import net.minecraft.class_5481;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
@@ -48,7 +48,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine<class_5481>> chatLines = event.getChatLines();
+		List<ChatHudLine<OrderedText>> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
 		
@@ -82,7 +82,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<class_5481> newLines = ChatMessages.breakRenderedChatMessageLines(
+		List<OrderedText> newLines = ChatMessages.breakRenderedChatMessageLines(
 			event.getComponent(), maxTextLength, MC.textRenderer);
 		
 		int spamCounter = 1;
