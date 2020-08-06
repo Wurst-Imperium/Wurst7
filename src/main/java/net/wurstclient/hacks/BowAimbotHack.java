@@ -19,6 +19,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -97,6 +98,8 @@ public final class BowAimbotHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't attack armor stands.", false);
 	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
@@ -123,6 +126,7 @@ public final class BowAimbotHack extends Hack
 		addSetting(filterVillagers);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
 	}
 	
 	@Override
@@ -230,6 +234,9 @@ public final class BowAimbotHack extends Hack
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterStands.isChecked())
+			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)

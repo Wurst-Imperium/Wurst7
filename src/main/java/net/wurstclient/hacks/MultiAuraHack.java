@@ -16,6 +16,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -94,6 +95,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't attack armor stands.", false);
 	
 	private int timer;
 	
@@ -119,6 +122,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(filterVillagers);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
 	}
 	
 	@Override
@@ -219,6 +223,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterStands.isChecked())
+			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		ArrayList<Entity> entities =
 			stream.collect(Collectors.toCollection(() -> new ArrayList<>()));

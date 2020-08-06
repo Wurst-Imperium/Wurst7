@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -87,6 +88,8 @@ public final class RemoteViewHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't view invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't view armor stands.", true);
 	
 	private Entity entity = null;
 	private boolean wasInvisible;
@@ -111,6 +114,7 @@ public final class RemoteViewHack extends Hack
 		addSetting(filterVillagers);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
 	}
 	
 	@Override
@@ -178,6 +182,9 @@ public final class RemoteViewHack extends Hack
 			
 			if(filterInvisible.isChecked())
 				stream = stream.filter(e -> !e.isInvisible());
+			
+			if(filterStands.isChecked())
+				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 			
 			entity = stream
 				.min(Comparator

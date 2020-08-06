@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -102,6 +103,8 @@ public final class FollowHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't follow invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't follow armor stands.", true);
 	
 	public FollowHack()
 	{
@@ -125,6 +128,7 @@ public final class FollowHack extends Hack
 		addSetting(filterVillagers);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
 	}
 	
 	@Override
@@ -200,6 +204,9 @@ public final class FollowHack extends Hack
 			
 			if(filterInvisible.isChecked())
 				stream = stream.filter(e -> !e.isInvisible());
+			
+			if(filterStands.isChecked())
+				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 			
 			entity = stream
 				.min(Comparator
