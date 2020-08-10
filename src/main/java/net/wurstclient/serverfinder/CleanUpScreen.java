@@ -194,7 +194,7 @@ public class CleanUpScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			method_30901(matrixStack, woButton.tooltip, mouseX, mouseY);
+			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
