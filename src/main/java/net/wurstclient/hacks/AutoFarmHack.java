@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.wurstclient.settings.CheckboxSetting;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.*;
@@ -49,6 +52,8 @@ public final class AutoFarmHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	private final CheckboxSetting useFortune = new CheckboxSetting("Use fortune tools",
+			"Switch to a tool with fortune enchantment before harvesting", false);
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	
@@ -60,6 +65,7 @@ public final class AutoFarmHack extends Hack
 	private int displayList;
 	private int box;
 	private int node;
+	private final HashSet<Block> fortuneBlocks;
 	
 	public AutoFarmHack()
 	{
@@ -70,6 +76,16 @@ public final class AutoFarmHack extends Hack
 				+ "nether warts.");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		addSetting(useFortune);
+
+		fortuneBlocks = new HashSet<>();
+		fortuneBlocks.add(Blocks.WHEAT);
+		fortuneBlocks.add(Blocks.CARROTS);
+		fortuneBlocks.add(Blocks.POTATOES);
+		fortuneBlocks.add(Blocks.BEETROOTS);
+		fortuneBlocks.add(Blocks.NETHER_WART);
+		fortuneBlocks.add(Blocks.PUMPKIN_STEM);
+		fortuneBlocks.add(Blocks.MELON_STEM);
 	}
 	
 	@Override
@@ -313,29 +329,78 @@ public final class AutoFarmHack extends Hack
 			ItemStack stack = player.inventory.getStack(slot);
 			if(stack.isEmpty() || stack.getItem() != neededItem)
 				continue;
-			
-			if(slot < 9)
-				player.inventory.selectedSlot = slot;
-			else if(player.inventory.getEmptySlot() < 9)
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
-			else if(player.inventory.getEmptySlot() != -1)
-			{
-				IMC.getInteractionManager()
-					.windowClick_QUICK_MOVE(player.inventory.selectedSlot + 36);
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
-			}else
-			{
-				IMC.getInteractionManager()
-					.windowClick_PICKUP(player.inventory.selectedSlot + 36);
-				IMC.getInteractionManager().windowClick_PICKUP(slot);
-				IMC.getInteractionManager()
-					.windowClick_PICKUP(player.inventory.selectedSlot + 36);
-			}
-			
+
+			selectInvSlot(slot);
 			return true;
 		}
-		
+
 		return false;
+	}
+
+	private void selectInvSlot(int slot)
+	{
+		ClientPlayerEntity player = MC.player;
+
+		// Already at the desired slot, skip.
+		if (slot == player.inventory.selectedSlot)
+			return;
+
+		// In hotbar, select directly
+		if (slot < 9)
+		{
+			player.inventory.selectedSlot = slot;
+			return;
+		}
+
+		int nextSlot = (player.inventory.selectedSlot + 1) % 9;
+		int inventoryEmptySlot = player.inventory.getEmptySlot();
+
+		if (inventoryEmptySlot >= 0 && inventoryEmptySlot < 9)
+		{
+			// Hotbar has an empty slot, shift click to move the item
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
+			player.inventory.selectedSlot = inventoryEmptySlot;
+			return;
+		}
+
+		if (inventoryEmptySlot != -1)
+		{
+			// Inventory has an empty slot, shift click twice to switch
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(nextSlot + 36);
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
+		} else
+		{
+			// Inventory full, click 3 times to switch
+			IMC.getInteractionManager().windowClick_PICKUP(nextSlot + 36);
+			IMC.getInteractionManager().windowClick_PICKUP(slot);
+			IMC.getInteractionManager().windowClick_PICKUP(nextSlot + 36);
+		}
+		player.inventory.selectedSlot = nextSlot;
+	}
+	
+	private int getFortuneSlot()
+	{
+		int fortuneSlot = -1;
+		int bestFortuneLevel = 0;
+
+		for (int i = 0; i < 36; i++) {
+			ItemStack stack = MC.player.inventory.getStack(i);
+			if(stack.isEmpty())
+				continue;
+
+			int level = EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack);
+			if (level > bestFortuneLevel) {
+				fortuneSlot = i;
+				bestFortuneLevel = level;
+			}
+		}
+		return fortuneSlot;
+	}
+	
+	private boolean affectedByFortune(BlockPos pos)
+	{
+		Block block = BlockUtils.getBlock(pos);
+		return fortuneBlocks.contains(block);
 	}
 	
 	private void placeBlockSimple(BlockPos pos)
@@ -437,11 +502,22 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		for(BlockPos pos : blocksToHarvest)
+		{
+		    if (useFortune.isChecked() && affectedByFortune(pos)) {
+		        int fortuneSlot = getFortuneSlot();
+
+				if (fortuneSlot >= 0 && fortuneSlot != MC.player.inventory.selectedSlot) {
+					selectInvSlot(fortuneSlot);
+					return;
+				}
+			}
+
 			if(BlockBreaker.breakOneBlock(pos))
 			{
 				currentBlock = pos;
 				break;
 			}
+		}
 		
 		if(currentBlock == null)
 			MC.interactionManager.cancelBlockBreaking();
