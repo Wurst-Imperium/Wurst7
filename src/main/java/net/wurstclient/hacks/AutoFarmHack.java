@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import org.lwjgl.opengl.GL11;
 
@@ -54,6 +56,13 @@ public final class AutoFarmHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	private final CheckboxSetting useFortune = new CheckboxSetting("Use fortune tools",
 			"Switch to a tool with fortune enchantment before harvesting", false);
+	private final BlockListSetting farmingBlocks = new BlockListSetting("Farming blocks",
+			"List of blocks to farm.",
+			"minecraft:wheat", "minecraft:carrots", "minecraft:potatoes",
+			"minecraft:beetroots", "minecraft:pumpkin", "minecraft:melon",
+			"minecraft:cactus", "minecraft:sugar_cane", "minecraft:nether_wart",
+			"minecraft:kelp", "minecraft:kelp_plant", "minecraft:bamboo");
+
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	
@@ -78,6 +87,7 @@ public final class AutoFarmHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(useFortune);
+		addSetting(farmingBlocks);
 
 		seeds = new HashMap<>();
 		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
@@ -266,11 +276,18 @@ public final class AutoFarmHack extends Hack
 	{
 		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
+		String name = BlockUtils.getName(block);
+
+		List<String> farmingBlockNames = farmingBlocks.getBlockNames();
+		if(Collections.binarySearch(farmingBlockNames, name) < 0)
+			return false;
 		
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
 		else if(block instanceof GourdBlock)
 			return true;
+		else if(block instanceof StemBlock)
+			return state.get(StemBlock.AGE) >= 7;
 		else if(block instanceof SugarCaneBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
 				&& !(BlockUtils
