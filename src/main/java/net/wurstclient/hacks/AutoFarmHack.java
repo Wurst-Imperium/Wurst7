@@ -65,6 +65,7 @@ public final class AutoFarmHack extends Hack
 	private int displayList;
 	private int box;
 	private int node;
+	private final HashMap<Block, Item> seeds;
 	private final HashSet<Block> fortuneBlocks;
 	
 	public AutoFarmHack()
@@ -77,6 +78,15 @@ public final class AutoFarmHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(useFortune);
+
+		seeds = new HashMap<>();
+		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
+		seeds.put(Blocks.CARROTS, Items.CARROT);
+		seeds.put(Blocks.POTATOES, Items.POTATO);
+		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
+		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
+		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
+		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
 
 		fortuneBlocks = new HashSet<>();
 		fortuneBlocks.add(Blocks.WHEAT);
@@ -280,15 +290,6 @@ public final class AutoFarmHack extends Hack
 	
 	private void registerPlants(List<BlockPos> blocks)
 	{
-		HashMap<Block, Item> seeds = new HashMap<>();
-		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
-		seeds.put(Blocks.CARROTS, Items.CARROT);
-		seeds.put(Blocks.POTATOES, Items.POTATO);
-		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
-		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
-		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
-		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
-		
 		plants.putAll(blocks.parallelStream()
 			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
 			.collect(Collectors.toMap(pos -> pos,
