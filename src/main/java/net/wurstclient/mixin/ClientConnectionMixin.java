@@ -45,7 +45,9 @@ public abstract class ClientConnectionMixin
 			ci.cancel();
 	}
 	
-	@ModifyVariable(method = "send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", at = @At("HEAD"))
+	@ModifyVariable(
+		method = "send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V",
+		at = @At("HEAD"))
 	public Packet<?> onSendPacket(Packet<?> packet)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);
@@ -58,7 +60,9 @@ public abstract class ClientConnectionMixin
 		method = {
 			"send(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V"},
 		cancellable = true)
-	private void onSendPacket(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback, CallbackInfo ci)
+	private void onSendPacket(Packet<?> packet,
+		GenericFutureListener<? extends Future<? super Void>> callback,
+		CallbackInfo ci)
 	{
 		if(event.isCancelled())
 			ci.cancel();

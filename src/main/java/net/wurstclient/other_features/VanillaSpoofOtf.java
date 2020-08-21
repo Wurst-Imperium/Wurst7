@@ -19,16 +19,17 @@ import net.wurstclient.settings.CheckboxSetting;
 @DontBlock
 public final class VanillaSpoofOtf extends OtherFeature
 {
-	private final CheckboxSetting spoof = new CheckboxSetting("Spoof Vanilla", false);
+	private final CheckboxSetting spoof =
+		new CheckboxSetting("Spoof Vanilla", false);
 	
 	public VanillaSpoofOtf()
 	{
 		super("VanillaSpoof",
 			"Is your server blocking Fabric? This feature will help\n"
-			+ "you get around the block by pretending to be a vanilla client.");
+				+ "you get around the block by pretending to be a vanilla client.");
 		addSetting(spoof);
 	}
-
+	
 	public void onSentPacket(PacketOutputEvent event)
 	{
 		if(!spoof.isChecked())
@@ -37,12 +38,16 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!(event.getPacket() instanceof CustomPayloadC2SPacket))
 			return;
 		
-		CustomPayloadC2SPacketAccessor packet = (CustomPayloadC2SPacketAccessor)event.getPacket();
-		if(packet.getChannel().getNamespace().equals("minecraft") && packet.getChannel().getPath().equals("register"))
+		CustomPayloadC2SPacketAccessor packet =
+			(CustomPayloadC2SPacketAccessor)event.getPacket();
+		if(packet.getChannel().getNamespace().equals("minecraft")
+			&& packet.getChannel().getPath().equals("register"))
 			event.cancel();
 		
-		if(packet.getChannel().getNamespace().equals("minecraft") && packet.getChannel().getPath().equals("brand"))
-			event.setPacket(new CustomPayloadC2SPacket(CustomPayloadC2SPacket.BRAND,
+		if(packet.getChannel().getNamespace().equals("minecraft")
+			&& packet.getChannel().getPath().equals("brand"))
+			event.setPacket(new CustomPayloadC2SPacket(
+				CustomPayloadC2SPacket.BRAND,
 				new PacketByteBuf(Unpooled.buffer()).writeString("vanilla")));
 		
 		if(packet.getChannel().getNamespace().equals("fabric"))
