@@ -9,8 +9,8 @@ package net.wurstclient.other_features;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.impl.networking.CustomPayloadC2SPacketAccessor;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.util.PacketByteBuf;
 import net.wurstclient.DontBlock;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 import net.wurstclient.other_feature.OtherFeature;
