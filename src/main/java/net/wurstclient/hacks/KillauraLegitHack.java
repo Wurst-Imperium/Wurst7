@@ -235,6 +235,7 @@ public final class KillauraLegitHack extends Hack
 			return;
 		
 		// attack entity
+		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 	}

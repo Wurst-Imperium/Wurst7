@@ -238,6 +238,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
 				rotations.getPitch(), MC.player.isOnGround()));
 		
+		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, entity);
 		player.swingHand(Hand.MAIN_HAND);
 	}

@@ -255,6 +255,7 @@ public final class ClickAuraHack extends Hack
 		MC.player.networkHandler.sendPacket(packet);
 		
 		// attack entity
+		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 	}

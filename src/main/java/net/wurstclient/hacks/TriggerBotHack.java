@@ -143,6 +143,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		WURST.getHax().autoSwordHack.setSlot();
 		
+		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 	}
