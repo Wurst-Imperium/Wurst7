@@ -62,7 +62,7 @@ public final class BowAimbotHack extends Hack
 			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
 			+ "the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+		Priority.values(), Priority.DISTANCE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
