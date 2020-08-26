@@ -15,6 +15,7 @@ import java.util.stream.StreamSupport;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -105,8 +106,11 @@ public final class FightBotHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't attack armor stands.", false);
+	private final CheckboxSetting filterCrystals = new CheckboxSetting(
+		"Filter end crytsals", "Won't attack end crystals.", false);
 	
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
@@ -136,6 +140,7 @@ public final class FightBotHack extends Hack
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
 		addSetting(filterStands);
+		addSetting(filterCrystals);
 	}
 	
 	@Override
@@ -173,12 +178,14 @@ public final class FightBotHack extends Hack
 	public void onUpdate()
 	{
 		// set entity
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity));
+		Stream<Entity> stream = StreamSupport
+			.stream(MC.world.getEntities().spliterator(), true)
+			.filter(e -> !e.removed)
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity)
+			.filter(e -> e != MC.player)
+			.filter(e -> !(e instanceof FakePlayerEntity));
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -234,6 +241,9 @@ public final class FightBotHack extends Hack
 		
 		if(filterStands.isChecked())
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
+		
+		if(filterCrystals.isChecked())
+			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
 		Entity entity = stream
 			.min(
