@@ -50,7 +50,7 @@ public final class KillauraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far Killaura will reach\n" + "to attack entitites.\n"
+		"Determines how far Killaura will reach\n" + "to attack entities.\n"
 			+ "Anything that is further away than the\n"
 			+ "specified value will not be attacked.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
