@@ -17,6 +17,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -97,8 +98,11 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't attack armor stands.", false);
+	private final CheckboxSetting filterCrystals = new CheckboxSetting(
+		"Filter end crytsals", "Won't attack end crystals.", false);
 	
 	public TpAuraHack()
 	{
@@ -122,6 +126,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
 		addSetting(filterStands);
+		addSetting(filterCrystals);
 	}
 	
 	@Override
@@ -152,14 +157,16 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		
 		// set entity
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<LivingEntity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e != player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		Stream<Entity> stream =
+			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+				.filter(e -> !e.removed)
+				.filter(e -> e instanceof LivingEntity
+					&& ((LivingEntity)e).getHealth() > 0
+					|| e instanceof EndCrystalEntity)
+				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+				.filter(e -> e != player)
+				.filter(e -> !(e instanceof FakePlayerEntity))
+				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -216,6 +223,9 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		if(filterStands.isChecked())
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
+		if(filterCrystals.isChecked())
+			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
+		
 		Entity entity =
 			stream.min(priority.getSelected().comparator).orElse(null);
 		if(entity == null)
@@ -251,13 +261,13 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("Health", e -> e.getHealth());
+		HEALTH("Health", e -> e instanceof LivingEntity
+			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;
-		private final Comparator<LivingEntity> comparator;
+		private final Comparator<Entity> comparator;
 		
-		private Priority(String name,
-			ToDoubleFunction<LivingEntity> keyExtractor)
+		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
 		{
 			this.name = name;
 			comparator = Comparator.comparingDouble(keyExtractor);
