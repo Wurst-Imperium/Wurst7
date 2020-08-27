@@ -29,8 +29,9 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			cir.setReturnValue(0F);
 	}
 	
+	// getSkyAngle
 	@Override
-	public float getSkyAngle(float tickDelta)
+	public float method_30274(float tickDelta)
 	{
 		NoWeatherHack noWeatherHack =
 			WurstClient.INSTANCE.getHax().noWeatherHack;
@@ -51,6 +52,6 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 		if(noWeatherHack.isMoonPhaseChanged())
 			return noWeatherHack.getChangedMoonPhase();
 		
-		return getDimension().method_28531(getLevelProperties().getTimeOfDay());
+		return getDimension().getMoonPhase(getLunarTime());
 	}
 }

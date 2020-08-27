@@ -7,25 +7,25 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoSignHack;
-import net.wurstclient.mixinterface.ISignBlockEntity;
 
 @Mixin(SignEditScreen.class)
 public abstract class SignEditScreenMixin extends Screen
 {
 	@Shadow
-	private SignBlockEntity sign;
+	@Final
+	private String[] field_24285;
 	
 	private SignEditScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -37,21 +37,18 @@ public abstract class SignEditScreenMixin extends Screen
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
 		
-		Text[] autoSignText = autoSignHack.getSignText();
+		String[] autoSignText = autoSignHack.getSignText();
 		if(autoSignText == null)
 			return;
 		
-		for(int i = 0; i < 4; i++)
-			sign.setTextOnRow(i, autoSignText[i]);
-		
+		field_24285 = autoSignText;
 		finishEditing();
 	}
 	
 	@Inject(at = {@At("HEAD")}, method = {"finishEditing()V"})
 	private void onFinishEditing(CallbackInfo ci)
 	{
-		Text[] allRows = ((ISignBlockEntity)sign).getTextOnAllRows();
-		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(allRows);
+		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(field_24285);
 	}
 	
 	@Shadow

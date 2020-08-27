@@ -150,13 +150,13 @@ public final class SearchHack extends Hack
 		{
 			ChunkDeltaUpdateS2CPacket change =
 				(ChunkDeltaUpdateS2CPacket)packet;
-			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
-				change.getRecords();
-			if(changedBlocks.length == 0)
+			
+			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
+			if(changedBlocks.isEmpty())
 				return;
 			
-			BlockPos pos = changedBlocks[0].getBlockPos();
-			chunk = world.getChunk(pos);
+			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{

@@ -92,11 +92,11 @@ public abstract class EntityRendererMixin<T extends Entity>
 		TextRenderer textRenderer = this.getFontRenderer();
 		float h = -textRenderer.getWidth(text) / 2;
 		
-		textRenderer.draw(text, h, j, 553648127, false, matrix4f,
-			vertexConsumerProvider, bl, k, i);
+		textRenderer.draw(text.asOrderedText(), h, j, 553648127, false,
+			matrix4f, vertexConsumerProvider, bl, k, i);
 		
 		if(bl)
-			textRenderer.draw(text, h, j, -1, false, matrix4f,
+			textRenderer.draw(text.asOrderedText(), h, j, -1, false, matrix4f,
 				vertexConsumerProvider, false, 0, i);
 		
 		matrixStack.pop();
