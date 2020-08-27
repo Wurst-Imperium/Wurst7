@@ -17,7 +17,7 @@ public final class RvCmd extends Command
 	public RvCmd()
 	{
 		super("rv", "Makes RemoteView target a specific entity.",
-			".rv <player>");
+			".rv <entity>");
 	}
 	
 	@Override

@@ -13,17 +13,18 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.passive.AbstractTraderEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
@@ -78,8 +79,9 @@ public final class RemoteViewHack extends Hack
 		new CheckboxSetting("Filter pets",
 			"Won't view tamed wolves,\n" + "tamed horses, etc.", true);
 	
-	private final CheckboxSetting filterVillagers =
-		new CheckboxSetting("Filter villagers", "Won't view villagers.", true);
+	private final CheckboxSetting filterTraders =
+		new CheckboxSetting("Filter traders",
+			"Won't view villagers, wandering traders, etc.", true);
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
@@ -87,6 +89,8 @@ public final class RemoteViewHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't view invisible entities.", false);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't view armor stands.", true);
 	
 	private Entity entity = null;
 	private boolean wasInvisible;
@@ -108,9 +112,10 @@ public final class RemoteViewHack extends Hack
 		addSetting(filterAnimals);
 		addSetting(filterBabies);
 		addSetting(filterPets);
-		addSetting(filterVillagers);
+		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
 	}
 	
 	@Override
@@ -169,14 +174,18 @@ public final class RemoteViewHack extends Hack
 					.filter(e -> !(e instanceof HorseBaseEntity
 						&& ((HorseBaseEntity)e).isTame()));
 			
-			if(filterVillagers.isChecked())
-				stream = stream.filter(e -> !(e instanceof VillagerEntity));
+			if(filterTraders.isChecked())
+				stream =
+					stream.filter(e -> !(e instanceof AbstractTraderEntity));
 			
 			if(filterGolems.isChecked())
 				stream = stream.filter(e -> !(e instanceof GolemEntity));
 			
 			if(filterInvisible.isChecked())
 				stream = stream.filter(e -> !e.isInvisible());
+			
+			if(filterStands.isChecked())
+				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 			
 			entity = stream
 				.min(Comparator
