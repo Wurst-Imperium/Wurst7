@@ -13,17 +13,19 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.passive.AbstractTraderEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
@@ -70,14 +72,21 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		new CheckboxSetting("Filter pets",
 			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
 	
-	private final CheckboxSetting filterVillagers = new CheckboxSetting(
-		"Filter villagers", "Won't attack villagers.", false);
+	private final CheckboxSetting filterTraders =
+		new CheckboxSetting("Filter traders",
+			"Won't attack villagers, wandering traders, etc.", false);
+	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't attack armor stands.", false);
+	private final CheckboxSetting filterCrystals = new CheckboxSetting(
+		"Filter end crytsals", "Won't attack end crystals.", false);
 	
 	public TriggerBotHack()
 	{
@@ -94,9 +103,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		addSetting(filterAnimals);
 		addSetting(filterBabies);
 		addSetting(filterPets);
-		addSetting(filterVillagers);
+		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterStands);
+		addSetting(filterCrystals);
 	}
 	
 	@Override
@@ -137,6 +148,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		WURST.getHax().autoSwordHack.setSlot();
 		
+		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 	}
@@ -147,9 +159,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		ClientWorld world = MC.world;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<LivingEntity> stream = Stream.of(entity)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
+		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.removed)
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e != player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
@@ -198,14 +211,20 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 				.filter(e -> !(e instanceof HorseBaseEntity
 					&& ((HorseBaseEntity)e).isTame()));
 		
-		if(filterVillagers.isChecked())
-			stream = stream.filter(e -> !(e instanceof VillagerEntity));
+		if(filterTraders.isChecked())
+			stream = stream.filter(e -> !(e instanceof AbstractTraderEntity));
 		
 		if(filterGolems.isChecked())
 			stream = stream.filter(e -> !(e instanceof GolemEntity));
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterStands.isChecked())
+			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
+		
+		if(filterCrystals.isChecked())
+			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
 		return stream.findFirst().isPresent();
 	}
