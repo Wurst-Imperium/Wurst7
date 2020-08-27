@@ -9,10 +9,10 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
-import net.minecraft.CharacterVisitor;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
+import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;

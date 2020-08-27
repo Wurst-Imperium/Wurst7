@@ -363,7 +363,7 @@ public final class AutoFarmHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			

@@ -263,7 +263,7 @@ public final class KillauraLegitHack extends Hack
 			return true;
 		
 		// if not facing center, check if facing anything in boundingBox
-		return bb.rayTrace(eyesPos,
+		return bb.raycast(eyesPos,
 			eyesPos.add(lookVec.multiply(range.getValue()))) != null;
 	}
 	

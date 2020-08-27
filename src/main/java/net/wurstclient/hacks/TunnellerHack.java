@@ -34,7 +34,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.EmptyBlockView;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -693,7 +693,7 @@ public final class TunnellerHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			
@@ -765,9 +765,9 @@ public final class TunnellerHack extends Hack
 		{
 			// check line of sight
 			if(MC.world
-				.rayTrace(new RayTraceContext(eyesPos, hitVecs[i],
-					RayTraceContext.ShapeType.COLLIDER,
-					RayTraceContext.FluidHandling.NONE, MC.player))
+				.raycast(new RaycastContext(eyesPos, hitVecs[i],
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player))
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
