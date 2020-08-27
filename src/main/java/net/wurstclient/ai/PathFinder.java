@@ -238,7 +238,8 @@ public class PathFinder
 	{
 		Material material = BlockUtils.getState(pos).getMaterial();
 		Block block = BlockUtils.getBlock(pos);
-		return material.blocksMovement() && !(block instanceof SignBlock)
+		return material.blocksMovement()
+			&& !(block instanceof AbstractSignBlock)
 			|| block instanceof LadderBlock || jesus
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
@@ -252,7 +253,7 @@ public class PathFinder
 		// check if solid
 		Material material = BlockUtils.getState(pos).getMaterial();
 		Block block = BlockUtils.getBlock(pos);
-		if(material.blocksMovement() && !(block instanceof SignBlock))
+		if(material.blocksMovement() && !(block instanceof AbstractSignBlock))
 			return false;
 		
 		// check if trapped
