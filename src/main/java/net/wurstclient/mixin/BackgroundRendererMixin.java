@@ -23,10 +23,22 @@ public class BackgroundRendererMixin
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
 		ordinal = 0),
-		method = {
-			"render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V",
-			"applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V"})
-	private static boolean wurstHasStatusEffect(LivingEntity entity,
+		method = "render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V")
+	private static boolean hasStatusEffectRender(LivingEntity entity,
+		StatusEffect effect)
+	{
+		if(effect == StatusEffects.BLINDNESS
+			&& WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+			return false;
+		
+		return entity.hasStatusEffect(effect);
+	}
+	
+	@Redirect(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
+		ordinal = 1),
+		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V")
+	private static boolean hasStatusEffectApplyFog(LivingEntity entity,
 		StatusEffect effect)
 	{
 		if(effect == StatusEffects.BLINDNESS
