@@ -207,7 +207,7 @@ public final class BowAimbotHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.doesNotCollide(box);
+				return MC.world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
