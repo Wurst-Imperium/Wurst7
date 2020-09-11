@@ -26,64 +26,70 @@ import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"base finder", "factions"})
 public final class BaseFinderHack extends Hack
-	implements UpdateListener, RenderListener
+		implements UpdateListener, RenderListener
 {
 	private final BlockListSetting naturalBlocks = new BlockListSetting(
-		"Natural Blocks",
-		"These blocks will be considered\n" + "part of natural generation.\n\n"
-			+ "They will NOT be highlighted\n" + "as player bases.",
-		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
-		"minecraft:allium", "minecraft:andesite", "minecraft:azure_bluet",
-		"minecraft:bedrock", "minecraft:birch_leaves", "minecraft:birch_log",
-		"minecraft:blue_orchid", "minecraft:brown_mushroom",
-		"minecraft:brown_mushroom_block", "minecraft:bubble_column",
-		"minecraft:cave_air", "minecraft:clay", "minecraft:coal_ore",
-		"minecraft:cobweb", "minecraft:cornflower", "minecraft:dandelion",
-		"minecraft:dark_oak_leaves", "minecraft:dark_oak_log",
-		"minecraft:dead_bush", "minecraft:diamond_ore", "minecraft:diorite",
-		"minecraft:dirt", "minecraft:emerald_ore", "minecraft:fern",
-		"minecraft:gold_ore", "minecraft:granite", "minecraft:grass",
-		"minecraft:grass_block", "minecraft:gravel", "minecraft:ice",
-		"minecraft:infested_stone", "minecraft:iron_ore",
-		"minecraft:jungle_leaves", "minecraft:jungle_log", "minecraft:kelp",
-		"minecraft:kelp_plant", "minecraft:lapis_ore", "minecraft:large_fern",
-		"minecraft:lava", "minecraft:lilac", "minecraft:lily_of_the_valley",
-		"minecraft:lily_pad", "minecraft:mossy_cobblestone",
-		"minecraft:mushroom_stem", "minecraft:nether_quartz_ore",
-		"minecraft:netherrack", "minecraft:oak_leaves", "minecraft:oak_log",
-		"minecraft:obsidian", "minecraft:orange_tulip", "minecraft:oxeye_daisy",
-		"minecraft:peony", "minecraft:pink_tulip", "minecraft:poppy",
-		"minecraft:red_mushroom", "minecraft:red_mushroom_block",
-		"minecraft:red_tulip", "minecraft:redstone_ore", "minecraft:rose_bush",
-		"minecraft:sand", "minecraft:sandstone", "minecraft:seagrass",
-		"minecraft:snow", "minecraft:spawner", "minecraft:spruce_leaves",
-		"minecraft:spruce_log", "minecraft:stone", "minecraft:sunflower",
-		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:vine",
-		"minecraft:water", "minecraft:white_tulip");
-	
+			"Natural Blocks",
+			"These blocks will be considered\n" + "part of natural generation.\n\n"
+					+ "They will NOT be highlighted\n" + "as player bases.",
+			"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
+			"minecraft:allium", "minecraft:andesite", "minecraft:azure_bluet",
+			"minecraft:bedrock", "minecraft:birch_leaves", "minecraft:birch_log",
+			"minecraft:blue_orchid", "minecraft:brown_mushroom",
+			"minecraft:brown_mushroom_block", "minecraft:bubble_column",
+			"minecraft:cave_air", "minecraft:clay", "minecraft:coal_ore",
+			"minecraft:cobweb", "minecraft:cornflower", "minecraft:dandelion",
+			"minecraft:dark_oak_leaves", "minecraft:dark_oak_log",
+			"minecraft:dead_bush", "minecraft:diamond_ore", "minecraft:diorite",
+			"minecraft:dirt", "minecraft:emerald_ore", "minecraft:fern",
+			"minecraft:gold_ore", "minecraft:granite", "minecraft:grass",
+			"minecraft:grass_block", "minecraft:gravel", "minecraft:ice",
+			"minecraft:infested_stone", "minecraft:iron_ore",
+			"minecraft:jungle_leaves", "minecraft:jungle_log", "minecraft:kelp",
+			"minecraft:kelp_plant", "minecraft:lapis_ore", "minecraft:large_fern",
+			"minecraft:lava", "minecraft:lilac", "minecraft:lily_of_the_valley",
+			"minecraft:lily_pad", "minecraft:mossy_cobblestone",
+			"minecraft:mushroom_stem", "minecraft:nether_quartz_ore",
+			"minecraft:netherrack", "minecraft:oak_leaves", "minecraft:oak_log",
+			"minecraft:obsidian", "minecraft:orange_tulip", "minecraft:oxeye_daisy",
+			"minecraft:peony", "minecraft:pink_tulip", "minecraft:poppy",
+			"minecraft:red_mushroom", "minecraft:red_mushroom_block",
+			"minecraft:red_tulip", "minecraft:redstone_ore", "minecraft:rose_bush",
+			"minecraft:sand", "minecraft:sandstone", "minecraft:seagrass",
+			"minecraft:snow", "minecraft:spawner", "minecraft:spruce_leaves",
+			"minecraft:spruce_log", "minecraft:stone", "minecraft:sunflower",
+			"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:vine",
+			"minecraft:water", "minecraft:white_tulip", "minecraft:ancient_debris",
+			"minecraft:warped_nylium", "minecraft:nether_sprouts" ,"minecraft:nether_gold_ore",
+			"minecraft:basalt", "minecraft:warped_fungus", "minecraft:warped_stem",
+			"minecraft:crimson_nylium", "minecraft:crimson_fungus", "minecraft:crimson_roots",
+			"minecraft:blackstone", "minecraft:soul_sand", "minecraft:soul_soil",
+			"minecraft:warped_wart_block", "minecraft:warped_roots", "minecraft:magma_block",
+			"minecraft:nether_wart_block");
+
 	private ArrayList<String> blockNames;
-	
+
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
 	private final ArrayList<int[]> vertices = new ArrayList<>();
-	
+
 	private int messageTimer = 0;
 	private int counter;
-	
+
 	public BaseFinderHack()
 	{
 		super("BaseFinder",
-			"Finds player bases by searching for man-made blocks.\n"
-				+ "The blocks that it finds will be highlighted in red.\n"
-				+ "Good for finding faction bases.");
+				"Finds player bases by searching for man-made blocks.\n"
+						+ "The blocks that it finds will be highlighted in red.\n"
+						+ "Good for finding faction bases.");
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
 	}
-	
+
 	@Override
 	public String getRenderName()
 	{
 		String name = getName() + " [";
-		
+
 		// counter
 		if(counter >= 10000)
 			name += "10000+ blocks";
@@ -93,22 +99,22 @@ public final class BaseFinderHack extends Hack
 			name += "nothing";
 		else
 			name += counter + " blocks";
-		
+
 		name += " found]";
 		return name;
 	}
-	
+
 	@Override
 	public void onEnable()
 	{
 		// reset timer
 		messageTimer = 0;
 		blockNames = new ArrayList<>(naturalBlocks.getBlockNames());
-		
+
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
@@ -117,7 +123,7 @@ public final class BaseFinderHack extends Hack
 		matchingBlocks.clear();
 		vertices.clear();
 	}
-	
+
 	@Override
 	public void onRender(float partialTicks)
 	{
@@ -129,10 +135,10 @@ public final class BaseFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glColor4f(1F, 0F, 0F, 0.15F);
-		
+
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
-		
+
 		// vertices
 		GL11.glBegin(GL11.GL_QUADS);
 		{
@@ -140,31 +146,31 @@ public final class BaseFinderHack extends Hack
 				GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
 		}
 		GL11.glEnd();
-		
+
 		GL11.glPopMatrix();
-		
+
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glColor4f(1, 1, 1, 1);
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
 		int modulo = MC.player.age % 64;
-		
+
 		// reset matching blocks
 		if(modulo == 0)
 			matchingBlocks.clear();
-		
+
 		int startY = 255 - modulo * 4;
 		int endY = startY - 4;
-		
+
 		BlockPos playerPos =
-			new BlockPos(MC.player.getX(), 0, MC.player.getZ());
-		
+				new BlockPos(MC.player.getX(), 0, MC.player.getZ());
+
 		// search matching blocks
 		loop: for(int y = startY; y > endY; y--)
 			for(int x = 64; x > -64; x--)
@@ -172,19 +178,19 @@ public final class BaseFinderHack extends Hack
 				{
 					if(matchingBlocks.size() >= 10000)
 						break loop;
-					
+
 					BlockPos pos = playerPos.add(x, y, z);
-					
+
 					if(Collections.binarySearch(blockNames,
-						BlockUtils.getName(pos)) >= 0)
+							BlockUtils.getName(pos)) >= 0)
 						continue;
-					
+
 					matchingBlocks.add(pos);
 				}
-			
+
 		if(modulo != 63)
 			return;
-		
+
 		// update timer
 		if(matchingBlocks.size() < 10000)
 			messageTimer--;
@@ -194,18 +200,18 @@ public final class BaseFinderHack extends Hack
 			if(messageTimer <= 0)
 			{
 				ChatUtils
-					.warning("BaseFinder found \u00a7lA LOT\u00a7r of blocks.");
+						.warning("BaseFinder found \u00a7lA LOT\u00a7r of blocks.");
 				ChatUtils.message(
-					"To prevent lag, it will only show the first 10000 blocks.");
+						"To prevent lag, it will only show the first 10000 blocks.");
 			}
-			
+
 			// reset timer
 			messageTimer = 3;
 		}
-		
+
 		// update counter
 		counter = matchingBlocks.size();
-		
+
 		// calculate vertices
 		vertices.clear();
 		for(BlockPos pos : matchingBlocks)
@@ -217,7 +223,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 0, 1);
 				addVertex(pos, 0, 0, 1);
 			}
-			
+
 			if(!matchingBlocks.contains(pos.up()))
 			{
 				addVertex(pos, 0, 1, 0);
@@ -225,7 +231,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 1);
 				addVertex(pos, 1, 1, 0);
 			}
-			
+
 			if(!matchingBlocks.contains(pos.north()))
 			{
 				addVertex(pos, 0, 0, 0);
@@ -233,7 +239,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 0);
 				addVertex(pos, 1, 0, 0);
 			}
-			
+
 			if(!matchingBlocks.contains(pos.east()))
 			{
 				addVertex(pos, 1, 0, 0);
@@ -241,7 +247,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 1);
 				addVertex(pos, 1, 0, 1);
 			}
-			
+
 			if(!matchingBlocks.contains(pos.south()))
 			{
 				addVertex(pos, 0, 0, 1);
@@ -249,7 +255,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 1);
 				addVertex(pos, 0, 1, 1);
 			}
-			
+
 			if(!matchingBlocks.contains(pos.west()))
 			{
 				addVertex(pos, 0, 0, 0);
@@ -259,7 +265,7 @@ public final class BaseFinderHack extends Hack
 			}
 		}
 	}
-	
+
 	private void addVertex(BlockPos pos, int x, int y, int z)
 	{
 		vertices.add(new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z});
