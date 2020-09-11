@@ -65,7 +65,7 @@ public final class BaseFinderHack extends Hack
 			"minecraft:crimson_nylium", "minecraft:crimson_fungus", "minecraft:crimson_roots",
 			"minecraft:blackstone", "minecraft:soul_sand", "minecraft:soul_soil",
 			"minecraft:warped_wart_block", "minecraft:warped_roots", "minecraft:magma_block",
-			"minecraft:nether_wart_block");
+			"minecraft:nether_wart_block", "minecraft:crimson_stem");
 
 	private ArrayList<String> blockNames;
 
