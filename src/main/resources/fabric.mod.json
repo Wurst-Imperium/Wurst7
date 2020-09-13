@@ -14,7 +14,7 @@
   },
 
   "license": "GPL-3.0-or-later",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/wurst/wurst_square.png",
 
   "environment": "client",
   "entrypoints": {
