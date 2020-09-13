@@ -74,7 +74,7 @@ public final class GlideHack extends Hack implements UpdateListener
 		{
 			Box box = player.getBoundingBox();
 			box = box.union(box.offset(0, -minHeight.getValue(), 0));
-			if(!MC.world.doesNotCollide(box))
+			if(!MC.world.isSpaceEmpty(box))
 				return;
 			
 			BlockPos min =

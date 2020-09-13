@@ -31,7 +31,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 	
 	// getSkyAngle
 	@Override
-	public float method_30274(float tickDelta)
+	public float getSkyAngle(float tickDelta)
 	{
 		NoWeatherHack noWeatherHack =
 			WurstClient.INSTANCE.getHax().noWeatherHack;
@@ -40,7 +40,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			noWeatherHack.isTimeChanged() ? noWeatherHack.getChangedTime()
 				: getLevelProperties().getTimeOfDay();
 		
-		return getDimension().method_28528(timeOfDay);
+		return getDimension().getSkyAngle(timeOfDay);
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public abstract class SignEditScreenMixin extends Screen
 {
 	@Shadow
 	@Final
-	private String[] field_24285;
+	private String[] text;
 	
 	private SignEditScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -41,14 +41,14 @@ public abstract class SignEditScreenMixin extends Screen
 		if(autoSignText == null)
 			return;
 		
-		field_24285 = autoSignText;
+		text = autoSignText;
 		finishEditing();
 	}
 	
 	@Inject(at = {@At("HEAD")}, method = {"finishEditing()V"})
 	private void onFinishEditing(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(field_24285);
+		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(text);
 	}
 	
 	@Shadow

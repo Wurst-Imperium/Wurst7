@@ -192,7 +192,7 @@ public final class KillauraLegitHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.doesNotCollide(box);
+				return world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
