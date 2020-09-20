@@ -105,7 +105,7 @@ public final class KillauraLegitHack extends Hack
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crytsals", "Won't attack end crystals.", false);
+		"Filter end crystals", "Won't attack end crystals.", false);
 	
 	private Entity target;
 	
