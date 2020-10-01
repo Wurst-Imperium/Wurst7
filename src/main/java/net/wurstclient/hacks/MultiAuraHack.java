@@ -20,6 +20,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.entity.mob.EndermiteEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
@@ -98,11 +99,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterNamed = new CheckboxSetting(
+		"Filter named", "Won't attack name-tagged entities.", false);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crytsals", "Won't attack end crystals.", false);
+		"Filter end crystals", "Won't attack end crystals.", false);
 	
 	private int timer;
 	
@@ -128,6 +131,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
 	}
@@ -222,7 +226,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.filter(e -> !(e instanceof TameableEntity
 					&& ((TameableEntity)e).isTamed()))
 				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()));
+					&& ((HorseBaseEntity)e).isTame()))
+				.filter(
+					e -> !(e instanceof EndermiteEntity && e.hasCustomName()));
 		
 		if(filterTraders.isChecked())
 			stream = stream.filter(e -> !(e instanceof AbstractTraderEntity));
@@ -232,6 +238,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterNamed.isChecked())
+			stream = stream.filter(e -> !e.hasCustomName());
 		
 		if(filterStands.isChecked())
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
