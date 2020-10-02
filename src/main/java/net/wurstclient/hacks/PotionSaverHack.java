@@ -38,6 +38,9 @@ public final class PotionSaverHack extends Hack implements PacketOutputListener
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
+		if(!isFrozen())
+			return;
+		
 		if(event.getPacket() instanceof PlayerMoveC2SPacket)
 			event.cancel();
 	}
