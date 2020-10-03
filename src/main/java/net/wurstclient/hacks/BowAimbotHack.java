@@ -185,7 +185,7 @@ public final class BowAimbotHack extends Hack
 		}
 		
 		// set target
-		if(target == null || filterEntities(Stream.of(target)) == null)
+		if(filterEntities(Stream.of(target)) == null)
 			target = filterEntities(StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true));
 		
@@ -232,7 +232,7 @@ public final class BowAimbotHack extends Hack
 	
 	private Entity filterEntities(Stream<Entity> s)
 	{
-		Stream<Entity> stream = s.filter(e -> !e.removed).filter(
+		Stream<Entity> stream = s.filter(e -> e != null && !e.removed).filter(
 			e -> e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player)
