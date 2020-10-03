@@ -36,6 +36,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -48,6 +49,8 @@ import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
+@SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
+	"crystal aura", "AutoCrystal", "auto crystal"})
 public final class KillauraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
