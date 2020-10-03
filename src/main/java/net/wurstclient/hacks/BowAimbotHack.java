@@ -62,7 +62,7 @@ public final class BowAimbotHack extends Hack
 			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
 			+ "the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.DISTANCE);
+		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -185,15 +185,59 @@ public final class BowAimbotHack extends Hack
 		}
 		
 		// set target
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity)
-				.filter(e -> e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		if(target == null || filterEntities(Stream.of(target)) == null)
+			target = filterEntities(StreamSupport
+				.stream(MC.world.getEntities().spliterator(), true));
+		
+		if(target == null)
+			return;
+		
+		// set velocity
+		velocity = (72000 - player.getItemUseTimeLeft()) / 20F;
+		velocity = (velocity * velocity + velocity * 2) / 3;
+		if(velocity > 1)
+			velocity = 1;
+		
+		// set position to aim at
+		double d = RotationUtils.getEyesPos()
+			.distanceTo(target.getBoundingBox().getCenter());
+		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
+			- player.getX();
+		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
+			+ target.getHeight() * 0.5 - player.getY()
+			- player.getEyeHeight(player.getPose());
+		double posZ = target.getZ() + (target.getZ() - target.lastRenderZ) * d
+			- player.getZ();
+		
+		// set yaw
+		MC.player.yaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
+		
+		// calculate needed pitch
+		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
+		double hDistanceSq = hDistance * hDistance;
+		float g = 0.006F;
+		float velocitySq = velocity * velocity;
+		float velocityPow4 = velocitySq * velocitySq;
+		float neededPitch = (float)-Math.toDegrees(Math.atan((velocitySq - Math
+			.sqrt(velocityPow4 - g * (g * hDistanceSq + 2 * posY * velocitySq)))
+			/ (g * hDistance)));
+		
+		// set pitch
+		if(Float.isNaN(neededPitch))
+			WURST.getRotationFaker()
+				.faceVectorClient(target.getBoundingBox().getCenter());
+		else
+			MC.player.pitch = neededPitch;
+	}
+	
+	private Entity filterEntities(Stream<Entity> s)
+	{
+		Stream<Entity> stream = s.filter(e -> !e.removed).filter(
+			e -> e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity)
+			.filter(e -> e != MC.player)
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -256,46 +300,7 @@ public final class BowAimbotHack extends Hack
 		if(filterCrystals.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
-		if(target == null)
-			return;
-		
-		// set velocity
-		velocity = (72000 - player.getItemUseTimeLeft()) / 20F;
-		velocity = (velocity * velocity + velocity * 2) / 3;
-		if(velocity > 1)
-			velocity = 1;
-		
-		// set position to aim at
-		double d = RotationUtils.getEyesPos()
-			.distanceTo(target.getBoundingBox().getCenter());
-		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
-			- player.getX();
-		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
-			+ target.getHeight() * 0.5 - player.getY()
-			- player.getEyeHeight(player.getPose());
-		double posZ = target.getZ() + (target.getZ() - target.lastRenderZ) * d
-			- player.getZ();
-		
-		// set yaw
-		MC.player.yaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
-		
-		// calculate needed pitch
-		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
-		double hDistanceSq = hDistance * hDistance;
-		float g = 0.006F;
-		float velocitySq = velocity * velocity;
-		float velocityPow4 = velocitySq * velocitySq;
-		float neededPitch = (float)-Math.toDegrees(Math.atan((velocitySq - Math
-			.sqrt(velocityPow4 - g * (g * hDistanceSq + 2 * posY * velocitySq)))
-			/ (g * hDistance)));
-		
-		// set pitch
-		if(Float.isNaN(neededPitch))
-			WURST.getRotationFaker()
-				.faceVectorClient(target.getBoundingBox().getCenter());
-		else
-			MC.player.pitch = neededPitch;
+		return stream.min(priority.getSelected().comparator).orElse(null);
 	}
 	
 	@Override
@@ -365,7 +370,7 @@ public final class BowAimbotHack extends Hack
 		if(velocity < 1)
 			message = "Charging: " + (int)(velocity * 100) + "%";
 		else
-			message = "Ready To Shoot";
+			message = "Target Locked";
 		
 		// translate to center
 		Window sr = MC.getWindow();
