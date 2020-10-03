@@ -64,6 +64,12 @@ public final class BowAimbotHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
+	private final SliderSetting predictMovement =
+		new SliderSetting("Predict movement",
+			"Controls the strength of BowAimbot's\n"
+				+ "movement prediction algorithm.",
+			0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
+	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
@@ -121,6 +127,7 @@ public final class BowAimbotHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
+		addSetting(predictMovement);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -199,8 +206,8 @@ public final class BowAimbotHack extends Hack
 			velocity = 1;
 		
 		// set position to aim at
-		double d = RotationUtils.getEyesPos()
-			.distanceTo(target.getBoundingBox().getCenter());
+		double d = RotationUtils.getEyesPos().distanceTo(
+			target.getBoundingBox().getCenter()) * predictMovement.getValue();
 		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
 			- player.getX();
 		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
