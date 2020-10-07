@@ -101,11 +101,13 @@ public final class KillauraLegitHack extends Hack
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", true);
+	private final CheckboxSetting filterNamed = new CheckboxSetting(
+		"Filter named", "Won't attack name-tagged entities.", false);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crytsals", "Won't attack end crystals.", false);
+		"Filter end crystals", "Won't attack end crystals.", false);
 	
 	private Entity target;
 	
@@ -128,6 +130,7 @@ public final class KillauraLegitHack extends Hack
 		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
 	}
@@ -172,10 +175,10 @@ public final class KillauraLegitHack extends Hack
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EnderCrystalEntity)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e != player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+				.filter(e -> e != player)
+				.filter(e -> !(e instanceof FakePlayerEntity))
+				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -228,6 +231,9 @@ public final class KillauraLegitHack extends Hack
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterNamed.isChecked())
+			stream = stream.filter(e -> !e.hasCustomName());
 		
 		if(filterStands.isChecked())
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
@@ -313,7 +319,8 @@ public final class KillauraLegitHack extends Hack
 		if(target instanceof LivingEntity)
 		{
 			LivingEntity le = (LivingEntity)target;
-			p = (le.getMaximumHealth() - le.getHealth()) / le.getMaximumHealth();
+			p = (le.getMaximumHealth() - le.getHealth())
+				/ le.getMaximumHealth();
 		}
 		float red = p * 2F;
 		float green = 2 - red;
