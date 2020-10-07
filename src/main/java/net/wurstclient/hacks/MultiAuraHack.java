@@ -20,7 +20,6 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.EndermiteEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
@@ -226,9 +225,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.filter(e -> !(e instanceof TameableEntity
 					&& ((TameableEntity)e).isTamed()))
 				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()))
-				.filter(
-					e -> !(e instanceof EndermiteEntity && e.hasCustomName()));
+					&& ((HorseBaseEntity)e).isTame()));
 		
 		if(filterTraders.isChecked())
 			stream = stream.filter(e -> !(e instanceof AbstractTraderEntity));
