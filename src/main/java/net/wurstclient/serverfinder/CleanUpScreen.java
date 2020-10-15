@@ -22,7 +22,6 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.mixinterface.IServerList;
 
@@ -93,9 +92,6 @@ public class CleanUpScreen extends Screen
 			"Renames your servers to \"Grief me #1\",\n"
 				+ "\"Grief me #2\", etc.",
 			b -> cleanupRename = !cleanupRename));
-		
-		WurstClient.INSTANCE.getAnalytics()
-			.trackPageView("/multiplayer/clean-up", "Clean Up");
 	}
 	
 	private String yesOrNo(boolean b)
@@ -110,8 +106,6 @@ public class CleanUpScreen extends Screen
 	
 	private void cleanUp()
 	{
-		WurstClient.INSTANCE.getAnalytics().trackEvent("clean up", "start");
-		
 		if(removeAll)
 		{
 			((IServerList)prevScreen.getServerList()).clear();
