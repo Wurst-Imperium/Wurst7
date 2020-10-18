@@ -37,7 +37,8 @@ public class BackgroundRendererMixin
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
 		ordinal = 1),
-		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V")
+		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V",
+		require = 0)
 	private static boolean hasStatusEffectApplyFog(LivingEntity entity,
 		StatusEffect effect)
 	{
