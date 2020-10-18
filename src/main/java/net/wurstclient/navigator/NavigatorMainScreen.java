@@ -137,9 +137,11 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				clickTimer++;
 			else
 			{
-				Feature feature = navigatorDisplayList.get(hoveredFeature);
-				WurstClient.MC
-					.openScreen(new NavigatorFeatureScreen(feature, this));
+				if (0 <= hoveredFeature && hoveredFeature < navigatorDisplayList.size()) {
+					Feature feature = navigatorDisplayList.get(hoveredFeature);
+					WurstClient.MC
+						.openScreen(new NavigatorFeatureScreen(feature, this));
+				}
 			}
 		else if(!expanding && clickTimer > -1)
 			clickTimer--;
