@@ -13,12 +13,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
+import io.sentry.Sentry;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -86,6 +91,7 @@ public enum WurstClient
 	{
 		System.out.println("Starting Wurst Client...");
 		
+		setupSentry();
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
@@ -148,6 +154,91 @@ public enum WurstClient
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
+	}
+	
+	private void setupSentry()
+	{
+		FabricLoader fabricLoader = FabricLoader.getInstance();
+		
+		Sentry.init(options -> {
+			
+			options.setDsn(
+				"https://c01aef15a7cb466da7824ec5dac0d009@o302674.ingest.sentry.io/5464583");
+			options.setDebug(true);
+			
+			String modVersion = fabricLoader.getModContainer("wurst").get()
+				.getMetadata().getVersion().getFriendlyString();
+			
+			if(modVersion != null && !modVersion.equals("${version}"))
+				options.setRelease(modVersion);
+			else
+				options.setRelease("v" + VERSION + "-MC" + MC_VERSION);
+		});
+		
+		Sentry.configureScope(scope -> {
+			scope.setTag("wurst.version", VERSION);
+		});
+		
+		Sentry.configureScope(scope -> {
+			scope.setTag("mc.version",
+				SharedConstants.getGameVersion().getName());
+		});
+		
+		Sentry.configureScope(scope -> {
+			scope.setTag("fabric.api_version",
+				fabricLoader.getModContainer("fabric").get().getMetadata()
+					.getVersion().getFriendlyString());
+		});
+		
+		Sentry.configureScope(scope -> {
+			scope.setTag("fabric.loader_version",
+				fabricLoader.getModContainer("fabricloader").get().getMetadata()
+					.getVersion().getFriendlyString());
+		});
+		
+		Sentry.configureScope(scope -> {
+			boolean dev = fabricLoader.isDevelopmentEnvironment();
+			scope.setTag("environment", dev ? "dev" : "prod");
+		});
+		
+		Sentry.configureScope(scope -> {
+			
+			HashMap<String, String> map = new HashMap<>();
+			map.put("name", System.getProperty("os.name"));
+			scope.setContexts("os", map);
+			
+			scope.setTag("os.arch", System.getProperty("os.arch"));
+		});
+		
+		Sentry.configureScope(scope -> {
+			
+			HashMap<String, String> map = new HashMap<>();
+			map.put("runtime", System.getProperty("java.runtime.name"));
+			map.put("version", System.getProperty("java.runtime.version"));
+			map.put("vendor", System.getProperty("java.vendor"));
+			map.put("vm", System.getProperty("java.vm.name") + " ("
+				+ System.getProperty("java.vm.info") + ")");
+			scope.setContexts("java", map);
+			
+			scope.setTag("java.version", System.getProperty("java.version"));
+			scope.setTag("java.vendor", System.getProperty("java.vendor"));
+			scope.setTag("java.vm", System.getProperty("java.vm.name"));
+		});
+		
+		Sentry.configureScope(scope -> {
+			
+			ArrayList<ModMetadata> mods =
+				fabricLoader.getAllMods().stream().map(mod -> mod.getMetadata())
+					.filter(mod -> !mod.getId().startsWith("fabric-"))
+					.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			
+			HashMap<String, String> map = new HashMap<>();
+			for(ModMetadata mod : mods)
+				map.put(mod.getId(), mod.getVersion().getFriendlyString());
+			scope.setContexts("mods", map);
+			
+			scope.setTag("other_mods", "" + (map.size() - 4));
+		});
 	}
 	
 	private Path createWurstFolder()

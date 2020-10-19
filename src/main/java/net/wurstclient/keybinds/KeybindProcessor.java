@@ -9,6 +9,8 @@ package net.wurstclient.keybinds;
 
 import org.lwjgl.glfw.GLFW;
 
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.WurstClient;
@@ -44,7 +46,16 @@ public final class KeybindProcessor implements KeyPressListener
 			return;
 		
 		String keyName = getKeyName(event);
+		
 		String cmds = keybinds.getCommands(keyName);
+		if(cmds == null)
+			return;
+		
+		Breadcrumb breadcrumb = new Breadcrumb(cmds);
+		breadcrumb.setCategory("keybind.trigger");
+		breadcrumb.setData("key", keyName);
+		Sentry.addBreadcrumb(breadcrumb);
+		
 		processCmds(cmds);
 	}
 	
@@ -57,10 +68,8 @@ public final class KeybindProcessor implements KeyPressListener
 	
 	private void processCmds(String cmds)
 	{
-		if(cmds == null)
-			return;
-		
 		cmds = cmds.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
+		
 		for(String cmd : cmds.split("\u00a7"))
 			processCmd(cmd.trim());
 	}
