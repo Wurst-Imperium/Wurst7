@@ -31,8 +31,9 @@ public final class HealthTagsHack extends Hack
 			return nametag;
 		
 		int health = (int)entity.getHealth();
-
-		MutableText formattedHealth = new LiteralText(" ").append(Integer.toString(health)).formatted(getColor(health));
+		
+		MutableText formattedHealth = new LiteralText(" ")
+			.append(Integer.toString(health)).formatted(getColor(health));
 		return ((MutableText)nametag).append(formattedHealth);
 	}
 	
