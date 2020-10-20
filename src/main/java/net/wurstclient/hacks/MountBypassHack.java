@@ -15,7 +15,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"mount bypass", "donkey chest"})
+@SearchTags({"mount bypass", "donkey chest", "AutoMount", "auto mount"})
 public final class MountBypassHack extends Hack implements PacketOutputListener
 {
 	public MountBypassHack()
