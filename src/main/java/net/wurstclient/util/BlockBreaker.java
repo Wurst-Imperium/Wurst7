@@ -50,7 +50,7 @@ public enum BlockBreaker
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check line of sight
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], pos,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos,
 				state.getOutlineShape(MC.world, pos), state) != null)
 				continue;
 			

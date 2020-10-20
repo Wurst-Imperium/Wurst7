@@ -45,7 +45,6 @@
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",
-    "SignBlockEntityMixin",
     "SignEditScreenMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",

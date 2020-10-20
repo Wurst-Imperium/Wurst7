@@ -16,15 +16,14 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
-import net.wurstclient.mixinterface.IServerList;
 
 public class CleanUpScreen extends Screen
 {
@@ -93,9 +92,6 @@ public class CleanUpScreen extends Screen
 			"Renames your servers to \"Grief me #1\",\n"
 				+ "\"Grief me #2\", etc.",
 			b -> cleanupRename = !cleanupRename));
-		
-		WurstClient.INSTANCE.getAnalytics()
-			.trackPageView("/multiplayer/clean-up", "Clean Up");
 	}
 	
 	private String yesOrNo(boolean b)
@@ -110,38 +106,12 @@ public class CleanUpScreen extends Screen
 	
 	private void cleanUp()
 	{
-		WurstClient.INSTANCE.getAnalytics().trackEvent("clean up", "start");
-		
-		if(removeAll)
-		{
-			((IServerList)prevScreen.getServerList()).clear();
-			prevScreen.getServerList().saveFile();
-			((IMultiplayerScreen)prevScreen).getServerListSelector()
-				.setSelected(null);
-			((IMultiplayerScreen)prevScreen).getServerListSelector()
-				.setServers(prevScreen.getServerList());
-			client.openScreen(prevScreen);
-			return;
-		}
-		
 		for(int i = prevScreen.getServerList().size() - 1; i >= 0; i--)
 		{
 			ServerInfo server = prevScreen.getServerList().get(i);
-			if(cleanupUnknown
-				&& "\u00a74Can\'t resolve hostname"
-					.equals(server.label.getString())
-				|| cleanupOutdated && server.protocolVersion != SharedConstants
-					.getGameVersion().getProtocolVersion()
-				|| cleanupFailed && server.ping != -2L && server.ping < 0L
-				|| cleanupGriefMe && server.name.startsWith("Grief me"))
-			{
+			
+			if(removeAll || shouldRemove(server))
 				prevScreen.getServerList().remove(server);
-				prevScreen.getServerList().saveFile();
-				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setSelected(null);
-				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setServers(prevScreen.getServerList());
-			}
 		}
 		
 		if(cleanupRename)
@@ -149,14 +119,69 @@ public class CleanUpScreen extends Screen
 			{
 				ServerInfo server = prevScreen.getServerList().get(i);
 				server.name = "Grief me #" + (i + 1);
-				prevScreen.getServerList().saveFile();
-				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setSelected(null);
-				((IMultiplayerScreen)prevScreen).getServerListSelector()
-					.setServers(prevScreen.getServerList());
 			}
 		
+		saveServerList();
 		client.openScreen(prevScreen);
+	}
+	
+	private boolean shouldRemove(ServerInfo server)
+	{
+		if(server == null)
+			return false;
+		
+		if(cleanupUnknown && isUnknownHost(server))
+			return true;
+		
+		if(cleanupOutdated && !isSameProtocol(server))
+			return true;
+		
+		if(cleanupFailed && isFailedPing(server))
+			return true;
+		
+		if(cleanupGriefMe && isGriefMeServer(server))
+			return true;
+		
+		return false;
+	}
+	
+	private boolean isUnknownHost(ServerInfo server)
+	{
+		if(server.label == null)
+			return false;
+		
+		if(server.label.getString() == null)
+			return false;
+		
+		return server.label.getString()
+			.equals("\u00a74Can\'t resolve hostname");
+	}
+	
+	private boolean isSameProtocol(ServerInfo server)
+	{
+		return server.protocolVersion == SharedConstants.getGameVersion()
+			.getProtocolVersion();
+	}
+	
+	private boolean isFailedPing(ServerInfo server)
+	{
+		return server.ping != -2L && server.ping < 0L;
+	}
+	
+	private boolean isGriefMeServer(ServerInfo server)
+	{
+		return server.name != null && server.name.startsWith("Grief me");
+	}
+	
+	private void saveServerList()
+	{
+		prevScreen.getServerList().saveFile();
+		
+		MultiplayerServerListWidget serverListSelector =
+			((IMultiplayerScreen)prevScreen).getServerListSelector();
+		
+		serverListSelector.setSelected(null);
+		serverListSelector.setServers(prevScreen.getServerList());
 	}
 	
 	@Override
@@ -178,6 +203,7 @@ public class CleanUpScreen extends Screen
 		drawCenteredString(matrixStack, textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
+		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		renderButtonTooltip(matrixStack, mouseX, mouseY);
 	}
@@ -190,11 +216,11 @@ public class CleanUpScreen extends Screen
 			if(!button.isHovered() || !(button instanceof CleanUpButton))
 				continue;
 			
-			CleanUpButton woButton = (CleanUpButton)button;
-			if(woButton.tooltip.isEmpty())
+			CleanUpButton cuButton = (CleanUpButton)button;
+			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
+			renderTooltip(matrixStack, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -223,8 +249,6 @@ public class CleanUpScreen extends Screen
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
-			
-			addButton(this);
 		}
 		
 		@Override

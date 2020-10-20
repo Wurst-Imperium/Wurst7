@@ -4,30 +4,27 @@ about: Create a report to help us improve
 title: ''
 labels: bug
 assignees: ''
-
 ---
 
 ## Description
-A clear and concise description of what the bug is.
+What's wrong?
 
-## Steps to reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Steps To Reproduce
+Please make a list of steps to reproduce the problem (ideally from a fresh Wurst installation):
+1. 
+2. 
+3. 
 
-## (Optional) screenshots / videos
-If applicable, add screenshots or videos to help explain your problem.
+## Screenshots / Videos (Optional)
+If applicable, add screenshots, videos or other files to help explain the problem.
 
-## Versions
-Please complete the following information:
-- Minecraft version: [e.g. 1.14.4]
-- Wurst version: [e.g. 7.0pre1]
+## Crash Report
+Please find your crash report file at "%appdata%/.minecraft/crash-reports", open the file in a text editor and copy-paste its content below.
 
-## Crash report
 ```
+
 (crash report goes here)
 
 ```
-Please note: A log file or a picture of the launcher's "something went wrong" screen are _not_ the same as crash report. If the game didn't crash, please hold down F3+C for 10 seconds to generate a crash report.
+
+**Please note:** If the game did not crash, please hold down F3+C for 10 seconds to generate a crash report. Even when a bug doesn't cause the game to crash, this file still contains useful information that can help us to find and fix the problem. Because of this, please always include a crash report.

@@ -20,7 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
@@ -29,7 +29,7 @@ import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 public class ChatHudMixin extends DrawableHelper
 {
 	@Shadow
-	private List<ChatHudLine> visibleMessages;
+	private List<ChatHudLine<OrderedText>> visibleMessages;
 	@Shadow
 	private static Logger LOGGER;
 	@Shadow
@@ -59,8 +59,8 @@ public class ChatHudMixin extends DrawableHelper
 	}
 	
 	@Shadow
-	private void shadow$addMessage(StringRenderable arg, int messageId,
-		int timestamp, boolean bl)
+	private void shadow$addMessage(Text text, int messageId, int timestamp,
+		boolean bl)
 	{
 		
 	}

@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.registry.Registry;
@@ -61,6 +63,11 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// check screen
+		if(MC.currentScreen instanceof HandledScreen
+			&& !(MC.currentScreen instanceof InventoryScreen))
+			return;
+		
 		for(int slot = 9; slot < 45; slot++)
 		{
 			int adjustedSlot = slot;
