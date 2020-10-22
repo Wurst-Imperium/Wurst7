@@ -21,7 +21,6 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
@@ -43,8 +42,8 @@ public abstract class EntityRendererMixin<T extends Entity>
 		int i, CallbackInfo ci)
 	{
 		if(entity instanceof LivingEntity)
-			text = new LiteralText(WurstClient.INSTANCE.getHax().healthTagsHack
-				.addHealth((LivingEntity)entity, text.getString()));
+			text = WurstClient.INSTANCE.getHax().healthTagsHack
+				.addHealth((LivingEntity)entity, text);
 		
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
 			vertexConsumerProvider, i);
