@@ -7,26 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
-import net.minecraft.util.math.Direction;
-import net.wurstclient.settings.CheckboxSetting;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -36,6 +16,7 @@ import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
@@ -44,13 +25,16 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.MinPriorityThreadFactory;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.*;
+import org.lwjgl.opengl.GL11;
+
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
