@@ -23,6 +23,8 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import net.minecraft.util.math.Direction;
+import net.wurstclient.settings.CheckboxSetting;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.Block;
@@ -66,6 +68,13 @@ public final class SearchHack extends Hack
 			+ "Higher values require a faster computer.",
 		4, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	
+	private final CheckboxSetting exposed = new CheckboxSetting(
+			"Exposed",
+			"If checked, will only display blocks adjecent to a transparent block. Useful against anti-xray plugins.",
+			false);
+	
+	private boolean prevExposed;
 	private int prevLimit;
 	private boolean notify;
 	
@@ -89,13 +98,14 @@ public final class SearchHack extends Hack
 		addSetting(block);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(exposed);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
 		return getName() + " [" + block.getBlockName().replace("minecraft:", "")
-			+ "]";
+			+ "]" + (exposed.isChecked() ? " Exposed" : "" );
 	}
 	
 	@Override
@@ -192,6 +202,8 @@ public final class SearchHack extends Hack
 			return;
 		
 		checkIfLimitChanged();
+		
+		checkIfExposedChanged();
 		
 		if(getMatchingBlocksTask == null)
 			startGetMatchingBlocksTask(eyesPos);
@@ -333,7 +345,7 @@ public final class SearchHack extends Hack
 	{
 		stopPool2Tasks();
 		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
+		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId, exposed.isChecked());
 		searchers.put(chunk, searcher);
 		searcher.startSearching(pool1);
 	}
@@ -379,6 +391,16 @@ public final class SearchHack extends Hack
 			stopPool2Tasks();
 			notify = true;
 			prevLimit = limit.getValueI();
+		}
+	}
+	
+	private void checkIfExposedChanged()
+	{
+		if(exposed.isChecked() != prevExposed)
+		{
+			stopPool2Tasks();
+			notify = true;
+			prevExposed = exposed.isChecked();
 		}
 	}
 	
@@ -526,12 +548,14 @@ public final class SearchHack extends Hack
 		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
 		private Status status = Status.IDLE;
 		private Future<?> future;
+		private boolean exposed;
 		
-		public ChunkSearcher(Chunk chunk, Block block, int dimensionId)
+		public ChunkSearcher(Chunk chunk, Block block, int dimensionId, boolean exposed)
 		{
 			this.chunk = chunk;
 			this.block = block;
 			this.dimensionId = dimensionId;
+			this.exposed = exposed;
 		}
 		
 		public void startSearching(ExecutorService pool)
@@ -566,10 +590,21 @@ public final class SearchHack extends Hack
 						
 						BlockPos pos = new BlockPos(x, y, z);
 						Block block = BlockUtils.getBlock(pos);
-						if(!this.block.equals(block))
-							continue;
 						
-						matchingBlocks.add(pos);
+						if (this.block.equals(block)) {
+							if (exposed) {
+								for (Direction dir : Direction.values()) {
+									BlockPos nPos = pos.offset(dir);
+									if (!BlockUtils.getState(nPos).isOpaque()) {
+										matchingBlocks.add(pos);
+										break;
+									}
+								}
+							} else {
+								matchingBlocks.add(pos);
+							}
+						}
+						
 					}
 				
 			status = Status.DONE;
