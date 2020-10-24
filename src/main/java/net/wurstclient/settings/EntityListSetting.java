@@ -9,17 +9,11 @@ package net.wurstclient.settings;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.components.BlockListEditButton;
 import net.wurstclient.clickgui.components.EntityListEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;

@@ -12,8 +12,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 
-import java.util.Optional;
-
 public enum EntityUtils
 {
 	;

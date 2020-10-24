@@ -12,9 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.clickgui.screens.EditEntityListScreen;
-import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.EntityListSetting;
 import org.lwjgl.opengl.GL11;
 

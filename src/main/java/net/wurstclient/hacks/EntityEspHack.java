@@ -7,9 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import jdk.nashorn.internal.runtime.logging.Logger;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
