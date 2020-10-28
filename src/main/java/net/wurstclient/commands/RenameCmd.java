@@ -37,13 +37,13 @@ public final class RenameCmd extends Command
 		for(int i = 1; i < args.length; i++)
 			message += " " + args[i];
 		
-		message = message.replace("$", "�").replace("��", "$");
+		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		ItemStack item = MC.player.inventory.getMainHandStack();
 		
 		if(item == null)
 			throw new CmdError("There is no item in your hand.");
 		
 		item.setCustomName(new LiteralText(message));
-		ChatUtils.message("Renamed item to \"" + message + "�r\".");
+		ChatUtils.message("Renamed item to \"" + message + "\u00a7r\".");
 	}
 }
