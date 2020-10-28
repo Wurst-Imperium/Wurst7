@@ -8,6 +8,10 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -21,26 +25,29 @@ public final class HealthTagsHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	public String addHealth(LivingEntity entity, String nametag)
+	public Text addHealth(LivingEntity entity, Text nametag)
 	{
 		if(!isEnabled())
 			return nametag;
 		
 		int health = (int)entity.getHealth();
-		return nametag + " " + getColor(health) + health;
+		
+		MutableText formattedHealth = new LiteralText(" ")
+			.append(Integer.toString(health)).formatted(getColor(health));
+		return ((MutableText)nametag).append(formattedHealth);
 	}
 	
-	private String getColor(int health)
+	private Formatting getColor(int health)
 	{
 		if(health <= 5)
-			return "\u00a74";
+			return Formatting.DARK_RED;
 		
 		if(health <= 10)
-			return "\u00a76";
+			return Formatting.GOLD;
 		
 		if(health <= 15)
-			return "\u00a7e";
+			return Formatting.YELLOW;
 		
-		return "\u00a7a";
+		return Formatting.GREEN;
 	}
 }
