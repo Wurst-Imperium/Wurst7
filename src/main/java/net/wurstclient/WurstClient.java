@@ -163,7 +163,7 @@ public enum WurstClient
 		Sentry.init(options -> {
 			
 			options.setDsn(
-				"https://c01aef15a7cb466da7824ec5dac0d009@o302674.ingest.sentry.io/5464583");
+				"https://c15466036b0144ed9de51ab2b16b46e6@sentry.wurstimperium.net/2");
 			options.setDebug(true);
 			
 			String modVersion = fabricLoader.getModContainer("wurst").get()
