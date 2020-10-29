@@ -37,12 +37,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	private boolean hoveringArrow;
 	private int clickTimer = -1;
 	private boolean expanding = false;
-
+	
 	@Override
-	public void mouseMoved(double mouseX, double mouseY) {
+	public void mouseMoved(double mouseX, double mouseY)
+	{
 		updateSelectedFeature = true;
 	}
-
+	
 	public NavigatorMainScreen()
 	{
 		hasBackground = false;
@@ -75,28 +76,28 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(keyCode == 1)
 			if(clickTimer == -1)
 				WurstClient.MC.openScreen((Screen)null);
-
+			
 		// Enter
-		if (keyCode == 257) {
-			if (selectedFeature != -1) {
+		if(keyCode == 257)
+			if(selectedFeature != -1)
 				enableFeature(navigatorDisplayList.get(selectedFeature));
-			}
-		}
-
+			
 		// Right arrow or tab
-		if (keyCode == 262 || (keyCode == 258 && !hasShiftDown())) {
-			if (selectedFeature + 1 < navigatorDisplayList.size())
+		if(keyCode == 262 || keyCode == 258 && !hasShiftDown())
+		{
+			if(selectedFeature + 1 < navigatorDisplayList.size())
 				selectedFeature++;
-		} else if (keyCode == 263|| (keyCode == 258 && hasShiftDown())) { // Left
-			if (selectedFeature - 1 > -1)
+		}else if(keyCode == 263 || keyCode == 258 && hasShiftDown())
+		{ // Left
+			if(selectedFeature - 1 > -1)
 				selectedFeature--;
-		} else if (keyCode == 264) { // Down
-			if (selectedFeature + 3 < navigatorDisplayList.size())
+		}else if(keyCode == 264)
+		{ // Down
+			if(selectedFeature + 3 < navigatorDisplayList.size())
 				selectedFeature += 3;
-		} else if (keyCode == 265) { // Up
-			if (selectedFeature - 3 > -1)
+		}else if(keyCode == 265)
+			if(selectedFeature - 3 > -1)
 				selectedFeature -= 3;
-		}
 	}
 	
 	@Override
@@ -113,9 +114,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				if(feature.getPrimaryAction().isEmpty())
 					expanding = true;
 				else
-				{
 					enableFeature(feature);
-				}
 			}else if(button == 1)
 			{
 				// right click
@@ -129,17 +128,17 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				// ConfigFiles.NAVIGATOR.save();
 			}
 	}
-
-	private void enableFeature(Feature feature) {
+	
+	private void enableFeature(Feature feature)
+	{
 		TooManyHaxHack tooManyHax =
 			WurstClient.INSTANCE.getHax().tooManyHaxHack;
 		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 		{
-			ChatUtils.error(
-				feature.getName() + " is blocked by TooManyHax.");
+			ChatUtils.error(feature.getName() + " is blocked by TooManyHax.");
 			return;
 		}
-
+		
 		feature.doPrimaryAction();
 		WurstClient wurst = WurstClient.INSTANCE;
 		wurst.getNavigator().addPreference(feature.getName());
@@ -160,8 +159,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			{
 				newText = newText.toLowerCase().trim();
 				navigator.getSearchResults(navigatorDisplayList, newText);
-				if (selectedFeature > navigatorDisplayList.size() - 1)
-					selectedFeature = Math.max(navigatorDisplayList.size() - 1, 0);
+				if(selectedFeature > navigatorDisplayList.size() - 1)
+					selectedFeature =
+						Math.max(navigatorDisplayList.size() - 1, 0);
 			}
 			setContentHeight(navigatorDisplayList.size() / 3 * 20);
 			lastSearchText = newText;
@@ -269,27 +269,29 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			{
 				// color
 				boolean hovering = area.contains(mouseX, mouseY);
-				if(hovering) {
+				if(hovering)
+				{
 					hoveredFeature = i;
-
-					if (updateSelectedFeature) {
+					
+					if(updateSelectedFeature)
+					{
 						selectedFeature = i;
 						updateSelectedFeature = false;
 					}
 				}
-
-
+				
 				if(feature.isEnabled())
 					// if(feature.isBlocked())
 					// GL11.glColor4f(1, 0, 0,
 					// hovering ? opacity * 1.5F : opacity);
 					// else
-					GL11.glColor4f(0, 1, 0,
-						((hovering || selectedFeature == i) ? opacity * 1.5F : opacity));
+					GL11.glColor4f(0, 1, 0, hovering || selectedFeature == i
+						? opacity * 1.5F : opacity);
 				else
 					GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
-						((hovering || selectedFeature == i) ? opacity * 1.5F : opacity));
-
+						hovering || selectedFeature == i ? opacity * 1.5F
+							: opacity);
+				
 				// tooltip
 				String tt = feature.getDescription();
 				// if(feature.isBlocked())
@@ -303,11 +305,11 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				// }
 				if(hovering)
 					tooltip = tt;
-
+				
 				// box & shadow
 				drawBox(area.x, area.y, area.x + area.width,
 					area.y + area.height);
-
+				
 				// separator
 				int bx1 = area.x + area.width - area.height;
 				int by1 = area.y + 2;
