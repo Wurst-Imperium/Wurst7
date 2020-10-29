@@ -161,7 +161,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				newText = newText.toLowerCase().trim();
 				navigator.getSearchResults(navigatorDisplayList, newText);
 				if (selectedFeature > navigatorDisplayList.size() - 1)
-					selectedFeature = navigatorDisplayList.size() - 1;
+					selectedFeature = Math.max(navigatorDisplayList.size() - 1, 0);
 			}
 			setContentHeight(navigatorDisplayList.size() / 3 * 20);
 			lastSearchText = newText;
