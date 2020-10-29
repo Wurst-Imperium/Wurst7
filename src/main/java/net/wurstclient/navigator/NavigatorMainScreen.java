@@ -10,6 +10,7 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
@@ -77,25 +78,28 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(clickTimer == -1)
 				WurstClient.MC.openScreen((Screen)null);
 			
-		// Enter
-		if(keyCode == 257)
+		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			if(selectedFeature != -1)
 				enableFeature(navigatorDisplayList.get(selectedFeature));
 			
-		// Right arrow or tab
-		if(keyCode == 262 || keyCode == 258 && !hasShiftDown())
+		if(keyCode == GLFW.GLFW_KEY_RIGHT
+			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown())
 		{
 			if(selectedFeature + 1 < navigatorDisplayList.size())
 				selectedFeature++;
-		}else if(keyCode == 263 || keyCode == 258 && hasShiftDown())
-		{ // Left
+			
+		}else if(keyCode == GLFW.GLFW_KEY_LEFT
+			|| keyCode == GLFW.GLFW_KEY_TAB && hasShiftDown())
+		{
 			if(selectedFeature - 1 > -1)
 				selectedFeature--;
-		}else if(keyCode == 264)
-		{ // Down
+			
+		}else if(keyCode == GLFW.GLFW_KEY_DOWN)
+		{
 			if(selectedFeature + 3 < navigatorDisplayList.size())
 				selectedFeature += 3;
-		}else if(keyCode == 265)
+			
+		}else if(keyCode == GLFW.GLFW_KEY_UP)
 			if(selectedFeature - 3 > -1)
 				selectedFeature -= 3;
 	}
