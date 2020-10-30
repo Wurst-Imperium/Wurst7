@@ -76,6 +76,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			leftClick(selectedFeature);
 		
+		if(keyCode == GLFW.GLFW_KEY_SPACE)
+			expand(selectedFeature);
+		
 		if(keyCode == GLFW.GLFW_KEY_RIGHT
 			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown())
 		{
@@ -107,8 +110,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// arrow click, shift click, wheel click
 		if(button == 0 && (hasShiftDown() || hoveringArrow) || button == 2)
 		{
-			expanding = true;
-			expandingFeature = navigatorDisplayList.get(hoveredFeature);
+			expand(hoveredFeature);
 			return;
 		}
 		
@@ -131,6 +133,15 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// wurst.navigator.addPreference(feature.getName());
 		// ConfigFiles.NAVIGATOR.save();
 		// }
+	}
+	
+	private void expand(int i)
+	{
+		if(i < 0 || i >= navigatorDisplayList.size())
+			return;
+		
+		expandingFeature = navigatorDisplayList.get(i);
+		expanding = true;
 	}
 	
 	private void leftClick(int i)
