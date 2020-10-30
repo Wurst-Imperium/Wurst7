@@ -69,7 +69,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == 1)
+		if(keyCode == GLFW.GLFW_KEY_BACKSPACE)
 			if(clickTimer == -1)
 				WurstClient.MC.openScreen((Screen)null);
 			
@@ -104,7 +104,17 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onMouseClick(double x, double y, int button)
 	{
-		if(clickTimer != -1 || hoveredFeature == -1)
+		if(clickTimer != -1)
+			return;
+		
+		// back button
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			WurstClient.MC.openScreen((Screen)null);
+			return;
+		}
+		
+		if(hoveredFeature == -1)
 			return;
 		
 		// arrow click, shift click, wheel click
