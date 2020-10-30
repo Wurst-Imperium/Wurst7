@@ -80,7 +80,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			if(selectedFeature != -1)
-				enableFeature(navigatorDisplayList.get(selectedFeature));
+				leftClick(navigatorDisplayList.get(selectedFeature));
 			
 		if(keyCode == GLFW.GLFW_KEY_RIGHT
 			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown())
@@ -107,36 +107,48 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onMouseClick(double x, double y, int button)
 	{
-		if(clickTimer == -1 && hoveredFeature != -1)
-			if(button == 0 && (hasShiftDown() || hoveringArrow) || button == 2)
-				// arrow click, shift click, wheel click
-				expanding = true;
-			else if(button == 0)
-			{
-				// left click
-				Feature feature = navigatorDisplayList.get(hoveredFeature);
-				if(feature.getPrimaryAction().isEmpty())
-					expanding = true;
-				else
-					enableFeature(feature);
-			}else if(button == 1)
-			{
-				// right click
-				// Feature feature = navigatorDisplayList.get(hoveredFeature);
-				// if(feature.getHelpPage().isEmpty())
-				// return;
-				// MiscUtils.openLink("https://www.wurstclient.net/wiki/"
-				// + feature.getHelpPage() + "/");
-				// WurstClient wurst = WurstClient.INSTANCE;
-				// wurst.navigator.addPreference(feature.getName());
-				// ConfigFiles.NAVIGATOR.save();
-			}
+		if(clickTimer != -1 || hoveredFeature == -1)
+			return;
+		
+		// arrow click, shift click, wheel click
+		if(button == 0 && (hasShiftDown() || hoveringArrow) || button == 2)
+		{
+			expanding = true;
+			return;
+		}
+		
+		// left click
+		if(button == 0)
+		{
+			leftClick(navigatorDisplayList.get(hoveredFeature));
+			return;
+		}
+		
+		// right click
+		// if(button == 1)
+		// {
+		// Feature feature = navigatorDisplayList.get(hoveredFeature);
+		// if(feature.getHelpPage().isEmpty())
+		// return;
+		// MiscUtils.openLink("https://www.wurstclient.net/wiki/"
+		// + feature.getHelpPage() + "/");
+		// WurstClient wurst = WurstClient.INSTANCE;
+		// wurst.navigator.addPreference(feature.getName());
+		// ConfigFiles.NAVIGATOR.save();
+		// }
 	}
 	
-	private void enableFeature(Feature feature)
+	private void leftClick(Feature feature)
 	{
-		TooManyHaxHack tooManyHax =
-			WurstClient.INSTANCE.getHax().tooManyHaxHack;
+		if(feature.getPrimaryAction().isEmpty())
+		{
+			expanding = true;
+			return;
+		}
+		
+		WurstClient wurst = WurstClient.INSTANCE;
+		TooManyHaxHack tooManyHax = wurst.getHax().tooManyHaxHack;
+		
 		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 		{
 			ChatUtils.error(feature.getName() + " is blocked by TooManyHax.");
@@ -144,7 +156,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		}
 		
 		feature.doPrimaryAction();
-		WurstClient wurst = WurstClient.INSTANCE;
 		wurst.getNavigator().addPreference(feature.getName());
 	}
 	
