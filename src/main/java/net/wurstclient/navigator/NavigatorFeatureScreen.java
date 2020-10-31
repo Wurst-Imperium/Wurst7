@@ -245,11 +245,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ESCAPE)
-		{
-			parent.setExpanding(false);
-			client.openScreen(parent);
-		}
+		if(keyCode == GLFW.GLFW_KEY_ESCAPE
+			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+			goBack();
 	}
 	
 	@Override
@@ -259,6 +257,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(
 			x - middleX + 154, y - 60 - scroll + 13, button))
 			return;
+		
+		// back button
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			goBack();
+			return;
+		}
 		
 		Rectangle area = new Rectangle(width / 2 - 154, 60, 308, height - 103);
 		if(!area.contains(x, y))
@@ -278,6 +283,12 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
 			x - middleX + 154, y - 60 - scroll - window.getY(), button, window);
+	}
+	
+	private void goBack()
+	{
+		parent.setExpanding(false);
+		client.openScreen(parent);
 	}
 	
 	@Override
