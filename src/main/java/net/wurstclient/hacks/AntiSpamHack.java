@@ -8,14 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.util.List;
-import java.util.Optional;
 
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
+import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.StringRenderable;
-import net.minecraft.text.StringRenderable.Visitor;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Style;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -48,36 +48,42 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine> chatLines = event.getChatLines();
+		List<ChatHudLine<OrderedText>> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
 		
 		/**
-		 * A {@link Visitor} to completely bypass Mojang's visitor system and
-		 * just get the damn {@link String} out of a {@link ChatHudLine}.
+		 * A {@link CharacterVisitor} to completely bypass Mojang's visitor
+		 * system and just get the damn {@link String} out of a
+		 * {@link ChatHudLine}.
 		 *
 		 * <p>
-		 * Is this seriously the replacement for <code>getString()</code>? What
-		 * were they thinking?!
+		 * Is this seriously the replacement for <code>getString()</code>?
+		 * What were they thinking?!
 		 */
-		class JustGiveMeTheStringVisitor implements Visitor<Object>
+		class JustGiveMeTheStringVisitor implements CharacterVisitor
 		{
-			String s = "";
+			StringBuilder sb = new StringBuilder();
 			
 			@Override
-			public Optional<Object> accept(String asString)
+			public boolean accept(int index, Style style, int codePoint)
 			{
-				s += asString;
-				return Optional.empty();
+				sb.appendCodePoint(codePoint);
+				return true;
+			}
+			
+			@Override
+			public String toString()
+			{
+				return sb.toString();
 			}
 		}
 		
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<StringRenderable> newLines =
-			ChatMessages.breakRenderedChatMessageLines(event.getComponent(),
-				maxTextLength, MC.textRenderer);
+		List<OrderedText> newLines = ChatMessages.breakRenderedChatMessageLines(
+			event.getComponent(), maxTextLength, MC.textRenderer);
 		
 		int spamCounter = 1;
 		int matchingLines = 0;
@@ -86,15 +92,15 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		{
 			JustGiveMeTheStringVisitor oldLineVS =
 				new JustGiveMeTheStringVisitor();
-			chatLines.get(i).getText().visit(oldLineVS);
-			String oldLine = oldLineVS.s;
+			chatLines.get(i).getText().accept(oldLineVS);
+			String oldLine = oldLineVS.toString();
 			
 			if(matchingLines <= newLines.size() - 1)
 			{
 				JustGiveMeTheStringVisitor newLineVS =
 					new JustGiveMeTheStringVisitor();
-				newLines.get(matchingLines).visit(newLineVS);
-				String newLine = newLineVS.s;
+				newLines.get(matchingLines).accept(newLineVS);
+				String newLine = newLineVS.toString();
 				
 				if(matchingLines < newLines.size() - 1)
 				{
@@ -116,8 +122,8 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				{
 					JustGiveMeTheStringVisitor nextOldLineVS =
 						new JustGiveMeTheStringVisitor();
-					chatLines.get(i - 1).getText().visit(nextOldLineVS);
-					String nextOldLine = nextOldLineVS.s;
+					chatLines.get(i - 1).getText().accept(nextOldLineVS);
+					String nextOldLine = nextOldLineVS.toString();
 					
 					String twoLines = oldLine + nextOldLine;
 					String addedText = twoLines.substring(newLine.length());

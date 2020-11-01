@@ -39,9 +39,18 @@ public final class NoFallHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		if(player.fallDistance <= 2)
+		if(player.fallDistance <= (player.isFallFlying() ? 1 : 2))
+			return;
+		
+		if(player.isFallFlying() && player.isSneaking()
+			&& !isFallingFastEnoughToCauseDamage(player))
 			return;
 		
 		player.networkHandler.sendPacket(new PlayerMoveC2SPacket(true));
+	}
+	
+	private boolean isFallingFastEnoughToCauseDamage(ClientPlayerEntity player)
+	{
+		return player.getVelocity().y < -0.5;
 	}
 }

@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Reddit Community for Suggestions
+  - name: Reddit Community
     url: https://www.reddit.com/r/WurstClient/
-    about: Please post suggestions here.
+    about: For general discussion, support, memes, etc.
+  - name: Contact Alexander
+    url: https://www.wurstclient.net/contact/
+    about: For anything that shouldn't be public.

@@ -104,7 +104,7 @@ public class PlayerSkinProviderMixin
 				});
 			});
 		};
-		Util.getServerWorkerExecutor().execute(runnable);
+		Util.getMainWorkerExecutor().execute(runnable);
 		
 		ci.cancel();
 	}

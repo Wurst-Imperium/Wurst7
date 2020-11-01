@@ -22,9 +22,9 @@ import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
+import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
@@ -79,8 +79,9 @@ public final class RemoteViewHack extends Hack
 		new CheckboxSetting("Filter pets",
 			"Won't view tamed wolves,\n" + "tamed horses, etc.", true);
 	
-	private final CheckboxSetting filterVillagers =
-		new CheckboxSetting("Filter villagers", "Won't view villagers.", true);
+	private final CheckboxSetting filterTraders =
+		new CheckboxSetting("Filter traders",
+			"Won't view villagers, wandering traders, etc.", true);
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
@@ -111,7 +112,7 @@ public final class RemoteViewHack extends Hack
 		addSetting(filterAnimals);
 		addSetting(filterBabies);
 		addSetting(filterPets);
-		addSetting(filterVillagers);
+		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
 		addSetting(filterStands);
@@ -145,7 +146,7 @@ public final class RemoteViewHack extends Hack
 					
 					Box box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-					return MC.world.doesNotCollide(box);
+					return MC.world.isSpaceEmpty(box);
 				});
 			
 			if(filterMonsters.isChecked())
@@ -174,8 +175,8 @@ public final class RemoteViewHack extends Hack
 					.filter(e -> !(e instanceof HorseBaseEntity
 						&& ((HorseBaseEntity)e).isTame()));
 			
-			if(filterVillagers.isChecked())
-				stream = stream.filter(e -> !(e instanceof VillagerEntity));
+			if(filterTraders.isChecked())
+				stream = stream.filter(e -> !(e instanceof MerchantEntity));
 			
 			if(filterGolems.isChecked())
 				stream = stream.filter(e -> !(e instanceof GolemEntity));

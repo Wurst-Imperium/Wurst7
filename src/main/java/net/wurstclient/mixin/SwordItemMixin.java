@@ -31,7 +31,7 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 	
 	@Shadow
 	@Final
-	private Multimap<EntityAttribute, EntityAttributeModifier> field_23745;
+	private Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 	
 	private SwordItemMixin(WurstClient wurst, ToolMaterial material,
 		Settings settings)
@@ -42,7 +42,8 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 	@Override
 	public float fuckMcAfee()
 	{
-		return (float)field_23745.get(EntityAttributes.GENERIC_ATTACK_SPEED)
-			.iterator().next().getValue();
+		return (float)attributeModifiers
+			.get(EntityAttributes.GENERIC_ATTACK_SPEED).iterator().next()
+			.getValue();
 	}
 }

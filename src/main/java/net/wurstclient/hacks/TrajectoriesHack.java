@@ -8,7 +8,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -194,10 +194,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			arrowMotionY -= gravity * 0.1;
 			
 			// check for collision
-			RayTraceContext context = new RayTraceContext(eyesPos, arrowPos,
-				RayTraceContext.ShapeType.COLLIDER,
-				RayTraceContext.FluidHandling.NONE, MC.player);
-			if(MC.world.rayTrace(context).getType() != HitResult.Type.MISS)
+			RaycastContext context = new RaycastContext(eyesPos, arrowPos,
+				RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+			if(MC.world.raycast(context).getType() != HitResult.Type.MISS)
 				break;
 		}
 		

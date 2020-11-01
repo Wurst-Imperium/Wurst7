@@ -26,7 +26,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -189,9 +189,9 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			
 			// check line of sight
 			if(MC.world
-				.rayTrace(new RayTraceContext(eyesPos, hitVec,
-					RayTraceContext.ShapeType.COLLIDER,
-					RayTraceContext.FluidHandling.NONE, MC.player))
+				.raycast(new RaycastContext(eyesPos, hitVec,
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player))
 				.getType() != HitResult.Type.MISS)
 				continue;
 			

@@ -1,10 +1,11 @@
 ---
 name: Bug Report
-about: Create a report to help us improve
+about: Report a bug
 title: ''
 labels: bug
 assignees: ''
 ---
+Before posting, please make sure that this hasn't already been reported by someone else.
 
 ## Description
 What's wrong?
