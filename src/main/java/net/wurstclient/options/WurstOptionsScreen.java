@@ -60,9 +60,16 @@ public class WurstOptionsScreen extends Screen
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,
-			() -> "Analytics: " + (analytics.isEnabled() ? "ON" : "OFF"),
-			"Allows us to measure the popularity of Wurst\n"
-				+ "by sending anonymous usage statistics.",
+			() -> "Count Users: " + (analytics.isEnabled() ? "ON" : "OFF"),
+			"Counts how many people are using Wurst\n"
+				+ "and which versions are the most popular.\n"
+				+ "We use this data to decide when to stop\n"
+				+ "supporting old Minecraft versions.\n\n"
+				+ "We use a random ID to tell users apart\n"
+				+ "so that this data can never be linked to\n"
+				+ "your Minecraft account. The random ID is\n"
+				+ "changed every 30 days to make extra sure\n"
+				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
 	}
 	
