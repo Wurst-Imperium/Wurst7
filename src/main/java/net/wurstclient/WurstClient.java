@@ -196,8 +196,8 @@ public enum WurstClient
 					.getVersion().getFriendlyString());
 		});
 		
+		boolean dev = fabricLoader.isDevelopmentEnvironment();
 		Sentry.configureScope(scope -> {
-			boolean dev = fabricLoader.isDevelopmentEnvironment();
 			scope.setTag("environment", dev ? "dev" : "prod");
 		});
 		
@@ -237,7 +237,11 @@ public enum WurstClient
 				map.put(mod.getId(), mod.getVersion().getFriendlyString());
 			scope.setContexts("mods", map);
 			
-			scope.setTag("other_mods", "" + (map.size() - 4));
+			// minecraft, fabric, fabricloader, wurst
+			// sentry is considered a mod in production, but not in dev
+			int wurstMods = dev ? 4 : 5;
+			
+			scope.setTag("other_mods", "" + (map.size() - wurstMods));
 		});
 	}
 	
