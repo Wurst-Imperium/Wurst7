@@ -211,6 +211,13 @@ public abstract class MinecraftClientMixin
 		method = {"printCrashReport(Lnet/minecraft/util/crash/CrashReport;)V"})
 	private static void onPrintCrashReport(CrashReport report, CallbackInfo ci)
 	{
+		WurstClient wurst = WurstClient.INSTANCE;
+		
+		// don't report crash if the version is known to be outdated, but still
+		// report if the updater didn't get a chance to check before the crash
+		if(wurst.getUpdater() != null && wurst.getUpdater().isOutdated())
+			return;
+		
 		Sentry.captureException(report.getCause());
 	}
 	
