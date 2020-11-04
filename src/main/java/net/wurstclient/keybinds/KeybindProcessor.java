@@ -9,10 +9,9 @@ package net.wurstclient.keybinds;
 
 import org.lwjgl.glfw.GLFW;
 
-import io.sentry.Breadcrumb;
-import io.sentry.Sentry;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
+import net.wurstclient.SentryConfig;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.command.CmdProcessor;
@@ -51,10 +50,7 @@ public final class KeybindProcessor implements KeyPressListener
 		if(cmds == null)
 			return;
 		
-		Breadcrumb breadcrumb = new Breadcrumb(cmds);
-		breadcrumb.setCategory("keybind.trigger");
-		breadcrumb.setData("key", keyName);
-		Sentry.addBreadcrumb(breadcrumb);
+		SentryConfig.addKeybindTriggerBreadcrumb(keyName, cmds);
 		
 		processCmds(cmds);
 	}
