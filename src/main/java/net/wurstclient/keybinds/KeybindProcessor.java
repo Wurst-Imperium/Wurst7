@@ -11,13 +11,13 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
-import net.wurstclient.SentryConfig;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.util.ChatUtils;
 
 public final class KeybindProcessor implements KeyPressListener

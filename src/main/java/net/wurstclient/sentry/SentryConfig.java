@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient;
+package net.wurstclient.sentry;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,8 +26,9 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.crash.CrashReport;
+import net.wurstclient.Feature;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.sentry.SentryConfigFile;
 import net.wurstclient.settings.Setting;
 
 public enum SentryConfig
