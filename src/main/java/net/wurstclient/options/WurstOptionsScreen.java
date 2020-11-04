@@ -20,6 +20,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
+import net.wurstclient.SentryConfig;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
@@ -71,6 +72,11 @@ public class WurstOptionsScreen extends Screen
 				+ "changed every 30 days to make extra sure\n"
 				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
+		
+		new WurstOptionsButton(-154, 72,
+			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
+			"Automatically reports crashes\n" + "so you don't have to.",
+			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
 	}
 	
 	private void addManagerButtons()

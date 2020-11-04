@@ -86,8 +86,10 @@ public enum WurstClient
 	{
 		System.out.println("Starting Wurst Client...");
 		
-		SentryConfig.setupSentry();
 		wurstFolder = createWurstFolder();
+		
+		Path sentryFile = wurstFolder.resolve("sentry.json");
+		SentryConfig.setupSentry(sentryFile);
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";

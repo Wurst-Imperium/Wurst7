@@ -7,6 +7,7 @@
  */
 package net.wurstclient;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.sentry.SentryConfigFile;
 import net.wurstclient.settings.Setting;
 
 public enum SentryConfig
@@ -35,8 +37,13 @@ public enum SentryConfig
 	private static final String DSN =
 		"https://c01aef15a7cb466da7824ec5dac0d009@sentry.io/5464583";
 	
-	public static void setupSentry()
+	private static SentryConfigFile configFile;
+	
+	public static void setupSentry(Path path)
 	{
+		configFile = new SentryConfigFile(path);
+		configFile.load();
+		
 		FabricLoader fabricLoader = FabricLoader.getInstance();
 		
 		Sentry.init(options -> {
@@ -167,6 +174,17 @@ public enum SentryConfig
 		otherMods.remove("wurst");
 		otherMods.remove("io_sentry_sentry");
 		return "" + otherMods.size();
+	}
+	
+	public static boolean isEnabled()
+	{
+		return configFile.isEnabled();
+	}
+	
+	public static void setEnabled(boolean enabled)
+	{
+		configFile.setEnabled(enabled);
+		configFile.save();
 	}
 	
 	public static void addHackToggleBreadcrumb(Hack hack, boolean enabled)
@@ -316,10 +334,12 @@ public enum SentryConfig
 	
 	public static void reportCrash(CrashReport report)
 	{
-		WurstClient wurst = WurstClient.INSTANCE;
-		
+		if(configFile != null && !configFile.isEnabled())
+			return;
+			
 		// don't report crash if the version is known to be outdated, but still
 		// report if the updater didn't get a chance to check before the crash
+		WurstClient wurst = WurstClient.INSTANCE;
 		if(wurst.getUpdater() != null && wurst.getUpdater().isOutdated())
 			return;
 		
