@@ -162,7 +162,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		ClientWorld world = MC.world;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.method_31481())
+		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)

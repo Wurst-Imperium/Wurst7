@@ -41,7 +41,7 @@ public final class ProtectCmd extends Command
 		Entity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity)
-			.filter(e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
+			.filter(e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> args[0].equalsIgnoreCase(e.getName().getString()))

@@ -168,7 +168,7 @@ public final class ProtectHack extends Hack
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(
-					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
@@ -207,7 +207,7 @@ public final class ProtectHack extends Hack
 	public void onUpdate()
 	{
 		// check if player died, friend died or disappeared
-		if(friend == null || friend.method_31481()
+		if(friend == null || friend.isRemoved()
 			|| !(friend instanceof LivingEntity)
 			|| ((LivingEntity)friend).getHealth() <= 0
 			|| MC.player.getHealth() <= 0)
@@ -221,7 +221,7 @@ public final class ProtectHack extends Hack
 		// set enemy
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.method_31481())
+			.filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)

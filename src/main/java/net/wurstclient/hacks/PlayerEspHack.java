@@ -97,12 +97,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		ClientWorld world = MC.world;
 		
 		players.clear();
-		Stream<AbstractClientPlayerEntity> stream =
-			world.getPlayers().parallelStream()
-				.filter(e -> !e.method_31481() && e.getHealth() > 0)
-				.filter(e -> e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
+		Stream<AbstractClientPlayerEntity> stream = world.getPlayers()
+			.parallelStream().filter(e -> !e.isRemoved() && e.getHealth() > 0)
+			.filter(e -> e != player)
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
 		
 		if(filterSleeping.isChecked())
 			stream = stream.filter(e -> !e.isSleeping());

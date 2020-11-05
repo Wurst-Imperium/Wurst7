@@ -128,7 +128,7 @@ public final class RemoteViewHack extends Hack
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(
-					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			
@@ -255,7 +255,7 @@ public final class RemoteViewHack extends Hack
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(
-					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
@@ -279,7 +279,7 @@ public final class RemoteViewHack extends Hack
 	public void onUpdate()
 	{
 		// validate entity
-		if(entity.method_31481() || ((LivingEntity)entity).getHealth() <= 0)
+		if(entity.isRemoved() || ((LivingEntity)entity).getHealth() <= 0)
 		{
 			setEnabled(false);
 			return;

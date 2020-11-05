@@ -153,7 +153,7 @@ public final class FollowHack extends Hack
 		{
 			Stream<Entity> stream =
 				StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-					.filter(e -> !e.method_31481())
+					.filter(e -> !e.isRemoved())
 					.filter(e -> e instanceof LivingEntity
 						&& ((LivingEntity)e).getHealth() > 0
 						|| e instanceof AbstractMinecartEntity)
@@ -270,14 +270,14 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity.method_31481() || entity instanceof LivingEntity
+		if(entity.isRemoved() || entity instanceof LivingEntity
 			&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(
-					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> entity.getName().getString()

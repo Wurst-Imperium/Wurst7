@@ -66,7 +66,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void despawn()
 	{
-		method_31472();
+		discard();
 	}
 	
 	public void resetPlayerPosition()
