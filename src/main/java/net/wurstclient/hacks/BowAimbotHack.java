@@ -168,7 +168,7 @@ public final class BowAimbotHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		// check if item is ranged weapon
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.method_31548().getMainHandStack();
 		Item item = stack.getItem();
 		if(!(item instanceof BowItem || item instanceof CrossbowItem))
 		{
@@ -239,8 +239,9 @@ public final class BowAimbotHack extends Hack
 	
 	private Entity filterEntities(Stream<Entity> s)
 	{
-		Stream<Entity> stream = s.filter(e -> e != null && !e.removed).filter(
-			e -> e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
+		Stream<Entity> stream = s.filter(e -> e != null && !e.method_31481())
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))

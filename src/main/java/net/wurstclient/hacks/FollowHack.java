@@ -153,7 +153,7 @@ public final class FollowHack extends Hack
 		{
 			Stream<Entity> stream =
 				StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-					.filter(e -> !e.removed)
+					.filter(e -> !e.method_31481())
 					.filter(e -> e instanceof LivingEntity
 						&& ((LivingEntity)e).getHealth() > 0
 						|| e instanceof AbstractMinecartEntity)
@@ -270,13 +270,14 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity.removed || entity instanceof LivingEntity
+		if(entity.method_31481() || entity instanceof LivingEntity
 			&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> entity.getName().getString()
@@ -338,7 +339,7 @@ public final class FollowHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.method_31549().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(

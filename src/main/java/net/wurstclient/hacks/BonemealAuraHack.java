@@ -94,7 +94,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.method_31548().getMainHandStack();
 		if(stack.isEmpty() || !(stack.getItem() instanceof BoneMealItem))
 			return;
 		

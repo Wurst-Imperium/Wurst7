@@ -162,7 +162,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.method_31481())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)

@@ -36,7 +36,7 @@ public final class ServerCrasherHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.method_31549().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -68,7 +68,7 @@ public final class ServerCrasherHack extends Hack
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getStack(i).isEmpty())
+			if(!MC.player.method_31548().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

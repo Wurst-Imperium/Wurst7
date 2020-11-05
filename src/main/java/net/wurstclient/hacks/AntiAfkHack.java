@@ -57,7 +57,7 @@ public final class AntiAfkHack extends Hack
 		start = new BlockPos(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
-		creativeFlying = MC.player.abilities.flying;
+		creativeFlying = MC.player.method_31549().flying;
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -89,7 +89,7 @@ public final class AntiAfkHack extends Hack
 			return;
 		}
 		
-		MC.player.abilities.flying = creativeFlying;
+		MC.player.method_31549().flying = creativeFlying;
 		
 		if(useAi.isChecked())
 		{

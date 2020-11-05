@@ -39,13 +39,13 @@ public final class ModifyCmd extends Command
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		if(!player.abilities.creativeMode)
+		if(!player.method_31549().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = player.inventory.getMainHandStack();
+		ItemStack stack = player.method_31548().getMainHandStack();
 		
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
@@ -70,7 +70,7 @@ public final class ModifyCmd extends Command
 		
 		MC.player.networkHandler
 			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.inventory.selectedSlot, stack));
+				36 + player.method_31548().selectedSlot, stack));
 		
 		ChatUtils.message("Item modified.");
 	}

@@ -35,7 +35,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void copyInventory()
 	{
-		inventory.clone(player.inventory);
+		method_31548().clone(player.method_31548());
 	}
 	
 	private void copyPlayerModel(Entity from, Entity to)
@@ -66,7 +66,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void despawn()
 	{
-		removed = true;
+		method_31472();
 	}
 	
 	public void resetPlayerPosition()

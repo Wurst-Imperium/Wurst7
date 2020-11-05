@@ -129,7 +129,7 @@ public final class PathCmd extends Command
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
+			.filter(e -> !e.method_31481() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))

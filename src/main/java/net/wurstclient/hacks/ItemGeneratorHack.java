@@ -52,7 +52,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	{
 		EVENTS.add(UpdateListener.class, this);
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.method_31549().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);

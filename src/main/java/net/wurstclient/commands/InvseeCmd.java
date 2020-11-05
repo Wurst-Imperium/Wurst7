@@ -33,7 +33,7 @@ public final class InvseeCmd extends Command implements RenderListener
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.method_31549().creativeMode)
 		{
 			ChatUtils.error("Survival mode only.");
 			return;

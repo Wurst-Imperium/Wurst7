@@ -26,9 +26,9 @@ public class PathFinder
 	private final WurstClient wurst = WurstClient.INSTANCE;
 	
 	private final boolean invulnerable =
-		WurstClient.MC.player.abilities.creativeMode;
+		WurstClient.MC.player.method_31549().creativeMode;
 	private final boolean creativeFlying =
-		WurstClient.MC.player.abilities.flying;
+		WurstClient.MC.player.method_31549().flying;
 	protected final boolean flying =
 		creativeFlying || wurst.getHax().flightHack.isEnabled();
 	private final boolean immuneToFallDamage =
@@ -574,7 +574,7 @@ public class PathFinder
 			throw new IllegalStateException("Path is not formatted!");
 		
 		// check player abilities
-		if(invulnerable != WurstClient.MC.player.abilities.creativeMode
+		if(invulnerable != WurstClient.MC.player.method_31549().creativeMode
 			|| flying != (creativeFlying
 				|| wurst.getHax().flightHack.isEnabled())
 			|| immuneToFallDamage != (invulnerable

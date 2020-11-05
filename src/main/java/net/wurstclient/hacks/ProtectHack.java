@@ -167,7 +167,8 @@ public final class ProtectHack extends Hack
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.method_31481() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
@@ -206,7 +207,8 @@ public final class ProtectHack extends Hack
 	public void onUpdate()
 	{
 		// check if player died, friend died or disappeared
-		if(friend == null || friend.removed || !(friend instanceof LivingEntity)
+		if(friend == null || friend.method_31481()
+			|| !(friend instanceof LivingEntity)
 			|| ((LivingEntity)friend).getHealth() <= 0
 			|| MC.player.getHealth() <= 0)
 		{
@@ -219,7 +221,7 @@ public final class ProtectHack extends Hack
 		// set enemy
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed)
+			.filter(e -> !e.method_31481())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
@@ -340,7 +342,7 @@ public final class ProtectHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.method_31549().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
 					target.getZ()) <= MC.player.squaredDistanceTo(

@@ -81,7 +81,7 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		if(prevSelectedSlot == -1)
-			prevSelectedSlot = MC.player.inventory.selectedSlot;
+			prevSelectedSlot = MC.player.method_31548().selectedSlot;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
 			repairMode.isChecked());
@@ -94,7 +94,7 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		if(switchBack.isChecked())
-			MC.player.inventory.selectedSlot = prevSelectedSlot;
+			MC.player.method_31548().selectedSlot = prevSelectedSlot;
 		
 		prevSelectedSlot = -1;
 	}
@@ -112,7 +112,7 @@ public final class AutoToolHack extends Hack
 		boolean repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
-		if(player.abilities.creativeMode)
+		if(player.method_31549().creativeMode)
 			return;
 		
 		int bestSlot = getBestSlot(pos, useSwords, repairMode);
@@ -137,13 +137,13 @@ public final class AutoToolHack extends Hack
 			return;
 		}
 		
-		player.inventory.selectedSlot = bestSlot;
+		player.method_31548().selectedSlot = bestSlot;
 	}
 	
 	private int getBestSlot(BlockPos pos, boolean useSwords, boolean repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.inventory;
+		PlayerInventory inventory = player.method_31548();
 		ItemStack heldItem = MC.player.getMainHandStack();
 		
 		BlockState state = BlockUtils.getState(pos);
@@ -208,7 +208,7 @@ public final class AutoToolHack extends Hack
 	private void selectFallbackSlot()
 	{
 		int fallbackSlot = getFallbackSlot();
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.method_31548();
 		
 		if(fallbackSlot == -1)
 		{
@@ -225,7 +225,7 @@ public final class AutoToolHack extends Hack
 	
 	private int getFallbackSlot()
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.method_31548();
 		
 		for(int slot = 0; slot < 9; slot++)
 		{

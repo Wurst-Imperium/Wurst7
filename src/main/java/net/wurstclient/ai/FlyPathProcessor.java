@@ -71,7 +71,7 @@ public class FlyPathProcessor extends PathProcessor
 		}
 		
 		lockControls();
-		MC.player.abilities.flying = creativeFlying;
+		MC.player.method_31549().flying = creativeFlying;
 		boolean x = posVec.x < nextBox.minX || posVec.x > nextBox.maxX;
 		boolean y = posVec.y < nextBox.minY || posVec.y > nextBox.maxY;
 		boolean z = posVec.z < nextBox.minZ || posVec.z > nextBox.maxZ;

@@ -165,7 +165,7 @@ public final class NukerHack extends Hack
 				pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toList());
 		
-		if(player.abilities.creativeMode)
+		if(player.method_31549().creativeMode)
 		{
 			Stream<BlockPos> stream2 = blocks2.parallelStream();
 			for(Set<BlockPos> set : prevBlocks)

@@ -307,29 +307,29 @@ public final class AutoFarmHack extends Hack
 		
 		for(int slot = 0; slot < 36; slot++)
 		{
-			if(slot == player.inventory.selectedSlot)
+			if(slot == player.method_31548().selectedSlot)
 				continue;
 			
-			ItemStack stack = player.inventory.getStack(slot);
+			ItemStack stack = player.method_31548().getStack(slot);
 			if(stack.isEmpty() || stack.getItem() != neededItem)
 				continue;
 			
 			if(slot < 9)
-				player.inventory.selectedSlot = slot;
-			else if(player.inventory.getEmptySlot() < 9)
+				player.method_31548().selectedSlot = slot;
+			else if(player.method_31548().getEmptySlot() < 9)
 				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
-			else if(player.inventory.getEmptySlot() != -1)
+			else if(player.method_31548().getEmptySlot() != -1)
 			{
-				IMC.getInteractionManager()
-					.windowClick_QUICK_MOVE(player.inventory.selectedSlot + 36);
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(
+					player.method_31548().selectedSlot + 36);
 				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
 			}else
 			{
-				IMC.getInteractionManager()
-					.windowClick_PICKUP(player.inventory.selectedSlot + 36);
+				IMC.getInteractionManager().windowClick_PICKUP(
+					player.method_31548().selectedSlot + 36);
 				IMC.getInteractionManager().windowClick_PICKUP(slot);
-				IMC.getInteractionManager()
-					.windowClick_PICKUP(player.inventory.selectedSlot + 36);
+				IMC.getInteractionManager().windowClick_PICKUP(
+					player.method_31548().selectedSlot + 36);
 			}
 			
 			return true;
@@ -414,7 +414,7 @@ public final class AutoFarmHack extends Hack
 	
 	private void harvest(List<BlockPos> blocksToHarvest)
 	{
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.method_31549().creativeMode)
 		{
 			Stream<BlockPos> stream3 = blocksToHarvest.parallelStream();
 			for(Set<BlockPos> set : prevBlocks)

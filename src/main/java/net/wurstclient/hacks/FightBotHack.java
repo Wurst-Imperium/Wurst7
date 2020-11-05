@@ -183,7 +183,7 @@ public final class FightBotHack extends Hack
 		// set entity
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed)
+			.filter(e -> !e.method_31481())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
@@ -301,7 +301,7 @@ public final class FightBotHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.method_31549().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(
