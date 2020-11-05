@@ -10,7 +10,6 @@ package net.wurstclient.util;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -45,7 +44,7 @@ public enum RenderUtils
 	
 	public static void applyCameraRotationOnly()
 	{
-		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
+		Camera camera = WurstClient.MC.method_31975().camera;
 		GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
 		GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
 			0);
@@ -53,7 +52,7 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return BlockEntityRenderDispatcher.INSTANCE.camera.getPos();
+		return WurstClient.MC.method_31975().camera.getPos();
 	}
 	
 	public static void drawSolidBox()
