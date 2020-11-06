@@ -120,7 +120,7 @@ public final class AutoFishHack extends Hack
 			reelInTimer--;
 		
 		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.method_31548();
+		PlayerInventory inventory = player.getInventory();
 		
 		if(scheduledWindowClick != -1)
 		{
@@ -185,7 +185,7 @@ public final class AutoFishHack extends Hack
 	
 	private void updateBestRod()
 	{
-		PlayerInventory inventory = MC.player.method_31548();
+		PlayerInventory inventory = MC.player.getInventory();
 		int selectedSlot = inventory.selectedSlot;
 		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
@@ -227,7 +227,7 @@ public final class AutoFishHack extends Hack
 	
 	private void selectBestRod()
 	{
-		PlayerInventory inventory = MC.player.method_31548();
+		PlayerInventory inventory = MC.player.getInventory();
 		
 		if(bestRodSlot < 9)
 		{
@@ -287,7 +287,7 @@ public final class AutoFishHack extends Hack
 	private void rightClick()
 	{
 		// check held item
-		ItemStack stack = MC.player.method_31548().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
 			return;
 		

@@ -449,7 +449,7 @@ public final class ExcavatorHack extends Hack
 			pos -> area.blocksSet.contains(pos));
 		
 		// nuke all
-		if(MC.player.method_31549().creativeMode && !legit)
+		if(MC.player.getAbilities().creativeMode && !legit)
 		{
 			MC.interactionManager.cancelBlockBreaking();
 			

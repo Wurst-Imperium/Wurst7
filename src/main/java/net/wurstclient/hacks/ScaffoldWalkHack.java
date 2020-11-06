@@ -62,7 +62,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-block items
-			ItemStack stack = MC.player.method_31548().getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 				continue;
 			
@@ -86,13 +86,13 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			return;
 		
 		// set slot
-		int oldSlot = MC.player.method_31548().selectedSlot;
-		MC.player.method_31548().selectedSlot = newSlot;
+		int oldSlot = MC.player.getInventory().selectedSlot;
+		MC.player.getInventory().selectedSlot = newSlot;
 		
 		placeBlock(belowPlayer);
 		
 		// reset slot
-		MC.player.method_31548().selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 	}
 	
 	private boolean placeBlock(BlockPos pos)

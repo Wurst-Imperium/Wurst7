@@ -76,7 +76,7 @@ public final class DropCmd extends Command implements UpdateListener
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
 			
-			if(!MC.player.method_31548().getStack(adjustedSlot).isEmpty())
+			if(!MC.player.getInventory().getStack(adjustedSlot).isEmpty())
 				break;
 			
 			slowModeSlotCounter++;

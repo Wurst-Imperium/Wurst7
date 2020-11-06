@@ -30,7 +30,7 @@ public final class ViewNbtCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		ClientPlayerEntity player = MC.player;
-		ItemStack stack = player.method_31548().getMainHandStack();
+		ItemStack stack = player.getInventory().getMainHandStack();
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		

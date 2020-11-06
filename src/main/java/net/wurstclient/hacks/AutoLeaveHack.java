@@ -75,7 +75,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// check gamemode
-		if(MC.player.method_31549().creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 			return;
 		
 		// check for other players

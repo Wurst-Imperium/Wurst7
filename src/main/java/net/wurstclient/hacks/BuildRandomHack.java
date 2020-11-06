@@ -120,7 +120,7 @@ public final class BuildRandomHack extends Hack
 		if(!checkItem.isChecked())
 			return true;
 		
-		ItemStack stack = MC.player.method_31548().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
 	}
 	

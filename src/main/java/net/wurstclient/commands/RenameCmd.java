@@ -27,7 +27,7 @@ public final class RenameCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length == 0)
@@ -38,7 +38,7 @@ public final class RenameCmd extends Command
 			message += " " + args[i];
 		
 		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
-		ItemStack item = MC.player.method_31548().getMainHandStack();
+		ItemStack item = MC.player.getInventory().getMainHandStack();
 		
 		if(item == null)
 			throw new CmdError("There is no item in your hand.");

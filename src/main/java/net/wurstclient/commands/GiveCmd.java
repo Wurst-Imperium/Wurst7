@@ -44,7 +44,7 @@ public final class GiveCmd extends Command
 		if(args.length < 1)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
@@ -114,7 +114,7 @@ public final class GiveCmd extends Command
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.method_31548().getStack(i).isEmpty())
+			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

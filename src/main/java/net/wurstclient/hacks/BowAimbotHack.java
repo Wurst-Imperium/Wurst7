@@ -168,7 +168,7 @@ public final class BowAimbotHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		// check if item is ranged weapon
-		ItemStack stack = MC.player.method_31548().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		Item item = stack.getItem();
 		if(!(item instanceof BowItem || item instanceof CrossbowItem))
 		{

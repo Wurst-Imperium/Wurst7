@@ -344,7 +344,7 @@ public final class TunnellerHack extends Hack
 				false);
 			breakBlockSimple(currentBlock);
 			
-			if(MC.player.method_31549().creativeMode
+			if(MC.player.getAbilities().creativeMode
 				|| BlockUtils.getHardness(currentBlock) >= 1)
 			{
 				progress = 1;
@@ -456,7 +456,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.method_31548().getStack(slot);
+				ItemStack stack = MC.player.getInventory().getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				
@@ -472,7 +472,7 @@ public final class TunnellerHack extends Hack
 					.canFallThrough(BlockUtils.getState(pos.down())))
 					continue;
 				
-				MC.player.method_31548().selectedSlot = slot;
+				MC.player.getInventory().selectedSlot = slot;
 				return true;
 			}
 			
@@ -651,7 +651,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.method_31548().getStack(slot);
+				ItemStack stack = MC.player.getInventory().getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				
@@ -660,7 +660,7 @@ public final class TunnellerHack extends Hack
 				if(!(block instanceof TorchBlock))
 					continue;
 				
-				MC.player.method_31548().selectedSlot = slot;
+				MC.player.getInventory().selectedSlot = slot;
 				return true;
 			}
 			

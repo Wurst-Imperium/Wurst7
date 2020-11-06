@@ -36,14 +36,14 @@ public final class CrashChestHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
 			return;
 		}
 		
-		if(!MC.player.method_31548().getArmorStack(0).isEmpty())
+		if(!MC.player.getInventory().getArmorStack(0).isEmpty())
 		{
 			ChatUtils.error("Please clear your shoes slot.");
 			setEnabled(false);
@@ -61,7 +61,7 @@ public final class CrashChestHack extends Hack
 		stack.setCustomName(new LiteralText("Copy Me"));
 		
 		// give item
-		MC.player.method_31548().armor.set(0, stack);
+		MC.player.getInventory().armor.set(0, stack);
 		ChatUtils.message("Item has been placed in your shoes slot.");
 		setEnabled(false);
 	}

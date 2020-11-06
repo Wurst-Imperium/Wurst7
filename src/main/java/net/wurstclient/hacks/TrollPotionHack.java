@@ -32,7 +32,7 @@ public final class TrollPotionHack extends Hack
 	public void onEnable()
 	{
 		// check gamemode
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -69,7 +69,7 @@ public final class TrollPotionHack extends Hack
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.method_31548().getStack(i).isEmpty())
+			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

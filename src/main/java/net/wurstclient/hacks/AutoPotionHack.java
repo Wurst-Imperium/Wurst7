@@ -76,17 +76,17 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 				return;
 			
 			// save old slot
-			int oldSlot = MC.player.method_31548().selectedSlot;
+			int oldSlot = MC.player.getInventory().selectedSlot;
 			
 			// throw potion in hotbar
-			MC.player.method_31548().selectedSlot = potionInHotbar;
+			MC.player.getInventory().selectedSlot = potionInHotbar;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw, 90,
 					MC.player.isOnGround()));
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
-			MC.player.method_31548().selectedSlot = oldSlot;
+			MC.player.getInventory().selectedSlot = oldSlot;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw,
 					MC.player.pitch, MC.player.isOnGround()));
@@ -110,7 +110,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.method_31548().getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			
 			// filter out non-splash potion items
 			if(stack.getItem() != Items.SPLASH_POTION)

@@ -65,7 +65,7 @@ public class WalkPathProcessor extends PathProcessor
 		}
 		
 		lockControls();
-		WurstClient.MC.player.method_31549().flying = false;
+		WurstClient.MC.player.getAbilities().flying = false;
 		
 		// face next position
 		facePosition(nextPos);

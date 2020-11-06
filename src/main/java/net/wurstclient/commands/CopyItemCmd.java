@@ -33,7 +33,7 @@ public final class CopyItemCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		AbstractClientPlayerEntity player = getPlayer(args[0]);
@@ -62,19 +62,19 @@ public final class CopyItemCmd extends Command
 		switch(slot.toLowerCase())
 		{
 			case "hand":
-			return player.method_31548().getMainHandStack();
+			return player.getInventory().getMainHandStack();
 			
 			case "head":
-			return player.method_31548().getArmorStack(3);
+			return player.getInventory().getArmorStack(3);
 			
 			case "chest":
-			return player.method_31548().getArmorStack(2);
+			return player.getInventory().getArmorStack(2);
 			
 			case "legs":
-			return player.method_31548().getArmorStack(1);
+			return player.getInventory().getArmorStack(1);
 			
 			case "feet":
-			return player.method_31548().getArmorStack(0);
+			return player.getInventory().getArmorStack(0);
 			
 			default:
 			throw new CmdSyntaxError();
@@ -83,7 +83,7 @@ public final class CopyItemCmd extends Command
 	
 	private void giveItem(ItemStack stack) throws CmdError
 	{
-		int slot = MC.player.method_31548().getEmptySlot();
+		int slot = MC.player.getInventory().getEmptySlot();
 		if(slot < 0)
 			throw new CmdError("Cannot give item. Your inventory is full.");
 		

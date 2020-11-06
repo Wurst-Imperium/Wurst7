@@ -21,7 +21,7 @@ public final class EnchantCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length > 1)
@@ -35,7 +35,7 @@ public final class EnchantCmd extends Command
 	
 	private ItemStack getHeldItem() throws CmdError
 	{
-		ItemStack stack = MC.player.method_31548().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		
 		if(stack.isEmpty())
 			throw new CmdError("There is no item in your hand.");

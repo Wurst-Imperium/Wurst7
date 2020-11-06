@@ -35,7 +35,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void copyInventory()
 	{
-		method_31548().clone(player.method_31548());
+		getInventory().clone(player.getInventory());
 	}
 	
 	private void copyPlayerModel(Entity from, Entity to)

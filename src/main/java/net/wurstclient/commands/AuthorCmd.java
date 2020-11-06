@@ -30,10 +30,10 @@ public final class AuthorCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.method_31549().creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
-		ItemStack heldItem = MC.player.method_31548().getMainHandStack();
+		ItemStack heldItem = MC.player.getInventory().getMainHandStack();
 		int heldItemID = Item.getRawId(heldItem.getItem());
 		int writtenBookID = Item.getRawId(Items.WRITTEN_BOOK);
 		

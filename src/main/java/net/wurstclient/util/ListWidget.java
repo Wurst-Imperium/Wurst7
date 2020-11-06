@@ -136,7 +136,7 @@ public abstract class ListWidget extends AbstractParentElement
 			client.getTextureManager()
 				.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D)
 				.texture(left / 32.0F, (bottom + (int)scrollAmount) / 32.0F)
@@ -167,7 +167,7 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.disableAlphaTest();
 			RenderSystem.shadeModel(7425);
 			RenderSystem.disableTexture();
-			bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, top + 4, 0.0D).texture(0.0F, 1.0F)
 				.color(0, 0, 0, 0).next();
@@ -178,7 +178,7 @@ public abstract class ListWidget extends AbstractParentElement
 			bufferBuilder.vertex(left, top, 0.0D).texture(0.0F, 0.0F)
 				.color(0, 0, 0, 255).next();
 			tessellator.draw();
-			bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, 1.0F)
 				.color(0, 0, 0, 255).next();
@@ -199,7 +199,7 @@ public abstract class ListWidget extends AbstractParentElement
 				if(p < top)
 					p = top;
 				
-				bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_TEXTURE_COLOR);
 				bufferBuilder.vertex(i, bottom, 0.0D).texture(0.0F, 1.0F)
 					.color(0, 0, 0, 255).next();
@@ -210,7 +210,7 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(i, top, 0.0D).texture(0.0F, 0.0F)
 					.color(0, 0, 0, 255).next();
 				tessellator.draw();
-				bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_TEXTURE_COLOR);
 				bufferBuilder.vertex(i, p + o, 0.0D).texture(0.0F, 1.0F)
 					.color(128, 128, 128, 255).next();
@@ -221,7 +221,7 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(i, p, 0.0D).texture(0.0F, 0.0F)
 					.color(128, 128, 128, 255).next();
 				tessellator.draw();
-				bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_TEXTURE_COLOR);
 				bufferBuilder.vertex(i, p + o - 1, 0.0D).texture(0.0F, 1.0F)
 					.color(192, 192, 192, 255).next();
@@ -390,7 +390,7 @@ public abstract class ListWidget extends AbstractParentElement
 				RenderSystem.disableTexture();
 				float g = isFocused() ? 1.0F : 0.5F;
 				RenderSystem.color4f(g, g, g, 1.0F);
-				bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(q, o + p + 2, 0.0D).next();
 				bufferBuilder.vertex(r, o + p + 2, 0.0D).next();
@@ -398,7 +398,7 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(q, o - 2, 0.0D).next();
 				tessellator.draw();
 				RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-				bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(q + 1, o + p + 1, 0.0D).next();
 				bufferBuilder.vertex(r - 1, o + p + 1, 0.0D).next();
@@ -431,7 +431,7 @@ public abstract class ListWidget extends AbstractParentElement
 		client.getTextureManager()
 			.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		bufferBuilder.begin(VertexFormat.class_5596.field_27382,
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_TEXTURE_COLOR);
 		bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, bottom / 32.0F)
 			.color(64, 64, 64, bottomAlpha).next();

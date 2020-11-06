@@ -98,7 +98,7 @@ public final class AutoArmorHack extends Hack
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.method_31548();
+		PlayerInventory inventory = player.getInventory();
 		
 		if(!swapWhileMoving.isChecked() && (player.input.movementForward != 0
 			|| player.input.movementSideways != 0))
