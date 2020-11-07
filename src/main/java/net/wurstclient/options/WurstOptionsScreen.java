@@ -24,6 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
@@ -60,10 +61,22 @@ public class WurstOptionsScreen extends Screen
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,
-			() -> "Analytics: " + (analytics.isEnabled() ? "ON" : "OFF"),
-			"Allows us to measure the popularity of Wurst\n"
-				+ "by sending anonymous usage statistics.",
+			() -> "Count Users: " + (analytics.isEnabled() ? "ON" : "OFF"),
+			"Counts how many people are using Wurst\n"
+				+ "and which versions are the most popular.\n"
+				+ "We use this data to decide when to stop\n"
+				+ "supporting old Minecraft versions.\n\n"
+				+ "We use a random ID to tell users apart\n"
+				+ "so that this data can never be linked to\n"
+				+ "your Minecraft account. The random ID is\n"
+				+ "changed every 30 days to make extra sure\n"
+				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
+		
+		new WurstOptionsButton(-154, 72,
+			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
+			"Automatically reports crashes\n" + "so you don't have to.",
+			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
 	}
 	
 	private void addManagerButtons()
