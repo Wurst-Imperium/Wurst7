@@ -13,5 +13,5 @@ import net.minecraft.world.chunk.BlockEntityTickInvoker;
 
 public interface IWorld
 {
-	List<BlockEntityTickInvoker> getBlockEntities();
+	List<BlockEntityTickInvoker> getBlockEntityTickers();
 }

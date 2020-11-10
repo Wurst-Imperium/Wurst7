@@ -145,7 +145,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		shulkerBoxes.clear();
 		
 		for(BlockEntityTickInvoker blockEntityTicker : ((IWorld)MC.world)
-			.getBlockEntities())
+			.getBlockEntityTickers())
 		{
 			BlockEntity blockEntity =
 				MC.world.getBlockEntity(blockEntityTicker.getPos());

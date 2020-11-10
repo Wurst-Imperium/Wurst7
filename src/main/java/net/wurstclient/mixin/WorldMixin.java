@@ -65,7 +65,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	}
 	
 	@Override
-	public List<BlockEntityTickInvoker> getBlockEntities()
+	public List<BlockEntityTickInvoker> getBlockEntityTickers()
 	{
 		return blockEntityTickers;
 	}
