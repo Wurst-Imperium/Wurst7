@@ -7,7 +7,12 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.wurstclient.mixinterface.IWorld;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,8 +23,11 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
 @Mixin(World.class)
-public abstract class WorldMixin implements WorldAccess, AutoCloseable
+public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 {
+
+	@Shadow @Final protected List<BlockEntityTickInvoker> blockEntityTickers;
+
 	@Inject(at = {@At("HEAD")},
 		method = {"getRainGradient(F)F"},
 		cancellable = true)
@@ -53,5 +61,10 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			return noWeatherHack.getChangedMoonPhase();
 		
 		return getDimension().getMoonPhase(getLunarTime());
+	}
+
+	@Override
+	public List<BlockEntityTickInvoker> getBlockEntities() {
+		return blockEntityTickers;
 	}
 }
