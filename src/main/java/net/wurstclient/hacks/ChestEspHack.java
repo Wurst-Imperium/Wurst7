@@ -153,12 +153,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			if(blockEntity instanceof TrappedChestBlockEntity)
 			{
 				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
-				if(box != null)
-					trappedChests.add(box);
-			}
-			if(blockEntity instanceof TrappedChestBlockEntity)
-			{
-				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
 				
 				if(box != null)
 					trappedChests.add(box);
