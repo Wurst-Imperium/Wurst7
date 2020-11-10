@@ -11,18 +11,29 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BarrelBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.block.entity.TrappedChestBlockEntity;
+import net.minecraft.block.enums.ChestType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IWorld;
 import net.wurstclient.settings.EnumSetting;
-import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -65,9 +76,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.add(RenderListener.class, this);
 		
 		setupDisplayLists();
-		
-		ChatUtils.error("Sorry, ChestESP is currently broken.");
-		setEnabled(false);
 	}
 	
 	private void setupDisplayLists()
@@ -136,48 +144,54 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		enderChests.clear();
 		shulkerBoxes.clear();
 		
-		// for(BlockEntity blockEntity : MC.world.blockEntities)
-		// if(blockEntity instanceof TrappedChestBlockEntity)
-		// {
-		// Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
-		//
-		// if(box != null)
-		// trappedChests.add(box);
-		//
-		// }else if(blockEntity instanceof ChestBlockEntity)
-		// {
-		// Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
-		//
-		// if(box != null)
-		// basicChests.add(box);
-		//
-		// }else if(blockEntity instanceof EnderChestBlockEntity)
-		// {
-		// BlockPos pos = blockEntity.getPos();
-		// if(!BlockUtils.canBeClicked(pos))
-		// continue;
-		//
-		// Box bb = BlockUtils.getBoundingBox(pos);
-		// enderChests.add(bb);
-		//
-		// }else if(blockEntity instanceof ShulkerBoxBlockEntity)
-		// {
-		// BlockPos pos = blockEntity.getPos();
-		// if(!BlockUtils.canBeClicked(pos))
-		// continue;
-		//
-		// Box bb = BlockUtils.getBoundingBox(pos);
-		// shulkerBoxes.add(bb);
-		//
-		// }else if(blockEntity instanceof BarrelBlockEntity)
-		// {
-		// BlockPos pos = blockEntity.getPos();
-		// if(!BlockUtils.canBeClicked(pos))
-		// continue;
-		//
-		// Box bb = BlockUtils.getBoundingBox(pos);
-		// basicChests.add(bb);
-		// }
+		for(BlockEntityTickInvoker blockEntityTicker : ((IWorld)MC.world)
+			.getBlockEntityTickers())
+		{
+			BlockEntity blockEntity =
+				MC.world.getBlockEntity(blockEntityTicker.getPos());
+			
+			if(blockEntity instanceof TrappedChestBlockEntity)
+			{
+				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
+				
+				if(box != null)
+					trappedChests.add(box);
+				
+			}else if(blockEntity instanceof ChestBlockEntity)
+			{
+				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
+				
+				if(box != null)
+					basicChests.add(box);
+				
+			}else if(blockEntity instanceof EnderChestBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				enderChests.add(bb);
+				
+			}else if(blockEntity instanceof ShulkerBoxBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				shulkerBoxes.add(bb);
+				
+			}else if(blockEntity instanceof BarrelBlockEntity)
+			{
+				BlockPos pos = blockEntity.getPos();
+				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				Box bb = BlockUtils.getBoundingBox(pos);
+				basicChests.add(bb);
+			}
+		}
 		
 		GL11.glNewList(normalChests, GL11.GL_COMPILE);
 		renderBoxes(basicChests, greenBox);
@@ -192,38 +206,38 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				minecarts.add(entity);
 	}
 	
-	// private Box getBoxFromChest(ChestBlockEntity chestBE)
-	// {
-	// BlockState state = chestBE.getCachedState();
-	// if(!state.contains(ChestBlock.CHEST_TYPE))
-	// return null;
-	//
-	// ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
-	//
-	// // ignore other block in double chest
-	// if(chestType == ChestType.LEFT)
-	// return null;
-	//
-	// BlockPos pos = chestBE.getPos();
-	// if(!BlockUtils.canBeClicked(pos))
-	// return null;
-	//
-	// Box box = BlockUtils.getBoundingBox(pos);
-	//
-	// // larger box for double chest
-	// if(chestType != ChestType.SINGLE)
-	// {
-	// BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
-	//
-	// if(BlockUtils.canBeClicked(pos2))
-	// {
-	// Box box2 = BlockUtils.getBoundingBox(pos2);
-	// box = box.union(box2);
-	// }
-	// }
-	//
-	// return box;
-	// }
+	private Box getBoxFromChest(ChestBlockEntity chestBE)
+	{
+		BlockState state = chestBE.getCachedState();
+		if(!state.contains(ChestBlock.CHEST_TYPE))
+			return null;
+		
+		ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+		
+		// ignore other block in double chest
+		if(chestType == ChestType.LEFT)
+			return null;
+		
+		BlockPos pos = chestBE.getPos();
+		if(!BlockUtils.canBeClicked(pos))
+			return null;
+		
+		Box box = BlockUtils.getBoundingBox(pos);
+		
+		// larger box for double chest
+		if(chestType != ChestType.SINGLE)
+		{
+			BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
+			
+			if(BlockUtils.canBeClicked(pos2))
+			{
+				Box box2 = BlockUtils.getBoundingBox(pos2);
+				box = box.union(box2);
+			}
+		}
+		
+		return box;
+	}
 	
 	@Override
 	public void onCameraTransformViewBobbing(
