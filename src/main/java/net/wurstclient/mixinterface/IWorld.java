@@ -1,15 +1,17 @@
+/*
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 package net.wurstclient.mixinterface;
 
 import java.util.List;
+
 import net.minecraft.world.chunk.BlockEntityTickInvoker;
 
-/**
- * IWorld
- *
- * @author Hexeption admin@hexeption.co.uk
- * @since 10/11/2020 - 04:38 am
- */
-public interface IWorld {
-
-    List<BlockEntityTickInvoker> getBlockEntities();
+public interface IWorld
+{
+	List<BlockEntityTickInvoker> getBlockEntities();
 }
