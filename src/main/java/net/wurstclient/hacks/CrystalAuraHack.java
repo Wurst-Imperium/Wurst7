@@ -37,7 +37,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener {
 
     int i = 0;
 
-    public CrystalAuraHack(String name, String description) {
+    public CrystalAuraHack() {
         super("CrystalAura", 	"Automatically hits end crystals. Also called AutoCrystal in some clients");
         this.setCategory(COMBAT);
         this.addSetting(
