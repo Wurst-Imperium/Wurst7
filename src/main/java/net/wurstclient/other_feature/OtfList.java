@@ -25,6 +25,7 @@ public final class OtfList
 	public final ReconnectOtf reconnectOtf = new ReconnectOtf();
 	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
+	public final VanillaSpoofOtf vanillaSpoofOtf = new VanillaSpoofOtf();
 	public final WurstCapesOtf wurstCapesOtf = new WurstCapesOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
 	public final ZoomOtf zoomOtf = new ZoomOtf();
