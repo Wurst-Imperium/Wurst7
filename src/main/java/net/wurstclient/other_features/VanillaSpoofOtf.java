@@ -27,9 +27,8 @@ public final class VanillaSpoofOtf extends OtherFeature
 	
 	public VanillaSpoofOtf()
 	{
-		super("VanillaSpoof",
-			"Is your server blocking Fabric? This feature will help\n"
-				+ "you get around the block by pretending to be a vanilla client.");
+		super("VanillaSpoof", "Bypasses anti-Fabric plugins by\n"
+			+ "pretending to be a vanilla client.");
 		addSetting(spoof);
 	}
 	
