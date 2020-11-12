@@ -115,14 +115,17 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(54, 24, () -> "Official Website",
 			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
 		
-		new WurstOptionsButton(54, 48, () -> "Twitter", "@Wurst_Imperium",
+		new WurstOptionsButton(54, 48, () -> "Wurst Wiki",
+			"Wiki.WurstClient.net",
+			b -> os.open("https://wiki.wurstclient.net/"));
+		
+		new WurstOptionsButton(54, 72, () -> "Twitter", "@Wurst_Imperium",
 			b -> os.open("https://twitter.com/Wurst_Imperium"));
 		
-		new WurstOptionsButton(54, 72, () -> "Subreddit (NEW!)",
-			"r/WurstClient",
+		new WurstOptionsButton(54, 96, () -> "Reddit", "r/WurstClient",
 			b -> os.open("https://www.reddit.com/r/WurstClient/"));
 		
-		new WurstOptionsButton(54, 96, () -> "Donate",
+		new WurstOptionsButton(54, 120, () -> "Donate",
 			"paypal.me/WurstImperium",
 			b -> os.open("https://www.wurstclient.net/donate/"));
 	}
