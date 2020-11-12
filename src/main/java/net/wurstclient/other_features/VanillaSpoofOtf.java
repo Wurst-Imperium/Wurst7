@@ -12,11 +12,14 @@ import net.fabricmc.fabric.impl.networking.CustomPayloadC2SPacketAccessor;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.wurstclient.DontBlock;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
 @DontBlock
+@SearchTags({"vanilla spoof", "AntiFabric", "anti fabric", "LibHatesMods",
+	"HackedServer"})
 public final class VanillaSpoofOtf extends OtherFeature
 {
 	private final CheckboxSetting spoof =
