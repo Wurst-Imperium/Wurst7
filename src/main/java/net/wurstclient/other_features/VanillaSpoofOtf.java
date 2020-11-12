@@ -59,4 +59,22 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(packet.getChannel().getNamespace().equals("fabric"))
 			event.cancel();
 	}
+	
+	@Override
+	public boolean isEnabled()
+	{
+		return spoof.isChecked();
+	}
+	
+	@Override
+	public String getPrimaryAction()
+	{
+		return isEnabled() ? "Disable" : "Enable";
+	}
+	
+	@Override
+	public void doPrimaryAction()
+	{
+		spoof.setChecked(!spoof.isChecked());
+	}
 }
