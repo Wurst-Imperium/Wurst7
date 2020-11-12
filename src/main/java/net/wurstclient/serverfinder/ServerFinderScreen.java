@@ -21,7 +21,6 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
-import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
 
@@ -73,9 +72,6 @@ public class ServerFinderScreen extends Screen
 		
 		setInitialFocus(ipBox);
 		state = ServerFinderState.NOT_RUNNING;
-		
-		WurstClient.INSTANCE.getAnalytics()
-			.trackPageView("/multiplayer/server-finder", "Server Finder");
 	}
 	
 	private void searchOrCancel()
