@@ -24,6 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -50,9 +51,11 @@ public class WurstOptionsScreen extends Screen
 	
 	private void addSettingButtons()
 	{
-		FriendsCmd friendsCmd = WurstClient.INSTANCE.getCmds().friendsCmd;
+		WurstClient wurst = WurstClient.INSTANCE;
+		FriendsCmd friendsCmd = wurst.getCmds().friendsCmd;
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
-		WurstAnalytics analytics = WurstClient.INSTANCE.getAnalytics();
+		WurstAnalytics analytics = wurst.getAnalytics();
+		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
 		
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
@@ -77,6 +80,12 @@ public class WurstOptionsScreen extends Screen
 			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
 			"Automatically reports crashes\n" + "so you don't have to.",
 			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
+		
+		new WurstOptionsButton(-154, 96,
+			() -> "Spoof Vanilla: "
+				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
+			vanillaSpoofOtf.getDescription(),
+			b -> vanillaSpoofOtf.doPrimaryAction());
 	}
 	
 	private void addManagerButtons()
