@@ -38,9 +38,9 @@ public class IngameHudMixin extends DrawableHelper
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"renderOverlay(Lnet/minecraft/util/Identifier;FI)V"},
+		method = {"renderOverlay(Lnet/minecraft/util/Identifier;F)V"},
 		cancellable = true)
-	private void onRenderOverlay(Identifier identifier, float scale, int i,
+	private void onRenderOverlay(Identifier identifier, float scale,
 		CallbackInfo ci)
 	{
 		if(identifier == null || identifier.getPath() == null)
