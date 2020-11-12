@@ -20,14 +20,14 @@ import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
 import net.wurstclient.WurstClient;
+import net.wurstclient.events.ConnectionPacketOutputListener.ConnectionPacketOutputEvent;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
-import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
 @Mixin(ClientConnection.class)
 public abstract class ClientConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
-	private PacketOutputEvent event;
+	private ConnectionPacketOutputEvent event;
 	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/network/ClientConnection;handlePacket(Lnet/minecraft/network/Packet;Lnet/minecraft/network/listener/PacketListener;)V",
@@ -50,9 +50,8 @@ public abstract class ClientConnectionMixin
 		at = @At("HEAD"))
 	public Packet<?> onSendPacket(Packet<?> packet)
 	{
-		PacketOutputEvent event = new PacketOutputEvent(packet);
-		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.onSentPacket(event);
-		this.event = event;
+		event = new ConnectionPacketOutputEvent(packet);
+		WurstClient.INSTANCE.getEventManager().fire(event);
 		return event.getPacket();
 	}
 	
@@ -64,8 +63,9 @@ public abstract class ClientConnectionMixin
 		GenericFutureListener<? extends Future<? super Void>> callback,
 		CallbackInfo ci)
 	{
-		if(event.isCancelled())
+		if(event != null && event.isCancelled())
 			ci.cancel();
+		
 		event = null;
 	}
 }

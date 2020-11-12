@@ -13,7 +13,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
+import net.wurstclient.events.ConnectionPacketOutputListener;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -21,6 +21,7 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"vanilla spoof", "AntiFabric", "anti fabric", "LibHatesMods",
 	"HackedServer"})
 public final class VanillaSpoofOtf extends OtherFeature
+	implements ConnectionPacketOutputListener
 {
 	private final CheckboxSetting spoof =
 		new CheckboxSetting("Spoof Vanilla", false);
@@ -30,9 +31,12 @@ public final class VanillaSpoofOtf extends OtherFeature
 		super("VanillaSpoof", "Bypasses anti-Fabric plugins by\n"
 			+ "pretending to be a vanilla client.");
 		addSetting(spoof);
+		
+		WURST.getEventManager().add(ConnectionPacketOutputListener.class, this);
 	}
 	
-	public void onSentPacket(PacketOutputEvent event)
+	@Override
+	public void onSentConnectionPacket(ConnectionPacketOutputEvent event)
 	{
 		if(!spoof.isChecked())
 			return;
