@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -55,8 +55,15 @@ public final class AnalyticsConfigFile
 		long lastLaunch = wson.getLong("last_launch");
 		int launches = wson.getInt("launches");
 		
-		return VisitorData.newSession(visitorID, firstLaunch, lastLaunch,
-			launches);
+		VisitorData visitorData = VisitorData.newSession(visitorID, firstLaunch,
+			lastLaunch, launches);
+		
+		// change visitor ID after 30 days
+		if(visitorData.getTimestampCurrent()
+			- visitorData.getTimestampFirst() >= 2592000)
+			visitorData = VisitorData.newVisitor();
+		
+		return visitorData;
 	}
 	
 	public void save(WurstAnalyticsTracker tracker)

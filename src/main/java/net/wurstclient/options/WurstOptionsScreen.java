@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,6 +24,8 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.other_features.VanillaSpoofOtf;
+import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
@@ -49,9 +51,11 @@ public class WurstOptionsScreen extends Screen
 	
 	private void addSettingButtons()
 	{
-		FriendsCmd friendsCmd = WurstClient.INSTANCE.getCmds().friendsCmd;
+		WurstClient wurst = WurstClient.INSTANCE;
+		FriendsCmd friendsCmd = wurst.getCmds().friendsCmd;
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
-		WurstAnalytics analytics = WurstClient.INSTANCE.getAnalytics();
+		WurstAnalytics analytics = wurst.getAnalytics();
+		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
 		
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
@@ -60,10 +64,28 @@ public class WurstOptionsScreen extends Screen
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,
-			() -> "Analytics: " + (analytics.isEnabled() ? "ON" : "OFF"),
-			"Allows us to measure the popularity of Wurst\n"
-				+ "by sending anonymous usage statistics.",
+			() -> "Count Users: " + (analytics.isEnabled() ? "ON" : "OFF"),
+			"Counts how many people are using Wurst\n"
+				+ "and which versions are the most popular.\n"
+				+ "We use this data to decide when to stop\n"
+				+ "supporting old Minecraft versions.\n\n"
+				+ "We use a random ID to tell users apart\n"
+				+ "so that this data can never be linked to\n"
+				+ "your Minecraft account. The random ID is\n"
+				+ "changed every 30 days to make extra sure\n"
+				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
+		
+		new WurstOptionsButton(-154, 72,
+			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
+			"Automatically reports crashes\n" + "so you don't have to.",
+			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
+		
+		new WurstOptionsButton(-154, 96,
+			() -> "Spoof Vanilla: "
+				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
+			vanillaSpoofOtf.getDescription(),
+			b -> vanillaSpoofOtf.doPrimaryAction());
 	}
 	
 	private void addManagerButtons()
@@ -93,14 +115,17 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(54, 24, () -> "Official Website",
 			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
 		
-		new WurstOptionsButton(54, 48, () -> "Twitter", "@Wurst_Imperium",
+		new WurstOptionsButton(54, 48, () -> "Wurst Wiki",
+			"Wiki.WurstClient.net",
+			b -> os.open("https://wiki.wurstclient.net/"));
+		
+		new WurstOptionsButton(54, 72, () -> "Twitter", "@Wurst_Imperium",
 			b -> os.open("https://twitter.com/Wurst_Imperium"));
 		
-		new WurstOptionsButton(54, 72, () -> "Subreddit (NEW!)",
-			"r/WurstClient",
+		new WurstOptionsButton(54, 96, () -> "Reddit", "r/WurstClient",
 			b -> os.open("https://www.reddit.com/r/WurstClient/"));
 		
-		new WurstOptionsButton(54, 96, () -> "Donate",
+		new WurstOptionsButton(54, 120, () -> "Donate",
 			"paypal.me/WurstImperium",
 			b -> os.open("https://www.wurstclient.net/donate/"));
 	}
