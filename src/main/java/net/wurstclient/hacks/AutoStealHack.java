@@ -28,7 +28,7 @@ public final class AutoStealHack extends Hack
 	public AutoStealHack()
 	{
 		super("AutoSteal", "Automatically steals everything\n"
-			+ "from all chests that you open.");
+			+ "from all chests and shulker boxes that you open.");
 		setCategory(Category.ITEMS);
 		addSetting(buttons);
 		addSetting(delay);

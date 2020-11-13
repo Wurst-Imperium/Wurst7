@@ -55,8 +55,15 @@ public final class AnalyticsConfigFile
 		long lastLaunch = wson.getLong("last_launch");
 		int launches = wson.getInt("launches");
 		
-		return VisitorData.newSession(visitorID, firstLaunch, lastLaunch,
-			launches);
+		VisitorData visitorData = VisitorData.newSession(visitorID, firstLaunch,
+			lastLaunch, launches);
+		
+		// change visitor ID after 30 days
+		if(visitorData.getTimestampCurrent()
+			- visitorData.getTimestampFirst() >= 2592000)
+			visitorData = VisitorData.newVisitor();
+		
+		return visitorData;
 	}
 	
 	public void save(WurstAnalyticsTracker tracker)
