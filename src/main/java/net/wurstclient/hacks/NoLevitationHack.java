@@ -15,7 +15,8 @@ import net.wurstclient.hack.Hack;
 public final class NoLevitationHack extends Hack {
 	public NoLevitationHack()
 	{
-		super("NoLevitation", "Dissables levitation status effect");
+		super("NoLevitation", "Dissables levitation status effect\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r Elytra will not work while levitation effect is applyed!");
 		setCategory(Category.MOVEMENT);
 	}
 }
