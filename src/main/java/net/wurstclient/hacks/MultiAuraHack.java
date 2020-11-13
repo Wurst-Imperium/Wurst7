@@ -146,6 +146,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
