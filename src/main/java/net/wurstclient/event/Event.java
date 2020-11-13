@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2018 | Wurst-Imperium | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this

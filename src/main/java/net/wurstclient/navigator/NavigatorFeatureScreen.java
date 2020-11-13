@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -235,29 +235,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			}
 		}
 		
-		// see also
-		// Feature[] seeAlso = feature.getSeeAlso();
-		// if(seeAlso.length != 0)
-		// {
-		// text += "\n\nSee also:";
-		// for(Feature seeAlsoFeature : seeAlso)
-		// {
-		// int y = 60 + getTextHeight() + 2;
-		// String name = seeAlsoFeature.getName();
-		// text += "\n- " + name;
-		// buttonDatas.add(new ButtonData(middleX - 148, y,
-		// Fonts.segoe15.getStringWidth(name) + 1, 8, "", 0x404040)
-		// {
-		// @Override
-		// public void press()
-		// {
-		// mc.displayGuiScreen(
-		// new NavigatorFeatureScreen(seeAlsoFeature, parent));
-		// }
-		// });
-		// }
-		// }
-		
 		// text height
 		setContentHeight(getStringHeight(text));
 	}
@@ -265,11 +242,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ESCAPE)
-		{
-			parent.setExpanding(false);
-			minecraft.openScreen(parent);
-		}
+		if(keyCode == GLFW.GLFW_KEY_ESCAPE
+			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+			goBack();
 	}
 	
 	@Override
@@ -279,6 +254,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(
 			x - middleX + 154, y - 60 - scroll + 13, button))
 			return;
+		
+		// back button
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			goBack();
+			return;
+		}
 		
 		Rectangle area = new Rectangle(width / 2 - 154, 60, 308, height - 103);
 		if(!area.contains(x, y))
@@ -298,6 +280,12 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
 			x - middleX + 154, y - 60 - scroll - window.getY(), button, window);
+	}
+	
+	private void goBack()
+	{
+		parent.setExpanding(false);
+		minecraft.openScreen(parent);
 	}
 	
 	@Override
