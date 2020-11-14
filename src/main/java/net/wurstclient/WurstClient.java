@@ -45,6 +45,7 @@ import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
+import net.wurstclient.sentry.NotEnoughCrashes;
 import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
@@ -101,6 +102,7 @@ public enum WurstClient
 		
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
 		hax = new HackList(enabledHacksFile);
+		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		cmds = new CmdList();
 		
