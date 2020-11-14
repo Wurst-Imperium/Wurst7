@@ -216,11 +216,12 @@ public enum SentryConfig
 		
 		Screen cs = WurstClient.MC.currentScreen;
 		String from = cs == null ? "none" : cs.getClass().getCanonicalName();
-		breadcrumb.setData("from", from);
+		breadcrumb.setData("from",
+			StacktraceDeobfuscator.deobfuscateClass(from));
 		
 		String to =
 			screen == null ? "none" : screen.getClass().getCanonicalName();
-		breadcrumb.setData("to", to);
+		breadcrumb.setData("to", StacktraceDeobfuscator.deobfuscateClass(to));
 		
 		Sentry.addBreadcrumb(breadcrumb);
 	}
@@ -344,6 +345,8 @@ public enum SentryConfig
 		if(wurst.getUpdater() != null && wurst.getUpdater().isOutdated())
 			return;
 		
-		Sentry.captureException(report.getCause());
+		Throwable cause = report.getCause();
+		StacktraceDeobfuscator.deobfuscateThrowable(cause);
+		Sentry.captureException(cause);
 	}
 }
