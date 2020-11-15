@@ -58,7 +58,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.7.1";
+	public static final String VERSION = "7.7.2";
 	public static final String MC_VERSION = "1.16.2";
 	
 	private WurstAnalytics analytics;
@@ -92,6 +92,7 @@ public enum WurstClient
 		
 		Path sentryFile = wurstFolder.resolve("sentry.json");
 		SentryConfig.setupSentry(sentryFile);
+		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -102,7 +103,6 @@ public enum WurstClient
 		
 		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
 		hax = new HackList(enabledHacksFile);
-		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		cmds = new CmdList();
 		

@@ -22,7 +22,7 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 
@@ -41,7 +41,7 @@ public abstract class BlockModelRendererMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 		{
@@ -53,7 +53,7 @@ public abstract class BlockModelRendererMixin
 			return;
 		
 		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState_1);
-		WurstClient.INSTANCE.getEventManager().fire(event2);
+		EventManager.fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;
 		
