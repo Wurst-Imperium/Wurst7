@@ -17,7 +17,7 @@ import net.minecraft.client.render.block.FluidRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 @Mixin(FluidRenderer.class)
@@ -33,7 +33,7 @@ public class FluidRendererMixin
 	{
 		BlockState state = blockView_1.getBlockState(blockPos_1);
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
 			cir.setReturnValue(!event.isRendered());

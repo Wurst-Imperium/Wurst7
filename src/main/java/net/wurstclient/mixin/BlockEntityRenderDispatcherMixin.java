@@ -16,7 +16,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 
 @Mixin(BlockEntityRenderDispatcher.class)
@@ -32,7 +32,7 @@ public class BlockEntityRenderDispatcherMixin
 	{
 		RenderBlockEntityEvent event =
 			new RenderBlockEntityEvent(blockEntity_1);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();

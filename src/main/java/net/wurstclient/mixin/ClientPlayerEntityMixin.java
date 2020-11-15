@@ -25,6 +25,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
@@ -57,7 +58,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onSendChatMessage(String message, CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 		{
@@ -79,7 +80,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		ordinal = 0), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
+		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
 	@Redirect(at = @At(value = "INVOKE",
@@ -96,13 +97,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(PreMotionEvent.INSTANCE);
+		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(PostMotionEvent.INSTANCE);
+		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = {@At("HEAD")},
@@ -111,7 +112,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 	
 	@Inject(at = {@At("HEAD")},
@@ -127,7 +128,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setVelocityClient(double x, double y, double z)
 	{
 		KnockbackEvent event = new KnockbackEvent(x, y, z);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
 	}
 	
@@ -136,7 +137,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		boolean inWater = super.isTouchingWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		return event.isInWater();
 	}
