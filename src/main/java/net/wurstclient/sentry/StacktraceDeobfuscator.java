@@ -131,11 +131,7 @@ public final class StacktraceDeobfuscator
 	private static void loadMappings()
 	{
 		if(!Files.exists(CACHED_MAPPINGS))
-		{
-			NotEnoughCrashes.LOGGER.warn(
-				"Could not download mappings, stack trace won't be deobfuscated");
 			return;
-		}
 		
 		Map<String, String> mappings = new HashMap<>();
 		
