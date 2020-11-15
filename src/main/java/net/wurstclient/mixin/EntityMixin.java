@@ -16,7 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
 @Mixin(Entity.class)
@@ -30,7 +30,7 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 	private void setVelocityFromFluid(Entity entity, Vec3d velocity)
 	{
 		VelocityFromFluidEvent event = new VelocityFromFluidEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(!event.isCancelled())
 			entity.setVelocity(velocity);

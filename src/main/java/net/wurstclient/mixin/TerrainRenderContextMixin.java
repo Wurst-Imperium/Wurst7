@@ -17,7 +17,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 
 @Mixin(TerrainRenderContext.class)
@@ -32,7 +32,7 @@ public class TerrainRenderContextMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(blockState);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			cir.cancel();

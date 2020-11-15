@@ -88,7 +88,10 @@ public final class MassTpaHack extends Hack
 		}
 		
 		if(index >= players.size())
+		{
 			setEnabled(false);
+			return;
+		}
 		
 		MC.player.sendChatMessage("/tpa " + players.get(index));
 		index++;
