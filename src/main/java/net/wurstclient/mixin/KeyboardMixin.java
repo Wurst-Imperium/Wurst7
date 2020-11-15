@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Keyboard;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.KeyPressListener.KeyPressEvent;
 
 @Mixin(Keyboard.class)
@@ -26,6 +26,6 @@ public class KeyboardMixin
 		KeyPressEvent event =
 			new KeyPressEvent(keyCode, scanCode, action, modifiers);
 		
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 }
