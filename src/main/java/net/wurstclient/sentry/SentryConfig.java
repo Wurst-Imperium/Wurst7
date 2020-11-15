@@ -347,6 +347,30 @@ public enum SentryConfig
 		
 		Throwable cause = report.getCause();
 		StacktraceDeobfuscator.deobfuscateThrowable(cause);
+		
+		if(isKnownBugFromOtherMod(cause))
+			return;
+		
 		Sentry.captureException(cause);
+	}
+	
+	private static boolean isKnownBugFromOtherMod(Throwable cause)
+	{
+		StackTraceElement[] trace = cause.getStackTrace();
+		
+		// VoxelMap 1.10.11's "ThreadDeath" bug
+		if(cause instanceof ThreadDeath && trace.length >= 2 && trace[0] != null
+			&& trace[1] != null
+			&& trace[0].toString().startsWith("java.lang.Thread.stop")
+			&& trace[1].toString().startsWith("com.mamiyaotaru.voxelmap.Map"))
+			return true;
+		
+		// Fabritone 1.6.1's "playerFeet" bug
+		if(cause instanceof NullPointerException && trace.length >= 1
+			&& trace[0] != null && trace[0].toString()
+				.startsWith("baritone.api.utils.IPlayerContext.playerFeet"))
+			return true;
+		
+		return false;
 	}
 }

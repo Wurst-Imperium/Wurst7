@@ -32,7 +32,7 @@ public final class VanillaSpoofOtf extends OtherFeature
 			+ "pretending to be a vanilla client.");
 		addSetting(spoof);
 		
-		WURST.getEventManager().add(ConnectionPacketOutputListener.class, this);
+		EVENTS.add(ConnectionPacketOutputListener.class, this);
 	}
 	
 	@Override

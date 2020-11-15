@@ -166,6 +166,13 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	
 	private void runForceOP(int delay, boolean waitForMsg)
 	{
+		// abort if disconnected before pressing start
+		if(MC.player == null)
+		{
+			setEnabled(false);
+			return;
+		}
+		
 		MC.player.sendChatMessage("/login " + MC.getSession().getUsername());
 		lastPW = 0;
 		sendIndexToDialog();

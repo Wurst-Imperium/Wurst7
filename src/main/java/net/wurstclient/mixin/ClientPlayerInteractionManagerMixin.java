@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -62,7 +62,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		BlockBreakingProgressEvent event =
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 	
 	@Inject(at = {@At("HEAD")},

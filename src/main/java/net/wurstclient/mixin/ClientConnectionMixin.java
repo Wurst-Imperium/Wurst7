@@ -19,7 +19,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ConnectionPacketOutputListener.ConnectionPacketOutputEvent;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
 
@@ -39,7 +39,7 @@ public abstract class ClientConnectionMixin
 		Packet<?> packet, CallbackInfo ci)
 	{
 		PacketInputEvent event = new PacketInputEvent(packet);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -51,7 +51,7 @@ public abstract class ClientConnectionMixin
 	public Packet<?> onSendPacket(Packet<?> packet)
 	{
 		event = new ConnectionPacketOutputEvent(packet);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		return event.getPacket();
 	}
 	

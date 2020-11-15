@@ -25,6 +25,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
@@ -47,7 +48,7 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 	private void onIsSimpleFullBlock(CallbackInfoReturnable<Boolean> cir)
 	{
 		IsNormalCubeEvent event = new IsNormalCubeEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
@@ -63,7 +64,7 @@ public class BlockStateMixin extends AbstractState<Block, BlockState>
 			new GetAmbientOcclusionLightLevelEvent((BlockState)(Object)this,
 				cir.getReturnValueF());
 		
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		cir.setReturnValue(event.getLightLevel());
 	}
 	
