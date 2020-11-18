@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,6 +17,8 @@ import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.sentry.SentryConfig;
+import net.wurstclient.util.ChatUtils;
 
 public final class KeybindProcessor implements KeyPressListener
 {
@@ -43,7 +45,13 @@ public final class KeybindProcessor implements KeyPressListener
 			return;
 		
 		String keyName = getKeyName(event);
+		
 		String cmds = keybinds.getCommands(keyName);
+		if(cmds == null)
+			return;
+		
+		SentryConfig.addKeybindTriggerBreadcrumb(keyName, cmds);
+		
 		processCmds(cmds);
 	}
 	
@@ -51,15 +59,13 @@ public final class KeybindProcessor implements KeyPressListener
 	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
-		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 	}
 	
 	private void processCmds(String cmds)
 	{
-		if(cmds == null)
-			return;
-		
 		cmds = cmds.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
+		
 		for(String cmd : cmds.split("\u00a7"))
 			processCmd(cmd.trim());
 	}
@@ -74,10 +80,20 @@ public final class KeybindProcessor implements KeyPressListener
 		{
 			Hack hack = hax.getHackByName(cmd);
 			
-			if(hack != null)
-				hack.setEnabled(!hack.isEnabled());
-			else
+			if(hack == null)
+			{
 				cmdProcessor.process(cmd);
+				return;
+			}
+			
+			if(!hack.isEnabled() && hax.tooManyHaxHack.isEnabled()
+				&& hax.tooManyHaxHack.isBlocked(hack))
+			{
+				ChatUtils.error(hack.getName() + " is blocked by TooManyHax.");
+				return;
+			}
+			
+			hack.setEnabled(!hack.isEnabled());
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,7 +32,12 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
+		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 	}
 	

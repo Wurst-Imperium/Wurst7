@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,7 +20,7 @@ import net.wurstclient.WurstClient;
 public abstract class LivingEntityRendererMixin
 {
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;canSeePlayer(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
 		ordinal = 0),
 		method = {
 			"render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"})
@@ -29,6 +29,6 @@ public abstract class LivingEntityRendererMixin
 		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
 			return false;
 		
-		return e.canSeePlayer(player);
+		return e.isInvisibleTo(player);
 	}
 }

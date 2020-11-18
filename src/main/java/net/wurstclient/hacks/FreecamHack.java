@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -111,7 +111,7 @@ public final class FreecamHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		player.setVelocity(Vec3d.ZERO);
 		
-		player.onGround = false;
+		player.setOnGround(false);
 		player.flyingSpeed = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
 		
@@ -174,6 +174,7 @@ public final class FreecamHack extends Hack
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();

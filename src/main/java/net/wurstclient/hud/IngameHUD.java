@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,7 @@ package net.wurstclient.hud;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -17,14 +18,17 @@ import net.wurstclient.events.GUIRenderListener;
 public final class IngameHUD implements GUIRenderListener
 {
 	private final WurstLogo wurstLogo = new WurstLogo();
-	private final HackListHUD modList = new HackListHUD();
-	// private static final TabGui tabGui = new TabGui();
+	private final HackListHUD hackList = new HackListHUD();
+	private TabGui tabGui;
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
+		
+		if(tabGui == null)
+			tabGui = new TabGui();
 		
 		boolean blend = GL11.glGetBoolean(GL11.GL_BLEND);
 		ClickGui clickGui = WurstClient.INSTANCE.getGui();
@@ -35,13 +39,13 @@ public final class IngameHUD implements GUIRenderListener
 		
 		clickGui.updateColors();
 		
-		wurstLogo.render();
-		modList.render(partialTicks);
-		// tabGui.render(partialTicks);
+		wurstLogo.render(matrixStack);
+		hackList.render(matrixStack, partialTicks);
+		tabGui.render(matrixStack, partialTicks);
 		
 		// pinned windows
 		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
-			clickGui.renderPinnedWindows(partialTicks);
+			clickGui.renderPinnedWindows(matrixStack, partialTicks);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -56,6 +60,6 @@ public final class IngameHUD implements GUIRenderListener
 	
 	public HackListHUD getHackList()
 	{
-		return modList;
+		return hackList;
 	}
 }

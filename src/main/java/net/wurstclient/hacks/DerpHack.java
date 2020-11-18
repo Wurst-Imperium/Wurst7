@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.Random;
 
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -49,7 +49,7 @@ public final class DerpHack extends Hack implements UpdateListener
 		float yaw = MC.player.yaw + random.nextFloat() * 360F - 180F;
 		float pitch = random.nextFloat() * 180F - 90F;
 		
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookOnly(yaw, pitch, MC.player.onGround));
+		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
+			yaw, pitch, MC.player.isOnGround()));
 	}
 }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
@@ -8,7 +15,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -18,7 +25,7 @@ import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
 	"arrow trajectories"})
-public class TrajectoriesHack extends Hack implements RenderListener
+public final class TrajectoriesHack extends Hack implements RenderListener
 {
 	public TrajectoriesHack()
 	{
@@ -50,6 +57,7 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		RenderUtils.applyCameraRotationOnly();
 		
@@ -150,7 +158,7 @@ public class TrajectoriesHack extends Hack implements RenderListener
 		arrowMotionZ /= arrowMotion;
 		
 		// apply bow charge
-		if(item instanceof BowItem)
+		if(item instanceof RangedWeaponItem)
 		{
 			float bowPower = (72000 - player.getItemUseTimeLeft()) / 20.0f;
 			bowPower = (bowPower * bowPower + bowPower * 2.0f) / 3.0f;
@@ -193,10 +201,10 @@ public class TrajectoriesHack extends Hack implements RenderListener
 			arrowMotionY -= gravity * 0.1;
 			
 			// check for collision
-			RayTraceContext context = new RayTraceContext(eyesPos, arrowPos,
-				RayTraceContext.ShapeType.COLLIDER,
-				RayTraceContext.FluidHandling.NONE, MC.player);
-			if(MC.world.rayTrace(context).getType() != HitResult.Type.MISS)
+			RaycastContext context = new RaycastContext(eyesPos, arrowPos,
+				RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+			if(MC.world.raycast(context).getType() != HitResult.Type.MISS)
 				break;
 		}
 		

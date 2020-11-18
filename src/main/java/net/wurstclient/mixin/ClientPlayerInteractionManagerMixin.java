@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,11 +17,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.container.SlotActionType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.packet.PlayerActionC2SPacket;
-import net.minecraft.server.network.packet.PlayerActionC2SPacket.Action;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -62,7 +62,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		BlockBreakingProgressEvent event =
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 	
 	@Inject(at = {@At("HEAD")},

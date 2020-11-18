@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -27,11 +27,11 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
-import net.minecraft.client.network.packet.ChunkDataS2CPacket;
-import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -54,7 +54,7 @@ public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
-		"The type of block to search for.", "minecraft:diamond_ore");
+		"The type of block to search for.", "minecraft:diamond_ore", false);
 	
 	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
@@ -150,13 +150,13 @@ public final class SearchHack extends Hack
 		{
 			ChunkDeltaUpdateS2CPacket change =
 				(ChunkDeltaUpdateS2CPacket)packet;
-			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
-				change.getRecords();
-			if(changedBlocks.length == 0)
+			
+			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
+			if(changedBlocks.isEmpty())
 				return;
 			
-			BlockPos pos = changedBlocks[0].getBlockPos();
-			chunk = world.getChunk(pos);
+			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
@@ -178,10 +178,15 @@ public final class SearchHack extends Hack
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
 		
-		addSearchersInRange(center, range, currentBlock);
+		// 20w21a: Assuming class_5321 is the new Dimension and using its
+		// toString() as an ID. Not sure why it has two Identifiers, but the
+		// combination should be unique for every dimension.
+		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
+		
+		addSearchersInRange(center, range, currentBlock, dimensionId);
 		removeSearchersOutOfRange(center, range);
-		replaceSearchersWithDifferentBlock(currentBlock);
-		replaceSearchersWithChunkUpdate(currentBlock);
+		replaceSearchersWithDifferences(currentBlock, dimensionId);
+		replaceSearchersWithChunkUpdate(currentBlock, dimensionId);
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -215,6 +220,7 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -250,7 +256,7 @@ public final class SearchHack extends Hack
 	}
 	
 	private void addSearchersInRange(ChunkPos center, int chunkRange,
-		Block block)
+		Block block, int dimensionId)
 	{
 		ArrayList<Chunk> chunksInRange = getChunksInRange(center, chunkRange);
 		
@@ -259,7 +265,7 @@ public final class SearchHack extends Hack
 			if(searchers.containsKey(chunk))
 				continue;
 			
-			addSearcher(chunk, block);
+			addSearcher(chunk, block, dimensionId);
 		}
 	}
 	
@@ -286,19 +292,22 @@ public final class SearchHack extends Hack
 		}
 	}
 	
-	private void replaceSearchersWithDifferentBlock(Block currentBlock)
+	private void replaceSearchersWithDifferences(Block currentBlock,
+		int dimensionId)
 	{
 		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
 		{
-			if(currentBlock.equals(oldSearcher.block))
+			if(currentBlock.equals(oldSearcher.block)
+				&& dimensionId == oldSearcher.dimensionId)
 				continue;
 			
 			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.chunk, currentBlock);
+			addSearcher(oldSearcher.chunk, currentBlock, dimensionId);
 		}
 	}
 	
-	private void replaceSearchersWithChunkUpdate(Block currentBlock)
+	private void replaceSearchersWithChunkUpdate(Block currentBlock,
+		int dimensionId)
 	{
 		synchronized(chunksToUpdate)
 		{
@@ -314,17 +323,17 @@ public final class SearchHack extends Hack
 					continue;
 				
 				removeSearcher(oldSearcher);
-				addSearcher(chunk, currentBlock);
+				addSearcher(chunk, currentBlock, dimensionId);
 				itr.remove();
 			}
 		}
 	}
 	
-	private void addSearcher(Chunk chunk, Block block)
+	private void addSearcher(Chunk chunk, Block block, int dimensionId)
 	{
 		stopPool2Tasks();
 		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block);
+		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
 		searchers.put(chunk, searcher);
 		searcher.startSearching(pool1);
 	}
@@ -513,14 +522,16 @@ public final class SearchHack extends Hack
 	{
 		private final Chunk chunk;
 		private final Block block;
+		private final int dimensionId;
 		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
 		private Status status = Status.IDLE;
 		private Future<?> future;
 		
-		public ChunkSearcher(Chunk chunk, Block block)
+		public ChunkSearcher(Chunk chunk, Block block, int dimensionId)
 		{
 			this.chunk = chunk;
 			this.block = block;
+			this.dimensionId = dimensionId;
 		}
 		
 		public void startSearching(ExecutorService pool)

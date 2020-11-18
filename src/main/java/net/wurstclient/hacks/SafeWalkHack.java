@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,5 +18,11 @@ public final class SafeWalkHack extends Hack
 	{
 		super("SafeWalk", "Prevents you from falling off edges.");
 		setCategory(Category.MOVEMENT);
+	}
+	
+	@Override
+	protected void onEnable()
+	{
+		WURST.getHax().parkourHack.setEnabled(false);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,12 +22,12 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
-import net.minecraft.client.network.packet.ChunkDataS2CPacket;
-import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.client.util.TextFormat;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
@@ -61,9 +61,8 @@ public final class MobSpawnEspHack extends Hack
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + TextFormat.YELLOW
-				+ "yellow" + TextFormat.RESET + " - mobs can spawn at night\n"
-				+ TextFormat.RED + "red" + TextFormat.RESET
+			"Highlights areas where mobs can spawn.\n" + "\u00a7eyellow\u00a7r"
+				+ " - mobs can spawn at night\n" + "\u00a7cred\u00a7r"
 				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
@@ -194,13 +193,13 @@ public final class MobSpawnEspHack extends Hack
 		{
 			ChunkDeltaUpdateS2CPacket change =
 				(ChunkDeltaUpdateS2CPacket)packet;
-			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
-				change.getRecords();
-			if(changedBlocks.length == 0)
+			
+			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
+			if(changedBlocks.isEmpty())
 				return;
 			
-			BlockPos pos = changedBlocks[0].getBlockPos();
-			chunk = world.getChunk(pos);
+			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
@@ -242,6 +241,7 @@ public final class MobSpawnEspHack extends Hack
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		}
 		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -307,7 +307,8 @@ public final class MobSpawnEspHack extends Hack
 							continue;
 						
 						BlockState stateDown = world.getBlockState(pos.down());
-						if(!stateDown.isFullOpaque(world, pos.down()))
+						if(!stateDown.allowsSpawning(world, pos.down(),
+							EntityType.ZOMBIE))
 							continue;
 						
 						blocks.add(pos);

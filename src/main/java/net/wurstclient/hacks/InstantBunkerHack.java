@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.network.packet.HandSwingC2SPacket;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -24,6 +27,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -45,6 +49,7 @@ public final class InstantBunkerHack extends Hack
 	
 	private int blockIndex;
 	private boolean building;
+	private int startTimer;
 	
 	public InstantBunkerHack()
 	{
@@ -56,8 +61,27 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		if(!MC.player.isOnGround())
+		{
+			ChatUtils.error("Can't build this in mid-air.");
+			setEnabled(false);
+			return;
+		}
+		
+		ItemStack stack = MC.player.inventory.getMainHandStack();
+		
+		if(!(stack.getItem() instanceof BlockItem))
+		{
+			ChatUtils.error("You must have blocks in the main hand.");
+			setEnabled(false);
+			return;
+		}
+		
+		if(stack.getCount() < 57 && !MC.player.isCreative())
+			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
+		
 		// get start pos and facings
-		BlockPos startPos = new BlockPos(MC.player);
+		BlockPos startPos = new BlockPos(MC.player.getPos());
 		Direction facing = MC.player.getHorizontalFacing();
 		Direction facing2 = facing.rotateYCounterclockwise();
 		
@@ -75,6 +99,9 @@ public final class InstantBunkerHack extends Hack
 			IMC.setItemUseCooldown(4);
 		}
 		
+		startTimer = 2;
+		MC.player.jump();
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -90,15 +117,26 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		if(startTimer > 0)
+		{
+			startTimer--;
+			return;
+		}
+		
 		// build instantly
-		if(!building)
+		if(!building && startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			setEnabled(false);
-			return;
+			
+			if(MC.player.isOnGround())
+			{
+				setEnabled(false);
+				return;
+			}
 		}
 		
 		// place next block
@@ -136,13 +174,13 @@ public final class InstantBunkerHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
 			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
@@ -155,7 +193,7 @@ public final class InstantBunkerHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			
@@ -221,6 +259,7 @@ public final class InstantBunkerHack extends Hack
 		GL11.glLineWidth(2F);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();

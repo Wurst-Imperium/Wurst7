@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -55,6 +55,15 @@ public final class RotationFaker
 		fakeRotation = true;
 		serverYaw = rotations.getYaw();
 		serverPitch = rotations.getPitch();
+	}
+	
+	public void faceVectorClient(Vec3d vec)
+	{
+		RotationUtils.Rotation rotations =
+			RotationUtils.getNeededRotations(vec);
+		
+		WurstClient.MC.player.yaw = rotations.getYaw();
+		WurstClient.MC.player.pitch = rotations.getPitch();
 	}
 	
 	public void faceVectorClientIgnorePitch(Vec3d vec)

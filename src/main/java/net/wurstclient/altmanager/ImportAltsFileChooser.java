@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,23 +18,15 @@ import java.nio.file.Files;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.wurstclient.util.SwingUtils;
 
 public final class ImportAltsFileChooser extends JFileChooser
 {
 	public static void main(String[] args)
 	{
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			
-		}catch(ReflectiveOperationException | UnsupportedLookAndFeelException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
+		SwingUtils.setLookAndFeel();
 		JFileChooser fileChooser = new ImportAltsFileChooser(new File(args[0]));
 		
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,7 +54,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		ChatUtils.message("Now annoying " + target + ".");
 		
 		ClientPlayerEntity player = MC.player;
-		if(player != null && target.equals(player.getName().asString()))
+		if(player != null && target.equals(player.getName().getString()))
 			ChatUtils.warning("Annoying yourself is a bad idea!");
 		
 		EVENTS.add(ChatInputListener.class, this);

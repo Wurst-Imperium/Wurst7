@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,13 +10,13 @@ package net.wurstclient.hacks;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.packet.PlaySoundS2CPacket;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -187,7 +187,7 @@ public final class AutoFishHack extends Hack
 	{
 		PlayerInventory inventory = MC.player.inventory;
 		int selectedSlot = inventory.selectedSlot;
-		ItemStack selectedStack = inventory.getInvStack(selectedSlot);
+		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
 		// start with selected rod
 		bestRodValue = getRodValue(selectedStack);
@@ -196,7 +196,7 @@ public final class AutoFishHack extends Hack
 		// search inventory for better rod
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			int rodValue = getRodValue(stack);
 			
 			if(rodValue > bestRodValue)
@@ -309,6 +309,7 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();

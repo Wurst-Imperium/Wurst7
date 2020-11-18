@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.server.network.packet.ChatMessageC2SPacket;
-import net.minecraft.server.network.packet.PlayerInteractEntityC2SPacket;
-import net.minecraft.server.network.packet.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -106,7 +106,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			
 			case SELFHURT:
 			MC.player.networkHandler
-				.sendPacket(new PlayerInteractEntityC2SPacket(MC.player));
+				.sendPacket(new PlayerInteractEntityC2SPacket(MC.player,
+					MC.player.isSneaking()));
 			break;
 		}
 		
