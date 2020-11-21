@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,11 +18,10 @@ import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.analytics.WurstAnalytics;
@@ -46,6 +45,8 @@ import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
+import net.wurstclient.sentry.NotEnoughCrashes;
+import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
@@ -57,8 +58,8 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.2";
-	public static final String MC_VERSION = "1.15.2";
+	public static final String VERSION = "7.8";
+	public static final String MC_VERSION = "1.16.4";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -81,13 +82,17 @@ public enum WurstClient
 	private WurstUpdater updater;
 	private Path wurstFolder;
 	
-	private FabricKeyBinding zoomKey;
+	private KeyBinding zoomKey;
 	
 	public void initialize()
 	{
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
+		
+		Path sentryFile = wurstFolder.resolve("sentry.json");
+		SentryConfig.setupSentry(sentryFile);
+		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -143,11 +148,9 @@ public enum WurstClient
 		Path encFolder = createEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
 		
-		zoomKey =
-			FabricKeyBinding.Builder.create(new Identifier("wurst", "zoom"),
-				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "Zoom").build();
-		KeyBindingRegistry.INSTANCE.addCategory("Zoom");
-		KeyBindingRegistry.INSTANCE.register(zoomKey);
+		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_V, "Zoom");
+		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
@@ -345,7 +348,7 @@ public enum WurstClient
 		return wurstFolder;
 	}
 	
-	public FabricKeyBinding getZoomKey()
+	public KeyBinding getZoomKey()
 	{
 		return zoomKey;
 	}

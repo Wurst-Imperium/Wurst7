@@ -14,7 +14,7 @@
   },
 
   "license": "GPL-3.0-or-later",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/wurst/icon.png",
 
   "environment": "client",
   "entrypoints": {
@@ -27,9 +27,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.4.0",
-    "fabric": "*",
-    "minecraft": "1.15.x"
+    "fabricloader": ">=0.8.8",
+    "fabric": ">=0.12.1",
+    "minecraft": ">=1.16.2"
   },
   "suggests": {
     "flamingo": "*"

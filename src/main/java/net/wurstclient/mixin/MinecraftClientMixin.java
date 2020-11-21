@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,20 +19,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.sentry.SentryConfig;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -60,7 +65,7 @@ public abstract class MinecraftClientMixin
 	private void onDoAttack(CallbackInfo ci)
 	{
 		LeftClickEvent event = new LeftClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -72,7 +77,7 @@ public abstract class MinecraftClientMixin
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -115,6 +120,29 @@ public abstract class MinecraftClientMixin
 			return wurstSession;
 		else
 			return session;
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"addDetailsToCrashReport(Lnet/minecraft/util/crash/CrashReport;)Lnet/minecraft/util/crash/CrashReport;"})
+	private void onAddDetailsToCrashReport(CrashReport report,
+		CallbackInfoReturnable<CrashReport> cir)
+	{
+		SentryConfig.addDetailsOnCrash();
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"printCrashReport(Lnet/minecraft/util/crash/CrashReport;)V"})
+	private static void onPrintCrashReport(CrashReport report, CallbackInfo ci)
+	{
+		SentryConfig.reportCrash(report);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"openScreen(Lnet/minecraft/client/gui/screen/Screen;)V"})
+	private void onOpenScreen(@Nullable Screen screen, CallbackInfo ci)
+	{
+		SentryConfig.addScreenChangeBreadcrumb(screen);
 	}
 	
 	@Override

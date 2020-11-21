@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,7 +35,7 @@ public enum BlockBreaker
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d relCenter = BlockUtils.getState(pos)
 			.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
-		Vec3d center = new Vec3d(pos).add(relCenter);
+		Vec3d center = Vec3d.of(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
@@ -50,7 +50,7 @@ public enum BlockBreaker
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check line of sight
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], pos,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos,
 				state.getOutlineShape(MC.world, pos), state) != null)
 				continue;
 			
@@ -97,13 +97,13 @@ public enum BlockBreaker
 		
 		for(BlockPos pos : blocks)
 		{
-			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 			
 			for(Direction side : Direction.values())
 			{
 				Vec3d hitVec =
-					posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+					posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 				
 				// check if side is facing towards player
 				if(eyesPos.squaredDistanceTo(hitVec) >= distanceSqPosVec)

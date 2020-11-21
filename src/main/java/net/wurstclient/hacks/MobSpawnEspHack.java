@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
@@ -36,6 +37,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.MinPriorityThreadFactory;
@@ -49,8 +51,12 @@ public final class MobSpawnEspHack extends Hack
 {
 	private final EnumSetting<DrawDistance> drawDistance = new EnumSetting<>(
 		"Draw distance", DrawDistance.values(), DrawDistance.D9);
+	
 	private final SliderSetting loadingSpeed =
 		new SliderSetting("Loading speed", 1, 1, 5, 1, v -> (int)v + "x");
+	
+	private final CheckboxSetting depthTest =
+		new CheckboxSetting("Depth test", true);
 	
 	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool;
@@ -64,6 +70,7 @@ public final class MobSpawnEspHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
+		addSetting(depthTest);
 	}
 	
 	@Override
@@ -189,13 +196,13 @@ public final class MobSpawnEspHack extends Hack
 		{
 			ChunkDeltaUpdateS2CPacket change =
 				(ChunkDeltaUpdateS2CPacket)packet;
-			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
-				change.getRecords();
-			if(changedBlocks.length == 0)
+			
+			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
+			if(changedBlocks.isEmpty())
 				return;
 			
-			BlockPos pos = changedBlocks[0].getBlockPos();
-			chunk = world.getChunk(pos);
+			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
@@ -224,12 +231,17 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		// Avoid inconsistent GL state if setting changed mid-onRender
+		boolean depthTest = this.depthTest.isChecked();
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		if(!depthTest)
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
@@ -248,6 +260,8 @@ public final class MobSpawnEspHack extends Hack
 		
 		// GL resets
 		GL11.glColor4f(1, 1, 1, 1);
+		if(!depthTest)
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
@@ -294,7 +308,8 @@ public final class MobSpawnEspHack extends Hack
 							continue;
 						
 						BlockState stateDown = world.getBlockState(pos.down());
-						if(!stateDown.isFullOpaque(world, pos.down()))
+						if(!stateDown.allowsSpawning(world, pos.down(),
+							EntityType.ZOMBIE))
 							continue;
 						
 						blocks.add(pos);

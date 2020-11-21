@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -56,7 +56,7 @@ public final class NoClipHack extends Hack implements UpdateListener,
 		
 		player.noClip = true;
 		player.fallDistance = 0;
-		player.onGround = false;
+		player.setOnGround(false);
 		
 		player.abilities.flying = false;
 		player.setVelocity(0, 0, 0);

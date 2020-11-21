@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,13 +38,17 @@ public final class PotionSaverHack extends Hack implements PacketOutputListener
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
+		if(!isFrozen())
+			return;
+		
 		if(event.getPacket() instanceof PlayerMoveC2SPacket)
 			event.cancel();
 	}
 	
 	public boolean isFrozen()
 	{
-		return isEnabled() && !MC.player.getActiveStatusEffects().isEmpty()
+		return isEnabled() && MC.player != null
+			&& !MC.player.getActiveStatusEffects().isEmpty()
 			&& MC.player.getVelocity().x == 0 && MC.player.getVelocity().z == 0;
 	}
 }

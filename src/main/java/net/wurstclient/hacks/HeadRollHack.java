@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -47,6 +47,6 @@ public final class HeadRollHack extends Hack implements UpdateListener
 		float pitch = MathHelper.sin(timer * (float)Math.PI) * 90F;
 		
 		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			MC.player.yaw, pitch, MC.player.onGround));
+			MC.player.yaw, pitch, MC.player.isOnGround()));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -114,7 +114,7 @@ public final class GiveCmd extends Command
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getInvStack(i).isEmpty())
+			if(!MC.player.inventory.getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

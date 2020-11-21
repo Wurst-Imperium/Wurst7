@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -66,7 +66,7 @@ public final class GlideHack extends Hack implements UpdateListener
 		ClientPlayerEntity player = MC.player;
 		Vec3d v = player.getVelocity();
 		
-		if(player.onGround || player.isTouchingWater() || player.isInLava()
+		if(player.isOnGround() || player.isTouchingWater() || player.isInLava()
 			|| player.isClimbing() || v.y >= 0)
 			return;
 		
@@ -74,11 +74,13 @@ public final class GlideHack extends Hack implements UpdateListener
 		{
 			Box box = player.getBoundingBox();
 			box = box.union(box.offset(0, -minHeight.getValue(), 0));
-			if(!MC.world.doesNotCollide(box))
+			if(!MC.world.isSpaceEmpty(box))
 				return;
 			
-			BlockPos min = new BlockPos(new Vec3d(box.x1, box.y1, box.z1));
-			BlockPos max = new BlockPos(new Vec3d(box.x2, box.y2, box.z2));
+			BlockPos min =
+				new BlockPos(new Vec3d(box.minX, box.minY, box.minZ));
+			BlockPos max =
+				new BlockPos(new Vec3d(box.maxX, box.maxY, box.maxZ));
 			Stream<BlockPos> stream = StreamSupport
 				.stream(BlockUtils.getAllInBox(min, max).spliterator(), true);
 			

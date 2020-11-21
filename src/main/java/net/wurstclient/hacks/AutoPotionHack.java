@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -82,14 +82,14 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			MC.player.inventory.selectedSlot = potionInHotbar;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw, 90,
-					MC.player.onGround));
+					MC.player.isOnGround()));
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
 			MC.player.inventory.selectedSlot = oldSlot;
 			MC.player.networkHandler
 				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw,
-					MC.player.pitch, MC.player.onGround));
+					MC.player.pitch, MC.player.isOnGround()));
 			
 			// reset timer
 			timer = 10;
@@ -110,7 +110,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.inventory.getInvStack(i);
+			ItemStack stack = MC.player.inventory.getStack(i);
 			
 			// filter out non-splash potion items
 			if(stack.getItem() != Items.SPLASH_POTION)

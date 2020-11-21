@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -72,8 +72,8 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!player.horizontalCollision)
 			return;
 		
-		if(!player.onGround || player.isClimbing() || player.isTouchingWater()
-			|| player.isInLava())
+		if(!player.isOnGround() || player.isClimbing()
+			|| player.isTouchingWater() || player.isInLava())
 			return;
 		
 		if(player.input.movementForward == 0
@@ -85,7 +85,7 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		Box box = player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
 		
-		if(!MC.world.doesNotCollide(player, box.offset(0, 1, 0)))
+		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
 		double stepHeight = -1;
@@ -95,8 +95,8 @@ public final class StepHack extends Hack implements UpdateListener
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 		
 		for(Box bb : blockCollisions)
-			if(bb.y2 > stepHeight)
-				stepHeight = bb.y2;
+			if(bb.maxY > stepHeight)
+				stepHeight = bb.maxY;
 			
 		stepHeight = stepHeight - player.getY();
 		
@@ -107,11 +107,11 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
 			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
-			player.onGround));
+			player.isOnGround()));
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
-			player.onGround));
+			player.isOnGround()));
 		
 		player.updatePosition(player.getX(), player.getY() + 1 * stepHeight,
 			player.getZ());
