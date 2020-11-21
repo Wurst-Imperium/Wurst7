@@ -281,7 +281,7 @@ public final class SearchHack extends Hack
 				if(!(chunk instanceof EmptyChunk))
 					chunksInRange.add(chunk);
 			}
-			
+		
 		return chunksInRange;
 	}
 	
