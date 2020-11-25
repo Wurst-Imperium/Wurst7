@@ -30,9 +30,10 @@ public abstract class CameraMixin
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"getSubmergedFluidState()Lnet/minecraft/class_5636;"},
+		method = {
+			"getSubmersionType()Lnet/minecraft/client/render/CameraSubmersionType;"},
 		cancellable = true)
-	private void onGetSubmergedFluidState(
+	private void onGetSubmersionType(
 		CallbackInfoReturnable<CameraSubmersionType> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
