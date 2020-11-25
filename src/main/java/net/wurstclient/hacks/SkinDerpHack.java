@@ -48,6 +48,7 @@ public final class SkinDerpHack extends Hack implements UpdateListener
 			return;
 		
 		for(PlayerModelPart part : PlayerModelPart.values())
-			MC.options.setPlayerModelPart(part, !MC.options.method_32594(part));
+			MC.options.setPlayerModelPart(part,
+				!MC.options.isPlayerModelPartEnabled(part));
 	}
 }

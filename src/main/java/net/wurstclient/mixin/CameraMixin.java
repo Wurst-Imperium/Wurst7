@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.class_5636;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.CameraSubmersionType;
 import net.wurstclient.WurstClient;
 
 @Mixin(Camera.class)
@@ -33,9 +33,9 @@ public abstract class CameraMixin
 		method = {"getSubmergedFluidState()Lnet/minecraft/class_5636;"},
 		cancellable = true)
 	private void onGetSubmergedFluidState(
-		CallbackInfoReturnable<class_5636> cir)
+		CallbackInfoReturnable<CameraSubmersionType> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
-			cir.setReturnValue(class_5636.field_27888);
+			cir.setReturnValue(CameraSubmersionType.NONE);
 	}
 }
