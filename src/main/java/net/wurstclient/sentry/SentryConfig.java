@@ -50,6 +50,7 @@ public enum SentryConfig
 		Sentry.init(options -> {
 			options.setDsn(DSN);
 			options.setRelease(getRelease(fabricLoader));
+			options.setEnableUncaughtExceptionHandler(false);
 		});
 		
 		addVersions(fabricLoader);
