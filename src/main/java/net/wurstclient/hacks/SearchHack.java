@@ -36,6 +36,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
@@ -275,8 +276,12 @@ public final class SearchHack extends Hack
 		
 		for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
 			for(int z = center.z - chunkRange; z <= center.z + chunkRange; z++)
-				chunksInRange.add(MC.world.getChunk(x, z));
-			
+			{
+				Chunk chunk = MC.world.getChunk(x, z);
+				if(!(chunk instanceof EmptyChunk))
+					chunksInRange.add(chunk);
+			}
+		
 		return chunksInRange;
 	}
 	
