@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -283,7 +284,7 @@ public abstract class AltEditorScreen extends Screen
 	{
 		URL profileURL =
 			URI.create("https://api.mojang.com/users/profiles/minecraft/")
-				.resolve(username).toURL();
+				.resolve(URLEncoder.encode(username, "UTF-8")).toURL();
 		
 		try(InputStream profileInputStream = profileURL.openStream())
 		{
