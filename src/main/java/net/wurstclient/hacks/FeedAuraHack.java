@@ -12,6 +12,8 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.entity.passive.PassiveEntity;
+import net.wurstclient.settings.CheckboxSetting;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -55,6 +57,10 @@ public final class FeedAuraHack extends Hack
 			+ "the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
+
+	private final CheckboxSetting filterBabies =
+			new CheckboxSetting("Filter babies",
+					"Won't feed baby mobs.\nThis saves food, but slows baby growth.", false);
 	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
@@ -65,6 +71,7 @@ public final class FeedAuraHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
+		addSetting(filterBabies);
 	}
 	
 	@Override
@@ -107,7 +114,10 @@ public final class FeedAuraHack extends Hack
 			.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
 			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e.isBreedingItem(heldStack)).filter(e -> e.canEat());
+			.filter(e -> e.isBreedingItem(heldStack)).filter(AnimalEntity::canEat);
+
+		if (filterBabies.isChecked())
+			stream = stream.filter(e -> !(e != null && e.isBaby()));
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;
