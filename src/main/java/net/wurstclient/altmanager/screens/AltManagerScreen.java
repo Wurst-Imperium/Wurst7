@@ -11,6 +11,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +32,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.AltRenderer;
+import net.wurstclient.altmanager.ExportAltsFileChooser;
 import net.wurstclient.altmanager.ImportAltsFileChooser;
 import net.wurstclient.altmanager.LoginManager;
 import net.wurstclient.altmanager.NameGenerator;
@@ -88,8 +93,11 @@ public final class AltManagerScreen extends Screen
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Import Alts"), b -> pressImportAlts()));
+		addButton(new ButtonWidget(8, 8, 50, 20, new LiteralText("Import"),
+			b -> pressImportAlts()));
+		
+		addButton(new ButtonWidget(58, 8, 50, 20, new LiteralText("Export"),
+			b -> pressExportAlts()));
 	}
 	
 	@Override
@@ -235,6 +243,61 @@ public final class AltManagerScreen extends Screen
 		}catch(IOException | InterruptedException e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	private void pressExportAlts()
+	{
+		try
+		{
+			Process process = MultiProcessingUtils.startProcessWithIO(
+				ExportAltsFileChooser.class,
+				WurstClient.INSTANCE.getWurstFolder().toString());
+			
+			Path path = getExportPath(process);
+			
+			process.waitFor();
+			
+			List<String> lines = new ArrayList<>();
+			
+			for(Alt alt : altManager.getList())
+				if(alt.isCracked())
+					lines.add(alt.getEmail());
+				else
+					lines.add(alt.getEmail() + ":" + alt.getPassword());
+				
+			Files.write(path, lines);
+			
+		}catch(IOException | InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Path getExportPath(Process process) throws IOException
+	{
+		try(BufferedReader bf =
+			new BufferedReader(new InputStreamReader(process.getInputStream(),
+				StandardCharsets.UTF_8)))
+		{
+			String response = bf.readLine();
+			
+			if(response == null)
+				throw new IOException("No reponse from ExportAltsFileChooser");
+			
+			try
+			{
+				Path path = Paths.get(response);
+				if(!path.getFileName().toString().endsWith(".txt"))
+					path = path.resolveSibling(path.getFileName() + ".txt");
+				
+				return path;
+				
+			}catch(InvalidPathException e)
+			{
+				throw new IOException(
+					"Reponse from ExportAltsFileChooser is not a valid path");
+			}
 		}
 	}
 	
