@@ -36,6 +36,7 @@ import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 public final class AltManagerScreen extends Screen
 {
@@ -212,36 +213,49 @@ public final class AltManagerScreen extends Screen
 				ImportAltsFileChooser.class,
 				WurstClient.INSTANCE.getWurstFolder().toString());
 			
-			try(BufferedReader bf = new BufferedReader(new InputStreamReader(
-				process.getInputStream(), StandardCharsets.UTF_8)))
-			{
-				ArrayList<Alt> alts = new ArrayList<>();
-				
-				for(String line = ""; (line = bf.readLine()) != null;)
-				{
-					String[] data = line.split(":");
-					
-					switch(data.length)
-					{
-						case 1:
-						alts.add(new Alt(data[0], null, null));
-						break;
-						
-						case 2:
-						alts.add(new Alt(data[0], data[1], null));
-						break;
-					}
-				}
-				
-				altManager.addAll(alts);
-			}
-			
+			Path path = getFileChooserPath(process);
 			process.waitFor();
 			
-		}catch(IOException | InterruptedException e)
+			if(path.getFileName().toString().endsWith(".json"))
+				importAsJSON(path);
+			else
+				importAsTXT(path);
+			
+		}catch(IOException | InterruptedException | JsonException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private void importAsJSON(Path path) throws IOException, JsonException
+	{
+		WsonObject wson = JsonUtils.parseFileToObject(path);
+		ArrayList<Alt> alts = AltsFile.parseJson(wson);
+		altManager.addAll(alts);
+	}
+	
+	private void importAsTXT(Path path) throws IOException
+	{
+		List<String> lines = Files.readAllLines(path);
+		ArrayList<Alt> alts = new ArrayList<>();
+		
+		for(String line : lines)
+		{
+			String[] data = line.split(":");
+			
+			switch(data.length)
+			{
+				case 1:
+				alts.add(new Alt(data[0], null, null));
+				break;
+				
+				case 2:
+				alts.add(new Alt(data[0], data[1], null));
+				break;
+			}
+		}
+		
+		altManager.addAll(alts);
 	}
 	
 	private void pressExportAlts()
@@ -252,7 +266,7 @@ public final class AltManagerScreen extends Screen
 				ExportAltsFileChooser.class,
 				WurstClient.INSTANCE.getWurstFolder().toString());
 			
-			Path path = getExportPath(process);
+			Path path = getFileChooserPath(process);
 			
 			process.waitFor();
 			
@@ -267,7 +281,7 @@ public final class AltManagerScreen extends Screen
 		}
 	}
 	
-	private Path getExportPath(Process process) throws IOException
+	private Path getFileChooserPath(Process process) throws IOException
 	{
 		try(BufferedReader bf =
 			new BufferedReader(new InputStreamReader(process.getInputStream(),
@@ -276,7 +290,7 @@ public final class AltManagerScreen extends Screen
 			String response = bf.readLine();
 			
 			if(response == null)
-				throw new IOException("No reponse from ExportAltsFileChooser");
+				throw new IOException("No reponse from FileChooser");
 			
 			try
 			{
@@ -285,7 +299,7 @@ public final class AltManagerScreen extends Screen
 			}catch(InvalidPathException e)
 			{
 				throw new IOException(
-					"Reponse from ExportAltsFileChooser is not a valid path");
+					"Reponse from FileChooser is not a valid path");
 			}
 		}
 	}
