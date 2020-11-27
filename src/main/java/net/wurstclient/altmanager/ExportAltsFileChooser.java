@@ -13,6 +13,7 @@ import java.awt.HeadlessException;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.wurstclient.util.SwingUtils;
@@ -37,13 +38,27 @@ public final class ExportAltsFileChooser extends JFileChooser
 		
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(
-			new FileNameExtensionFilter("TXT file (username:password)", "txt"));
+		
+		FileNameExtensionFilter txtFilter =
+			new FileNameExtensionFilter("TXT file (username:password)", "txt");
+		fileChooser.addChoosableFileFilter(txtFilter);
+		
+		FileNameExtensionFilter jsonFilter =
+			new FileNameExtensionFilter("JSON file", "json");
+		fileChooser.addChoosableFileFilter(jsonFilter);
 		
 		if(fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION)
 			return;
 		
-		System.out.println(fileChooser.getSelectedFile().getAbsolutePath());
+		String path = fileChooser.getSelectedFile().getAbsolutePath();
+		FileFilter fileFilter = fileChooser.getFileFilter();
+		
+		if(fileFilter == txtFilter && !path.endsWith(".txt"))
+			path += ".txt";
+		else if(fileFilter == jsonFilter && !path.endsWith(".json"))
+			path += ".json";
+		
+		System.out.println(path);
 	}
 	
 	@Override

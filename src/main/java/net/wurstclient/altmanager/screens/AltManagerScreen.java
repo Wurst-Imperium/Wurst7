@@ -21,6 +21,8 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.google.gson.JsonObject;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -29,15 +31,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
-import net.wurstclient.altmanager.Alt;
-import net.wurstclient.altmanager.AltManager;
-import net.wurstclient.altmanager.AltRenderer;
-import net.wurstclient.altmanager.ExportAltsFileChooser;
-import net.wurstclient.altmanager.ImportAltsFileChooser;
-import net.wurstclient.altmanager.LoginManager;
-import net.wurstclient.altmanager.NameGenerator;
+import net.wurstclient.altmanager.*;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
+import net.wurstclient.util.json.JsonException;
+import net.wurstclient.util.json.JsonUtils;
 
 public final class AltManagerScreen extends Screen
 {
@@ -258,17 +256,12 @@ public final class AltManagerScreen extends Screen
 			
 			process.waitFor();
 			
-			List<String> lines = new ArrayList<>();
+			if(path.getFileName().toString().endsWith(".json"))
+				exportAsJSON(path);
+			else
+				exportAsTXT(path);
 			
-			for(Alt alt : altManager.getList())
-				if(alt.isCracked())
-					lines.add(alt.getEmail());
-				else
-					lines.add(alt.getEmail() + ":" + alt.getPassword());
-				
-			Files.write(path, lines);
-			
-		}catch(IOException | InterruptedException e)
+		}catch(IOException | InterruptedException | JsonException e)
 		{
 			e.printStackTrace();
 		}
@@ -287,11 +280,7 @@ public final class AltManagerScreen extends Screen
 			
 			try
 			{
-				Path path = Paths.get(response);
-				if(!path.getFileName().toString().endsWith(".txt"))
-					path = path.resolveSibling(path.getFileName() + ".txt");
-				
-				return path;
+				return Paths.get(response);
 				
 			}catch(InvalidPathException e)
 			{
@@ -299,6 +288,25 @@ public final class AltManagerScreen extends Screen
 					"Reponse from ExportAltsFileChooser is not a valid path");
 			}
 		}
+	}
+	
+	private void exportAsJSON(Path path) throws IOException, JsonException
+	{
+		JsonObject json = AltsFile.createJson(altManager);
+		JsonUtils.toJson(json, path);
+	}
+	
+	private void exportAsTXT(Path path) throws IOException
+	{
+		List<String> lines = new ArrayList<>();
+		
+		for(Alt alt : altManager.getList())
+			if(alt.isCracked())
+				lines.add(alt.getEmail());
+			else
+				lines.add(alt.getEmail() + ":" + alt.getPassword());
+			
+		Files.write(path, lines);
 	}
 	
 	private void confirmGenerate(boolean confirmed)

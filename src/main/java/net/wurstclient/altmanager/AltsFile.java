@@ -122,7 +122,7 @@ public final class AltsFile
 		}
 	}
 	
-	private JsonObject createJson(AltManager alts)
+	public static JsonObject createJson(AltManager alts)
 	{
 		JsonObject json = new JsonObject();
 		
