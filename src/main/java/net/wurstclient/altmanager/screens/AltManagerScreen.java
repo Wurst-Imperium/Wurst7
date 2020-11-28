@@ -157,6 +157,8 @@ public final class AltManagerScreen extends Screen
 	private void pressUse()
 	{
 		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
 		
 		if(alt.isCracked())
 		{
@@ -181,6 +183,9 @@ public final class AltManagerScreen extends Screen
 	private void pressStar()
 	{
 		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
+		
 		altManager.setStarred(listGui.selected, !alt.isStarred());
 		listGui.selected = -1;
 	}
@@ -188,15 +193,22 @@ public final class AltManagerScreen extends Screen
 	private void pressEdit()
 	{
 		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
+		
 		client.openScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
 	{
+		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
+		
 		LiteralText text =
 			new LiteralText("Are you sure you want to remove this alt?");
 		
-		String altName = listGui.getSelectedAlt().getNameOrEmail();
+		String altName = alt.getNameOrEmail();
 		LiteralText message = new LiteralText(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
@@ -358,6 +370,9 @@ public final class AltManagerScreen extends Screen
 			&& listGui.getSelectedSlot() < altManager.getList().size())
 		{
 			Alt alt = listGui.getSelectedAlt();
+			if(alt == null)
+				return;
+			
 			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
 			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
