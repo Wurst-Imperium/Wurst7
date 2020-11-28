@@ -117,7 +117,7 @@ public final class FeedAuraHack extends Hack
 			.filter(e -> e.isBreedingItem(heldStack)).filter(AnimalEntity::canEat);
 
 		if (filterBabies.isChecked())
-			stream = stream.filter(e -> !(e != null && e.isBaby()));
+			stream = stream.filter(e -> !e.isBaby());
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;
