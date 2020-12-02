@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.class_5747;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
@@ -673,6 +674,13 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	@Shadow
 	@Override
 	public void onPlayerActionResponse(PlayerActionResponseS2CPacket var1)
+	{
+		
+	}
+	
+	@Shadow
+	@Override
+	public void method_33135(class_5747 arg)
 	{
 		
 	}
