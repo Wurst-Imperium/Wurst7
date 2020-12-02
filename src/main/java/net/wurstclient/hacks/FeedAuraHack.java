@@ -12,8 +12,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.entity.passive.PassiveEntity;
-import net.wurstclient.settings.CheckboxSetting;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -33,6 +31,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -57,10 +56,11 @@ public final class FeedAuraHack extends Hack
 			+ "the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
-
-	private final CheckboxSetting filterBabies =
-			new CheckboxSetting("Filter babies",
-					"Won't feed baby mobs.\nThis saves food, but slows baby growth.", false);
+	
+	private final CheckboxSetting filterBabies = new CheckboxSetting(
+		"Filter babies",
+		"Won't feed baby mobs.\n" + "This saves food, but slows baby growth.",
+		false);
 	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
@@ -109,14 +109,15 @@ public final class FeedAuraHack extends Hack
 		ItemStack heldStack = player.inventory.getMainHandStack();
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<AnimalEntity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
-			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e.isBreedingItem(heldStack)).filter(AnimalEntity::canEat);
-
-		if (filterBabies.isChecked())
+		Stream<AnimalEntity> stream =
+			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+				.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
+				.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
+				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+				.filter(e -> e.isBreedingItem(heldStack))
+				.filter(AnimalEntity::canEat);
+		
+		if(filterBabies.isChecked())
 			stream = stream.filter(e -> !e.isBaby());
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
