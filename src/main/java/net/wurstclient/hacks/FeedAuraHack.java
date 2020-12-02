@@ -57,10 +57,10 @@ public final class FeedAuraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final CheckboxSetting filterBabies = new CheckboxSetting(
-		"Filter babies",
-		"Won't feed baby mobs.\n" + "This saves food, but slows baby growth.",
-		false);
+	private final CheckboxSetting filterBabies =
+		new CheckboxSetting("Filter babies",
+			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
+			false);
 	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
