@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.WurstClient;
 
 public enum BlockBreaker
@@ -32,9 +33,13 @@ public enum BlockBreaker
 		Direction side = null;
 		Direction[] sides = Direction.values();
 		
+		BlockState state = BlockUtils.getState(pos);
+		VoxelShape shape = state.getOutlineShape(MC.world, pos);
+		if(shape.isEmpty())
+			return false;
+		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d relCenter = BlockUtils.getState(pos)
-			.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
+		Vec3d relCenter = shape.getBoundingBox().getCenter();
 		Vec3d center = Vec3d.of(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
@@ -46,12 +51,11 @@ public enum BlockBreaker
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		BlockState state = BlockUtils.getState(pos);
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check line of sight
-			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos,
-				state.getOutlineShape(MC.world, pos), state) != null)
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos, shape,
+				state) != null)
 				continue;
 			
 			side = sides[i];
