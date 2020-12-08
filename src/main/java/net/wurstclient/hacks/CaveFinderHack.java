@@ -45,6 +45,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
 import net.wurstclient.util.MinPriorityThreadFactory;
@@ -420,72 +421,10 @@ public final class CaveFinderHack extends Hack
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
 		
-		Callable<ArrayList<int[]>> task = () -> matchingBlocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, matchingBlocks).stream())
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		Callable<ArrayList<int[]>> task =
+			BlockVertexCompiler.createTask(matchingBlocks);
 		
 		compileVerticesTask = pool2.submit(task);
-	}
-	
-	private ArrayList<int[]> getVertices(BlockPos pos,
-		HashSet<BlockPos> matchingBlocks)
-	{
-		ArrayList<int[]> vertices = new ArrayList<>();
-		
-		if(!matchingBlocks.contains(pos.down()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 0, 0, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.up()))
-		{
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 0));
-		}
-		
-		if(!matchingBlocks.contains(pos.north()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-		}
-		
-		if(!matchingBlocks.contains(pos.east()))
-		{
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.south()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.west()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 0));
-		}
-		
-		return vertices;
-	}
-	
-	private int[] getVertex(BlockPos pos, int x, int y, int z)
-	{
-		return new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z};
 	}
 	
 	private void setDisplayListFromTask()
