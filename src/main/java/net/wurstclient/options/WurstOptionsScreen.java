@@ -25,7 +25,6 @@ import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.other_features.VanillaSpoofOtf;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
@@ -77,11 +76,6 @@ public class WurstOptionsScreen extends Screen
 			b -> analytics.setEnabled(!analytics.isEnabled()));
 		
 		new WurstOptionsButton(-154, 72,
-			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
-			"Automatically reports crashes\n" + "so you don't have to.",
-			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
-		
-		new WurstOptionsButton(-154, 96,
 			() -> "Spoof Vanilla: "
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
 			vanillaSpoofOtf.getDescription(),
