@@ -66,7 +66,7 @@ public final class EditBlockScreen extends Screen
 	private void done()
 	{
 		String value = blockField.getText();
-		Block block = BlockUtils.getBlockFromName(value);
+		Block block = BlockUtils.getBlockFromName(value).orElse(null);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -131,7 +131,7 @@ public final class EditBlockScreen extends Screen
 		fill(matrixStack, 215, -55, 216, -37, 0xff000000);
 		fill(matrixStack, 242, -55, 245, -37, 0xff000000);
 		
-		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
+		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText()).orElse(Blocks.AIR);
 		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
 		
 		GL11.glPopMatrix();

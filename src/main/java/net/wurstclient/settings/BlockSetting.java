@@ -16,6 +16,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BlockComponent;
@@ -35,8 +36,7 @@ public final class BlockSetting extends Setting
 	{
 		super(name, description);
 		
-		Block block = BlockUtils.getBlockFromName(blockName);
-		Objects.requireNonNull(block);
+		Block block = BlockUtils.getBlockFromName(blockName).orElse(Blocks.AIR);
 		this.blockName = BlockUtils.getName(block);
 		
 		defaultName = this.blockName;
@@ -50,7 +50,7 @@ public final class BlockSetting extends Setting
 	
 	public Block getBlock()
 	{
-		return BlockUtils.getBlockFromName(blockName);
+		return BlockUtils.getBlockFromName(blockName).orElse(Blocks.AIR);
 	}
 	
 	public String getBlockName()
@@ -77,9 +77,7 @@ public final class BlockSetting extends Setting
 	
 	public void setBlockName(String blockName)
 	{
-		Block block = BlockUtils.getBlockFromName(blockName);
-		Objects.requireNonNull(block);
-		
+		Block block = BlockUtils.getBlockFromName(blockName).orElse(Blocks.AIR);
 		setBlock(block);
 	}
 	
@@ -97,12 +95,12 @@ public final class BlockSetting extends Setting
 	
 	@Override
 	public void fromJson(JsonElement json)
-	{
+	{	
 		try
 		{
 			String newName = JsonUtils.getAsString(json);
 			
-			Block newBlock = BlockUtils.getBlockFromName(newName);
+			Block newBlock = BlockUtils.getBlockFromName(newName).orElse(null);
 			if(newBlock == null)
 				throw new JsonException();
 			

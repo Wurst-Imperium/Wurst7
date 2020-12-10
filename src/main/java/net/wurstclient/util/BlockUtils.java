@@ -8,10 +8,10 @@
 package net.wurstclient.util;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -53,15 +53,15 @@ public enum BlockUtils
 		return Registry.BLOCK.getId(block).toString();
 	}
 	
-	public static Block getBlockFromName(String name)
+	public static Optional<Block> getBlockFromName(String name)
 	{
 		try
 		{
-			return Registry.BLOCK.get(new Identifier(name));
+			return Registry.BLOCK.getOrEmpty(new Identifier(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
-			return Blocks.AIR;
+			return Optional.empty();
 		}
 	}
 	

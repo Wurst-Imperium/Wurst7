@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -164,7 +165,7 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		Block currentBlock = BlockUtils.getBlockFromName("minecraft:cave_air");
+		Block currentBlock = BlockUtils.getBlockFromName("minecraft:cave_air").orElseThrow(() -> new NoSuchElementException("minecraft:cave_air"));
 		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
 		
 		ChunkPos center = getPlayerChunkPos(eyesPos);

@@ -65,8 +65,10 @@ public final class EditBlockListScreen extends Screen
 		
 		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
 			20, new LiteralText("Add"), b -> {
-				blockList.add(blockToAdd);
-				blockNameField.setText("");
+				if (blockToAdd != null) {
+				    blockList.add(blockToAdd);
+				    blockNameField.setText("");
+				}
 			}));
 		
 		addButton(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
@@ -144,7 +146,7 @@ public final class EditBlockListScreen extends Screen
 	{
 		blockNameField.tick();
 		
-		blockToAdd = BlockUtils.getBlockFromName(blockNameField.getText());
+		blockToAdd = BlockUtils.getBlockFromName(blockNameField.getText()).orElse(null);
 		addButton.active = blockToAdd != null;
 		
 		removeButton.active =
@@ -235,7 +237,7 @@ public final class EditBlockListScreen extends Screen
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			ItemStack stack = new ItemStack(BlockUtils.getBlockFromName(name));
+			ItemStack stack = new ItemStack(BlockUtils.getBlockFromName(name).orElse(Blocks.AIR));
 			TextRenderer fr = mc.textRenderer;
 			
 			String displayName =
