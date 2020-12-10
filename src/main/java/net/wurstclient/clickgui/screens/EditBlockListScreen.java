@@ -240,10 +240,8 @@ public final class EditBlockListScreen extends Screen
 			
 			String displayName =
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
-			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
-			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + BlockUtils.getBlockFromName(name),
-				x + 28, y + 18, 0xa0a0a0);
+			fr.draw(matrixStack, displayName, x + 28, y + 4, 0xf0f0f0);
+			fr.draw(matrixStack, name, x + 28, y + 13, 0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(MatrixStack matrixStack,
