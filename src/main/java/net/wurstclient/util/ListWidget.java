@@ -380,33 +380,37 @@ public abstract class ListWidget extends AbstractParentElement
 		{
 			int o = j + n * itemHeight + headerHeight;
 			int p = itemHeight - 4;
-			if(o > bottom || o + p < top)
-				updateItemPosition(n, i, o, f);
 			
-			if(renderSelection && isSelectedItem(n))
-			{
-				int q = left + width / 2 - getRowWidth() / 2;
-				int r = left + width / 2 + getRowWidth() / 2;
-				RenderSystem.disableTexture();
-				float g = isFocused() ? 1.0F : 0.5F;
-				RenderSystem.color4f(g, g, g, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(q, o + p + 2, 0.0D).next();
-				bufferBuilder.vertex(r, o + p + 2, 0.0D).next();
-				bufferBuilder.vertex(r, o - 2, 0.0D).next();
-				bufferBuilder.vertex(q, o - 2, 0.0D).next();
-				tessellator.draw();
-				RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(q + 1, o + p + 1, 0.0D).next();
-				bufferBuilder.vertex(r - 1, o + p + 1, 0.0D).next();
-				bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
-				bufferBuilder.vertex(q + 1, o - 1, 0.0D).next();
-				tessellator.draw();
-				RenderSystem.enableTexture();
+			// Check if this item is in the visible Range
+			if (o + itemHeight >= top && o <= bottom) {
+				if(o > bottom || o + p < top)
+					updateItemPosition(n, i, o, f);
+				
+				if(renderSelection && isSelectedItem(n))
+				{
+					int q = left + width / 2 - getRowWidth() / 2;
+					int r = left + width / 2 + getRowWidth() / 2;
+					RenderSystem.disableTexture();
+					float g = isFocused() ? 1.0F : 0.5F;
+					RenderSystem.color4f(g, g, g, 1.0F);
+					bufferBuilder.begin(7, VertexFormats.POSITION);
+					bufferBuilder.vertex(q, o + p + 2, 0.0D).next();
+					bufferBuilder.vertex(r, o + p + 2, 0.0D).next();
+					bufferBuilder.vertex(r, o - 2, 0.0D).next();
+					bufferBuilder.vertex(q, o - 2, 0.0D).next();
+					tessellator.draw();
+					RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
+					bufferBuilder.begin(7, VertexFormats.POSITION);
+					bufferBuilder.vertex(q + 1, o + p + 1, 0.0D).next();
+					bufferBuilder.vertex(r - 1, o + p + 1, 0.0D).next();
+					bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
+					bufferBuilder.vertex(q + 1, o - 1, 0.0D).next();
+					tessellator.draw();
+					RenderSystem.enableTexture();
+				}
+				
+				renderItem(matrixStack, n, i, o, p, k, l, f);
 			}
-			
-			renderItem(matrixStack, n, i, o, p, k, l, f);
 		}
 		
 	}
