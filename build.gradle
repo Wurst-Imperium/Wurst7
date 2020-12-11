@@ -22,10 +22,6 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
-	// Sentry. Automatically reports crashes so you don't have to.
-	modCompile 'io.sentry:sentry:3.1.0'
-	include 'io.sentry:sentry:3.1.0'
-  
 	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
 	// which uses javax.annotation.concurrent.Immutable, which is part of
 	// the JSR305 library.

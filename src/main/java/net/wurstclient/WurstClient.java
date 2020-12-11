@@ -45,8 +45,6 @@ import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
-import net.wurstclient.sentry.NotEnoughCrashes;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
@@ -58,7 +56,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.8";
+	public static final String VERSION = "7.9";
 	public static final String MC_VERSION = "1.15.2";
 	
 	private WurstAnalytics analytics;
@@ -89,10 +87,6 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
-		
-		Path sentryFile = wurstFolder.resolve("sentry.json");
-		SentryConfig.setupSentry(sentryFile);
-		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";

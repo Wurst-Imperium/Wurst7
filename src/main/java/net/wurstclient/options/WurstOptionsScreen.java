@@ -23,7 +23,6 @@ import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.other_features.VanillaSpoofOtf;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
@@ -70,16 +69,11 @@ public class WurstOptionsScreen extends Screen
 				+ "We use a random ID to tell users apart\n"
 				+ "so that this data can never be linked to\n"
 				+ "your Minecraft account. The random ID is\n"
-				+ "changed every 30 days to make extra sure\n"
+				+ "changed every 3 days to make extra sure\n"
 				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
 		
 		new WurstOptionsButton(-154, 72,
-			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
-			"Automatically reports crashes\n" + "so you don't have to.",
-			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
-		
-		new WurstOptionsButton(-154, 96,
 			() -> "Spoof Vanilla: "
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
 			vanillaSpoofOtf.getDescription(),

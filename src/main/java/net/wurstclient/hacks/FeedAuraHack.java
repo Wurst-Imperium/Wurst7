@@ -31,6 +31,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -56,6 +57,11 @@ public final class FeedAuraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	
+	private final CheckboxSetting filterBabies =
+		new CheckboxSetting("Filter babies",
+			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
+			false);
+	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
 	
@@ -65,6 +71,7 @@ public final class FeedAuraHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
+		addSetting(filterBabies);
 	}
 	
 	@Override
@@ -102,12 +109,16 @@ public final class FeedAuraHack extends Hack
 		ItemStack heldStack = player.inventory.getMainHandStack();
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<AnimalEntity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
-			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e.isBreedingItem(heldStack)).filter(e -> e.canEat());
+		Stream<AnimalEntity> stream =
+			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+				.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
+				.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
+				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+				.filter(e -> e.isBreedingItem(heldStack))
+				.filter(AnimalEntity::canEat);
+		
+		if(filterBabies.isChecked())
+			stream = stream.filter(e -> !e.isBaby());
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;
