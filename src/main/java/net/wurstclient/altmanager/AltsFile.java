@@ -74,15 +74,7 @@ public final class AltsFile
 	
 	private void loadAlts(WsonObject wson, AltManager altManager)
 	{
-		ArrayList<Alt> alts = new ArrayList<>();
-		
-		for(Entry<String, JsonObject> e : wson.getAllJsonObjects().entrySet())
-		{
-			String email = e.getKey();
-			JsonObject jsonAlt = e.getValue();
-			
-			alts.add(loadAlt(email, jsonAlt));
-		}
+		ArrayList<Alt> alts = parseJson(wson);
 		
 		try
 		{
@@ -95,7 +87,22 @@ public final class AltsFile
 		}
 	}
 	
-	private Alt loadAlt(String email, JsonObject jsonAlt)
+	public static ArrayList<Alt> parseJson(WsonObject wson)
+	{
+		ArrayList<Alt> alts = new ArrayList<>();
+		
+		for(Entry<String, JsonObject> e : wson.getAllJsonObjects().entrySet())
+		{
+			String email = e.getKey();
+			JsonObject jsonAlt = e.getValue();
+			
+			alts.add(loadAlt(email, jsonAlt));
+		}
+		
+		return alts;
+	}
+	
+	private static Alt loadAlt(String email, JsonObject jsonAlt)
 	{
 		String password = JsonUtils.getAsString(jsonAlt.get("password"), "");
 		String name = JsonUtils.getAsString(jsonAlt.get("name"), "");
@@ -122,7 +129,7 @@ public final class AltsFile
 		}
 	}
 	
-	private JsonObject createJson(AltManager alts)
+	public static JsonObject createJson(AltManager alts)
 	{
 		JsonObject json = new JsonObject();
 		

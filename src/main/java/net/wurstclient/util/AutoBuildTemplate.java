@@ -40,6 +40,9 @@ public final class AutoBuildTemplate
 		int[][] blocks =
 			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
 		
+		if(blocks == null)
+			throw new JsonException("Template has no blocks!");
+		
 		for(int i = 0; i < blocks.length; i++)
 		{
 			int length = blocks[i].length;

@@ -73,6 +73,9 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
 	public void onTick(CallbackInfo ci)
 	{
+		if(lastServerButton == null)
+			return;
+		
 		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	

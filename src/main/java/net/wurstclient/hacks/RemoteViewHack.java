@@ -251,7 +251,7 @@ public final class RemoteViewHack extends Hack
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
 		{
 			entity = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true)
+				.stream(MC.world.getEntities().spliterator(), false)
 				.filter(e -> e instanceof LivingEntity)
 				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)

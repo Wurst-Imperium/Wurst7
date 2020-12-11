@@ -17,7 +17,6 @@ import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.util.ChatUtils;
 
 public final class KeybindProcessor implements KeyPressListener
@@ -49,8 +48,6 @@ public final class KeybindProcessor implements KeyPressListener
 		String cmds = keybinds.getCommands(keyName);
 		if(cmds == null)
 			return;
-		
-		SentryConfig.addKeybindTriggerBreadcrumb(keyName, cmds);
 		
 		processCmds(cmds);
 	}
