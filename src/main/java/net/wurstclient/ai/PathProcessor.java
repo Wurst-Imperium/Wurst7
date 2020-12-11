@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -58,7 +58,7 @@ public abstract class PathProcessor
 	protected final void facePosition(BlockPos pos)
 	{
 		WURST.getRotationFaker()
-			.faceVectorClientIgnorePitch(new Vec3d(pos).add(0.5, 0.5, 0.5));
+			.faceVectorClientIgnorePitch(Vec3d.ofCenter(pos));
 	}
 	
 	public static final void lockControls()

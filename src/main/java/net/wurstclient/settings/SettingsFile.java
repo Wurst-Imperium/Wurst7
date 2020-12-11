@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.settings;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -82,6 +83,17 @@ public final class SettingsFile
 		save();
 	}
 	
+	public void loadProfile(Path profilePath) throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		WsonObject wson = JsonUtils.parseFileToObject(profilePath);
+		loadSettings(wson);
+		
+		save();
+	}
+	
 	private void loadSettings(WsonObject wson)
 	{
 		try
@@ -134,6 +146,16 @@ public final class SettingsFile
 			System.out.println("Couldn't save " + path.getFileName());
 			e.printStackTrace();
 		}
+	}
+	
+	public void saveProfile(Path profilePath) throws IOException, JsonException
+	{
+		if(!profilePath.getFileName().toString().endsWith(".json"))
+			throw new IllegalArgumentException();
+		
+		JsonObject json = createJson();
+		Files.createDirectories(profilePath.getParent());
+		JsonUtils.toJson(json, profilePath);
 	}
 	
 	private JsonObject createJson()

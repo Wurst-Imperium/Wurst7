@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -87,6 +88,11 @@ public final class ExcavatorHack extends Hack
 		// TODO:
 		// WURST.getHax().bowAimbotMod.setEnabled(false);
 		// WURST.getHax().templateToolMod.setEnabled(false);
+		WURST.getHax().autoMineHack.setEnabled(false);
+		WURST.getHax().nukerHack.setEnabled(false);
+		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		step = Step.START_POS;
 		
@@ -147,6 +153,7 @@ public final class ExcavatorHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -310,7 +317,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -330,7 +337,7 @@ public final class ExcavatorHack extends Hack
 		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = tr.getStringWidth(message);
+		int msgWidth = tr.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
@@ -347,7 +354,7 @@ public final class ExcavatorHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		tr.draw(message, 2, 1, 0xffffffff);
+		tr.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		
@@ -455,6 +462,7 @@ public final class ExcavatorHack extends Hack
 			
 			// break all blocks
 			BlockBreaker.breakBlocksWithPacketSpam(validBlocks);
+			
 		}else
 		{
 			ArrayList<BlockPos> blocks = new ArrayList<>();
@@ -496,9 +504,8 @@ public final class ExcavatorHack extends Hack
 		
 		if(pathFinder == null)
 		{
-			Comparator<BlockPos> cDistance =
-				Comparator.comparingDouble(pos -> MC.player
-					.squaredDistanceTo(new Vec3d(pos).add(0.5, 0.5, 0.5)));
+			Comparator<BlockPos> cDistance = Comparator.comparingDouble(
+				pos -> MC.player.squaredDistanceTo(Vec3d.ofCenter(pos)));
 			Comparator<BlockPos> cAltitude =
 				Comparator.comparingInt(pos -> -pos.getY());
 			BlockPos closestBlock =
@@ -555,10 +562,10 @@ public final class ExcavatorHack extends Hack
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	

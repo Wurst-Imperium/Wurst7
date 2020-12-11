@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,6 +34,9 @@ public abstract class Feature
 	private final String searchTags =
 		getClass().isAnnotationPresent(SearchTags.class) ? String.join("\u00a7",
 			getClass().getAnnotation(SearchTags.class).value()) : "";
+	
+	private final boolean safeToBlock =
+		!getClass().isAnnotationPresent(DontBlock.class);
 	
 	public abstract String getName();
 	
@@ -78,13 +81,18 @@ public abstract class Feature
 		possibleKeybinds.add(new PossibleKeybind(command, description));
 	}
 	
+	public final Set<PossibleKeybind> getPossibleKeybinds()
+	{
+		return Collections.unmodifiableSet(possibleKeybinds);
+	}
+	
 	public final String getSearchTags()
 	{
 		return searchTags;
 	}
 	
-	public final Set<PossibleKeybind> getPossibleKeybinds()
+	public final boolean isSafeToBlock()
 	{
-		return Collections.unmodifiableSet(possibleKeybinds);
+		return safeToBlock;
 	}
 }

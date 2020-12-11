@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,7 +26,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -140,10 +140,10 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(validator)
 			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	
@@ -171,13 +171,12 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
 		{
-			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
 			
 			// check if hitVec is within range (4.25 blocks)
@@ -190,9 +189,9 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			
 			// check line of sight
 			if(MC.world
-				.rayTrace(new RayTraceContext(eyesPos, hitVec,
-					RayTraceContext.ShapeType.COLLIDER,
-					RayTraceContext.FluidHandling.NONE, MC.player))
+				.raycast(new RaycastContext(eyesPos, hitVec,
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player))
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
@@ -213,13 +212,12 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private boolean rightClickBlockSimple(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
 		{
-			Vec3d hitVec =
-				posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
 			
 			// check if hitVec is within range (6 blocks)

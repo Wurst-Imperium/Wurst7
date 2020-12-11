@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import java.util.Objects;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.hacks.NavigatorHack;
+import net.wurstclient.hacks.TooManyHaxHack;
 
 public abstract class Hack extends Feature
 {
@@ -67,6 +68,10 @@ public abstract class Hack extends Feature
 	public final void setEnabled(boolean enabled)
 	{
 		if(this.enabled == enabled)
+			return;
+		
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		if(enabled && tooManyHax.isEnabled() && tooManyHax.isBlocked(this))
 			return;
 		
 		this.enabled = enabled;

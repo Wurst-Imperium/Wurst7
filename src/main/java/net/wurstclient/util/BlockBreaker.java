@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,14 +10,15 @@ package net.wurstclient.util;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.server.network.packet.HandSwingC2SPacket;
-import net.minecraft.server.network.packet.PlayerActionC2SPacket;
-import net.minecraft.server.network.packet.PlayerActionC2SPacket.Action;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.WurstClient;
 
 public enum BlockBreaker
@@ -32,10 +33,14 @@ public enum BlockBreaker
 		Direction side = null;
 		Direction[] sides = Direction.values();
 		
+		BlockState state = BlockUtils.getState(pos);
+		VoxelShape shape = state.getOutlineShape(MC.world, pos);
+		if(shape.isEmpty())
+			return false;
+		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d relCenter = BlockUtils.getState(pos)
-			.getOutlineShape(MC.world, pos).getBoundingBox().getCenter();
-		Vec3d center = new Vec3d(pos).add(relCenter);
+		Vec3d relCenter = shape.getBoundingBox().getCenter();
+		Vec3d center = Vec3d.of(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
@@ -46,12 +51,11 @@ public enum BlockBreaker
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		BlockState state = BlockUtils.getState(pos);
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check line of sight
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], pos,
-				state.getOutlineShape(MC.world, pos), state) != null)
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos, shape,
+				state) != null)
 				continue;
 			
 			side = sides[i];
@@ -97,13 +101,13 @@ public enum BlockBreaker
 		
 		for(BlockPos pos : blocks)
 		{
-			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 			
 			for(Direction side : Direction.values())
 			{
 				Vec3d hitVec =
-					posVec.add(new Vec3d(side.getVector()).multiply(0.5));
+					posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
 				
 				// check if side is facing towards player
 				if(eyesPos.squaredDistanceTo(hitVec) >= distanceSqPosVec)
