@@ -9,7 +9,6 @@ package net.wurstclient.command;
 
 import java.util.Arrays;
 
-import io.sentry.Sentry;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
@@ -76,8 +75,6 @@ public final class CmdProcessor implements ChatOutputListener
 	
 	private void runCmd(Command cmd, String input)
 	{
-		Sentry.addBreadcrumb("." + input, "command.run");
-		
 		String[] args = input.split(" ");
 		args = Arrays.copyOfRange(args, 1, args.length);
 		

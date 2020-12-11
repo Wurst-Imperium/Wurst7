@@ -69,10 +69,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_BACKSPACE)
-			if(clickTimer == -1)
-				WurstClient.MC.openScreen((Screen)null);
-			
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			leftClick(selectedFeature);
 		
