@@ -70,7 +70,7 @@ public final class AltManagerScreen extends Screen
 					"Would you like some random alts to get started?")));
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, new LiteralText("Use"), b -> pressUse()));
+			100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
 		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
@@ -81,7 +81,7 @@ public final class AltManagerScreen extends Screen
 			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
 		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, new LiteralText("Star"), b -> pressStar()));
+			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
 		
 		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
 			20, new LiteralText("Edit"), b -> pressEdit()));
@@ -154,7 +154,7 @@ public final class AltManagerScreen extends Screen
 		deleteButton.active = altSelected;
 	}
 	
-	private void pressUse()
+	private void pressLogin()
 	{
 		Alt alt = listGui.getSelectedAlt();
 		if(alt == null)
@@ -180,7 +180,7 @@ public final class AltManagerScreen extends Screen
 		client.openScreen(prevScreen);
 	}
 	
-	private void pressStar()
+	private void pressFavorite()
 	{
 		Alt alt = listGui.getSelectedAlt();
 		if(alt == null)
