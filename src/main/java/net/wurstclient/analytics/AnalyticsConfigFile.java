@@ -58,9 +58,9 @@ public final class AnalyticsConfigFile
 		VisitorData visitorData = VisitorData.newSession(visitorID, firstLaunch,
 			lastLaunch, launches);
 		
-		// change visitor ID after 30 days
+		// change visitor ID after 3 days
 		if(visitorData.getTimestampCurrent()
-			- visitorData.getTimestampFirst() >= 2592000)
+			- visitorData.getTimestampFirst() >= 259200)
 			visitorData = VisitorData.newVisitor();
 		
 		return visitorData;
