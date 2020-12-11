@@ -71,7 +71,7 @@ public class WurstOptionsScreen extends Screen
 				+ "We use a random ID to tell users apart\n"
 				+ "so that this data can never be linked to\n"
 				+ "your Minecraft account. The random ID is\n"
-				+ "changed every 30 days to make extra sure\n"
+				+ "changed every 3 days to make extra sure\n"
 				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
 		
