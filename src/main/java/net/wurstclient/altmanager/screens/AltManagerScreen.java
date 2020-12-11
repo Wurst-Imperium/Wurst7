@@ -511,7 +511,7 @@ public final class AltManagerScreen extends Screen
 			// tags
 			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			if(alt.isStarred())
-				tags += "\u00a7r, \u00a7estarred";
+				tags += "\u00a7r, \u00a7efavorite";
 			if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
 			minecraft.textRenderer.draw(tags, x + 31, y + 15, 10526880);
