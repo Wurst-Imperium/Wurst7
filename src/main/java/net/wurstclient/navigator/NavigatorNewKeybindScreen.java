@@ -103,6 +103,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		// text
 		if(choosingKey)
 		{
+			WurstClient.INSTANCE.selectingKey(true);
 			text = "Now press the key that should trigger this keybind.";
 			if(!selectedKey.equals("key.keyboard.unknown"))
 			{
@@ -121,7 +122,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				}
 			}
 		}else
+		{
 			text = "Select what this keybind should do.";
+			WurstClient.INSTANCE.selectingKey(false);
+		}
 		
 		// content height
 		if(choosingKey)
