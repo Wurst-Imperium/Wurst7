@@ -48,6 +48,7 @@ import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
+import net.wurstclient.options.KeybindEditorScreen;
 
 public enum WurstClient
 {
@@ -74,7 +75,7 @@ public enum WurstClient
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
 	private FriendsList friends;
-	
+
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
@@ -350,5 +351,11 @@ public enum WurstClient
 	public AltManager getAltManager()
 	{
 		return altManager;
+	}
+	
+	public KeybindEditorScreen selectingKey(boolean selecting)
+	{
+		if(selecting) commandField.setEditable(false);
+		else commandField.setEditable(true);
 	}
 }
