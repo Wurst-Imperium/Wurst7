@@ -173,7 +173,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onGuiActionConfirm(ConfirmGuiActionS2CPacket var1)
+	public void onConfirmScreenAction(ConfirmScreenActionS2CPacket var1)
 	{
 		
 	}
