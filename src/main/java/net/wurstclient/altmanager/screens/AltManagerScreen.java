@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ListWidget;
 import net.minecraft.text.LiteralText;
@@ -50,6 +51,9 @@ public final class AltManagerScreen extends Screen
 	private ButtonWidget starButton;
 	private ButtonWidget editButton;
 	private ButtonWidget deleteButton;
+	
+	private ButtonWidget importButton;
+	private ButtonWidget exportButton;
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
@@ -90,10 +94,10 @@ public final class AltManagerScreen extends Screen
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			"Cancel", b -> minecraft.openScreen(prevScreen)));
 		
-		addButton(
+		addButton(importButton =
 			new ButtonWidget(8, 8, 50, 20, "Import", b -> pressImportAlts()));
 		
-		addButton(
+		addButton(exportButton =
 			new ButtonWidget(58, 8, 50, 20, "Export", b -> pressExportAlts()));
 	}
 	
@@ -150,6 +154,10 @@ public final class AltManagerScreen extends Screen
 		starButton.active = altSelected;
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
+		
+		boolean windowMode = !minecraft.options.fullscreen;
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
 	}
 	
 	private void pressLogin()
@@ -410,6 +418,31 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		super.render(mouseX, mouseY, partialTicks);
+		renderButtonTooltip(mouseX, mouseY);
+	}
+	
+	private void renderButtonTooltip(int mouseX, int mouseY)
+	{
+		for(AbstractButtonWidget button : buttons)
+		{
+			if(!button.isHovered())
+				continue;
+			
+			if(button != importButton && button != exportButton)
+				continue;
+			
+			ArrayList<String> tooltip = new ArrayList<>();
+			tooltip.add("This button opens another window.");
+			if(minecraft.options.fullscreen)
+				tooltip.add("\u00a7cTurn off fullscreen mode!");
+			else
+			{
+				tooltip.add("It might look like the game is not");
+				tooltip.add("responding while that window is open.");
+			}
+			renderTooltip(tooltip, mouseX, mouseY);
+			break;
+		}
 	}
 	
 	public static final class ListGui extends ListWidget
