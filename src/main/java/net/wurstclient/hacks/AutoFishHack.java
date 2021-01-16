@@ -26,7 +26,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixin.FishingBobberEntityMixin;
+import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -367,7 +367,7 @@ public final class AutoFishHack extends Hack
 	
 	private boolean isInOpenWater(FishingBobberEntity bobber)
 	{
-		return ((FishingBobberEntityMixin)bobber)
-			.callIsOpenOrWaterAround(bobber.getBlockPos());
+		return ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
 	}
 }
