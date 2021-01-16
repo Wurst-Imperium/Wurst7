@@ -16,7 +16,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixin.FishingBobberEntityMixin;
+import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"open water esp", "AutoFishESP", "auto fish esp"})
@@ -121,7 +121,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	
 	private boolean isInOpenWater(FishingBobberEntity bobber)
 	{
-		return ((FishingBobberEntityMixin)bobber)
-			.callIsOpenOrWaterAround(bobber.getBlockPos());
+		return ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
 	}
 }

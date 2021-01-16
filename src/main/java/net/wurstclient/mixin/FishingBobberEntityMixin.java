@@ -8,14 +8,24 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.mixinterface.IFishingBobberEntity;
 
 @Mixin(FishingBobberEntity.class)
-public interface FishingBobberEntityMixin
+public abstract class FishingBobberEntityMixin implements IFishingBobberEntity
 {
-	@Invoker("isOpenOrWaterAround(Lnet/minecraft/util/math/BlockPos;)Z")
-	public boolean callIsOpenOrWaterAround(BlockPos pos);
+	@Override
+	public boolean checkOpenWaterAround(BlockPos pos)
+	{
+		return isOpenOrWaterAround(pos);
+	}
+	
+	@Shadow
+	private boolean isOpenOrWaterAround(BlockPos pos)
+	{
+		return false;
+	}
 }
