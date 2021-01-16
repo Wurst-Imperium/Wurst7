@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,9 +26,11 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
@@ -51,6 +53,9 @@ public final class AltManagerScreen extends Screen
 	private ButtonWidget starButton;
 	private ButtonWidget editButton;
 	private ButtonWidget deleteButton;
+	
+	private ButtonWidget importButton;
+	private ButtonWidget exportButton;
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
@@ -92,11 +97,11 @@ public final class AltManagerScreen extends Screen
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 50, 20, new LiteralText("Import"),
-			b -> pressImportAlts()));
+		addButton(importButton = new ButtonWidget(8, 8, 50, 20,
+			new LiteralText("Import"), b -> pressImportAlts()));
 		
-		addButton(new ButtonWidget(58, 8, 50, 20, new LiteralText("Export"),
-			b -> pressExportAlts()));
+		addButton(exportButton = new ButtonWidget(58, 8, 50, 20,
+			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	
 	@Override
@@ -152,6 +157,10 @@ public final class AltManagerScreen extends Screen
 		starButton.active = altSelected;
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
+		
+		boolean windowMode = !client.options.fullscreen;
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
 	}
 	
 	private void pressLogin()
@@ -415,6 +424,35 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(matrixStack, mouseX, mouseY);
+	}
+	
+	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
+	{
+		for(AbstractButtonWidget button : buttons)
+		{
+			if(!button.isHovered())
+				continue;
+			
+			if(button != importButton && button != exportButton)
+				continue;
+			
+			ArrayList<Text> tooltip = new ArrayList<>();
+			tooltip.add(new LiteralText("This button opens another window."));
+			if(client.options.fullscreen)
+				tooltip
+					.add(new LiteralText("\u00a7cTurn off fullscreen mode!"));
+			else
+			{
+				tooltip
+					.add(new LiteralText("It might look like the game is not"));
+				tooltip.add(
+					new LiteralText("responding while that window is open."));
+			}
+			renderTooltip(matrixStack, tooltip, mouseX, mouseY);
+			break;
+		}
 	}
 	
 	public static final class ListGui extends ListWidget
