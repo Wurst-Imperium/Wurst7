@@ -123,9 +123,11 @@ public final class SpamCmd extends Command {
 
 		// Replace pipe symbol (|) to space symbol ( )
 
-		if (toChange1.contains("|"))
+		if (toChange1.contains("|")) {
 			toChange2 = toChange1.replace("|", " ");
-
+		} else {
+			toChange2 = toChange1;
+		}
 		String toChange = toChange2;
 
 		// Starts the program in a new tread
