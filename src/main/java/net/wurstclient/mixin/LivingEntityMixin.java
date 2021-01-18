@@ -25,13 +25,15 @@ public abstract class LivingEntityMixin
 		method = {
 			"hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"},
 		cancellable = true)
-	private void hasNightVisionStatus(StatusEffect effect, CallbackInfoReturnable<Boolean> cir)
+	private void onHasStatusEffect(StatusEffect effect,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		LivingEntity en = (LivingEntity)(Object)this;
+		
 		if(effect == StatusEffects.NIGHT_VISION
-			&& WurstClient.INSTANCE.getHax().fullbrightHack.isNightVisionActive()
-			&& en instanceof ClientPlayerEntity
-			&& en.getY() > 0)
+			&& WurstClient.INSTANCE.getHax().fullbrightHack
+				.isNightVisionActive()
+			&& en instanceof ClientPlayerEntity)
 			cir.setReturnValue(true);
 	}
 }
