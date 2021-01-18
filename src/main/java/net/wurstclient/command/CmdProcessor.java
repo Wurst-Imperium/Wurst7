@@ -8,7 +8,9 @@
 package net.wurstclient.command;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
@@ -17,113 +19,95 @@ import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.util.ChatUtils;
 
-public final class CmdProcessor implements ChatOutputListener
-{
+public final class CmdProcessor implements ChatOutputListener {
 	private final CmdList cmds;
-	
-	public CmdProcessor(CmdList cmds)
-	{
+
+	public CmdProcessor(CmdList cmds) {
 		this.cmds = cmds;
 	}
-	
+
 	@Override
-	public void onSentMessage(ChatOutputEvent event)
-	{
-		if(!WurstClient.INSTANCE.isEnabled())
+	public void onSentMessage(ChatOutputEvent event) {
+		if (!WurstClient.INSTANCE.isEnabled())
 			return;
-		
+
 		String message = event.getOriginalMessage().trim();
-		if(!message.startsWith("."))
+		if (!message.startsWith("."))
 			return;
-		
+
 		event.cancel();
 		process(message.substring(1));
 	}
-	
-	public void process(String input)
-	{
-		try
-		{
+
+	public void process(String input) {
+		try {
 			Command cmd = parseCmd(input);
-			
-			TooManyHaxHack tooManyHax =
-				WurstClient.INSTANCE.getHax().tooManyHaxHack;
-			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(cmd))
-			{
+
+			TooManyHaxHack tooManyHax = WurstClient.INSTANCE.getHax().tooManyHaxHack;
+			if (tooManyHax.isEnabled() && tooManyHax.isBlocked(cmd)) {
 				ChatUtils.error(cmd.getName() + " is blocked by TooManyHax.");
 				return;
 			}
-			
+
 			runCmd(cmd, input);
-			
-		}catch(CmdNotFoundException e)
-		{
+
+		} catch (CmdNotFoundException e) {
 			e.printToChat();
 		}
 	}
-	
-	private Command parseCmd(String input) throws CmdNotFoundException
-	{
+
+	private Command parseCmd(String input) throws CmdNotFoundException {
 		String cmdName = input.split(" ")[0];
 		Command cmd = cmds.getCmdByName(cmdName);
-		
-		if(cmd == null)
+
+		if (cmd == null)
 			throw new CmdNotFoundException(input);
-		
+
 		return cmd;
 	}
-	
-	private void runCmd(Command cmd, String input)
-	{
+
+	private void runCmd(Command cmd, String input) {
 		String[] args = input.split(" ");
 		args = Arrays.copyOfRange(args, 1, args.length);
-		
-		try
-		{
+
+		try {
 			cmd.call(args);
-			
-		}catch(CmdException e)
-		{
+
+		} catch (CmdException e) {
 			e.printToChat(cmd);
-			
-		}catch(Throwable e)
-		{
+
+		} catch (Throwable e) {
 			CrashReport report = CrashReport.create(e, "Running Wurst command");
 			CrashReportSection section = report.addElement("Affected command");
 			section.add("Command input", () -> input);
 			throw new CrashException(report);
 		}
 	}
-	
-	private static class CmdNotFoundException extends Exception
-	{
+
+	private static class CmdNotFoundException extends Exception {
 		private final String input;
-		
-		public CmdNotFoundException(String input)
-		{
+
+		public CmdNotFoundException(String input) {
 			super();
 			this.input = input;
 		}
-		
-		public void printToChat()
-		{
+
+		public void printToChat() {
 			String cmdName = input.split(" ")[0];
 			ChatUtils.error("Unknown command: ." + cmdName);
-			
+
 			StringBuilder helpMsg = new StringBuilder();
-			
-			if(input.startsWith("/"))
-			{
+
+			if (input.startsWith("/")) {
 				helpMsg.append("Use \".say " + input + "\"");
 				helpMsg.append(" to send it as a chat command.");
-				
-			}else
-			{
+
+			} else {
 				helpMsg.append("Type \".help\" for a list of commands or ");
 				helpMsg.append("\".say ." + input + "\"");
 				helpMsg.append(" to send it as a chat message.");
 			}
-			
+
 			ChatUtils.message(helpMsg.toString());
 		}
 	}
