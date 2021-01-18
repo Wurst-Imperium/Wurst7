@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -319,8 +319,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(box.x1, box.y1, box.z1);
-			GL11.glScaled(box.x2 - box.x1, box.y2 - box.y1, box.z2 - box.z1);
+			GL11.glTranslated(box.minX, box.minY, box.minZ);
+			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
+				box.maxZ - box.minZ);
 			GL11.glCallList(displayList);
 			GL11.glPopMatrix();
 		}

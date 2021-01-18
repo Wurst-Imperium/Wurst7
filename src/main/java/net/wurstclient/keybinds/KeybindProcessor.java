@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -44,7 +44,11 @@ public final class KeybindProcessor implements KeyPressListener
 			return;
 		
 		String keyName = getKeyName(event);
+		
 		String cmds = keybinds.getCommands(keyName);
+		if(cmds == null)
+			return;
+		
 		processCmds(cmds);
 	}
 	
@@ -52,15 +56,13 @@ public final class KeybindProcessor implements KeyPressListener
 	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
-		return InputUtil.getKeyCode(keyCode, scanCode).getName();
+		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 	}
 	
 	private void processCmds(String cmds)
 	{
-		if(cmds == null)
-			return;
-		
 		cmds = cmds.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
+		
 		for(String cmd : cmds.split("\u00a7"))
 			processCmd(cmd.trim());
 	}

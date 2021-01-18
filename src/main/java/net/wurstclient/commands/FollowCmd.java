@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -43,7 +43,7 @@ public final class FollowCmd extends Command
 			.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> args[0].equalsIgnoreCase(e.getName().asString()))
+			.filter(e -> args[0].equalsIgnoreCase(e.getName().getString()))
 			.min(
 				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 			.orElse(null);

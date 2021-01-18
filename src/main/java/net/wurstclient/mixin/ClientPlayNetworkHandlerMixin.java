@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.text.Text;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
 @Mixin(ClientPlayNetworkHandler.class)
@@ -31,7 +31,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -61,13 +61,6 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	@Shadow
 	@Override
 	public void onExperienceOrbSpawn(ExperienceOrbSpawnS2CPacket var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void onEntitySpawnGlobal(EntitySpawnGlobalS2CPacket var1)
 	{
 		
 	}
@@ -145,7 +138,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onBlockAction(BlockActionS2CPacket var1)
+	public void onBlockEvent(BlockEventS2CPacket var1)
 	{
 		
 	}
@@ -159,7 +152,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onChatMessage(ChatMessageS2CPacket var1)
+	public void onGameMessage(GameMessageS2CPacket var1)
 	{
 		
 	}
@@ -180,14 +173,14 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onGuiActionConfirm(ConfirmGuiActionS2CPacket var1)
+	public void onConfirmScreenAction(ConfirmScreenActionS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onCloseContainer(CloseContainerS2CPacket var1)
+	public void onCloseScreen(CloseScreenS2CPacket var1)
 	{
 		
 	}
@@ -201,21 +194,22 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenHorseContainer(OpenHorseContainerS2CPacket var1)
+	public void onOpenHorseScreen(OpenHorseScreenS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerPropertyUpdate(ContainerPropertyUpdateS2CPacket var1)
+	public void onScreenHandlerPropertyUpdate(
+		ScreenHandlerPropertyUpdateS2CPacket var1)
 	{
 		
 	}
 	
 	@Shadow
 	@Override
-	public void onContainerSlotUpdate(ContainerSlotUpdateS2CPacket var1)
+	public void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket var1)
 	{
 		
 	}
@@ -649,7 +643,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onOpenContainer(OpenContainerS2CPacket var1)
+	public void onOpenScreen(OpenScreenS2CPacket var1)
 	{
 		
 	}

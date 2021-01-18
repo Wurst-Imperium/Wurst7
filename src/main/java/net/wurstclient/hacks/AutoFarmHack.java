@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -128,7 +128,7 @@ public final class AutoFarmHack extends Hack
 		int blockRange = (int)Math.ceil(range.getValue());
 		
 		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.canBeClicked(pos))
 			.collect(Collectors.toList());
 		
@@ -142,18 +142,18 @@ public final class AutoFarmHack extends Hack
 			blocksToHarvest =
 				blocks.parallelStream().filter(this::shouldBeHarvested)
 					.sorted(Comparator.comparingDouble(
-						pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+						pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 					.collect(Collectors.toList());
 			
 			blocksToReplant = getBlockStream(eyesBlock, blockRange)
 				.filter(
-					pos -> eyesVec.squaredDistanceTo(new Vec3d(pos)) <= rangeSq)
+					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 				.filter(pos -> BlockUtils.getState(pos).getMaterial()
 					.isReplaceable())
 				.filter(pos -> plants.containsKey(pos))
 				.filter(this::canBeReplanted)
 				.sorted(Comparator.comparingDouble(
-					pos -> eyesVec.squaredDistanceTo(new Vec3d(pos))))
+					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 				.collect(Collectors.toList());
 		}
 		
@@ -310,7 +310,7 @@ public final class AutoFarmHack extends Hack
 			if(slot == player.inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = player.inventory.getInvStack(slot);
+			ItemStack stack = player.inventory.getStack(slot);
 			if(stack.isEmpty() || stack.getItem() != neededItem)
 				continue;
 			
@@ -344,13 +344,13 @@ public final class AutoFarmHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
 			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
@@ -363,7 +363,7 @@ public final class AutoFarmHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			

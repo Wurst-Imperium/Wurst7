@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,19 +16,22 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombiePigmanEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
+import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
@@ -61,6 +64,12 @@ public final class BowAimbotHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
+	private final SliderSetting predictMovement =
+		new SliderSetting("Predict movement",
+			"Controls the strength of BowAimbot's\n"
+				+ "movement prediction algorithm.",
+			0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
+	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
@@ -88,14 +97,23 @@ public final class BowAimbotHack extends Hack
 		new CheckboxSetting("Filter pets",
 			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
 	
-	private final CheckboxSetting filterVillagers = new CheckboxSetting(
-		"Filter villagers", "Won't attack villagers.", false);
+	private final CheckboxSetting filterTraders =
+		new CheckboxSetting("Filter traders",
+			"Won't attack villagers, wandering traders, etc.", false);
+	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);
+	private final CheckboxSetting filterNamed = new CheckboxSetting(
+		"Filter named", "Won't attack name-tagged entities.", false);
+	
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands", "Won't attack armor stands.", false);
+	private final CheckboxSetting filterCrystals = new CheckboxSetting(
+		"Filter end crystals", "Won't attack end crystals.", false);
 	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
@@ -109,6 +127,7 @@ public final class BowAimbotHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
+		addSetting(predictMovement);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -119,9 +138,12 @@ public final class BowAimbotHack extends Hack
 		addSetting(filterAnimals);
 		addSetting(filterBabies);
 		addSetting(filterPets);
-		addSetting(filterVillagers);
+		addSetting(filterTraders);
 		addSetting(filterGolems);
 		addSetting(filterInvisible);
+		addSetting(filterNamed);
+		addSetting(filterStands);
+		addSetting(filterCrystals);
 	}
 	
 	@Override
@@ -170,67 +192,10 @@ public final class BowAimbotHack extends Hack
 		}
 		
 		// set target
-		Stream<LivingEntity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
-			.filter(e -> e != player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		if(filterEntities(Stream.of(target)) == null)
+			target = filterEntities(StreamSupport
+				.stream(MC.world.getEntities().spliterator(), true));
 		
-		if(filterPlayers.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity));
-		
-		if(filterSleeping.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity
-				&& ((PlayerEntity)e).isSleeping()));
-		
-		if(filterFlying.getValue() > 0)
-			stream = stream.filter(e -> {
-				
-				if(!(e instanceof PlayerEntity))
-					return true;
-				
-				Box box = e.getBoundingBox();
-				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.doesNotCollide(box);
-			});
-		
-		if(filterMonsters.isChecked())
-			stream = stream.filter(e -> !(e instanceof Monster));
-		
-		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombiePigmanEntity));
-		
-		if(filterEndermen.isChecked())
-			stream = stream.filter(e -> !(e instanceof EndermanEntity));
-		
-		if(filterAnimals.isChecked())
-			stream = stream.filter(
-				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-		
-		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !(e instanceof PassiveEntity
-				&& ((PassiveEntity)e).isBaby()));
-		
-		if(filterPets.isChecked())
-			stream = stream
-				.filter(e -> !(e instanceof TameableEntity
-					&& ((TameableEntity)e).isTamed()))
-				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()));
-		
-		if(filterVillagers.isChecked())
-			stream = stream.filter(e -> !(e instanceof VillagerEntity));
-		
-		if(filterGolems.isChecked())
-			stream = stream.filter(e -> !(e instanceof GolemEntity));
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
-		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
 		
@@ -241,8 +206,8 @@ public final class BowAimbotHack extends Hack
 			velocity = 1;
 		
 		// set position to aim at
-		double d = RotationUtils.getEyesPos()
-			.distanceTo(target.getBoundingBox().getCenter());
+		double d = RotationUtils.getEyesPos().distanceTo(
+			target.getBoundingBox().getCenter()) * predictMovement.getValue();
 		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
 			- player.getX();
 		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
@@ -270,6 +235,79 @@ public final class BowAimbotHack extends Hack
 				.faceVectorClient(target.getBoundingBox().getCenter());
 		else
 			MC.player.pitch = neededPitch;
+	}
+	
+	private Entity filterEntities(Stream<Entity> s)
+	{
+		Stream<Entity> stream = s.filter(e -> e != null && !e.removed).filter(
+			e -> e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity)
+			.filter(e -> e != MC.player)
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		
+		if(filterPlayers.isChecked())
+			stream = stream.filter(e -> !(e instanceof PlayerEntity));
+		
+		if(filterSleeping.isChecked())
+			stream = stream.filter(e -> !(e instanceof PlayerEntity
+				&& ((PlayerEntity)e).isSleeping()));
+		
+		if(filterFlying.getValue() > 0)
+			stream = stream.filter(e -> {
+				
+				if(!(e instanceof PlayerEntity))
+					return true;
+				
+				Box box = e.getBoundingBox();
+				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
+				return MC.world.isSpaceEmpty(box);
+			});
+		
+		if(filterMonsters.isChecked())
+			stream = stream.filter(e -> !(e instanceof Monster));
+		
+		if(filterPigmen.isChecked())
+			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
+		
+		if(filterEndermen.isChecked())
+			stream = stream.filter(e -> !(e instanceof EndermanEntity));
+		
+		if(filterAnimals.isChecked())
+			stream = stream.filter(
+				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
+					|| e instanceof WaterCreatureEntity));
+		
+		if(filterBabies.isChecked())
+			stream = stream.filter(e -> !(e instanceof PassiveEntity
+				&& ((PassiveEntity)e).isBaby()));
+		
+		if(filterPets.isChecked())
+			stream = stream
+				.filter(e -> !(e instanceof TameableEntity
+					&& ((TameableEntity)e).isTamed()))
+				.filter(e -> !(e instanceof HorseBaseEntity
+					&& ((HorseBaseEntity)e).isTame()));
+		
+		if(filterTraders.isChecked())
+			stream = stream.filter(e -> !(e instanceof MerchantEntity));
+		
+		if(filterGolems.isChecked())
+			stream = stream.filter(e -> !(e instanceof GolemEntity));
+		
+		if(filterInvisible.isChecked())
+			stream = stream.filter(e -> !e.isInvisible());
+		
+		if(filterNamed.isChecked())
+			stream = stream.filter(e -> !e.hasCustomName());
+		
+		if(filterStands.isChecked())
+			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
+		
+		if(filterCrystals.isChecked())
+			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
+		
+		return stream.min(priority.getSelected().comparator).orElse(null);
 	}
 	
 	@Override
@@ -322,7 +360,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(float partialTicks)
+	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -339,11 +377,11 @@ public final class BowAimbotHack extends Hack
 		if(velocity < 1)
 			message = "Charging: " + (int)(velocity * 100) + "%";
 		else
-			message = "Ready To Shoot";
+			message = "Target Locked";
 		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getStringWidth(message);
+		int msgWidth = MC.textRenderer.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
@@ -360,7 +398,7 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		MC.textRenderer.draw(message, 2, 1, 0xffffffff);
+		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		GL11.glPopMatrix();
 		
@@ -377,13 +415,13 @@ public final class BowAimbotHack extends Hack
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("Health", e -> e.getHealth());
+		HEALTH("Health", e -> e instanceof LivingEntity
+			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;
-		private final Comparator<LivingEntity> comparator;
+		private final Comparator<Entity> comparator;
 		
-		private Priority(String name,
-			ToDoubleFunction<LivingEntity> keyExtractor)
+		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
 		{
 			this.name = name;
 			comparator = Comparator.comparingDouble(keyExtractor);

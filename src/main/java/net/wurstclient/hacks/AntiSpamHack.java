@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,8 +11,11 @@ import java.util.List;
 
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.util.Texts;
-import net.minecraft.text.Text;
+import net.minecraft.client.util.ChatMessages;
+import net.minecraft.text.CharacterVisitor;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Style;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -45,26 +48,59 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine> chatLines = event.getChatLines();
+		List<ChatHudLine<OrderedText>> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
+		
+		/**
+		 * A {@link CharacterVisitor} to completely bypass Mojang's visitor
+		 * system and just get the damn {@link String} out of a
+		 * {@link ChatHudLine}.
+		 *
+		 * <p>
+		 * Is this seriously the replacement for <code>getString()</code>?
+		 * What were they thinking?!
+		 */
+		class JustGiveMeTheStringVisitor implements CharacterVisitor
+		{
+			StringBuilder sb = new StringBuilder();
+			
+			@Override
+			public boolean accept(int index, Style style, int codePoint)
+			{
+				sb.appendCodePoint(codePoint);
+				return true;
+			}
+			
+			@Override
+			public String toString()
+			{
+				return sb.toString();
+			}
+		}
 		
 		ChatHud chat = MC.inGameHud.getChatHud();
 		int maxTextLength =
 			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<Text> newLines = Texts.wrapLines(event.getComponent(),
-			maxTextLength, MC.textRenderer, false, false);
+		List<OrderedText> newLines = ChatMessages.breakRenderedChatMessageLines(
+			event.getComponent(), maxTextLength, MC.textRenderer);
 		
 		int spamCounter = 1;
 		int matchingLines = 0;
 		
 		for(int i = chatLines.size() - 1; i >= 0; i--)
 		{
-			String oldLine = chatLines.get(i).getText().getString();
+			JustGiveMeTheStringVisitor oldLineVS =
+				new JustGiveMeTheStringVisitor();
+			chatLines.get(i).getText().accept(oldLineVS);
+			String oldLine = oldLineVS.toString();
 			
 			if(matchingLines <= newLines.size() - 1)
 			{
-				String newLine = newLines.get(matchingLines).getString();
+				JustGiveMeTheStringVisitor newLineVS =
+					new JustGiveMeTheStringVisitor();
+				newLines.get(matchingLines).accept(newLineVS);
+				String newLine = newLineVS.toString();
 				
 				if(matchingLines < newLines.size() - 1)
 				{
@@ -84,8 +120,12 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				
 				if(i > 0 && matchingLines == newLines.size() - 1)
 				{
-					String twoLines =
-						oldLine + chatLines.get(i - 1).getText().getString();
+					JustGiveMeTheStringVisitor nextOldLineVS =
+						new JustGiveMeTheStringVisitor();
+					chatLines.get(i - 1).getText().accept(nextOldLineVS);
+					String nextOldLine = nextOldLineVS.toString();
+					
+					String twoLines = oldLine + nextOldLine;
 					String addedText = twoLines.substring(newLine.length());
 					
 					if(addedText.startsWith(" [x") && addedText.endsWith("]"))
@@ -131,6 +171,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		}
 		
 		if(spamCounter > 1)
-			event.getComponent().append(" [x" + spamCounter + "]");
+			event.setComponent(new LiteralText(
+				event.getComponent().getString() + " [x" + spamCounter + "]"));
 	}
 }

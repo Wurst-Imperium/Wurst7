@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.registry.Registry;
@@ -61,12 +63,17 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// check screen
+		if(MC.currentScreen instanceof HandledScreen
+			&& !(MC.currentScreen instanceof InventoryScreen))
+			return;
+		
 		for(int slot = 9; slot < 45; slot++)
 		{
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
-			ItemStack stack = MC.player.inventory.getInvStack(adjustedSlot);
+			ItemStack stack = MC.player.inventory.getStack(adjustedSlot);
 			
 			if(stack.isEmpty())
 				continue;

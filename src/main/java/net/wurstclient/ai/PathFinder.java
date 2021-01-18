@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -58,12 +58,12 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		if(WurstClient.MC.player.onGround)
+		if(WurstClient.MC.player.isOnGround())
 			start = new PathPos(new BlockPos(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ()));
 		else
-			start = new PathPos(new BlockPos(WurstClient.MC.player));
+			start = new PathPos(new BlockPos(WurstClient.MC.player.getPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);
@@ -239,7 +239,8 @@ public class PathFinder
 	{
 		Material material = BlockUtils.getState(pos).getMaterial();
 		Block block = BlockUtils.getBlock(pos);
-		return material.blocksMovement() && !(block instanceof SignBlock)
+		return material.blocksMovement()
+			&& !(block instanceof AbstractSignBlock)
 			|| block instanceof LadderBlock || jesus
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
@@ -253,7 +254,7 @@ public class PathFinder
 		// check if solid
 		Material material = BlockUtils.getState(pos).getMaterial();
 		Block block = BlockUtils.getBlock(pos);
-		if(material.blocksMovement() && !(block instanceof SignBlock))
+		if(material.blocksMovement() && !(block instanceof AbstractSignBlock))
 			return false;
 		
 		// check if trapped

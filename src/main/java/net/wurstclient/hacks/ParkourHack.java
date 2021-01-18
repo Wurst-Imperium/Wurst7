@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -43,7 +43,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(!MC.player.onGround || MC.options.keyJump.isPressed())
+		if(!MC.player.isOnGround() || MC.options.keyJump.isPressed())
 			return;
 		
 		if(MC.player.isSneaking() || MC.options.keySneak.isPressed())

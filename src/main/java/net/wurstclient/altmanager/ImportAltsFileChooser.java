@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,14 +10,9 @@ package net.wurstclient.altmanager;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Files;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.wurstclient.util.SwingUtils;
@@ -33,25 +28,14 @@ public final class ImportAltsFileChooser extends JFileChooser
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.addChoosableFileFilter(
 			new FileNameExtensionFilter("TXT file (username:password)", "txt"));
+		fileChooser.addChoosableFileFilter(
+			new FileNameExtensionFilter("JSON file", "json"));
 		
 		if(fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
 			return;
 		
-		File file = fileChooser.getSelectedFile();
-		try
-		{
-			for(String line : Files.readAllLines(file.toPath()))
-				System.out.println(line);
-			
-		}catch(IOException e)
-		{
-			e.printStackTrace();
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			String message = writer.toString();
-			JOptionPane.showMessageDialog(fileChooser, message, "Error",
-				JOptionPane.ERROR_MESSAGE);
-		}
+		String path = fileChooser.getSelectedFile().getAbsolutePath();
+		System.out.println(path);
 	}
 	
 	public ImportAltsFileChooser(File currentDirectory)

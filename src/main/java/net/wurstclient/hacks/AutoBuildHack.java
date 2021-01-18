@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,7 +22,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
@@ -229,7 +229,7 @@ public final class AutoBuildHack extends Hack
 	
 	private boolean tryToPlace(BlockPos pos, Vec3d eyesPos, double rangeSq)
 	{
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		for(Direction side : Direction.values())
@@ -241,7 +241,7 @@ public final class AutoBuildHack extends Hack
 				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d dirVec = new Vec3d(side.getVector());
+			Vec3d dirVec = Vec3d.of(side.getVector());
 			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
 			
 			// check if hitVec is within range
@@ -254,9 +254,9 @@ public final class AutoBuildHack extends Hack
 			
 			// check line of sight
 			if(checkLOS.isChecked() && MC.world
-				.rayTrace(new RayTraceContext(eyesPos, hitVec,
-					RayTraceContext.ShapeType.COLLIDER,
-					RayTraceContext.FluidHandling.NONE, MC.player))
+				.raycast(new RaycastContext(eyesPos, hitVec,
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player))
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
@@ -264,7 +264,7 @@ public final class AutoBuildHack extends Hack
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookOnly packet =
 				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
-					rotation.getPitch(), MC.player.onGround);
+					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			
 			// place block
@@ -316,7 +316,7 @@ public final class AutoBuildHack extends Hack
 			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
 				continue;
 			
-			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			
 			for(Direction side : Direction.values())
 			{
@@ -326,7 +326,7 @@ public final class AutoBuildHack extends Hack
 				if(!BlockUtils.canBeClicked(neighbor))
 					continue;
 				
-				Vec3d sideVec = new Vec3d(side.getVector());
+				Vec3d sideVec = Vec3d.of(side.getVector());
 				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
 				
 				// check if hitVec is within range
@@ -380,7 +380,7 @@ public final class AutoBuildHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d posVec = Vec3d.ofCenter(pos);
 			
 			if(eyesPos.squaredDistanceTo(posVec) <= rangeSq)
 				drawGreenBox();
