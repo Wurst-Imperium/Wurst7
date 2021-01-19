@@ -106,7 +106,8 @@ public abstract class GameRendererMixin
 		method = {
 			"getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F"},
 		cancellable = true)
-	private static void onNightVisionStrength(LivingEntity en, float f, CallbackInfoReturnable<Float> cir)
+	private static void onGetNightVisionStrength(LivingEntity livingEntity,
+		float f, CallbackInfoReturnable<Float> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().fullbrightHack.isNightVisionActive())
 			cir.setReturnValue(1F);
