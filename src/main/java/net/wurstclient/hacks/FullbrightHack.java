@@ -14,12 +14,14 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"NightVision", "full bright", "brightness", "night vision"})
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"\u00a7lGamma\u00a7r works by setting the brightness to\n"
+		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
 			+ "beyond 100%. It supports the \u00a76Fade\u00a7r effect,\n"
 			+ "but isn't compatible with shader packs.\n\n"
 			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
@@ -33,34 +35,86 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			+ "Only works if \u00a76Method\u00a7r is set to \u00a76Gamma\u00a7r.",
 		true);
 	
+	private final SliderSetting defaultGamma =
+		new SliderSetting("Default brightness",
+			"Fullbright will set your brightness slider\n"
+				+ "back to this value when you turn it off.",
+			0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+	
+	private boolean wasGammaChanged;
+	
 	public FullbrightHack()
 	{
 		super("Fullbright", "Allows you to see in the dark.");
 		setCategory(Category.RENDER);
 		addSetting(method);
 		addSetting(fade);
+		addSetting(defaultGamma);
 		
+		checkGammaOnStartup();
 		EVENTS.add(UpdateListener.class, this);
+	}
+	
+	private void checkGammaOnStartup()
+	{
+		EVENTS.add(UpdateListener.class, new UpdateListener()
+		{
+			@Override
+			public void onUpdate()
+			{
+				double gamma = MC.options.gamma;
+				
+				if(gamma > 1)
+					wasGammaChanged = true;
+				else
+					defaultGamma.setValue(gamma);
+				
+				EVENTS.remove(UpdateListener.class, this);
+			}
+		});
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(isEnabled() && method.getSelected() == Method.GAMMA)
-			approachGamma(16);
-		else
-			approachGamma(0.5);
+		boolean shouldChangeGamma =
+			isEnabled() && method.getSelected() == Method.GAMMA;
+		
+		if(shouldChangeGamma)
+		{
+			setGamma(16);
+			return;
+		}
+		
+		if(wasGammaChanged)
+			resetGamma(defaultGamma.getValue());
 	}
 	
-	private void approachGamma(double target)
+	private void setGamma(double target)
 	{
+		wasGammaChanged = true;
 		GameOptions options = MC.options;
-		boolean doFade =
-			fade.isChecked() && method.getSelected() == Method.GAMMA;
 		
-		if(!doFade || Math.abs(options.gamma - target) <= 0.5)
+		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
 		{
 			options.gamma = target;
+			return;
+		}
+		
+		if(options.gamma < target)
+			options.gamma += 0.5;
+		else
+			options.gamma -= 0.5;
+	}
+	
+	private void resetGamma(double target)
+	{
+		GameOptions options = MC.options;
+		
+		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
+		{
+			options.gamma = target;
+			wasGammaChanged = false;
 			return;
 		}
 		
