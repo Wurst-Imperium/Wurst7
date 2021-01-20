@@ -65,6 +65,8 @@ public final class AutoFarmHack extends Hack
 	private int box;
 	private int node;
 	
+	private boolean busy;
+	
 	public AutoFarmHack()
 	{
 		super("AutoFarm",
@@ -118,6 +120,7 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		prevBlocks.clear();
+		busy = false;
 		GL11.glDeleteLists(displayList, 1);
 		GL11.glDeleteLists(box, 1);
 		GL11.glDeleteLists(node, 1);
@@ -164,6 +167,7 @@ public final class AutoFarmHack extends Hack
 		if(blocksToReplant.isEmpty())
 			harvest(blocksToHarvest);
 		
+		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
 		updateDisplayList(blocksToHarvest, blocksToReplant);
 	}
 	
@@ -509,5 +513,13 @@ public final class AutoFarmHack extends Hack
 			GL11.glPopMatrix();
 		}
 		GL11.glEndList();
+	}
+	
+	/**
+	 * Returns true if AutoFarm is currently harvesting or replanting something.
+	 */
+	public boolean isBusy()
+	{
+		return busy;
 	}
 }
