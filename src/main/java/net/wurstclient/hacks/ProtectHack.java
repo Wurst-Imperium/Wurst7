@@ -160,6 +160,7 @@ public final class ProtectHack extends Hack
 		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		
 		// set friend
 		if(friend == null)
