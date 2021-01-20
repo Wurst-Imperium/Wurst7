@@ -36,6 +36,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
@@ -50,6 +51,9 @@ public final class AutoFarmHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
+	private final CheckboxSetting replant =
+		new CheckboxSetting("Replant", true);
+	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
@@ -61,15 +65,19 @@ public final class AutoFarmHack extends Hack
 	private int box;
 	private int node;
 	
+	private boolean busy;
+	
 	public AutoFarmHack()
 	{
 		super("AutoFarm",
-			"Harvests and re-plants crops automatically.\n"
+			"Harvests and replants crops automatically.\n"
 				+ "Works with wheat, carrots, potatoes, beetroots,\n"
-				+ "pumpkins, melons, cacti, sugar canes, kelp and\n"
-				+ "nether warts.");
+				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
+				+ "bamboo and nether warts.");
+		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		addSetting(replant);
 	}
 	
 	@Override
@@ -112,6 +120,7 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		prevBlocks.clear();
+		busy = false;
 		GL11.glDeleteLists(displayList, 1);
 		GL11.glDeleteLists(box, 1);
 		GL11.glDeleteLists(node, 1);
@@ -120,7 +129,6 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		
 		currentBlock = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
 		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
@@ -139,22 +147,11 @@ public final class AutoFarmHack extends Hack
 		
 		if(!WURST.getHax().freecamHack.isEnabled())
 		{
-			blocksToHarvest =
-				blocks.parallelStream().filter(this::shouldBeHarvested)
-					.sorted(Comparator.comparingDouble(
-						pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-					.collect(Collectors.toList());
+			blocksToHarvest = getBlocksToHarvest(eyesVec, blocks);
 			
-			blocksToReplant = getBlockStream(eyesBlock, blockRange)
-				.filter(
-					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-				.filter(pos -> BlockUtils.getState(pos).getMaterial()
-					.isReplaceable())
-				.filter(pos -> plants.containsKey(pos))
-				.filter(this::canBeReplanted)
-				.sorted(Comparator.comparingDouble(
-					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-				.collect(Collectors.toList());
+			if(replant.isChecked())
+				blocksToReplant =
+					getBlocksToReplant(eyesVec, eyesBlock, rangeSq, blockRange);
 		}
 		
 		while(!blocksToReplant.isEmpty())
@@ -170,7 +167,30 @@ public final class AutoFarmHack extends Hack
 		if(blocksToReplant.isEmpty())
 			harvest(blocksToHarvest);
 		
+		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
 		updateDisplayList(blocksToHarvest, blocksToReplant);
+	}
+	
+	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
+		List<BlockPos> blocks)
+	{
+		return blocks.parallelStream().filter(this::shouldBeHarvested)
+			.sorted(Comparator.comparingDouble(
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.collect(Collectors.toList());
+	}
+	
+	private List<BlockPos> getBlocksToReplant(Vec3d eyesVec, BlockPos eyesBlock,
+		double rangeSq, int blockRange)
+	{
+		return getBlockStream(eyesBlock, blockRange)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
+			.filter(
+				pos -> BlockUtils.getState(pos).getMaterial().isReplaceable())
+			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
+			.sorted(Comparator.comparingDouble(
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.collect(Collectors.toList());
 	}
 	
 	@Override
@@ -258,6 +278,9 @@ public final class AutoFarmHack extends Hack
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
 		else if(block instanceof NetherWartBlock)
 			return state.get(NetherWartBlock.AGE) >= 3;
+		else if(block instanceof BambooBlock)
+			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
+				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
 		
 		return false;
 	}
@@ -490,5 +513,13 @@ public final class AutoFarmHack extends Hack
 			GL11.glPopMatrix();
 		}
 		GL11.glEndList();
+	}
+	
+	/**
+	 * Returns true if AutoFarm is currently harvesting or replanting something.
+	 */
+	public boolean isBusy()
+	{
+		return busy;
 	}
 }

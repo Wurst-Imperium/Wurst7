@@ -26,6 +26,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -54,12 +55,13 @@ public final class AutoFishHack extends Hack
 	
 	private int castRodTimer;
 	private int reelInTimer;
-	
-	private int box;
-	private int cross;
-	
 	private int scheduledWindowClick;
 	private Vec3d lastSoundPos;
+	
+	private int validRangeBox;
+	private int biteCross;
+	
+	private boolean wasOpenWater;
 	
 	public AutoFishHack()
 	{
@@ -81,11 +83,12 @@ public final class AutoFishHack extends Hack
 		reelInTimer = -1;
 		scheduledWindowClick = -1;
 		lastSoundPos = null;
+		wasOpenWater = true;
 		
-		box = GL11.glGenLists(1);
+		validRangeBox = GL11.glGenLists(1);
 		
-		cross = GL11.glGenLists(1);
-		GL11.glNewList(cross, GL11.GL_COMPILE);
+		biteCross = GL11.glGenLists(1);
+		GL11.glNewList(biteCross, GL11.GL_COMPILE);
 		GL11.glColor4f(1, 0, 0, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(-0.125, 0, -0.125);
@@ -107,8 +110,8 @@ public final class AutoFishHack extends Hack
 		EVENTS.remove(PacketInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		GL11.glDeleteLists(box, 1);
-		GL11.glDeleteLists(cross, 1);
+		GL11.glDeleteLists(validRangeBox, 1);
+		GL11.glDeleteLists(biteCross, 1);
 	}
 	
 	@Override
@@ -134,7 +137,7 @@ public final class AutoFishHack extends Hack
 		
 		if(bestRodSlot == -1)
 		{
-			ChatUtils.message("Out of fishing rods.");
+			ChatUtils.message("AutoFish has run out of fishing rods.");
 			setEnabled(false);
 			return;
 		}
@@ -173,7 +176,7 @@ public final class AutoFishHack extends Hack
 	{
 		if(debugDraw.isChecked())
 		{
-			GL11.glNewList(box, GL11.GL_COMPILE);
+			GL11.glNewList(validRangeBox, GL11.GL_COMPILE);
 			Box box = new Box(-validRange.getValue(), -1 / 16.0,
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
@@ -279,9 +282,22 @@ public final class AutoFishHack extends Hack
 			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
 			return;
 		
+		// check open water
+		boolean isOpenWater = isInOpenWater(bobber);
+		if(!isOpenWater && wasOpenWater)
+		{
+			ChatUtils.warning("You are currently fishing in shallow water.");
+			ChatUtils.message(
+				"You can't get any treasure items while fishing like this.");
+			
+			if(!WURST.getHax().openWaterEspHack.isEnabled())
+				ChatUtils.message("Use OpenWaterESP to find open water.");
+		}
+		
 		// catch fish
 		rightClick();
 		castRodTimer = 15;
+		wasOpenWater = isOpenWater;
 	}
 	
 	private void rightClick()
@@ -316,20 +332,9 @@ public final class AutoFishHack extends Hack
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(bobber.getX(), bobber.getY(), bobber.getZ());
-			GL11.glCallList(box);
-			GL11.glPopMatrix();
-		}
+			drawValidRange(bobber);
 		
-		if(lastSoundPos != null)
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(lastSoundPos.x, lastSoundPos.y, lastSoundPos.z);
-			GL11.glCallList(cross);
-			GL11.glPopMatrix();
-		}
+		drawLastBite();
 		
 		GL11.glPopMatrix();
 		
@@ -339,5 +344,30 @@ public final class AutoFishHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	private void drawValidRange(FishingBobberEntity bobber)
+	{
+		GL11.glPushMatrix();
+		GL11.glTranslated(bobber.getX(), bobber.getY(), bobber.getZ());
+		GL11.glCallList(validRangeBox);
+		GL11.glPopMatrix();
+	}
+	
+	private void drawLastBite()
+	{
+		if(lastSoundPos != null)
+		{
+			GL11.glPushMatrix();
+			GL11.glTranslated(lastSoundPos.x, lastSoundPos.y, lastSoundPos.z);
+			GL11.glCallList(biteCross);
+			GL11.glPopMatrix();
+		}
+	}
+	
+	private boolean isInOpenWater(FishingBobberEntity bobber)
+	{
+		return ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
 	}
 }
