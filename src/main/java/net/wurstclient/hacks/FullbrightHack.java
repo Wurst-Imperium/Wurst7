@@ -17,7 +17,9 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"NightVision", "full bright", "brightness", "night vision"})
+@SearchTags({"Fullbrightness", "full brightness", "Fulbrightness",
+	"ful brightness", "NightVision", "night vision", "FullLightness",
+	"FulLightness", "full lightness", "FullGamma", "full gamma"})
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
