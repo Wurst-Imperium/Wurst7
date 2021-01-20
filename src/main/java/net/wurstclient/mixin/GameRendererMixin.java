@@ -28,6 +28,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
+import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
@@ -109,8 +110,11 @@ public abstract class GameRendererMixin
 	private static void onGetNightVisionStrength(LivingEntity livingEntity,
 		float f, CallbackInfoReturnable<Float> cir)
 	{
-		if(WurstClient.INSTANCE.getHax().fullbrightHack.isNightVisionActive())
-			cir.setReturnValue(1F);
+		FullbrightHack fullbright =
+			WurstClient.INSTANCE.getHax().fullbrightHack;
+		
+		if(fullbright.isNightVisionActive())
+			cir.setReturnValue(fullbright.getNightVisionStrength());
 	}
 	
 	@Inject(at = {@At("HEAD")},
