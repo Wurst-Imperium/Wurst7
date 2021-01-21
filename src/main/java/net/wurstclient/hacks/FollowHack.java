@@ -149,6 +149,10 @@ public final class FollowHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		if(entity == null)
 		{
 			Stream<Entity> stream =

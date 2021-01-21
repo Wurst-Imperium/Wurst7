@@ -107,8 +107,12 @@ public final class TunnellerHack extends Hack
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().followHack.setEnabled(false);
+		WURST.getHax().instantBunkerHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		
 		// add listeners
@@ -151,16 +155,13 @@ public final class TunnellerHack extends Hack
 	public void onUpdate()
 	{
 		HackList hax = WURST.getHax();
-		Hack[] incompatibleHax = {hax.autoToolHack, hax.autoWalkHack,
-			hax.blinkHack, hax.flightHack, hax.nukerHack,
-			// TODO:
-			// hax.nukerLegitHack,
-			// hax.speedNukerHack,
-			hax.sneakHack};
+		Hack[] incompatibleHax = {hax.autoSwitchHack, hax.autoToolHack,
+			hax.autoWalkHack, hax.blinkHack, hax.flightHack,
+			hax.scaffoldWalkHack, hax.sneakHack};
 		for(Hack hack : incompatibleHax)
 			hack.setEnabled(false);
 		
-		if(hax.freecamHack.isEnabled())
+		if(hax.freecamHack.isEnabled() || hax.remoteViewHack.isEnabled())
 			return;
 		
 		GameOptions gs = MC.options;
