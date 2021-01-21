@@ -342,7 +342,7 @@ public final class TunnellerHack extends Hack
 			
 			WURST.getHax().autoToolHack.equipBestTool(currentBlock, false, true,
 				false);
-			breakBlockSimple(currentBlock);
+			breakBlock(currentBlock);
 			
 			if(MC.player.abilities.creativeMode
 				|| BlockUtils.getHardness(currentBlock) >= 1)
@@ -447,7 +447,7 @@ public final class TunnellerHack extends Hack
 			{
 				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
 					false);
-				breakBlockSimple(pos);
+				breakBlock(pos);
 			}
 		}
 		
@@ -742,9 +742,8 @@ public final class TunnellerHack extends Hack
 		IMC.setItemUseCooldown(4);
 	}
 	
-	private boolean breakBlockSimple(BlockPos pos)
+	private boolean breakBlock(BlockPos pos)
 	{
-		Direction side = null;
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
@@ -761,37 +760,38 @@ public final class TunnellerHack extends Hack
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
+		double[] distancesSq = new double[sides.length];
+		boolean[] linesOfSight = new boolean[sides.length];
+		
+		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
 		for(int i = 0; i < sides.length; i++)
 		{
-			// check line of sight
-			if(MC.world
-				.raycast(new RaycastContext(eyesPos, hitVecs[i],
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
+			
+			// no need to raytrace the rear sides,
+			// they can't possibly have line of sight
+			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			side = sides[i];
-			break;
+			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
-		if(side == null)
+		Direction side = sides[0];
+		for(int i = 1; i < sides.length; i++)
 		{
-			double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
-			for(int i = 0; i < sides.length; i++)
+			int bestSide = side.ordinal();
+			
+			// prefer sides with LOS
+			if(!linesOfSight[bestSide] && linesOfSight[i])
 			{
-				// check if side is facing towards player
-				if(eyesPos.squaredDistanceTo(hitVecs[i]) >= distanceSqToCenter)
-					continue;
-				
 				side = sides[i];
-				break;
+				continue;
 			}
+			
+			// then pick the closest side
+			if(distancesSq[i] < distancesSq[bestSide])
+				side = sides[i];
 		}
-		
-		if(side == null)
-			throw new RuntimeException(
-				"How could none of the sides be facing towards the player?!");
 		
 		// face block
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
@@ -807,11 +807,41 @@ public final class TunnellerHack extends Hack
 		return true;
 	}
 	
+	private boolean hasLineOfSight(Vec3d from, Vec3d to)
+	{
+		RaycastContext context =
+			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+		
+		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
+	}
+	
 	private enum TunnelSize
 	{
 		SIZE_1X2("1x2", new Vec3i(0, 1, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X3("1x3", new Vec3i(0, 2, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X4("1x4", new Vec3i(0, 3, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X5("1x5", new Vec3i(0, 4, 0), new Vec3i(0, 0, 0), 3, 13),
 		
-		SIZE_3X3("3x3", new Vec3i(1, 2, 0), new Vec3i(-1, 0, 0), 4, 11);
+		SIZE_2X2("2x2", new Vec3i(1, 1, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X3("2x3", new Vec3i(1, 2, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X4("2x4", new Vec3i(1, 3, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X5("2x5", new Vec3i(1, 4, 0), new Vec3i(0, 0, 0), 3, 11),
+		
+		SIZE_3X2("3x2", new Vec3i(1, 1, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X3("3x3", new Vec3i(1, 2, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X4("3x4", new Vec3i(1, 3, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X5("3x5", new Vec3i(1, 4, 0), new Vec3i(-1, 0, 0), 3, 11),
+		
+		SIZE_4X2("4x2", new Vec3i(2, 1, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X3("4x3", new Vec3i(2, 2, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X4("4x4", new Vec3i(2, 3, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X5("4x5", new Vec3i(2, 4, 0), new Vec3i(-1, 0, 0), 3, 9),
+		
+		SIZE_5X2("5x2", new Vec3i(2, 1, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X3("5x3", new Vec3i(2, 2, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X4("5x4", new Vec3i(2, 3, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X5("5x5", new Vec3i(2, 4, 0), new Vec3i(-2, 0, 0), 3, 9);
 		
 		private final String name;
 		private final Vec3i from;
