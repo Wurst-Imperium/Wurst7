@@ -73,7 +73,7 @@ public final class AutoFarmHack extends Hack
 			"Harvests and replants crops automatically.\n"
 				+ "Works with wheat, carrots, potatoes, beetroots,\n"
 				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
-				+ "bamboo and nether warts.");
+				+ "bamboo, nether warts, and cocoa beans.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -281,6 +281,8 @@ public final class AutoFarmHack extends Hack
 		else if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
+		else if(block instanceof CocoaBlock)
+			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;
 	}
