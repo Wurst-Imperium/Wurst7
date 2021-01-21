@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -69,7 +69,7 @@ public abstract class GameRendererMixin
 	
 	@Redirect(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
 		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})

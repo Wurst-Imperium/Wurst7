@@ -53,7 +53,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private boolean overrideReach;
 	
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
 		ordinal = 0)},
 		method = {
 			"updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})

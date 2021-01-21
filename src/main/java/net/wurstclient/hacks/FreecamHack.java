@@ -10,8 +10,8 @@ package net.wurstclient.hacks;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;

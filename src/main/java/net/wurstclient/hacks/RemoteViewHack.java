@@ -287,10 +287,11 @@ public final class RemoteViewHack extends Hack
 		
 		// update position, rotation, etc.
 		MC.player.copyPositionAndRotation(entity);
-		MC.player.resetPosition(entity.getX(),
+		MC.player.setPos(entity.getX(),
 			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
 				+ entity.getEyeHeight(entity.getPose()),
 			entity.getZ());
+		MC.player.resetPosition();
 		MC.player.setVelocity(Vec3d.ZERO);
 		
 		// set entity invisible

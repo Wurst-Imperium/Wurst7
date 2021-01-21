@@ -10,7 +10,7 @@ package net.wurstclient.ai;
 import java.util.ArrayList;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;

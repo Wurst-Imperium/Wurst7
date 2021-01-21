@@ -240,7 +240,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WURST.getHax().autoSwordHack.setSlot();
 		
 		// teleport
-		player.updatePosition(entity.getX() + random.nextInt(3) * 2 - 2,
+		player.setPosition(entity.getX() + random.nextInt(3) * 2 - 2,
 			entity.getY(), entity.getZ() + random.nextInt(3) * 2 - 2);
 		
 		// check cooldown
