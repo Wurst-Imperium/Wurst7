@@ -24,6 +24,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.BlockSetting;
@@ -36,6 +37,7 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"speed nuker", "FastNuker", "fast nuker"})
+@DontSaveState
 public final class SpeedNukerHack extends Hack
 	implements LeftClickListener, UpdateListener
 {
