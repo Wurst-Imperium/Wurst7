@@ -79,6 +79,9 @@ public final class TunnellerHack extends Hack
 	private float progress;
 	private float prevProgress;
 	
+	private BlockPos lastTorch;
+	private BlockPos nextTorch;
+	
 	public TunnellerHack()
 	{
 		super("Tunneller", "Automatically digs a tunnel.\n\n"
@@ -126,6 +129,8 @@ public final class TunnellerHack extends Hack
 		start = new BlockPos(player.getPos());
 		direction = player.getHorizontalFacing();
 		length = 0;
+		lastTorch = null;
+		nextTorch = start;
 		
 		tasks = new Task[]{new DodgeLiquidTask(), new FillInFloorTask(),
 			new PlaceTorchTask(), new DigTunnelTask(), new WalkForwardTask()};
@@ -317,6 +322,10 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : blocks)
 			{
 				if(!BlockUtils.canBeClicked(pos))
+					continue;
+				
+				if((pos.equals(nextTorch) || pos.equals(lastTorch))
+					&& BlockUtils.getBlock(pos) instanceof TorchBlock)
 					continue;
 				
 				currentBlock = pos;
@@ -597,9 +606,6 @@ public final class TunnellerHack extends Hack
 	
 	private class PlaceTorchTask extends Task
 	{
-		private BlockPos lastTorch;
-		private BlockPos nextTorch = start;
-		
 		@Override
 		public boolean canRun()
 		{
@@ -612,6 +618,9 @@ public final class TunnellerHack extends Hack
 				return false;
 			}
 			
+			if(BlockUtils.getBlock(nextTorch) instanceof TorchBlock)
+				lastTorch = nextTorch;
+			
 			if(lastTorch != null)
 				nextTorch = lastTorch.offset(direction,
 					size.getSelected().torchDistance);
@@ -622,12 +631,15 @@ public final class TunnellerHack extends Hack
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			
-			BlockPos base = start.offset(direction, length);
-			if(getDistance(start, base) <= getDistance(start, nextTorch))
+			BlockPos player = new BlockPos(MC.player.getPos());
+			if(getDistance(player, nextTorch) > 4)
 				return false;
 			
-			return Blocks.TORCH.canPlaceAt(BlockUtils.getState(nextTorch),
-				MC.world, nextTorch);
+			BlockState state = BlockUtils.getState(nextTorch);
+			if(!state.getMaterial().isReplaceable())
+				return false;
+			
+			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
 		}
 		
 		@Override
@@ -642,9 +654,6 @@ public final class TunnellerHack extends Hack
 			
 			MC.options.keySneak.setPressed(true);
 			placeBlockSimple(nextTorch);
-			
-			if(BlockUtils.getBlock(nextTorch) instanceof TorchBlock)
-				lastTorch = nextTorch;
 		}
 		
 		private boolean equipTorch()
