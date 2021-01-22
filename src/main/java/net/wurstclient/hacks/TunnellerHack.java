@@ -273,7 +273,7 @@ public final class TunnellerHack extends Hack
 	
 	private class DigTunnelTask extends Task
 	{
-		private int requiredDistance;
+		private int maxDistance;
 		
 		@Override
 		public boolean canRun()
@@ -283,11 +283,11 @@ public final class TunnellerHack extends Hack
 			int distance = getDistance(player, base);
 			
 			if(distance <= 1)
-				requiredDistance = size.getSelected().maxRange;
+				maxDistance = size.getSelected().maxRange;
 			else if(distance > size.getSelected().maxRange)
-				requiredDistance = 1;
+				maxDistance = 1;
 			
-			return distance <= requiredDistance;
+			return distance <= maxDistance;
 		}
 		
 		@Override
