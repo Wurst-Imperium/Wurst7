@@ -350,14 +350,6 @@ public final class TunnellerHack extends Hack
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			GL11.glColor4f(0, 1, 0, 0.5F);
-			for(BlockPos pos : blocks)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
-			GL11.glEndList();
 			
 			currentBlock = null;
 			for(BlockPos pos : blocks)
@@ -369,9 +361,16 @@ public final class TunnellerHack extends Hack
 					&& BlockUtils.getBlock(pos) instanceof TorchBlock)
 					continue;
 				
-				currentBlock = pos;
-				break;
+				if(currentBlock == null)
+					currentBlock = pos;
+				
+				GL11.glPushMatrix();
+				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+				RenderUtils.drawOutlinedBox(box);
+				GL11.glPopMatrix();
 			}
+			
+			GL11.glEndList();
 			
 			if(currentBlock == null)
 			{
