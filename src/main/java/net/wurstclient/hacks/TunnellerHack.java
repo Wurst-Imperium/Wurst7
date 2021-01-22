@@ -8,9 +8,9 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,6 +22,7 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -133,7 +134,8 @@ public final class TunnellerHack extends Hack
 		nextTorch = start;
 		
 		tasks = new Task[]{new DodgeLiquidTask(), new FillInFloorTask(),
-			new PlaceTorchTask(), new DigTunnelTask(), new WalkForwardTask()};
+			new PlaceTorchTask(), new WaitForFallingBlocksTask(),
+			new DigTunnelTask(), new WalkForwardTask()};
 		
 		updateCyanList();
 	}
@@ -269,6 +271,45 @@ public final class TunnellerHack extends Hack
 			+ Math.abs(pos1.getZ() - pos2.getZ());
 	}
 	
+	/**
+	 * Returns all block positions in the given box, in the order that Tunneller
+	 * should mine them (left to right, top to bottom, front to back).
+	 */
+	public ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)
+	{
+		ArrayList<BlockPos> blocks = new ArrayList<>();
+		
+		Direction front = direction;
+		Direction left = front.rotateYCounterclockwise();
+		
+		int fromFront =
+			from.getX() * front.getOffsetX() + from.getZ() * front.getOffsetZ();
+		int toFront =
+			to.getX() * front.getOffsetX() + to.getZ() * front.getOffsetZ();
+		int fromLeft =
+			from.getX() * left.getOffsetX() + from.getZ() * left.getOffsetZ();
+		int toLeft =
+			to.getX() * left.getOffsetX() + to.getZ() * left.getOffsetZ();
+		
+		int minFront = Math.min(fromFront, toFront);
+		int maxFront = Math.max(fromFront, toFront);
+		int minY = Math.min(from.getY(), to.getY());
+		int maxY = Math.max(from.getY(), to.getY());
+		int minLeft = Math.min(fromLeft, toLeft);
+		int maxLeft = Math.max(fromLeft, toLeft);
+		
+		for(int f = minFront; f <= maxFront; f++)
+			for(int y = maxY; y >= minY; y--)
+				for(int l = maxLeft; l >= minLeft; l--)
+				{
+					int x = f * front.getOffsetX() + l * left.getOffsetX();
+					int z = f * front.getOffsetZ() + l * left.getOffsetZ();
+					blocks.add(new BlockPos(x, y, z));
+				}
+			
+		return blocks;
+	}
+	
 	private static abstract class Task
 	{
 		public abstract boolean canRun();
@@ -298,13 +339,13 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
-			BlockPos from = offset(base, size.getSelected().from);
+			BlockPos from = offset(player, size.getSelected().from);
 			BlockPos to = offset(base, size.getSelected().to);
 			
 			ArrayList<BlockPos> blocks = new ArrayList<>();
-			BlockUtils.getAllInBox(from, to).forEach(blocks::add);
-			Collections.reverse(blocks);
+			getAllInBox(from, to).forEach(blocks::add);
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
@@ -675,6 +716,25 @@ public final class TunnellerHack extends Hack
 			}
 			
 			return false;
+		}
+	}
+	
+	private class WaitForFallingBlocksTask extends Task
+	{
+		@Override
+		public boolean canRun()
+		{
+			// check for nearby falling blocks
+			return StreamSupport
+				.stream(MC.world.getEntities().spliterator(), false)
+				.filter(e -> e instanceof FallingBlockEntity)
+				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
+		}
+		
+		@Override
+		public void run()
+		{
+			// just wait for them to land
 		}
 	}
 	
