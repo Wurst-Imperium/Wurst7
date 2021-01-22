@@ -20,13 +20,13 @@ public final class SpamCmd extends Command {
 	public SpamCmd() {
 		super("spam",
 				"Spams the given chat message while adding randomized charachters."
-						+ "Use the Pipe Symbol (|) to represent spaces in the argument <message>."
 						+ "<length> represents the times <message> is to be spammed."
 						+ "<delay> represents the time between <message> sending in milliseconds."
-						+ "<message> represents the message you want to send."
+						+ "<replace> represents the amount of characters replaced in <message>. Format as a percentage with 2 numbers."
+						+ "<message> represents the message you want to send. <message> can have spaces in it."
 						+ "The following charachters are mapped for replacement:"
 						+ "ÃΒÇÐËfĜĤÌĴĶĹmŃÔpqŘŚŢÙΛŴ×ÝŽäΒçđêFğĥïĵķĺMńöPQŕŚ†üνŵXỳž",
-				".spam <length> <delay> <message>");
+				".spam <length> <delay> <replace> <message>");
 	}
 
 	static Map<String, String> map = new HashMap<String, String>();
@@ -96,13 +96,26 @@ public final class SpamCmd extends Command {
 
 		// Warning for less than 3 arguments
 
-		if (args.length < 3)
-			throw new CmdSyntaxError("There should be 3 Arguments - Do .help spam for more info");
+		if (args.length < 4)
+			throw new CmdSyntaxError("There should be 4 Arguments - Do .help spam for more info");
 
 		// Warning for more than 3 arguments
-
-		if (args.length > 3)
-			throw new CmdSyntaxError("Use the Pipe Symbol (|) to represent spaces - Do .help spam for more info");
+		
+		String toChange1 = "";
+		
+		// Convert all arguments after the first 3 arguments into 1 string for conversion.
+		
+		if (args.length > 3) {
+			StringBuilder message = new StringBuilder();
+			
+			// Combine all arguments after i (3)
+			
+			for (int i = 3; i < args.length; i++) {
+				message.append(" ").append(args[i]);
+			}
+			
+			toChange1 = message.toString();
+		}
 
 		// Warning for incorrect input of Length
 
@@ -113,23 +126,41 @@ public final class SpamCmd extends Command {
 
 		if (!isInteger(args[1]))
 			throw new CmdSyntaxError("Second Argument is Delay - Should be an Intiger");
-
+		
+		// Remove percent sign from chanceInputString1.
+		
+		String chanceInputString1 = args[2];
+		
+		if (chanceInputString1.contains("%")) {
+			chanceInputString1 = chanceInputString1.replace("%", "");
+		}
+		
+		if (!(chanceInputString1.length() == 2))
+			throw new CmdSyntaxError("Use two numbers to represent your Chance - 00 to 99 Supported.");
+		// Warning for incorrect input of Chance
+		
+		if (!isInteger(chanceInputString1))
+			throw new CmdSyntaxError("Third Argument is Chance - Should be an Intiger");
+		
+		// Convert chanceInputString1 to chanceInputString if requirements met.
+		
+		String chanceInputString = chanceInputString1;
+		
+		// Make ChanceInputString into an int
+		
+		int chanceInput = Integer.parseInt(chanceInputString);
+		
+		// Make compatible with Math.Random()
+		
+		double chance = ((double) chanceInput) / 100;
+		
 		// Apply repeatLength and repeatDelay from args input
 
 		int repeatLenght = Integer.parseInt(args[0]);
 		int repeatDelay = Integer.parseInt(args[1]);
-		String toChange1 = args[2];
-		String toChange2 = "";
-
-		// Replace pipe symbol (|) to space symbol ( )
-
-		if (toChange1.contains("|")) {
-			toChange2 = toChange1.replace("|", " ");
-		} else {
-			toChange2 = toChange1;
-		}
-		String toChange = toChange2;
-
+		
+		final String toChange = toChange1;
+		
 		// Starts the program in a new tread
 
 		Thread thread = new Thread() {
@@ -151,7 +182,7 @@ public final class SpamCmd extends Command {
 						// Gets a random value and checks if it is below a probability to get a %
 						// chance.
 
-						if ((Math.random() < 0.5)) {
+						if ((Math.random() < chance)) {
 
 							// Set string temp to string temp after a character has gone through the
 							// function findMapping()
