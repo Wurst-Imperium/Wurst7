@@ -297,6 +297,7 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
 		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
+		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
 		
 		plants.putAll(blocks.parallelStream()
 			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
