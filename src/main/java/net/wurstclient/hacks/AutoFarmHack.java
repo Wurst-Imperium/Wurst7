@@ -316,12 +316,12 @@ public final class AutoFarmHack extends Hack
 		
 		if(item == Items.NETHER_WART)
 			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
-
+		
 		if(item == Items.COCOA_BEANS)
-			return (BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG)
-				|| (BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG)
-				|| (BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG)
-				|| (BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG);
+			return BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG;
 		
 		return false;
 	}
