@@ -73,7 +73,7 @@ public final class AutoFarmHack extends Hack
 			"Harvests and replants crops automatically.\n"
 				+ "Works with wheat, carrots, potatoes, beetroots,\n"
 				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
-				+ "bamboo and nether warts.");
+				+ "bamboo, nether warts, and cocoa beans.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -281,6 +281,8 @@ public final class AutoFarmHack extends Hack
 		else if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
+		else if(block instanceof CocoaBlock)
+			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;
 	}
@@ -295,6 +297,7 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
 		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
+		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
 		
 		plants.putAll(blocks.parallelStream()
 			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
@@ -313,6 +316,12 @@ public final class AutoFarmHack extends Hack
 		
 		if(item == Items.NETHER_WART)
 			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
+		
+		if(item == Items.COCOA_BEANS)
+			return BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG;
 		
 		return false;
 	}
