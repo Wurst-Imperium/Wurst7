@@ -9,8 +9,6 @@ package net.wurstclient.hacks;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -70,11 +68,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 	{
 		if(jumpTimer > 0)
 			jumpTimer--;
-		
-		ItemStack chest = MC.player.getEquippedStack(EquipmentSlot.CHEST);
-		if(chest.getItem() != Items.ELYTRA)
-			return;
-		
+
 		if(MC.player.isFallFlying())
 		{
 			if(stopInWater.isChecked() && MC.player.isTouchingWater())
@@ -88,7 +82,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(ElytraItem.isUsable(chest) && MC.options.keyJump.isPressed())
+		if(ElytraItem.isUsable(MC.player.getEquippedStack(EquipmentSlot.CHEST)) && MC.options.keyJump.isPressed())
 			doInstantFly();
 	}
 	
