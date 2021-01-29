@@ -89,6 +89,28 @@ public final class SpamCmd extends Command {
 		map.put("x", "X");
 		map.put("y", "ỳ");
 		map.put("z", "ž");
+		
+		// Number Mapping
+		
+		map.put("1", "¹");
+		map.put("2", "²");
+		map.put("3", "³");
+		map.put("4", "⁴");
+		map.put("5", "⁵");
+		map.put("6", "⁶");
+		map.put("7", "⁷");
+		map.put("8", "⁸");
+		map.put("9", "⁹");
+		map.put("0", "⁰");
+		
+		// Symbol Mapping
+		
+		map.put("?", "¿");
+		map.put("!", "¡");
+		map.put("&", "⅋");
+		map.put(".", "˙");
+		
+		// Going To Add More Later
 	}
 
 	@Override
