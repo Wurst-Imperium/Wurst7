@@ -33,11 +33,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
 {
 	private final CheckboxSetting legitMode = new CheckboxSetting("Legit mode",
-			"Only reveals blocks that can be legitimately seen,\n"
-			        + "where at least one side is next to a non-solid block.\n\n"
-					+ "Can be used to bypass anti-xray plugins like Orebfuscator\n"
-					+ "which replace fully concealed blocks with random ores.",
-			false);
+		"Only reveals blocks that can be legitimately seen,\n"
+				+ "where at least one side is next to a non-solid block.\n\n"
+				+ "Can be used to bypass anti-xray plugins like Orebfuscator\n"
+				+ "which replace fully concealed blocks with random ores.",
+		false);
 
 	private final BlockListSetting ores = new BlockListSetting("Ores", "",
 		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
