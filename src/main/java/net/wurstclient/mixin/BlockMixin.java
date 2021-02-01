@@ -33,7 +33,7 @@ public abstract class BlockMixin implements ItemConvertible
 	private static void onShouldDrawSide(BlockState state, BlockView blockView,
 		BlockPos blockPos, Direction side, CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, blockPos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

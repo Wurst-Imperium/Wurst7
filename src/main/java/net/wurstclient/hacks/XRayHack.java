@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
@@ -23,6 +24,7 @@ import net.wurstclient.events.TesselateBlockListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
@@ -30,6 +32,13 @@ public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
 {
+	private final CheckboxSetting legitMode = new CheckboxSetting("Legit mode",
+			"Only reveals blocks that can be legitimately seen,\n"
+			        + "where at least one side is next to a non-solid block.\n\n"
+					+ "Can be used to bypass anti-xray plugins like Orebfuscator\n"
+					+ "which replace fully concealed blocks with random ores.",
+			false);
+
 	private final BlockListSetting ores = new BlockListSetting("Ores", "",
 		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
 		"minecraft:bone_block", "minecraft:bookshelf",
@@ -58,13 +67,14 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		super("X-Ray", "Allows you to see ores through walls.");
 		setCategory(Category.RENDER);
+		addSetting(legitMode);
 		addSetting(ores);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		return "X-Wurst";
+		return "X-Wurst" + (legitMode.isChecked() ? " Legit" : "");
 	}
 	
 	@Override
@@ -118,20 +128,20 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(isVisible(event.getState().getBlock()));
+		event.setRendered(isVisible(event.getState().getBlock(), event.getPos()));
 	}
 	
 	@Override
 	public void onTesselateBlock(TesselateBlockEvent event)
 	{
-		if(!isVisible(event.getState().getBlock()))
+		if(!isVisible(event.getState().getBlock(), event.getPos()))
 			event.cancel();
 	}
 	
 	@Override
 	public void onRenderBlockEntity(RenderBlockEntityEvent event)
 	{
-		if(!isVisible(BlockUtils.getBlock(event.getBlockEntity().getPos())))
+		if(!isVisible(BlockUtils.getBlock(event.getBlockEntity().getPos()), event.getBlockEntity().getPos()))
 			event.cancel();
 	}
 	
@@ -139,9 +149,22 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		MC.openScreen(new EditBlockListScreen(prevScreen, ores));
 	}
-	
-	private boolean isVisible(Block block)
+
+	private boolean isOpaque(BlockPos pos)
 	{
+		return BlockUtils.getState(pos).isOpaque();
+	}
+
+	private boolean isFullyConcealed(BlockPos pos)
+	{
+		return isOpaque(pos.up()) && isOpaque(pos.down()) && isOpaque(pos.north()) && isOpaque(pos.south()) && isOpaque(pos.east()) && isOpaque(pos.west());
+	}
+
+	private boolean isVisible(Block block, BlockPos pos)
+	{
+		if (legitMode.isChecked() && isFullyConcealed(pos))
+			return false;
+
 		String name = BlockUtils.getName(block);
 		int index = Collections.binarySearch(oreNames, name);
 		return index >= 0;

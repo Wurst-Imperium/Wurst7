@@ -40,7 +40,7 @@ public abstract class BlockModelRendererMixin
 		boolean depthTest, Random random_1, long long_1, int int_1,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
+		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1, blockPos_1);
 		EventManager.fire(event);
 		
 		if(event.isCancelled())
@@ -52,7 +52,7 @@ public abstract class BlockModelRendererMixin
 		if(!depthTest)
 			return;
 		
-		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState_1);
+		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState_1, blockPos_1);
 		EventManager.fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;

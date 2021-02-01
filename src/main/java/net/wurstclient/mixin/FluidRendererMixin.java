@@ -32,7 +32,7 @@ public class FluidRendererMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		BlockState state = blockView_1.getBlockState(blockPos_1);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, blockPos_1);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
