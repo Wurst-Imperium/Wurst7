@@ -1,7 +1,10 @@
+
 /*
  * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
- * This is test code by Andrew Popov and is not official.
- * Code is still being writen and is prone to bugs.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.commands;
 
@@ -24,8 +27,6 @@ public final class SpamCmd extends Command {
 						+ "<delay> represents the time between <message> sending in milliseconds."
 						+ "<replace> represents the amount of characters replaced in <message>. Format as a percentage with 2 numbers."
 						+ "<message> represents the message you want to send. <message> can have spaces in it."
-						+ "The following charachters are mapped for replacement:"
-						+ "ÃΒÇÐËfĜĤÌĴĶĹmŃÔpqŘŚŢÙΛŴ×ÝŽäΒçđêFğĥïĵķĺMńöPQŕŚ†üνŵXỳž",
 				".spam <length> <delay> <replace> <message>");
 	}
 
