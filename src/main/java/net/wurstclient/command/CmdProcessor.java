@@ -20,6 +20,16 @@ import net.wurstclient.util.ChatUtils;
 public final class CmdProcessor implements ChatOutputListener
 {
 	private final CmdList cmds;
+
+	private static String prefix = ".";
+
+	public static void setPrefix(String newPrefix){
+		prefix = newPrefix;
+	}
+
+	public static String getPrefix(){
+		return prefix;
+	}
 	
 	public CmdProcessor(CmdList cmds)
 	{
@@ -33,11 +43,11 @@ public final class CmdProcessor implements ChatOutputListener
 			return;
 		
 		String message = event.getOriginalMessage().trim();
-		if(!message.startsWith("."))
+		if(!message.startsWith(prefix))
 			return;
 		
 		event.cancel();
-		process(message.substring(1));
+		process(message.substring(prefix.length()));
 	}
 	
 	public void process(String input)
