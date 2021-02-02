@@ -8,7 +8,6 @@
 
 package net.wurstclient.commands;
 
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdProcessor;
