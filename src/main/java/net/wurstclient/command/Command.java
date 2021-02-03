@@ -36,7 +36,7 @@ public abstract class Command extends Feature
 	@Override
 	public String getName()
 	{
-		return "." + name;
+		return CmdProcessor.getPrefix() + name;
 	}
 	
 	@Override
