@@ -8,6 +8,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 
@@ -15,7 +16,7 @@ public final class GmCmd extends Command
 {
 	public GmCmd()
 	{
-		super("gm", "Shortcut for /gamemode.", ".gm <gamemode>");
+		super("gm", "Shortcut for /gamemode.", CmdProcessor.getPrefix() + "gm <gamemode>");
 	}
 	
 	@Override

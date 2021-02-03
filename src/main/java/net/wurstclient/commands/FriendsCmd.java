@@ -9,10 +9,7 @@ package net.wurstclient.commands;
 
 import java.util.ArrayList;
 
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
@@ -28,9 +25,9 @@ public class FriendsCmd extends Command
 	
 	public FriendsCmd()
 	{
-		super("friends", "Manages your friends list.", ".friends add <name>",
-			".friends remove <name>", ".friends remove-all",
-			".friends list [<page>]");
+		super("friends", "Manages your friends list.",  CmdProcessor.getPrefix() + "friends add <name>",
+				CmdProcessor.getPrefix() + "friends remove <name>", CmdProcessor.getPrefix() + "friends remove-all",
+				CmdProcessor.getPrefix() + "friends list [<page>]");
 		
 		addSetting(middleClickFriends);
 	}

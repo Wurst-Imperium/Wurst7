@@ -13,10 +13,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import net.wurstclient.DontBlock;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
@@ -27,9 +24,9 @@ public final class EnabledHaxCmd extends Command
 	public EnabledHaxCmd()
 	{
 		super("enabledhax", "Allows you to make profiles of enabled hacks.",
-			".enabledhax load-profile <file>",
-			".enabledhax save-profile <file>",
-			".enabledhax list-profiles [<page>]",
+				CmdProcessor.getPrefix() + "enabledhax load-profile <file>",
+				CmdProcessor.getPrefix() + "enabledhax save-profile <file>",
+				CmdProcessor.getPrefix() + "enabledhax list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/enabled hacks'.");
 	}
 	

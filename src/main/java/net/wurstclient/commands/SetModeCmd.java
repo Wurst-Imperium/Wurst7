@@ -11,10 +11,7 @@ import java.util.stream.Stream;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;
 
@@ -26,8 +23,8 @@ public final class SetModeCmd extends Command
 		super("setmode",
 			"Changes a mode setting of a feature. Allows you to\n"
 				+ "switch modes through keybinds.",
-			".setmode <feature> <setting> <mode>",
-			".setmode <feature> <setting> (prev|next)");
+				CmdProcessor.getPrefix() + "setmode <feature> <setting> <mode>",
+				CmdProcessor.getPrefix() + "setmode <feature> <setting> (prev|next)");
 	}
 	
 	@Override

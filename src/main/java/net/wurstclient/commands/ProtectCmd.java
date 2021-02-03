@@ -12,10 +12,7 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.hacks.ProtectHack;
 import net.wurstclient.util.FakePlayerEntity;
 
@@ -24,7 +21,7 @@ public final class ProtectCmd extends Command
 	public ProtectCmd()
 	{
 		super("protect", "Protects the given entity from other entities.",
-			".protect <entity>");
+				CmdProcessor.getPrefix() + "protect <entity>");
 	}
 	
 	@Override

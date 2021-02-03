@@ -10,10 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 public final class RepairCmd extends Command
@@ -21,7 +18,7 @@ public final class RepairCmd extends Command
 	public RepairCmd()
 	{
 		super("repair", "Repairs the held item. Requires creative mode.",
-			".repair");
+				CmdProcessor.getPrefix() + "repair");
 	}
 	
 	@Override

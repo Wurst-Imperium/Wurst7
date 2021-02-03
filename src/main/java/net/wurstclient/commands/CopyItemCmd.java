@@ -10,10 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 public final class CopyItemCmd extends Command
@@ -23,7 +20,7 @@ public final class CopyItemCmd extends Command
 		super("copyitem",
 			"Allows you to copy items that other people are holding\n"
 				+ "or wearing. Requires creative mode.",
-			".copyitem <player> <slot>",
+				CmdProcessor.getPrefix() + "copyitem <player> <slot>",
 			"Valid slots: hand, head, chest, legs, feet");
 	}
 	

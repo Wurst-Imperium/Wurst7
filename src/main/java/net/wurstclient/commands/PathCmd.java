@@ -15,10 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathPos;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.settings.CheckboxSetting;
@@ -45,8 +42,8 @@ public final class PathCmd extends Command
 		super("path",
 			"Shows the shortest path to a specific point.\n"
 				+ "Useful for labyrinths and caves.",
-			".path <x> <y> <z>", ".path <entity>", ".path -debug",
-			".path -depth", ".path -refresh", "Turn off: .path");
+				CmdProcessor.getPrefix() + "path <x> <y> <z>", ".path <entity>", ".path -debug",
+				CmdProcessor.getPrefix() + "path -depth", CmdProcessor.getPrefix() + "path -refresh", "Turn off: " + CmdProcessor.getPrefix() + "path");
 		
 		addSetting(debugMode);
 		addSetting(depthTest);

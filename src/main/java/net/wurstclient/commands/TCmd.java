@@ -8,10 +8,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.DontBlock;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.util.ChatUtils;
@@ -21,8 +18,8 @@ public final class TCmd extends Command
 {
 	public TCmd()
 	{
-		super("t", "Toggles a hack.", ".t <hack> [on|off]", "Examples:",
-			"Toggle Nuker: .t Nuker", "Disable Nuker: .t Nuker off");
+		super("t", "Toggles a hack.", CmdProcessor.getPrefix() + "t <hack> [on|off]", "Examples:",
+			"Toggle Nuker: " + CmdProcessor.getPrefix() + "t Nuker", "Disable Nuker: " + CmdProcessor.getPrefix() + "t Nuker off");
 	}
 	
 	@Override

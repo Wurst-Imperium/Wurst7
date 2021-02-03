@@ -12,6 +12,7 @@ import net.minecraft.util.ChatUtil;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
@@ -20,8 +21,8 @@ public final class AddAltCmd extends Command
 {
 	public AddAltCmd()
 	{
-		super("addalt", "Adds a player to your alt list.", ".addalt <player>",
-			"Add all players on the server: .addalt all");
+		super("addalt", "Adds a player to your alt list.", CmdProcessor.getPrefix() + "addalt <player>",
+			"Add all players on the server: " + CmdProcessor.getPrefix() + "addalt all");
 	}
 	
 	@Override

@@ -7,18 +7,15 @@
  */
 package net.wurstclient.commands;
 
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.hacks.BlinkHack;
 
 public final class BlinkCmd extends Command
 {
 	public BlinkCmd()
 	{
-		super("blink", "Enables, disables or cancels Blink.", ".blink [on|off]",
-			".blink cancel");
+		super("blink", "Enables, disables or cancels Blink.", CmdProcessor.getPrefix() + "blink [on|off]",
+				CmdProcessor.getPrefix() + "blink cancel");
 	}
 	
 	@Override

@@ -9,10 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.MathUtils;
 
 public final class DamageCmd extends Command
@@ -20,8 +17,8 @@ public final class DamageCmd extends Command
 	public DamageCmd()
 	{
 		super("damage", "Applies the given amount of damage.",
-			".damage <amount>", "Note: The amount is in half-hearts.",
-			"Example: .damage 7 (applies 3.5 hearts)",
+				CmdProcessor.getPrefix() + "damage <amount>", "Note: The amount is in half-hearts.",
+			"Example: " + CmdProcessor.getPrefix() + "damage 7 (applies 3.5 hearts)",
 			"To apply more damage, run the command multiple times.");
 	}
 	

@@ -16,10 +16,7 @@ import java.util.List;
 
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.DontBlock;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.util.ChatUtils;
@@ -32,11 +29,11 @@ public final class BindsCmd extends Command
 	public BindsCmd()
 	{
 		super("binds", "Allows you to manage keybinds through the chat.",
-			".binds add <key> <hacks>", ".binds add <key> <commands>",
-			".binds remove <key>", ".binds list [<page>]",
-			".binds load-profile <file>", ".binds save-profile <file>",
-			".binds list-profiles [<page>]", ".binds remove-all",
-			".binds reset", "Multiple hacks/commands must be separated by ';'.",
+				CmdProcessor.getPrefix() + "binds add <key> <hacks>", CmdProcessor.getPrefix() + "binds add <key> <commands>",
+				CmdProcessor.getPrefix() + "binds remove <key>", CmdProcessor.getPrefix() + "binds list [<page>]",
+				CmdProcessor.getPrefix() + "binds load-profile <file>", CmdProcessor.getPrefix() + "binds save-profile <file>",
+				CmdProcessor.getPrefix() + "binds list-profiles [<page>]", CmdProcessor.getPrefix() + "binds remove-all",
+				CmdProcessor.getPrefix() + "binds reset", "Multiple hacks/commands must be separated by ';'.",
 			"Profiles are saved in '.minecraft/wurst/keybinds'.");
 	}
 	

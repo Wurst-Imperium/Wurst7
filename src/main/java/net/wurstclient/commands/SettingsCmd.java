@@ -13,10 +13,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import net.wurstclient.DontBlock;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
@@ -27,8 +24,8 @@ public final class SettingsCmd extends Command
 	public SettingsCmd()
 	{
 		super("settings", "Allows you to make profiles of your settings.",
-			".settings load-profile <file>", ".settings save-profile <file>",
-			".settings list-profiles [<page>]",
+				CmdProcessor.getPrefix() + "settings load-profile <file>", CmdProcessor.getPrefix() + "settings save-profile <file>",
+				CmdProcessor.getPrefix() + "settings list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/settings'.");
 	}
 	

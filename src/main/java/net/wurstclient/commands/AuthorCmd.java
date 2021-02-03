@@ -11,17 +11,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.StringTag;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 
 public final class AuthorCmd extends Command
 {
 	public AuthorCmd()
 	{
 		super("author", "Changes the author of a written book.\n"
-			+ "Requires creative mode.", ".author <author>");
+			+ "Requires creative mode.", CmdProcessor.getPrefix() + "author <author>");
 	}
 	
 	@Override

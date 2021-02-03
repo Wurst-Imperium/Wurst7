@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.MathUtils;
@@ -19,7 +20,7 @@ public final class ExcavateCmd extends Command
 	{
 		super("excavate",
 			"Automatically destroys all blocks in the selected area.",
-			".excavate <x1> <y1> <z1> <x2> <y2> <z2>");
+				CmdProcessor.getPrefix() + "excavate <x1> <y1> <z1> <x2> <y2> <z2>");
 	}
 	
 	@Override

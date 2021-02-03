@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
@@ -17,8 +18,8 @@ public final class GetPosCmd extends Command
 {
 	public GetPosCmd()
 	{
-		super("getpos", "Shows your current position.", ".getpos",
-			"Copy to clipboard: .getpos copy");
+		super("getpos", "Shows your current position.", CmdProcessor.getPrefix() + "getpos",
+			"Copy to clipboard: " + CmdProcessor.getPrefix() + "getpos copy");
 	}
 	
 	@Override

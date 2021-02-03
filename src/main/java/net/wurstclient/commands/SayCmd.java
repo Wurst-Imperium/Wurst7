@@ -10,6 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 
@@ -19,8 +20,8 @@ public final class SayCmd extends Command
 	public SayCmd()
 	{
 		super("say",
-			"Sends the given chat message, even if it starts with a\n" + "dot.",
-			".say <message>");
+			"Sends the given chat message, even if it starts with a\n" + "\"" + CmdProcessor.getPrefix() + "\"",
+				CmdProcessor.getPrefix() + "say <message>");
 	}
 	
 	@Override

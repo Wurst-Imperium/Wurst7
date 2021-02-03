@@ -11,10 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.wurstclient.SearchTags;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"view nbt", "NBTViewer", "nbt viewer"})
@@ -22,8 +19,8 @@ public final class ViewNbtCmd extends Command
 {
 	public ViewNbtCmd()
 	{
-		super("viewnbt", "Shows you the NBT data of an item.", ".viewnbt",
-			"Copy to clipboard: .viewnbt copy");
+		super("viewnbt", "Shows you the NBT data of an item.", CmdProcessor.getPrefix() + "viewnbt",
+			"Copy to clipboard: " + CmdProcessor.getPrefix() + "viewnbt copy");
 	}
 	
 	@Override
