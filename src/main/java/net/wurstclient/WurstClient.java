@@ -268,7 +268,7 @@ public enum WurstClient
 		if(hack != null)
 			return hack;
 		
-		Command cmd = getCmds().getCmdByName(name.substring(1));
+		Command cmd = getCmds().getCmdByName(name.substring(CmdProcessor.getPrefix().length()));
 		if(cmd != null)
 			return cmd;
 		
