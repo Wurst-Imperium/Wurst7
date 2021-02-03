@@ -31,7 +31,12 @@ public final class PrefixCmd extends Command
         if(args.length != 1)
             throw new CmdSyntaxError();
 
-        CmdProcessor.setPrefix(args[0]);
+        if(!args[0].equals("/")){
+            CmdProcessor.setPrefix(args[0]);
+        }
+        else {
+            throw new CmdSyntaxError("Can't use \"/\" because it's the main command prefix of minecraft");
+        }
 
         ChatUtils.message("New prefix is " + "\"" + args[0] + "\"");
     }
