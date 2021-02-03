@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
@@ -64,14 +65,14 @@ public final class HelpCmd extends Command
 	
 	private void help(String cmdName) throws CmdException
 	{
-		if(cmdName.startsWith("."))
+		if(cmdName.startsWith(CmdProcessor.getPrefix()))
 			cmdName = cmdName.substring(1);
 		
 		Command cmd = WURST.getCmds().getCmdByName(cmdName);
 		if(cmd == null)
-			throw new CmdSyntaxError("Unknown command: ." + cmdName);
+			throw new CmdSyntaxError("Unknown command: " + CmdProcessor.getPrefix() + cmdName);
 		
-		ChatUtils.message("Available help for ." + cmdName + ":");
+		ChatUtils.message("Available help for " + CmdProcessor.getPrefix() + cmdName + ":");
 		cmd.printHelp();
 	}
 }
