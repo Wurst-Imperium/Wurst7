@@ -34,9 +34,9 @@ public abstract class Command extends Feature
 	public abstract void call(String[] args) throws CmdException;
 	
 	@Override
-	public final String getName()
+	public String getName()
 	{
-		return CmdProcessor.getPrefix() + name;
+		return "." + name;
 	}
 	
 	@Override

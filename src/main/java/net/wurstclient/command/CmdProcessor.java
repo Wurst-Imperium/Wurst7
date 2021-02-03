@@ -7,6 +7,7 @@
  */
 package net.wurstclient.command;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import net.minecraft.util.crash.CrashException;
@@ -21,10 +22,11 @@ public final class CmdProcessor implements ChatOutputListener
 {
 	private final CmdList cmds;
 
-	private static String prefix = ".";
+	private static String prefix = CmdProcessorFile.readPrefix();
 
-	public static void setPrefix(String newPrefix){
+	public static void setPrefix(String newPrefix) {
 		prefix = newPrefix;
+		CmdProcessorFile.writePrefix(prefix);
 	}
 
 	public static String getPrefix(){
