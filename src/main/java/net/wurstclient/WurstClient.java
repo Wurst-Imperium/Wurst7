@@ -299,6 +299,11 @@ public enum WurstClient
 	{
 		return navigator;
 	}
+
+	public void newNavigator(){
+		Path preferencesFile = wurstFolder.resolve("preferences.json");
+		this.navigator = new Navigator(preferencesFile, hax, cmds, otfs);
+	}
 	
 	public CmdProcessor getCmdProcessor()
 	{
