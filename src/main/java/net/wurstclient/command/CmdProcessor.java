@@ -20,13 +20,14 @@ import net.wurstclient.util.ChatUtils;
 
 public final class CmdProcessor implements ChatOutputListener
 {
-	private final CmdList cmds;
+	private static CmdList cmds;
 
 	private static String prefix = CmdProcessorFile.readPrefix();
 
 	public static void setPrefix(String newPrefix) {
 		prefix = newPrefix;
 		CmdProcessorFile.writePrefix(prefix);
+		cmds.updateCmd();
 	}
 
 	public static String getPrefix(){
@@ -57,7 +58,7 @@ public final class CmdProcessor implements ChatOutputListener
 		try
 		{
 			Command cmd = parseCmd(input);
-			
+
 			TooManyHaxHack tooManyHax =
 				WurstClient.INSTANCE.getHax().tooManyHaxHack;
 			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(cmd))
