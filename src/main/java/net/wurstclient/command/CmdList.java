@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.commands.*;
+import org.lwjgl.system.CallbackI;
 
 public final class CmdList
 {

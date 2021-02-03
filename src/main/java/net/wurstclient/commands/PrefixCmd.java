@@ -9,10 +9,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.SearchTags;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdProcessor;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"change dot", "dots in chat", "command bypass", "prefix"})
@@ -22,7 +19,7 @@ public final class PrefixCmd extends Command
     {
         super("prefix",
                 "Change the prefix for all commands.",
-                ".prefix <prefix>");
+                CmdProcessor.getPrefix() + "prefix <prefix>");
     }
 
     @Override
@@ -39,5 +36,7 @@ public final class PrefixCmd extends Command
         }
 
         ChatUtils.message("New prefix is " + "\"" + args[0] + "\"");
+
+        Command.WURST.newCmds();
     }
 }
