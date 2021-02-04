@@ -252,10 +252,6 @@ public enum WurstClient
 	{
 		return cmds;
 	}
-
-	public void newCmds(){
-		this.cmds = new CmdList();
-	}
 	
 	public OtfList getOtfs()
 	{
