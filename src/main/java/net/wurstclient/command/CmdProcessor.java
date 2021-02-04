@@ -20,7 +20,7 @@ import net.wurstclient.util.ChatUtils;
 
 public final class CmdProcessor implements ChatOutputListener
 {
-	private CmdList cmds;
+	private final CmdList cmds;
 
 	private static String prefix = CmdProcessorFile.readPrefix();
 
