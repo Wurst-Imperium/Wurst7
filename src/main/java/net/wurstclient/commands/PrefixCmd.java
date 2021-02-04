@@ -38,6 +38,6 @@ public final class PrefixCmd extends Command
         ChatUtils.message("New prefix is " + "\"" + args[0] + "\"");
 
         Command.WURST.getCmds().newCmds();
-        Command.WURST.newNavigator();
+        Command.WURST.getNavigator().updateNavigatoreList(Command.WURST.getHax(), Command.WURST.getCmds(), Command.WURST.getOtfs());
     }
 }

@@ -34,6 +34,13 @@ public final class Navigator
 		preferencesFile = new PreferencesFile(path, preferences);
 		preferencesFile.load();
 	}
+
+	public void updateNavigatoreList(HackList hax, CmdList cmds, OtfList otfs){
+		navigatorList.removeAll(navigatorList);
+		navigatorList.addAll(hax.getAllHax());
+		navigatorList.addAll(cmds.getAllCmds());
+		navigatorList.addAll(otfs.getAllOtfs());
+	}
 	
 	public void copyNavigatorList(ArrayList<Feature> list)
 	{
