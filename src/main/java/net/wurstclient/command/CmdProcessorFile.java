@@ -51,7 +51,7 @@ public class CmdProcessorFile {
             // close the file
             fr.close();
 
-            if(prefix.length()>=1) {
+            if(prefix.length()>=1 && prefix.charAt(0) != '/') {
                 return prefix;
             }
             else {

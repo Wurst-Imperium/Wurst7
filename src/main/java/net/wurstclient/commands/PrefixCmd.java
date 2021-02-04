@@ -28,7 +28,7 @@ public final class PrefixCmd extends Command
         if(args.length != 1)
             throw new CmdSyntaxError();
 
-        if(!args[0].equals("/")){
+        if(args[0].charAt(0) != '/'){
             CmdProcessor.setPrefix(args[0]);
         }
         else {
