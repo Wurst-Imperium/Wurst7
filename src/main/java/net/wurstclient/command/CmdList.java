@@ -66,7 +66,7 @@ public final class CmdList
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	
-	private TreeMap<String, Command> cmds =
+	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
 	
 	public CmdList()
@@ -79,30 +79,9 @@ public final class CmdList
 					continue;
 				
 				Command cmd = (Command)field.get(this);
-				cmds.put(cmd.getName(), cmd);
+				cmds.put(cmd.getName().substring(CmdProcessor.getPrefix().length()), cmd);
 			}
 			
-		}catch(Exception e)
-		{
-			String message = "Initializing Wurst commands";
-			CrashReport report = CrashReport.create(e, message);
-			throw new CrashException(report);
-		}
-	}
-
-	public void updateCmd(){
-		this.cmds = new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
-		try
-		{
-			for(Field field : CmdList.class.getDeclaredFields())
-			{
-				if(!field.getName().endsWith("Cmd"))
-					continue;
-
-				Command cmd = (Command)field.get(this);
-				this.cmds.put(cmd.getName(), cmd);
-			}
-
 		}catch(Exception e)
 		{
 			String message = "Initializing Wurst commands";
@@ -113,7 +92,7 @@ public final class CmdList
 	
 	public Command getCmdByName(String name)
 	{
-		return cmds.get(CmdProcessor.getPrefix() + name);
+		return cmds.get(name);
 	}
 	
 	public Collection<Command> getAllCmds()
