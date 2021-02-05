@@ -126,7 +126,7 @@ public final class CmdList
 					continue;
 
 				Command cmd = (Command)field.get(this);
-				cmds.put(cmd.getName().substring(CmdProcessor.getPrefix().length()), cmd);
+				cmds.put(cmd.getName(), cmd);
 			}
 
 		}catch(Exception e)
@@ -144,7 +144,7 @@ public final class CmdList
 	
 	public Command getCmdByName(String name)
 	{
-		return cmds.get(name);
+		return cmds.get(CmdProcessor.getPrefix() + name);
 	}
 	
 	public Collection<Command> getAllCmds()
