@@ -7,7 +7,6 @@
  */
 package net.wurstclient.command;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import net.minecraft.util.crash.CrashException;
