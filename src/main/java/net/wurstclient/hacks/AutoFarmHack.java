@@ -207,7 +207,11 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		GL11.glCallList(displayList);
 		
@@ -220,8 +224,8 @@ public final class AutoFarmHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			GL11.glTranslated(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
 			{
 				GL11.glTranslated(0.5, 0.5, 0.5);
@@ -496,12 +500,17 @@ public final class AutoFarmHack extends Hack
 	private void updateDisplayList(List<BlockPos> blocksToHarvest,
 		List<BlockPos> blocksToReplant)
 	{
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
 		GL11.glColor4f(0, 1, 0, 0.5F);
 		for(BlockPos pos : blocksToHarvest)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}
@@ -509,7 +518,8 @@ public final class AutoFarmHack extends Hack
 		for(BlockPos pos : plants.keySet())
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(node);
 			GL11.glPopMatrix();
 		}
@@ -517,7 +527,8 @@ public final class AutoFarmHack extends Hack
 		for(BlockPos pos : blocksToReplant)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}
