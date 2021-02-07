@@ -111,7 +111,6 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	
 	private void drawOpenWater(FishingBobberEntity bobber)
 	{
-		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
