@@ -71,7 +71,8 @@ public enum RenderUtils
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera.getBlockPos();
+		return WurstClient.MC.getBlockEntityRenderDispatcher().camera
+			.getBlockPos();
 	}
 	
 	public static void drawSolidBox()

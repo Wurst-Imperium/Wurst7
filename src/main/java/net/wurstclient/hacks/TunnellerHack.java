@@ -362,7 +362,7 @@ public final class TunnellerHack extends Hack
 					continue;
 				
 				if(currentBlock == null)
-				currentBlock = pos;
+					currentBlock = pos;
 				
 				GL11.glPushMatrix();
 				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
@@ -854,13 +854,13 @@ public final class TunnellerHack extends Hack
 			if(!linesOfSight[bestSide] && linesOfSight[i])
 			{
 				side = sides[i];
-					continue;
+				continue;
 			}
-				
+			
 			// then pick the closest side
 			if(distancesSq[i] < distancesSq[bestSide])
 				side = sides[i];
-			}
+		}
 		
 		// face block
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
