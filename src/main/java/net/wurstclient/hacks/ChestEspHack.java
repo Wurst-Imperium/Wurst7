@@ -193,11 +193,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			}
 		}
 		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		GL11.glNewList(normalChests, GL11.GL_COMPILE);
-		renderBoxes(basicChests, greenBox);
-		renderBoxes(trappedChests, orangeBox);
-		renderBoxes(enderChests, cyanBox);
-		renderBoxes(shulkerBoxes, purpleBox);
+		renderBoxes(basicChests, greenBox, regionX, regionZ);
+		renderBoxes(trappedChests, orangeBox, regionX, regionZ);
+		renderBoxes(enderChests, cyanBox, regionX, regionZ);
+		renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
 		GL11.glEndList();
 		
 		minecarts.clear();
@@ -261,14 +265,18 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
 		ArrayList<Box> minecartBoxes = calculateMinecartBoxes(partialTicks);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		if(style.getSelected().boxes)
 		{
 			GL11.glCallList(normalChests);
-			renderBoxes(minecartBoxes, greenBox);
+			renderBoxes(minecartBoxes, greenBox, regionX, regionZ);
 		}
 		
 		if(style.getSelected().lines)
@@ -279,17 +287,17 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			GL11.glBegin(GL11.GL_LINES);
 			
 			GL11.glColor4f(0, 1, 0, 0.5F);
-			renderLines(start, basicChests);
-			renderLines(start, minecartBoxes);
+			renderLines(start, basicChests, regionX, regionZ);
+			renderLines(start, minecartBoxes, regionX, regionZ);
 			
 			GL11.glColor4f(1, 0.5F, 0, 0.5F);
-			renderLines(start, trappedChests);
+			renderLines(start, trappedChests, regionX, regionZ);
 			
 			GL11.glColor4f(0, 1, 1, 0.5F);
-			renderLines(start, enderChests);
+			renderLines(start, enderChests, regionX, regionZ);
 			
 			GL11.glColor4f(1, 0, 1, 0.5F);
-			renderLines(start, shulkerBoxes);
+			renderLines(start, shulkerBoxes, regionX, regionZ);
 			
 			GL11.glEnd();
 		}
@@ -322,12 +330,13 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		return minecartBoxes;
 	}
 	
-	private void renderBoxes(ArrayList<Box> boxes, int displayList)
+	private void renderBoxes(ArrayList<Box> boxes, int displayList, int regionX,
+		int regionZ)
 	{
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(box.minX, box.minY, box.minZ);
+			GL11.glTranslated(box.minX - regionX, box.minY, box.minZ - regionZ);
 			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
 				box.maxZ - box.minZ);
 			GL11.glCallList(displayList);
@@ -335,13 +344,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderLines(Vec3d start, ArrayList<Box> boxes)
+	private void renderLines(Vec3d start, ArrayList<Box> boxes, int regionX,
+		int regionZ)
 	{
 		for(Box box : boxes)
 		{
 			Vec3d end = box.getCenter();
-			GL11.glVertex3d(start.x, start.y, start.z);
-			GL11.glVertex3d(end.x, end.y, end.z);
+			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
+			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
 		}
 	}
 	

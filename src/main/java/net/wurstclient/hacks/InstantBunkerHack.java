@@ -61,6 +61,8 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		if(!MC.player.isOnGround())
 		{
 			ChatUtils.error("Can't build this in mid-air.");

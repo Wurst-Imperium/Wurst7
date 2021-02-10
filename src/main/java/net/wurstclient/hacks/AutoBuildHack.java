@@ -365,7 +365,11 @@ public final class AutoBuildHack extends Hack
 		GL11.glColor4f(0F, 0F, 0F, 0.5F);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		int blocksDrawn = 0;
 		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
@@ -376,7 +380,8 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
