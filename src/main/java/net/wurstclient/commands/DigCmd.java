@@ -11,6 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 
@@ -21,7 +22,7 @@ public final class DigCmd extends Command
 		super("dig",
 			"Automatically digs out the selected area,\n"
 				+ "starting in the front-left-top corner.",
-			".dig <length> <width> <height>", ".dig stop");
+				CmdProcessor.getPrefix() + "dig <length> <width> <height>", CmdProcessor.getPrefix() + "dig stop");
 	}
 	
 	@Override

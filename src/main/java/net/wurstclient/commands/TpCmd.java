@@ -13,10 +13,7 @@ import java.util.stream.StreamSupport;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.MathUtils;
 
@@ -24,8 +21,8 @@ public final class TpCmd extends Command
 {
 	public TpCmd()
 	{
-		super("tp", "Teleports you up to 10 blocks away.", ".tp <x> <y> <z>",
-			".tp <entity>");
+		super("tp", "Teleports you up to 10 blocks away.", CmdProcessor.getPrefix() + "tp <x> <y> <z>",
+				CmdProcessor.getPrefix() + "tp <entity>");
 	}
 	
 	@Override

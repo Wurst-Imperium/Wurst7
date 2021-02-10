@@ -9,18 +9,15 @@ package net.wurstclient.commands;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 public final class RenameCmd extends Command
 {
 	public RenameCmd()
 	{
-		super("rename", "Renames the item in your hand.", ".rename <new_name>",
-			"Use $ for colors, use $$ for $.", "Example:", ".rename $cRed Name",
+		super("rename", "Renames the item in your hand.", CmdProcessor.getPrefix() + "rename <new_name>",
+			"Use $ for colors, use $$ for $.", "Example:", CmdProcessor.getPrefix() + "rename $cRed Name",
 			"(changes the item's name to \u00a7cRed Name\u00a7r)");
 	}
 	

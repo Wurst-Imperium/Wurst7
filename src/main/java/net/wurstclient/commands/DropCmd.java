@@ -8,6 +8,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.UpdateListener;
@@ -19,9 +20,9 @@ public final class DropCmd extends Command implements UpdateListener
 	
 	public DropCmd()
 	{
-		super("drop", "Drops all your items on the ground.", ".drop",
-			"Slow mode: .drop slow",
-			"If regular .drop kicks you from the server,",
+		super("drop", "Drops all your items on the ground.", CmdProcessor.getPrefix() + "drop",
+			"Slow mode: " + CmdProcessor.getPrefix() + "drop slow",
+			"If regular " + CmdProcessor.getPrefix() + "drop kicks you from the server,",
 			"use slow mode instead.");
 	}
 	

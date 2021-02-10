@@ -18,10 +18,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
@@ -30,9 +27,9 @@ public final class PotionCmd extends Command
 	public PotionCmd()
 	{
 		super("potion", "Changes the effects of the held potion.",
-			".potion add (<effect> <amplifier> <duration>)...",
-			".potion set (<effect> <amplifier> <duration>)...",
-			".potion remove <effect>");
+				CmdProcessor.getPrefix() + "potion add (<effect> <amplifier> <duration>)...",
+				CmdProcessor.getPrefix() + "potion set (<effect> <amplifier> <duration>)...",
+				CmdProcessor.getPrefix() + "potion remove <effect>");
 	}
 	
 	@Override

@@ -17,69 +17,123 @@ import net.wurstclient.commands.*;
 
 public final class CmdList
 {
-	public final AddAltCmd addAltCmd = new AddAltCmd();
-	public final AnnoyCmd annoyCmd = new AnnoyCmd();
-	public final AuthorCmd authorCmd = new AuthorCmd();
-	public final BindCmd bindCmd = new BindCmd();
-	public final BindsCmd bindsCmd = new BindsCmd();
-	public final BlinkCmd blinkCmd = new BlinkCmd();
-	public final ClearCmd clearCmd = new ClearCmd();
-	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
-	public final DamageCmd damageCmd = new DamageCmd();
-	public final DigCmd digCmd = new DigCmd();
-	public final DropCmd dropCmd = new DropCmd();
-	public final EnabledHaxCmd enabledHaxCmd = new EnabledHaxCmd();
-	public final EnchantCmd enchantCmd = new EnchantCmd();
-	public final ExcavateCmd excavateCmd = new ExcavateCmd();
-	public final FeaturesCmd featuresCmd = new FeaturesCmd();
-	public final FollowCmd followCmd = new FollowCmd();
-	public final FriendsCmd friendsCmd = new FriendsCmd();
-	public final GetPosCmd getPosCmd = new GetPosCmd();
-	public final GiveCmd giveCmd = new GiveCmd();
-	public final GmCmd gmCmd = new GmCmd();
-	public final GoToCmd goToCmd = new GoToCmd();
-	public final HelpCmd helpCmd = new HelpCmd();
-	public final InvseeCmd invseeCmd = new InvseeCmd();
-	public final IpCmd ipCmd = new IpCmd();
-	public final JumpCmd jumpCmd = new JumpCmd();
-	public final LeaveCmd leaveCmd = new LeaveCmd();
-	public final ModifyCmd modifyCmd = new ModifyCmd();
-	public final PathCmd pathCmd = new PathCmd();
-	public final PotionCmd potionCmd = new PotionCmd();
-	public final ProtectCmd protectCmd = new ProtectCmd();
-	public final RenameCmd renameCmd = new RenameCmd();
-	public final RepairCmd repairCmd = new RepairCmd();
-	public final RvCmd rvCmd = new RvCmd();
-	public final SvCmd svCmd = new SvCmd();
-	public final SayCmd sayCmd = new SayCmd();
-	public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
-	public final SetModeCmd setModeCmd = new SetModeCmd();
-	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
-	public final SettingsCmd settingsCmd = new SettingsCmd();
-	public final TacoCmd tacoCmd = new TacoCmd();
-	public final TCmd tCmd = new TCmd();
-	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
-	public final TpCmd tpCmd = new TpCmd();
-	public final UnbindCmd unbindCmd = new UnbindCmd();
-	public final VClipCmd vClipCmd = new VClipCmd();
-	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
-	
-	private final TreeMap<String, Command> cmds =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
-	
+	public AddAltCmd addAltCmd;
+	public AnnoyCmd annoyCmd;
+	public AuthorCmd authorCmd;
+	public BindCmd bindCmd;
+	public BindsCmd bindsCmd;
+	public BlinkCmd blinkCmd;
+	public ClearCmd clearCmd;
+	public CopyItemCmd copyitemCmd;
+	public DamageCmd damageCmd;
+	public DigCmd digCmd;
+	public DropCmd dropCmd;
+	public EnabledHaxCmd enabledHaxCmd;
+	public EnchantCmd enchantCmd;
+	public ExcavateCmd excavateCmd;
+	public FeaturesCmd featuresCmd;
+	public FollowCmd followCmd;
+	public FriendsCmd friendsCmd;
+	public GetPosCmd getPosCmd;
+	public GiveCmd giveCmd;
+	public GmCmd gmCmd;
+	public GoToCmd goToCmd;
+	public HelpCmd helpCmd;
+	public InvseeCmd invseeCmd;
+	public IpCmd ipCmd;
+	public JumpCmd jumpCmd;
+	public LeaveCmd leaveCmd;
+	public ModifyCmd modifyCmd;
+	public PathCmd pathCmd;
+	public PotionCmd potionCmd;
+	public PrefixCmd prefixCmd;
+	public ProtectCmd protectCmd;
+	public RenameCmd renameCmd;
+	public RepairCmd repairCmd;
+	public RvCmd rvCmd;
+	public SvCmd svCmd;
+	public SayCmd sayCmd;
+	public SetCheckboxCmd setCheckboxCmd;
+	public SetModeCmd setModeCmd;
+	public SetSliderCmd setSliderCmd;
+	public SettingsCmd settingsCmd;
+	public TacoCmd tacoCmd;
+	public TCmd tCmd;
+	public TooManyHaxCmd tooManyHaxCmd;
+	public TpCmd tpCmd;
+	public UnbindCmd unbindCmd;
+	public VClipCmd vClipCmd;
+	public ViewNbtCmd viewNbtCmd;
+
+	private TreeMap<String, Command> cmds;
+
 	public CmdList()
 	{
+		newCmds();
+	}
+
+	public void newCmds(){
+		addAltCmd = new AddAltCmd();
+		annoyCmd = new AnnoyCmd();
+		authorCmd = new AuthorCmd();
+		bindCmd = new BindCmd();
+		bindsCmd = new BindsCmd();
+		blinkCmd = new BlinkCmd();
+		clearCmd = new ClearCmd();
+		copyitemCmd = new CopyItemCmd();
+		damageCmd = new DamageCmd();
+		digCmd = new DigCmd();
+		dropCmd = new DropCmd();
+		enabledHaxCmd = new EnabledHaxCmd();
+		enchantCmd = new EnchantCmd();
+		excavateCmd = new ExcavateCmd();
+		featuresCmd = new FeaturesCmd();
+		followCmd = new FollowCmd();
+		friendsCmd = new FriendsCmd();
+		getPosCmd = new GetPosCmd();
+		giveCmd = new GiveCmd();
+		gmCmd = new GmCmd();
+		goToCmd = new GoToCmd();
+		helpCmd = new HelpCmd();
+		invseeCmd = new InvseeCmd();
+		ipCmd = new IpCmd();
+		jumpCmd = new JumpCmd();
+		leaveCmd = new LeaveCmd();
+		modifyCmd = new ModifyCmd();
+		pathCmd = new PathCmd();
+		potionCmd = new PotionCmd();
+		prefixCmd = new PrefixCmd();
+		protectCmd = new ProtectCmd();
+		renameCmd = new RenameCmd();
+		repairCmd = new RepairCmd();
+		rvCmd = new RvCmd();
+		svCmd = new SvCmd();
+		sayCmd = new SayCmd();
+		setCheckboxCmd = new SetCheckboxCmd();
+		setModeCmd = new SetModeCmd();
+		setSliderCmd = new SetSliderCmd();
+		settingsCmd = new SettingsCmd();
+		tacoCmd = new TacoCmd();
+		tCmd = new TCmd();
+	 	tooManyHaxCmd = new TooManyHaxCmd();
+		tpCmd = new TpCmd();
+		unbindCmd = new UnbindCmd();
+ 		vClipCmd = new VClipCmd();
+	 	viewNbtCmd = new ViewNbtCmd();
+
+		cmds = new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+
 		try
 		{
 			for(Field field : CmdList.class.getDeclaredFields())
 			{
 				if(!field.getName().endsWith("Cmd"))
 					continue;
-				
+
 				Command cmd = (Command)field.get(this);
 				cmds.put(cmd.getName(), cmd);
 			}
-			
+
 		}catch(Exception e)
 		{
 			String message = "Initializing Wurst commands";
@@ -90,7 +144,7 @@ public final class CmdList
 	
 	public Command getCmdByName(String name)
 	{
-		return cmds.get("." + name);
+		return cmds.get(CmdProcessor.getPrefix() + name);
 	}
 	
 	public Collection<Command> getAllCmds()

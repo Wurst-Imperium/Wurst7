@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.MathUtils;
@@ -18,7 +19,7 @@ public final class VClipCmd extends Command
 	public VClipCmd()
 	{
 		super("vclip", "Lets you clip through blocks vertically.\n"
-			+ "The maximum distance is 10 blocks.", ".vclip <height>");
+			+ "The maximum distance is 10 blocks.", CmdProcessor.getPrefix() + "vclip <height>");
 	}
 	
 	@Override

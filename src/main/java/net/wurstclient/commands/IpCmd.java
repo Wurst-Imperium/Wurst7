@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ServerInfo;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
@@ -21,7 +22,7 @@ public final class IpCmd extends Command
 		super("ip",
 			"Shows the IP of the server you are currently\n"
 				+ "connected to or copies it to the clipboard.",
-			".ip", "Copy to clipboard: .ip copy");
+				CmdProcessor.getPrefix() + "ip", "Copy to clipboard: " + CmdProcessor.getPrefix() + "ip copy");
 	}
 	
 	@Override

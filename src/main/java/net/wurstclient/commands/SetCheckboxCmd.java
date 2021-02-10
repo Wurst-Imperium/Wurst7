@@ -11,10 +11,7 @@ import java.util.stream.Stream;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
 
@@ -26,8 +23,8 @@ public final class SetCheckboxCmd extends Command
 		super("setcheckbox",
 			"Changes a checkbox setting of a feature. Allows you\n"
 				+ "to toggle checkboxes through keybinds.",
-			".setcheckbox <feature> <setting> (on|off)",
-			".setcheckbox <feature> <setting> toggle");
+				CmdProcessor.getPrefix() + "setcheckbox <feature> <setting> (on|off)",
+				CmdProcessor.getPrefix() + "setcheckbox <feature> <setting> toggle");
 	}
 	
 	@Override

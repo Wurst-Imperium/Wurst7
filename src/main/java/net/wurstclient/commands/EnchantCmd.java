@@ -11,10 +11,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.registry.Registry;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 public final class EnchantCmd extends Command
@@ -22,7 +19,7 @@ public final class EnchantCmd extends Command
 	public EnchantCmd()
 	{
 		super("enchant", "Enchants an item with everything,\n"
-			+ "except for silk touch and curses.", ".enchant");
+			+ "except for silk touch and curses.", CmdProcessor.getPrefix() + "enchant");
 	}
 	
 	@Override

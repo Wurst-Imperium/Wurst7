@@ -14,10 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathProcessor;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.util.ChatUtils;
@@ -34,8 +31,8 @@ public final class GoToCmd extends Command
 	public GoToCmd()
 	{
 		super("goto", "Walks or flies you to a specific location.",
-			".goto <x> <y> <z>", ".goto <entity>", ".goto -path",
-			"Turn off: .goto");
+				CmdProcessor.getPrefix() + "goto <x> <y> <z>", CmdProcessor.getPrefix() + "goto <entity>", CmdProcessor.getPrefix() + "goto -path",
+			"Turn off: " + CmdProcessor.getPrefix() + "goto");
 	}
 	
 	@Override

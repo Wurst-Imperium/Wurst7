@@ -8,6 +8,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 
@@ -15,7 +16,7 @@ public final class LeaveCmd extends Command
 {
 	public LeaveCmd()
 	{
-		super("leave", "Instantly disconnects from the server.", ".leave");
+		super("leave", "Instantly disconnects from the server.", CmdProcessor.getPrefix() + "leave");
 	}
 	
 	@Override

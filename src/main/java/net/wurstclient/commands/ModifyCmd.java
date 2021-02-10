@@ -16,10 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 
 public final class ModifyCmd extends Command
@@ -27,10 +24,10 @@ public final class ModifyCmd extends Command
 	public ModifyCmd()
 	{
 		super("modify", "Allows you to modify NBT data of items.",
-			".modify add <nbt_data>", ".modify set <nbt_data>",
-			".modify remove <nbt_path>", "Use $ for colors, use $$ for $.", "",
+				CmdProcessor.getPrefix() + "modify add <nbt_data>", CmdProcessor.getPrefix() + "modify set <nbt_data>",
+				CmdProcessor.getPrefix() + "modify remove <nbt_path>", "Use $ for colors, use $$ for $.", "",
 			"Example:",
-			".modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}",
+				CmdProcessor.getPrefix() + "modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}",
 			"(changes the item's name to \u00a7cRed Name\u00a7r)");
 	}
 	

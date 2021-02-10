@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.RenderListener;
@@ -24,7 +25,7 @@ public final class InvseeCmd extends Command implements RenderListener
 	{
 		super("invsee",
 			"Allows you to see parts of another player's inventory.",
-			".invsee <player>");
+				CmdProcessor.getPrefix() + "invsee <player>");
 	}
 	
 	@Override

@@ -8,10 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.util.ChatUtils;
 
@@ -23,7 +20,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	public AnnoyCmd()
 	{
 		super("annoy", "Annoys a player by repeating everything they say.",
-			".annoy <player>", "Turn off: .annoy");
+				CmdProcessor.getPrefix() + "annoy <player>", "Turn off: " + CmdProcessor.getPrefix() + "annoy");
 	}
 	
 	@Override

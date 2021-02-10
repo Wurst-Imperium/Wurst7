@@ -20,10 +20,7 @@ import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
@@ -34,7 +31,7 @@ public final class GiveCmd extends Command
 		super("give",
 			"Gives you an item with custom NBT data.\n"
 				+ "Requires creative mode.",
-			".give <item> [<amount>] [<nbt>]", ".give <id> [<amount>] [<nbt>]");
+				CmdProcessor.getPrefix() + "give <item> [<amount>] [<nbt>]", CmdProcessor.getPrefix() + "give <id> [<amount>] [<nbt>]");
 	}
 	
 	@Override

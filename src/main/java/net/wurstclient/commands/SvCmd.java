@@ -8,10 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.network.ServerInfo;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.LastServerRememberer;
 
@@ -20,7 +17,7 @@ public final class SvCmd extends Command
 	public SvCmd()
 	{
 		super("sv", "Shows the version of the server\n"
-			+ "you are currently connected to.", ".sv");
+			+ "you are currently connected to.", CmdProcessor.getPrefix() + "sv");
 	}
 	
 	@Override

@@ -12,10 +12,7 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.hacks.FollowHack;
 import net.wurstclient.util.FakePlayerEntity;
 
@@ -23,7 +20,7 @@ public final class FollowCmd extends Command
 {
 	public FollowCmd()
 	{
-		super("follow", "Follows the given entity.", ".follow <entity>");
+		super("follow", "Follows the given entity.", CmdProcessor.getPrefix() + "follow <entity>");
 	}
 	
 	@Override

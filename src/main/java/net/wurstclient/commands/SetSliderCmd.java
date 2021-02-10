@@ -11,10 +11,7 @@ import java.util.stream.Stream;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.MathUtils;
@@ -27,8 +24,8 @@ public final class SetSliderCmd extends Command
 		super("setslider",
 			"Changes a slider setting of a feature. Allows you to\n"
 				+ "move sliders through keybinds.",
-			".setslider <feature> <setting> <value>",
-			".setslider <feature> <setting> (more|less)");
+				CmdProcessor.getPrefix() + "setslider <feature> <setting> <value>",
+				CmdProcessor.getPrefix() + "setslider <feature> <setting> (more|less)");
 	}
 	
 	@Override

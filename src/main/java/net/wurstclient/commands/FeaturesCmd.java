@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
@@ -21,7 +22,7 @@ public final class FeaturesCmd extends Command
 	{
 		super("features",
 			"Shows the number of features and some other\n" + "statistics.",
-			".features");
+				CmdProcessor.getPrefix() + "features");
 	}
 	
 	@Override

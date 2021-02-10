@@ -8,6 +8,7 @@
 package net.wurstclient.commands;
 
 import net.wurstclient.command.CmdException;
+import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 
@@ -15,7 +16,7 @@ public final class ClearCmd extends Command
 {
 	public ClearCmd()
 	{
-		super("clear", "Clears the chat completely.", ".clear");
+		super("clear", "Clears the chat completely.", CmdProcessor.getPrefix() + "clear");
 	}
 	
 	@Override

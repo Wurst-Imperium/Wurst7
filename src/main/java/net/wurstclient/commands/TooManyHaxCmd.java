@@ -15,10 +15,7 @@ import java.util.List;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
-import net.wurstclient.command.CmdError;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
-import net.wurstclient.command.Command;
+import net.wurstclient.command.*;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.other_feature.OtherFeature;
@@ -34,11 +31,11 @@ public final class TooManyHaxCmd extends Command
 		super("toomanyhax",
 			"Allows to manage which hacks should be blocked\n"
 				+ "when TooManyHax is enabled.",
-			".toomanyhax block <feature>", ".toomanyhax unblock <feature>",
-			".toomanyhax block-all", ".toomanyhax unblock-all",
-			".toomanyhax list [<page>]", ".toomanyhax load-profile <file>",
-			".toomanyhax save-profile <file>",
-			".toomanyhax list-profiles [<page>]",
+				CmdProcessor.getPrefix() + "toomanyhax block <feature>", CmdProcessor.getPrefix() + "toomanyhax unblock <feature>",
+				CmdProcessor.getPrefix() + "toomanyhax block-all", CmdProcessor.getPrefix() + "toomanyhax unblock-all",
+				CmdProcessor.getPrefix() + "toomanyhax list [<page>]", CmdProcessor.getPrefix() + "toomanyhax load-profile <file>",
+				CmdProcessor.getPrefix() + "toomanyhax save-profile <file>",
+				CmdProcessor.getPrefix() + "toomanyhax list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/toomanyhax'.");
 	}
 	
