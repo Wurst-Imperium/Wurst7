@@ -73,7 +73,7 @@ public final class AutoFarmHack extends Hack
 			"Harvests and replants crops automatically.\n"
 				+ "Works with wheat, carrots, potatoes, beetroots,\n"
 				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
-				+ "bamboo and nether warts.");
+				+ "bamboo, nether warts, and cocoa beans.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -207,7 +207,11 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		GL11.glCallList(displayList);
 		
@@ -220,8 +224,8 @@ public final class AutoFarmHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			GL11.glTranslated(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
 			{
 				GL11.glTranslated(0.5, 0.5, 0.5);
@@ -281,6 +285,8 @@ public final class AutoFarmHack extends Hack
 		else if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
+		else if(block instanceof CocoaBlock)
+			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;
 	}
@@ -295,6 +301,7 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
 		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
+		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
 		
 		plants.putAll(blocks.parallelStream()
 			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
@@ -313,6 +320,12 @@ public final class AutoFarmHack extends Hack
 		
 		if(item == Items.NETHER_WART)
 			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
+		
+		if(item == Items.COCOA_BEANS)
+			return BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG;
 		
 		return false;
 	}
@@ -487,12 +500,17 @@ public final class AutoFarmHack extends Hack
 	private void updateDisplayList(List<BlockPos> blocksToHarvest,
 		List<BlockPos> blocksToReplant)
 	{
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
 		GL11.glColor4f(0, 1, 0, 0.5F);
 		for(BlockPos pos : blocksToHarvest)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}
@@ -500,7 +518,8 @@ public final class AutoFarmHack extends Hack
 		for(BlockPos pos : plants.keySet())
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(node);
 			GL11.glPopMatrix();
 		}
@@ -508,7 +527,8 @@ public final class AutoFarmHack extends Hack
 		for(BlockPos pos : blocksToReplant)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}

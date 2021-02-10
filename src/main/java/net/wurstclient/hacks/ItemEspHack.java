@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -114,12 +115,16 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
-		renderBoxes(partialTicks);
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
+		renderBoxes(partialTicks, regionX, regionZ);
 		
 		if(style.getSelected().lines)
-			renderTracers(partialTicks);
+			renderTracers(partialTicks, regionX, regionZ);
 		
 		GL11.glPopMatrix();
 		
@@ -131,7 +136,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void renderBoxes(double partialTicks)
+	private void renderBoxes(double partialTicks, int regionX, int regionZ)
 	{
 		double extraSize = boxSize.getSelected().extraSize;
 		
@@ -139,9 +144,10 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		{
 			GL11.glPushMatrix();
 			
-			GL11.glTranslated(e.prevX + (e.getX() - e.prevX) * partialTicks,
+			GL11.glTranslated(
+				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
 				e.prevY + (e.getY() - e.prevY) * partialTicks,
-				e.prevZ + (e.getZ() - e.prevZ) * partialTicks);
+				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
 			
 			if(style.getSelected().boxes)
 			{
@@ -167,7 +173,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(double partialTicks)
+	private void renderTracers(double partialTicks, int regionX, int regionZ)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -185,8 +191,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 					.subtract(e.prevX, e.prevY, e.prevZ)
 					.multiply(1 - partialTicks));
 			
-			GL11.glVertex3d(start.x, start.y, start.z);
-			GL11.glVertex3d(end.x, end.y, end.z);
+			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
+			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
 		}
 		GL11.glEnd();
 	}

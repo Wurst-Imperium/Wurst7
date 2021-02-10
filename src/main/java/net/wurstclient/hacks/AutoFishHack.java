@@ -18,6 +18,7 @@ import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -328,13 +329,17 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
-			drawValidRange(bobber);
+			drawValidRange(bobber, regionX, regionZ);
 		
-		drawLastBite();
+		drawLastBite(regionX, regionZ);
 		
 		GL11.glPopMatrix();
 		
@@ -346,20 +351,23 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void drawValidRange(FishingBobberEntity bobber)
+	private void drawValidRange(FishingBobberEntity bobber, int regionX,
+		int regionZ)
 	{
 		GL11.glPushMatrix();
-		GL11.glTranslated(bobber.getX(), bobber.getY(), bobber.getZ());
+		GL11.glTranslated(bobber.getX() - regionX, bobber.getY(),
+			bobber.getZ() - regionZ);
 		GL11.glCallList(validRangeBox);
 		GL11.glPopMatrix();
 	}
 	
-	private void drawLastBite()
+	private void drawLastBite(int regionX, int regionZ)
 	{
 		if(lastSoundPos != null)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(lastSoundPos.x, lastSoundPos.y, lastSoundPos.z);
+			GL11.glTranslated(lastSoundPos.x - regionX, lastSoundPos.y,
+				lastSoundPos.z - regionZ);
 			GL11.glCallList(biteCross);
 			GL11.glPopMatrix();
 		}

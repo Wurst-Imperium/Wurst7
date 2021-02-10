@@ -152,6 +152,9 @@ public final class ProtectHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().followHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
