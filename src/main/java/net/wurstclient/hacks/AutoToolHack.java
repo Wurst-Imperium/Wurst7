@@ -7,14 +7,14 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.MiningToolItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -47,9 +47,10 @@ public final class AutoToolHack extends Hack
 			+ "back to the previously selected slot.",
 		true);
 	
-	private final CheckboxSetting useSilkTouchForGlowstone =
-		new CheckboxSetting("Glowstone Silk Touch",
-			"Uses a tool with Silk Touch\nwhen mining Glowstone.", true);
+	private final CheckboxSetting useSilkTouch = new CheckboxSetting(
+		"Use Silk Touch",
+		"Uses a tool with Silk Touch\nwhen a whitelisted block is detected.",
+		true);
 	
 	private int prevSelectedSlot;
 	
@@ -63,7 +64,7 @@ public final class AutoToolHack extends Hack
 		addSetting(useHands);
 		addSetting(repairMode);
 		addSetting(switchBack);
-		addSetting(useSilkTouchForGlowstone);
+		addSetting(useSilkTouch);
 	}
 	
 	@Override
@@ -92,7 +93,7 @@ public final class AutoToolHack extends Hack
 			prevSelectedSlot = MC.player.inventory.selectedSlot;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.isChecked(), useSilkTouchForGlowstone.isChecked());
+			repairMode.isChecked(), useSilkTouch.isChecked());
 	}
 	
 	@Override
@@ -113,7 +114,7 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.isChecked(), useSilkTouchForGlowstone.isChecked());
+			repairMode.isChecked(), useSilkTouch.isChecked());
 	}
 	
 	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
@@ -163,8 +164,8 @@ public final class AutoToolHack extends Hack
 		{
 			ItemStack stack = inventory.getStack(slot);
 			
-			if(useSilkTouch && isGlowstone(state) && hasSilkTouch(stack)
-				&& stack.getItem() instanceof MiningToolItem)
+			if(useSilkTouch && useSilkTouchTool(state, stack)
+				&& hasSilkTouch(stack))
 			{
 				return slot;
 			}
@@ -210,9 +211,27 @@ public final class AutoToolHack extends Hack
 			.containsKey(Enchantments.SILK_TOUCH);
 	}
 	
-	private boolean isGlowstone(BlockState state)
+	private boolean useSilkTouchTool(BlockState state, ItemStack stack)
 	{
-		return Blocks.GLOWSTONE.is(state.getBlock());
+		if(stack.getItem() instanceof MiningToolItem)
+		{
+			MiningToolItem item = (MiningToolItem)stack.getItem();
+			boolean effectiveOn = item.isEffectiveOn(state);
+			if(!effectiveOn)
+			{
+				return false;
+			}
+			Block block = state.getBlock();
+			return block instanceof AbstractGlassBlock
+				|| block instanceof LeavesBlock
+				|| block instanceof MushroomBlock || block.is(Blocks.GLOWSTONE)
+				|| block.is(Blocks.CAMPFIRE) || block.is(Blocks.SOUL_CAMPFIRE)
+				|| block.is(Blocks.GRAVEL) || block.is(Blocks.ICE)
+				|| block.is(Blocks.SEA_LANTERN) || block.is(Blocks.TURTLE_EGG)
+				|| block.is(Blocks.CLAY) || block.is(Blocks.MYCELIUM)
+				|| block.is(Blocks.BEEHIVE) || block.is(Blocks.BEE_NEST);
+		}
+		return false;
 	}
 	
 	private boolean isDamageable(ItemStack stack)
