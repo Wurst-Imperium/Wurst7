@@ -31,6 +31,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -215,8 +216,7 @@ public final class SearchHack extends Hack implements UpdateListener, PacketInpu
 		GL11.glCallList(displayList);
 		GL11.glEnd();
 
-		if (style.getSelected().lines)
-			renderTracers(partialTicks);
+		renderTracers(partialTicks);
 
 		GL11.glPopMatrix();
 
