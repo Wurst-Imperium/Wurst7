@@ -27,6 +27,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import net.wurstclient.Category;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -193,16 +194,19 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			}
 		}
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		GL11.glNewList(normalChests, GL11.GL_COMPILE);
-		renderBoxes(basicChests, greenBox, regionX, regionZ);
-		renderBoxes(trappedChests, orangeBox, regionX, regionZ);
-		renderBoxes(enderChests, cyanBox, regionX, regionZ);
-		renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
-		GL11.glEndList();
+		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera != null)
+		{
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			GL11.glNewList(normalChests, GL11.GL_COMPILE);
+			renderBoxes(basicChests, greenBox, regionX, regionZ);
+			renderBoxes(trappedChests, orangeBox, regionX, regionZ);
+			renderBoxes(enderChests, cyanBox, regionX, regionZ);
+			renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
+			GL11.glEndList();
+		}
 		
 		minecarts.clear();
 		for(Entity entity : MC.world.getEntities())
