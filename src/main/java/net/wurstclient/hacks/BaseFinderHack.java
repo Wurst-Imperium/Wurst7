@@ -165,8 +165,9 @@ public final class BaseFinderHack extends Hack
 		if(modulo == 0)
 			matchingBlocks.clear();
 		
-		int startY = 255 - modulo * 4;
-		int endY = startY - 4;
+		int stepSize = MC.world.getHeight() / 64;
+		int startY = MC.world.getTopY() - 1 - modulo * stepSize;
+		int endY = startY - stepSize;
 		
 		BlockPos playerPos =
 			new BlockPos(MC.player.getX(), 0, MC.player.getZ());
@@ -179,7 +180,8 @@ public final class BaseFinderHack extends Hack
 					if(matchingBlocks.size() >= 10000)
 						break loop;
 					
-					BlockPos pos = playerPos.add(x, y, z);
+					BlockPos pos = new BlockPos(playerPos.getX() + x, y,
+						playerPos.getZ() + z);
 					
 					if(Collections.binarySearch(blockNames,
 						BlockUtils.getName(pos)) >= 0)
