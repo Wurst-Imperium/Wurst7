@@ -61,7 +61,7 @@ public class ServerFinderScreen extends Screen
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, new LiteralText(""));
 		ipBox.setMaxLength(200);
-		ipBox.setSelected(true);
+		ipBox.setTextFieldFocused(true);
 		children.add(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
