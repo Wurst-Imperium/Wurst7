@@ -34,6 +34,7 @@ import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -44,6 +45,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
@@ -55,7 +57,7 @@ public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
-		"The type of block to search for.", "minecraft:diamond_ore", false);
+		"The type of block to search for.", "minecraft:nether_portal", false);
 	
 	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
@@ -67,6 +69,10 @@ public final class SearchHack extends Hack
 			+ "Higher values require a faster computer.",
 		4, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+
+	private final CheckboxSetting tracers = new CheckboxSetting(
+			"Tracers", "Draws tracers to selected blocks.", false);
+
 	private int prevLimit;
 	private boolean notify;
 	
@@ -78,18 +84,21 @@ public final class SearchHack extends Hack
 	private ForkJoinPool pool2;
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
+	private ArrayList<int[]> blockTracerVertices;
 	
 	private int displayList;
 	private boolean displayListUpToDate;
+		
 	
 	public SearchHack()
 	{
 		super("Search", "Helps you to find specific blocks by\n"
-			+ "highlighting them in rainbow color.");
+			+ "highlighting them in rainbow color and drawing tracers to their location.");
 		setCategory(Category.RENDER);
 		addSetting(block);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(tracers);
 	}
 	
 	@Override
@@ -235,6 +244,9 @@ public final class SearchHack extends Hack
 		GL11.glCallList(displayList);
 		GL11.glEnd();
 		
+		if(tracers.isChecked())
+			renderTracers(partialTicks, red, green, blue);
+
 		GL11.glPopMatrix();
 		
 		// GL resets
@@ -243,6 +255,24 @@ public final class SearchHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+
+	private void renderTracers(double partialTicks, float red, float green, float blue)
+	{
+		if(blockTracerVertices == null)
+			return;
+
+		Vec3d start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		GL11.glBegin(GL11.GL_LINES);
+		int i = 0;
+		for(int[] vertex : blockTracerVertices)
+		{
+			Vec3d end = new Vec3d(vertex[0], vertex[1], vertex[2]);
+			GL11.glColor4f(red, green, blue, 0.1F);
+			GL11.glVertex3d(start.x, start.y, start.z);
+			GL11.glVertex3d(end.x, end.y, end.z);
+		}
+		GL11.glEnd();
 	}
 	
 	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
@@ -442,11 +472,9 @@ public final class SearchHack extends Hack
 	
 	private void setDisplayListFromTask()
 	{
-		ArrayList<int[]> vertices;
-		
 		try
 		{
-			vertices = compileVerticesTask.get();
+			blockTracerVertices = compileVerticesTask.get();
 			
 		}catch(InterruptedException | ExecutionException e)
 		{
@@ -454,7 +482,7 @@ public final class SearchHack extends Hack
 		}
 		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		for(int[] vertex : vertices)
+		for(int[] vertex : blockTracerVertices)
 			GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
 		GL11.glEndList();
 		
