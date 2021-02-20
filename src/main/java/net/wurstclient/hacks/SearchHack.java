@@ -85,6 +85,8 @@ public final class SearchHack extends Hack
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	private ArrayList<int[]> blockTracerVertices;
+	HashSet<BlockPos> matchingBlocks;
+
 	
 	private int displayList;
 	private boolean displayListUpToDate;
@@ -245,7 +247,7 @@ public final class SearchHack extends Hack
 		GL11.glEnd();
 		
 		if(tracers.isChecked())
-			renderTracers(partialTicks, red, green, blue);
+			renderTracers(red, green, blue);
 
 		GL11.glPopMatrix();
 		
@@ -257,18 +259,17 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 
-	private void renderTracers(double partialTicks, float red, float green, float blue)
+	private void renderTracers(float red, float green, float blue)
 	{
-		if(blockTracerVertices == null)
+		if(matchingBlocks == null)
 			return;
 
 		Vec3d start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		GL11.glBegin(GL11.GL_LINES);
-		int i = 0;
-		for(int[] vertex : blockTracerVertices)
+		for(BlockPos bp : matchingBlocks)
 		{
-			Vec3d end = new Vec3d(vertex[0], vertex[1], vertex[2]);
-			GL11.glColor4f(red, green, blue, 0.1F);
+			Vec3d end = new Vec3d(bp.getX() + .5, bp.getY() + .5, bp.getZ() + .5);
+			GL11.glColor4f(red, green, blue, 0.4F);
 			GL11.glVertex3d(start.x, start.y, start.z);
 			GL11.glVertex3d(end.x, end.y, end.z);
 		}
@@ -462,7 +463,7 @@ public final class SearchHack extends Hack
 	
 	private void startCompileVerticesTask()
 	{
-		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
+		matchingBlocks = getMatchingBlocksFromTask();
 		
 		Callable<ArrayList<int[]>> task =
 			BlockVertexCompiler.createTask(matchingBlocks);
