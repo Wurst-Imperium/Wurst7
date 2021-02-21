@@ -8,40 +8,99 @@
 package net.wurstclient.serverfinder;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.client.network.MultiplayerServerListPinger;
 import net.minecraft.client.network.ServerInfo;
+import net.wurstclient.serverfinder.ServerFinderScreen.ServerFinderState;
 
-public class WurstServerPinger
+public class WurstServerPinger implements IServerFinderDisconnectListener
 {
 	private static final AtomicInteger threadNumber = new AtomicInteger(0);
-	private ServerInfo server;
+	private WurstServerInfo server;
 	private boolean done = false;
 	private boolean failed = false;
+	private Thread thread;
+	private int pingPort;
+	private WurstServerListPinger pinger;
+	private IServerFinderDoneListener doneListener;
+	private boolean notifiedDoneListener = false;
+	private boolean scanPorts;
+	
+	public WurstServerPinger(IServerFinderDoneListener doneListener, boolean scanPorts) {
+		pinger = new WurstServerListPinger();
+		pinger.addServerFinderDisconnectListener(this);
+		this.doneListener = doneListener;
+		this.scanPorts = scanPorts;
+	}
 	
 	public void ping(String ip)
 	{
 		ping(ip, 25565);
 	}
 	
+	public Thread getThread() {
+		return thread;
+	}
+	
+	public int getPingPort() {
+		return pingPort;
+	}
+	
+	public WurstServerInfo getServerInfo() {
+		return server;
+	}
+	
 	public void ping(String ip, int port)
 	{
-		server = new ServerInfo("", ip + ":" + port, false);
+		if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+			return;
 		
-		new Thread(() -> pingInCurrentThread(ip, port),
-			"Wurst Server Pinger #" + threadNumber.incrementAndGet()).start();
+		pingPort = port;
+		server = new WurstServerInfo("", ip + ":" + port, false);
+		server.version = null;
+		
+		if (scanPorts) {
+			thread = new Thread(() -> pingInCurrentThread(ip, port),
+					"Wurst Server Pinger #" + threadNumber.incrementAndGet());
+		}
+		else {
+			thread = new Thread(() -> pingInCurrentThread(ip, port),
+					"Wurst Server Pinger #" + threadNumber + ", " + port);
+		}
+		thread.start();
+	}
+	
+	public WurstServerListPinger getServerListPinger() {
+		return pinger;
 	}
 	
 	private void pingInCurrentThread(String ip, int port)
 	{
-		MultiplayerServerListPinger pinger = new MultiplayerServerListPinger();
+		if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+			return;
+		
 		System.out.println("Pinging " + ip + ":" + port + "...");
 		
 		try
 		{
 			pinger.add(server, () -> {});
 			System.out.println("Ping successful: " + ip + ":" + port);
+			if (scanPorts) {
+				ArrayList<WurstServerPinger> portPingers = new ArrayList<WurstServerPinger>();
+				for (int i = 1; i <= 100; i++) {
+					if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+						return;
+					WurstServerPinger pp1 = new WurstServerPinger(doneListener, false);
+					WurstServerPinger pp2 = new WurstServerPinger(doneListener, false);
+					if (ServerFinderScreen.instance != null) {
+						ServerFinderScreen.instance.incrementTargetChecked(2);
+					}
+					pp1.ping(ip, port - i);
+					pp2.ping(ip, port + i);
+				}
+			}
 			
 		}catch(UnknownHostException e)
 		{
@@ -54,8 +113,16 @@ public class WurstServerPinger
 			failed = true;
 		}
 		
-		pinger.cancel();
-		done = true;
+		if (failed) {
+			pinger.cancel();
+			done = true;
+			synchronized(this) {
+				if (doneListener != null && !notifiedDoneListener) {
+					doneListener.onServerDone(this);
+					notifiedDoneListener = true;
+				}
+			}
+		}
 	}
 	
 	public boolean isStillPinging()
@@ -76,5 +143,29 @@ public class WurstServerPinger
 	public String getServerIP()
 	{
 		return server.address;
+	}
+
+	@Override
+	public void onServerDisconnect() {
+		pinger.cancel();
+		done = true;
+		synchronized(this) {
+			if (doneListener != null && !notifiedDoneListener) {
+				doneListener.onServerDone(this);
+				notifiedDoneListener = true;
+			}
+		}
+	}
+	
+	@Override
+	public void onServerFailed() {
+		pinger.cancel();
+		done = true;
+		synchronized(this) {
+			if (doneListener != null && !notifiedDoneListener) {
+				doneListener.onServerFailed(this);
+				notifiedDoneListener = true;
+			}
+		}
 	}
 }
