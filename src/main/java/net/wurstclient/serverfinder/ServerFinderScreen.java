@@ -7,9 +7,17 @@
  */
 package net.wurstclient.serverfinder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Stack;
 
 import org.lwjgl.glfw.GLFW;
@@ -19,9 +27,11 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.options.ServerList;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
+import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
 
@@ -51,6 +61,8 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 	private ArrayList<String> versionFilters = new ArrayList<>();
 	private int playerCountFilter = 0;
 	private boolean scanPorts = true;
+	
+	private String saveToFileMessage = null;
 
 	public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu) {
 		super(new LiteralText(""));
@@ -73,15 +85,68 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 	public ServerFinderState getState() {
 		return state;
 	}
+	
+	private void saveToFile() {
+		if (WurstClient.INSTANCE == null || prevScreen == null)
+			return;
+		
+		int newIPs = 0;
+		
+		Path wurstFolder = WurstClient.INSTANCE.getWurstFolder();
+		if (wurstFolder == null)
+			return;
+		
+		Path filePath = wurstFolder.resolve("servers.txt");
+		File serverFile = filePath.toFile();
+		HashSet<IPAddress> hashedIPs = new HashSet<>();
+		if (serverFile.exists()) {
+			try {
+				List<String> ips = Files.readAllLines(filePath);
+				for (String ip: ips) {
+					IPAddress parsedIP = IPAddress.fromText(ip);
+					if (parsedIP != null)
+						hashedIPs.add(parsedIP);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ServerList servers = prevScreen.getServerList();
+		for (int i = 0; i < servers.size(); i++) {
+			ServerInfo info = servers.get(i);
+			IPAddress addr = IPAddress.fromText(info.address);
+			if (addr != null && hashedIPs.add(addr))
+				newIPs++;
+		}
+		
+		String fileOutput = "";
+		for (IPAddress ip : hashedIPs) {
+			String stringIP = ip.toString();
+			if (stringIP != null)
+				fileOutput += stringIP + "\n";
+		}
+		try (PrintWriter pw = new PrintWriter(filePath.toFile())) {
+			pw.print(fileOutput);
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		saveToFileMessage = "\u00a76Saved " + newIPs + " new IP" + (newIPs == 1 ? "" : "s");
+	}
 
 	@Override
 	public void init() {
 		addButton(searchButton = new ButtonWidget(width / 2 - 100, height / 4 + 140 + 12, 200, 20,
 				new LiteralText("Search"), b -> searchOrCancel()));
 
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 164 + 12, 200, 20, new LiteralText("Tutorial"),
+		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 164 + 12, 98, 20, new LiteralText("Tutorial"),
 				b -> Util.getOperatingSystem()
 						.open("https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
+		
+		addButton(new ButtonWidget(width / 2 + 2, height / 4 + 164 + 12, 98, 20, new LiteralText("Save to File"),
+				b -> saveToFile()));
 
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 188 + 12, 200, 20, new LiteralText("Back"),
 				b -> client.openScreen(prevScreen)));
@@ -116,6 +181,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 
 		state = ServerFinderState.RESOLVING;
 		maxThreads = Integer.parseInt(maxThreadsBox.getText());
+		saveToFileMessage = null;
 		ipsToPing.clear();
 		targetChecked = 1792;
 		numActiveThreads = 0;
@@ -239,7 +305,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 		drawStringWithShadow(matrixStack, textRenderer, "Max. threads:", width / 2 - 100, height / 4 + 40, 10526880);
 		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
-		drawCenteredString(matrixStack, textRenderer, state.toString(), width / 2, height / 4 + 53, 10526880);
+		drawCenteredString(matrixStack, textRenderer, saveToFileMessage == null ? state.toString() : saveToFileMessage, width / 2, height / 4 + 53, 10526880);
 
 		drawStringWithShadow(matrixStack, textRenderer, "Checked: " + checked + " / " + targetChecked, width / 2 - 100,
 				height / 4 + 64, 10526880);
