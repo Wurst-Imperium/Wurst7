@@ -46,6 +46,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 	private final Object serverFinderLock = new Object();
 	
 	public static ServerFinderScreen instance = null;
+	private static int searchNumber = 0;
 	
 	private ArrayList<String> versionFilters = new ArrayList<>();
 	private int playerCountFilter = 0;
@@ -53,8 +54,13 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 
 	public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu) {
 		super(new LiteralText(""));
+		newSearch();
 		instance = this;
 		prevScreen = prevMultiplayerMenu;
+	}
+	
+	private void newSearch() {
+		searchNumber = (searchNumber + 1) % 1000;
 	}
 	
 	public void incrementTargetChecked(int amount) {
@@ -110,9 +116,14 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 
 		state = ServerFinderState.RESOLVING;
 		maxThreads = Integer.parseInt(maxThreadsBox.getText());
+		ipsToPing.clear();
+		targetChecked = 1792;
 		numActiveThreads = 0;
 		checked = 0;
 		working = 0;
+		
+		newSearch();
+		parseVersionFilters();
 
 		findServers();
 	}
@@ -132,7 +143,6 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 	}
 
 	private void findServers() {
-		parseVersionFilters();
 		try {
 			InetAddress addr = InetAddress.getByName(ipBox.getText().split(":")[0].trim());
 
@@ -170,7 +180,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 		synchronized (serverFinderLock) {
 			if (ipsToPing.size() > 0) {
 				String ip = ipsToPing.pop();
-				WurstServerPinger pinger = new WurstServerPinger(this, scanPorts);
+				WurstServerPinger pinger = new WurstServerPinger(this, scanPorts, searchNumber);
 				pinger.ping(ip);
 				numActiveThreads++;
 				return true;
@@ -266,6 +276,10 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 		}
 	}
 	
+	public static int getSearchNumber() {
+		return searchNumber;
+	}
+	
 	private boolean filterPass(WurstServerInfo info) {
 		if (info == null)
 			return false;
@@ -281,7 +295,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 	
 	@Override
 	public void onServerDone(WurstServerPinger pinger) {
-		if (state == ServerFinderState.CANCELLED)
+		if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
 			return;
 		synchronized (serverFinderLock) {
 			checked++;
@@ -298,8 +312,7 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 				}
 			}
 		}
-		while (numActiveThreads < maxThreads && pingNewIP()) {
-		}
+		while (numActiveThreads < maxThreads && pingNewIP());
 		synchronized (serverFinderLock) {
 			if (checked == targetChecked) {
 				state = ServerFinderState.DONE;
@@ -309,14 +322,13 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 
 	@Override
 	public void onServerFailed(WurstServerPinger pinger) {
-		if (state == ServerFinderState.CANCELLED)
+		if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
 			return;
 		synchronized (serverFinderLock) {
 			checked++;
 			numActiveThreads--;
 		}
-		while (numActiveThreads < maxThreads && pingNewIP()) {
-		}
+		while (numActiveThreads < maxThreads && pingNewIP());
 		synchronized (serverFinderLock) {
 			if (checked == targetChecked) {
 				state = ServerFinderState.DONE;

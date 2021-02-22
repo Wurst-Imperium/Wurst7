@@ -27,17 +27,23 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 	private IServerFinderDoneListener doneListener;
 	private boolean notifiedDoneListener = false;
 	private boolean scanPorts;
+	private int searchNumber;
 	
-	public WurstServerPinger(IServerFinderDoneListener doneListener, boolean scanPorts) {
+	public WurstServerPinger(IServerFinderDoneListener doneListener, boolean scanPorts, int searchNumber) {
 		pinger = new WurstServerListPinger();
 		pinger.addServerFinderDisconnectListener(this);
 		this.doneListener = doneListener;
 		this.scanPorts = scanPorts;
+		this.searchNumber = searchNumber;
 	}
 	
 	public void ping(String ip)
 	{
 		ping(ip, 25565);
+	}
+	
+	public int getSearchNumber() {
+		return searchNumber;
 	}
 	
 	public Thread getThread() {
@@ -54,7 +60,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 	
 	public void ping(String ip, int port)
 	{
-		if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+		if (isOldSearch())
 			return;
 		
 		pingPort = port;
@@ -76,25 +82,28 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		return pinger;
 	}
 	
+	private boolean isOldSearch() {
+		return ServerFinderScreen.instance == null || ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED || ServerFinderScreen.getSearchNumber() != searchNumber;
+	}
+	
 	private void pingInCurrentThread(String ip, int port)
 	{
-		if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+		if (isOldSearch())
 			return;
 		
-		System.out.println("Pinging " + ip + ":" + port + "...");
+		//System.out.println("Pinging " + ip + ":" + port + "...");
 		
 		try
 		{
 			pinger.add(server, () -> {});
-			System.out.println("Ping successful: " + ip + ":" + port);
+			//System.out.println("Ping successful: " + ip + ":" + port);
 			if (scanPorts) {
-				ArrayList<WurstServerPinger> portPingers = new ArrayList<WurstServerPinger>();
 				for (int i = 1; i <= 100; i++) {
-					if (ServerFinderScreen.instance != null && ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED)
+					if (isOldSearch())
 						return;
-					WurstServerPinger pp1 = new WurstServerPinger(doneListener, false);
-					WurstServerPinger pp2 = new WurstServerPinger(doneListener, false);
-					if (ServerFinderScreen.instance != null) {
+					WurstServerPinger pp1 = new WurstServerPinger(doneListener, false, searchNumber);
+					WurstServerPinger pp2 = new WurstServerPinger(doneListener, false, searchNumber);
+					if (ServerFinderScreen.instance != null && !isOldSearch()) {
 						ServerFinderScreen.instance.incrementTargetChecked(2);
 					}
 					pp1.ping(ip, port - i);
@@ -104,12 +113,12 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 			
 		}catch(UnknownHostException e)
 		{
-			System.out.println("Unknown host: " + ip + ":" + port);
+			//System.out.println("Unknown host: " + ip + ":" + port);
 			failed = true;
 			
 		}catch(Exception e2)
 		{
-			System.out.println("Ping failed: " + ip + ":" + port);
+			//System.out.println("Ping failed: " + ip + ":" + port);
 			failed = true;
 		}
 		
@@ -147,6 +156,9 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 
 	@Override
 	public void onServerDisconnect() {
+		if (isOldSearch())
+			return;
+		
 		pinger.cancel();
 		done = true;
 		synchronized(this) {
@@ -159,6 +171,9 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 	
 	@Override
 	public void onServerFailed() {
+		if (isOldSearch())
+			return;
+		
 		pinger.cancel();
 		done = true;
 		synchronized(this) {
