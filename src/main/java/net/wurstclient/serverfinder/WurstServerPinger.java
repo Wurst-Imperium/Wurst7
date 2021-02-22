@@ -15,7 +15,7 @@ import net.minecraft.client.network.MultiplayerServerListPinger;
 import net.minecraft.client.network.ServerInfo;
 import net.wurstclient.serverfinder.ServerFinderScreen.ServerFinderState;
 
-public class WurstServerPinger implements IServerFinderDisconnectListener
+public class WurstServerPinger implements IServerFinderDisconnectListener, IServerFinderDoneListener
 {
 	private static final AtomicInteger threadNumber = new AtomicInteger(0);
 	private WurstServerInfo server;
@@ -24,17 +24,25 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 	private Thread thread;
 	private int pingPort;
 	private WurstServerListPinger pinger;
-	private IServerFinderDoneListener doneListener;
-	private boolean notifiedDoneListener = false;
+	private boolean notifiedDoneListeners = false;
 	private boolean scanPorts;
 	private int searchNumber;
+	private int currentIncrement = 1;
+	private ArrayList<IServerFinderDoneListener> doneListeners = new ArrayList<>();
+	private int portPingers = 0;
+	private int successfulPortPingers = 0;
+	private String pingIP;
+	private final Object portPingerLock = new Object();
 	
-	public WurstServerPinger(IServerFinderDoneListener doneListener, boolean scanPorts, int searchNumber) {
+	public WurstServerPinger(boolean scanPorts, int searchNumber) {
 		pinger = new WurstServerListPinger();
 		pinger.addServerFinderDisconnectListener(this);
-		this.doneListener = doneListener;
 		this.scanPorts = scanPorts;
 		this.searchNumber = searchNumber;
+	}
+	
+	public void addServerFinderDoneListener(IServerFinderDoneListener listener) {
+		doneListeners.add(listener);
 	}
 	
 	public void ping(String ip)
@@ -63,6 +71,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		if (isOldSearch())
 			return;
 		
+		pingIP = ip;
 		pingPort = port;
 		server = new WurstServerInfo("", ip + ":" + port, false);
 		server.version = null;
@@ -86,6 +95,33 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		return ServerFinderScreen.instance == null || ServerFinderScreen.instance.getState() == ServerFinderState.CANCELLED || ServerFinderScreen.getSearchNumber() != searchNumber;
 	}
 	
+	private void runPortIncrement(String ip) {
+		synchronized(portPingerLock) {
+			portPingers = 0;
+			successfulPortPingers = 0;
+		}
+		for (int i = currentIncrement; i < currentIncrement * 10; i++) {
+			if (isOldSearch())
+				return;
+			WurstServerPinger pp1 = new WurstServerPinger(false, searchNumber);
+			WurstServerPinger pp2 = new WurstServerPinger(false, searchNumber);
+			for (int j = 0; j < doneListeners.size(); j++) {
+				pp1.addServerFinderDoneListener(doneListeners.get(j));
+				pp2.addServerFinderDoneListener(doneListeners.get(j));
+			}
+			pp1.addServerFinderDoneListener(this);
+			pp2.addServerFinderDoneListener(this);
+			if (ServerFinderScreen.instance != null && !isOldSearch()) {
+				ServerFinderScreen.instance.incrementTargetChecked(2);
+			}
+			pp1.ping(ip, 25565 - i);
+			pp2.ping(ip, 25565 + i);
+		}
+		synchronized(portPingerLock) {
+			currentIncrement *= 10;
+		}
+	}
+	
 	private void pingInCurrentThread(String ip, int port)
 	{
 		if (isOldSearch())
@@ -98,17 +134,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 			pinger.add(server, () -> {});
 			//System.out.println("Ping successful: " + ip + ":" + port);
 			if (scanPorts) {
-				for (int i = 1; i <= 100; i++) {
-					if (isOldSearch())
-						return;
-					WurstServerPinger pp1 = new WurstServerPinger(doneListener, false, searchNumber);
-					WurstServerPinger pp2 = new WurstServerPinger(doneListener, false, searchNumber);
-					if (ServerFinderScreen.instance != null && !isOldSearch()) {
-						ServerFinderScreen.instance.incrementTargetChecked(2);
-					}
-					pp1.ping(ip, port - i);
-					pp2.ping(ip, port + i);
-				}
+				runPortIncrement(ip);
 			}
 			
 		}catch(UnknownHostException e)
@@ -125,12 +151,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		if (failed) {
 			pinger.cancel();
 			done = true;
-			synchronized(this) {
-				if (doneListener != null && !notifiedDoneListener) {
-					doneListener.onServerDone(this);
-					notifiedDoneListener = true;
-				}
-			}
+			notifyDoneListeners(false);
 		}
 	}
 	
@@ -161,10 +182,23 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		
 		pinger.cancel();
 		done = true;
+		notifyDoneListeners(false);
+	}
+	
+	private void notifyDoneListeners(boolean failure) {
 		synchronized(this) {
-			if (doneListener != null && !notifiedDoneListener) {
-				doneListener.onServerDone(this);
-				notifiedDoneListener = true;
+			if (!notifiedDoneListeners) {
+				notifiedDoneListeners = true;
+				for (IServerFinderDoneListener doneListener : doneListeners) {
+					if (doneListener != null) {
+						if (failure) {
+							doneListener.onServerFailed(this);
+						}
+						else {
+							doneListener.onServerDone(this);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -176,11 +210,25 @@ public class WurstServerPinger implements IServerFinderDisconnectListener
 		
 		pinger.cancel();
 		done = true;
-		synchronized(this) {
-			if (doneListener != null && !notifiedDoneListener) {
-				doneListener.onServerFailed(this);
-				notifiedDoneListener = true;
+		notifyDoneListeners(true);
+	}
+
+	@Override
+	public void onServerDone(WurstServerPinger pinger) {
+		synchronized(portPingerLock) {
+			portPingers += 1;
+			if (pinger.isWorking())
+				successfulPortPingers += 1;
+			if (portPingers == (currentIncrement / 10) * 18 && currentIncrement <= 1000 && successfulPortPingers > 0) {
+				new Thread(() -> runPortIncrement(pingIP)).start();
 			}
+		}
+	}
+
+	@Override
+	public void onServerFailed(WurstServerPinger pinger) {
+		synchronized(portPingerLock) {
+			portPingers += 1;
 		}
 	}
 }

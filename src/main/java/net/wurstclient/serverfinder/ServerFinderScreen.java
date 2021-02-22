@@ -246,7 +246,8 @@ public class ServerFinderScreen extends Screen implements IServerFinderDoneListe
 		synchronized (serverFinderLock) {
 			if (ipsToPing.size() > 0) {
 				String ip = ipsToPing.pop();
-				WurstServerPinger pinger = new WurstServerPinger(this, scanPorts, searchNumber);
+				WurstServerPinger pinger = new WurstServerPinger(scanPorts, searchNumber);
+				pinger.addServerFinderDoneListener(this);
 				pinger.ping(ip);
 				numActiveThreads++;
 				return true;
