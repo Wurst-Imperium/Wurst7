@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -37,7 +37,7 @@ public final class DirectLoginScreen extends AltEditorScreen
 			message = LoginManager.login(getEmail(), getPassword());
 		
 		if(message.isEmpty())
-			minecraft.openScreen(new TitleScreen());
+			client.openScreen(new TitleScreen());
 		else
 			doErrorEffect();
 	}

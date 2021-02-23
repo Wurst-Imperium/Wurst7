@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,9 +23,12 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
@@ -33,6 +36,7 @@ import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
+import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(ClientPlayerEntity.class)
@@ -58,7 +62,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onSendChatMessage(String message, CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 		{
@@ -80,7 +84,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		ordinal = 0), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(UpdateEvent.INSTANCE);
+		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
 	@Redirect(at = @At(value = "INVOKE",
@@ -97,13 +101,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(PreMotionEvent.INSTANCE);
+		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(PostMotionEvent.INSTANCE);
+		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = {@At("HEAD")},
@@ -112,13 +116,13 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"getLastAutoJump()Z"},
+		method = {"isAutoJumpEnabled()Z"},
 		cancellable = true)
-	private void onGetLastAutoJump(CallbackInfoReturnable<Boolean> cir)
+	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
 			cir.setReturnValue(false);
@@ -140,7 +144,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setVelocityClient(double x, double y, double z)
 	{
 		KnockbackEvent event = new KnockbackEvent(x, y, z);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
 	}
 	
@@ -149,7 +153,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		boolean inWater = super.isTouchingWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		return event.isInWater();
 	}
@@ -173,6 +177,19 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		return super.clipAtLedge()
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+	}
+	
+	@Override
+	public boolean hasStatusEffect(StatusEffect effect)
+	{
+		FullbrightHack fullbright =
+			WurstClient.INSTANCE.getHax().fullbrightHack;
+		
+		if(effect == StatusEffects.NIGHT_VISION
+			&& fullbright.isNightVisionActive())
+			return true;
+		
+		return super.hasStatusEffect(effect);
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -70,7 +70,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 		if(!isEnabled())
 			return;
 		
-		if(!MC.player.onGround)
+		if(!MC.player.isOnGround())
 			return;
 		
 		if(MC.player.isTouchingWater() || MC.player.isInLava())
@@ -114,7 +114,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	{
 		MC.player.addVelocity(0, 0.1, 0);
 		MC.player.fallDistance = 0.1F;
-		MC.player.onGround = false;
+		MC.player.setOnGround(false);
 	}
 	
 	private void doFullJump()

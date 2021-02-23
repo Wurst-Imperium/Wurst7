@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,27 +11,34 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.google.gson.JsonObject;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
-import net.wurstclient.altmanager.Alt;
-import net.wurstclient.altmanager.AltManager;
-import net.wurstclient.altmanager.AltRenderer;
-import net.wurstclient.altmanager.ImportAltsFileChooser;
-import net.wurstclient.altmanager.LoginManager;
-import net.wurstclient.altmanager.NameGenerator;
+import net.wurstclient.altmanager.*;
+import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
+import net.wurstclient.util.json.JsonException;
+import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 public final class AltManagerScreen extends Screen
 {
@@ -47,6 +54,9 @@ public final class AltManagerScreen extends Screen
 	private ButtonWidget editButton;
 	private ButtonWidget deleteButton;
 	
+	private ButtonWidget importButton;
+	private ButtonWidget exportButton;
+	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
 		super(new LiteralText("Alt Manager"));
@@ -57,37 +67,41 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(minecraft, this, altManager.getList());
+		listGui = new ListGui(client, this, altManager.getList());
 		
 		if(altManager.getList().isEmpty() && shouldAsk)
-			minecraft.openScreen(new ConfirmScreen(this::confirmGenerate,
+			client.openScreen(new ConfirmScreen(this::confirmGenerate,
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, "Use", b -> pressUse()));
+			100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
 		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
-			"Direct Login",
-			b -> minecraft.openScreen(new DirectLoginScreen(this))));
+			new LiteralText("Direct Login"),
+			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20, "Add",
-			b -> minecraft.openScreen(new AddAltScreen(this, altManager))));
+		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+			new LiteralText("Add"),
+			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
 		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, "Star", b -> pressStar()));
+			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
 		
 		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, "Edit", b -> pressEdit()));
+			20, new LiteralText("Edit"), b -> pressEdit()));
 		
 		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, "Delete", b -> pressDelete()));
+			74, 20, new LiteralText("Delete"), b -> pressDelete()));
 		
 		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			"Cancel", b -> minecraft.openScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(8, 8, 100, 20, "Import Alts",
-			b -> pressImportAlts()));
+		addButton(importButton = new ButtonWidget(8, 8, 50, 20,
+			new LiteralText("Import"), b -> pressImportAlts()));
+		
+		addButton(exportButton = new ButtonWidget(58, 8, 50, 20,
+			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	
 	@Override
@@ -143,16 +157,22 @@ public final class AltManagerScreen extends Screen
 		starButton.active = altSelected;
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
+		
+		boolean windowMode = !client.options.fullscreen;
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
 	}
 	
-	private void pressUse()
+	private void pressLogin()
 	{
 		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
 		
 		if(alt.isCracked())
 		{
 			LoginManager.changeCrackedName(alt.getEmail());
-			minecraft.openScreen(prevScreen);
+			client.openScreen(prevScreen);
 			return;
 		}
 		
@@ -165,13 +185,16 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		altManager.setChecked(listGui.selected,
-			minecraft.getSession().getUsername());
-		minecraft.openScreen(prevScreen);
+			client.getSession().getUsername());
+		client.openScreen(prevScreen);
 	}
 	
-	private void pressStar()
+	private void pressFavorite()
 	{
 		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
+		
 		altManager.setStarred(listGui.selected, !alt.isStarred());
 		listGui.selected = -1;
 	}
@@ -179,21 +202,28 @@ public final class AltManagerScreen extends Screen
 	private void pressEdit()
 	{
 		Alt alt = listGui.getSelectedAlt();
-		minecraft.openScreen(new EditAltScreen(this, altManager, alt));
+		if(alt == null)
+			return;
+		
+		client.openScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
 	{
+		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
+			return;
+		
 		LiteralText text =
 			new LiteralText("Are you sure you want to remove this alt?");
 		
-		String altName = listGui.getSelectedAlt().getNameOrEmail();
+		String altName = alt.getNameOrEmail();
 		LiteralText message = new LiteralText(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
-			message, "Delete", "Cancel");
-		minecraft.openScreen(screen);
+			message, new LiteralText("Delete"), new LiteralText("Cancel"));
+		client.openScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -204,36 +234,114 @@ public final class AltManagerScreen extends Screen
 				ImportAltsFileChooser.class,
 				WurstClient.INSTANCE.getWurstFolder().toString());
 			
-			try(BufferedReader bf = new BufferedReader(new InputStreamReader(
-				process.getInputStream(), StandardCharsets.UTF_8)))
-			{
-				ArrayList<Alt> alts = new ArrayList<>();
-				
-				for(String line = ""; (line = bf.readLine()) != null;)
-				{
-					String[] data = line.split(":");
-					
-					switch(data.length)
-					{
-						case 1:
-						alts.add(new Alt(data[0], null, null));
-						break;
-						
-						case 2:
-						alts.add(new Alt(data[0], data[1], null));
-						break;
-					}
-				}
-				
-				altManager.addAll(alts);
-			}
-			
+			Path path = getFileChooserPath(process);
 			process.waitFor();
 			
-		}catch(IOException | InterruptedException e)
+			if(path.getFileName().toString().endsWith(".json"))
+				importAsJSON(path);
+			else
+				importAsTXT(path);
+			
+		}catch(IOException | InterruptedException | JsonException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private void importAsJSON(Path path) throws IOException, JsonException
+	{
+		WsonObject wson = JsonUtils.parseFileToObject(path);
+		ArrayList<Alt> alts = AltsFile.parseJson(wson);
+		altManager.addAll(alts);
+	}
+	
+	private void importAsTXT(Path path) throws IOException
+	{
+		List<String> lines = Files.readAllLines(path);
+		ArrayList<Alt> alts = new ArrayList<>();
+		
+		for(String line : lines)
+		{
+			String[] data = line.split(":");
+			
+			switch(data.length)
+			{
+				case 1:
+				alts.add(new Alt(data[0], null, null));
+				break;
+				
+				case 2:
+				alts.add(new Alt(data[0], data[1], null));
+				break;
+			}
+		}
+		
+		altManager.addAll(alts);
+	}
+	
+	private void pressExportAlts()
+	{
+		try
+		{
+			Process process = MultiProcessingUtils.startProcessWithIO(
+				ExportAltsFileChooser.class,
+				WurstClient.INSTANCE.getWurstFolder().toString());
+			
+			Path path = getFileChooserPath(process);
+			
+			process.waitFor();
+			
+			if(path.getFileName().toString().endsWith(".json"))
+				exportAsJSON(path);
+			else
+				exportAsTXT(path);
+			
+		}catch(IOException | InterruptedException | JsonException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Path getFileChooserPath(Process process) throws IOException
+	{
+		try(BufferedReader bf =
+			new BufferedReader(new InputStreamReader(process.getInputStream(),
+				StandardCharsets.UTF_8)))
+		{
+			String response = bf.readLine();
+			
+			if(response == null)
+				throw new IOException("No reponse from FileChooser");
+			
+			try
+			{
+				return Paths.get(response);
+				
+			}catch(InvalidPathException e)
+			{
+				throw new IOException(
+					"Reponse from FileChooser is not a valid path");
+			}
+		}
+	}
+	
+	private void exportAsJSON(Path path) throws IOException, JsonException
+	{
+		JsonObject json = AltsFile.createJson(altManager);
+		JsonUtils.toJson(json, path);
+	}
+	
+	private void exportAsTXT(Path path) throws IOException
+	{
+		List<String> lines = new ArrayList<>();
+		
+		for(Alt alt : altManager.getList())
+			if(alt.isCracked())
+				lines.add(alt.getEmail());
+			else
+				lines.add(alt.getEmail() + ":" + alt.getPassword());
+			
+		Files.write(path, lines);
 	}
 	
 	private void confirmGenerate(boolean confirmed)
@@ -248,7 +356,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -256,34 +364,40 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		minecraft.openScreen(this);
+		client.openScreen(this);
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground();
-		listGui.render(mouseX, mouseY, partialTicks);
+		renderBackground(matrixStack);
+		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
 		{
 			Alt alt = listGui.getSelectedAlt();
-			AltRenderer.drawAltBack(alt.getNameOrEmail(),
+			if(alt == null)
+				return;
+			
+			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(alt.getNameOrEmail(),
+			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		drawCenteredString(font, "Alt Manager", width / 2, 4, 16777215);
-		drawCenteredString(font, "Alts: " + altManager.getList().size(),
-			width / 2, 14, 10526880);
-		drawCenteredString(font, "premium: " + altManager.getNumPremium()
-			+ ", cracked: " + altManager.getNumCracked(), width / 2, 24,
-			10526880);
+		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
+			4, 16777215);
+		drawCenteredString(matrixStack, textRenderer,
+			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
+		drawCenteredString(
+			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
+				+ ", cracked: " + altManager.getNumCracked(),
+			width / 2, 24, 10526880);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -309,7 +423,36 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(matrixStack, mouseX, mouseY);
+	}
+	
+	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
+	{
+		for(AbstractButtonWidget button : buttons)
+		{
+			if(!button.isHovered())
+				continue;
+			
+			if(button != importButton && button != exportButton)
+				continue;
+			
+			ArrayList<Text> tooltip = new ArrayList<>();
+			tooltip.add(new LiteralText("This button opens another window."));
+			if(client.options.fullscreen)
+				tooltip
+					.add(new LiteralText("\u00a7cTurn off fullscreen mode!"));
+			else
+			{
+				tooltip
+					.add(new LiteralText("It might look like the game is not"));
+				tooltip.add(
+					new LiteralText("responding while that window is open."));
+			}
+			renderTooltip(matrixStack, tooltip, mouseX, mouseY);
+			break;
+		}
 	}
 	
 	public static final class ListGui extends ListWidget
@@ -368,13 +511,13 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(int id, int x, int y, int var4, int var5,
-			int var6, float partialTicks)
+		protected void renderItem(MatrixStack matrixStack, int id, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			Alt alt = list.get(id);
 			
 			// green glow when logged in
-			if(minecraft.getSession().getUsername().equals(alt.getName()))
+			if(client.getSession().getUsername().equals(alt.getName()))
 			{
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
@@ -401,20 +544,21 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			AltRenderer.drawAltFace(alt.getNameOrEmail(), x + 1, y + 1, 24, 24,
-				isSelectedItem(id));
+			AltRenderer.drawAltFace(matrixStack, alt.getNameOrEmail(), x + 1,
+				y + 1, 24, 24, isSelectedItem(id));
 			
 			// name / email
-			minecraft.textRenderer.draw("Name: " + alt.getNameOrEmail(), x + 31,
-				y + 3, 10526880);
+			client.textRenderer.draw(matrixStack,
+				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
 			
 			// tags
 			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			if(alt.isStarred())
-				tags += "\u00a7r, \u00a7estarred";
+				tags += "\u00a7r, \u00a7efavorite";
 			if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
-			minecraft.textRenderer.draw(tags, x + 31, y + 15, 10526880);
+			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
+				10526880);
 		}
 	}
 }

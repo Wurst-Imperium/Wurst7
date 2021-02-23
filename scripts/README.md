@@ -18,6 +18,6 @@ For switching to different Yarn mappings (e.g. when updating to a new Minecraft 
 
 To fix missing assets (no sound, missing textures, etc). Mostly happens when using the **old** `migrateMappings` script.
 
-## `premerge.bat`
+## `premerge.cmd`
 
-To download a pull request and try it out locally before merging. No idea why this ends in `.bat` instead of `.cmd`.
+To download a pull request and try it out locally before merging.

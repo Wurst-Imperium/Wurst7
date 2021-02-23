@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -37,13 +37,13 @@ public final class RenameCmd extends Command
 		for(int i = 1; i < args.length; i++)
 			message += " " + args[i];
 		
-		message = message.replace("$", "�").replace("��", "$");
+		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		ItemStack item = MC.player.inventory.getMainHandStack();
 		
 		if(item == null)
 			throw new CmdError("There is no item in your hand.");
 		
 		item.setCustomName(new LiteralText(message));
-		ChatUtils.message("Renamed item to \"" + message + "�r\".");
+		ChatUtils.message("Renamed item to \"" + message + "\u00a7r\".");
 	}
 }

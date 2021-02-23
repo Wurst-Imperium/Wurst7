@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -61,7 +61,9 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		if(!MC.player.onGround)
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
+		if(!MC.player.isOnGround())
 		{
 			ChatUtils.error("Can't build this in mid-air.");
 			setEnabled(false);
@@ -81,7 +83,7 @@ public final class InstantBunkerHack extends Hack
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings
-		BlockPos startPos = new BlockPos(MC.player);
+		BlockPos startPos = new BlockPos(MC.player.getPos());
 		Direction facing = MC.player.getHorizontalFacing();
 		Direction facing2 = facing.rotateYCounterclockwise();
 		
@@ -132,7 +134,7 @@ public final class InstantBunkerHack extends Hack
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
 			
-			if(MC.player.onGround)
+			if(MC.player.isOnGround())
 			{
 				setEnabled(false);
 				return;
@@ -174,13 +176,13 @@ public final class InstantBunkerHack extends Hack
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
 			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
@@ -193,7 +195,7 @@ public final class InstantBunkerHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			

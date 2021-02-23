@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -39,6 +39,9 @@ public final class AutoBuildTemplate
 		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
 		int[][] blocks =
 			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
+		
+		if(blocks == null)
+			throw new JsonException("Template has no blocks!");
 		
 		for(int i = 0; i < blocks.length; i++)
 		{

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
@@ -36,6 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
@@ -44,8 +44,9 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.ChunkSearcher;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -54,7 +55,7 @@ public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
-		"The type of block to search for.", "minecraft:diamond_ore");
+		"The type of block to search for.", "minecraft:diamond_ore", false);
 	
 	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
@@ -150,13 +151,13 @@ public final class SearchHack extends Hack
 		{
 			ChunkDeltaUpdateS2CPacket change =
 				(ChunkDeltaUpdateS2CPacket)packet;
-			ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord[] changedBlocks =
-				change.getRecords();
-			if(changedBlocks.length == 0)
+			
+			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
+			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
+			if(changedBlocks.isEmpty())
 				return;
 			
-			BlockPos pos = changedBlocks[0].getBlockPos();
-			chunk = world.getChunk(pos);
+			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket)
 		{
@@ -177,7 +178,7 @@ public final class SearchHack extends Hack
 		
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
-		int dimensionId = MC.player.dimension.getRawId();
+		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
 		addSearchersInRange(center, range, currentBlock, dimensionId);
 		removeSearchersOutOfRange(center, range);
@@ -271,8 +272,14 @@ public final class SearchHack extends Hack
 		
 		for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
 			for(int z = center.z - chunkRange; z <= center.z + chunkRange; z++)
-				chunksInRange.add(MC.world.getChunk(x, z));
-			
+			{
+				Chunk chunk = MC.world.getChunk(x, z);
+				if(chunk instanceof EmptyChunk)
+					continue;
+				
+				chunksInRange.add(chunk);
+			}
+		
 		return chunksInRange;
 	}
 	
@@ -280,8 +287,10 @@ public final class SearchHack extends Hack
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
-			if(Math.abs(searcher.chunk.getPos().x - center.x) <= chunkRange
-				&& Math.abs(searcher.chunk.getPos().z - center.z) <= chunkRange)
+			ChunkPos searcherPos = searcher.getChunk().getPos();
+			
+			if(Math.abs(searcherPos.x - center.x) <= chunkRange
+				&& Math.abs(searcherPos.z - center.z) <= chunkRange)
 				continue;
 			
 			removeSearcher(searcher);
@@ -293,12 +302,12 @@ public final class SearchHack extends Hack
 	{
 		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
 		{
-			if(currentBlock.equals(oldSearcher.block)
-				&& dimensionId == oldSearcher.dimensionId)
+			if(currentBlock.equals(oldSearcher.getBlock())
+				&& dimensionId == oldSearcher.getDimensionId())
 				continue;
 			
 			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.chunk, currentBlock, dimensionId);
+			addSearcher(oldSearcher.getChunk(), currentBlock, dimensionId);
 		}
 	}
 	
@@ -338,7 +347,7 @@ public final class SearchHack extends Hack
 	{
 		stopPool2Tasks();
 		
-		searchers.remove(searcher.chunk);
+		searchers.remove(searcher.getChunk());
 		searcher.cancelSearching();
 	}
 	
@@ -362,7 +371,7 @@ public final class SearchHack extends Hack
 	private boolean areAllChunkSearchersDone()
 	{
 		for(ChunkSearcher searcher : searchers.values())
-			if(searcher.status != ChunkSearcher.Status.DONE)
+			if(searcher.getStatus() != ChunkSearcher.Status.DONE)
 				return false;
 			
 		return true;
@@ -384,7 +393,7 @@ public final class SearchHack extends Hack
 		
 		Callable<HashSet<BlockPos>> task =
 			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.matchingBlocks.stream())
+				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
 				.sorted(Comparator
 					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
 				.limit(maxBlocks)
@@ -425,72 +434,10 @@ public final class SearchHack extends Hack
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
 		
-		Callable<ArrayList<int[]>> task = () -> matchingBlocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, matchingBlocks).stream())
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		Callable<ArrayList<int[]>> task =
+			BlockVertexCompiler.createTask(matchingBlocks);
 		
 		compileVerticesTask = pool2.submit(task);
-	}
-	
-	private ArrayList<int[]> getVertices(BlockPos pos,
-		HashSet<BlockPos> matchingBlocks)
-	{
-		ArrayList<int[]> vertices = new ArrayList<>();
-		
-		if(!matchingBlocks.contains(pos.down()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 0, 0, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.up()))
-		{
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 0));
-		}
-		
-		if(!matchingBlocks.contains(pos.north()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-		}
-		
-		if(!matchingBlocks.contains(pos.east()))
-		{
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.south()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-		}
-		
-		if(!matchingBlocks.contains(pos.west()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 0));
-		}
-		
-		return vertices;
-	}
-	
-	private int[] getVertex(BlockPos pos, int x, int y, int z)
-	{
-		return new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z};
 	}
 	
 	private void setDisplayListFromTask()
@@ -512,94 +459,6 @@ public final class SearchHack extends Hack
 		GL11.glEndList();
 		
 		displayListUpToDate = true;
-	}
-	
-	private static class ChunkSearcher
-	{
-		private final Chunk chunk;
-		private final Block block;
-		private final int dimensionId;
-		private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
-		private Status status = Status.IDLE;
-		private Future<?> future;
-		
-		public ChunkSearcher(Chunk chunk, Block block, int dimensionId)
-		{
-			this.chunk = chunk;
-			this.block = block;
-			this.dimensionId = dimensionId;
-		}
-		
-		public void startSearching(ExecutorService pool)
-		{
-			if(status != Status.IDLE)
-				throw new IllegalStateException();
-			
-			status = Status.SEARCHING;
-			future = pool.submit(() -> searchNow());
-		}
-		
-		private void searchNow()
-		{
-			if(status == Status.IDLE || status == Status.DONE
-				|| !matchingBlocks.isEmpty())
-				throw new IllegalStateException();
-			
-			ChunkPos chunkPos = chunk.getPos();
-			int minX = chunkPos.getStartX();
-			int minY = 0;
-			int minZ = chunkPos.getStartZ();
-			int maxX = chunkPos.getEndX();
-			int maxY = 255;
-			int maxZ = chunkPos.getEndZ();
-			
-			for(int x = minX; x <= maxX; x++)
-				for(int y = minY; y <= maxY; y++)
-					for(int z = minZ; z <= maxZ; z++)
-					{
-						if(status == Status.INTERRUPTED || Thread.interrupted())
-							return;
-						
-						BlockPos pos = new BlockPos(x, y, z);
-						Block block = BlockUtils.getBlock(pos);
-						if(!this.block.equals(block))
-							continue;
-						
-						matchingBlocks.add(pos);
-					}
-				
-			status = Status.DONE;
-		}
-		
-		public void cancelSearching()
-		{
-			new Thread(() -> cancelNow(), "ChunkSearcher-canceller").start();
-		}
-		
-		private void cancelNow()
-		{
-			if(future != null)
-				try
-				{
-					status = Status.INTERRUPTED;
-					future.get();
-					
-				}catch(InterruptedException | ExecutionException e)
-				{
-					e.printStackTrace();
-				}
-			
-			matchingBlocks.clear();
-			status = Status.IDLE;
-		}
-		
-		private enum Status
-		{
-			IDLE,
-			SEARCHING,
-			INTERRUPTED,
-			DONE;
-		}
 	}
 	
 	private enum Area

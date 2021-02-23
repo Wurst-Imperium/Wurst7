@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
-import net.minecraft.entity.EntityContext;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -33,18 +33,14 @@ public abstract class CactusBlockMixin extends Block
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/EntityContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+			"getOutlineShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,
-		EntityContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
+		ShapeContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
 	{
-		EventManager events = WurstClient.INSTANCE.getEventManager();
-		if(events == null)
-			return;
-		
 		CactusCollisionShapeEvent event = new CactusCollisionShapeEvent();
-		events.fire(event);
+		EventManager.fire(event);
 		
 		VoxelShape collisionShape = event.getCollisionShape();
 		if(collisionShape != null)

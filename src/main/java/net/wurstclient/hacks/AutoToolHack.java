@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -155,7 +155,7 @@ public final class AutoToolHack extends Hack
 			if(slot == inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			float speed = getMiningSpeed(stack, state);
 			if(speed <= bestSpeed)
@@ -176,7 +176,7 @@ public final class AutoToolHack extends Hack
 	
 	private float getMiningSpeed(ItemStack stack, BlockState state)
 	{
-		float speed = stack.getMiningSpeed(state);
+		float speed = stack.getMiningSpeedMultiplier(state);
 		
 		if(speed > 1)
 		{
@@ -232,7 +232,7 @@ public final class AutoToolHack extends Hack
 			if(slot == inventory.selectedSlot)
 				continue;
 			
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			if(!isDamageable(stack))
 				return slot;

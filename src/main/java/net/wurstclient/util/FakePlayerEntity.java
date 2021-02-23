@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,9 +54,9 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void resetCapeMovement()
 	{
-		field_7500 = getX();
-		field_7521 = getY();
-		field_7499 = getZ();
+		capeX = getX();
+		capeY = getY();
+		capeZ = getZ();
 	}
 	
 	private void spawn()

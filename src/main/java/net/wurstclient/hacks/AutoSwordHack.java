@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -110,10 +110,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// skip empty slots
-			if(MC.player.inventory.getInvStack(i).isEmpty())
+			if(MC.player.inventory.getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.inventory.getInvStack(i).getItem();
+			Item item = MC.player.inventory.getStack(i).getItem();
 			
 			// get damage
 			float value = getValue(item);

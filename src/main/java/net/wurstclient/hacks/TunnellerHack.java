@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,9 +8,9 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,6 +22,7 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -34,7 +35,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.EmptyBlockView;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -79,6 +80,9 @@ public final class TunnellerHack extends Hack
 	private float progress;
 	private float prevProgress;
 	
+	private BlockPos lastTorch;
+	private BlockPos nextTorch;
+	
 	public TunnellerHack()
 	{
 		super("Tunneller", "Automatically digs a tunnel.\n\n"
@@ -107,8 +111,12 @@ public final class TunnellerHack extends Hack
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().followHack.setEnabled(false);
+		WURST.getHax().instantBunkerHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		
 		// add listeners
@@ -119,12 +127,15 @@ public final class TunnellerHack extends Hack
 			displayLists[i] = GL11.glGenLists(1);
 		
 		ClientPlayerEntity player = MC.player;
-		start = new BlockPos(player);
+		start = new BlockPos(player.getPos());
 		direction = player.getHorizontalFacing();
 		length = 0;
+		lastTorch = null;
+		nextTorch = start;
 		
 		tasks = new Task[]{new DodgeLiquidTask(), new FillInFloorTask(),
-			new PlaceTorchTask(), new DigTunnelTask(), new WalkForwardTask()};
+			new PlaceTorchTask(), new WaitForFallingBlocksTask(),
+			new DigTunnelTask(), new WalkForwardTask()};
 		
 		updateCyanList();
 	}
@@ -151,16 +162,13 @@ public final class TunnellerHack extends Hack
 	public void onUpdate()
 	{
 		HackList hax = WURST.getHax();
-		Hack[] incompatibleHax = {hax.autoToolHack, hax.autoWalkHack,
-			hax.blinkHack, hax.flightHack, hax.nukerHack,
-			// TODO:
-			// hax.nukerLegitHack,
-			// hax.speedNukerHack,
-			hax.sneakHack};
+		Hack[] incompatibleHax = {hax.autoSwitchHack, hax.autoToolHack,
+			hax.autoWalkHack, hax.blinkHack, hax.flightHack,
+			hax.scaffoldWalkHack, hax.sneakHack};
 		for(Hack hack : incompatibleHax)
 			hack.setEnabled(false);
 		
-		if(hax.freecamHack.isEnabled())
+		if(hax.freecamHack.isEnabled() || hax.remoteViewHack.isEnabled())
 			return;
 		
 		GameOptions gs = MC.options;
@@ -243,8 +251,8 @@ public final class TunnellerHack extends Hack
 		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
 		GL11.glEnd();
 		
-		RenderUtils.drawArrow(new Vec3d(direction.getVector()).multiply(0.25),
-			new Vec3d(direction.getVector()).multiply(Math.max(0.5, length)));
+		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
+			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
 		
 		GL11.glPopMatrix();
 		GL11.glEndList();
@@ -263,6 +271,45 @@ public final class TunnellerHack extends Hack
 			+ Math.abs(pos1.getZ() - pos2.getZ());
 	}
 	
+	/**
+	 * Returns all block positions in the given box, in the order that Tunneller
+	 * should mine them (left to right, top to bottom, front to back).
+	 */
+	public ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)
+	{
+		ArrayList<BlockPos> blocks = new ArrayList<>();
+		
+		Direction front = direction;
+		Direction left = front.rotateYCounterclockwise();
+		
+		int fromFront =
+			from.getX() * front.getOffsetX() + from.getZ() * front.getOffsetZ();
+		int toFront =
+			to.getX() * front.getOffsetX() + to.getZ() * front.getOffsetZ();
+		int fromLeft =
+			from.getX() * left.getOffsetX() + from.getZ() * left.getOffsetZ();
+		int toLeft =
+			to.getX() * left.getOffsetX() + to.getZ() * left.getOffsetZ();
+		
+		int minFront = Math.min(fromFront, toFront);
+		int maxFront = Math.max(fromFront, toFront);
+		int minY = Math.min(from.getY(), to.getY());
+		int maxY = Math.max(from.getY(), to.getY());
+		int minLeft = Math.min(fromLeft, toLeft);
+		int maxLeft = Math.max(fromLeft, toLeft);
+		
+		for(int f = minFront; f <= maxFront; f++)
+			for(int y = maxY; y >= minY; y--)
+				for(int l = maxLeft; l >= minLeft; l--)
+				{
+					int x = f * front.getOffsetX() + l * left.getOffsetX();
+					int z = f * front.getOffsetZ() + l * left.getOffsetZ();
+					blocks.add(new BlockPos(x, y, z));
+				}
+			
+		return blocks;
+	}
+	
 	private static abstract class Task
 	{
 		public abstract boolean canRun();
@@ -272,45 +319,37 @@ public final class TunnellerHack extends Hack
 	
 	private class DigTunnelTask extends Task
 	{
-		private int requiredDistance;
+		private int maxDistance;
 		
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			int distance = getDistance(player, base);
 			
 			if(distance <= 1)
-				requiredDistance = size.getSelected().maxRange;
+				maxDistance = size.getSelected().maxRange;
 			else if(distance > size.getSelected().maxRange)
-				requiredDistance = 1;
+				maxDistance = 1;
 			
-			return distance <= requiredDistance;
+			return distance <= maxDistance;
 		}
 		
 		@Override
 		public void run()
 		{
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
-			BlockPos from = offset(base, size.getSelected().from);
+			BlockPos from = offset(player, size.getSelected().from);
 			BlockPos to = offset(base, size.getSelected().to);
 			
 			ArrayList<BlockPos> blocks = new ArrayList<>();
-			BlockUtils.getAllInBox(from, to).forEach(blocks::add);
-			Collections.reverse(blocks);
+			getAllInBox(from, to).forEach(blocks::add);
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			GL11.glColor4f(0, 1, 0, 0.5F);
-			for(BlockPos pos : blocks)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
-			GL11.glEndList();
 			
 			currentBlock = null;
 			for(BlockPos pos : blocks)
@@ -318,9 +357,20 @@ public final class TunnellerHack extends Hack
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				currentBlock = pos;
-				break;
+				if((pos.equals(nextTorch) || pos.equals(lastTorch))
+					&& BlockUtils.getBlock(pos) instanceof TorchBlock)
+					continue;
+				
+				if(currentBlock == null)
+					currentBlock = pos;
+				
+				GL11.glPushMatrix();
+				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+				RenderUtils.drawOutlinedBox(box);
+				GL11.glPopMatrix();
 			}
+			
+			GL11.glEndList();
 			
 			if(currentBlock == null)
 			{
@@ -342,7 +392,7 @@ public final class TunnellerHack extends Hack
 			
 			WURST.getHax().autoToolHack.equipBestTool(currentBlock, false, true,
 				false);
-			breakBlockSimple(currentBlock);
+			breakBlock(currentBlock);
 			
 			if(MC.player.abilities.creativeMode
 				|| BlockUtils.getHardness(currentBlock) >= 1)
@@ -365,7 +415,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			
 			return getDistance(player, base) > 1;
@@ -375,7 +425,7 @@ public final class TunnellerHack extends Hack
 		public void run()
 		{
 			BlockPos base = start.offset(direction, length);
-			Vec3d vec = new Vec3d(base).add(0.5, 0.5, 0.5);
+			Vec3d vec = Vec3d.ofCenter(base);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 			
 			MC.options.keyForward.setPressed(true);
@@ -389,7 +439,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			BlockPos from = offsetFloor(player, size.getSelected().from);
 			BlockPos to = offsetFloor(player, size.getSelected().to);
 			
@@ -429,7 +479,7 @@ public final class TunnellerHack extends Hack
 			Vec3d eyes = RotationUtils.getEyesPos().add(-0.5, -0.5, -0.5);
 			Comparator<BlockPos> comparator =
 				Comparator.<BlockPos> comparingDouble(
-					p -> eyes.squaredDistanceTo(new Vec3d(p)));
+					p -> eyes.squaredDistanceTo(Vec3d.of(p)));
 			
 			BlockPos pos = blocks.stream().max(comparator).get();
 			
@@ -447,7 +497,7 @@ public final class TunnellerHack extends Hack
 			{
 				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
 					false);
-				breakBlockSimple(pos);
+				breakBlock(pos);
 			}
 		}
 		
@@ -456,7 +506,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.inventory.getInvStack(slot);
+				ItemStack stack = MC.player.inventory.getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				
@@ -464,8 +514,7 @@ public final class TunnellerHack extends Hack
 				
 				// filter out non-solid blocks
 				BlockState state = block.getDefaultState();
-				if(!block.isFullOpaque(state, EmptyBlockView.INSTANCE,
-					BlockPos.ORIGIN))
+				if(!state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
 					continue;
 				
 				// filter out blocks that would fall
@@ -549,11 +598,11 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player);
+			BlockPos player = new BlockPos(MC.player.getPos());
 			KeyBinding forward = MC.options.keyForward;
 			
-			Vec3d diffVec = new Vec3d(player.subtract(start));
-			Vec3d dirVec = new Vec3d(direction.getVector());
+			Vec3d diffVec = Vec3d.of(player.subtract(start));
+			Vec3d dirVec = Vec3d.of(direction.getVector());
 			double dotProduct = diffVec.dotProduct(dirVec);
 			
 			BlockPos pos1 = start.offset(direction, (int)dotProduct);
@@ -591,26 +640,26 @@ public final class TunnellerHack extends Hack
 		
 		private Vec3d toVec3d(BlockPos pos)
 		{
-			return new Vec3d(pos).add(0.5, 0.5, 0.5);
+			return Vec3d.ofCenter(pos);
 		}
 	}
 	
 	private class PlaceTorchTask extends Task
 	{
-		private BlockPos lastTorch;
-		private BlockPos nextTorch = start;
-		
 		@Override
 		public boolean canRun()
 		{
 			if(!torches.isChecked())
 			{
 				lastTorch = null;
-				nextTorch = new BlockPos(MC.player);
+				nextTorch = new BlockPos(MC.player.getPos());
 				GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 				GL11.glEndList();
 				return false;
 			}
+			
+			if(BlockUtils.getBlock(nextTorch) instanceof TorchBlock)
+				lastTorch = nextTorch;
 			
 			if(lastTorch != null)
 				nextTorch = lastTorch.offset(direction,
@@ -618,16 +667,19 @@ public final class TunnellerHack extends Hack
 			
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 			GL11.glColor4f(1, 1, 0, 0.5F);
-			Vec3d torchVec = new Vec3d(nextTorch).add(0.5, 0, 0.5);
+			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			
-			BlockPos base = start.offset(direction, length);
-			if(getDistance(start, base) <= getDistance(start, nextTorch))
+			BlockPos player = new BlockPos(MC.player.getPos());
+			if(getDistance(player, nextTorch) > 4)
 				return false;
 			
-			return Blocks.TORCH.canPlaceAt(BlockUtils.getState(nextTorch),
-				MC.world, nextTorch);
+			BlockState state = BlockUtils.getState(nextTorch);
+			if(!state.getMaterial().isReplaceable())
+				return false;
+			
+			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
 		}
 		
 		@Override
@@ -642,9 +694,6 @@ public final class TunnellerHack extends Hack
 			
 			MC.options.keySneak.setPressed(true);
 			placeBlockSimple(nextTorch);
-			
-			if(BlockUtils.getBlock(nextTorch) instanceof TorchBlock)
-				lastTorch = nextTorch;
 		}
 		
 		private boolean equipTorch()
@@ -652,7 +701,7 @@ public final class TunnellerHack extends Hack
 			for(int slot = 0; slot < 9; slot++)
 			{
 				// filter out non-block items
-				ItemStack stack = MC.player.inventory.getInvStack(slot);
+				ItemStack stack = MC.player.inventory.getStack(slot);
 				if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 					continue;
 				
@@ -669,19 +718,38 @@ public final class TunnellerHack extends Hack
 		}
 	}
 	
+	private class WaitForFallingBlocksTask extends Task
+	{
+		@Override
+		public boolean canRun()
+		{
+			// check for nearby falling blocks
+			return StreamSupport
+				.stream(MC.world.getEntities().spliterator(), false)
+				.filter(e -> e instanceof FallingBlockEntity)
+				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
+		}
+		
+		@Override
+		public void run()
+		{
+			// just wait for them to land
+		}
+	}
+	
 	private void placeBlockSimple(BlockPos pos)
 	{
 		Direction side = null;
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
 			hitVecs[i] =
-				posVec.add(new Vec3d(sides[i].getVector()).multiply(0.5));
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
@@ -694,7 +762,7 @@ public final class TunnellerHack extends Hack
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
 				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.rayTraceBlock(eyesPos, hitVecs[i], neighbor,
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
 				neighborShape, neighborState) != null)
 				continue;
 			
@@ -743,15 +811,14 @@ public final class TunnellerHack extends Hack
 		IMC.setItemUseCooldown(4);
 	}
 	
-	private boolean breakBlockSimple(BlockPos pos)
+	private boolean breakBlock(BlockPos pos)
 	{
-		Direction side = null;
 		Direction[] sides = Direction.values();
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d relCenter = BlockUtils.getBoundingBox(pos)
 			.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter();
-		Vec3d center = new Vec3d(pos).add(relCenter);
+		Vec3d center = Vec3d.of(pos).add(relCenter);
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
@@ -762,37 +829,38 @@ public final class TunnellerHack extends Hack
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
+		double[] distancesSq = new double[sides.length];
+		boolean[] linesOfSight = new boolean[sides.length];
+		
+		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
 		for(int i = 0; i < sides.length; i++)
 		{
-			// check line of sight
-			if(MC.world
-				.rayTrace(new RayTraceContext(eyesPos, hitVecs[i],
-					RayTraceContext.ShapeType.COLLIDER,
-					RayTraceContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
+			
+			// no need to raytrace the rear sides,
+			// they can't possibly have line of sight
+			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			side = sides[i];
-			break;
+			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
-		if(side == null)
+		Direction side = sides[0];
+		for(int i = 1; i < sides.length; i++)
 		{
-			double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
-			for(int i = 0; i < sides.length; i++)
+			int bestSide = side.ordinal();
+			
+			// prefer sides with LOS
+			if(!linesOfSight[bestSide] && linesOfSight[i])
 			{
-				// check if side is facing towards player
-				if(eyesPos.squaredDistanceTo(hitVecs[i]) >= distanceSqToCenter)
-					continue;
-				
 				side = sides[i];
-				break;
+				continue;
 			}
+			
+			// then pick the closest side
+			if(distancesSq[i] < distancesSq[bestSide])
+				side = sides[i];
 		}
-		
-		if(side == null)
-			throw new RuntimeException(
-				"How could none of the sides be facing towards the player?!");
 		
 		// face block
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
@@ -808,11 +876,41 @@ public final class TunnellerHack extends Hack
 		return true;
 	}
 	
+	private boolean hasLineOfSight(Vec3d from, Vec3d to)
+	{
+		RaycastContext context =
+			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+		
+		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
+	}
+	
 	private enum TunnelSize
 	{
 		SIZE_1X2("1x2", new Vec3i(0, 1, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X3("1x3", new Vec3i(0, 2, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X4("1x4", new Vec3i(0, 3, 0), new Vec3i(0, 0, 0), 4, 13),
+		SIZE_1X5("1x5", new Vec3i(0, 4, 0), new Vec3i(0, 0, 0), 3, 13),
 		
-		SIZE_3X3("3x3", new Vec3i(1, 2, 0), new Vec3i(-1, 0, 0), 4, 11);
+		SIZE_2X2("2x2", new Vec3i(1, 1, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X3("2x3", new Vec3i(1, 2, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X4("2x4", new Vec3i(1, 3, 0), new Vec3i(0, 0, 0), 4, 11),
+		SIZE_2X5("2x5", new Vec3i(1, 4, 0), new Vec3i(0, 0, 0), 3, 11),
+		
+		SIZE_3X2("3x2", new Vec3i(1, 1, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X3("3x3", new Vec3i(1, 2, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X4("3x4", new Vec3i(1, 3, 0), new Vec3i(-1, 0, 0), 4, 11),
+		SIZE_3X5("3x5", new Vec3i(1, 4, 0), new Vec3i(-1, 0, 0), 3, 11),
+		
+		SIZE_4X2("4x2", new Vec3i(2, 1, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X3("4x3", new Vec3i(2, 2, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X4("4x4", new Vec3i(2, 3, 0), new Vec3i(-1, 0, 0), 4, 9),
+		SIZE_4X5("4x5", new Vec3i(2, 4, 0), new Vec3i(-1, 0, 0), 3, 9),
+		
+		SIZE_5X2("5x2", new Vec3i(2, 1, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X3("5x3", new Vec3i(2, 2, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X4("5x4", new Vec3i(2, 3, 0), new Vec3i(-2, 0, 0), 4, 9),
+		SIZE_5X5("5x5", new Vec3i(2, 4, 0), new Vec3i(-2, 0, 0), 3, 9);
 		
 		private final String name;
 		private final Vec3i from;
