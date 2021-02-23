@@ -128,9 +128,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cir.setReturnValue(false);
 	}
 	
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/screen/Screen;isPauseScreen()Z",
-		ordinal = 0),
+	@Redirect(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/screen/Screen;isPauseScreen()Z",
+			ordinal = 0),
 		method = {"updateNausea()V"})
 	private boolean onUpdateNausea(Screen screen)
 	{
