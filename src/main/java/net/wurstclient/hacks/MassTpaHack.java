@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -88,7 +88,10 @@ public final class MassTpaHack extends Hack
 		}
 		
 		if(index >= players.size())
+		{
 			setEnabled(false);
+			return;
+		}
 		
 		MC.player.sendChatMessage("/tpa " + players.get(index));
 		index++;
@@ -98,7 +101,7 @@ public final class MassTpaHack extends Hack
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		String message = event.getComponent().asString().toLowerCase();
+		String message = event.getComponent().getString().toLowerCase();
 		if(message.startsWith("\u00a7c[\u00a76wurst\u00a7c]"))
 			return;
 		

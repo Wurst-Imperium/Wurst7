@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.other_features;
 
 import net.minecraft.util.Util;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_feature.OtherFeature;
@@ -15,6 +16,7 @@ import net.wurstclient.update.Version;
 
 @SearchTags({"change log", "wurst update", "release notes", "what's new",
 	"what is new", "new features", "recently added features"})
+@DontBlock
 public final class ChangelogOtf extends OtherFeature
 {
 	public ChangelogOtf()

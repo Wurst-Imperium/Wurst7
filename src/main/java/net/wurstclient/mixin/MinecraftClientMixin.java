@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -27,6 +27,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -60,7 +61,7 @@ public abstract class MinecraftClientMixin
 	private void onDoAttack(CallbackInfo ci)
 	{
 		LeftClickEvent event = new LeftClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -72,7 +73,7 @@ public abstract class MinecraftClientMixin
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();

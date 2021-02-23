@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -41,6 +41,6 @@ public final class TiredHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			MC.player.yaw, MC.player.age % 100, MC.player.onGround));
+			MC.player.yaw, MC.player.age % 100, MC.player.isOnGround()));
 	}
 }

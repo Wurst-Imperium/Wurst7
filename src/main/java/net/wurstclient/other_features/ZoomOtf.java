@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,10 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.MouseScrollListener;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -18,6 +19,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
 
 @SearchTags({"telescope", "optifine"})
+@DontBlock
 public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 {
 	private final SliderSetting level = new SliderSetting("Zoom level", 3, 1,
@@ -43,7 +45,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	public double changeFovBasedOnZoom(double fov)
 	{
-		GameOptions gameOptions = MinecraftClient.getInstance().options;
+		GameOptions gameOptions = WurstClient.MC.options;
 		
 		if(currentLevel == null)
 			currentLevel = level.getValue();

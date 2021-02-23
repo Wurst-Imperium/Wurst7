@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,12 +13,15 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.SettingsWindow;
 import net.wurstclient.clickgui.Window;
+import net.wurstclient.hacks.TooManyHaxHack;
+import net.wurstclient.util.ChatUtils;
 
 public final class FeatureButton extends Component
 {
@@ -55,6 +58,14 @@ public final class FeatureButton extends Component
 			return;
 		}
 		
+		TooManyHaxHack tooManyHax =
+			WurstClient.INSTANCE.getHax().tooManyHaxHack;
+		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
+		{
+			ChatUtils.error(feature.getName() + " is blocked by TooManyHax.");
+			return;
+		}
+		
 		feature.doPrimaryAction();
 	}
 	
@@ -76,7 +87,8 @@ public final class FeatureButton extends Component
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -104,7 +116,7 @@ public final class FeatureButton extends Component
 			drawSettingsArrow(x2, x3, y1, y2, hSettings);
 		}
 		
-		drawName(x1, x3, y1);
+		drawName(matrixStack, x1, x3, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -236,18 +248,18 @@ public final class FeatureButton extends Component
 		GL11.glEnd();
 	}
 	
-	private void drawName(int x1, int x3, int y1)
+	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = feature.getName();
-		int nameWidth = tr.getStringWidth(name);
+		int nameWidth = tr.getWidth(name);
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		tr.draw(name, tx, ty, 0xF0F0F0);
+		tr.draw(matrixStack, name, tx, ty, 0xF0F0F0);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -258,7 +270,7 @@ public final class FeatureButton extends Component
 	{
 		String name = feature.getName();
 		TextRenderer tr = MC.textRenderer;
-		int width = tr.getStringWidth(name) + 4;
+		int width = tr.getWidth(name) + 4;
 		if(hasSettings)
 			width += 11;
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,6 +15,7 @@ import java.util.stream.StreamSupport;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -116,15 +117,20 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		if(style.getSelected().boxes)
-			renderBoxes(partialTicks);
+			renderBoxes(partialTicks, regionX, regionZ);
 		
 		if(style.getSelected().lines)
-			renderTracers(partialTicks);
+			renderTracers(partialTicks, regionX, regionZ);
 		
 		GL11.glPopMatrix();
 		
@@ -136,7 +142,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void renderBoxes(double partialTicks)
+	private void renderBoxes(double partialTicks, int regionX, int regionZ)
 	{
 		double extraSize = boxSize.getSelected().extraSize;
 		
@@ -144,9 +150,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		{
 			GL11.glPushMatrix();
 			
-			GL11.glTranslated(e.prevX + (e.getX() - e.prevX) * partialTicks,
+			GL11.glTranslated(
+				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
 				e.prevY + (e.getY() - e.prevY) * partialTicks,
-				e.prevZ + (e.getZ() - e.prevZ) * partialTicks);
+				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
 			
 			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
 				e.getWidth() + extraSize);
@@ -160,7 +167,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(double partialTicks)
+	private void renderTracers(double partialTicks, int regionX, int regionZ)
 	{
 		Vec3d start =
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
@@ -176,8 +183,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			float f = MC.player.distanceTo(e) / 20F;
 			GL11.glColor4f(2 - f, f, 0, 0.5F);
 			
-			GL11.glVertex3d(start.x, start.y, start.z);
-			GL11.glVertex3d(end.x, end.y, end.z);
+			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
+			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
 		}
 		GL11.glEnd();
 	}

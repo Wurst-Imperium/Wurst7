@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.client.util.InputUtil;
+import net.wurstclient.DontBlock;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -25,6 +26,7 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
 
+@DontBlock
 public final class BindsCmd extends Command
 {
 	public BindsCmd()
@@ -123,7 +125,7 @@ public final class BindsCmd extends Command
 		
 		try
 		{
-			InputUtil.fromName(key);
+			InputUtil.fromTranslationKey(key);
 			return key;
 			
 		}catch(IllegalArgumentException e)

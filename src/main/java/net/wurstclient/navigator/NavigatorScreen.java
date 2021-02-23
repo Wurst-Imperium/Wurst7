@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.awt.Rectangle;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 
@@ -75,6 +76,13 @@ public abstract class NavigatorScreen extends Screen
 				scroll = 0;
 			else if(scroll < maxScroll)
 				scroll = maxScroll;
+			
+			if(maxScroll == 0)
+				scrollKnobPosition = 0;
+			else
+				scrollKnobPosition =
+					(int)((height - 131) * scroll / (float)maxScroll);
+			scrollKnobPosition += 2;
 		}
 		
 		onMouseDrag(mouseX, mouseY, mouseButton, double_3, double_4);
@@ -126,7 +134,8 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(int mouseX, int mouseY, float partialTicks)
+	public final void render(MatrixStack matrixStack, int mouseX, int mouseY,
+		float partialTicks)
 	{
 		// GL settings
 		glEnable(GL_BLEND);
@@ -165,7 +174,7 @@ public abstract class NavigatorScreen extends Screen
 				drawDownShadow(x1, y1, x2, y2);
 		}
 		
-		onRender(mouseX, mouseY, partialTicks);
+		onRender(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// GL resets
 		glEnable(GL_CULL_FACE);
@@ -192,12 +201,12 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(int mouseX, int mouseY,
-		float partialTicks);
+	protected abstract void onRender(MatrixStack matrixStack, int mouseX,
+		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)
 	{
-		int fontHeight = minecraft.textRenderer.fontHeight;
+		int fontHeight = client.textRenderer.fontHeight;
 		int height = fontHeight;
 		
 		for(int i = 0; i < s.length(); i++)
@@ -213,6 +222,9 @@ public abstract class NavigatorScreen extends Screen
 		if(maxScroll > 0)
 			maxScroll = 0;
 		showScrollbar = maxScroll != 0;
+		
+		if(scroll < maxScroll)
+			scroll = maxScroll;
 	}
 	
 	protected final void drawQuads(int x1, int y1, int x2, int y2)

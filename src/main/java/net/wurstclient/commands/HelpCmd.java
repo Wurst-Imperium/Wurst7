@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,12 +9,14 @@ package net.wurstclient.commands;
 
 import java.util.ArrayList;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
+@DontBlock
 public final class HelpCmd extends Command
 {
 	private static final int CMDS_PER_PAGE = 8;

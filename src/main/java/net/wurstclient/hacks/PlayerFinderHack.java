@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnGlobalS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -82,6 +81,7 @@ public final class PlayerFinderHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -104,7 +104,7 @@ public final class PlayerFinderHack extends Hack
 				.add(RenderUtils.getCameraPos());
 			
 			// set end position
-			Vec3d end = new Vec3d(pos).add(0.5, 0.5, 0.5);
+			Vec3d end = Vec3d.ofCenter(pos);
 			
 			// draw line
 			GL11.glVertex3d(start.x, start.y, start.z);
@@ -155,19 +155,23 @@ public final class PlayerFinderHack extends Hack
 			PlaySoundS2CPacket sound = (PlaySoundS2CPacket)packet;
 			newPos = new BlockPos(sound.getX(), sound.getY(), sound.getZ());
 			
-		}else if(packet instanceof EntitySpawnGlobalS2CPacket)
-		{
-			EntitySpawnGlobalS2CPacket lightning =
-				(EntitySpawnGlobalS2CPacket)packet;
-			newPos = new BlockPos(lightning.getX() / 32D,
-				lightning.getY() / 32D, lightning.getZ() / 32D);
+			// }else if(packet instanceof EntitySpawnGlobalS2CPacket)
+			// {
+			// EntitySpawnGlobalS2CPacket lightning =
+			// (EntitySpawnGlobalS2CPacket)packet;
+			// newPos = new BlockPos(lightning.getX() / 32D,
+			// lightning.getY() / 32D, lightning.getZ() / 32D);
+			
+			// It seems that EntitySpawnGlobalS2CPacket has been deleted from
+			// the game. Further testing is needed to figure out if PlayerFinder
+			// can still work using only PlaySoundS2CPacket.
 		}
 		
 		if(newPos == null)
 			return;
 		
 		// check distance to player
-		BlockPos playerPos = new BlockPos(MC.player);
+		BlockPos playerPos = new BlockPos(MC.player.getPos());
 		if(Math.abs(playerPos.getX() - newPos.getX()) > 256
 			|| Math.abs(playerPos.getZ() - newPos.getZ()) > 256)
 			pos = newPos;

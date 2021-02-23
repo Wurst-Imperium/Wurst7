@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import java.util.stream.Stream;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -17,6 +18,7 @@ import net.wurstclient.command.Command;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;
 
+@DontBlock
 public final class SetModeCmd extends Command
 {
 	public SetModeCmd()

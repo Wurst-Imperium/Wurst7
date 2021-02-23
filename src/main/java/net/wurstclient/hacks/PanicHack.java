@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,11 +8,13 @@
 package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"legit", "disable"})
+@DontBlock
 public final class PanicHack extends Hack implements UpdateListener
 {
 	public PanicHack()

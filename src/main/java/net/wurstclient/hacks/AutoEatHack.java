@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
@@ -126,7 +126,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-food items
-			Item item = MC.player.inventory.getInvStack(i).getItem();
+			Item item = MC.player.inventory.getStack(i).getItem();
 			if(!item.isFood())
 				continue;
 			
@@ -152,7 +152,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
 		{
-			StatusEffect effect = pair.getLeft().getEffectType();
+			StatusEffect effect = pair.getFirst().getEffectType();
 			
 			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
 				return false;
@@ -189,14 +189,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		if(hitResult instanceof EntityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
+			Entity entity = ((EntityHitResult)hitResult).getEntity();
 			return entity instanceof VillagerEntity
 				|| entity instanceof TameableEntity;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
 		{
-			BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+			BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
 			if(pos == null)
 				return false;
 			

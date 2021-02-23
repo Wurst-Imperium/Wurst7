@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
@@ -22,7 +22,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClickWindowC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -93,7 +93,7 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.currentScreen instanceof ContainerScreen
+		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
 		
@@ -124,7 +124,7 @@ public final class AutoArmorHack extends Hack
 		// search inventory for better armor
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getInvStack(slot);
+			ItemStack stack = inventory.getStack(slot);
 			
 			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
 				continue;
@@ -172,7 +172,7 @@ public final class AutoArmorHack extends Hack
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(event.getPacket() instanceof ClickWindowC2SPacket)
+		if(event.getPacket() instanceof ClickSlotC2SPacket)
 			timer = delay.getValueI();
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,11 +7,13 @@
  */
 package net.wurstclient.other_features;
 
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 
 @SearchTags({"turn off", "hide wurst logo", "ghost mode", "stealth mode",
 	"vanilla Minecraft"})
+@DontBlock
 public final class DisableOtf extends OtherFeature
 {
 	public DisableOtf()
