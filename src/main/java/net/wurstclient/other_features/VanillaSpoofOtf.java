@@ -8,12 +8,12 @@
 package net.wurstclient.other_features;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.mixin.networking.accessor.CustomPayloadC2SPacketAccessor;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
+import net.wurstclient.mixin.CustomPayloadC2SPacketAccessor;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -40,18 +40,6 @@ public final class VanillaSpoofOtf extends OtherFeature
 	{
 		if(!spoof.isChecked())
 			return;
-		
-		try
-		{
-			Class.forName(
-				"net.fabricmc.fabric.mixin.networking.accessor.CustomPayloadC2SPacketAccessor");
-			
-		}catch(ClassNotFoundException e)
-		{
-			System.out.println(
-				"Can't spoof vanilla! CustomPayloadC2SPacketAccessor doesn't exist for some reason.");
-			return;
-		}
 		
 		if(!(event.getPacket() instanceof CustomPayloadC2SPacketAccessor))
 			return;
