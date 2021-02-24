@@ -41,11 +41,24 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!spoof.isChecked())
 			return;
 		
-		if(!(event.getPacket() instanceof CustomPayloadC2SPacket))
+		try
+		{
+			Class.forName(
+				"net.fabricmc.fabric.mixin.networking.accessor.CustomPayloadC2SPacketAccessor");
+			
+		}catch(ClassNotFoundException e)
+		{
+			System.out.println(
+				"Can't spoof vanilla! CustomPayloadC2SPacketAccessor doesn't exist for some reason.");
+			return;
+		}
+		
+		if(!(event.getPacket() instanceof CustomPayloadC2SPacketAccessor))
 			return;
 		
 		CustomPayloadC2SPacketAccessor packet =
 			(CustomPayloadC2SPacketAccessor)event.getPacket();
+		
 		if(packet.getChannel().getNamespace().equals("minecraft")
 			&& packet.getChannel().getPath().equals("register"))
 			event.cancel();
