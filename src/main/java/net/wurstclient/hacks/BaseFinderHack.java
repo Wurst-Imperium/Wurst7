@@ -43,11 +43,14 @@ public final class BaseFinderHack extends Hack
 		"minecraft:coal_ore", "minecraft:cobweb", "minecraft:copper_ore",
 		"minecraft:cornflower", "minecraft:dandelion",
 		"minecraft:dark_oak_leaves", "minecraft:dark_oak_log",
-		"minecraft:dead_bush", "minecraft:diamond_ore", "minecraft:diorite",
-		"minecraft:dirt", "minecraft:emerald_ore", "minecraft:fern",
-		"minecraft:glow_lichen", "minecraft:gold_ore", "minecraft:granite",
-		"minecraft:grass", "minecraft:grass_block", "minecraft:gravel",
-		"minecraft:grimstone", "minecraft:ice", "minecraft:infested_stone",
+		"minecraft:dead_bush", "minecraft:deepslate",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_gold_ore",
+		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
+		"minecraft:deepslate_redstone_ore", "minecraft:diamond_ore",
+		"minecraft:diorite", "minecraft:dirt", "minecraft:emerald_ore",
+		"minecraft:fern", "minecraft:glow_lichen", "minecraft:gold_ore",
+		"minecraft:granite", "minecraft:grass", "minecraft:grass_block",
+		"minecraft:gravel", "minecraft:ice", "minecraft:infested_stone",
 		"minecraft:iron_ore", "minecraft:jungle_leaves", "minecraft:jungle_log",
 		"minecraft:kelp", "minecraft:kelp_plant", "minecraft:lapis_ore",
 		"minecraft:large_amethyst_bud", "minecraft:large_fern",
@@ -61,11 +64,11 @@ public final class BaseFinderHack extends Hack
 		"minecraft:red_mushroom_block", "minecraft:red_tulip",
 		"minecraft:redstone_ore", "minecraft:rose_bush", "minecraft:sand",
 		"minecraft:sandstone", "minecraft:seagrass",
-		"minecraft:small_amethyst_bud", "minecraft:snow", "minecraft:spawner",
-		"minecraft:spruce_leaves", "minecraft:spruce_log", "minecraft:stone",
-		"minecraft:sunflower", "minecraft:tall_grass",
-		"minecraft:tall_seagrass", "minecraft:tuff", "minecraft:vine",
-		"minecraft:water", "minecraft:white_tulip");
+		"minecraft:small_amethyst_bud", "minecraft:smooth_basalt",
+		"minecraft:snow", "minecraft:spawner", "minecraft:spruce_leaves",
+		"minecraft:spruce_log", "minecraft:stone", "minecraft:sunflower",
+		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:tuff",
+		"minecraft:vine", "minecraft:water", "minecraft:white_tulip");
 	
 	private ArrayList<String> blockNames;
 	
