@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.class_5911;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -46,7 +46,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 			&& !isFallingFastEnoughToCauseDamage(player))
 			return;
 		
-		player.networkHandler.sendPacket(new PlayerMoveC2SPacket(true));
+		player.networkHandler.sendPacket(new class_5911(true));
 	}
 	
 	private boolean isFallingFastEnoughToCauseDamage(ClientPlayerEntity player)
