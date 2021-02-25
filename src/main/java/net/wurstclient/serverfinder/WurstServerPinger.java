@@ -7,12 +7,12 @@
  */
 package net.wurstclient.serverfinder;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.minecraft.client.network.MultiplayerServerListPinger;
-import net.minecraft.client.network.ServerInfo;
 import net.wurstclient.serverfinder.ServerFinderScreen.ServerFinderState;
 
 public class WurstServerPinger implements IServerFinderDisconnectListener, IServerFinderDoneListener
@@ -28,6 +28,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 	private boolean scanPorts;
 	private int searchNumber;
 	private int currentIncrement = 1;
+	private boolean startingIncrement = true;
 	private ArrayList<IServerFinderDoneListener> doneListeners = new ArrayList<>();
 	private int portPingers = 0;
 	private int successfulPortPingers = 0;
@@ -100,7 +101,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 			portPingers = 0;
 			successfulPortPingers = 0;
 		}
-		for (int i = currentIncrement; i < currentIncrement * 10; i++) {
+		for (int i = startingIncrement ? 1 : currentIncrement; i < currentIncrement * 2; i++) {
 			if (isOldSearch())
 				return;
 			WurstServerPinger pp1 = new WurstServerPinger(false, searchNumber);
@@ -118,7 +119,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 			pp2.ping(ip, 25565 + i);
 		}
 		synchronized(portPingerLock) {
-			currentIncrement *= 10;
+			currentIncrement *= 2;
 		}
 	}
 	
@@ -132,12 +133,8 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 		try
 		{
 			pinger.add(server, () -> {});
-			//System.out.println("Ping successful: " + ip + ":" + port);
-			if (scanPorts) {
-				runPortIncrement(ip);
-			}
-			
-		}catch(UnknownHostException e)
+		}
+		catch(UnknownHostException e)
 		{
 			//System.out.println("Unknown host: " + ip + ":" + port);
 			failed = true;
@@ -146,6 +143,15 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 		{
 			//System.out.println("Ping failed: " + ip + ":" + port);
 			failed = true;
+		}
+		
+		startingIncrement =  true;
+		if (!failed) {
+			currentIncrement = 8;
+		}
+		
+		if (!failed && scanPorts) {
+			runPortIncrement(ip);
 		}
 		
 		if (failed) {
@@ -219,7 +225,8 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 			portPingers += 1;
 			if (pinger.isWorking())
 				successfulPortPingers += 1;
-			if (portPingers == (currentIncrement / 10) * 18 && currentIncrement <= 1000 && successfulPortPingers > 0) {
+			if (portPingers == (startingIncrement ? currentIncrement * 2 - 2 : currentIncrement) && currentIncrement <= 5000 && successfulPortPingers > 0) {
+				startingIncrement = false;
 				new Thread(() -> runPortIncrement(pingIP)).start();
 			}
 		}
