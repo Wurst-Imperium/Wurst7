@@ -157,7 +157,7 @@ public final class AutoFishHack extends Hack
 		}
 		
 		// cast rod
-		if(player.fishHook == null)
+		if(player.fishHook == null || player.fishHook.isRemoved())
 		{
 			rightClick();
 			castRodTimer = 15;
