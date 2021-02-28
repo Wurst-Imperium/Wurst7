@@ -60,8 +60,10 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:water");
 	
 	private ArrayList<String> oreNames;
-	
 	private final String warning;
+	
+	private final String renderName =
+		Math.random() < 0.01 ? "X-Wurst" : getName();
 	
 	public XRayHack()
 	{
@@ -87,7 +89,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public String getRenderName()
 	{
-		return "X-Wurst";
+		return renderName;
 	}
 	
 	@Override
