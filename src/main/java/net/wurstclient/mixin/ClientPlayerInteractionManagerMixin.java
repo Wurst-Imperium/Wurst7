@@ -29,8 +29,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -50,8 +52,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	private int blockBreakingCooldown;
 	
-	private boolean overrideReach;
-	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
 		ordinal = 0)},
@@ -70,8 +70,11 @@ public abstract class ClientPlayerInteractionManagerMixin
 		cancellable = true)
 	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
 	{
-		if(overrideReach)
-			ci.setReturnValue(10F);
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return;
+		
+		ci.setReturnValue(hax.reachHack.getReachDistance());
 	}
 	
 	@Inject(at = {@At("HEAD")},
@@ -79,8 +82,11 @@ public abstract class ClientPlayerInteractionManagerMixin
 		cancellable = true)
 	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
 	{
-		if(overrideReach)
-			cir.setReturnValue(true);
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return;
+		
+		cir.setReturnValue(true);
 	}
 	
 	@Override
@@ -132,12 +138,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 		Direction direction)
 	{
 		sendPlayerAction(action, blockPos, direction);
-	}
-	
-	@Override
-	public void setOverrideReach(boolean overrideReach)
-	{
-		this.overrideReach = overrideReach;
 	}
 	
 	@Shadow
