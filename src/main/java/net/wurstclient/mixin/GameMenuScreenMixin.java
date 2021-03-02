@@ -28,10 +28,7 @@ import net.wurstclient.options.WurstOptionsScreen;
 
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
-{
-	private static final Identifier wurstTexture =
-		new Identifier("wurst", "wurst_128.png");
-	
+{	
 	private ButtonWidget wurstOptionsButton;
 	
 	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
@@ -52,7 +49,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void addWurstOptionsButton()
 	{
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
-			204, 20, new LiteralText("            Options"),
+			204, 20, new LiteralText("Wurst"),
 			b -> openWurstOptions());
 		
 		addButton(wurstOptionsButton);
@@ -89,25 +86,5 @@ public abstract class GameMenuScreenMixin extends Screen
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glColor4f(1, 1, 1, 1);
-		
-		client.getTextureManager().bindTexture(wurstTexture);
-		
-		int x = wurstOptionsButton.x + 34;
-		int y = wurstOptionsButton.y + 2;
-		int w = 63;
-		int h = 16;
-		int fw = 63;
-		int fh = 16;
-		float u = 0;
-		float v = 0;
-		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
 	}
 }
