@@ -18,7 +18,7 @@ import net.wurstclient.WurstClient;
 public final class WurstLogo
 {
 	private static final Identifier texture =
-		new Identifier("wurst", "wurst_128.png");
+		new Identifier("wurst", "wurst_200.png");
 	
 	public void render(MatrixStack matrixStack)
 	{
@@ -40,19 +40,19 @@ public final class WurstLogo
 		}else
 			GL11.glColor4f(1, 1, 1, 0.5F);
 		
-		drawQuads(0, 6, tr.getWidth(version) + 76, 17);
+		drawQuads(0, 15, tr.getWidth(version) + 50, 26);
 		
 		// draw version string
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		tr.draw(matrixStack, version, 74, 8, 0xFF000000);
+		tr.draw(matrixStack, version, 45, 17, 0xFF000000);
 		
 		// draw Wurst logo
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
 		WurstClient.MC.getTextureManager().bindTexture(texture);
-		DrawableHelper.drawTexture(matrixStack, 0, 3, 0, 0, 72, 18, 72, 18);
+		DrawableHelper.drawTexture(matrixStack, 2, 0, 0, 0, 40, 40, 40, 40);
 	}
 	
 	private String getVersionString()
