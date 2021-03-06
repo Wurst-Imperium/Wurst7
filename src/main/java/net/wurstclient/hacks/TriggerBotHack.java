@@ -186,7 +186,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.isSpaceEmpty(box);
+				return !world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
