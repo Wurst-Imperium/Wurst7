@@ -245,18 +245,18 @@ public final class MobSpawnEspHack extends Hack
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
-		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
 			if(scanner.displayList == 0)
 				continue;
 			
+			GL11.glPushMatrix();
+			RenderUtils.applyRegionalRenderOffset(scanner.chunk);
+			
 			GL11.glCallList(scanner.displayList);
+			
+			GL11.glPopMatrix();
 		}
-		
-		GL11.glPopMatrix();
 		
 		// GL resets
 		GL11.glColor4f(1, 1, 1, 1);
@@ -334,32 +334,43 @@ public final class MobSpawnEspHack extends Hack
 		
 		private void compileDisplayList()
 		{
+			int regionX = (chunk.getPos().getStartX() >> 9) * 512;
+			int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
+			
 			GL11.glNewList(displayList, GL11.GL_COMPILE);
 			
 			try
 			{
 				GL11.glColor4f(1, 0, 0, 0.5F);
 				GL11.glBegin(GL11.GL_LINES);
-				new ArrayList<>(red).forEach(pos -> {
-					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
-					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ() + 1);
-					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ());
-					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-						pos.getZ() + 1);
-				});
+				new ArrayList<>(red).stream()
+					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
+						pos.getZ() - regionZ))
+					.forEach(pos -> {
+						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+							pos.getZ());
+						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+							pos.getZ() + 1);
+						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+							pos.getZ());
+						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+							pos.getZ() + 1);
+					});
 				
 				GL11.glColor4f(1, 1, 0, 0.5F);
-				new ArrayList<>(yellow).forEach(pos -> {
-					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01, pos.getZ());
-					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ() + 1);
-					GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ());
-					GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-						pos.getZ() + 1);
-				});
+				new ArrayList<>(yellow).stream()
+					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
+						pos.getZ() - regionZ))
+					.forEach(pos -> {
+						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+							pos.getZ());
+						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+							pos.getZ() + 1);
+						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+							pos.getZ());
+						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+							pos.getZ() + 1);
+					});
 				GL11.glEnd();
 				
 			}finally

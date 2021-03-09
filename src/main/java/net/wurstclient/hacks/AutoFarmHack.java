@@ -154,17 +154,21 @@ public final class AutoFarmHack extends Hack
 					getBlocksToReplant(eyesVec, eyesBlock, rangeSq, blockRange);
 		}
 		
+		boolean replanting = false;
 		while(!blocksToReplant.isEmpty())
 		{
 			BlockPos pos = blocksToReplant.get(0);
 			Item neededItem = plants.get(pos);
 			if(tryToReplant(pos, neededItem))
+			{
+				replanting = true;
 				break;
+			}
 			
 			blocksToReplant.removeIf(p -> plants.get(p) == neededItem);
 		}
 		
-		if(blocksToReplant.isEmpty())
+		if(!replanting)
 			harvest(blocksToHarvest);
 		
 		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
@@ -338,7 +342,7 @@ public final class AutoFarmHack extends Hack
 		if(!heldItem.isEmpty() && heldItem.getItem() == neededItem)
 		{
 			placeBlockSimple(pos);
-			return true;
+			return IMC.getItemUseCooldown() <= 0;
 		}
 		
 		for(int slot = 0; slot < 36; slot++)

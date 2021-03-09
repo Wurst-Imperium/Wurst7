@@ -186,7 +186,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
+				return !MC.world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
