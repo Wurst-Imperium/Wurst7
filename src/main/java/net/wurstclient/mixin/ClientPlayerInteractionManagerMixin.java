@@ -18,7 +18,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.screen.slot.SlotActionType;
@@ -102,21 +101,21 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
-	public ItemStack windowClick_PICKUP(int slot)
+	public void windowClick_PICKUP(int slot)
 	{
-		return clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
+		clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
 	}
 	
 	@Override
-	public ItemStack windowClick_QUICK_MOVE(int slot)
+	public void windowClick_QUICK_MOVE(int slot)
 	{
-		return clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
+		clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
 	}
 	
 	@Override
-	public ItemStack windowClick_THROW(int slot)
+	public void windowClick_THROW(int slot)
 	{
-		return clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
+		clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
 	}
 	
 	@Override
@@ -164,6 +163,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 		World world_1, Hand hand_1);
 	
 	@Shadow
-	public abstract ItemStack clickSlot(int int_1, int int_2, int int_3,
-		SlotActionType slotActionType_1, PlayerEntity playerEntity_1);
+	public abstract void clickSlot(int syncId, int slotId, int clickData,
+		SlotActionType actionType, PlayerEntity playerEntity);
 }
