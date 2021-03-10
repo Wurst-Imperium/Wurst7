@@ -250,8 +250,8 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		// attack entity
 		RotationUtils.Rotation rotations = RotationUtils
 			.getNeededRotations(entity.getBoundingBox().getCenter());
-		WurstClient.MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
+		WurstClient.MC.player.networkHandler.sendPacket(
+			new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
 				rotations.getPitch(), MC.player.isOnGround()));
 		
 		WURST.getHax().criticalsHack.doCritical();

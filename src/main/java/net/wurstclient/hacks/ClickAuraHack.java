@@ -267,8 +267,9 @@ public final class ClickAuraHack extends Hack
 		// face entity
 		Rotation rotation = RotationUtils
 			.getNeededRotations(target.getBoundingBox().getCenter());
-		PlayerMoveC2SPacket.LookOnly packet = new PlayerMoveC2SPacket.LookOnly(
-			rotation.getYaw(), rotation.getPitch(), MC.player.isOnGround());
+		PlayerMoveC2SPacket.LookAndOnGround packet =
+			new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
+				rotation.getPitch(), MC.player.isOnGround());
 		MC.player.networkHandler.sendPacket(packet);
 		
 		// attack entity

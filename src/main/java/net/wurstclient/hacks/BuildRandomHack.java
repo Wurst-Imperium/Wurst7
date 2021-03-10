@@ -107,7 +107,7 @@ public final class BuildRandomHack extends Hack
 		do
 		{
 			// generate random position
-			pos = new BlockPos(MC.player.getPos()).add(
+			pos = new BlockPos(MC.player.getPos()).method_34592(
 				random.nextInt(bound) - range, random.nextInt(bound) - range,
 				random.nextInt(bound) - range);
 			attempts++;
@@ -224,8 +224,8 @@ public final class BuildRandomHack extends Hack
 			
 			// face block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			

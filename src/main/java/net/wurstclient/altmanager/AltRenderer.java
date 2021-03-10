@@ -7,7 +7,6 @@
  */
 package net.wurstclient.altmanager;
 
-import java.io.IOException;
 import java.util.HashSet;
 
 import org.lwjgl.opengl.GL11;
@@ -15,7 +14,6 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.texture.PlayerSkinTexture;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,16 +35,16 @@ public final class AltRenderer
 			return;
 		}
 		
-		try
-		{
-			PlayerSkinTexture img =
-				AbstractClientPlayerEntity.loadSkin(location, name);
-			img.load(mc.getResourceManager());
-			
-		}catch(IOException e)
-		{
-			e.printStackTrace();
-		}
+		// try
+		// {
+		// PlayerSkinTexture img =
+		// AbstractClientPlayerEntity.loadSkin(location, name);
+		// img.load(mc.getResourceManager());
+		//
+		// }catch(IOException e)
+		// {
+		// e.printStackTrace();
+		// }
 		
 		mc.getTextureManager().bindTexture(location);
 		loadedSkins.add(name);

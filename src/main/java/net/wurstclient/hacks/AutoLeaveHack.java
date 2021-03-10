@@ -100,13 +100,14 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			break;
 			
 			case TELEPORT:
-			MC.player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.PositionOnly(3.1e7, 100, 3.1e7, false));
+			MC.player.networkHandler
+				.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(3.1e7,
+					100, 3.1e7, false));
 			break;
 			
 			case SELFHURT:
 			MC.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket
-				.method_34206(MC.player, MC.player.isSneaking()));
+				.attack(MC.player, MC.player.isSneaking()));
 			break;
 		}
 		

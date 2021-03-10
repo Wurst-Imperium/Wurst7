@@ -277,10 +277,10 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				DiffuseLighting.enable();
+				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				DiffuseLighting.disable();
+				DiffuseLighting.disableGuiDepthLighting();
 				GL11.glPopMatrix();
 				
 				GL11.glPushMatrix();
@@ -304,9 +304,9 @@ public final class EditItemListScreen extends Screen
 				else
 					GL11.glScaled(0.75, 0.75, 0.75);
 				
-				DiffuseLighting.enable();
+				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-				DiffuseLighting.disable();
+				DiffuseLighting.disableGuiDepthLighting();
 				
 				GL11.glPopMatrix();
 				
