@@ -26,8 +26,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -455,7 +461,7 @@ public final class ClickGui
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
+		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		GL11.glLineWidth(1);
 		
 		tooltip = "";
@@ -578,7 +584,7 @@ public final class ClickGui
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
+		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		GL11.glLineWidth(1);
 		
 		for(Window window : windows)
@@ -618,6 +624,9 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
 		if(window.isMinimized())
 			y2 = y3;
 		
@@ -654,20 +663,23 @@ public final class ClickGui
 				// window background
 				RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 					opacity);
-				GL11.glBegin(GL11.GL_QUADS);
-				GL11.glVertex2i(xs2, ys1);
-				GL11.glVertex2i(xs2, ys2);
-				GL11.glVertex2i(xs3, ys2);
-				GL11.glVertex2i(xs3, ys1);
-				GL11.glVertex2i(xs1, ys1);
-				GL11.glVertex2i(xs1, ys3);
-				GL11.glVertex2i(xs2, ys3);
-				GL11.glVertex2i(xs2, ys1);
-				GL11.glVertex2i(xs1, ys4);
-				GL11.glVertex2i(xs1, ys2);
-				GL11.glVertex2i(xs2, ys2);
-				GL11.glVertex2i(xs2, ys4);
-				GL11.glEnd();
+				
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, xs2, ys1, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys2, 0).next();
+				bufferBuilder.vertex(matrix, xs3, ys2, 0).next();
+				bufferBuilder.vertex(matrix, xs3, ys1, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys1, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys1, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys2, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys2, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 				
 				boolean hovering = mouseX >= xs1 && mouseY >= ys3
 					&& mouseX < xs2 && mouseY < ys4;
@@ -675,22 +687,28 @@ public final class ClickGui
 				// scrollbar
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					hovering ? opacity * 1.5F : opacity);
-				GL11.glBegin(GL11.GL_QUADS);
-				GL11.glVertex2i(xs1, ys3);
-				GL11.glVertex2i(xs1, ys4);
-				GL11.glVertex2i(xs2, ys4);
-				GL11.glVertex2i(xs2, ys3);
-				GL11.glEnd();
+				
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 				
 				// outline
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					0.5F);
-				GL11.glBegin(GL11.GL_LINE_LOOP);
-				GL11.glVertex2i(xs1, ys3);
-				GL11.glVertex2i(xs1, ys4);
-				GL11.glVertex2i(xs2, ys4);
-				GL11.glVertex2i(xs2, ys3);
-				GL11.glEnd();
+				
+				bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
+				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 			}
 			
 			int x3 = x1 + 2;
@@ -702,28 +720,35 @@ public final class ClickGui
 			// left & right
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(x1, y3);
-			GL11.glVertex2i(x1, y2);
-			GL11.glVertex2i(x3, y2);
-			GL11.glVertex2i(x3, y3);
-			GL11.glVertex2i(x5, y3);
-			GL11.glVertex2i(x5, y2);
-			GL11.glVertex2i(x4, y2);
-			GL11.glVertex2i(x4, y3);
-			GL11.glEnd();
+			
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0).next();
+			bufferBuilder.vertex(matrix, x1, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y2, 0).next();
+			bufferBuilder.vertex(matrix, x4, y2, 0).next();
+			bufferBuilder.vertex(matrix, x4, y3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
 			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
 				window.getWidth() * sf, (y2 - y3) * sf);
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
-			GL11.glPushMatrix();
-			GL11.glTranslated(x1, y4, 0);
+			
+			// GL11.glPushMatrix();
+			matrixStack.push();
+			// GL11.glTranslated(x1, y4, 0);
+			matrixStack.translate(x1, y4, 0);
 			
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
-			GL11.glBegin(GL11.GL_QUADS);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
 			
 			// window background
 			// between children
@@ -733,10 +758,10 @@ public final class ClickGui
 			{
 				int yc1 = window.getChild(i).getY();
 				int yc2 = yc1 - 2;
-				GL11.glVertex2i(xc1, yc2);
-				GL11.glVertex2i(xc1, yc1);
-				GL11.glVertex2i(xc2, yc1);
-				GL11.glVertex2i(xc2, yc2);
+				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			}
 			
 			// window background
@@ -751,40 +776,47 @@ public final class ClickGui
 				yc1 = lastChild.getY() + lastChild.getHeight();
 			}
 			int yc2 = yc1 + 2;
-			GL11.glVertex2i(xc1, yc2);
-			GL11.glVertex2i(xc1, yc1);
-			GL11.glVertex2i(xc2, yc1);
-			GL11.glVertex2i(xc2, yc2);
+			bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+			bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			GL11.glEnd();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			// render children
-			int cMouseX = mouseX - x1;
-			int cMouseY = mouseY - y4;
-			for(int i = 0; i < window.countChildren(); i++)
-				window.getChild(i).render(matrixStack, cMouseX, cMouseY,
-					partialTicks);
+			// int cMouseX = mouseX - x1;
+			// int cMouseY = mouseY - y4;
+			// for(int i = 0; i < window.countChildren(); i++)
+			// window.getChild(i).render(matrixStack, cMouseX, cMouseY,
+			// partialTicks);
 			
-			GL11.glPopMatrix();
+			// GL11.glPopMatrix();
+			matrixStack.pop();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 		
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		if(!window.isMinimized())
 		{
 			// title bar outline
-			GL11.glBegin(GL11.GL_LINES);
-			GL11.glVertex2i(x1, y3);
-			GL11.glVertex2i(x2, y3);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0).next();
+			bufferBuilder.vertex(matrix, x2, y3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 		}
 		
 		// title bar buttons
@@ -798,7 +830,7 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			renderCloseButton(x3, y4, x4, y5, hovering);
+			// renderCloseButton(x3, y4, x4, y5, hovering);
 		}
 		
 		if(window.isPinnable())
@@ -806,7 +838,7 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			renderPinButton(x3, y4, x4, y5, hovering, window.isPinned());
+			// renderPinButton(x3, y4, x4, y5, hovering, window.isPinned());
 		}
 		
 		if(window.isMinimizable())
@@ -814,33 +846,38 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			renderMinimizeButton(x3, y4, x4, y5, hovering,
-				window.isMinimized());
+			// renderMinimizeButton(x3, y4, x4, y5, hovering,
+			// window.isMinimized());
 		}
 		
 		// title bar background
 		// above & below buttons
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 			opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y4);
-		GL11.glVertex2i(x2, y4);
-		GL11.glVertex2i(x2, y1);
-		GL11.glVertex2i(x3, y5);
-		GL11.glVertex2i(x3, y3);
-		GL11.glVertex2i(x2, y3);
-		GL11.glVertex2i(x2, y5);
-		GL11.glEnd();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
+		bufferBuilder.vertex(matrix, x2, y4, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y5, 0).next();
+		bufferBuilder.vertex(matrix, x3, y3, 0).next();
+		bufferBuilder.vertex(matrix, x2, y3, 0).next();
+		bufferBuilder.vertex(matrix, x2, y5, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// title bar background
 		// behind title
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y3);
-		GL11.glVertex2i(x3, y3);
-		GL11.glVertex2i(x3, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y3, 0).next();
+		bufferBuilder.vertex(matrix, x3, y3, 0).next();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// window title
 		GL11.glEnable(GL11.GL_TEXTURE_2D);

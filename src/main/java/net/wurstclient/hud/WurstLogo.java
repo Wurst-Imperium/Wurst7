@@ -13,8 +13,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 
 public final class WurstLogo
@@ -43,7 +49,7 @@ public final class WurstLogo
 		}else
 			RenderSystem.setShaderColor(1, 1, 1, 0.5F);
 		
-		drawQuads(0, 6, tr.getWidth(version) + 76, 17);
+		drawQuads(matrixStack, 0, 6, tr.getWidth(version) + 76, 17);
 		
 		// draw version string
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -69,13 +75,18 @@ public final class WurstLogo
 		return version;
 	}
 	
-	private void drawQuads(int x1, int y1, int x2, int y2)
+	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2)
 	{
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x2, y1);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x1, y2);
-		GL11.glEnd();
+		Matrix4f matrix = matrices.peek().getModel();
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y2, 0.0F).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0.0F).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0.0F).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0.0F).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 }
