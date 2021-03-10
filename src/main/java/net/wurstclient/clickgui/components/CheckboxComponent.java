@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
@@ -102,7 +104,8 @@ public final class CheckboxComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x3, y1);
 		GL11.glVertex2i(x3, y2);
@@ -117,7 +120,7 @@ public final class CheckboxComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hovering ? opacity * 1.5F : opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
@@ -126,7 +129,7 @@ public final class CheckboxComponent extends Component
 		GL11.glVertex2i(x3, y1);
 		GL11.glEnd();
 		
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -150,9 +153,9 @@ public final class CheckboxComponent extends Component
 		
 		// check
 		if(setting.isLocked())
-			GL11.glColor4f(0.5F, 0.5F, 0.5F, 0.75F);
+			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
-			GL11.glColor4f(0, hovering ? 1 : 0.85F, 0, 1);
+			RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(xc2, yc3);
 		GL11.glVertex2d(xc3, yc4);
@@ -165,7 +168,7 @@ public final class CheckboxComponent extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xc2, yc3);
 		GL11.glVertex2d(xc3, yc4);
@@ -178,7 +181,7 @@ public final class CheckboxComponent extends Component
 	
 	private void drawName(MatrixStack matrixStack, int x3, int y1)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();

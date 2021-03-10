@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
@@ -74,7 +76,8 @@ public final class BlockListEditButton extends Component
 			gui.setTooltip(setting.getDescription());
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -83,7 +86,7 @@ public final class BlockListEditButton extends Component
 		GL11.glEnd();
 		
 		// box
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hBox ? opacity * 1.5F : opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x3, y1);
@@ -91,7 +94,7 @@ public final class BlockListEditButton extends Component
 		GL11.glVertex2i(x2, y2);
 		GL11.glVertex2i(x2, y1);
 		GL11.glEnd();
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x3, y1);
 		GL11.glVertex2i(x3, y2);
@@ -100,7 +103,7 @@ public final class BlockListEditButton extends Component
 		GL11.glEnd();
 		
 		// setting name
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getBlockNames().size();

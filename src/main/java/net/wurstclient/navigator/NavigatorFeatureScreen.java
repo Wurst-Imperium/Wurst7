@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 
@@ -25,6 +24,8 @@ import java.util.TreeMap;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -439,7 +440,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			}else
 				alpha = 0.375F;
 			float[] rgb = buttonData.color.getColorComponents(null);
-			glColor4f(rgb[0], rgb[1], rgb[2], alpha);
+			RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], alpha);
 			
 			// button
 			drawBox(x1, y1, x2, y2);
@@ -489,13 +490,15 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
 			if(feature.isEnabled() && button == primaryButton)
 				// if(feature.isBlocked())
-				// glColor4f(hovering ? 1F : 0.875F, 0F, 0F, 0.25F);
+				// RenderSystem.setShaderColor(hovering ? 1F : 0.875F, 0F, 0F,
+				// 0.25F);
 				// else
-				glColor4f(0F, hovering ? 1F : 0.875F, 0F, 0.25F);
+				RenderSystem.setShaderColor(0F, hovering ? 1F : 0.875F, 0F,
+					0.25F);
 			else if(hovering)
-				glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
 			glDisable(GL_TEXTURE_2D);

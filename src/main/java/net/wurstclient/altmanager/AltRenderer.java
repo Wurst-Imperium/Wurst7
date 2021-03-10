@@ -11,6 +11,8 @@ import java.util.HashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -59,9 +61,9 @@ public final class AltRenderer
 			GL11.glEnable(GL11.GL_BLEND);
 			
 			if(selected)
-				GL11.glColor4f(1, 1, 1, 1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			else
-				GL11.glColor4f(0.9F, 0.9F, 0.9F, 1);
+				RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1);
 			
 			// Face
 			int fw = 192;
@@ -97,7 +99,7 @@ public final class AltRenderer
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glColor4f(1, 1, 1, 1);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;
@@ -229,7 +231,7 @@ public final class AltRenderer
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glColor4f(1, 1, 1, 1);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;

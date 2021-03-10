@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.hit.HitResult;
@@ -72,7 +74,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			drawEndOfLine(end, camPos);
 		}
 		
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -84,7 +86,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	private void drawLine(ArrayList<Vec3d> path, Vec3d camPos)
 	{
 		GL11.glBegin(GL11.GL_LINE_STRIP);
-		GL11.glColor4f(0, 1, 0, 0.75F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		
 		for(Vec3d point : path)
 			GL11.glVertex3d(point.x - camPos.x, point.y - camPos.y,
@@ -102,10 +104,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glPushMatrix();
 		GL11.glTranslated(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
 		
-		GL11.glColor4f(0, 1, 0, 0.25F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
 		RenderUtils.drawSolidBox();
 		
-		GL11.glColor4f(0, 1, 0, 0.75F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		RenderUtils.drawOutlinedBox();
 		
 		GL11.glPopMatrix();

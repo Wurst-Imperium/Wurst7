@@ -11,6 +11,8 @@ import java.util.Objects;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -159,9 +161,10 @@ public final class FeatureButton extends Component
 			// if(feature.isBlocked())
 			// glColor4f(1, 0, 0, hHack ? opacity * 1.5F : opacity);
 			// else
-			GL11.glColor4f(0, 1, 0, hHack ? opacity * 1.5F : opacity);
+			RenderSystem.setShaderColor(0, 1, 0,
+				hHack ? opacity * 1.5F : opacity);
 		else
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				hHack ? opacity * 1.5F : opacity);
 		
 		GL11.glVertex2i(x1, y1);
@@ -179,7 +182,7 @@ public final class FeatureButton extends Component
 		float opacity = GUI.getOpacity();
 		
 		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hSettings ? opacity * 1.5F : opacity);
 		GL11.glVertex2i(x3, y1);
 		GL11.glVertex2i(x3, y2);
@@ -193,7 +196,7 @@ public final class FeatureButton extends Component
 		float[] acColor = GUI.getAcColor();
 		
 		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
 		GL11.glVertex2i(x2, y2);
@@ -223,13 +226,13 @@ public final class FeatureButton extends Component
 		{
 			ya1 = y2 - 3.5;
 			ya2 = y1 + 3;
-			GL11.glColor4f(hSettings ? 1 : 0.85F, 0, 0, 1);
+			RenderSystem.setShaderColor(hSettings ? 1 : 0.85F, 0, 0, 1);
 			
 		}else
 		{
 			ya1 = y1 + 3.5;
 			ya2 = y2 - 3;
-			GL11.glColor4f(0, hSettings ? 1 : 0.85F, 0, 1);
+			RenderSystem.setShaderColor(0, hSettings ? 1 : 0.85F, 0, 1);
 		}
 		
 		// arrow
@@ -240,7 +243,7 @@ public final class FeatureButton extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xa1, ya1);
 		GL11.glVertex2d(xa3, ya1);
@@ -250,7 +253,7 @@ public final class FeatureButton extends Component
 	
 	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		TextRenderer tr = MC.textRenderer;

@@ -14,6 +14,8 @@ import java.util.LinkedHashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
@@ -362,7 +364,7 @@ public final class AutoBuildHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glColor4f(0F, 0F, 0F, 0.5F);
+		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRegionalRenderOffset();
@@ -402,17 +404,17 @@ public final class AutoBuildHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private void drawGreenBox()
 	{
 		GL11.glDepthMask(false);
-		GL11.glColor4f(0F, 1F, 0F, 0.15F);
+		RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
 		RenderUtils.drawSolidBox();
 		GL11.glDepthMask(true);
 		
-		GL11.glColor4f(0F, 0F, 0F, 0.5F);
+		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 		RenderUtils.drawOutlinedBox();
 	}
 	

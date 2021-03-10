@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -350,7 +351,7 @@ public abstract class AltEditorScreen extends Screen
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glColor4f(1, 0, 0, errorTimer / 16F);
+			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
 			GL11.glBegin(GL11.GL_QUADS);
 			{

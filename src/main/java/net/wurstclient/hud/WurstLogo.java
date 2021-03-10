@@ -9,6 +9,8 @@ package net.wurstclient.hud;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
@@ -35,10 +37,11 @@ public final class WurstLogo
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
 			float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.5F);
 			
 		}else
-			GL11.glColor4f(1, 1, 1, 0.5F);
+			RenderSystem.setShaderColor(1, 1, 1, 0.5F);
 		
 		drawQuads(0, 6, tr.getWidth(version) + 76, 17);
 		
@@ -49,7 +52,7 @@ public final class WurstLogo
 		tr.draw(matrixStack, version, 74, 8, 0xFF000000);
 		
 		// draw Wurst logo
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
 		WurstClient.MC.getTextureManager().bindTexture(texture);
 		DrawableHelper.drawTexture(matrixStack, 0, 3, 0, 0, 72, 18, 72, 18);

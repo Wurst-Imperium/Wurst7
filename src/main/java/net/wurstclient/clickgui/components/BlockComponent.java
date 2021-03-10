@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -88,7 +90,8 @@ public final class BlockComponent extends Component
 		}
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -97,7 +100,7 @@ public final class BlockComponent extends Component
 		GL11.glEnd();
 		
 		// setting name
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";

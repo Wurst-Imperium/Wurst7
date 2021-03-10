@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.Box;
@@ -63,7 +65,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
 			.sin(System.currentTimeMillis() % 1000 / 500F * (float)Math.PI);
-		GL11.glColor4f(1, 0, 0, alpha);
+		RenderSystem.setShaderColor(1, 0, 0, alpha);
 		
 		// draw boxes
 		for(Entity entity : MC.world.getEntities())
@@ -89,7 +91,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

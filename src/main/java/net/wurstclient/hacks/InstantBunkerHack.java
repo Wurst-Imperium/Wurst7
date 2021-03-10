@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -269,7 +271,7 @@ public final class InstantBunkerHack extends Hack
 		// green box
 		{
 			GL11.glDepthMask(false);
-			GL11.glColor4f(0, 1, 0, 0.15F);
+			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
 			BlockPos pos = positions.get(blockIndex);
 			
 			GL11.glPushMatrix();
@@ -284,7 +286,7 @@ public final class InstantBunkerHack extends Hack
 		}
 		
 		// black outlines
-		GL11.glColor4f(0, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(int i = blockIndex; i < positions.size(); i++)
 		{
 			BlockPos pos = positions.get(i);

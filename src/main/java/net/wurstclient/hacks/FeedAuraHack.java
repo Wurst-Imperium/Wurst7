@@ -14,6 +14,8 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
@@ -197,16 +199,16 @@ public final class FeedAuraHack extends Hack
 			GL11.glTranslated(-0.5, -0.5, -0.5);
 		}
 		
-		GL11.glColor4f(red, green, 0, 0.25F);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box);
 		
-		GL11.glColor4f(red, green, 0, 0.5F);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(box);
 		
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

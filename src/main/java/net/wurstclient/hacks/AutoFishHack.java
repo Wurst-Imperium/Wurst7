@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -90,7 +92,7 @@ public final class AutoFishHack extends Hack
 		
 		biteCross = GL11.glGenLists(1);
 		GL11.glNewList(biteCross, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(-0.125, 0, -0.125);
 		GL11.glVertex3d(0.125, 0, 0.125);
@@ -181,7 +183,7 @@ public final class AutoFishHack extends Hack
 			Box box = new Box(-validRange.getValue(), -1 / 16.0,
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
-			GL11.glColor4f(1, 0, 0, 0.5F);
+			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			RenderUtils.drawOutlinedBox(box);
 			GL11.glEndList();
 		}
@@ -344,7 +346,7 @@ public final class AutoFishHack extends Hack
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

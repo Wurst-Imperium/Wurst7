@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BarrelBlockEntity;
@@ -85,33 +87,33 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		greenBox = GL11.glGenLists(1);
 		GL11.glNewList(greenBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 0, 0.25F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
 		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(0, 1, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
 		orangeBox = GL11.glGenLists(1);
 		GL11.glNewList(orangeBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0.5F, 0, 0.25F);
+		RenderSystem.setShaderColor(1, 0.5F, 0, 0.25F);
 		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(1, 0.5F, 0, 0.5F);
+		RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
 		cyanBox = GL11.glGenLists(1);
 		GL11.glNewList(cyanBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 1, 0.25F);
+		RenderSystem.setShaderColor(0, 1, 1, 0.25F);
 		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(0, 1, 1, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
 		purpleBox = GL11.glGenLists(1);
 		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 1, 0.25F);
+		RenderSystem.setShaderColor(1, 0, 1, 0.25F);
 		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(1, 0, 1, 0.5F);
+		RenderSystem.setShaderColor(1, 0, 1, 0.5F);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
@@ -290,17 +292,17 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			GL11.glBegin(GL11.GL_LINES);
 			
-			GL11.glColor4f(0, 1, 0, 0.5F);
+			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 			renderLines(start, basicChests, regionX, regionZ);
 			renderLines(start, minecartBoxes, regionX, regionZ);
 			
-			GL11.glColor4f(1, 0.5F, 0, 0.5F);
+			RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
 			renderLines(start, trappedChests, regionX, regionZ);
 			
-			GL11.glColor4f(0, 1, 1, 0.5F);
+			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 			renderLines(start, enderChests, regionX, regionZ);
 			
-			GL11.glColor4f(1, 0, 1, 0.5F);
+			RenderSystem.setShaderColor(1, 0, 1, 0.5F);
 			renderLines(start, shulkerBoxes, regionX, regionZ);
 			
 			GL11.glEnd();
@@ -309,7 +311,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

@@ -9,6 +9,8 @@ package net.wurstclient.clickgui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
@@ -100,7 +102,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	private void drawOutline(int x1, int x2, int y1, int y2)
 	{
 		float[] acColor = gui.getAcColor();
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x1, y1);
@@ -115,7 +117,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	{
 		float[] bgColor = gui.getBgColor();
 		float alpha = gui.getOpacity() * (hValue ? 1.5F : 1);
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], alpha);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], alpha);
 		
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, yi1);
@@ -128,7 +130,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	private void drawValueName(MatrixStack matrixStack, int x1, int yi1,
 		Enum<?> value)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);

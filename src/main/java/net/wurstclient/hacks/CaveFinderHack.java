@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -217,7 +219,7 @@ public final class CaveFinderHack extends Hack
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
 		
-		GL11.glColor4f(1, 0, 0, alpha);
+		RenderSystem.setShaderColor(1, 0, 0, alpha);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glCallList(displayList);
 		GL11.glEnd();
@@ -225,7 +227,7 @@ public final class CaveFinderHack extends Hack
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

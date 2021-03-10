@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.util.hit.BlockHitResult;
@@ -296,9 +298,9 @@ public final class NukerLegitHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		RenderUtils.drawOutlinedBox();
 		
 		GL11.glPopMatrix();

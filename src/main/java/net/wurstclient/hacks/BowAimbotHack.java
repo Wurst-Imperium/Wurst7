@@ -14,6 +14,8 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -387,7 +389,7 @@ public final class BowAimbotHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		GL11.glColor4f(0, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		GL11.glBegin(GL11.GL_QUADS);
 		{
 			GL11.glVertex2d(0, 0);

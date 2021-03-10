@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -58,7 +60,8 @@ public final class RadarComponent extends Component
 			gui.setTooltip("");
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -83,7 +86,8 @@ public final class RadarComponent extends Component
 		double ya3 = 1;
 		
 		// arrow
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], opacity);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_POLYGON);
 		GL11.glVertex2d(xa1, ya1);
 		GL11.glVertex2d(xa2, ya2);
@@ -92,7 +96,7 @@ public final class RadarComponent extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xa1, ya1);
 		GL11.glVertex2d(xa2, ya2);
@@ -142,7 +146,7 @@ public final class RadarComponent extends Component
 			else
 				color = 0x808080;
 			
-			GL11.glColor4f((color >> 16 & 255) / 255F,
+			RenderSystem.setShaderColor((color >> 16 & 255) / 255F,
 				(color >> 8 & 255) / 255F, (color & 255) / 255F, 1);
 			GL11.glVertex2d(middleX + renderX, middleY + renderY);
 		}

@@ -14,6 +14,8 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -222,16 +224,16 @@ public final class TunnellerHack extends Hack
 			}
 			
 			Box box2 = new Box(BlockPos.ORIGIN);
-			GL11.glColor4f(red, green, 0, 0.25F);
+			RenderSystem.setShaderColor(red, green, 0, 0.25F);
 			RenderUtils.drawSolidBox(box2);
-			GL11.glColor4f(red, green, 0, 0.5F);
+			RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			RenderUtils.drawOutlinedBox(box2);
 		}
 		
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -246,7 +248,7 @@ public final class TunnellerHack extends Hack
 		GL11.glTranslated(start.getX(), start.getY(), start.getZ());
 		GL11.glTranslated(0.5, 0.5, 0.5);
 		
-		GL11.glColor4f(0, 1, 1, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
 		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
 		GL11.glEnd();
@@ -349,7 +351,7 @@ public final class TunnellerHack extends Hack
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			GL11.glColor4f(0, 1, 0, 0.5F);
+			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 			
 			currentBlock = null;
 			for(BlockPos pos : blocks)
@@ -450,7 +452,7 @@ public final class TunnellerHack extends Hack
 				
 			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			GL11.glColor4f(1, 1, 0, 0.5F);
+			RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			for(BlockPos pos : blocks)
 			{
 				GL11.glPushMatrix();
@@ -583,7 +585,7 @@ public final class TunnellerHack extends Hack
 			
 			GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			GL11.glColor4f(1, 0, 0, 0.5F);
+			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			for(BlockPos pos : liquids)
 			{
 				GL11.glPushMatrix();
@@ -666,7 +668,7 @@ public final class TunnellerHack extends Hack
 					size.getSelected().torchDistance);
 			
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
-			GL11.glColor4f(1, 1, 0, 0.5F);
+			RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();

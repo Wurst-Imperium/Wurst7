@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;
@@ -237,10 +239,10 @@ public final class AutoFarmHack extends Hack
 				GL11.glTranslated(-0.5, -0.5, -0.5);
 			}
 			
-			GL11.glColor4f(red, green, 0, 0.25F);
+			RenderSystem.setShaderColor(red, green, 0, 0.25F);
 			RenderUtils.drawSolidBox(box);
 			
-			GL11.glColor4f(red, green, 0, 0.5F);
+			RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			RenderUtils.drawOutlinedBox(box);
 			
 			GL11.glPopMatrix();
@@ -249,7 +251,7 @@ public final class AutoFarmHack extends Hack
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -509,7 +511,7 @@ public final class AutoFarmHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 		for(BlockPos pos : blocksToHarvest)
 		{
 			GL11.glPushMatrix();
@@ -518,7 +520,7 @@ public final class AutoFarmHack extends Hack
 			GL11.glCallList(box);
 			GL11.glPopMatrix();
 		}
-		GL11.glColor4f(0, 1, 1, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 		for(BlockPos pos : plants.keySet())
 		{
 			GL11.glPushMatrix();
@@ -527,7 +529,7 @@ public final class AutoFarmHack extends Hack
 			GL11.glCallList(node);
 			GL11.glPopMatrix();
 		}
-		GL11.glColor4f(1, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 		for(BlockPos pos : blocksToReplant)
 		{
 			GL11.glPushMatrix();

@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -541,7 +542,8 @@ public final class ClickGui
 			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], 0.75F);
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+				0.75F);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2i(xt1, yt1);
 			GL11.glVertex2i(xt1, yt2);
@@ -550,7 +552,8 @@ public final class ClickGui
 			GL11.glEnd();
 			
 			// outline
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.5F);
 			GL11.glBegin(GL11.GL_LINE_LOOP);
 			GL11.glVertex2i(xt1, yt1);
 			GL11.glVertex2i(xt1, yt2);
@@ -649,7 +652,8 @@ public final class ClickGui
 				int ys4 = ys3 + (int)scrollbarHeight;
 				
 				// window background
-				GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+				RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+					opacity);
 				GL11.glBegin(GL11.GL_QUADS);
 				GL11.glVertex2i(xs2, ys1);
 				GL11.glVertex2i(xs2, ys2);
@@ -669,7 +673,7 @@ public final class ClickGui
 					&& mouseX < xs2 && mouseY < ys4;
 				
 				// scrollbar
-				GL11.glColor4f(acColor[0], acColor[1], acColor[2],
+				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					hovering ? opacity * 1.5F : opacity);
 				GL11.glBegin(GL11.GL_QUADS);
 				GL11.glVertex2i(xs1, ys3);
@@ -679,7 +683,8 @@ public final class ClickGui
 				GL11.glEnd();
 				
 				// outline
-				GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+					0.5F);
 				GL11.glBegin(GL11.GL_LINE_LOOP);
 				GL11.glVertex2i(xs1, ys3);
 				GL11.glVertex2i(xs1, ys4);
@@ -695,7 +700,8 @@ public final class ClickGui
 			
 			// window background
 			// left & right
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+				opacity);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2i(x1, y3);
 			GL11.glVertex2i(x1, y2);
@@ -715,7 +721,8 @@ public final class ClickGui
 			GL11.glPushMatrix();
 			GL11.glTranslated(x1, y4, 0);
 			
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+				opacity);
 			GL11.glBegin(GL11.GL_QUADS);
 			
 			// window background
@@ -763,7 +770,7 @@ public final class ClickGui
 		}
 		
 		// window outline
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -813,7 +820,8 @@ public final class ClickGui
 		
 		// title bar background
 		// above & below buttons
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], opacity);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x3, y1);
 		GL11.glVertex2i(x3, y4);
@@ -836,7 +844,7 @@ public final class ClickGui
 		
 		// window title
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = MC.textRenderer;
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
@@ -851,7 +859,7 @@ public final class ClickGui
 		int x3 = x2 + 2;
 		
 		// button background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hovering ? opacity * 1.5F : opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
@@ -861,7 +869,8 @@ public final class ClickGui
 		GL11.glEnd();
 		
 		// background between buttons
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], opacity);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x2, y1);
 		GL11.glVertex2i(x2, y2);
@@ -870,7 +879,7 @@ public final class ClickGui
 		GL11.glEnd();
 		
 		// button outline
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x1, y2);
@@ -894,13 +903,13 @@ public final class ClickGui
 		{
 			ya1 = y1 + 3;
 			ya2 = y2 - 2.5;
-			GL11.glColor4f(0, hovering ? 1 : 0.85F, 0, 1);
+			RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
 			
 		}else
 		{
 			ya1 = y2 - 3;
 			ya2 = y1 + 2.5;
-			GL11.glColor4f(hovering ? 1 : 0.85F, 0, 0, 1);
+			RenderSystem.setShaderColor(hovering ? 1 : 0.85F, 0, 0, 1);
 		}
 		
 		// arrow
@@ -911,7 +920,7 @@ public final class ClickGui
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xa1, ya1);
 		GL11.glVertex2d(xa3, ya1);
@@ -936,7 +945,7 @@ public final class ClickGui
 			double yk3 = y2 - 0.5;
 			
 			// knob
-			GL11.glColor4f(h, 0, 0, 0.5F);
+			RenderSystem.setShaderColor(h, 0, 0, 0.5F);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2d(xk1, yk1);
 			GL11.glVertex2d(xk2, yk1);
@@ -954,7 +963,7 @@ public final class ClickGui
 			double yn2 = y2;
 			
 			// needle
-			GL11.glColor4f(h, h, h, 1);
+			RenderSystem.setShaderColor(h, h, h, 1);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2d(xn1, yn1);
 			GL11.glVertex2d(xn2, yn1);
@@ -963,7 +972,7 @@ public final class ClickGui
 			GL11.glEnd();
 			
 			// outlines
-			GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 			GL11.glBegin(GL11.GL_LINE_LOOP);
 			GL11.glVertex2d(xk1, yk1);
 			GL11.glVertex2d(xk2, yk1);
@@ -1001,7 +1010,7 @@ public final class ClickGui
 			double yk7 = y2 - 1;
 			
 			// knob
-			GL11.glColor4f(0, h, 0, 1);
+			RenderSystem.setShaderColor(0, h, 0, 1);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2d(xk1, yk1);
 			GL11.glVertex2d(xk2, yk2);
@@ -1021,7 +1030,7 @@ public final class ClickGui
 			double yn3 = y2 - 1;
 			
 			// needle
-			GL11.glColor4f(h, h, h, 1);
+			RenderSystem.setShaderColor(h, h, h, 1);
 			GL11.glBegin(GL11.GL_TRIANGLES);
 			GL11.glVertex2d(xn1, yn1);
 			GL11.glVertex2d(xn2, yn2);
@@ -1029,7 +1038,7 @@ public final class ClickGui
 			GL11.glEnd();
 			
 			// outlines
-			GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 			GL11.glBegin(GL11.GL_LINE_LOOP);
 			GL11.glVertex2d(xk1, yk1);
 			GL11.glVertex2d(xk2, yk2);
@@ -1071,7 +1080,7 @@ public final class ClickGui
 		double yc7 = y2 - 3.5;
 		
 		// cross
-		GL11.glColor4f(hovering ? 1 : 0.85F, 0, 0, 1);
+		RenderSystem.setShaderColor(hovering ? 1 : 0.85F, 0, 0, 1);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(xc1, yc1);
 		GL11.glVertex2d(xc2, yc2);
@@ -1088,7 +1097,7 @@ public final class ClickGui
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xc1, yc1);
 		GL11.glVertex2d(xc2, yc2);

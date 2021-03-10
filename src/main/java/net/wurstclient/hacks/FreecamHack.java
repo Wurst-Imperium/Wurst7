@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -179,7 +181,7 @@ public final class FreecamHack extends Hack
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		GL11.glColor4f(1, 1, 1, 0.5F);
+		RenderSystem.setShaderColor(1, 1, 1, 0.5F);
 		
 		// box
 		GL11.glPushMatrix();

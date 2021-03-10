@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -259,7 +261,7 @@ public final class MobSpawnEspHack extends Hack
 		}
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		if(!depthTest)
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -341,7 +343,7 @@ public final class MobSpawnEspHack extends Hack
 			
 			try
 			{
-				GL11.glColor4f(1, 0, 0, 0.5F);
+				RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 				GL11.glBegin(GL11.GL_LINES);
 				new ArrayList<>(red).stream()
 					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
@@ -357,7 +359,7 @@ public final class MobSpawnEspHack extends Hack
 							pos.getZ() + 1);
 					});
 				
-				GL11.glColor4f(1, 1, 0, 0.5F);
+				RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 				new ArrayList<>(yellow).stream()
 					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 						pos.getZ() - regionZ))

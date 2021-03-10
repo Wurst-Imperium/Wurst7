@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -56,13 +58,13 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		
 		openWaterBox = GL11.glGenLists(1);
 		GL11.glNewList(openWaterBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(bb);
 		GL11.glEndList();
 		
 		shallowWaterBox = GL11.glGenLists(1);
 		GL11.glNewList(shallowWaterBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 		RenderUtils.drawCrossBox(bb);
 		RenderUtils.drawOutlinedBox(bb);
 		GL11.glEndList();
@@ -102,7 +104,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

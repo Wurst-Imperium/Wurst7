@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -230,7 +232,7 @@ public final class SearchHack extends Hack
 		float blue =
 			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
 		
-		GL11.glColor4f(red, green, blue, 0.5F);
+		RenderSystem.setShaderColor(red, green, blue, 0.5F);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glCallList(displayList);
 		GL11.glEnd();
@@ -238,7 +240,7 @@ public final class SearchHack extends Hack
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

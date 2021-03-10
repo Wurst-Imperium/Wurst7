@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
@@ -175,10 +177,10 @@ public final class ExcavatorHack extends Hack
 					GL11.glTranslated(-0.005, -0.005, -0.005);
 					GL11.glScaled(1.01, 1.01, 1.01);
 					
-					GL11.glColor4f(0F, 1F, 0F, 0.15F);
+					RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
 					RenderUtils.drawSolidBox();
 					
-					GL11.glColor4f(0F, 0F, 0F, 0.5F);
+					RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 					RenderUtils.drawOutlinedBox();
 					
 					GL11.glPopMatrix();
@@ -197,17 +199,17 @@ public final class ExcavatorHack extends Hack
 				GL11.glTranslated(0, 0, area.progress);
 				GL11.glScaled(1, 1, 0);
 				
-				GL11.glColor4f(0F, 1F, 0F, 0.3F);
+				RenderSystem.setShaderColor(0F, 1F, 0F, 0.3F);
 				RenderUtils.drawSolidBox();
 				
-				GL11.glColor4f(0F, 0F, 0F, 0.5F);
+				RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 				RenderUtils.drawOutlinedBox();
 				
 				GL11.glPopMatrix();
 			}
 			
 			// area box
-			GL11.glColor4f(0F, 0F, 0F, 0.5F);
+			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 			RenderUtils.drawOutlinedBox();
 			
 			GL11.glPopMatrix();
@@ -227,10 +229,10 @@ public final class ExcavatorHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			GL11.glColor4f(0F, 1F, 0F, 0.15F);
+			RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
 			RenderUtils.drawSolidBox();
 			
-			GL11.glColor4f(0F, 0F, 0F, 0.5F);
+			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 			RenderUtils.drawOutlinedBox();
 			
 			GL11.glPopMatrix();
@@ -248,7 +250,7 @@ public final class ExcavatorHack extends Hack
 				preview.minZ + offset);
 			GL11.glScaled(preview.sizeX + scale, preview.sizeY + scale,
 				preview.sizeZ + scale);
-			GL11.glColor4f(0F, 0F, 0F, 0.5F);
+			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 			RenderUtils.drawOutlinedBox();
 			GL11.glPopMatrix();
 			
@@ -264,10 +266,10 @@ public final class ExcavatorHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.15F);
+			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
 			RenderUtils.drawSolidBox();
 			
-			GL11.glColor4f(0F, 0F, 0F, 0.5F);
+			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 			RenderUtils.drawOutlinedBox();
 			
 			GL11.glPopMatrix();
@@ -301,9 +303,9 @@ public final class ExcavatorHack extends Hack
 			float green = 2 - red;
 			
 			// draw box
-			GL11.glColor4f(red, green, 0, 0.25F);
+			RenderSystem.setShaderColor(red, green, 0, 0.25F);
 			RenderUtils.drawSolidBox();
-			GL11.glColor4f(red, green, 0, 0.5F);
+			RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			RenderUtils.drawOutlinedBox();
 		}
 		
@@ -342,7 +344,7 @@ public final class ExcavatorHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		GL11.glColor4f(0, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		GL11.glBegin(GL11.GL_QUADS);
 		{
 			GL11.glVertex2d(0, 0);

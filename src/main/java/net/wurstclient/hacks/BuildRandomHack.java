@@ -11,6 +11,8 @@ import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -151,9 +153,9 @@ public final class BuildRandomHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		RenderUtils.drawOutlinedBox();
 		
 		GL11.glPopMatrix();

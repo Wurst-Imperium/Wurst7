@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
@@ -210,7 +212,8 @@ public final class TabGui implements KeyPressListener
 		float opacity = gui.getOpacity();
 		
 		// color
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		
 		// box
 		GL11.glBegin(GL11.GL_QUADS);
@@ -230,7 +233,7 @@ public final class TabGui implements KeyPressListener
 		
 		// outline
 		GL11.glLineWidth(1);
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		{
 			GL11.glVertex2d(xi1, yi1);
@@ -249,14 +252,16 @@ public final class TabGui implements KeyPressListener
 		// top left
 		GL11.glBegin(GL11.GL_POLYGON);
 		{
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.75F);
 			GL11.glVertex2d(x1, y1);
 			GL11.glVertex2d(x2, y1);
-			GL11.glColor4f(0, 0, 0, 0);
+			RenderSystem.setShaderColor(0, 0, 0, 0);
 			GL11.glVertex2d(xi2, yi1);
 			GL11.glVertex2d(xi1, yi1);
 			GL11.glVertex2d(xi1, yi2);
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.75F);
 			GL11.glVertex2d(x1, y2);
 		}
 		GL11.glEnd();
@@ -266,11 +271,12 @@ public final class TabGui implements KeyPressListener
 		{
 			GL11.glVertex2d(x2, y2);
 			GL11.glVertex2d(x2, y1);
-			GL11.glColor4f(0, 0, 0, 0);
+			RenderSystem.setShaderColor(0, 0, 0, 0);
 			GL11.glVertex2d(xi2, yi1);
 			GL11.glVertex2d(xi2, yi2);
 			GL11.glVertex2d(xi1, yi2);
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.75F);
 			GL11.glVertex2d(x1, y2);
 		}
 		GL11.glEnd();

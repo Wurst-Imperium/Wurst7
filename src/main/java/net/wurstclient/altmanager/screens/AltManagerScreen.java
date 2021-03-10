@@ -22,6 +22,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -406,7 +407,7 @@ public final class AltManagerScreen extends Screen
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glColor4f(1, 0, 0, errorTimer / 16F);
+			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
@@ -527,7 +528,7 @@ public final class AltManagerScreen extends Screen
 					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
-				GL11.glColor4f(0, 1, 0, opacity);
+				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
 				GL11.glBegin(GL11.GL_QUADS);
 				{

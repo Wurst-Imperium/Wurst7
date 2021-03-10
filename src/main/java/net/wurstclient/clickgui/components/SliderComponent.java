@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -158,7 +160,8 @@ public final class SliderComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		
 		GL11.glVertex2i(x1, y1);
@@ -201,7 +204,8 @@ public final class SliderComponent extends Component
 		}
 		
 		// limit
-		GL11.glColor4f(1, 0, 0, hSlider ? opacity * 1.5F : opacity);
+		RenderSystem.setShaderColor(1, 0, 0,
+			hSlider ? opacity * 1.5F : opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(x3, y4);
 		GL11.glVertex2d(x3, y5);
@@ -214,7 +218,7 @@ public final class SliderComponent extends Component
 		GL11.glEnd();
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hSlider ? opacity * 1.5F : opacity);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(xl1, y4);
@@ -224,7 +228,7 @@ public final class SliderComponent extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x3, y4);
 		GL11.glVertex2i(x3, y5);
@@ -245,11 +249,11 @@ public final class SliderComponent extends Component
 		
 		// knob
 		if(renderAsDisabled)
-			GL11.glColor4f(0.5F, 0.5F, 0.5F, 0.75F);
+			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
 		{
 			float f = (float)(2 * percentage);
-			GL11.glColor4f(f, 2 - f, 0, hSlider ? 1 : 0.75F);
+			RenderSystem.setShaderColor(f, 2 - f, 0, hSlider ? 1 : 0.75F);
 		}
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(xk1, yk1);
@@ -259,7 +263,7 @@ public final class SliderComponent extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xk1, yk1);
 		GL11.glVertex2d(xk1, yk2);
@@ -271,7 +275,7 @@ public final class SliderComponent extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1, boolean renderAsDisabled)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		TextRenderer tr = MC.textRenderer;

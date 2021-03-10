@@ -13,6 +13,8 @@ import java.util.HashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -137,7 +139,7 @@ public final class BaseFinderHack extends Hack
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1F, 0F, 0F, 0.15F);
+		RenderSystem.setShaderColor(1F, 0F, 0F, 0.15F);
 		
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
@@ -156,7 +158,7 @@ public final class BaseFinderHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override

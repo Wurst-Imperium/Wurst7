@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
@@ -150,7 +152,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glPopMatrix();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -175,11 +177,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			
 			// set color
 			if(WURST.getFriends().contains(e.getEntityName()))
-				GL11.glColor4f(0, 0, 1, 0.5F);
+				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
 			else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
-				GL11.glColor4f(2 - f, f, 0, 0.5F);
+				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			}
 			
 			GL11.glCallList(playerBox);
@@ -202,11 +204,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 					.multiply(1 - partialTicks));
 			
 			if(WURST.getFriends().contains(e.getEntityName()))
-				GL11.glColor4f(0, 0, 1, 0.5F);
+				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
 			else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
-				GL11.glColor4f(2 - f, f, 0, 0.5F);
+				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			}
 			
 			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);

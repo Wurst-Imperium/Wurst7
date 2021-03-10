@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
@@ -173,13 +175,14 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				{
 					hoveredCommand = pkb;
 					if(pkb == selectedCommand)
-						GL11.glColor4f(0F, 1F, 0F, 0.375F);
+						RenderSystem.setShaderColor(0F, 1F, 0F, 0.375F);
 					else
-						GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
+						RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F,
+							0.375F);
 				}else if(pkb == selectedCommand)
-					GL11.glColor4f(0F, 1F, 0F, 0.25F);
+					RenderSystem.setShaderColor(0F, 1F, 0F, 0.25F);
 				else
-					GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+					RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 				
 				// button
 				drawBox(x1, y1, x2, y2);
@@ -221,12 +224,12 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 			// color
 			if(!button.active)
-				GL11.glColor4f(0F, 0F, 0F, 0.25F);
+				RenderSystem.setShaderColor(0F, 0F, 0F, 0.25F);
 			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
 				&& mouseY <= y2)
-				GL11.glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
 			GL11.glDisable(GL11.GL_TEXTURE_2D);

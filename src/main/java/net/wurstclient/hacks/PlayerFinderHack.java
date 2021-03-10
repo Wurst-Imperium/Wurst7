@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -94,7 +96,7 @@ public final class PlayerFinderHack extends Hack
 		float blue =
 			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
 		
-		GL11.glColor4f(red, green, blue, 0.5F);
+		RenderSystem.setShaderColor(red, green, blue, 0.5F);
 		
 		// tracer line
 		GL11.glBegin(GL11.GL_LINES);
@@ -119,7 +121,7 @@ public final class PlayerFinderHack extends Hack
 			
 			RenderUtils.drawOutlinedBox();
 			
-			GL11.glColor4f(red, green, blue, 0.25F);
+			RenderSystem.setShaderColor(red, green, blue, 0.25F);
 			RenderUtils.drawSolidBox();
 			
 			GL11.glPopMatrix();

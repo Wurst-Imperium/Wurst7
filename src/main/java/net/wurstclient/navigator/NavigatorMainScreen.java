@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -289,7 +291,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], 0.75F);
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+				0.75F);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glVertex2i(xt1, yt1);
 			GL11.glVertex2i(xt1, yt2);
@@ -298,7 +301,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			GL11.glEnd();
 			
 			// outline
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				0.5F);
 			GL11.glBegin(GL11.GL_LINE_LOOP);
 			GL11.glVertex2i(xt1, yt1);
 			GL11.glVertex2i(xt1, yt2);
@@ -371,12 +375,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		if(feature.isEnabled())
 			// if(feature.isBlocked())
-			// GL11.glColor4f(1, 0, 0,
+			// RenderSystem.setShaderColor(1, 0, 0,
 			// hovering ? opacity * 1.5F : opacity);
 			// else
-			GL11.glColor4f(0, 1, 0, renderAsHovered ? opacity * 1.5F : opacity);
+			RenderSystem.setShaderColor(0, 1, 0,
+				renderAsHovered ? opacity * 1.5F : opacity);
 		else
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				renderAsHovered ? opacity * 1.5F : opacity);
 		
 		// tooltip
@@ -419,7 +424,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		double ay2 = area.y + twoThrirds;
 		
 		// arrow
-		GL11.glColor4f(0, hovering ? 1 : 0.85F, 0, 1);
+		RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
 		GL11.glBegin(GL11.GL_TRIANGLES);
 		GL11.glVertex2d(ax1, ay1);
 		GL11.glVertex2d(ax2, ay1);
@@ -428,7 +433,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// arrow shadow
 		GL11.glLineWidth(1);
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(ax1, ay1);
 		GL11.glVertex2d(ax2, ay1);

@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
@@ -136,7 +138,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	{
 		float[] bgColor = gui.getBgColor();
 		float opacity = gui.getOpacity();
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
 		
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
@@ -154,7 +157,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		// background
 		float bgAlpha = hBox ? opacity * 1.5F : opacity;
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], bgAlpha);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			bgAlpha);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x4, y1);
 		GL11.glVertex2i(x4, y2);
@@ -163,7 +167,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2i(x4, y1);
 		GL11.glVertex2i(x4, y2);
@@ -192,13 +196,13 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		{
 			ya1 = y2 - 3.5;
 			ya2 = y1 + 3;
-			GL11.glColor4f(hBox ? 1 : 0.85F, 0, 0, 1);
+			RenderSystem.setShaderColor(hBox ? 1 : 0.85F, 0, 0, 1);
 			
 		}else
 		{
 			ya1 = y1 + 3.5;
 			ya2 = y2 - 3;
-			GL11.glColor4f(0, hBox ? 1 : 0.85F, 0, 1);
+			RenderSystem.setShaderColor(0, hBox ? 1 : 0.85F, 0, 1);
 		}
 		
 		// arrow
@@ -209,7 +213,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		GL11.glEnd();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
 		GL11.glVertex2d(xa1, ya1);
 		GL11.glVertex2d(xa3, ya1);
@@ -220,7 +224,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
 		int y1)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();

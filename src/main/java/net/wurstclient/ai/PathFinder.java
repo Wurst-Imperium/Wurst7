@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -518,7 +520,7 @@ public class PathFinder
 			
 			// queue (yellow)
 			GL11.glLineWidth(2);
-			GL11.glColor4f(1, 1, 0, 0.75F);
+			RenderSystem.setShaderColor(1, 1, 0, 0.75F);
 			for(PathPos element : queue.toArray())
 			{
 				if(renderedThings >= 5000)
@@ -536,9 +538,9 @@ public class PathFinder
 					break;
 				
 				if(entry.getKey().isJumping())
-					GL11.glColor4f(1, 0, 1, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 1, 0.75F);
 				else
-					GL11.glColor4f(1, 0, 0, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
 				PathRenderer.renderArrow(entry.getValue(), entry.getKey());
 				renderedThings++;
@@ -549,11 +551,11 @@ public class PathFinder
 		if(debugMode)
 		{
 			GL11.glLineWidth(4);
-			GL11.glColor4f(0, 0, 1, 0.75F);
+			RenderSystem.setShaderColor(0, 0, 1, 0.75F);
 		}else
 		{
 			GL11.glLineWidth(2);
-			GL11.glColor4f(0, 1, 0, 0.75F);
+			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		}
 		for(int i = 0; i < path.size() - 1; i++)
 			PathRenderer.renderArrow(path.get(i), path.get(i + 1));
