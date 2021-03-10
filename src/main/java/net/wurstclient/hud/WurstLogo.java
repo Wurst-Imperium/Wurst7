@@ -15,6 +15,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -40,16 +41,14 @@ public final class WurstLogo
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
+		float[] color;
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
-		{
-			float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
-			
-		}else
-			RenderSystem.setShaderColor(1, 1, 1, 0.5F);
+			color = WurstClient.INSTANCE.getGui().getAcColor();
+		else
+			color = new float[]{1, 1, 1};
 		
-		drawQuads(matrixStack, 0, 6, tr.getWidth(version) + 76, 17);
+		drawQuads(matrixStack, 0, 6, tr.getWidth(version) + 76, 17, color[0],
+			color[1], color[2], 0.5F);
 		
 		// draw version string
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -60,7 +59,7 @@ public final class WurstLogo
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
-		WurstClient.MC.getTextureManager().bindTexture(texture);
+		RenderSystem.setShaderTexture(0, texture);
 		DrawableHelper.drawTexture(matrixStack, 0, 3, 0, 0, 72, 18, 72, 18);
 	}
 	
@@ -75,17 +74,19 @@ public final class WurstLogo
 		return version;
 	}
 	
-	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2)
+	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2,
+		float r, float g, float b, float a)
 	{
 		Matrix4f matrix = matrices.peek().getModel();
+		RenderSystem.setShader(GameRenderer::method_34540);
 		
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y2, 0.0F).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0.0F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0.0F).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0.0F).next();
+			VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
