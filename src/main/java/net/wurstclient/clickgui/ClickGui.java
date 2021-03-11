@@ -515,14 +515,14 @@ public final class ClickGui
 			int y1 =
 				parent.getY() + 13 + parent.getScrollOffset() + owner.getY();
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(x1, y1, 300);
+			matrixStack.push();
+			matrixStack.translate(x1, y1, 300);
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
 			popup.render(matrixStack, cMouseX, cMouseY);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
 		// tooltip
@@ -547,8 +547,8 @@ public final class ClickGui
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 			int yt2 = yt1 + th + 2;
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(0, 0, 300);
+			matrixStack.push();
+			matrixStack.translate(0, 0, 300);
 			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -582,7 +582,7 @@ public final class ClickGui
 					yt1 + 2 + i * fr.fontHeight, 0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 	}
 	
@@ -749,9 +749,7 @@ public final class ClickGui
 				window.getWidth() * sf, (y2 - y3) * sf);
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			
-			// GL11.glPushMatrix();
 			matrixStack.push();
-			// GL11.glTranslated(x1, y4, 0);
 			matrixStack.translate(x1, y4, 0);
 			matrix = matrixStack.peek().getModel();
 			
@@ -795,13 +793,12 @@ public final class ClickGui
 			BufferRenderer.draw(bufferBuilder);
 			
 			// render children
-			// int cMouseX = mouseX - x1;
-			// int cMouseY = mouseY - y4;
-			// for(int i = 0; i < window.countChildren(); i++)
-			// window.getChild(i).render(matrixStack, cMouseX, cMouseY,
-			// partialTicks);
+			int cMouseX = mouseX - x1;
+			int cMouseY = mouseY - y4;
+			for(int i = 0; i < window.countChildren(); i++)
+				window.getChild(i).render(matrixStack, cMouseX, cMouseY,
+					partialTicks);
 			
-			// GL11.glPopMatrix();
 			matrixStack.pop();
 			matrix = matrixStack.peek().getModel();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -909,6 +906,7 @@ public final class ClickGui
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
