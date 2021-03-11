@@ -30,12 +30,19 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -326,6 +333,10 @@ public abstract class AltEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// skin preview
 		AltRenderer.drawAltBack(matrixStack, emailBox.getText(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
@@ -353,14 +364,14 @@ public abstract class AltEditorScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				GL11.glVertex2d(0, 0);
-				GL11.glVertex2d(width, 0);
-				GL11.glVertex2d(width, height);
-				GL11.glVertex2d(0, height);
-			}
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, height, 0).next();
+			bufferBuilder.vertex(matrix, 0, height, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);

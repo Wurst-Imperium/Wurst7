@@ -29,10 +29,17 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
 import net.wurstclient.util.ListWidget;
@@ -375,6 +382,10 @@ public final class AltManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
@@ -409,14 +420,14 @@ public final class AltManagerScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				GL11.glVertex2d(0, 0);
-				GL11.glVertex2d(width, 0);
-				GL11.glVertex2d(width, height);
-				GL11.glVertex2d(0, height);
-			}
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, height, 0).next();
+			bufferBuilder.vertex(matrix, 0, height, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);
@@ -517,6 +528,10 @@ public final class AltManagerScreen extends Screen
 		{
 			Alt alt = list.get(id);
 			
+			Matrix4f matrix = matrixStack.peek().getModel();
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			RenderSystem.setShader(GameRenderer::method_34539);
+			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
@@ -530,14 +545,16 @@ public final class AltManagerScreen extends Screen
 				
 				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				GL11.glBegin(GL11.GL_QUADS);
-				{
-					GL11.glVertex2d(x - 2, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2 + 30);
-					GL11.glVertex2d(x - 2, y - 2 + 30);
-				}
-				GL11.glEnd();
+				bufferBuilder.vertex(matrix, 0, 0, 0).next();
+				
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
+				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 				
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_CULL_FACE);
