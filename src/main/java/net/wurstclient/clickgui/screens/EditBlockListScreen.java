@@ -162,13 +162,13 @@ public final class EditBlockListScreen extends Screen
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(0, 0, 300);
+		matrixStack.push();
+		matrixStack.translate(0, 0, 300);
 		
 		blockNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
+		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
 			drawStringWithShadow(matrixStack, client.textRenderer,
@@ -186,7 +186,7 @@ public final class EditBlockListScreen extends Screen
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd), 52,
 			height - 52, false);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 	
 	private static class ListGui extends ListWidget
@@ -252,45 +252,45 @@ public final class EditBlockListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
+					matrixStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					GL11.glScaled(0.75, 0.75, 0.75);
+					matrixStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(2, 2, 2);
+					matrixStack.scale(2, 2, 2);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				TextRenderer fr = mc.textRenderer;
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
 				return "\u00a7ounknown block\u00a7r";
 				
 			}else
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
+					matrixStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					GL11.glScaled(0.75, 0.75, 0.75);
+					matrixStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
 				
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
 				return stack.getName().getString();
 			}
