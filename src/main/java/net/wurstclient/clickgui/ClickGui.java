@@ -28,6 +28,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -462,7 +463,7 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// GL11.glShadeModel(GL11.GL_SMOOTH);
-		GL11.glLineWidth(1);
+		RenderSystem.lineWidth(1);
 		
 		tooltip = "";
 		for(Window window : windows)
@@ -501,6 +502,9 @@ public final class ClickGui
 	public void renderPopupsAndTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
 		// popups
 		for(Popup popup : popups)
 		{
@@ -550,22 +554,26 @@ public final class ClickGui
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				0.75F);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			// outline
 			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 				0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -585,7 +593,7 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// GL11.glShadeModel(GL11.GL_SMOOTH);
-		GL11.glLineWidth(1);
+		RenderSystem.lineWidth(1);
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
@@ -626,6 +634,7 @@ public final class ClickGui
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -744,6 +753,7 @@ public final class ClickGui
 			matrixStack.push();
 			// GL11.glTranslated(x1, y4, 0);
 			matrixStack.translate(x1, y4, 0);
+			matrix = matrixStack.peek().getModel();
 			
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
@@ -793,6 +803,7 @@ public final class ClickGui
 			
 			// GL11.glPopMatrix();
 			matrixStack.pop();
+			matrix = matrixStack.peek().getModel();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 		
@@ -830,7 +841,7 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			// renderCloseButton(x3, y4, x4, y5, hovering);
+			renderCloseButton(matrixStack, x3, y4, x4, y5, hovering);
 		}
 		
 		if(window.isPinnable())
@@ -838,7 +849,8 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			// renderPinButton(x3, y4, x4, y5, hovering, window.isPinned());
+			renderPinButton(matrixStack, x3, y4, x4, y5, hovering,
+				window.isPinned());
 		}
 		
 		if(window.isMinimizable())
@@ -846,8 +858,8 @@ public final class ClickGui
 			x3 -= 11;
 			int x4 = x3 + 9;
 			boolean hovering = hoveringY && mouseX >= x3 && mouseX < x4;
-			// renderMinimizeButton(x3, y4, x4, y5, hovering,
-			// window.isMinimized());
+			renderMinimizeButton(matrixStack, x3, y4, x4, y5, hovering,
+				window.isMinimized());
 		}
 		
 		// title bar background
@@ -890,265 +902,311 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
-	private void renderTitleBarButton(int x1, int y1, int x2, int y2,
-		boolean hovering)
+	private void renderTitleBarButton(MatrixStack matrixStack, int x1, int y1,
+		int x2, int y2, boolean hovering)
 	{
 		int x3 = x2 + 2;
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hovering ? opacity * 1.5F : opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// background between buttons
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 			opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x2, y1);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x3, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// button outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void renderMinimizeButton(int x1, int y1, int x2, int y2,
-		boolean hovering, boolean minimized)
+	private void renderMinimizeButton(MatrixStack matrixStack, int x1, int y1,
+		int x2, int y2, boolean hovering, boolean minimized)
 	{
-		renderTitleBarButton(x1, y1, x2, y2, hovering);
+		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		double xa1 = x1 + 1;
-		double xa2 = (x1 + x2) / 2.0;
-		double xa3 = x2 - 1;
-		double ya1;
-		double ya2;
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		float xa1 = x1 + 1;
+		float xa2 = (x1 + x2) / 2.0F;
+		float xa3 = x2 - 1;
+		float ya1;
+		float ya2;
 		
 		if(minimized)
 		{
 			ya1 = y1 + 3;
-			ya2 = y2 - 2.5;
+			ya2 = y2 - 2.5F;
 			RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
 			
 		}else
 		{
 			ya1 = y2 - 3;
-			ya2 = y1 + 2.5;
+			ya2 = y1 + 2.5F;
 			RenderSystem.setShaderColor(hovering ? 1 : 0.85F, 0, 0, 1);
 		}
 		
 		// arrow
-		GL11.glBegin(GL11.GL_TRIANGLES);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void renderPinButton(int x1, int y1, int x2, int y2,
-		boolean hovering, boolean pinned)
+	private void renderPinButton(MatrixStack matrixStack, int x1, int y1,
+		int x2, int y2, boolean hovering, boolean pinned)
 	{
-		renderTitleBarButton(x1, y1, x2, y2, hovering);
+		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		float h = hovering ? 1 : 0.85F;
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		if(pinned)
 		{
-			double xk1 = x1 + 2;
-			double xk2 = x2 - 2;
-			double xk3 = x1 + 1;
-			double xk4 = x2 - 1;
-			double yk1 = y1 + 2;
-			double yk2 = y2 - 2;
-			double yk3 = y2 - 0.5;
+			float xk1 = x1 + 2;
+			float xk2 = x2 - 2;
+			float xk3 = x1 + 1;
+			float xk4 = x2 - 1;
+			float yk1 = y1 + 2;
+			float yk2 = y2 - 2;
+			float yk3 = y2 - 0.5F;
 			
 			// knob
 			RenderSystem.setShaderColor(h, 0, 0, 0.5F);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2d(xk1, yk1);
-			GL11.glVertex2d(xk2, yk1);
-			GL11.glVertex2d(xk2, yk2);
-			GL11.glVertex2d(xk1, yk2);
-			GL11.glVertex2d(xk3, yk2);
-			GL11.glVertex2d(xk4, yk2);
-			GL11.glVertex2d(xk4, yk3);
-			GL11.glVertex2d(xk3, yk3);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
-			double xn1 = x1 + 3.5;
-			double xn2 = x2 - 3.5;
-			double yn1 = y2 - 0.5;
-			double yn2 = y2;
+			float xn1 = x1 + 3.5F;
+			float xn2 = x2 - 3.5F;
+			float yn1 = y2 - 0.5F;
+			float yn2 = y2;
 			
 			// needle
 			RenderSystem.setShaderColor(h, h, h, 1);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2d(xn1, yn1);
-			GL11.glVertex2d(xn2, yn1);
-			GL11.glVertex2d(xn2, yn2);
-			GL11.glVertex2d(xn1, yn2);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
+			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xk1, yk1);
-			GL11.glVertex2d(xk2, yk1);
-			GL11.glVertex2d(xk2, yk2);
-			GL11.glVertex2d(xk1, yk2);
-			GL11.glEnd();
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xk3, yk2);
-			GL11.glVertex2d(xk4, yk2);
-			GL11.glVertex2d(xk4, yk3);
-			GL11.glVertex2d(xk3, yk3);
-			GL11.glEnd();
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xn1, yn1);
-			GL11.glVertex2d(xn2, yn1);
-			GL11.glVertex2d(xn2, yn2);
-			GL11.glVertex2d(xn1, yn2);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
+			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 		}else
 		{
-			double xk1 = x2 - 3.5;
-			double xk2 = x2 - 0.5;
-			double xk3 = x2 - 3;
-			double xk4 = x1 + 3;
-			double xk5 = x1 + 2;
-			double xk6 = x2 - 2;
-			double xk7 = x1 + 1;
-			double yk1 = y1 + 0.5;
-			double yk2 = y1 + 3.5;
-			double yk3 = y2 - 3;
-			double yk4 = y1 + 3;
-			double yk5 = y1 + 2;
-			double yk6 = y2 - 2;
-			double yk7 = y2 - 1;
+			float xk1 = x2 - 3.5F;
+			float xk2 = x2 - 0.5F;
+			float xk3 = x2 - 3;
+			float xk4 = x1 + 3;
+			float xk5 = x1 + 2;
+			float xk6 = x2 - 2;
+			float xk7 = x1 + 1;
+			float yk1 = y1 + 0.5F;
+			float yk2 = y1 + 3.5F;
+			float yk3 = y2 - 3;
+			float yk4 = y1 + 3;
+			float yk5 = y1 + 2;
+			float yk6 = y2 - 2;
+			float yk7 = y2 - 1;
 			
 			// knob
 			RenderSystem.setShaderColor(0, h, 0, 1);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2d(xk1, yk1);
-			GL11.glVertex2d(xk2, yk2);
-			GL11.glVertex2d(xk3, yk3);
-			GL11.glVertex2d(xk4, yk4);
-			GL11.glVertex2d(xk5, yk5);
-			GL11.glVertex2d(xk6, yk6);
-			GL11.glVertex2d(xk3, yk7);
-			GL11.glVertex2d(xk7, yk4);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
+			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
+			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
+			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
-			double xn1 = x1 + 3;
-			double xn2 = x1 + 4;
-			double xn3 = x1 + 1;
-			double yn1 = y2 - 4;
-			double yn2 = y2 - 3;
-			double yn3 = y2 - 1;
+			float xn1 = x1 + 3;
+			float xn2 = x1 + 4;
+			float xn3 = x1 + 1;
+			float yn1 = y2 - 4;
+			float yn2 = y2 - 3;
+			float yn3 = y2 - 1;
 			
 			// needle
 			RenderSystem.setShaderColor(h, h, h, 1);
-			GL11.glBegin(GL11.GL_TRIANGLES);
-			GL11.glVertex2d(xn1, yn1);
-			GL11.glVertex2d(xn2, yn2);
-			GL11.glVertex2d(xn3, yn3);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
+			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xk1, yk1);
-			GL11.glVertex2d(xk2, yk2);
-			GL11.glVertex2d(xk3, yk3);
-			GL11.glVertex2d(xk4, yk4);
-			GL11.glEnd();
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xk5, yk5);
-			GL11.glVertex2d(xk6, yk6);
-			GL11.glVertex2d(xk3, yk7);
-			GL11.glVertex2d(xk7, yk4);
-			GL11.glEnd();
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2d(xn1, yn1);
-			GL11.glVertex2d(xn2, yn2);
-			GL11.glVertex2d(xn3, yn3);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
+			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
+			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
+			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
+			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
+			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 		}
 	}
 	
-	private void renderCloseButton(int x1, int y1, int x2, int y2,
-		boolean hovering)
+	private void renderCloseButton(MatrixStack matrixStack, int x1, int y1,
+		int x2, int y2, boolean hovering)
 	{
-		renderTitleBarButton(x1, y1, x2, y2, hovering);
+		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		double xc1 = x1 + 2;
-		double xc2 = x1 + 3;
-		double xc3 = x2 - 2;
-		double xc4 = x2 - 3;
-		double xc5 = x1 + 3.5;
-		double xc6 = (x1 + x2) / 2.0;
-		double xc7 = x2 - 3.5;
-		double yc1 = y1 + 3;
-		double yc2 = y1 + 2;
-		double yc3 = y2 - 3;
-		double yc4 = y2 - 2;
-		double yc5 = y1 + 3.5;
-		double yc6 = (y1 + y2) / 2.0;
-		double yc7 = y2 - 3.5;
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		float xc1 = x1 + 2;
+		float xc2 = x1 + 3;
+		float xc3 = x2 - 2;
+		float xc4 = x2 - 3;
+		float xc5 = x1 + 3.5F;
+		float xc6 = (x1 + x2) / 2.0F;
+		float xc7 = x2 - 3.5F;
+		float yc1 = y1 + 3;
+		float yc2 = y1 + 2;
+		float yc3 = y2 - 3;
+		float yc4 = y2 - 2;
+		float yc5 = y1 + 3.5F;
+		float yc6 = (y1 + y2) / 2.0F;
+		float yc7 = y2 - 3.5F;
 		
 		// cross
 		RenderSystem.setShaderColor(hovering ? 1 : 0.85F, 0, 0, 1);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2d(xc1, yc1);
-		GL11.glVertex2d(xc2, yc2);
-		GL11.glVertex2d(xc3, yc3);
-		GL11.glVertex2d(xc4, yc4);
-		GL11.glVertex2d(xc3, yc1);
-		GL11.glVertex2d(xc4, yc2);
-		GL11.glVertex2d(xc6, yc5);
-		GL11.glVertex2d(xc7, yc6);
-		GL11.glVertex2d(xc6, yc7);
-		GL11.glVertex2d(xc5, yc6);
-		GL11.glVertex2d(xc1, yc3);
-		GL11.glVertex2d(xc2, yc4);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+		bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+		bufferBuilder.vertex(matrix, xc3, yc3, 0).next();
+		bufferBuilder.vertex(matrix, xc4, yc4, 0).next();
+		bufferBuilder.vertex(matrix, xc3, yc1, 0).next();
+		bufferBuilder.vertex(matrix, xc4, yc2, 0).next();
+		bufferBuilder.vertex(matrix, xc6, yc5, 0).next();
+		bufferBuilder.vertex(matrix, xc7, yc6, 0).next();
+		bufferBuilder.vertex(matrix, xc6, yc7, 0).next();
+		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
+		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
+		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(xc1, yc1);
-		GL11.glVertex2d(xc2, yc2);
-		GL11.glVertex2d(xc6, yc5);
-		GL11.glVertex2d(xc4, yc2);
-		GL11.glVertex2d(xc3, yc1);
-		GL11.glVertex2d(xc7, yc6);
-		GL11.glVertex2d(xc3, yc3);
-		GL11.glVertex2d(xc4, yc4);
-		GL11.glVertex2d(xc6, yc7);
-		GL11.glVertex2d(xc2, yc4);
-		GL11.glVertex2d(xc1, yc3);
-		GL11.glVertex2d(xc5, yc6);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+		bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+		bufferBuilder.vertex(matrix, xc6, yc5, 0).next();
+		bufferBuilder.vertex(matrix, xc4, yc2, 0).next();
+		bufferBuilder.vertex(matrix, xc3, yc1, 0).next();
+		bufferBuilder.vertex(matrix, xc7, yc6, 0).next();
+		bufferBuilder.vertex(matrix, xc3, yc3, 0).next();
+		bufferBuilder.vertex(matrix, xc4, yc4, 0).next();
+		bufferBuilder.vertex(matrix, xc6, yc7, 0).next();
+		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
+		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
+		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	public float[] getBgColor()
