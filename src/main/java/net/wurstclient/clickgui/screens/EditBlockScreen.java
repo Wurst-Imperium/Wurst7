@@ -110,8 +110,8 @@ public final class EditBlockScreen extends Screen
 		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(-64 + width / 2 - 100, 115, 0);
+		matrixStack.push();
+		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
 		
 		boolean lblAbove =
 			!blockField.getText().isEmpty() || blockField.isFocused();
@@ -134,7 +134,7 @@ public final class EditBlockScreen extends Screen
 		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
 		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 	
 	@Override
@@ -152,11 +152,11 @@ public final class EditBlockScreen extends Screen
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
-		double scale = large ? 1.5 : 0.75;
-		GL11.glScaled(scale, scale, scale);
+		matrixStack.translate(x, y, 0);
+		float scale = large ? 1.5F : 0.75F;
+		matrixStack.scale(scale, scale, scale);
 		
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
@@ -165,7 +165,7 @@ public final class EditBlockScreen extends Screen
 			0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);
@@ -174,17 +174,17 @@ public final class EditBlockScreen extends Screen
 	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
 		boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		if(large)
-			GL11.glScaled(2, 2, 2);
+			matrixStack.scale(2, 2, 2);
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		tr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 }

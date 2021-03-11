@@ -14,9 +14,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -77,6 +84,10 @@ public final class BlockComponent extends Component
 		
 		ItemStack stack = new ItemStack(setting.getBlock());
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// tooltip
 		if(hText)
 			gui.setTooltip(setting.getDescription());
@@ -92,12 +103,14 @@ public final class BlockComponent extends Component
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -129,12 +142,15 @@ public final class BlockComponent extends Component
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
-		double scale = large ? 1.5 : 0.75;
-		GL11.glScaled(scale, scale, scale);
+		matrixStack.translate(x, y, 0);
+		float scale = large ? 1.5F : 0.75F;
+		// GL11.glScaled(scale, scale, scale);
+		matrixStack.scale(scale, scale, scale);
 		
+		// RenderSystem.enableTexture();
+		// RenderSystem.setShader(GameRenderer::method_34542);
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
@@ -142,7 +158,7 @@ public final class BlockComponent extends Component
 			0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);
@@ -151,9 +167,9 @@ public final class BlockComponent extends Component
 	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
 		boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		if(large)
 			GL11.glScaled(2, 2, 2);
 		
@@ -163,7 +179,7 @@ public final class BlockComponent extends Component
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 	
 	private String getBlockName(ItemStack stack)
