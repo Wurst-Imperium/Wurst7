@@ -179,16 +179,16 @@ public final class EditItemListScreen extends Screen
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
+		matrixStack.push();
+		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(0, 0, 300);
+			matrixStack.push();
+			matrixStack.translate(0, 0, 300);
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"item name or ID", 68, height - 50, 0x808080);
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
 		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
@@ -203,7 +203,7 @@ public final class EditItemListScreen extends Screen
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd), 52,
 			height - 52, false);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 	
 	private static class ListGui extends ListWidget
@@ -270,45 +270,45 @@ public final class EditItemListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
+					matrixStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					GL11.glScaled(0.75, 0.75, 0.75);
+					matrixStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
 					GL11.glScaled(2, 2, 2);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				TextRenderer fr = mc.textRenderer;
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
 				return "\u00a7ounknown item\u00a7r";
 				
 			}else
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
+					matrixStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					GL11.glScaled(0.75, 0.75, 0.75);
+					matrixStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
 				
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
 				return stack.getName().getString();
 			}

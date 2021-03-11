@@ -12,7 +12,14 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -71,6 +78,10 @@ public final class ItemListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// tooltip
 		if(hText)
 			gui.setTooltip(setting.getDescription());
@@ -78,29 +89,35 @@ public final class ItemListEditButton extends Component
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x3, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// box
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hBox ? opacity * 1.5F : opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
