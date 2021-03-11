@@ -94,7 +94,7 @@ public final class SliderComponent extends Component
 		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
 		boolean hSlider = hovering && mouseY >= y3 || dragging;
 		boolean renderAsDisabled = setting.isDisabled() || setting.isLocked();
-
+		
 		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		if(hovering && mouseY < y3)
@@ -196,7 +196,7 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, x4, y5, 0).next();
 		bufferBuilder.vertex(matrix, x2, y5, 0).next();
 		bufferBuilder.vertex(matrix, x2, y4, 0).next();
-
+		
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
