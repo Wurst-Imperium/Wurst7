@@ -16,7 +16,14 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ComboBoxPopup;
@@ -110,15 +117,17 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		boolean hText = hovering && mouseX < x4;
 		boolean hBox = hovering && mouseX >= x4;
 		
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// tooltip
 		if(hText)
 			gui.setTooltip(setting.getDescription());
 		
-		drawBackground(x1, x4, y1, y2);
-		drawBox(x2, x4, y1, y2, hBox);
+		drawBackground(matrixStack, x1, x4, y1, y2);
+		drawBox(matrixStack, x2, x4, y1, y2, hBox);
 		
-		drawSeparator(x3, y1, y2);
-		drawArrow(x2, x3, y1, y2, hBox);
+		drawSeparator(matrixStack, x3, y1, y2);
+		drawArrow(matrixStack, x2, x3, y1, y2, hBox);
 		
 		drawNameAndValue(matrixStack, x1, x4, y1);
 	}
@@ -134,91 +143,119 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
 	}
 	
-	private void drawBackground(int x1, int x4, int y1, int y2)
+	private void drawBackground(MatrixStack matrixStack, int x1, int x4, int y1,
+		int y2)
 	{
 		float[] bgColor = gui.getBgColor();
 		float opacity = gui.getOpacity();
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
 		
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x4, y2);
-		GL11.glVertex2i(x4, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x4, y2, 0).next();
+		bufferBuilder.vertex(matrix, x4, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawBox(int x2, int x4, int y1, int y2, boolean hBox)
+	private void drawBox(MatrixStack matrixStack, int x2, int x4, int y1,
+		int y2, boolean hBox)
 	{
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
 		// background
 		float bgAlpha = hBox ? opacity * 1.5F : opacity;
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			bgAlpha);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x4, y1);
-		GL11.glVertex2i(x4, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x4, y1, 0).next();
+		bufferBuilder.vertex(matrix, x4, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x4, y1);
-		GL11.glVertex2i(x4, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x4, y1, 0).next();
+		bufferBuilder.vertex(matrix, x4, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawSeparator(int x3, int y1, int y2)
+	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y2);
-		GL11.glEnd();
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawArrow(int x2, int x3, int y1, int y2, boolean hBox)
+	private void drawArrow(MatrixStack matrixStack, int x2, int x3, int y1,
+		int y2, boolean hBox)
 	{
-		double xa1 = x3 + 1;
-		double xa2 = (x3 + x2) / 2.0;
-		double xa3 = x2 - 1;
-		double ya1;
-		double ya2;
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		float xa1 = x3 + 1;
+		float xa2 = (x3 + x2) / 2.0F;
+		float xa3 = x2 - 1;
+		float ya1;
+		float ya2;
 		
 		if(isPopupOpen())
 		{
-			ya1 = y2 - 3.5;
+			ya1 = y2 - 3.5F;
 			ya2 = y1 + 3;
 			RenderSystem.setShaderColor(hBox ? 1 : 0.85F, 0, 0, 1);
 			
 		}else
 		{
-			ya1 = y1 + 3.5;
+			ya1 = y1 + 3.5F;
 			ya2 = y2 - 3;
 			RenderSystem.setShaderColor(0, hBox ? 1 : 0.85F, 0, 1);
 		}
 		
 		// arrow
-		GL11.glBegin(GL11.GL_TRIANGLES);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
