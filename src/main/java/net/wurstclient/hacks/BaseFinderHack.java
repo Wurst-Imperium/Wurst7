@@ -15,7 +15,15 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -130,7 +138,7 @@ public final class BaseFinderHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -141,18 +149,25 @@ public final class BaseFinderHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		RenderSystem.setShaderColor(1F, 0F, 0F, 0.15F);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		// vertices
-		GL11.glBegin(GL11.GL_QUADS);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
 		{
 			for(int[] vertex : vertices)
-				GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
+				bufferBuilder.vertex(matrix, vertex[0], vertex[1], vertex[2])
+					.next();
 		}
-		GL11.glEnd();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
