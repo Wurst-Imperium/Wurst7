@@ -25,6 +25,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -232,7 +234,7 @@ public final class NukerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(currentBlock == null)
 			return;
@@ -247,30 +249,32 @@ public final class NukerHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
+		matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
 			currentBlock.getZ());
 		if(p < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(p, p, p);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
+		RenderUtils.drawSolidBox(matrixStack, box);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
+		RenderUtils.drawOutlinedBox(matrixStack, box);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
