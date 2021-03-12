@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
@@ -497,7 +498,8 @@ public class PathFinder
 		return path;
 	}
 	
-	public void renderPath(boolean debugMode, boolean depthTest)
+	public void renderPath(MatrixStack matrixStack, boolean debugMode,
+		boolean depthTest)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -510,9 +512,9 @@ public class PathFinder
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
-		GL11.glTranslated(0.5, 0.5, 0.5);
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
+		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
 		{
@@ -526,7 +528,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(element);
+				PathRenderer.renderNode(matrixStack, element);
 				renderedThings++;
 			}
 			
@@ -542,7 +544,8 @@ public class PathFinder
 				else
 					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
-				PathRenderer.renderArrow(entry.getValue(), entry.getKey());
+				PathRenderer.renderArrow(matrixStack, entry.getValue(),
+					entry.getKey());
 				renderedThings++;
 			}
 		}
@@ -558,9 +561,9 @@ public class PathFinder
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		}
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glDisable(GL11.GL_BLEND);
