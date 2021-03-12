@@ -20,6 +20,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -256,7 +258,7 @@ public final class NukerLegitHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(currentBlock == null)
 			return;
@@ -271,11 +273,11 @@ public final class NukerLegitHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set position
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
+		matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
 			currentBlock.getZ());
 		
 		// get progress
@@ -288,9 +290,9 @@ public final class NukerLegitHack extends Hack
 		// set size
 		if(progress < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(progress, progress, progress);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(progress, progress, progress);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
 		// get color
@@ -298,12 +300,13 @@ public final class NukerLegitHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
+		RenderSystem.setShader(GameRenderer::method_34539);
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
+		RenderUtils.drawSolidBox(matrixStack);
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderUtils.drawOutlinedBox(matrixStack);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
