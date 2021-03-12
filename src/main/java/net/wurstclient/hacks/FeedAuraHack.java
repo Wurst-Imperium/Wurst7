@@ -18,6 +18,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -155,7 +157,7 @@ public final class FeedAuraHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(renderTarget == null)
 			return;
@@ -170,8 +172,8 @@ public final class FeedAuraHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -180,32 +182,34 @@ public final class FeedAuraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(
+		matrixStack.translate(
 			renderTarget.prevX
 				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
 			renderTarget.prevY
 				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
 			renderTarget.prevZ
 				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
-		GL11.glTranslated(0, 0.05, 0);
-		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
+		matrixStack.translate(0, 0.05, 0);
+		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());
-		GL11.glTranslated(-0.5, 0, -0.5);
+		matrixStack.translate(-0.5, 0, -0.5);
 		
 		if(p < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(p, p, p);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
+		RenderUtils.drawSolidBox(matrixStack, box);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
+		RenderUtils.drawOutlinedBox(matrixStack, box);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
