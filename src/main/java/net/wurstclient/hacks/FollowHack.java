@@ -12,6 +12,10 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -54,73 +58,73 @@ public final class FollowHack extends Hack
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
 	private int ticksProcessing;
-	
+
 	private final SliderSetting distance =
 		new SliderSetting("Distance", "How closely to follow the target.", 1, 1,
 			12, 0.5, ValueDisplay.DECIMAL);
-	
+
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
-	
+
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't follow other players.", false);
-	
+
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't follow sleeping players.", false);
-	
+
 	private final SliderSetting filterFlying =
 		new SliderSetting("Filter flying",
 			"Won't follow players that\n" + "are at least the given\n"
 				+ "distance above ground.",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
-	
+
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't follow zombies, creepers, etc.", true);
-	
+
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
 		"Filter pigmen", "Won't follow zombie pigmen.", true);
-	
+
 	private final CheckboxSetting filterEndermen =
 		new CheckboxSetting("Filter endermen", "Won't follow endermen.", true);
-	
+
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals", "Won't follow pigs, cows, etc.", true);
-	
+
 	private final CheckboxSetting filterBabies =
 		new CheckboxSetting("Filter babies",
 			"Won't follow baby pigs,\n" + "baby villagers, etc.", true);
-	
+
 	private final CheckboxSetting filterPets =
 		new CheckboxSetting("Filter pets",
 			"Won't follow tamed wolves,\n" + "tamed horses, etc.", true);
-	
+
 	private final CheckboxSetting filterTraders =
 		new CheckboxSetting("Filter traders",
 			"Won't follow villagers, wandering traders, etc.", true);
-	
+
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
 			"Won't follow iron golems,\n" + "snow golems and shulkers.", true);
-	
+
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't follow invisible entities.", false);
 	private final CheckboxSetting filterStands = new CheckboxSetting(
 		"Filter armor stands", "Won't follow armor stands.", true);
-	
+
 	private final CheckboxSetting filterCarts = new CheckboxSetting(
 		"Filter minecarts", "Won't follow minecarts.", true);
-	
+
 	public FollowHack()
 	{
 		super("Follow",
 			"A bot that follows the closest entity.\n" + "Very annoying.\n\n"
 				+ "Use .follow to follow a specific entity.");
-		
+
 		setCategory(Category.MOVEMENT);
 		addSetting(distance);
 		addSetting(useAi);
-		
+
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -136,7 +140,7 @@ public final class FollowHack extends Hack
 		addSetting(filterStands);
 		addSetting(filterCarts);
 	}
-	
+
 	@Override
 	public String getRenderName()
 	{
@@ -145,14 +149,14 @@ public final class FollowHack extends Hack
 		else
 			return "Follow";
 	}
-	
+
 	@Override
 	public void onEnable()
 	{
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
-		
+
 		if(entity == null)
 		{
 			Stream<Entity> stream =
@@ -163,72 +167,72 @@ public final class FollowHack extends Hack
 						|| e instanceof AbstractMinecartEntity)
 					.filter(e -> e != MC.player)
 					.filter(e -> !(e instanceof FakePlayerEntity));
-			
+
 			if(filterPlayers.isChecked())
 				stream = stream.filter(e -> !(e instanceof PlayerEntity));
-			
+
 			if(filterSleeping.isChecked())
 				stream = stream.filter(e -> !(e instanceof PlayerEntity
 					&& ((PlayerEntity)e).isSleeping()));
-			
+
 			if(filterFlying.getValue() > 0)
 				stream = stream.filter(e -> {
-					
+
 					if(!(e instanceof PlayerEntity))
 						return true;
-					
+
 					Box box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
 					return !MC.world.isSpaceEmpty(box);
 				});
-			
+
 			if(filterMonsters.isChecked())
 				stream = stream.filter(e -> !(e instanceof Monster));
-			
+
 			if(filterPigmen.isChecked())
 				stream =
 					stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
-			
+
 			if(filterEndermen.isChecked())
 				stream = stream.filter(e -> !(e instanceof EndermanEntity));
-			
+
 			if(filterAnimals.isChecked())
 				stream = stream.filter(e -> !(e instanceof AnimalEntity
 					|| e instanceof AmbientEntity
 					|| e instanceof WaterCreatureEntity));
-			
+
 			if(filterBabies.isChecked())
 				stream = stream.filter(e -> !(e instanceof PassiveEntity
 					&& ((PassiveEntity)e).isBaby()));
-			
+
 			if(filterPets.isChecked())
 				stream = stream
 					.filter(e -> !(e instanceof TameableEntity
 						&& ((TameableEntity)e).isTamed()))
 					.filter(e -> !(e instanceof HorseBaseEntity
 						&& ((HorseBaseEntity)e).isTame()));
-			
+
 			if(filterTraders.isChecked())
 				stream = stream.filter(e -> !(e instanceof MerchantEntity));
-			
+
 			if(filterGolems.isChecked())
 				stream = stream.filter(e -> !(e instanceof GolemEntity));
-			
+
 			if(filterInvisible.isChecked())
 				stream = stream.filter(e -> !e.isInvisible());
-			
+
 			if(filterStands.isChecked())
 				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
-			
+
 			if(filterCarts.isChecked())
 				stream =
 					stream.filter(e -> !(e instanceof AbstractMinecartEntity));
-			
+
 			entity = stream
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);
-			
+
 			if(entity == null)
 			{
 				ChatUtils.error("Could not find a valid entity.");
@@ -236,31 +240,31 @@ public final class FollowHack extends Hack
 				return;
 			}
 		}
-		
+
 		pathFinder = new EntityPathFinder();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		ChatUtils.message("Now following " + entity.getName().getString());
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
+
 		pathFinder = null;
 		processor = null;
 		ticksProcessing = 0;
 		PathProcessor.releaseControls();
-		
+
 		if(entity != null)
 			ChatUtils
 				.message("No longer following " + entity.getName().getString());
-		
+
 		entity = null;
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -272,7 +276,7 @@ public final class FollowHack extends Hack
 			setEnabled(false);
 			return;
 		}
-		
+
 		// check if entity died or disappeared
 		if(entity.isRemoved() || entity instanceof LivingEntity
 			&& ((LivingEntity)entity).getHealth() <= 0)
@@ -289,19 +293,19 @@ public final class FollowHack extends Hack
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
 				.orElse(null);
-			
+
 			if(entity == null)
 			{
 				ChatUtils.message("No longer following entity");
 				setEnabled(false);
 				return;
 			}
-			
+
 			pathFinder = new EntityPathFinder();
 			processor = null;
 			ticksProcessing = 0;
 		}
-		
+
 		if(useAi.isChecked())
 		{
 			// reset pathfinder
@@ -313,7 +317,7 @@ public final class FollowHack extends Hack
 				processor = null;
 				ticksProcessing = 0;
 			}
-			
+
 			// find path
 			if(!pathFinder.isDone() && !pathFinder.isFailed())
 			{
@@ -324,7 +328,7 @@ public final class FollowHack extends Hack
 				pathFinder.formatPath();
 				processor = pathFinder.getProcessor();
 			}
-			
+
 			// process path
 			if(!processor.isDone())
 			{
@@ -336,11 +340,11 @@ public final class FollowHack extends Hack
 			// jump if necessary
 			if(MC.player.horizontalCollision && MC.player.isOnGround())
 				MC.player.jump();
-			
+
 			// swim up if necessary
 			if(MC.player.isTouchingWater() && MC.player.getY() < entity.getY())
 				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
-			
+
 			// control height if flying
 			if(!MC.player.isOnGround()
 				&& (MC.player.getAbilities().flying
@@ -358,7 +362,7 @@ public final class FollowHack extends Hack
 				MC.options.keySneak.setPressed(false);
 				MC.options.keyJump.setPressed(false);
 			}
-			
+
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
@@ -368,19 +372,21 @@ public final class FollowHack extends Hack
 					MC.player.getY(), entity.getZ()) > distanceSq);
 		}
 	}
-	
+
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		RenderSystem.setShader(GameRenderer::method_34539);
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
-	
+
 	public void setEntity(Entity entity)
 	{
 		this.entity = entity;
 	}
-	
+
 	private class EntityPathFinder extends PathFinder
 	{
 		public EntityPathFinder()
@@ -388,7 +394,7 @@ public final class FollowHack extends Hack
 			super(new BlockPos(entity.getPos()));
 			setThinkTime(1);
 		}
-		
+
 		@Override
 		protected boolean checkDone()
 		{
@@ -396,13 +402,13 @@ public final class FollowHack extends Hack
 			double distanceSq = Math.pow(distance.getValue(), 2);
 			return done = entity.squaredDistanceTo(center) <= distanceSq;
 		}
-		
+
 		@Override
 		public ArrayList<PathPos> formatPath()
 		{
 			if(!done)
 				failed = true;
-			
+
 			return super.formatPath();
 		}
 	}
