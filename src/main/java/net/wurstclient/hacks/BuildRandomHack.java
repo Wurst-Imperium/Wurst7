@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -127,7 +129,7 @@ public final class BuildRandomHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(lastPos == null)
 			return;
@@ -142,23 +144,24 @@ public final class BuildRandomHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set position
-		GL11.glTranslated(lastPos.getX(), lastPos.getY(), lastPos.getZ());
+		matrixStack.translate(lastPos.getX(), lastPos.getY(), lastPos.getZ());
 		
 		// get color
 		float red = partialTicks * 2F;
 		float green = 2 - red;
 		
 		// draw box
+		RenderSystem.setShader(GameRenderer::method_34539);
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
+		RenderUtils.drawSolidBox(matrixStack);
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderUtils.drawOutlinedBox(matrixStack);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
