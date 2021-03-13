@@ -26,7 +26,7 @@ import net.wurstclient.events.CactusCollisionShapeListener.CactusCollisionShapeE
 @Mixin(CactusBlock.class)
 public abstract class CactusBlockMixin extends Block
 {
-	private CactusBlockMixin(WurstClient wurst, Settings block$Settings_1)
+	private CactusBlockMixin(Settings block$Settings_1)
 	{
 		super(block$Settings_1);
 	}
