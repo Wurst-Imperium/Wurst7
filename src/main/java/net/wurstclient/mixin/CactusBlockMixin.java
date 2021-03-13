@@ -33,7 +33,7 @@ public abstract class CactusBlockMixin extends Block
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"getOutlineShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+			"getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,
