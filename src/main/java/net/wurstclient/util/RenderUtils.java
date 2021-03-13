@@ -9,8 +9,11 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -109,6 +112,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -202,6 +206,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
 			VertexFormats.POSITION);
@@ -395,6 +400,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
 		double midY = (bb.minY + bb.maxY) / 2;
@@ -473,6 +479,7 @@ public enum RenderUtils
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		matrixStack.push();
 		
@@ -485,8 +492,8 @@ public enum RenderUtils
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
-		GL11.glTranslated(endX, endY, endZ);
-		GL11.glScaled(0.1, 0.1, 0.1);
+		matrixStack.translate(endX, endY, endZ);
+		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
 		double angleX = Math.atan2(endY - startY, startZ - endZ);
 		GL11.glRotated(Math.toDegrees(angleX) + 90, 1, 0, 0);
