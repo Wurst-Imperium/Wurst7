@@ -17,6 +17,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -40,6 +46,7 @@ import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
@@ -314,7 +321,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -328,32 +335,34 @@ public final class BowAimbotHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set position
-		GL11.glTranslated(target.getX(), target.getY(), target.getZ());
+		matrixStack.translate(target.getX(), target.getY(), target.getZ());
 		
 		// set size
-		double boxWidth = target.getWidth() + 0.1;
-		double boxHeight = target.getHeight() + 0.1;
-		GL11.glScaled(boxWidth, boxHeight, boxWidth);
+		float boxWidth = target.getWidth() + 0.1F;
+		float boxHeight = target.getHeight() + 0.1F;
+		matrixStack.scale(boxWidth, boxHeight, boxWidth);
 		
 		// move to center
-		GL11.glTranslated(0, 0.5, 0);
+		matrixStack.translate(0, 0.5, 0);
 		
-		double v = 1 / velocity;
-		GL11.glScaled(v, v, v);
+		float v = 1 / velocity;
+		matrixStack.scale(v, v, v);
+		
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		// draw outline
-		GL11.glColor4d(1, 0, 0, 0.5F * velocity);
-		RenderUtils.drawOutlinedBox(TARGET_BOX);
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F * velocity);
+		RenderUtils.drawOutlinedBox(matrixStack, TARGET_BOX);
 		
 		// draw box
-		GL11.glColor4d(1, 0, 0, 0.25F * velocity);
-		RenderUtils.drawSolidBox(TARGET_BOX);
+		RenderSystem.setShaderColor(1, 0, 0, 0.25F * velocity);
+		RenderUtils.drawSolidBox(matrixStack, TARGET_BOX);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -374,7 +383,10 @@ public final class BowAimbotHack extends Hack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		String message;
 		if(velocity < 1)
@@ -385,25 +397,25 @@ public final class BowAimbotHack extends Hack
 		// translate to center
 		Window sr = MC.getWindow();
 		int msgWidth = MC.textRenderer.getWidth(message);
-		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
+		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
+		RenderSystem.setShader(GameRenderer::method_34539);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		GL11.glBegin(GL11.GL_QUADS);
-		{
-			GL11.glVertex2d(0, 0);
-			GL11.glVertex2d(msgWidth + 3, 0);
-			GL11.glVertex2d(msgWidth + 3, 10);
-			GL11.glVertex2d(0, 10);
-		}
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0).next();
+		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
+		bufferBuilder.vertex(matrix, 0, 10, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
