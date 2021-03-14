@@ -39,6 +39,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	private int clickTimer = -1;
 	private boolean expanding = false;
 	private Feature expandingFeature;
+	private long startTime = System.currentTimeMillis();
 	
 	public NavigatorMainScreen()
 	{
@@ -54,7 +55,16 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		searchBar =
-			new TextFieldWidget(tr, 0, 32, 200, 20, new LiteralText(""));
+			new TextFieldWidget(tr, 0, 32, 200, 20, new LiteralText(""))
+			{
+				@Override
+				public boolean charTyped(char chr, int keyCode)
+				{
+					if(System.currentTimeMillis() <= startTime + 10L)
+						return false;
+					return super.charTyped(chr, keyCode);
+				}
+			};
 		searchBar.setHasBorder(false);
 		searchBar.setMaxLength(128);
 		
@@ -69,6 +79,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
+		if(System.currentTimeMillis() <= startTime + 10L)
+			return;
+		
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			leftClick(selectedFeature);
 		
