@@ -16,6 +16,7 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TickableElement;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.WurstClient;
@@ -46,7 +47,8 @@ public abstract class ScreenMixin extends AbstractParentElement
 		cancellable = true)
 	public void onRenderBackground(MatrixStack matrices, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled()
+			&& ((Screen)(Object)this) instanceof HandledScreen)
 			ci.cancel();
 	}
 }
