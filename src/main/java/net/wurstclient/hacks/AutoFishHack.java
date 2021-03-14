@@ -184,7 +184,7 @@ public final class AutoFishHack extends Hack
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box);
+//			RenderUtils.drawOutlinedBox(box);
 			GL11.glEndList();
 		}
 	}
@@ -331,7 +331,7 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+//		RenderUtils.applyRegionalRenderOffset();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;

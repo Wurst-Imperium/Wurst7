@@ -105,10 +105,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glTranslated(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
 		
 		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
-		RenderUtils.drawSolidBox();
+//		RenderUtils.drawSolidBox();
 		
 		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
-		RenderUtils.drawOutlinedBox();
+//		RenderUtils.drawOutlinedBox();
 		
 		GL11.glPopMatrix();
 	}

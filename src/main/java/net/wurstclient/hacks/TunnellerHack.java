@@ -203,7 +203,7 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+//		RenderUtils.applyRenderOffset();
 		
 		for(int displayList : displayLists)
 			GL11.glCallList(displayList);
@@ -225,9 +225,9 @@ public final class TunnellerHack extends Hack
 			
 			Box box2 = new Box(BlockPos.ORIGIN);
 			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box2);
+//			RenderUtils.drawSolidBox(box2);
 			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box2);
+//			RenderUtils.drawOutlinedBox(box2);
 		}
 		
 		GL11.glPopMatrix();
@@ -250,11 +250,11 @@ public final class TunnellerHack extends Hack
 		
 		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
-		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
+//		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
 		GL11.glEnd();
 		
-		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
-			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
+//		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
+//			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
 		
 		GL11.glPopMatrix();
 		GL11.glEndList();
@@ -368,7 +368,7 @@ public final class TunnellerHack extends Hack
 				
 				GL11.glPushMatrix();
 				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
+//				RenderUtils.drawOutlinedBox(box);
 				GL11.glPopMatrix();
 			}
 			
@@ -457,7 +457,7 @@ public final class TunnellerHack extends Hack
 			{
 				GL11.glPushMatrix();
 				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
+//				RenderUtils.drawOutlinedBox(box);
 				GL11.glPopMatrix();
 			}
 			GL11.glEndList();
@@ -590,7 +590,7 @@ public final class TunnellerHack extends Hack
 			{
 				GL11.glPushMatrix();
 				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
+//				RenderUtils.drawOutlinedBox(box);
 				GL11.glPopMatrix();
 			}
 			GL11.glEndList();
@@ -670,7 +670,7 @@ public final class TunnellerHack extends Hack
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
 			RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
-			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
+//			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			
 			BlockPos player = new BlockPos(MC.player.getPos());

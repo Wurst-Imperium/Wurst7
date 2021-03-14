@@ -194,7 +194,7 @@ public final class PathCmd extends Command
 	@Override
 	public void onRender(float partialTicks)
 	{
-		pathFinder.renderPath(debugMode.isChecked(), depthTest.isChecked());
+//		pathFinder.renderPath(debugMode.isChecked(), depthTest.isChecked());
 	}
 	
 	public BlockPos getLastGoal()

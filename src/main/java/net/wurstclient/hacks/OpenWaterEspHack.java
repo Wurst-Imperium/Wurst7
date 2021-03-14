@@ -59,14 +59,14 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		openWaterBox = GL11.glGenLists(1);
 		GL11.glNewList(openWaterBox, GL11.GL_COMPILE);
 		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(bb);
+//		RenderUtils.drawOutlinedBox(bb);
 		GL11.glEndList();
 		
 		shallowWaterBox = GL11.glGenLists(1);
 		GL11.glNewList(shallowWaterBox, GL11.GL_COMPILE);
 		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-		RenderUtils.drawCrossBox(bb);
-		RenderUtils.drawOutlinedBox(bb);
+//		RenderUtils.drawCrossBox(bb);
+//		RenderUtils.drawOutlinedBox(bb);
 		GL11.glEndList();
 		
 		EVENTS.add(RenderListener.class, this);
@@ -95,7 +95,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+//		RenderUtils.applyRegionalRenderOffset();
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
