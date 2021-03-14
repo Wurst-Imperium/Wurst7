@@ -63,7 +63,7 @@ public abstract class GameRendererMixin
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
 		MatrixStack matrixStack, CallbackInfo ci)
 	{
-		RenderEvent event = new RenderEvent(partialTicks);
+		RenderEvent event = new RenderEvent(matrixStack, partialTicks);
 		EventManager.fire(event);
 	}
 	
