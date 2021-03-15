@@ -15,16 +15,7 @@ import net.wurstclient.event.Listener;
 
 public interface RenderListener extends Listener
 {
-	@Deprecated
-	public default void onRender(float partialTicks)
-	{
-		
-	}
-	
-	public default void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		onRender(partialTicks);
-	}
+	public void onRender(MatrixStack matrixStack, float partialTicks);
 	
 	public static class RenderEvent extends Event<RenderListener>
 	{
