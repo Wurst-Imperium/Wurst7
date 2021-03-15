@@ -10,6 +10,7 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
@@ -171,10 +172,11 @@ public final class GoToCmd extends Command
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	private void disable()
