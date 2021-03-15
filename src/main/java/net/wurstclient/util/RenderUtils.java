@@ -406,6 +406,9 @@ public enum RenderUtils
 		double midY = (bb.minY + bb.maxY) / 2;
 		double midZ = (bb.minZ + bb.maxZ) / 2;
 		
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			VertexFormats.POSITION);
+		
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ)
 			.next();
 		bufferBuilder.vertex(matrix, (float)bb.minX, (float)midY, (float)midZ)
@@ -465,6 +468,9 @@ public enum RenderUtils
 			.next();
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ)
 			.next();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	public static void drawArrow(MatrixStack matrixStack, Vec3d from, Vec3d to)
