@@ -97,13 +97,13 @@ public final class AutoFarmHack extends Hack
 		GL11.glNewList(box, GL11.GL_COMPILE);
 		Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0,
 			15 / 16.0);
-//		RenderUtils.drawOutlinedBox(box);
+		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
 		GL11.glNewList(node, GL11.GL_COMPILE);
 		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		GL11.glBegin(GL11.GL_LINES);
-//		RenderUtils.drawNode(node);
+		RenderUtils.drawNode(node);
 		GL11.glEnd();
 		GL11.glEndList();
 	}
@@ -213,7 +213,7 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRegionalRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -240,10 +240,10 @@ public final class AutoFarmHack extends Hack
 			}
 			
 			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-//			RenderUtils.drawSolidBox(box);
+			RenderUtils.drawSolidBox(box);
 			
 			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-//			RenderUtils.drawOutlinedBox(box);
+			RenderUtils.drawOutlinedBox(box);
 			
 			GL11.glPopMatrix();
 		}

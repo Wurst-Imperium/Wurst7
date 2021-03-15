@@ -85,37 +85,37 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	{
 		Box box = new Box(BlockPos.ORIGIN);
 		
-//		greenBox = GL11.glGenLists(1);
-//		GL11.glNewList(greenBox, GL11.GL_COMPILE);
-//		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
-//		RenderUtils.drawSolidBox(box);
-//		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-//		RenderUtils.drawOutlinedBox(box);
-//		GL11.glEndList();
-//		
-//		orangeBox = GL11.glGenLists(1);
-//		GL11.glNewList(orangeBox, GL11.GL_COMPILE);
-//		RenderSystem.setShaderColor(1, 0.5F, 0, 0.25F);
-//		RenderUtils.drawSolidBox(box);
-//		RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
-//		RenderUtils.drawOutlinedBox(box);
-//		GL11.glEndList();
-//		
-//		cyanBox = GL11.glGenLists(1);
-//		GL11.glNewList(cyanBox, GL11.GL_COMPILE);
-//		RenderSystem.setShaderColor(0, 1, 1, 0.25F);
-//		RenderUtils.drawSolidBox(box);
-//		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-//		RenderUtils.drawOutlinedBox(box);
-//		GL11.glEndList();
-//		
-//		purpleBox = GL11.glGenLists(1);
-//		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
-//		RenderSystem.setShaderColor(1, 0, 1, 0.25F);
-//		RenderUtils.drawSolidBox(box);
-//		RenderSystem.setShaderColor(1, 0, 1, 0.5F);
-//		RenderUtils.drawOutlinedBox(box);
-//		GL11.glEndList();
+		greenBox = GL11.glGenLists(1);
+		GL11.glNewList(greenBox, GL11.GL_COMPILE);
+		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
+		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(box);
+		GL11.glEndList();
+		
+		orangeBox = GL11.glGenLists(1);
+		GL11.glNewList(orangeBox, GL11.GL_COMPILE);
+		RenderSystem.setShaderColor(1, 0.5F, 0, 0.25F);
+		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(box);
+		GL11.glEndList();
+		
+		cyanBox = GL11.glGenLists(1);
+		GL11.glNewList(cyanBox, GL11.GL_COMPILE);
+		RenderSystem.setShaderColor(0, 1, 1, 0.25F);
+		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+		RenderUtils.drawOutlinedBox(box);
+		GL11.glEndList();
+		
+		purpleBox = GL11.glGenLists(1);
+		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
+		RenderSystem.setShaderColor(1, 0, 1, 0.25F);
+		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShaderColor(1, 0, 1, 0.5F);
+		RenderUtils.drawOutlinedBox(box);
+		GL11.glEndList();
 		
 		normalChests = GL11.glGenLists(1);
 	}
@@ -271,7 +271,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRegionalRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
 		ArrayList<Box> minecartBoxes = calculateMinecartBoxes(partialTicks);
 		

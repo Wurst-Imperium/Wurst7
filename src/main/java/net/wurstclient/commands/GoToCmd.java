@@ -173,8 +173,8 @@ public final class GoToCmd extends Command
 	@Override
 	public void onRender(float partialTicks)
 	{
-//		PathCmd pathCmd = WURST.getCmds().pathCmd;
-//		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		PathCmd pathCmd = WURST.getCmds().pathCmd;
+		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
 	}
 	
 	private void disable()

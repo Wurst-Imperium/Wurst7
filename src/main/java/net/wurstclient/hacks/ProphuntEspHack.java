@@ -60,7 +60,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset();
 		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
@@ -82,8 +82,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			GL11.glPushMatrix();
 			GL11.glTranslated(entity.getX(), entity.getY(), entity.getZ());
 			
-//			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX);
-//			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX);
+			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX);
+			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX);
 			
 			GL11.glPopMatrix();
 		}

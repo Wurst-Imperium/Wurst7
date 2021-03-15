@@ -222,7 +222,7 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset();
 		
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;

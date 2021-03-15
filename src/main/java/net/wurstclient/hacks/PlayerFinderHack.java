@@ -86,7 +86,7 @@ public final class PlayerFinderHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset();
 		
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -119,10 +119,10 @@ public final class PlayerFinderHack extends Hack
 			GL11.glPushMatrix();
 			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
 			
-//			RenderUtils.drawOutlinedBox();
+			RenderUtils.drawOutlinedBox();
 			
 			RenderSystem.setShaderColor(red, green, blue, 0.25F);
-//			RenderUtils.drawSolidBox();
+			RenderUtils.drawSolidBox();
 			
 			GL11.glPopMatrix();
 		}

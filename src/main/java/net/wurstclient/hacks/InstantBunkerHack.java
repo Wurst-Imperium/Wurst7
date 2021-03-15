@@ -266,7 +266,7 @@ public final class InstantBunkerHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-//		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset();
 		
 		// green box
 		{
@@ -279,7 +279,7 @@ public final class InstantBunkerHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-//			RenderUtils.drawSolidBox();
+			RenderUtils.drawSolidBox();
 			
 			GL11.glPopMatrix();
 			GL11.glDepthMask(true);
@@ -296,7 +296,7 @@ public final class InstantBunkerHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-//			RenderUtils.drawOutlinedBox();
+			RenderUtils.drawOutlinedBox();
 			
 			GL11.glPopMatrix();
 		}
