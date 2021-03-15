@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -70,7 +71,7 @@ public final class PlayerFinderHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(pos == null)
 			return;
@@ -86,7 +87,7 @@ public final class PlayerFinderHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -119,10 +120,10 @@ public final class PlayerFinderHack extends Hack
 			GL11.glPushMatrix();
 			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
 			
-			RenderUtils.drawOutlinedBox();
+			RenderUtils.drawOutlinedBox(matrixStack);
 			
 			RenderSystem.setShaderColor(red, green, blue, 0.25F);
-			RenderUtils.drawSolidBox();
+			RenderUtils.drawSolidBox(matrixStack);
 			
 			GL11.glPopMatrix();
 		}
