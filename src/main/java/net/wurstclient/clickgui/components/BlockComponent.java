@@ -146,7 +146,7 @@ public final class BlockComponent extends Component
 		
 		matrixStack.translate(x, y, 0);
 		float scale = large ? 1.5F : 0.75F;
-		// GL11.glScaled(scale, scale, scale);
+		// matrixStack.scale(scale, scale, scale);
 		matrixStack.scale(scale, scale, scale);
 		
 		// RenderSystem.enableTexture();
@@ -171,7 +171,7 @@ public final class BlockComponent extends Component
 		
 		matrixStack.translate(x, y, 0);
 		if(large)
-			GL11.glScaled(2, 2, 2);
+			matrixStack.scale(2, 2, 2);
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;

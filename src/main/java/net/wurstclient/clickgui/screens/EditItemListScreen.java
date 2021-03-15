@@ -286,7 +286,7 @@ public final class EditItemListScreen extends Screen
 				matrixStack.push();
 				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(2, 2, 2);
+					matrixStack.scale(2, 2, 2);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				TextRenderer fr = mc.textRenderer;
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
