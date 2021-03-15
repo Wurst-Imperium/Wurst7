@@ -28,6 +28,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -200,7 +201,7 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -213,7 +214,7 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
