@@ -24,6 +24,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.network.Packet;
@@ -231,7 +232,7 @@ public final class MobSpawnEspHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// Avoid inconsistent GL state if setting changed mid-onRender
 		boolean depthTest = this.depthTest.isChecked();
@@ -253,7 +254,7 @@ public final class MobSpawnEspHack extends Hack
 				continue;
 			
 			GL11.glPushMatrix();
-			RenderUtils.applyRegionalRenderOffset(scanner.chunk);
+			RenderUtils.applyRegionalRenderOffset(matrixStack, scanner.chunk);
 			
 			GL11.glCallList(scanner.displayList);
 			
