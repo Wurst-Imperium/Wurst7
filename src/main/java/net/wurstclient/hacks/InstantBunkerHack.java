@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -247,7 +248,7 @@ public final class InstantBunkerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!building || blockIndex >= positions.size())
 			return;
@@ -266,7 +267,7 @@ public final class InstantBunkerHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// green box
 		{
@@ -279,7 +280,7 @@ public final class InstantBunkerHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			RenderUtils.drawSolidBox();
+			RenderUtils.drawSolidBox(matrixStack);
 			
 			GL11.glPopMatrix();
 			GL11.glDepthMask(true);
@@ -296,7 +297,7 @@ public final class InstantBunkerHack extends Hack
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
-			RenderUtils.drawOutlinedBox();
+			RenderUtils.drawOutlinedBox(matrixStack);
 			
 			GL11.glPopMatrix();
 		}
