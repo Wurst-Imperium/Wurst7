@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.Box;
@@ -47,7 +48,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -60,7 +61,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
@@ -82,8 +83,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			GL11.glPushMatrix();
 			GL11.glTranslated(entity.getX(), entity.getY(), entity.getZ());
 			
-			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX);
-			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX);
+			RenderUtils.drawOutlinedBox(matrixStack, FAKE_BLOCK_BOX);
+			RenderUtils.drawSolidBox(matrixStack, FAKE_BLOCK_BOX);
 			
 			GL11.glPopMatrix();
 		}
