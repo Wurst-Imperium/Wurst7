@@ -12,6 +12,13 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
@@ -22,6 +29,7 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -61,8 +69,7 @@ public final class AutoFishHack extends Hack
 	private int scheduledWindowClick;
 	private Vec3d lastSoundPos;
 	
-	private int validRangeBox;
-	private int biteCross;
+	private Box validRangeBox;
 	
 	private boolean wasOpenWater;
 	
@@ -88,19 +95,6 @@ public final class AutoFishHack extends Hack
 		lastSoundPos = null;
 		wasOpenWater = true;
 		
-		validRangeBox = GL11.glGenLists(1);
-		
-		biteCross = GL11.glGenLists(1);
-		GL11.glNewList(biteCross, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3d(-0.125, 0, -0.125);
-		GL11.glVertex3d(0.125, 0, 0.125);
-		GL11.glVertex3d(0.125, 0, -0.125);
-		GL11.glVertex3d(-0.125, 0, 0.125);
-		GL11.glEnd();
-		GL11.glEndList();
-		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -112,9 +106,6 @@ public final class AutoFishHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(validRangeBox, 1);
-		GL11.glDeleteLists(biteCross, 1);
 	}
 	
 	@Override
@@ -178,15 +169,9 @@ public final class AutoFishHack extends Hack
 	private void updateDebugDraw()
 	{
 		if(debugDraw.isChecked())
-		{
-			GL11.glNewList(validRangeBox, GL11.GL_COMPILE);
-			Box box = new Box(-validRange.getValue(), -1 / 16.0,
+			validRangeBox = new Box(-validRange.getValue(), -1 / 16.0,
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
-			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box);
-			GL11.glEndList();
-		}
 	}
 	
 	private void updateBestRod()
@@ -315,7 +300,7 @@ public final class AutoFishHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!debugDraw.isChecked())
 			return;
@@ -330,8 +315,8 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -339,11 +324,11 @@ public final class AutoFishHack extends Hack
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
-			drawValidRange(bobber, regionX, regionZ);
+			drawValidRange(matrixStack, bobber, regionX, regionZ);
 		
-		drawLastBite(regionX, regionZ);
+		drawLastBite(matrixStack, regionX, regionZ);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -353,25 +338,39 @@ public final class AutoFishHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void drawValidRange(FishingBobberEntity bobber, int regionX,
-		int regionZ)
+	private void drawValidRange(MatrixStack matrixStack,
+		FishingBobberEntity bobber, int regionX, int regionZ)
 	{
-		GL11.glPushMatrix();
-		GL11.glTranslated(bobber.getX() - regionX, bobber.getY(),
+		matrixStack.push();
+		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
 			bobber.getZ() - regionZ);
-		GL11.glCallList(validRangeBox);
-		GL11.glPopMatrix();
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(matrixStack, validRangeBox);
+		matrixStack.pop();
 	}
 	
-	private void drawLastBite(int regionX, int regionZ)
+	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
 	{
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		if(lastSoundPos != null)
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(lastSoundPos.x - regionX, lastSoundPos.y,
+			matrixStack.push();
+			matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
 				lastSoundPos.z - regionZ);
-			GL11.glCallList(biteCross);
-			GL11.glPopMatrix();
+			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)-0.125)
+				.next();
+			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
+			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
+			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			matrixStack.pop();
 		}
 	}
 	
