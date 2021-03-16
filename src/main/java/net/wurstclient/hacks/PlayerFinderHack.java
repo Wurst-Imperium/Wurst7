@@ -11,11 +11,18 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -86,7 +93,7 @@ public final class PlayerFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// generate rainbow color
@@ -99,36 +106,45 @@ public final class PlayerFinderHack extends Hack
 		
 		RenderSystem.setShaderColor(red, green, blue, 0.5F);
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		// tracer line
-		GL11.glBegin(GL11.GL_LINES);
-		{
-			// set start position
-			Vec3d start = RotationUtils.getClientLookVec()
-				.add(RenderUtils.getCameraPos());
-			
-			// set end position
-			Vec3d end = Vec3d.ofCenter(pos);
-			
-			// draw line
-			GL11.glVertex3d(start.x, start.y, start.z);
-			GL11.glVertex3d(end.x, end.y, end.z);
-		}
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			VertexFormats.POSITION);
+		
+		// set start position
+		Vec3d start =
+			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		
+		// set end position
+		Vec3d end = Vec3d.ofCenter(pos);
+		
+		// draw line
+		bufferBuilder
+			.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+			.next();
+		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+			.next();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// block box
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.push();
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			
 			RenderUtils.drawOutlinedBox(matrixStack);
 			
 			RenderSystem.setShaderColor(red, green, blue, 0.25F);
 			RenderUtils.drawSolidBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
