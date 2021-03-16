@@ -254,7 +254,7 @@ public final class InstantBunkerHack extends Hack
 			return;
 		
 		// scale and offset
-		double scale = 1.0 * 7.0 / 8.0;
+		float scale = 1.0F * 7.0F / 8.0F;
 		double offset = (1.0 - scale) / 2.0;
 		
 		// GL settings
@@ -266,7 +266,7 @@ public final class InstantBunkerHack extends Hack
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// green box
@@ -275,14 +275,14 @@ public final class InstantBunkerHack extends Hack
 			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
 			BlockPos pos = positions.get(blockIndex);
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-			GL11.glTranslated(offset, offset, offset);
-			GL11.glScaled(scale, scale, scale);
+			matrixStack.push();
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(offset, offset, offset);
+			matrixStack.scale(scale, scale, scale);
 			
 			RenderUtils.drawSolidBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 			GL11.glDepthMask(true);
 		}
 		
@@ -292,17 +292,17 @@ public final class InstantBunkerHack extends Hack
 		{
 			BlockPos pos = positions.get(i);
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-			GL11.glTranslated(offset, offset, offset);
-			GL11.glScaled(scale, scale, scale);
+			matrixStack.push();
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(offset, offset, offset);
+			matrixStack.scale(scale, scale, scale);
 			
 			RenderUtils.drawOutlinedBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
