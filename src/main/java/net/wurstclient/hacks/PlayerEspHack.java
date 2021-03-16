@@ -16,10 +16,18 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -53,7 +61,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible players.", false);
 	
-	private int playerBox;
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
 	public PlayerEspHack()
@@ -74,12 +81,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		playerBox = GL11.glGenLists(1);
-		GL11.glNewList(playerBox, GL11.GL_COMPILE);
-		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(bb);
-		GL11.glEndList();
 	}
 	
 	@Override
@@ -88,9 +89,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(playerBox, 1);
-		playerBox = 0;
 	}
 	
 	@Override
@@ -124,7 +122,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -135,8 +133,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -144,12 +142,12 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		// draw boxes
 		if(style.getSelected().boxes)
-			renderBoxes(partialTicks, regionX, regionZ);
+			renderBoxes(matrixStack, partialTicks, regionX, regionZ);
 		
 		if(style.getSelected().lines)
-			renderTracers(partialTicks, regionX, regionZ);
+			renderTracers(matrixStack, partialTicks, regionX, regionZ);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -159,21 +157,22 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void renderBoxes(double partialTicks, int regionX, int regionZ)
+	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
-		double extraSize = boxSize.getSelected().extraSize;
+		float extraSize = boxSize.getSelected().extraSize;
 		
 		for(PlayerEntity e : players)
 		{
-			GL11.glPushMatrix();
+			matrixStack.push();
 			
-			GL11.glTranslated(
+			matrixStack.translate(
 				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
 				e.prevY + (e.getY() - e.prevY) * partialTicks,
 				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
 			
-			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
-				e.getWidth() + extraSize);
+			matrixStack.scale(e.getWidth() + extraSize,
+				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
 			// set color
 			if(WURST.getFriends().contains(e.getEntityName()))
@@ -184,18 +183,25 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			}
 			
-			GL11.glCallList(playerBox);
+			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+			RenderUtils.drawOutlinedBox(matrixStack, bb);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 	}
 	
-	private void renderTracers(double partialTicks, int regionX, int regionZ)
+	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
 		Vec3d start =
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		
-		GL11.glBegin(GL11.GL_LINES);
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			VertexFormats.POSITION);
 		for(PlayerEntity e : players)
 		{
 			Vec3d end = e.getBoundingBox().getCenter()
@@ -211,10 +217,13 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			}
 			
-			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
-			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
+			bufferBuilder.vertex(matrix, (float)start.x - regionX,
+				(float)start.y, (float)start.z - regionZ).next();
+			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
+				(float)end.z - regionZ).next();
 		}
-		GL11.glEnd();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private enum Style
@@ -244,12 +253,12 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private enum BoxSize
 	{
 		ACCURATE("Accurate", 0),
-		FANCY("Fancy", 0.1);
+		FANCY("Fancy", 0.1F);
 		
 		private final String name;
-		private final double extraSize;
+		private final float extraSize;
 		
-		private BoxSize(String name, double extraSize)
+		private BoxSize(String name, float extraSize)
 		{
 			this.name = name;
 			this.extraSize = extraSize;
