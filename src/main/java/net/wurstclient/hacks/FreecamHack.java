@@ -16,12 +16,14 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -194,12 +196,17 @@ public final class FreecamHack extends Hack
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		Vec3d end = fakePlayer.getBoundingBox().getCenter();
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
 			VertexFormats.POSITION);
-		GL11.glVertex3d(start.x, start.y, start.z);
-		GL11.glVertex3d(end.x, end.y, end.z);
+		bufferBuilder
+			.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+			.next();
+		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+			.next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
