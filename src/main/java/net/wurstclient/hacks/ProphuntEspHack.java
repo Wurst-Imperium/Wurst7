@@ -60,7 +60,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set color
@@ -80,16 +80,16 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			if(MC.player.squaredDistanceTo(entity) < 0.25)
 				continue;
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(entity.getX(), entity.getY(), entity.getZ());
+			matrixStack.push();
+			matrixStack.translate(entity.getX(), entity.getY(), entity.getZ());
 			
 			RenderUtils.drawOutlinedBox(matrixStack, FAKE_BLOCK_BOX);
 			RenderUtils.drawSolidBox(matrixStack, FAKE_BLOCK_BOX);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
