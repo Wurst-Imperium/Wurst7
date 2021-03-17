@@ -23,6 +23,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -64,8 +65,6 @@ public final class AutoFarmHack extends Hack
 	private float prevProgress;
 	
 	private int displayList;
-	private int box;
-	private int node;
 	
 	private boolean busy;
 	
@@ -91,21 +90,6 @@ public final class AutoFarmHack extends Hack
 		EVENTS.add(RenderListener.class, this);
 		
 		displayList = GL11.glGenLists(1);
-		box = GL11.glGenLists(1);
-		node = GL11.glGenLists(1);
-		
-		GL11.glNewList(box, GL11.GL_COMPILE);
-		Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0,
-			15 / 16.0);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		GL11.glNewList(node, GL11.GL_COMPILE);
-		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-		GL11.glBegin(GL11.GL_LINES);
-		RenderUtils.drawNode(node);
-		GL11.glEnd();
-		GL11.glEndList();
 	}
 	
 	@Override
@@ -124,8 +108,6 @@ public final class AutoFarmHack extends Hack
 		prevBlocks.clear();
 		busy = false;
 		GL11.glDeleteLists(displayList, 1);
-		GL11.glDeleteLists(box, 1);
-		GL11.glDeleteLists(node, 1);
 	}
 	
 	@Override
@@ -174,7 +156,7 @@ public final class AutoFarmHack extends Hack
 			harvest(blocksToHarvest);
 		
 		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
-		updateDisplayList(blocksToHarvest, blocksToReplant);
+		// updateDisplayList(matrixStack, blocksToHarvest, blocksToReplant);
 	}
 	
 	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
@@ -200,7 +182,7 @@ public final class AutoFarmHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -212,8 +194,8 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -223,32 +205,32 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			GL11.glPushMatrix();
+			matrixStack.push();
 			
 			Box box = new Box(BlockPos.ORIGIN);
 			float p = prevProgress + (progress - prevProgress) * partialTicks;
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			GL11.glTranslated(currentBlock.getX() - regionX,
+			matrixStack.translate(currentBlock.getX() - regionX,
 				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
 			{
-				GL11.glTranslated(0.5, 0.5, 0.5);
-				GL11.glScaled(p, p, p);
-				GL11.glTranslated(-0.5, -0.5, -0.5);
+				matrixStack.translate(0.5, 0.5, 0.5);
+				matrixStack.scale(p, p, p);
+				matrixStack.translate(-0.5, -0.5, -0.5);
 			}
 			
 			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box);
+			RenderUtils.drawSolidBox(matrixStack, box);
 			
 			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box);
+			RenderUtils.drawOutlinedBox(matrixStack, box);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -503,43 +485,48 @@ public final class AutoFarmHack extends Hack
 		}
 	}
 	
-	private void updateDisplayList(List<BlockPos> blocksToHarvest,
-		List<BlockPos> blocksToReplant)
-	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-		for(BlockPos pos : blocksToHarvest)
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
-			GL11.glCallList(box);
-			GL11.glPopMatrix();
-		}
-		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-		for(BlockPos pos : plants.keySet())
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
-			GL11.glCallList(node);
-			GL11.glPopMatrix();
-		}
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-		for(BlockPos pos : blocksToReplant)
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
-			GL11.glCallList(box);
-			GL11.glPopMatrix();
-		}
-		GL11.glEndList();
-	}
+	// private void updateDisplayList(MatrixStack matrixStack,
+	// List<BlockPos> blocksToHarvest, List<BlockPos> blocksToReplant)
+	// {
+	// BlockPos camPos = RenderUtils.getCameraBlockPos();
+	// int regionX = (camPos.getX() >> 9) * 512;
+	// int regionZ = (camPos.getZ() >> 9) * 512;
+	//
+	// GL11.glNewList(displayList, GL11.GL_COMPILE);
+	// RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+	// for(BlockPos pos : blocksToHarvest)
+	// {
+	// matrixStack.push();
+	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
+	// pos.getZ() - regionZ);
+	// Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0,
+	// 15 / 16.0, 15 / 16.0);
+	// RenderUtils.drawOutlinedBox(matrixStack, box);
+	// matrixStack.pop();
+	// }
+	// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+	// for(BlockPos pos : plants.keySet())
+	// {
+	// matrixStack.push();
+	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
+	// pos.getZ() - regionZ);
+	// Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+	// RenderUtils.drawNode(matrixStack, node);
+	// matrixStack.pop();
+	// }
+	// RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+	// for(BlockPos pos : blocksToReplant)
+	// {
+	// matrixStack.push();
+	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
+	// pos.getZ() - regionZ);
+	// Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0,
+	// 15 / 16.0, 15 / 16.0);
+	// RenderUtils.drawOutlinedBox(matrixStack, box);
+	// matrixStack.pop();
+	// }
+	// GL11.glEndList();
+	// }
 	
 	/**
 	 * Returns true if AutoFarm is currently harvesting or replanting something.

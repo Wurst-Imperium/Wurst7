@@ -13,14 +13,11 @@ import java.util.LinkedHashMap;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
-import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.other_features.TabGuiOtf;
@@ -126,7 +123,7 @@ public final class TabGui implements KeyPressListener
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		Window sr = WurstClient.MC.getWindow();
 		
 		int x = 2;
@@ -159,7 +156,7 @@ public final class TabGui implements KeyPressListener
 		
 		if(tabOpened)
 		{
-			GL11.glPushMatrix();
+			matrixStack.push();
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			
 			Tab tab = tabs.get(selected);
@@ -195,10 +192,10 @@ public final class TabGui implements KeyPressListener
 			
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -206,80 +203,89 @@ public final class TabGui implements KeyPressListener
 	
 	private void drawBox(int x1, int y1, int x2, int y2)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		float[] acColor = gui.getAcColor();
-		float opacity = gui.getOpacity();
-		
-		// color
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
-		
-		// box
-		GL11.glBegin(GL11.GL_QUADS);
-		{
-			GL11.glVertex2i(x1, y1);
-			GL11.glVertex2i(x2, y1);
-			GL11.glVertex2i(x2, y2);
-			GL11.glVertex2i(x1, y2);
-		}
-		GL11.glEnd();
-		
-		// outline positions
-		double xi1 = x1 - 0.1;
-		double xi2 = x2 + 0.1;
-		double yi1 = y1 - 0.1;
-		double yi2 = y2 + 0.1;
-		
-		// outline
-		GL11.glLineWidth(1);
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		{
-			GL11.glVertex2d(xi1, yi1);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi2, yi2);
-			GL11.glVertex2d(xi1, yi2);
-		}
-		GL11.glEnd();
-		
-		// shadow positions
-		xi1 -= 0.9;
-		xi2 += 0.9;
-		yi1 -= 0.9;
-		yi2 += 0.9;
-		
-		// top left
-		GL11.glBegin(GL11.GL_POLYGON);
-		{
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.75F);
-			GL11.glVertex2d(x1, y1);
-			GL11.glVertex2d(x2, y1);
-			RenderSystem.setShaderColor(0, 0, 0, 0);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi1, yi1);
-			GL11.glVertex2d(xi1, yi2);
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.75F);
-			GL11.glVertex2d(x1, y2);
-		}
-		GL11.glEnd();
-		
-		// bottom right
-		GL11.glBegin(GL11.GL_POLYGON);
-		{
-			GL11.glVertex2d(x2, y2);
-			GL11.glVertex2d(x2, y1);
-			RenderSystem.setShaderColor(0, 0, 0, 0);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi2, yi2);
-			GL11.glVertex2d(xi1, yi2);
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.75F);
-			GL11.glVertex2d(x1, y2);
-		}
-		GL11.glEnd();
+		// ClickGui gui = WurstClient.INSTANCE.getGui();
+		// float[] bgColor = gui.getBgColor();
+		// float[] acColor = gui.getAcColor();
+		// float opacity = gui.getOpacity();
+		//
+		// // color
+		// RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		// opacity);
+		//
+		// // box
+		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		// VertexFormats.POSITION);
+		// {
+		// GL11.glVertex2i(x1, y1);
+		// GL11.glVertex2i(x2, y1);
+		// GL11.glVertex2i(x2, y2);
+		// GL11.glVertex2i(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // outline positions
+		// double xi1 = x1 - 0.1;
+		// double xi2 = x2 + 0.1;
+		// double yi1 = y1 - 0.1;
+		// double yi2 = y2 + 0.1;
+		//
+		// // outline
+		// GL11.glLineWidth(1);
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.5F);
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+		// VertexFormats.POSITION);
+		// {
+		// GL11.glVertex2d(xi1, yi1);
+		// GL11.glVertex2d(xi2, yi1);
+		// GL11.glVertex2d(xi2, yi2);
+		// GL11.glVertex2d(xi1, yi2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // shadow positions
+		// xi1 -= 0.9;
+		// xi2 += 0.9;
+		// yi1 -= 0.9;
+		// yi2 += 0.9;
+		//
+		// // top left
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// GL11.glVertex2d(x1, y1);
+		// GL11.glVertex2d(x2, y1);
+		// RenderSystem.setShaderColor(0, 0, 0, 0);
+		// GL11.glVertex2d(xi2, yi1);
+		// GL11.glVertex2d(xi1, yi1);
+		// GL11.glVertex2d(xi1, yi2);
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// GL11.glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // bottom right
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// GL11.glVertex2d(x2, y2);
+		// GL11.glVertex2d(x2, y1);
+		// RenderSystem.setShaderColor(0, 0, 0, 0);
+		// GL11.glVertex2d(xi2, yi1);
+		// GL11.glVertex2d(xi2, yi2);
+		// GL11.glVertex2d(xi1, yi2);
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// GL11.glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private static final class Tab

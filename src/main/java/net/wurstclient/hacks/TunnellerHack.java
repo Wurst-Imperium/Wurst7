@@ -24,6 +24,7 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -139,7 +140,7 @@ public final class TunnellerHack extends Hack
 			new PlaceTorchTask(), new WaitForFallingBlocksTask(),
 			new DigTunnelTask(), new WalkForwardTask()};
 		
-		updateCyanList();
+		// updateCyanList();
 	}
 	
 	@Override
@@ -190,7 +191,7 @@ public final class TunnellerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -202,8 +203,8 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		for(int displayList : displayLists)
 			GL11.glCallList(displayList);
@@ -214,23 +215,23 @@ public final class TunnellerHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
+			matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
 				currentBlock.getZ());
 			if(p < 1)
 			{
-				GL11.glTranslated(0.5, 0.5, 0.5);
-				GL11.glScaled(p, p, p);
-				GL11.glTranslated(-0.5, -0.5, -0.5);
+				matrixStack.translate(0.5, 0.5, 0.5);
+				matrixStack.scale(p, p, p);
+				matrixStack.translate(-0.5, -0.5, -0.5);
 			}
 			
 			Box box2 = new Box(BlockPos.ORIGIN);
 			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box2);
+			RenderUtils.drawSolidBox(matrixStack, box2);
 			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box2);
+			RenderUtils.drawOutlinedBox(matrixStack, box2);
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -240,25 +241,29 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void updateCyanList()
-	{
-		GL11.glNewList(displayLists[0], GL11.GL_COMPILE);
-		
-		GL11.glPushMatrix();
-		GL11.glTranslated(start.getX(), start.getY(), start.getZ());
-		GL11.glTranslated(0.5, 0.5, 0.5);
-		
-		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-		GL11.glBegin(GL11.GL_LINES);
-		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
-		GL11.glEnd();
-		
-		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
-			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
-		
-		GL11.glPopMatrix();
-		GL11.glEndList();
-	}
+	// private void updateCyanList(MatrixStack matrixStack)
+	// {
+	// GL11.glNewList(displayLists[0], GL11.GL_COMPILE);
+	//
+	// matrixStack.push();
+	// matrixStack.translate(start.getX(), start.getY(), start.getZ());
+	// matrixStack.translate(0.5, 0.5, 0.5);
+	//
+	// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+	// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+	// VertexFormats.POSITION);
+	// RenderUtils.drawNode(matrixStack,
+	// new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
+	// bufferBuilder.end();
+	// BufferRenderer.draw(bufferBuilder);
+	//
+	// RenderUtils.drawArrow(matrixStack,
+	// Vec3d.of(direction.getVector()).multiply(0.25),
+	// Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
+	//
+	// matrixStack.pop();
+	// GL11.glEndList();
+	// }
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
 	{
@@ -350,7 +355,7 @@ public final class TunnellerHack extends Hack
 			getAllInBox(from, to).forEach(blocks::add);
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 			
 			currentBlock = null;
@@ -365,11 +370,11 @@ public final class TunnellerHack extends Hack
 				
 				if(currentBlock == null)
 					currentBlock = pos;
-				
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
+					
+				// matrixStack.push();
+				// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+				// RenderUtils.drawOutlinedBox(matrixStack, box);
+				// matrixStack.pop();
 			}
 			
 			GL11.glEndList();
@@ -382,8 +387,9 @@ public final class TunnellerHack extends Hack
 				
 				length++;
 				if(limit.getValueI() == 0 || length < limit.getValueI())
-					updateCyanList();
-				else
+				{
+					// updateCyanList(matrixStack);
+				}else
 				{
 					ChatUtils.message("Tunnel completed.");
 					setEnabled(false);
@@ -449,18 +455,18 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : BlockUtils.getAllInBox(from, to))
 				if(!BlockUtils.getState(pos).isFullCube(MC.world, pos))
 					blocks.add(pos);
-				
-			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			RenderSystem.setShaderColor(1, 1, 0, 0.5F);
-			for(BlockPos pos : blocks)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
-			GL11.glEndList();
+					
+			// GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
+			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			// RenderSystem.setShaderColor(1, 1, 0, 0.5F);
+			// for(BlockPos pos : blocks)
+			// {
+			// matrixStack.push();
+			// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			// RenderUtils.drawOutlinedBox(matrixStack, box);
+			// matrixStack.pop();
+			// }
+			// GL11.glEndList();
 			
 			return !blocks.isEmpty();
 		}
@@ -583,17 +589,17 @@ public final class TunnellerHack extends Hack
 			
 			ChatUtils.error("The tunnel is flooded, cannot continue.");
 			
-			GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			for(BlockPos pos : liquids)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
-			GL11.glEndList();
+			// GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
+			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			// RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			// for(BlockPos pos : liquids)
+			// {
+			// matrixStack.push();
+			// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			// RenderUtils.drawOutlinedBox(matrixStack, box);
+			// matrixStack.pop();
+			// }
+			// GL11.glEndList();
 			return true;
 		}
 		
@@ -666,12 +672,12 @@ public final class TunnellerHack extends Hack
 			if(lastTorch != null)
 				nextTorch = lastTorch.offset(direction,
 					size.getSelected().torchDistance);
-			
-			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
-			RenderSystem.setShaderColor(1, 1, 0, 0.5F);
-			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
-			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
-			GL11.glEndList();
+				
+			// GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
+			// RenderSystem.setShaderColor(1, 1, 0, 0.5F);
+			// Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
+			// RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
+			// GL11.glEndList();
 			
 			BlockPos player = new BlockPos(MC.player.getPos());
 			if(getDistance(player, nextTorch) > 4)

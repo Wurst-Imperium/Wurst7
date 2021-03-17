@@ -224,9 +224,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		float[] acColor = gui.getAcColor();
+		// ClickGui gui = WurstClient.INSTANCE.getGui();
+		// float[] bgColor = gui.getBgColor();
+		// float[] acColor = gui.getAcColor();
 		
 		boolean clickTimerRunning = clickTimer != -1;
 		tooltip = null;
@@ -285,30 +285,34 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int sh = client.currentScreen.height;
 			
 			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
-			int xt2 = xt1 + tw + 3;
+			// int xt2 = xt1 + tw + 3;
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
-			int yt2 = yt1 + th + 2;
+			// int yt2 = yt1 + th + 2;
 			
 			// background
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				0.75F);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
-			
-			// outline
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
+			// GL11.glDisable(GL11.GL_TEXTURE_2D);
+			// RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			// 0.75F);
+			// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			// VertexFormats.POSITION);
+			// GL11.glVertex2i(xt1, yt1);
+			// GL11.glVertex2i(xt1, yt2);
+			// GL11.glVertex2i(xt2, yt2);
+			// GL11.glVertex2i(xt2, yt1);
+			// bufferBuilder.end();
+			// BufferRenderer.draw(bufferBuilder);
+			//
+			// // outline
+			// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+			// 0.5F);
+			// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+			// VertexFormats.POSITION);
+			// GL11.glVertex2i(xt1, yt1);
+			// GL11.glVertex2i(xt1, yt2);
+			// GL11.glVertex2i(xt2, yt2);
+			// GL11.glVertex2i(xt2, yt1);
+			// bufferBuilder.end();
+			// BufferRenderer.draw(bufferBuilder);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -403,42 +407,48 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
-		int by1 = area.y + 2;
-		int by2 = by1 + area.height - 4;
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex2i(bx1, by1);
-		GL11.glVertex2i(bx1, by2);
-		GL11.glEnd();
+		// int by1 = area.y + 2;
+		// int by2 = by1 + area.height - 4;
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		// VertexFormats.POSITION);
+		// GL11.glVertex2i(bx1, by1);
+		// GL11.glVertex2i(bx1, by2);
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 		
 		// hovering
 		if(hovering)
 			hoveringArrow = mouseX >= bx1;
-		
+			
 		// arrow positions
-		double oneThrird = area.height / 3D;
-		double twoThrirds = area.height * 2D / 3D;
-		double ax1 = bx1 + oneThrird - 2D;
-		double ax2 = bx1 + twoThrirds + 2D;
-		double ax3 = bx1 + area.height / 2D;
-		double ay1 = area.y + oneThrird;
-		double ay2 = area.y + twoThrirds;
+		// double oneThrird = area.height / 3D;
+		// double twoThrirds = area.height * 2D / 3D;
+		// double ax1 = bx1 + oneThrird - 2D;
+		// double ax2 = bx1 + twoThrirds + 2D;
+		// double ax3 = bx1 + area.height / 2D;
+		// double ay1 = area.y + oneThrird;
+		// double ay2 = area.y + twoThrirds;
 		
 		// arrow
 		RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
-		GL11.glBegin(GL11.GL_TRIANGLES);
-		GL11.glVertex2d(ax1, ay1);
-		GL11.glVertex2d(ax2, ay1);
-		GL11.glVertex2d(ax3, ay2);
-		GL11.glEnd();
+		// bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+		// VertexFormats.POSITION);
+		// GL11.glVertex2d(ax1, ay1);
+		// GL11.glVertex2d(ax2, ay1);
+		// GL11.glVertex2d(ax3, ay2);
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 		
 		// arrow shadow
 		GL11.glLineWidth(1);
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(ax1, ay1);
-		GL11.glVertex2d(ax2, ay1);
-		GL11.glVertex2d(ax3, ay2);
-		GL11.glEnd();
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+		// VertexFormats.POSITION);
+		// GL11.glVertex2d(ax1, ay1);
+		// GL11.glVertex2d(ax2, ay1);
+		// GL11.glVertex2d(ax3, ay2);
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 		
 		// text
 		if(!clickTimerRunning)

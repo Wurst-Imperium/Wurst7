@@ -36,7 +36,6 @@ import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -213,19 +212,21 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// generate rainbow color
-		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
+		// float x = System.currentTimeMillis() % 2000 / 1000F;
+		// float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
+		//
+		// RenderSystem.setShaderColor(1, 0, 0, alpha);
+		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		// VertexFormats.POSITION);
+		// GL11.glCallList(displayList);
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 		
-		RenderSystem.setShaderColor(1, 0, 0, alpha);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glCallList(displayList);
-		GL11.glEnd();
-		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -432,21 +433,22 @@ public final class CaveFinderHack extends Hack
 	
 	private void setDisplayListFromTask()
 	{
-		ArrayList<int[]> vertices;
-		
-		try
-		{
-			vertices = compileVerticesTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
-		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		for(int[] vertex : vertices)
-			GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
-		GL11.glEndList();
+		// ArrayList<int[]> vertices;
+		//
+		// try
+		// {
+		// vertices = compileVerticesTask.get();
+		//
+		// }catch(InterruptedException | ExecutionException e)
+		// {
+		// throw new RuntimeException(e);
+		// }
+		//
+		// GL11.glNewList(displayList, GL11.GL_COMPILE);
+		// for(int[] vertex : vertices)
+		// bufferBuilder.vertex(matrix, vertex[0], vertex[1], vertex[2])
+		// .next();
+		// GL11.glEndList();
 		
 		displayListUpToDate = true;
 	}

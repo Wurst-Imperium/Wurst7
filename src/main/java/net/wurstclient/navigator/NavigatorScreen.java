@@ -229,161 +229,179 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected final void drawQuads(int x1, int y1, int x2, int y2)
 	{
-		glBegin(GL_QUADS);
-		{
-			glVertex2i(x1, y1);
-			glVertex2i(x2, y1);
-			glVertex2i(x2, y2);
-			glVertex2i(x1, y2);
-		}
-		glEnd();
+		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2i(x1, y1);
+		// glVertex2i(x2, y1);
+		// glVertex2i(x2, y2);
+		// glVertex2i(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	protected final void drawBoxShadow(int x1, int y1, int x2, int y2)
 	{
-		// color
-		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		
-		// outline positions
-		double xi1 = x1 - 0.1;
-		double xi2 = x2 + 0.1;
-		double yi1 = y1 - 0.1;
-		double yi2 = y2 + 0.1;
-		
-		// outline
-		glLineWidth(1F);
-		glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		glBegin(GL_LINE_LOOP);
-		{
-			glVertex2d(xi1, yi1);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi2, yi2);
-			glVertex2d(xi1, yi2);
-		}
-		glEnd();
-		
-		// shadow positions
-		xi1 -= 0.9;
-		xi2 += 0.9;
-		yi1 -= 0.9;
-		yi2 += 0.9;
-		
-		// top left
-		glBegin(GL_POLYGON);
-		{
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y1);
-			glColor4f(0F, 0F, 0F, 0F);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi1, yi1);
-			glVertex2d(xi1, yi2);
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y2);
-		}
-		glEnd();
-		
-		// bottom right
-		glBegin(GL_POLYGON);
-		{
-			glVertex2d(x2, y2);
-			glVertex2d(x2, y1);
-			glColor4f(0F, 0F, 0F, 0F);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi2, yi2);
-			glVertex2d(xi1, yi2);
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y2);
-		}
-		glEnd();
+		// // color
+		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+		//
+		// // outline positions
+		// double xi1 = x1 - 0.1;
+		// double xi2 = x2 + 0.1;
+		// double yi1 = y1 - 0.1;
+		// double yi2 = y2 + 0.1;
+		//
+		// // outline
+		// glLineWidth(1F);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2d(xi1, yi1);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi2, yi2);
+		// glVertex2d(xi1, yi2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // shadow positions
+		// xi1 -= 0.9;
+		// xi2 += 0.9;
+		// yi1 -= 0.9;
+		// yi2 += 0.9;
+		//
+		// // top left
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y1);
+		// glVertex2d(x2, y1);
+		// glColor4f(0F, 0F, 0F, 0F);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi1, yi1);
+		// glVertex2d(xi1, yi2);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // bottom right
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2d(x2, y2);
+		// glVertex2d(x2, y1);
+		// glColor4f(0F, 0F, 0F, 0F);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi2, yi2);
+		// glVertex2d(xi1, yi2);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	protected final void drawInvertedBoxShadow(int x1, int y1, int x2, int y2)
 	{
-		// color
-		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		
-		// outline positions
-		double xi1 = x1 + 0.1;
-		double xi2 = x2 - 0.1;
-		double yi1 = y1 + 0.1;
-		double yi2 = y2 - 0.1;
-		
-		// outline
-		glLineWidth(1F);
-		glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		glBegin(GL_LINE_LOOP);
-		{
-			glVertex2d(xi1, yi1);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi2, yi2);
-			glVertex2d(xi1, yi2);
-		}
-		glEnd();
-		
-		// shadow positions
-		xi1 += 0.9;
-		xi2 -= 0.9;
-		yi1 += 0.9;
-		yi2 -= 0.9;
-		
-		// top left
-		glBegin(GL_POLYGON);
-		{
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y1);
-			glColor4f(0F, 0F, 0F, 0F);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi1, yi1);
-			glVertex2d(xi1, yi2);
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y2);
-		}
-		glEnd();
-		
-		// bottom right
-		glBegin(GL_POLYGON);
-		{
-			glVertex2d(x2, y2);
-			glVertex2d(x2, y1);
-			glColor4f(0F, 0F, 0F, 0F);
-			glVertex2d(xi2, yi1);
-			glVertex2d(xi2, yi2);
-			glVertex2d(xi1, yi2);
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2d(x1, y2);
-		}
-		glEnd();
+		// // color
+		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+		//
+		// // outline positions
+		// double xi1 = x1 + 0.1;
+		// double xi2 = x2 - 0.1;
+		// double yi1 = y1 + 0.1;
+		// double yi2 = y2 - 0.1;
+		//
+		// // outline
+		// glLineWidth(1F);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2d(xi1, yi1);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi2, yi2);
+		// glVertex2d(xi1, yi2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // shadow positions
+		// xi1 += 0.9;
+		// xi2 -= 0.9;
+		// yi1 += 0.9;
+		// yi2 -= 0.9;
+		//
+		// // top left
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y1);
+		// glVertex2d(x2, y1);
+		// glColor4f(0F, 0F, 0F, 0F);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi1, yi1);
+		// glVertex2d(xi1, yi2);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // bottom right
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2d(x2, y2);
+		// glVertex2d(x2, y1);
+		// glColor4f(0F, 0F, 0F, 0F);
+		// glVertex2d(xi2, yi1);
+		// glVertex2d(xi2, yi2);
+		// glVertex2d(xi1, yi2);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2d(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	protected final void drawDownShadow(int x1, int y1, int x2, int y2)
 	{
-		// color
-		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		
-		// outline
-		double yi1 = y1 + 0.1;
-		glLineWidth(1F);
-		glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		glBegin(GL_LINES);
-		{
-			glVertex2d(x1, yi1);
-			glVertex2d(x2, yi1);
-		}
-		glEnd();
-		
-		// shadow
-		glBegin(GL_POLYGON);
-		{
-			glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			glVertex2i(x1, y1);
-			glVertex2i(x2, y1);
-			glColor4f(0F, 0F, 0F, 0F);
-			glVertex2i(x2, y2);
-			glVertex2i(x1, y2);
-		}
-		glEnd();
+		// // color
+		// float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+		//
+		// // outline
+		// double yi1 = y1 + 0.1;
+		// glLineWidth(1F);
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		// VertexFormats.POSITION);
+		// {
+		// glVertex2d(x1, yi1);
+		// glVertex2d(x2, yi1);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // shadow
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
+		// glVertex2i(x1, y1);
+		// glVertex2i(x2, y1);
+		// glColor4f(0F, 0F, 0F, 0F);
+		// glVertex2i(x2, y2);
+		// glVertex2i(x1, y2);
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	protected final void drawBox(int x1, int y1, int x2, int y2)

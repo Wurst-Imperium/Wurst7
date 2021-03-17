@@ -22,10 +22,18 @@ import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import net.wurstclient.Category;
@@ -83,39 +91,39 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private void setupDisplayLists()
 	{
-		Box box = new Box(BlockPos.ORIGIN);
+		// Box box = new Box(BlockPos.ORIGIN);
 		
-		greenBox = GL11.glGenLists(1);
-		GL11.glNewList(greenBox, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		orangeBox = GL11.glGenLists(1);
-		GL11.glNewList(orangeBox, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(1, 0.5F, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		cyanBox = GL11.glGenLists(1);
-		GL11.glNewList(cyanBox, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(0, 1, 1, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		purpleBox = GL11.glGenLists(1);
-		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
-		RenderSystem.setShaderColor(1, 0, 1, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		RenderSystem.setShaderColor(1, 0, 1, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
+		// greenBox = GL11.glGenLists(1);
+		// GL11.glNewList(greenBox, GL11.GL_COMPILE);
+		// RenderSystem.setShaderColor(0, 1, 0, 0.25F);
+		// RenderUtils.drawSolidBox(matrixStack, box);
+		// RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+		// RenderUtils.drawOutlinedBox(matrixStack, box);
+		// GL11.glEndList();
+		//
+		// orangeBox = GL11.glGenLists(1);
+		// GL11.glNewList(orangeBox, GL11.GL_COMPILE);
+		// RenderSystem.setShaderColor(1, 0.5F, 0, 0.25F);
+		// RenderUtils.drawSolidBox(matrixStack, box);
+		// RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
+		// RenderUtils.drawOutlinedBox(matrixStack, box);
+		// GL11.glEndList();
+		//
+		// cyanBox = GL11.glGenLists(1);
+		// GL11.glNewList(cyanBox, GL11.GL_COMPILE);
+		// RenderSystem.setShaderColor(0, 1, 1, 0.25F);
+		// RenderUtils.drawSolidBox(matrixStack, box);
+		// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+		// RenderUtils.drawOutlinedBox(matrixStack, box);
+		// GL11.glEndList();
+		//
+		// purpleBox = GL11.glGenLists(1);
+		// GL11.glNewList(purpleBox, GL11.GL_COMPILE);
+		// RenderSystem.setShaderColor(1, 0, 1, 0.25F);
+		// RenderUtils.drawSolidBox(matrixStack, box);
+		// RenderSystem.setShaderColor(1, 0, 1, 0.5F);
+		// RenderUtils.drawOutlinedBox(matrixStack, box);
+		// GL11.glEndList();
 		
 		normalChests = GL11.glGenLists(1);
 	}
@@ -198,16 +206,16 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera != null)
 		{
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
+			// BlockPos camPos = RenderUtils.getCameraBlockPos();
+			// int regionX = (camPos.getX() >> 9) * 512;
+			// int regionZ = (camPos.getZ() >> 9) * 512;
 			
-			GL11.glNewList(normalChests, GL11.GL_COMPILE);
-			renderBoxes(basicChests, greenBox, regionX, regionZ);
-			renderBoxes(trappedChests, orangeBox, regionX, regionZ);
-			renderBoxes(enderChests, cyanBox, regionX, regionZ);
-			renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
-			GL11.glEndList();
+			// GL11.glNewList(normalChests, GL11.GL_COMPILE);
+			// renderBoxes(basicChests, greenBox, regionX, regionZ);
+			// renderBoxes(trappedChests, orangeBox, regionX, regionZ);
+			// renderBoxes(enderChests, cyanBox, regionX, regionZ);
+			// renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
+			// GL11.glEndList();
 		}
 		
 		minecarts.clear();
@@ -258,7 +266,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -270,8 +278,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		ArrayList<Box> minecartBoxes = calculateMinecartBoxes(partialTicks);
 		
@@ -280,35 +288,38 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		if(style.getSelected().boxes)
-		{
-			GL11.glCallList(normalChests);
-			renderBoxes(minecartBoxes, greenBox, regionX, regionZ);
-		}
+			// GL11.glCallList(normalChests);
+			renderBoxes(matrixStack, minecartBoxes, greenBox, regionX, regionZ);
 		
 		if(style.getSelected().lines)
 		{
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			RenderSystem.setShader(GameRenderer::method_34539);
+			
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos());
 			
-			GL11.glBegin(GL11.GL_LINES);
+			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+				VertexFormats.POSITION);
 			
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-			renderLines(start, basicChests, regionX, regionZ);
-			renderLines(start, minecartBoxes, regionX, regionZ);
+			renderLines(matrixStack, start, basicChests, regionX, regionZ);
+			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
 			
 			RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
-			renderLines(start, trappedChests, regionX, regionZ);
+			renderLines(matrixStack, start, trappedChests, regionX, regionZ);
 			
 			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-			renderLines(start, enderChests, regionX, regionZ);
+			renderLines(matrixStack, start, enderChests, regionX, regionZ);
 			
 			RenderSystem.setShaderColor(1, 0, 1, 0.5F);
-			renderLines(start, shulkerBoxes, regionX, regionZ);
+			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
 			
-			GL11.glEnd();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -336,28 +347,35 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		return minecartBoxes;
 	}
 	
-	private void renderBoxes(ArrayList<Box> boxes, int displayList, int regionX,
-		int regionZ)
+	private void renderBoxes(MatrixStack matrixStack, ArrayList<Box> boxes,
+		int displayList, int regionX, int regionZ)
 	{
 		for(Box box : boxes)
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(box.minX - regionX, box.minY, box.minZ - regionZ);
-			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
-				box.maxZ - box.minZ);
-			GL11.glCallList(displayList);
-			GL11.glPopMatrix();
+			matrixStack.push();
+			matrixStack.translate(box.minX - regionX, box.minY,
+				box.minZ - regionZ);
+			matrixStack.scale((float)(box.maxX - box.minX),
+				(float)(box.maxY - box.minY), (float)(box.maxZ - box.minZ));
+			// GL11.glCallList(displayList);
+			matrixStack.pop();
 		}
 	}
 	
-	private void renderLines(Vec3d start, ArrayList<Box> boxes, int regionX,
-		int regionZ)
+	private void renderLines(MatrixStack matrixStack, Vec3d start,
+		ArrayList<Box> boxes, int regionX, int regionZ)
 	{
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::method_34539);
+		
 		for(Box box : boxes)
 		{
 			Vec3d end = box.getCenter();
-			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
-			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
+			bufferBuilder.vertex(matrix, (float)start.x - regionX,
+				(float)start.y, (float)start.z - regionZ).next();
+			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
+				(float)end.z - regionZ).next();
 		}
 	}
 	

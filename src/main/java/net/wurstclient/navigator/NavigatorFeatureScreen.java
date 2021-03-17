@@ -349,74 +349,78 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		window.validate();
 		
 		int windowY = bgy1 + scroll + window.getY();
-		GL11.glPushMatrix();
-		GL11.glTranslated(bgx1, windowY, 0);
+		matrixStack.push();
+		matrixStack.translate(bgx1, windowY, 0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		{
-			int x1 = 0;
-			int y1 = -13;
-			int x2 = x1 + window.getWidth();
-			int y2 = y1 + window.getHeight();
-			int y3 = y1 + 13;
-			int x3 = x1 + 2;
-			int x5 = x2 - 2;
-			
-			// window background
-			// left & right
-			setColorToBackground();
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(x1, y3);
-			GL11.glVertex2i(x1, y2);
-			GL11.glVertex2i(x3, y2);
-			GL11.glVertex2i(x3, y3);
-			GL11.glVertex2i(x5, y3);
-			GL11.glVertex2i(x5, y2);
-			GL11.glVertex2i(x2, y2);
-			GL11.glVertex2i(x2, y3);
-			GL11.glEnd();
-			
-			setColorToBackground();
-			GL11.glBegin(GL11.GL_QUADS);
-			
-			// window background
-			// between children
-			int xc1 = 2;
-			int xc2 = x5 - x1;
-			for(int i = 0; i < window.countChildren(); i++)
-			{
-				int yc1 = window.getChild(i).getY();
-				int yc2 = yc1 - 2;
-				GL11.glVertex2i(xc1, yc2);
-				GL11.glVertex2i(xc1, yc1);
-				GL11.glVertex2i(xc2, yc1);
-				GL11.glVertex2i(xc2, yc2);
-			}
-			
-			// window background
-			// bottom
-			int yc1;
-			if(window.countChildren() == 0)
-				yc1 = 0;
-			else
-			{
-				Component lastChild =
-					window.getChild(window.countChildren() - 1);
-				yc1 = lastChild.getY() + lastChild.getHeight();
-			}
-			int yc2 = yc1 + 2;
-			GL11.glVertex2i(xc1, yc2);
-			GL11.glVertex2i(xc1, yc1);
-			GL11.glVertex2i(xc2, yc1);
-			GL11.glVertex2i(xc2, yc2);
-			
-			GL11.glEnd();
+			// int x1 = 0;
+			// int y1 = -13;
+			// int x2 = x1 + window.getWidth();
+			// int y2 = y1 + window.getHeight();
+			// int y3 = y1 + 13;
+			// int x3 = x1 + 2;
+			// int x5 = x2 - 2;
+			//
+			// // window background
+			// // left & right
+			// setColorToBackground();
+			// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			// VertexFormats.POSITION);
+			// GL11.glVertex2i(x1, y3);
+			// GL11.glVertex2i(x1, y2);
+			// GL11.glVertex2i(x3, y2);
+			// GL11.glVertex2i(x3, y3);
+			// GL11.glVertex2i(x5, y3);
+			// GL11.glVertex2i(x5, y2);
+			// GL11.glVertex2i(x2, y2);
+			// GL11.glVertex2i(x2, y3);
+			// bufferBuilder.end();
+			// BufferRenderer.draw(bufferBuilder);
+			//
+			// setColorToBackground();
+			// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			// VertexFormats.POSITION);
+			//
+			// // window background
+			// // between children
+			// int xc1 = 2;
+			// int xc2 = x5 - x1;
+			// for(int i = 0; i < window.countChildren(); i++)
+			// {
+			// int yc1 = window.getChild(i).getY();
+			// int yc2 = yc1 - 2;
+			// GL11.glVertex2i(xc1, yc2);
+			// GL11.glVertex2i(xc1, yc1);
+			// GL11.glVertex2i(xc2, yc1);
+			// GL11.glVertex2i(xc2, yc2);
+			// }
+			//
+			// // window background
+			// // bottom
+			// int yc1;
+			// if(window.countChildren() == 0)
+			// yc1 = 0;
+			// else
+			// {
+			// Component lastChild =
+			// window.getChild(window.countChildren() - 1);
+			// yc1 = lastChild.getY() + lastChild.getHeight();
+			// }
+			// int yc2 = yc1 + 2;
+			// GL11.glVertex2i(xc1, yc2);
+			// GL11.glVertex2i(xc1, yc1);
+			// GL11.glVertex2i(xc2, yc1);
+			// GL11.glVertex2i(xc2, yc2);
+			//
+			// bufferBuilder.end();
+			// BufferRenderer.draw(bufferBuilder);
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
 			window.getChild(i).render(matrixStack, mouseX - bgx1,
 				mouseY - windowY, partialTicks);
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// buttons
 		activeButton = null;
@@ -469,12 +473,12 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// scissor box
 		glDisable(GL_SCISSOR_TEST);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
+		matrixStack.push();
+		matrixStack.translate(bgx1, bgy1 + scroll - 13, 0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
 			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// buttons below scissor box
 		for(AbstractButtonWidget button : buttons)

@@ -253,12 +253,12 @@ public final class MobSpawnEspHack extends Hack
 			if(scanner.displayList == 0)
 				continue;
 			
-			GL11.glPushMatrix();
+			matrixStack.push();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, scanner.chunk);
 			
 			GL11.glCallList(scanner.displayList);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
 		// GL resets
@@ -337,49 +337,51 @@ public final class MobSpawnEspHack extends Hack
 		
 		private void compileDisplayList()
 		{
-			int regionX = (chunk.getPos().getStartX() >> 9) * 512;
-			int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
-			
-			GL11.glNewList(displayList, GL11.GL_COMPILE);
-			
-			try
-			{
-				RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-				GL11.glBegin(GL11.GL_LINES);
-				new ArrayList<>(red).stream()
-					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
-						pos.getZ() - regionZ))
-					.forEach(pos -> {
-						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-							pos.getZ());
-						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-							pos.getZ() + 1);
-						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-							pos.getZ());
-						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-							pos.getZ() + 1);
-					});
-				
-				RenderSystem.setShaderColor(1, 1, 0, 0.5F);
-				new ArrayList<>(yellow).stream()
-					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
-						pos.getZ() - regionZ))
-					.forEach(pos -> {
-						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-							pos.getZ());
-						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-							pos.getZ() + 1);
-						GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
-							pos.getZ());
-						GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
-							pos.getZ() + 1);
-					});
-				GL11.glEnd();
-				
-			}finally
-			{
-				GL11.glEndList();
-			}
+			// int regionX = (chunk.getPos().getStartX() >> 9) * 512;
+			// int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
+			//
+			// GL11.glNewList(displayList, GL11.GL_COMPILE);
+			//
+			// try
+			// {
+			// RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			// VertexFormats.POSITION);
+			// new ArrayList<>(red).stream()
+			// .map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
+			// pos.getZ() - regionZ))
+			// .forEach(pos -> {
+			// GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+			// pos.getZ());
+			// GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+			// pos.getZ() + 1);
+			// GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+			// pos.getZ());
+			// GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+			// pos.getZ() + 1);
+			// });
+			//
+			// RenderSystem.setShaderColor(1, 1, 0, 0.5F);
+			// new ArrayList<>(yellow).stream()
+			// .map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
+			// pos.getZ() - regionZ))
+			// .forEach(pos -> {
+			// GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+			// pos.getZ());
+			// GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+			// pos.getZ() + 1);
+			// GL11.glVertex3d(pos.getX() + 1, pos.getY() + 0.01,
+			// pos.getZ());
+			// GL11.glVertex3d(pos.getX(), pos.getY() + 0.01,
+			// pos.getZ() + 1);
+			// });
+			// bufferBuilder.end();
+			// BufferRenderer.draw(bufferBuilder);
+			//
+			// }finally
+			// {
+			// GL11.glEndList();
+			// }
 			
 			doneCompiling = true;
 		}
