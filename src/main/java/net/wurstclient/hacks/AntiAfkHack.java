@@ -147,8 +147,8 @@ public final class AntiAfkHack extends Hack
 			// set next block
 			if(timer <= 0 || nextBlock == null)
 			{
-				nextBlock = start.method_34592(random.nextInt(3) - 1, 0,
-					random.nextInt(3) - 1);
+				nextBlock =
+					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
 				timer = 40 + random.nextInt(21);
 			}
 			
@@ -187,8 +187,8 @@ public final class AntiAfkHack extends Hack
 	{
 		public RandomPathFinder(BlockPos goal)
 		{
-			super(goal.method_34592(random.nextInt(33) - 16,
-				random.nextInt(33) - 16, random.nextInt(33) - 16));
+			super(goal.add(random.nextInt(33) - 16, random.nextInt(33) - 16,
+				random.nextInt(33) - 16));
 			setThinkTime(10);
 			setFallingAllowed(false);
 			setDivingAllowed(false);

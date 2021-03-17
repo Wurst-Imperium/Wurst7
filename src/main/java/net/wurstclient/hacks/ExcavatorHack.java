@@ -575,8 +575,8 @@ public final class ExcavatorHack extends Hack
 		int rangeI = (int)Math.ceil(range);
 		
 		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
-		BlockPos min = center.method_34592(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.method_34592(rangeI, rangeI, rangeI);
+		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
+		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)

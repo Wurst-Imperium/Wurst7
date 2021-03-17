@@ -242,8 +242,8 @@ public final class AutoFarmHack extends Hack
 	
 	private Stream<BlockPos> getBlockStream(BlockPos center, int range)
 	{
-		BlockPos min = center.method_34592(-range, -range, -range);
-		BlockPos max = center.method_34592(range, range, range);
+		BlockPos min = center.add(-range, -range, -range);
+		BlockPos max = center.add(range, range, range);
 		
 		return BlockUtils.getAllInBox(min, max).stream();
 	}
