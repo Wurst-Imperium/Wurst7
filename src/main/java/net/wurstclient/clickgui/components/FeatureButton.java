@@ -218,7 +218,7 @@ public final class FeatureButton extends Component
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
@@ -279,7 +279,7 @@ public final class FeatureButton extends Component
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();

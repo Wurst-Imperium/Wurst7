@@ -112,7 +112,7 @@ public final class RadarComponent extends Component
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();

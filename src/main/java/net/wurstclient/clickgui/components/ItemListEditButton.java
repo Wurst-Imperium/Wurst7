@@ -110,7 +110,7 @@ public final class ItemListEditButton extends Component
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();

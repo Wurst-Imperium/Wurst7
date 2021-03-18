@@ -98,7 +98,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::method_34539);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		

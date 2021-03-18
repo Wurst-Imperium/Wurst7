@@ -250,7 +250,7 @@ public final class SliderComponent extends Component
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y4, 0).next();
 		bufferBuilder.vertex(matrix, x3, y5, 0).next();
@@ -292,7 +292,7 @@ public final class SliderComponent extends Component
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 		bufferBuilder.vertex(matrix, xk1, yk2, 0).next();

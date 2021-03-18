@@ -566,7 +566,7 @@ public final class ClickGui
 			// outline
 			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 				0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
 			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
@@ -710,7 +710,7 @@ public final class ClickGui
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					0.5F);
 				
-				bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+				bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
 				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
@@ -807,7 +807,7 @@ public final class ClickGui
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
@@ -934,7 +934,7 @@ public final class ClickGui
 		
 		// button outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
@@ -982,7 +982,7 @@ public final class ClickGui
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
@@ -1043,7 +1043,7 @@ public final class ClickGui
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 			bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
@@ -1051,7 +1051,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
@@ -1059,7 +1059,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
@@ -1119,7 +1119,7 @@ public final class ClickGui
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
@@ -1127,7 +1127,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
 			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
@@ -1135,7 +1135,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINE_STRIP,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
