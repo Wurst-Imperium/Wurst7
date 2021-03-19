@@ -299,7 +299,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos());
 			
-			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);

@@ -208,7 +208,7 @@ public enum RenderUtils
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::method_34539);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.minY, (float)bb.minZ)
@@ -307,7 +307,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.minY, (float)bb.minZ)
@@ -406,7 +406,7 @@ public enum RenderUtils
 		double midY = (bb.minY + bb.maxY) / 2;
 		double midZ = (bb.minZ + bb.maxZ) / 2;
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ)
@@ -489,7 +489,7 @@ public enum RenderUtils
 		
 		matrixStack.push();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder
 			.vertex(matrix, (float)startX, (float)startY, (float)startZ).next();
@@ -508,7 +508,7 @@ public enum RenderUtils
 			Math.sqrt(Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2)));
 		GL11.glRotated(Math.toDegrees(angleZ), 0, 0, 1);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();

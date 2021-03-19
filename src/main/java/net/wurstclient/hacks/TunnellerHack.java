@@ -250,7 +250,7 @@ public final class TunnellerHack extends Hack
 	// matrixStack.translate(0.5, 0.5, 0.5);
 	//
 	// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-	// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+	// bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 	// VertexFormats.POSITION);
 	// RenderUtils.drawNode(matrixStack,
 	// new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));

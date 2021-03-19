@@ -380,7 +380,7 @@ public abstract class NavigatorScreen extends Screen
 		// double yi1 = y1 + 0.1;
 		// glLineWidth(1F);
 		// glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		// bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 		// VertexFormats.POSITION);
 		// {
 		// glVertex2d(x1, yi1);

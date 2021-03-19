@@ -409,7 +409,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		int bx1 = area.x + area.width - area.height;
 		// int by1 = area.y + 2;
 		// int by2 = by1 + area.height - 4;
-		// bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		// bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 		// VertexFormats.POSITION);
 		// GL11.glVertex2i(bx1, by1);
 		// GL11.glVertex2i(bx1, by2);

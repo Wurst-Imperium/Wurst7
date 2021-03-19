@@ -256,6 +256,7 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, x3, y5, 0).next();
 		bufferBuilder.vertex(matrix, x4, y5, 0).next();
 		bufferBuilder.vertex(matrix, x4, y4, 0).next();
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
@@ -298,6 +299,7 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
 		bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 		bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
+		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}

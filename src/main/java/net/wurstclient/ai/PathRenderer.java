@@ -35,7 +35,7 @@ public final class PathRenderer
 		
 		matrixStack.push();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		{
 			bufferBuilder.vertex(matrix, startX, startY, startZ).next();
@@ -60,7 +60,7 @@ public final class PathRenderer
 			(float)Math.toDegrees(Math.atan2(endX - startX, Math.sqrt(
 				Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2))))));
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		{
 			bufferBuilder.vertex(matrix, 0, 2, 1).next();
@@ -109,7 +109,7 @@ public final class PathRenderer
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		{
 			// middle part

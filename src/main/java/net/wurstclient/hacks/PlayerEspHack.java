@@ -200,7 +200,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::method_34539);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		for(PlayerEntity e : players)
 		{

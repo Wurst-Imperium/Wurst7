@@ -361,7 +361,7 @@ public final class AutoFishHack extends Hack
 			matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
 				lastSoundPos.z - regionZ);
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)-0.125)
 				.next();

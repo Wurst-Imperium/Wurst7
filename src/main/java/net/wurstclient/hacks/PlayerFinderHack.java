@@ -111,7 +111,7 @@ public final class PlayerFinderHack extends Hack
 		RenderSystem.setShader(GameRenderer::method_34539);
 		
 		// tracer line
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
 		// set start position

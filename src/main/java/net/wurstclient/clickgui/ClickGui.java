@@ -550,6 +550,8 @@ public final class ClickGui
 			matrixStack.push();
 			matrixStack.translate(0, 0, 300);
 			
+			RenderSystem.setShader(GameRenderer::method_34539);
+			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -572,6 +574,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
 			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
@@ -716,6 +719,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
+				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
 				bufferBuilder.end();
 				BufferRenderer.draw(bufferBuilder);
 			}
@@ -813,13 +817,14 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
 		if(!window.isMinimized())
 		{
 			// title bar outline
-			bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
@@ -940,6 +945,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
@@ -987,6 +993,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
@@ -1049,6 +1056,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
 			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -1057,6 +1065,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
+			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -1065,6 +1074,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
@@ -1125,6 +1135,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
+			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -1133,6 +1144,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
+			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -1140,6 +1152,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
+			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 		}
@@ -1189,7 +1202,7 @@ public final class ClickGui
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.LINES,
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
 		bufferBuilder.vertex(matrix, xc2, yc2, 0).next();

@@ -116,6 +116,7 @@ public final class ItemListEditButton extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
