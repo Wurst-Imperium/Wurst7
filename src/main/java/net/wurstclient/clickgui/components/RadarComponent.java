@@ -87,6 +87,8 @@ public final class RadarComponent extends Component
 		
 		matrixStack.push();
 		matrixStack.translate(middleX, middleY, 0);
+		matrix = matrixStack.peek().getModel();
+		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
 			GL11.glRotated(180 + player.yaw, 0, 0, 1);
@@ -118,16 +120,18 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.pop();
+		matrix = matrixStack.peek().getModel();
 		
 		// points
-		GL11.glEnable(GL11.GL_POINT_SMOOTH);
-		GL11.glPointSize(2);
+		RenderSystem.setShader(GameRenderer::method_34540);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+			VertexFormats.POSITION_COLOR);
 		for(Entity e : hack.getEntities())
 		{
 			double diffX =
@@ -164,10 +168,26 @@ public final class RadarComponent extends Component
 			else
 				color = 0x808080;
 			
-			RenderSystem.setShaderColor((color >> 16 & 255) / 255F,
-				(color >> 8 & 255) / 255F, (color & 255) / 255F, 1);
-			bufferBuilder.vertex(matrix, middleX + (float)renderX,
-				middleY + (float)renderY, 0).next();
+			float red = (color >> 16 & 255) / 255F;
+			float green = (color >> 8 & 255) / 255F;
+			float blue = (color & 255) / 255F;
+			float alpha = 1;
+			bufferBuilder
+				.vertex(matrix, middleX + (float)renderX - 0.5F,
+					middleY + (float)renderY - 0.5F, 0)
+				.color(red, green, blue, alpha).next();
+			bufferBuilder
+				.vertex(matrix, middleX + (float)renderX + 0.5F,
+					middleY + (float)renderY - 0.5F, 0)
+				.color(red, green, blue, alpha).next();
+			bufferBuilder
+				.vertex(matrix, middleX + (float)renderX + 0.5F,
+					middleY + (float)renderY + 0.5F, 0)
+				.color(red, green, blue, alpha).next();
+			bufferBuilder
+				.vertex(matrix, middleX + (float)renderX - 0.5F,
+					middleY + (float)renderY + 0.5F, 0)
+				.color(red, green, blue, alpha).next();
 		}
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
