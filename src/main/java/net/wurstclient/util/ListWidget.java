@@ -142,7 +142,7 @@ public abstract class ListWidget extends AbstractParentElement
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShaderTexture(0,
 				DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-			// RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D)
@@ -395,9 +395,8 @@ public abstract class ListWidget extends AbstractParentElement
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
 				RenderSystem.disableTexture();
-				if(isFocused())
-				{}
-				// RenderSystem.color4f(g, g, g, 1.0F);
+				float g = isFocused() ? 1.0F : 0.5F;
+				RenderSystem.setShaderColor(g, g, g, 1.0F);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(q, o + p + 2, 0.0D).next();
@@ -405,7 +404,7 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(r, o - 2, 0.0D).next();
 				bufferBuilder.vertex(q, o - 2, 0.0D).next();
 				tessellator.draw();
-				// RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
+				RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(q + 1, o + p + 1, 0.0D).next();
@@ -438,7 +437,7 @@ public abstract class ListWidget extends AbstractParentElement
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShaderTexture(0,
 			DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-		// RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_TEXTURE_COLOR);
 		bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, bottom / 32.0F)
