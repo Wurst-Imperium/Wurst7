@@ -592,10 +592,8 @@ public final class ClickGui
 	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
 	{
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		RenderSystem.lineWidth(1);
 		
 		for(Window window : windows)
@@ -604,7 +602,6 @@ public final class ClickGui
 					Integer.MIN_VALUE, partialTicks);
 			
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	

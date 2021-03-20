@@ -118,7 +118,6 @@ public final class TabGui implements KeyPressListener
 			return;
 		
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
@@ -139,7 +138,7 @@ public final class TabGui implements KeyPressListener
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		int textY = 1;
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
 		for(int i = 0; i < tabs.size(); i++)
 		{
 			String tabName = tabs.get(i).name;
@@ -151,13 +150,11 @@ public final class TabGui implements KeyPressListener
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
-		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if(tabOpened)
 		{
 			matrixStack.push();
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			
 			Tab tab = tabs.get(selected);
 			int tabX = x + width + 2;
@@ -172,7 +169,6 @@ public final class TabGui implements KeyPressListener
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			
 			int tabTextY = 1;
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < tab.features.size(); i++)
 			{
 				Feature feature = tab.features.get(i);
@@ -189,15 +185,12 @@ public final class TabGui implements KeyPressListener
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
-			
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			
 			matrixStack.pop();
 		}
 		
 		matrixStack.pop();
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 	}
 	
@@ -216,10 +209,10 @@ public final class TabGui implements KeyPressListener
 		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 		// VertexFormats.POSITION);
 		// {
-		// GL11.glVertex2i(x1, y1);
-		// GL11.glVertex2i(x2, y1);
-		// GL11.glVertex2i(x2, y2);
-		// GL11.glVertex2i(x1, y2);
+		// bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		// }
 		// bufferBuilder.end();
 		// BufferRenderer.draw(bufferBuilder);
@@ -237,10 +230,10 @@ public final class TabGui implements KeyPressListener
 		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
 		// VertexFormats.POSITION);
 		// {
-		// GL11.glVertex2d(xi1, yi1);
-		// GL11.glVertex2d(xi2, yi1);
-		// GL11.glVertex2d(xi2, yi2);
-		// GL11.glVertex2d(xi1, yi2);
+		// bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 		// }
 		// bufferBuilder.end();
 		// BufferRenderer.draw(bufferBuilder);
@@ -257,15 +250,15 @@ public final class TabGui implements KeyPressListener
 		// {
 		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 		// 0.75F);
-		// GL11.glVertex2d(x1, y1);
-		// GL11.glVertex2d(x2, y1);
+		// bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		// RenderSystem.setShaderColor(0, 0, 0, 0);
-		// GL11.glVertex2d(xi2, yi1);
-		// GL11.glVertex2d(xi1, yi1);
-		// GL11.glVertex2d(xi1, yi2);
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 		// 0.75F);
-		// GL11.glVertex2d(x1, y2);
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		// }
 		// bufferBuilder.end();
 		// BufferRenderer.draw(bufferBuilder);
@@ -274,15 +267,15 @@ public final class TabGui implements KeyPressListener
 		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
 		// VertexFormats.POSITION);
 		// {
-		// GL11.glVertex2d(x2, y2);
-		// GL11.glVertex2d(x2, y1);
+		// bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		// RenderSystem.setShaderColor(0, 0, 0, 0);
-		// GL11.glVertex2d(xi2, yi1);
-		// GL11.glVertex2d(xi2, yi2);
-		// GL11.glVertex2d(xi1, yi2);
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 		// 0.75F);
-		// GL11.glVertex2d(x1, y2);
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		// }
 		// bufferBuilder.end();
 		// BufferRenderer.draw(bufferBuilder);

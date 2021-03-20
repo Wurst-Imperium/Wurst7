@@ -51,7 +51,6 @@ public final class WurstLogo
 			color[1], color[2], 0.5F);
 		
 		// draw version string
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		tr.draw(matrixStack, version, 74, 8, 0xFF000000);

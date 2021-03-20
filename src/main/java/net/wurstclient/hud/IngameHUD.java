@@ -37,7 +37,6 @@ public final class IngameHUD implements GUIRenderListener
 		
 		// GL settings
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		clickGui.updateColors();
 		
@@ -51,7 +50,6 @@ public final class IngameHUD implements GUIRenderListener
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		if(blend)
