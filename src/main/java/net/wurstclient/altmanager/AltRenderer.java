@@ -13,18 +13,15 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
-import net.wurstclient.WurstClient;
 
 public final class AltRenderer
 {
-	private static final MinecraftClient mc = WurstClient.MC;
 	private static final HashSet<String> loadedSkins = new HashSet<>();
 	
 	private static void bindSkinTexture(String name)
@@ -33,7 +30,7 @@ public final class AltRenderer
 		
 		if(loadedSkins.contains(name))
 		{
-			mc.getTextureManager().bindTexture(location);
+			RenderSystem.setShaderTexture(0, location);
 			return;
 		}
 		
@@ -48,7 +45,7 @@ public final class AltRenderer
 		// e.printStackTrace();
 		// }
 		
-		mc.getTextureManager().bindTexture(location);
+		RenderSystem.setShaderTexture(0, location);
 		loadedSkins.add(name);
 	}
 	

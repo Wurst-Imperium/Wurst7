@@ -98,7 +98,7 @@ public final class TacoCmd extends Command
 		}else
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		MC.getTextureManager().bindTexture(tacos[ticks / 8]);
+		RenderSystem.setShaderTexture(0, tacos[ticks / 8]);
 		Window sr = MC.getWindow();
 		int x = sr.getScaledWidth() / 2 - 32 + 76;
 		int y = sr.getScaledHeight() - 32 - 19;

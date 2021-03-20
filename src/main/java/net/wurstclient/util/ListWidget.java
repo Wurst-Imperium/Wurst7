@@ -140,8 +140,8 @@ public abstract class ListWidget extends AbstractParentElement
 			capYPosition();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			client.getTextureManager()
-				.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderTexture(0,
+				DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 			// RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
@@ -436,8 +436,8 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		client.getTextureManager()
-			.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.setShaderTexture(0,
+			DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 		// RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_TEXTURE_COLOR);

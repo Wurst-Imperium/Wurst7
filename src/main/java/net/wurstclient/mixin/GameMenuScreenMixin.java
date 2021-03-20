@@ -100,7 +100,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		client.getTextureManager().bindTexture(wurstTexture);
+		RenderSystem.setShaderTexture(0, wurstTexture);
 		
 		int x = wurstOptionsButton.x + 34;
 		int y = wurstOptionsButton.y + 2;
