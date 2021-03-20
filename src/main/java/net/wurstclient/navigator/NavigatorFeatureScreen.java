@@ -7,13 +7,6 @@
  */
 package net.wurstclient.navigator;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -29,10 +22,17 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -319,7 +319,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, 0xffffff);
-		glDisable(GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -329,20 +329,20 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int bgy2 = height - 43;
 		
 		setColorToBackground();
-		drawQuads(bgx1, bgy1, bgx2,
+		drawQuads(matrixStack, bgx1, bgy1, bgx2,
 			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
 				bgy1 + scroll + window.getY())));
-		drawQuads(bgx1,
+		drawQuads(matrixStack, bgx1,
 			Math.max(bgy1,
 				Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
 					bgy1 + scroll + window.getY() + window.getInnerHeight())),
 			bgx2, bgy2);
-		drawBoxShadow(bgx1, bgy1, bgx2, bgy2);
+		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
 			bgy2 - (buttons.isEmpty() ? 0 : 24));
-		glEnable(GL_SCISSOR_TEST);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
 		WurstClient.INSTANCE.getGui().setTooltip("");
@@ -354,67 +354,71 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		{
-			// int x1 = 0;
-			// int y1 = -13;
-			// int x2 = x1 + window.getWidth();
-			// int y2 = y1 + window.getHeight();
-			// int y3 = y1 + 13;
-			// int x3 = x1 + 2;
-			// int x5 = x2 - 2;
-			//
-			// // window background
-			// // left & right
-			// setColorToBackground();
-			// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			// VertexFormats.POSITION);
-			// GL11.glVertex2i(x1, y3);
-			// GL11.glVertex2i(x1, y2);
-			// GL11.glVertex2i(x3, y2);
-			// GL11.glVertex2i(x3, y3);
-			// GL11.glVertex2i(x5, y3);
-			// GL11.glVertex2i(x5, y2);
-			// GL11.glVertex2i(x2, y2);
-			// GL11.glVertex2i(x2, y3);
-			// bufferBuilder.end();
-			// BufferRenderer.draw(bufferBuilder);
-			//
-			// setColorToBackground();
-			// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			// VertexFormats.POSITION);
-			//
-			// // window background
-			// // between children
-			// int xc1 = 2;
-			// int xc2 = x5 - x1;
-			// for(int i = 0; i < window.countChildren(); i++)
-			// {
-			// int yc1 = window.getChild(i).getY();
-			// int yc2 = yc1 - 2;
-			// GL11.glVertex2i(xc1, yc2);
-			// GL11.glVertex2i(xc1, yc1);
-			// GL11.glVertex2i(xc2, yc1);
-			// GL11.glVertex2i(xc2, yc2);
-			// }
-			//
-			// // window background
-			// // bottom
-			// int yc1;
-			// if(window.countChildren() == 0)
-			// yc1 = 0;
-			// else
-			// {
-			// Component lastChild =
-			// window.getChild(window.countChildren() - 1);
-			// yc1 = lastChild.getY() + lastChild.getHeight();
-			// }
-			// int yc2 = yc1 + 2;
-			// GL11.glVertex2i(xc1, yc2);
-			// GL11.glVertex2i(xc1, yc1);
-			// GL11.glVertex2i(xc2, yc1);
-			// GL11.glVertex2i(xc2, yc2);
-			//
-			// bufferBuilder.end();
-			// BufferRenderer.draw(bufferBuilder);
+			int x1 = 0;
+			int y1 = -13;
+			int x2 = x1 + window.getWidth();
+			int y2 = y1 + window.getHeight();
+			int y3 = y1 + 13;
+			int x3 = x1 + 2;
+			int x5 = x2 - 2;
+			
+			Matrix4f matrix = matrixStack.peek().getModel();
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			RenderSystem.setShader(GameRenderer::method_34539);
+			
+			// window background
+			// left & right
+			setColorToBackground();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0).next();
+			bufferBuilder.vertex(matrix, x1, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y2, 0).next();
+			bufferBuilder.vertex(matrix, x2, y2, 0).next();
+			bufferBuilder.vertex(matrix, x2, y3, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			
+			setColorToBackground();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			
+			// window background
+			// between children
+			int xc1 = 2;
+			int xc2 = x5 - x1;
+			for(int i = 0; i < window.countChildren(); i++)
+			{
+				int yc1 = window.getChild(i).getY();
+				int yc2 = yc1 - 2;
+				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+			}
+			
+			// window background
+			// bottom
+			int yc1;
+			if(window.countChildren() == 0)
+				yc1 = 0;
+			else
+			{
+				Component lastChild =
+					window.getChild(window.countChildren() - 1);
+				yc1 = lastChild.getY() + lastChild.getHeight();
+			}
+			int yc2 = yc1 + 2;
+			bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+			bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+			
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
@@ -447,7 +451,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], alpha);
 			
 			// button
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -455,7 +459,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
-			glDisable(GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -471,7 +475,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// scissor box
-		glDisable(GL_SCISSOR_TEST);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		matrixStack.push();
 		matrixStack.translate(bgx1, bgy1 + scroll - 13, 0);
@@ -505,8 +509,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			glDisable(GL_TEXTURE_2D);
-			drawBox(x1, y1, x2, y2);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -517,9 +521,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		// GL resets
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_TEXTURE_2D);
-		glDisable(GL_BLEND);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override

@@ -164,7 +164,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -213,7 +213,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// button
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
