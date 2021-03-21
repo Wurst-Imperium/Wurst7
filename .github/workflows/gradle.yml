@@ -11,7 +11,7 @@ jobs:
         - uses: actions/setup-java@v1
           with:
             java-version: 1.8
-        - run: ./gradlew build
+        - run: ./gradlew jar
         - uses: actions/upload-artifact@v2
           with:
-            path: build
+            path: build/libs
