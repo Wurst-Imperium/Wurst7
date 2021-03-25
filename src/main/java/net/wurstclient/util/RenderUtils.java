@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
 public enum RenderUtils
@@ -53,6 +54,18 @@ public enum RenderUtils
 		
 		int regionX = (blockPos.getX() >> 9) * 512;
 		int regionZ = (blockPos.getZ() >> 9) * 512;
+		
+		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
+	}
+	
+	public static void applyRegionalRenderOffset(Chunk chunk)
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
+		
+		int regionX = (chunk.getPos().getStartX() >> 9) * 512;
+		int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
 		
 		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
 	}

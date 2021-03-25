@@ -195,7 +195,7 @@ public final class KillauraLegitHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.isSpaceEmpty(box);
+				return !world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
@@ -269,8 +269,9 @@ public final class KillauraLegitHack extends Hack
 			return true;
 		
 		// if not facing center, check if facing anything in boundingBox
-		return bb.raycast(eyesPos,
-			eyesPos.add(lookVec.multiply(range.getValue()))) != null;
+		return bb
+			.raycast(eyesPos, eyesPos.add(lookVec.multiply(range.getValue())))
+			.isPresent();
 	}
 	
 	private boolean faceVectorClient(Vec3d vec)
