@@ -65,7 +65,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 				
 			}catch(Exception e)
 			{
-				
+				e.printStackTrace();
 			}
 		}, "ChatTranslator").start();
 	}
