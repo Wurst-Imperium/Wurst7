@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -200,6 +201,9 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		if(BlockEntityRenderDispatcher.INSTANCE.camera == null)
+			return;
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
