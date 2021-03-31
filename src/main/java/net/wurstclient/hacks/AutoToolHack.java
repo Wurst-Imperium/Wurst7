@@ -146,8 +146,9 @@ public final class AutoToolHack extends Hack
 		PlayerInventory inventory = player.inventory;
 		ItemStack heldItem = MC.player.getMainHandStack();
 		
+		Block block = BlockUtils.getBlock(block);
 		BlockState state = BlockUtils.getState(pos);
-		float bestSpeed = getMiningSpeed(heldItem, state);
+		float bestQuality = getToolQuality(heldItem, state, block);
 		int bestSlot = -1;
 		
 		for(int slot = 0; slot < 9; slot++)
@@ -157,7 +158,7 @@ public final class AutoToolHack extends Hack
 			
 			ItemStack stack = inventory.getStack(slot);
 			
-			float speed = getMiningSpeed(stack, state);
+			float speed = getToolQuality(stack, state, block);
 			if(speed <= bestSpeed)
 				continue;
 			
@@ -172,6 +173,14 @@ public final class AutoToolHack extends Hack
 		}
 		
 		return bestSlot;
+	}
+	
+	private int getToolQuality(ItemStack stack, BlockState state, Block block)
+	{
+		if(block instanceof CropBlock)
+			return EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack);
+		
+		return getMiningSpeed()
 	}
 	
 	private float getMiningSpeed(ItemStack stack, BlockState state)
