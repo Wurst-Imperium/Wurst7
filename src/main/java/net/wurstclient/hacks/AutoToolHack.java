@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.block.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -146,7 +147,7 @@ public final class AutoToolHack extends Hack
 		PlayerInventory inventory = player.inventory;
 		ItemStack heldItem = MC.player.getMainHandStack();
 		
-		Block block = BlockUtils.getBlock(block);
+		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
 		float bestQuality = getToolQuality(heldItem, state, block);
 		int bestSlot = -1;
@@ -158,8 +159,8 @@ public final class AutoToolHack extends Hack
 			
 			ItemStack stack = inventory.getStack(slot);
 			
-			float speed = getToolQuality(stack, state, block);
-			if(speed <= bestSpeed)
+			float quality = getToolQuality(stack, state, block);
+			if(quality <= bestQuality)
 				continue;
 			
 			if(!useSwords && stack.getItem() instanceof SwordItem)
@@ -168,19 +169,19 @@ public final class AutoToolHack extends Hack
 			if(repairMode && isTooDamaged(stack))
 				continue;
 			
-			bestSpeed = speed;
+			bestQuality = quality;
 			bestSlot = slot;
 		}
 		
 		return bestSlot;
 	}
 	
-	private int getToolQuality(ItemStack stack, BlockState state, Block block)
+	private float getToolQuality(ItemStack stack, BlockState state, Block block)
 	{
 		if(block instanceof CropBlock)
-			return EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack);
+			return (float)EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack);
 		
-		return getMiningSpeed()
+		return getMiningSpeed(stack, state);
 	}
 	
 	private float getMiningSpeed(ItemStack stack, BlockState state)
