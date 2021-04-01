@@ -87,9 +87,9 @@ public class FlyPathProcessor extends PathProcessor
 		}
 		
 		// skip mid-air nodes
-		Vec3i offset = nextPos.subtract(pos);
+		Vec3i offset = nextPos.method_35852(pos);
 		while(index < path.size() - 1
-			&& path.get(index).add(offset).equals(path.get(index + 1)))
+			&& path.get(index).method_35853(offset).equals(path.get(index + 1)))
 			index++;
 		
 		if(creativeFlying)

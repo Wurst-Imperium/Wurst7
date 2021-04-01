@@ -353,7 +353,7 @@ public final class AutoFishHack extends Hack
 	{
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(lastSoundPos != null)
 		{

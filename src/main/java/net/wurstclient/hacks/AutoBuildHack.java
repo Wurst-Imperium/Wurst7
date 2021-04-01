@@ -238,7 +238,7 @@ public final class AutoBuildHack extends Hack
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.offset(side);
+			BlockPos neighbor = pos.method_35851(side);
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor)
@@ -299,7 +299,7 @@ public final class AutoBuildHack extends Hack
 		if(!BlockUtils.canBeClicked(hitResultPos))
 			return;
 		
-		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
+		BlockPos startPos = hitResultPos.method_35851(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getPositions(startPos, direction);
 		
@@ -324,7 +324,7 @@ public final class AutoBuildHack extends Hack
 			
 			for(Direction side : Direction.values())
 			{
-				BlockPos neighbor = pos.offset(side);
+				BlockPos neighbor = pos.method_35851(side);
 				
 				// check if neighbor can be right-clicked
 				if(!BlockUtils.canBeClicked(neighbor))
@@ -376,7 +376,7 @@ public final class AutoBuildHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		int blocksDrawn = 0;
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
 			&& blocksDrawn < 1024;)
 		{

@@ -10,7 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtString;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -42,6 +42,6 @@ public final class AuthorCmd extends Command
 				"You must hold a written book in your main hand.");
 		
 		String author = String.join(" ", args);
-		heldItem.putSubTag("author", StringTag.of(author));
+		heldItem.putSubTag("author", NbtString.of(author));
 	}
 }

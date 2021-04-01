@@ -11,7 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.Identifier;
@@ -51,7 +51,7 @@ public final class ServerCrasherHack extends Hack
 		setEnabled(false);
 	}
 	
-	private CompoundTag createNBT()
+	private NbtCompound createNBT()
 	{
 		try
 		{

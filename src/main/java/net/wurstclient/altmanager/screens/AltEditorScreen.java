@@ -335,7 +335,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// skin preview
 		AltRenderer.drawAltBack(matrixStack, emailBox.getText(),

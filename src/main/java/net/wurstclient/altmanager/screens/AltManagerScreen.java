@@ -384,7 +384,7 @@ public final class AltManagerScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
@@ -530,7 +530,7 @@ public final class AltManagerScreen extends Screen
 			
 			Matrix4f matrix = matrixStack.peek().getModel();
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))

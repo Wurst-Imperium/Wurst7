@@ -90,7 +90,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			if(value == setting.getSelected())
 				continue;
 			
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			yi1 += 11;
 			int yi2 = yi1 + 11;

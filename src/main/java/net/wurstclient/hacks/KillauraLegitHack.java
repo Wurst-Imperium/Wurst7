@@ -345,7 +345,7 @@ public final class KillauraLegitHack extends Hack
 			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack, box);

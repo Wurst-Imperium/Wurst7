@@ -154,7 +154,7 @@ public final class BaseFinderHack extends Hack
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// vertices
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -254,7 +254,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 0);
 			}
 			
-			if(!matchingBlocks.contains(pos.north()))
+			if(!matchingBlocks.contains(pos.method_35861()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 0, 1, 0);
@@ -262,7 +262,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 0, 0);
 			}
 			
-			if(!matchingBlocks.contains(pos.east()))
+			if(!matchingBlocks.contains(pos.method_35855()))
 			{
 				addVertex(pos, 1, 0, 0);
 				addVertex(pos, 1, 1, 0);
@@ -270,7 +270,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 0, 1);
 			}
 			
-			if(!matchingBlocks.contains(pos.south()))
+			if(!matchingBlocks.contains(pos.method_35859()))
 			{
 				addVertex(pos, 0, 0, 1);
 				addVertex(pos, 1, 0, 1);
@@ -278,7 +278,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 0, 1, 1);
 			}
 			
-			if(!matchingBlocks.contains(pos.west()))
+			if(!matchingBlocks.contains(pos.method_35857()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 0, 0, 1);

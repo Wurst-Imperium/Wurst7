@@ -298,7 +298,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			Matrix4f matrix = matrixStack.peek().getModel();
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -420,7 +420,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;

@@ -61,10 +61,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private final ArrayList<Entity> minecarts = new ArrayList<>();
 	
 	private int greenBox;
-	private int orangeBox;
-	private int cyanBox;
-	private int purpleBox;
-	private int normalChests;
+	// private int orangeBox;
+	// private int cyanBox;
+	// private int purpleBox;
+	// private int normalChests;
 	
 	public ChestEspHack()
 	{
@@ -124,8 +124,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		// RenderSystem.setShaderColor(1, 0, 1, 0.5F);
 		// RenderUtils.drawOutlinedBox(matrixStack, box);
 		// GL11.glEndList();
-		
-		normalChests = GL11.glGenLists(1);
+		//
+		// normalChests = GL11.glGenLists(1);
 	}
 	
 	@Override
@@ -140,11 +140,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private void deleteDisplayLists()
 	{
-		GL11.glDeleteLists(greenBox, 1);
-		GL11.glDeleteLists(orangeBox, 1);
-		GL11.glDeleteLists(cyanBox, 1);
-		GL11.glDeleteLists(purpleBox, 1);
-		GL11.glDeleteLists(normalChests, 1);
+		// GL11.glDeleteLists(greenBox, 1);
+		// GL11.glDeleteLists(orangeBox, 1);
+		// GL11.glDeleteLists(cyanBox, 1);
+		// GL11.glDeleteLists(purpleBox, 1);
+		// GL11.glDeleteLists(normalChests, 1);
 	}
 	
 	@Override
@@ -245,7 +245,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		// larger box for double chest
 		if(chestType != ChestType.SINGLE)
 		{
-			BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
+			BlockPos pos2 = pos.method_35851(ChestBlock.getFacing(state));
 			
 			if(BlockUtils.canBeClicked(pos2))
 			{
@@ -273,7 +273,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		// GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
@@ -294,7 +294,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		if(style.getSelected().lines)
 		{
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos());
@@ -324,7 +324,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		// GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
@@ -367,7 +367,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	{
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		for(Box box : boxes)
 		{

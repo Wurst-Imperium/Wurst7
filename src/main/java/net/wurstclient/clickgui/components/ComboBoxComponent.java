@@ -117,7 +117,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		boolean hText = hovering && mouseX < x4;
 		boolean hBox = hovering && mouseX >= x4;
 		
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// tooltip
 		if(hText)

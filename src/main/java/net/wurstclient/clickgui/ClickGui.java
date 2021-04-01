@@ -550,7 +550,7 @@ public final class ClickGui
 			matrixStack.push();
 			matrixStack.translate(0, 0, 300);
 			
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// background
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -634,7 +634,7 @@ public final class ClickGui
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -908,7 +908,7 @@ public final class ClickGui
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],

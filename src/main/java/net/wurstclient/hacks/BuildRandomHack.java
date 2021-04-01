@@ -155,7 +155,7 @@ public final class BuildRandomHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
@@ -202,7 +202,7 @@ public final class BuildRandomHack extends Hack
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.offset(side);
+			BlockPos neighbor = pos.method_35851(side);
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))
@@ -253,7 +253,7 @@ public final class BuildRandomHack extends Hack
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.offset(side);
+			BlockPos neighbor = pos.method_35851(side);
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))

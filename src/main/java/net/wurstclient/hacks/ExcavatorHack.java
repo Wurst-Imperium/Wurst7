@@ -168,7 +168,7 @@ public final class ExcavatorHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// area
 		if(area != null)
@@ -276,7 +276,7 @@ public final class ExcavatorHack extends Hack
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
-			RenderSystem.setShader(GameRenderer::method_34539);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
 			RenderUtils.drawSolidBox(matrixStack);
 			
@@ -358,7 +358,7 @@ public final class ExcavatorHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::method_34539);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -411,8 +411,8 @@ public final class ExcavatorHack extends Hack
 			
 			// offset if sneaking
 			if(MC.options.keySneak.isPressed())
-				posLookingAt = posLookingAt
-					.offset(((BlockHitResult)MC.crosshairTarget).getSide());
+				posLookingAt = posLookingAt.method_35851(
+					((BlockHitResult)MC.crosshairTarget).getSide());
 			
 		}else
 			posLookingAt = null;
@@ -687,14 +687,16 @@ public final class ExcavatorHack extends Hack
 		{
 			BlockPos goal = getGoal();
 			
-			return done = goal.down(2).equals(current)
-				|| goal.up().equals(current) || goal.north().equals(current)
-				|| goal.south().equals(current) || goal.west().equals(current)
-				|| goal.east().equals(current)
-				|| goal.down().north().equals(current)
-				|| goal.down().south().equals(current)
-				|| goal.down().west().equals(current)
-				|| goal.down().east().equals(current);
+			return done =
+				goal.down(2).equals(current) || goal.up().equals(current)
+					|| goal.method_35861().equals(current)
+					|| goal.method_35859().equals(current)
+					|| goal.method_35857().equals(current)
+					|| goal.method_35855().equals(current)
+					|| goal.down().method_35861().equals(current)
+					|| goal.down().method_35859().equals(current)
+					|| goal.down().method_35857().equals(current)
+					|| goal.down().method_35855().equals(current);
 		}
 	}
 }
