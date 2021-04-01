@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -154,17 +155,21 @@ public final class AutoFarmHack extends Hack
 					getBlocksToReplant(eyesVec, eyesBlock, rangeSq, blockRange);
 		}
 		
+		boolean replanting = false;
 		while(!blocksToReplant.isEmpty())
 		{
 			BlockPos pos = blocksToReplant.get(0);
 			Item neededItem = plants.get(pos);
 			if(tryToReplant(pos, neededItem))
+			{
+				replanting = true;
 				break;
+			}
 			
 			blocksToReplant.removeIf(p -> plants.get(p) == neededItem);
 		}
 		
-		if(blocksToReplant.isEmpty())
+		if(!replanting)
 			harvest(blocksToHarvest);
 		
 		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
@@ -196,6 +201,9 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
+		if(BlockEntityRenderDispatcher.INSTANCE.camera == null)
+			return;
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -338,7 +346,7 @@ public final class AutoFarmHack extends Hack
 		if(!heldItem.isEmpty() && heldItem.getItem() == neededItem)
 		{
 			placeBlockSimple(pos);
-			return true;
+			return IMC.getItemUseCooldown() <= 0;
 		}
 		
 		for(int slot = 0; slot < 36; slot++)

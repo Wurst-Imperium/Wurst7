@@ -28,6 +28,7 @@ public final class CmdList
 	public DamageCmd damageCmd;
 	public DigCmd digCmd;
 	public DropCmd dropCmd;
+	public DupeCmd dupeCmd;
 	public EnabledHaxCmd enabledHaxCmd;
 	public EnchantCmd enchantCmd;
 	public ExcavateCmd excavateCmd;
@@ -46,7 +47,6 @@ public final class CmdList
 	public ModifyCmd modifyCmd;
 	public PathCmd pathCmd;
 	public PotionCmd potionCmd;
-	public PrefixCmd prefixCmd;
 	public ProtectCmd protectCmd;
 	public RenameCmd renameCmd;
 	public RepairCmd repairCmd;
@@ -64,62 +64,62 @@ public final class CmdList
 	public UnbindCmd unbindCmd;
 	public VClipCmd vClipCmd;
 	public ViewNbtCmd viewNbtCmd;
-
-	private TreeMap<String, Command> cmds;
-
+  
+  private TreeMap<String, Command> cmds;
+	
 	public CmdList()
 	{
 		newCmds();
 	}
 
 	public void newCmds(){
-		addAltCmd = new AddAltCmd();
-		annoyCmd = new AnnoyCmd();
-		authorCmd = new AuthorCmd();
-		bindCmd = new BindCmd();
-		bindsCmd = new BindsCmd();
-		blinkCmd = new BlinkCmd();
-		clearCmd = new ClearCmd();
-		copyitemCmd = new CopyItemCmd();
-		damageCmd = new DamageCmd();
-		digCmd = new DigCmd();
-		dropCmd = new DropCmd();
-		enabledHaxCmd = new EnabledHaxCmd();
-		enchantCmd = new EnchantCmd();
-		excavateCmd = new ExcavateCmd();
-		featuresCmd = new FeaturesCmd();
-		followCmd = new FollowCmd();
-		friendsCmd = new FriendsCmd();
-		getPosCmd = new GetPosCmd();
-		giveCmd = new GiveCmd();
-		gmCmd = new GmCmd();
-		goToCmd = new GoToCmd();
-		helpCmd = new HelpCmd();
-		invseeCmd = new InvseeCmd();
-		ipCmd = new IpCmd();
-		jumpCmd = new JumpCmd();
-		leaveCmd = new LeaveCmd();
-		modifyCmd = new ModifyCmd();
-		pathCmd = new PathCmd();
-		potionCmd = new PotionCmd();
-		prefixCmd = new PrefixCmd();
-		protectCmd = new ProtectCmd();
-		renameCmd = new RenameCmd();
-		repairCmd = new RepairCmd();
-		rvCmd = new RvCmd();
-		svCmd = new SvCmd();
-		sayCmd = new SayCmd();
-		setCheckboxCmd = new SetCheckboxCmd();
-		setModeCmd = new SetModeCmd();
-		setSliderCmd = new SetSliderCmd();
-		settingsCmd = new SettingsCmd();
-		tacoCmd = new TacoCmd();
-		tCmd = new TCmd();
-	 	tooManyHaxCmd = new TooManyHaxCmd();
-		tpCmd = new TpCmd();
-		unbindCmd = new UnbindCmd();
- 		vClipCmd = new VClipCmd();
-	 	viewNbtCmd = new ViewNbtCmd();
+    AddAltCmd addAltCmd = new AddAltCmd();
+    AnnoyCmd annoyCmd = new AnnoyCmd();
+    AuthorCmd authorCmd = new AuthorCmd();
+    BindCmd bindCmd = new BindCmd();
+    BindsCmd bindsCmd = new BindsCmd();
+    BlinkCmd blinkCmd = new BlinkCmd();
+    ClearCmd clearCmd = new ClearCmd();
+    CopyItemCmd copyitemCmd = new CopyItemCmd();
+    DamageCmd damageCmd = new DamageCmd();
+    DigCmd digCmd = new DigCmd();
+    DropCmd dropCmd = new DropCmd();
+    DupeCmd dupeCmd = new DupeCmd();
+    EnabledHaxCmd enabledHaxCmd = new EnabledHaxCmd();
+    EnchantCmd enchantCmd = new EnchantCmd();
+    ExcavateCmd excavateCmd = new ExcavateCmd();
+    FeaturesCmd featuresCmd = new FeaturesCmd();
+    FollowCmd followCmd = new FollowCmd();
+    FriendsCmd friendsCmd = new FriendsCmd();
+    GetPosCmd getPosCmd = new GetPosCmd();
+    GiveCmd giveCmd = new GiveCmd();
+    GmCmd gmCmd = new GmCmd();
+    GoToCmd goToCmd = new GoToCmd();
+    HelpCmd helpCmd = new HelpCmd();
+    InvseeCmd invseeCmd = new InvseeCmd();
+    IpCmd ipCmd = new IpCmd();
+    JumpCmd jumpCmd = new JumpCmd();
+    LeaveCmd leaveCmd = new LeaveCmd();
+    ModifyCmd modifyCmd = new ModifyCmd();
+    PathCmd pathCmd = new PathCmd();
+    PotionCmd potionCmd = new PotionCmd();
+    ProtectCmd protectCmd = new ProtectCmd();
+    RenameCmd renameCmd = new RenameCmd();
+    RepairCmd repairCmd = new RepairCmd();
+    RvCmd rvCmd = new RvCmd();
+    SvCmd svCmd = new SvCmd();
+    SayCmd sayCmd = new SayCmd();
+    SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
+    SetModeCmd setModeCmd = new SetModeCmd();
+    SetSliderCmd setSliderCmd = new SetSliderCmd();
+    SettingsCmd settingsCmd = new SettingsCmd();
+    TacoCmd tacoCmd = new TacoCmd();
+    TCmd tCmd = new TCmd();
+    TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
+    TpCmd tpCmd = new TpCmd();
+    UnbindCmd unbindCmd = new UnbindCmd();
+    VClipCmd vClipCmd = new VClipCmd();
+    ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 
 		cmds = new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
 
