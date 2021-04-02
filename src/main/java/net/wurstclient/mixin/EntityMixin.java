@@ -10,18 +10,34 @@ package net.wurstclient.mixin;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
+import net.wurstclient.hacks.FreecamHack;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, CommandOutput
 {
+	private FreecamHack freeCam = WurstClient.INSTANCE.getHax().freecamHack;
+	
+	@Inject(method = "setPose", at = @At("HEAD"), cancellable = true)
+	public void setPose(EntityPose pose, CallbackInfo info)
+	{
+		if(freeCam.isEnabled() && (pose.equals(pose.SWIMMING) || pose.equals(pose.CROUCHING)) && ((Object)this).getClass().equals(ClientPlayerEntity.class))
+		{
+			info.cancel();
+		}
+	}
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
 		opcode = Opcodes.INVOKEVIRTUAL,

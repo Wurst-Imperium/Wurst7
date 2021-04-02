@@ -1,0 +1,730 @@
+/*
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.hacks;
+
+import java.util.ArrayList;
+
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
+import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
+
+@SearchTags({"auto hole", "feet protect", "protect foot", "crystal protection", "foot bunker"})
+public final class AutoHoleHack extends Hack
+	implements UpdateListener, RenderListener
+{
+	private final int[][] template = {{1, 0, 0}, {0, 0, 1}, {-1, 0, 0}, {0, 0, -1}};
+	private final ArrayList<BlockPos> positions = new ArrayList<>();
+	
+	private int blockIndex;
+	private boolean building;
+	private int startTimer;
+
+	private int prevSelected = -1;
+
+	private final CheckboxSetting center = new CheckboxSetting("Center", "Will teleport you to the center\nof where you are building to avoid stopping blocks from placing", true);
+	private final CheckboxSetting useOtherBlocks = new CheckboxSetting("Use other blocks", "Will use blocks other than obsidian if you are out", false);
+	
+	public AutoHoleHack()
+	{
+		super("AutoHole",
+			"Builds a hole around your feet. Needs 4 blocks. \nUseful in crystalPVP");
+		setCategory(Category.BLOCKS);
+		addSetting(center);
+		addSetting(useOtherBlocks);
+	}
+	
+	@Override
+	public void onEnable()
+	{
+		if(!MC.player.isOnGround())
+		{
+			ChatUtils.error("Can't build this in mid-air.");
+			setEnabled(false);
+			return;
+		}
+		
+		prevSelected = MC.player.getInventory().selectedSlot;
+
+		if(!selectBestSlot())//!(stack.getItem() instanceof BlockItem))
+		{
+			ChatUtils.error("You must have blocks in your hotbar.");
+			setEnabled(false);
+			return;
+		}
+		
+		if(center.isChecked())
+			{
+				MC.player.setPos(MC.player.getBlockPos().getX()+0.5, MC.player.getBlockPos().getY(), MC.player.getBlockPos().getZ()+0.5);
+				MC.player.setVelocity(0, 0.1, 0);
+			}
+
+		ItemStack stack = MC.player.getMainHandStack();
+
+		if(stack.getCount() < 4 && !MC.player.isCreative())
+			ChatUtils.warning("Not enough blocks. hole may be incomplete.");
+		
+		// get start pos and facings
+		BlockPos startPos = new BlockPos(MC.player.getPos());
+		Direction facing = MC.player.getHorizontalFacing();
+		Direction facing2 = facing.rotateYCounterclockwise();
+		
+		// set positions
+		positions.clear();
+		for(int[] pos : template)
+			positions.add(startPos.up(pos[1]).offset(facing, pos[2])
+				.offset(facing2, pos[0]));
+		
+		if(!"".isEmpty())// mode.getSelected() == 1)
+		{
+			// initialize building process
+			blockIndex = 0;
+			building = true;
+			IMC.setItemUseCooldown(4);
+		}
+		
+		startTimer = 2;
+		
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RenderListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
+		building = false;
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		if(startTimer > 0)
+		{
+			startTimer--;
+			return;
+		}
+		
+		// build instantly
+		if(!building && startTimer <= 0)
+		{
+			for(BlockPos pos : positions)
+				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
+					placeBlockSimple(pos);
+			MC.player.swingHand(Hand.MAIN_HAND);
+			
+			if(MC.player.isOnGround())
+			{
+				MC.player.getInventory().selectedSlot = prevSelected;
+				setEnabled(false);
+				return;
+			}
+		}
+		
+		// place next block
+		// if(blockIndex < positions.size() && (IMC.getItemUseCooldown() == 0
+		// || WURST.getHax().fastPlaceHack.isEnabled()))
+		// {
+		// BlockPos pos = positions.get(blockIndex);
+		//
+		// if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+		// {
+		// if(!BlockUtils.placeBlockLegit(pos))
+		// {
+		// BlockPos playerPos = new BlockPos(MC.player);
+		// if(MC.player.onGround
+		// && Math.abs(pos.getX() - playerPos.getX()) == 2
+		// && pos.getY() - playerPos.getY() == 2
+		// && Math.abs(pos.getZ() - playerPos.getZ()) == 2)
+		// MC.player.jump();
+		// }
+		// }else
+		// {
+		// blockIndex++;
+		// if(blockIndex == positions.size())
+		// {
+		// building = false;
+		// setEnabled(false);
+		// }
+		// }
+		// }
+	}
+	
+	private void placeBlockSimple(BlockPos pos)
+	{
+		Direction side = null;
+		Direction[] sides = Direction.values();
+		
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d posVec = Vec3d.ofCenter(pos);
+		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		
+		Vec3d[] hitVecs = new Vec3d[sides.length];
+		for(int i = 0; i < sides.length; i++)
+			hitVecs[i] =
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
+		
+		for(int i = 0; i < sides.length; i++)
+		{
+			// check if neighbor can be right clicked
+			BlockPos neighbor = pos.offset(sides[i]);
+			if(!BlockUtils.canBeClicked(neighbor))
+				continue;
+			
+			// check line of sight
+			BlockState neighborState = BlockUtils.getState(neighbor);
+			VoxelShape neighborShape =
+				neighborState.getOutlineShape(MC.world, neighbor);
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
+				neighborShape, neighborState) != null)
+				continue;
+			
+			side = sides[i];
+			break;
+		}
+		
+		if(side == null)
+			for(int i = 0; i < sides.length; i++)
+			{
+				// check if neighbor can be right clicked
+				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
+					continue;
+				
+				// check if side is facing away from player
+				if(distanceSqPosVec > eyesPos.squaredDistanceTo(hitVecs[i]))
+					continue;
+				
+				side = sides[i];
+				break;
+			}
+		
+		if(side == null)
+			return;
+		
+		Vec3d hitVec = hitVecs[side.ordinal()];
+		
+		// face block
+		// WURST.getRotationFaker().faceVectorPacket(hitVec);
+		// if(RotationUtils.getAngleToLastReportedLookVec(hitVec) > 1)
+		// return;
+		
+		// check timer
+		// if(IMC.getItemUseCooldown() > 0)
+		// return;
+		
+		// place block
+		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
+			side.getOpposite(), hitVec);
+		
+		// swing arm
+		MC.player.networkHandler
+			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		
+		// reset timer
+		IMC.setItemUseCooldown(4);
+	}
+	
+	@Override
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		if(!building || blockIndex >= positions.size())
+			return;
+		
+		// scale and offset
+		double scale = 1.0 * 7.0 / 8.0;
+		double offset = (1.0 - scale) / 2.0;
+		
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_LINE_SMOOTH);
+		GL11.glLineWidth(2F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		
+		GL11.glPushMatrix();
+		RenderUtils.applyRenderOffset(matrixStack);
+		
+		// green box
+		{
+			GL11.glDepthMask(false);
+			GL11.glColor4f(0, 1, 0, 0.15F);
+			BlockPos pos = positions.get(blockIndex);
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(offset, offset, offset);
+			GL11.glScaled(scale, scale, scale);
+			
+			RenderUtils.drawSolidBox(matrixStack);
+			
+			GL11.glPopMatrix();
+			GL11.glDepthMask(true);
+		}
+		
+		// black outlines
+		GL11.glColor4f(0, 0, 0, 0.5F);
+		for(int i = blockIndex; i < positions.size(); i++)
+		{
+			BlockPos pos = positions.get(i);
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(offset, offset, offset);
+			GL11.glScaled(scale, scale, scale);
+			
+			RenderUtils.drawOutlinedBox(matrixStack);
+			
+			GL11.glPopMatrix();
+		}
+		
+		GL11.glPopMatrix();
+		
+		// GL resets
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	public boolean selectBestSlot()
+	{
+		Inventory inventory = MC.player.getInventory();
+		int hasBlock = -1;
+		for(int slot = 0; slot < 9; slot++)
+		{
+		 	ItemStack stack = inventory.getStack(slot);
+
+			if(stack.getItem() == Items.OBSIDIAN)
+			{
+				MC.player.getInventory().selectedSlot = slot;
+				return true;
+			}
+		 	if(stack.getItem() instanceof BlockItem && useOtherBlocks.isChecked())
+			{
+				hasBlock = slot;
+			}
+		}
+		if(hasBlock != -1)
+		{
+			MC.player.getInventory().selectedSlot = hasBlock;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+/*
+package net.wurstclient.hacks;
+
+import java.util.ArrayList;
+
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
+import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
+
+@SearchTags({"auto hole", "feet protect", "protect foot", "crystal protection", "foot bunker"})
+public final class AutoHoleHack extends Hack
+	implements UpdateListener, RenderListener
+{
+	private final int[][] template = {{1, 0, 0}, {0, 0, 1}, {-1, 0, 0}, {0, 0, -1}};
+	private final ArrayList<BlockPos> positions = new ArrayList<>();
+	
+	private int blockIndex;
+	private boolean building;
+	private int startTimer;
+	private int hasTeleported;
+	private int prevSelected = -1;
+
+	private final CheckboxSetting center = new CheckboxSetting("Center", "Will teleport you to the center\nof where you are building to avoid stopping blocks from placing", true);
+	private final CheckboxSetting useOtherBlocks = new CheckboxSetting("Use other blocks", "Will use blocks other than obsidian if you are out", false);
+	
+	public AutoHoleHack()
+	{
+		super("AutoHole",
+			"Builds a hole around your feet. Needs 4 blocks. \nUseful in crystalPVP");
+		setCategory(Category.BLOCKS);
+		addSetting(center);
+		addSetting(useOtherBlocks);
+	}
+	
+	@Override
+	public void onEnable()
+	{
+		if(!MC.player.isOnGround())
+		{
+			ChatUtils.error("Can't build this in mid-air.");
+			setEnabled(false);
+			return;
+		}
+		
+		prevSelected = MC.player.getInventory().selectedSlot;
+
+		if(!selectBestSlot())//!(stack.getItem() instanceof BlockItem))
+		{
+			ChatUtils.error("You must have blocks in your hotbar.");
+			setEnabled(false);
+			return;
+		}
+		
+		if(center.isChecked())
+		{
+			MC.player.setPos(MC.player.getBlockPos().getX()+0.5, MC.player.getBlockPos().getY(), MC.player.getBlockPos().getZ()+0.5);
+			hasTeleported=0;
+		}
+		else
+		{
+			hasTeleported=2;
+		}
+
+		if(hasTeleported > 1)
+		{
+			ItemStack stack = MC.player.getMainHandStack();
+			if(stack.getCount() < 4 && !MC.player.isCreative())
+				ChatUtils.warning("Not enough blocks. hole may be incomplete.");
+		
+			// get start pos and facings
+			BlockPos startPos = new BlockPos(MC.player.getPos());
+			Direction facing = MC.player.getHorizontalFacing();
+			Direction facing2 = facing.rotateYCounterclockwise();
+		
+			// set positions
+			positions.clear();
+			for(int[] pos : template)
+				positions.add(startPos.up(pos[1]).offset(facing, pos[2])
+					.offset(facing2, pos[0]));
+		
+			if(!"".isEmpty())// mode.getSelected() == 1)
+			{
+				// initialize building process
+				blockIndex = 0;
+				building = true;
+				IMC.setItemUseCooldown(4);
+			}
+		
+			startTimer = 2;
+		}
+		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(RenderListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(RenderListener.class, this);
+		building = false;
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		System.out.println(hasTeleported);
+		if(hasTeleported > 0)
+		{
+			if(hasTeleported < 2)
+			{
+				hasTeleported++;
+				ItemStack stack = MC.player.getMainHandStack();
+				if(stack.getCount() < 4 && !MC.player.isCreative())
+					ChatUtils.warning("Not enough blocks. hole may be incomplete.");
+		
+				// get start pos and facings
+				BlockPos startPos = new BlockPos(MC.player.getPos());
+				Direction facing = MC.player.getHorizontalFacing();
+				Direction facing2 = facing.rotateYCounterclockwise();
+				
+				// set positions
+				positions.clear();
+				for(int[] pos : template)
+					positions.add(startPos.up(pos[1]).offset(facing, pos[2])
+						.offset(facing2, pos[0]));
+		
+				if(!"".isEmpty())// mode.getSelected() == 1)
+				{
+					// initialize building process
+					blockIndex = 0;
+					building = true;
+					IMC.setItemUseCooldown(4);
+				}
+		
+				startTimer = 2;
+			}
+			else
+			{
+				if(startTimer > 0)
+				{
+					startTimer--;
+					return;
+				}
+		
+				// build instantly
+				if(!building && startTimer <= 0)
+				{
+					for(BlockPos pos : positions)
+						if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+							&& !MC.player.getBoundingBox().intersects(new Box(pos)))
+							placeBlockSimple(pos);
+					MC.player.swingHand(Hand.MAIN_HAND);
+			
+					if(MC.player.isOnGround())
+					{
+						MC.player.getInventory().selectedSlot = prevSelected;
+						setEnabled(false);
+						return;
+					}
+				}
+		
+				// place next block
+				// if(blockIndex < positions.size() && (IMC.getItemUseCooldown() == 0
+				// || WURST.getHax().fastPlaceHack.isEnabled()))
+				// {
+				// BlockPos pos = positions.get(blockIndex);
+				//
+				// if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+				// {
+				// if(!BlockUtils.placeBlockLegit(pos))
+				// {
+				// BlockPos playerPos = new BlockPos(MC.player);
+				// if(MC.player.onGround
+				// && Math.abs(pos.getX() - playerPos.getX()) == 2
+				// && pos.getY() - playerPos.getY() == 2
+				// && Math.abs(pos.getZ() - playerPos.getZ()) == 2)
+				// MC.player.jump();
+				// }
+				// }else
+				// {
+				// blockIndex++;
+				// if(blockIndex == positions.size())
+				// {
+				// building = false;
+				// setEnabled(false);
+				// }
+				// }
+				// }
+			}
+		}
+		else
+		{
+			hasTeleported++;
+		}
+	}
+	
+	private void placeBlockSimple(BlockPos pos)
+	{
+		Direction side = null;
+		Direction[] sides = Direction.values();
+		
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d posVec = Vec3d.ofCenter(pos);
+		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		
+		Vec3d[] hitVecs = new Vec3d[sides.length];
+		for(int i = 0; i < sides.length; i++)
+			hitVecs[i] =
+				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
+		
+		for(int i = 0; i < sides.length; i++)
+		{
+			// check if neighbor can be right clicked
+			BlockPos neighbor = pos.offset(sides[i]);
+			if(!BlockUtils.canBeClicked(neighbor))
+				continue;
+			
+			// check line of sight
+			BlockState neighborState = BlockUtils.getState(neighbor);
+			VoxelShape neighborShape =
+				neighborState.getOutlineShape(MC.world, neighbor);
+			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
+				neighborShape, neighborState) != null)
+				continue;
+			
+			side = sides[i];
+			break;
+		}
+		
+		if(side == null)
+			for(int i = 0; i < sides.length; i++)
+			{
+				// check if neighbor can be right clicked
+				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
+					continue;
+				
+				// check if side is facing away from player
+				if(distanceSqPosVec > eyesPos.squaredDistanceTo(hitVecs[i]))
+					continue;
+				
+				side = sides[i];
+				break;
+			}
+		
+		if(side == null)
+			return;
+		
+		Vec3d hitVec = hitVecs[side.ordinal()];
+		
+		// face block
+		// WURST.getRotationFaker().faceVectorPacket(hitVec);
+		// if(RotationUtils.getAngleToLastReportedLookVec(hitVec) > 1)
+		// return;
+		
+		// check timer
+		// if(IMC.getItemUseCooldown() > 0)
+		// return;
+		
+		// place block
+		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
+			side.getOpposite(), hitVec);
+		
+		// swing arm
+		MC.player.networkHandler
+			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		
+		// reset timer
+		IMC.setItemUseCooldown(4);
+	}
+	
+	@Override
+	public void onRender(float partialTicks)
+	{
+		if(!building || blockIndex >= positions.size())
+			return;
+		
+		// scale and offset
+		double scale = 1.0 * 7.0 / 8.0;
+		double offset = (1.0 - scale) / 2.0;
+		
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_LINE_SMOOTH);
+		GL11.glLineWidth(2F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		
+		GL11.glPushMatrix();
+		RenderUtils.applyRenderOffset();
+		
+		// green box
+		{
+			GL11.glDepthMask(false);
+			GL11.glColor4f(0, 1, 0, 0.15F);
+			BlockPos pos = positions.get(blockIndex);
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(offset, offset, offset);
+			GL11.glScaled(scale, scale, scale);
+			
+			RenderUtils.drawSolidBox();
+			
+			GL11.glPopMatrix();
+			GL11.glDepthMask(true);
+		}
+		
+		// black outlines
+		GL11.glColor4f(0, 0, 0, 0.5F);
+		for(int i = blockIndex; i < positions.size(); i++)
+		{
+			BlockPos pos = positions.get(i);
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(offset, offset, offset);
+			GL11.glScaled(scale, scale, scale);
+			
+			RenderUtils.drawOutlinedBox();
+			
+			GL11.glPopMatrix();
+		}
+		
+		GL11.glPopMatrix();
+		
+		// GL resets
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	public boolean selectBestSlot()
+	{
+		Inventory inventory = MC.player.getInventory();
+		int hasBlock = -1;
+		for(int slot = 0; slot < 9; slot++)
+		{
+		 	ItemStack stack = inventory.getStack(slot);
+
+			if(stack.getItem() == Items.OBSIDIAN)
+			{
+				MC.player.getInventory().selectedSlot = slot;
+				return true;
+			}
+		 	if(stack.getItem() instanceof BlockItem && useOtherBlocks.isChecked())
+			{
+				hasBlock = slot;
+			}
+		}
+		if(hasBlock != -1)
+		{
+			MC.player.getInventory().selectedSlot = hasBlock;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+*/
+

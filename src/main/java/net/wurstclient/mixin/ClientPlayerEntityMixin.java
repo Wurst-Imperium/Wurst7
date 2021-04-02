@@ -36,6 +36,7 @@ import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
+import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
@@ -43,6 +44,7 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
+	private FreecamHack freeCam = WurstClient.INSTANCE.getHax().freecamHack;
 	@Shadow
 	private float lastYaw;
 	@Shadow
@@ -85,6 +87,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
+	}
+
+	@Inject(at = @At("INVOKE"), method = "pushOutOfBlocks", cancellable = true)
+	private void stopPush(CallbackInfo info)
+	{
+		if(freeCam.isEnabled())
+		{
+			info.cancel();
+		}
 	}
 	
 	@Redirect(at = @At(value = "INVOKE",

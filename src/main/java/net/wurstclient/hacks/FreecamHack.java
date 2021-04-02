@@ -21,6 +21,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
@@ -114,6 +115,9 @@ public final class FreecamHack extends Hack
 		player.setOnGround(false);
 		player.flyingSpeed = speed.getValueF();
 		Vec3d velcity = player.getVelocity();
+
+		if(player.getPose().equals(EntityPose.CROUCHING)||player.getPose().equals(EntityPose.SWIMMING))
+			player.setPose(EntityPose.STANDING);
 		
 		if(MC.options.keyJump.isPressed())
 			player.setVelocity(velcity.add(0, speed.getValue(), 0));
