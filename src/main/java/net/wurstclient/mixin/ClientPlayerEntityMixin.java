@@ -202,6 +202,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
+	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
+	{
+		Vec3d result = super.adjustMovementForSneaking(movement, type);
+		
+		if(movement != null)
+			WurstClient.INSTANCE.getHax().safeWalkHack
+				.onClipAtLedge(!movement.equals(result));
+		
+		return result;
+	}
+	
+	@Override
 	public boolean hasStatusEffect(StatusEffect effect)
 	{
 		FullbrightHack fullbright =
