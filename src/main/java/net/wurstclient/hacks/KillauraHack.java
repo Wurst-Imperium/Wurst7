@@ -62,7 +62,7 @@ public final class KillauraHack extends Hack
 	
 	private final SliderSetting hitDelay = new SliderSetting("Delay",
 			"Delay between hits",
-			12, 1, 18, 0.05, ValueDisplay.DECIMAL);
+			0, 1, 20, 0.1, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -130,6 +130,8 @@ public final class KillauraHack extends Hack
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
+
+	private int timer;
 	private Entity target;
 	private Entity renderTarget;
 	
@@ -276,11 +278,18 @@ public final class KillauraHack extends Hack
 		
 		WURST.getRotationFaker()
 			.faceVectorPacket(target.getBoundingBox().getCenter());
+		
+		// update timer
+		if(timer > 0) {
+			timer--;
+			return;
+		}
 	}
 	
 	@Override
 	public void onPostMotion()
 	{
+		if (timer > 0) return;
 		if(target == null)
 			return;
 		
@@ -289,6 +298,8 @@ public final class KillauraHack extends Hack
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 		
+		// start timer
+		timer = hitDelay.getValueI();
 		target = null;
 	}
 	
