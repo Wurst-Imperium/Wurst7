@@ -29,7 +29,7 @@ public final class SafeWalkHack extends Hack
 			"How far will you be from the edge of the\n"
 			+ "blocks before it keeps you from falling?\n\n"
 			+ "Good for making your speedbridging look legit.\n",
-			5, 1, 30, 1, ValueDisplay.PERCENTAGE);
+			5, 1, 30, 1, ValueDisplay.INTEGER);
 	
 	private boolean sneaking;
 	
@@ -68,7 +68,7 @@ public final class SafeWalkHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Box bb = player.getBoundingBox();
 		float stepHeight = player.stepHeight;
-		float dMaxDistance = maxDistance.getValueF();
+		float dMaxDistance = (maxDistance.getValueF() / 100);
 		
 		for(double x = -dMaxDistance; x <= dMaxDistance; x += dMaxDistance)
 			for(double z = -dMaxDistance; z <= dMaxDistance; z += dMaxDistance)
