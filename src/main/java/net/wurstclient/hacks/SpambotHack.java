@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.util.ChatUtil;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -15,8 +16,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 import java.time.LocalDateTime;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -75,8 +75,8 @@ public final class SpambotHack extends Hack implements UpdateListener {
 				.replaceAll("%date%", getDate("MM/dd/yyyy"))
 				.replaceAll("%time%", getDate("HH:mm:ss"))
 				.replaceAll("%rand%", "" + rand.nextInt(1000))
-				.replaceAll("%user%", MC.player.getEntityName())
-				.replaceAll("%ruser%", ((PlayerEntity) getRandomFrom(MC.player.networkHandler.getPlayerList())).getEntityName());
+				.replaceAll("%user%", MC.getSession().getProfile().getName())
+				.replaceAll("%ruser%", getRandomPlayer());
 		return newMessage;
 	}
 
@@ -85,8 +85,15 @@ public final class SpambotHack extends Hack implements UpdateListener {
 		LocalDateTime now = LocalDateTime.now();
 		return dtf.format(now);
 	}
-
-	private Object getRandomFrom(Collection<PlayerListEntry> from) {
-		return from.toArray()[rand.nextInt(from.size())];
+	
+	@SuppressWarnings("null")
+	public String getRandomPlayer() {
+		List<String> players = null;
+		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList()) {
+			String name = info.getProfile().getName();
+			name = ChatUtil.stripTextFormat(name);
+			
+			players.add(name);
+		} return (String) players.toArray()[rand.nextInt(players.size())];
 	}
 }
