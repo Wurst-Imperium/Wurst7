@@ -14,20 +14,28 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Random;
+import java.time.LocalDateTime;
+
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.entity.player.PlayerEntity;
 
 @SearchTags({ "spambot", "chatspam", "spammer" })
 public final class SpambotHack extends Hack implements UpdateListener {
+	private Random rand = new Random();
 	private int timer;
-	
+	public static String message = "If you see this, then the K-Client Spambot is working!"
+			+ "Make sure you check out the command help for .spam to customize the message.";
+
 	private final SliderSetting spamDelay = new SliderSetting("Speed",
-		"The message send rate of the spambot.\n"
-		+ "Lower = faster.",
-		6, 0, 60, 0.5, ValueDisplay.DECIMAL);
+			"The message send rate of the spambot.\n" + "Lower = faster.", 6, 0, 60, 0.5, ValueDisplay.DECIMAL);
 
 	public SpambotHack() {
-		super("SpambotHack", "Spams the chat!\n\n"
-				+ "Make sure you're using .say if your message.\n"
-				+ "starts with a dot.");
+		super("SpambotHack",
+				"Spams the chat!\n\n" + "Make sure you're using .say if your message.\n" + "starts with a dot.");
 		setCategory(Category.CHAT);
 		addSetting(spamDelay);
 	}
@@ -47,10 +55,11 @@ public final class SpambotHack extends Hack implements UpdateListener {
 	@Override
 	public void onUpdate() {
 		if (timer > 0) {
-			timer--; return;
+			timer--;
+			return;
 		}
-		
-		sendMessage("hi");
+
+		sendMessage(evaluateMessage(message));
 		timer = spamDelay.getValueI();
 	}
 
@@ -58,4 +67,25 @@ public final class SpambotHack extends Hack implements UpdateListener {
 		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
 		MC.getNetworkHandler().sendPacket(packet);
 	}
+
+	public String evaluateMessage(String message) {
+		// Turns all pseudocode into a real message
+		// str.replaceAll("(First)[^&]*(Second)", "$1foo$2");
+		String newMessage = message.replaceAll("%fulldate%", getDate("MM/dd/yyyy HH:mm:ss"))
+				.replaceAll("%date%", getDate("MM/dd/yyyy"))
+				.replaceAll("%time%", getDate("HH:mm:ss"))
+				.replaceAll("%rand%", "" + rand.nextInt(1000))
+				.replaceAll("%user%", MC.player.getEntityName())
+				.replaceAll("%ruser%", getRandomFrom(MC.player.networkHandler.getPlayerList()).getEntityName());
+		return newMessage;
+	}
+
+	public String getDate(String format) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+		LocalDateTime now = LocalDateTime.now();
+		return dtf.format(now);
+	}
+
+	private PlayerListEntry getRandomFrom(Collection<PlayerListEntry> from)
+		return (PlayerListEntry) from.toArray()[rand.nextInt(from.size())];
 }
