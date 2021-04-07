@@ -62,12 +62,16 @@ public final class KillauraHack extends Hack
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final SliderSetting hitDelay = new SliderSetting("Delay",
-			"Delay between hits",
+			"Delay between hits.\n"
+			+ "Set this to 0 for 1.9+ servers.",
 			0, 0, 20, 0.1, ValueDisplay.DECIMAL);
 	
-	private final SliderSetting ranDelay = new SliderSetting("Random CPS+",
-			"Range for the random added delay between hits.",
-			1, 0, 3, 0.1, ValueDisplay.DECIMAL);
+	private final SliderSetting ranDelay = new SliderSetting("CPS Spoofer",
+			"Range for the random added delay between hits.\n"
+			+ "THE DELAY ONLY ADDS NUMBERS!\n"
+			+ "It doesn't subtract randoms, so make sure\n"
+			+ "your non-random delay is your minimum.",
+			0.1, 0, 5, 0.1, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
