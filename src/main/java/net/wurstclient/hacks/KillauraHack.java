@@ -60,6 +60,10 @@ public final class KillauraHack extends Hack
 			+ "specified value will not be attacked.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
+	private final SliderSetting hitDelay = new SliderSetting("Delay",
+			"Delay between hits",
+			12, 1, 18, 0.05, ValueDisplay.DECIMAL);
+	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -134,6 +138,7 @@ public final class KillauraHack extends Hack
 		super("Killaura", "Automatically attacks entities around you.");
 		setCategory(Category.COMBAT);
 		addSetting(range);
+		addSetting(hitDelay);
 		addSetting(priority);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
