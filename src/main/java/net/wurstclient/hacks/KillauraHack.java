@@ -59,7 +59,7 @@ public final class KillauraHack extends Hack
 		"Determines how far Killaura will reach\n" + "to attack entities.\n"
 			+ "Anything that is further away than the\n"
 			+ "specified value will not be attacked.",
-		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+		0, 0, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final SliderSetting hitDelay = new SliderSetting("Delay",
 			"Delay between hits.\n"
