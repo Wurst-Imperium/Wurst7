@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
+import java.util.Random;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -62,7 +63,11 @@ public final class KillauraHack extends Hack
 	
 	private final SliderSetting hitDelay = new SliderSetting("Delay",
 			"Delay between hits",
-			0, 1, 20, 0.1, ValueDisplay.DECIMAL);
+			0, 0, 20, 0.1, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting ranDelay = new SliderSetting("Random CPS+",
+			"Range for the random added delay between hits.",
+			1, 0, 3, 0.1, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
