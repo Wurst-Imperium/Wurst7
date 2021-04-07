@@ -54,7 +54,7 @@ public enum BlockVertexCompiler
 			vertices.add(getVertex(pos, 1, 1, 0));
 		}
 		
-		if(!matchingBlocks.contains(pos.method_35861()))
+		if(!matchingBlocks.contains(pos.north()))
 		{
 			vertices.add(getVertex(pos, 0, 0, 0));
 			vertices.add(getVertex(pos, 0, 1, 0));
@@ -62,7 +62,7 @@ public enum BlockVertexCompiler
 			vertices.add(getVertex(pos, 1, 0, 0));
 		}
 		
-		if(!matchingBlocks.contains(pos.method_35855()))
+		if(!matchingBlocks.contains(pos.east()))
 		{
 			vertices.add(getVertex(pos, 1, 0, 0));
 			vertices.add(getVertex(pos, 1, 1, 0));
@@ -70,7 +70,7 @@ public enum BlockVertexCompiler
 			vertices.add(getVertex(pos, 1, 0, 1));
 		}
 		
-		if(!matchingBlocks.contains(pos.method_35859()))
+		if(!matchingBlocks.contains(pos.south()))
 		{
 			vertices.add(getVertex(pos, 0, 0, 1));
 			vertices.add(getVertex(pos, 1, 0, 1));
@@ -78,7 +78,7 @@ public enum BlockVertexCompiler
 			vertices.add(getVertex(pos, 0, 1, 1));
 		}
 		
-		if(!matchingBlocks.contains(pos.method_35857()))
+		if(!matchingBlocks.contains(pos.west()))
 		{
 			vertices.add(getVertex(pos, 0, 0, 0));
 			vertices.add(getVertex(pos, 0, 0, 1));

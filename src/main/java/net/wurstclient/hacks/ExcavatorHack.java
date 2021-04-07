@@ -411,8 +411,8 @@ public final class ExcavatorHack extends Hack
 			
 			// offset if sneaking
 			if(MC.options.keySneak.isPressed())
-				posLookingAt = posLookingAt.method_35851(
-					((BlockHitResult)MC.crosshairTarget).getSide());
+				posLookingAt = posLookingAt
+					.offset(((BlockHitResult)MC.crosshairTarget).getSide());
 			
 		}else
 			posLookingAt = null;
@@ -687,16 +687,14 @@ public final class ExcavatorHack extends Hack
 		{
 			BlockPos goal = getGoal();
 			
-			return done =
-				goal.down(2).equals(current) || goal.up().equals(current)
-					|| goal.method_35861().equals(current)
-					|| goal.method_35859().equals(current)
-					|| goal.method_35857().equals(current)
-					|| goal.method_35855().equals(current)
-					|| goal.down().method_35861().equals(current)
-					|| goal.down().method_35859().equals(current)
-					|| goal.down().method_35857().equals(current)
-					|| goal.down().method_35855().equals(current);
+			return done = goal.down(2).equals(current)
+				|| goal.up().equals(current) || goal.north().equals(current)
+				|| goal.south().equals(current) || goal.west().equals(current)
+				|| goal.east().equals(current)
+				|| goal.down().north().equals(current)
+				|| goal.down().south().equals(current)
+				|| goal.down().west().equals(current)
+				|| goal.down().east().equals(current);
 		}
 	}
 }

@@ -155,8 +155,8 @@ public final class NukerHack extends Hack
 		int blockRange = (int)Math.ceil(range.getValue());
 		
 		Vec3i rangeVec = new Vec3i(blockRange, blockRange, blockRange);
-		BlockPos min = eyesBlock.method_35852(rangeVec);
-		BlockPos max = eyesBlock.method_35853(rangeVec);
+		BlockPos min = eyesBlock.subtract(rangeVec);
+		BlockPos max = eyesBlock.add(rangeVec);
 		
 		ArrayList<BlockPos> blocks = BlockUtils.getAllInBox(min, max);
 		Stream<BlockPos> stream = blocks.parallelStream();

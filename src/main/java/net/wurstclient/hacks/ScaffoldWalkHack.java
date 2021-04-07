@@ -103,7 +103,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.method_35851(side);
+			BlockPos neighbor = pos.offset(side);
 			Direction side2 = side.getOpposite();
 			
 			// check if side is visible (facing away from player)

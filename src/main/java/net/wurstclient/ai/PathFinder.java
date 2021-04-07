@@ -132,15 +132,15 @@ public class PathFinder
 			return neighbors;
 		
 		// get all neighbors
-		BlockPos north = pos.method_35861();
-		BlockPos east = pos.method_35855();
-		BlockPos south = pos.method_35859();
-		BlockPos west = pos.method_35857();
+		BlockPos north = pos.north();
+		BlockPos east = pos.east();
+		BlockPos south = pos.south();
+		BlockPos west = pos.west();
 		
-		BlockPos northEast = north.method_35855();
-		BlockPos southEast = south.method_35855();
-		BlockPos southWest = south.method_35857();
-		BlockPos northWest = north.method_35857();
+		BlockPos northEast = north.east();
+		BlockPos southEast = south.east();
+		BlockPos southWest = south.west();
+		BlockPos northWest = north.west();
 		
 		BlockPos up = pos.up();
 		BlockPos down = pos.down();
@@ -220,9 +220,9 @@ public class PathFinder
 	private boolean checkDiagonalMovement(BlockPos current,
 		Direction direction1, Direction direction2)
 	{
-		BlockPos horizontal1 = current.method_35851(direction1);
-		BlockPos horizontal2 = current.method_35851(direction2);
-		BlockPos next = horizontal1.method_35851(direction2);
+		BlockPos horizontal1 = current.offset(direction1);
+		BlockPos horizontal2 = current.offset(direction2);
+		BlockPos next = horizontal1.offset(direction2);
 		
 		if(isPassable(horizontal1) && isPassable(horizontal2)
 			&& checkHorizontalMovement(current, next))
@@ -364,11 +364,10 @@ public class PathFinder
 		
 		// check if any adjacent block is solid
 		BlockPos up = pos.up();
-		if(!canBeSolid(pos.method_35861()) && !canBeSolid(pos.method_35855())
-			&& !canBeSolid(pos.method_35859())
-			&& !canBeSolid(pos.method_35857()) && !canBeSolid(up.method_35861())
-			&& !canBeSolid(up.method_35855()) && !canBeSolid(up.method_35859())
-			&& !canBeSolid(up.method_35857()))
+		if(!canBeSolid(pos.north()) && !canBeSolid(pos.east())
+			&& !canBeSolid(pos.south()) && !canBeSolid(pos.west())
+			&& !canBeSolid(up.north()) && !canBeSolid(up.east())
+			&& !canBeSolid(up.south()) && !canBeSolid(up.west()))
 			return false;
 		
 		return true;

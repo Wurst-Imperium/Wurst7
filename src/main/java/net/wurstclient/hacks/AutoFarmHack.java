@@ -310,10 +310,10 @@ public final class AutoFarmHack extends Hack
 			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
 		
 		if(item == Items.COCOA_BEANS)
-			return BlockUtils.getBlock(pos.method_35861()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.method_35855()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.method_35859()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.method_35857()) == Blocks.JUNGLE_LOG;
+			return BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG
+				|| BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG;
 		
 		return false;
 	}
@@ -379,7 +379,7 @@ public final class AutoFarmHack extends Hack
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check if neighbor can be right clicked
-			BlockPos neighbor = pos.method_35851(sides[i]);
+			BlockPos neighbor = pos.offset(sides[i]);
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
@@ -399,7 +399,7 @@ public final class AutoFarmHack extends Hack
 			for(int i = 0; i < sides.length; i++)
 			{
 				// check if neighbor can be right clicked
-				if(!BlockUtils.canBeClicked(pos.method_35851(sides[i])))
+				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
 					continue;
 				
 				// check if side is facing away from player
@@ -425,7 +425,7 @@ public final class AutoFarmHack extends Hack
 			return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.method_35851(side),
+		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
 			side.getOpposite(), hitVec);
 		
 		// swing arm

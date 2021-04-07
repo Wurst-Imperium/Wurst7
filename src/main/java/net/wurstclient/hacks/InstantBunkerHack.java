@@ -190,7 +190,7 @@ public final class InstantBunkerHack extends Hack
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check if neighbor can be right clicked
-			BlockPos neighbor = pos.method_35851(sides[i]);
+			BlockPos neighbor = pos.offset(sides[i]);
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
@@ -210,7 +210,7 @@ public final class InstantBunkerHack extends Hack
 			for(int i = 0; i < sides.length; i++)
 			{
 				// check if neighbor can be right clicked
-				if(!BlockUtils.canBeClicked(pos.method_35851(sides[i])))
+				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
 					continue;
 				
 				// check if side is facing away from player
@@ -236,7 +236,7 @@ public final class InstantBunkerHack extends Hack
 		// return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.method_35851(side),
+		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
 			side.getOpposite(), hitVec);
 		
 		// swing arm

@@ -570,7 +570,7 @@ public final class TunnellerHack extends Hack
 					continue;
 				
 				// check next blocks
-				BlockPos pos3 = pos.method_35851(direction);
+				BlockPos pos3 = pos.offset(direction);
 				if(!BlockUtils.getState(pos3).getFluidState().isEmpty())
 					liquids.add(pos3);
 				
@@ -609,7 +609,7 @@ public final class TunnellerHack extends Hack
 			BlockPos player = new BlockPos(MC.player.getPos());
 			KeyBinding forward = MC.options.keyForward;
 			
-			Vec3d diffVec = Vec3d.of(player.method_35852(start));
+			Vec3d diffVec = Vec3d.of(player.subtract(start));
 			Vec3d dirVec = Vec3d.of(direction.getVector());
 			double dotProduct = diffVec.dotProduct(dirVec);
 			
@@ -762,7 +762,7 @@ public final class TunnellerHack extends Hack
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check if neighbor can be right clicked
-			BlockPos neighbor = pos.method_35851(sides[i]);
+			BlockPos neighbor = pos.offset(sides[i]);
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
@@ -782,7 +782,7 @@ public final class TunnellerHack extends Hack
 			for(int i = 0; i < sides.length; i++)
 			{
 				// check if neighbor can be right clicked
-				if(!BlockUtils.canBeClicked(pos.method_35851(sides[i])))
+				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
 					continue;
 				
 				// check if side is facing away from player
@@ -808,7 +808,7 @@ public final class TunnellerHack extends Hack
 			return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.method_35851(side),
+		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
 			side.getOpposite(), hitVec);
 		
 		// swing arm

@@ -245,7 +245,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		// larger box for double chest
 		if(chestType != ChestType.SINGLE)
 		{
-			BlockPos pos2 = pos.method_35851(ChestBlock.getFacing(state));
+			BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
 			
 			if(BlockUtils.canBeClicked(pos2))
 			{

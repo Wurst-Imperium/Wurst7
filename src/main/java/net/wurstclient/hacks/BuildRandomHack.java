@@ -202,7 +202,7 @@ public final class BuildRandomHack extends Hack
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.method_35851(side);
+			BlockPos neighbor = pos.offset(side);
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))
@@ -253,7 +253,7 @@ public final class BuildRandomHack extends Hack
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.method_35851(side);
+			BlockPos neighbor = pos.offset(side);
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))

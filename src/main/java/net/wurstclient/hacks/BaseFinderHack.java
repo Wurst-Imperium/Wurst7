@@ -254,7 +254,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 1, 0);
 			}
 			
-			if(!matchingBlocks.contains(pos.method_35861()))
+			if(!matchingBlocks.contains(pos.north()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 0, 1, 0);
@@ -262,7 +262,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 0, 0);
 			}
 			
-			if(!matchingBlocks.contains(pos.method_35855()))
+			if(!matchingBlocks.contains(pos.east()))
 			{
 				addVertex(pos, 1, 0, 0);
 				addVertex(pos, 1, 1, 0);
@@ -270,7 +270,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 1, 0, 1);
 			}
 			
-			if(!matchingBlocks.contains(pos.method_35859()))
+			if(!matchingBlocks.contains(pos.south()))
 			{
 				addVertex(pos, 0, 0, 1);
 				addVertex(pos, 1, 0, 1);
@@ -278,7 +278,7 @@ public final class BaseFinderHack extends Hack
 				addVertex(pos, 0, 1, 1);
 			}
 			
-			if(!matchingBlocks.contains(pos.method_35857()))
+			if(!matchingBlocks.contains(pos.west()))
 			{
 				addVertex(pos, 0, 0, 0);
 				addVertex(pos, 0, 0, 1);
