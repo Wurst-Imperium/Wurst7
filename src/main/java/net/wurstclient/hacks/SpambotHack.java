@@ -25,7 +25,7 @@ import net.minecraft.client.network.PlayerListEntry;
 public final class SpambotHack extends Hack implements UpdateListener {
 	private Random rand = new Random();
 	private int timer;
-	public static String message = "If you see this, then the K-Client Spambot is working!"
+	public static String message = "If you see this, then the K-Client Spambot is working! "
 			+ "Make sure you check out the command help for .spam to customize the message.";
 
 	private final SliderSetting spamDelay = new SliderSetting("Speed",
@@ -69,7 +69,8 @@ public final class SpambotHack extends Hack implements UpdateListener {
 	public String evaluateMessage(String message) {
 		// Turns all pseudocode into a real message
 		// str.replaceAll("(First)[^&]*(Second)", "$1foo$2");
-		String newMessage = message.replaceAll("%fulldate%", getDate("MM/dd/yyyy HH:mm:ss"))
+		String newMessage = message.replaceAll("%%", "%")
+				.replaceAll("%fulldate%", getDate("MM/dd/yyyy HH:mm:ss"))
 				.replaceAll("%date%", getDate("MM/dd/yyyy"))
 				.replaceAll("%time%", getDate("HH:mm:ss"))
 				.replaceAll("%rand%", "" + rand.nextInt(1000))
