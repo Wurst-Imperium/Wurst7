@@ -5,6 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
+
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -15,26 +16,35 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"safe walk"})
-public final class SafeWalkHack extends Hack
+@SearchTags({"safe walk", "scaffoldwalk", "scaffold walk", "scaffoldlegit",
+	"legit", "speedbridge", "godbridge", "bridge", "bridging", "autobridge"})
+public final class ScaffoldLegitHack extends Hack
 {
 	private final CheckboxSetting sneak =
 		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
+	private final SliderSetting maxDistance = new SliderSetting("Maximum Distance to Edge",
+			"How much \"safety\" offset is taken into account?\n\n"
+			+ "Good for making your speedbridging look legit.\n",
+			5, 1, 60, 1, ValueDisplay.INTEGER);
 	
 	private boolean sneaking;
 	
-	public SafeWalkHack()
-	{
-		super("SafeWalk", "Prevents you from falling off edges.");
+	public ScaffoldLegitHack() {
+		super("ScaffoldLegit", "SafeWalk modification designed for speedbridging.\n"
+				+ "Good alternative to Scaffoldwalk for high-risk situations");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
+		addSetting(maxDistance);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
 		WURST.getHax().parkourHack.setEnabled(false);
+		WURST.getHax().safeWalkHack.setEnabled(false);
 		sneaking = false;
 	}
 	
@@ -58,9 +68,10 @@ public final class SafeWalkHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Box bb = player.getBoundingBox();
 		float stepHeight = player.stepHeight;
+		float dMaxDistance = (maxDistance.getValueF() / 100);
 		
-		for(double x = -0.05; x <= 0.05; x += 0.05)
-			for(double z = -0.05; z <= 0.05; z += 0.05)
+		for(double x = -dMaxDistance; x <= dMaxDistance; x += dMaxDistance)
+			for(double z = -dMaxDistance; z <= dMaxDistance; z += dMaxDistance)
 				if(MC.world.isSpaceEmpty(player, bb.offset(x, -stepHeight, z)))
 					clipping = true;
 				
