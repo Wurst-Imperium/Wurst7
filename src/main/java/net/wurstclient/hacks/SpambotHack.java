@@ -29,13 +29,13 @@ public final class SpambotHack extends Hack implements UpdateListener {
 				+ "Make sure you're using .say if your message.\n"
 				+ "starts with a dot.");
 		setCategory(Category.CHAT);
-		addSetting(spamDelay)
+		addSetting(spamDelay);
 	}
 
 	@Override
 	public void onEnable() {
 		EVENTS.add(UpdateListener.class, this);
-		timer = spamDelay.getValueI()
+		timer = spamDelay.getValueI();
 	}
 
 	@Override
@@ -47,8 +47,11 @@ public final class SpambotHack extends Hack implements UpdateListener {
 	@Override
 	public void onUpdate() {
 		if (timer > 0) {
-			timer--; return
-		} sendMessage("hi");
+			timer--; return;
+		}
+		
+		sendMessage("hi");
+		timer = spamDelay.getValueI();
 	}
 
 	public void sendMessage(String message) {
