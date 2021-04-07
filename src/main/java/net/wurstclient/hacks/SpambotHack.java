@@ -19,9 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalDateTime;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.entity.player.PlayerEntity;
 
 @SearchTags({ "spambot", "chatspam", "spammer" })
 public final class SpambotHack extends Hack implements UpdateListener {
@@ -86,14 +84,12 @@ public final class SpambotHack extends Hack implements UpdateListener {
 		return dtf.format(now);
 	}
 	
-	@SuppressWarnings("null")
-	public String getRandomPlayer() {
-		List<String> players = null;
+	private String getRandomPlayer() {
+		final ArrayList<String> players = new ArrayList<>();
 		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList()) {
 			String name = info.getProfile().getName();
-			name = ChatUtil.stripTextFormat(name);
 			
 			players.add(name);
-		} return (String) players.toArray()[rand.nextInt(players.size())];
+		} return players.get(rand.nextInt(players.size()));
 	}
 }
