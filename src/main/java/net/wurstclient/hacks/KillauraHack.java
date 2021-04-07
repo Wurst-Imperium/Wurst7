@@ -136,6 +136,7 @@ public final class KillauraHack extends Hack
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
 
+	private Random rand = new Random();
 	private int timer;
 	private Entity target;
 	private Entity renderTarget;
@@ -146,6 +147,7 @@ public final class KillauraHack extends Hack
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(hitDelay);
+		addSetting(ranDelay);
 		addSetting(priority);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -304,7 +306,7 @@ public final class KillauraHack extends Hack
 		player.swingHand(Hand.MAIN_HAND);
 		
 		// start timer
-		timer = hitDelay.getValueI();
+		timer = hitDelay.getValueI() + rand.nextInt(ranDelay.getValueI()+1);
 		target = null;
 	}
 	
