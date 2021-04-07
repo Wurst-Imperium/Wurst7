@@ -209,6 +209,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		if(movement != null)
 			WurstClient.INSTANCE.getHax().safeWalkHack
 				.onClipAtLedge(!movement.equals(result));
+			WurstClient.INSTANCE.getHax().scaffoldLegitHack
+				.onClipAtLedge(!movement.equals(result));
 		
 		return result;
 	}

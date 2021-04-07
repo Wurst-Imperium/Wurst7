@@ -24,7 +24,7 @@ public final class ScaffoldLegitHack extends Hack {
 	private final SliderSetting maxDistance = new SliderSetting("Maximum Distance to Edge",
 			"How much \"safety\" offset is taken into account?\n\n"
 			+ "Good for making your speedbridging look legit.\n",
-			5, 1, 60, 1, ValueDisplay.INTEGER);
+			45, 30, 70, 1, ValueDisplay.INTEGER);
 	
 	private boolean sneaking;
 	
