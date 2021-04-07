@@ -15,16 +15,12 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"safe walk", "scaffoldwalk", "scaffold walk", "scaffoldlegit",
 	"legit", "speedbridge", "godbridge", "bridge", "bridging", "autobridge"})
-public final class ScaffoldLegitHack extends Hack
-{
-	private final CheckboxSetting sneak =
-		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
+public final class ScaffoldLegitHack extends Hack {
 	private final SliderSetting maxDistance = new SliderSetting("Maximum Distance to Edge",
 			"How much \"safety\" offset is taken into account?\n\n"
 			+ "Good for making your speedbridging look legit.\n",
@@ -36,7 +32,6 @@ public final class ScaffoldLegitHack extends Hack
 		super("ScaffoldLegit", "SafeWalk modification designed for speedbridging.\n"
 				+ "Good alternative to Scaffoldwalk for high-risk situations");
 		setCategory(Category.MOVEMENT);
-		addSetting(sneak);
 		addSetting(maxDistance);
 	}
 	
@@ -55,13 +50,10 @@ public final class ScaffoldLegitHack extends Hack
 			setSneaking(false);
 	}
 	
-	public void onClipAtLedge(boolean clipping)
-	{
-		if(!isEnabled() || !sneak.isChecked())
-		{
+	public void onClipAtLedge(boolean clipping) {
+		if(!isEnabled()) {
 			if(sneaking)
 				setSneaking(false);
-			
 			return;
 		}
 		

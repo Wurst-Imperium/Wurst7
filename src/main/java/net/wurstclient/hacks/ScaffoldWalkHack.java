@@ -39,6 +39,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().scaffoldLegitHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
