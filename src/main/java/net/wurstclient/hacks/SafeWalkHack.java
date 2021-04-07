@@ -5,6 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
+
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -16,7 +17,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 
-@SearchTags({"safe walk"})
+@SearchTags({"safe walk", "scaffoldwalk", "scaffold walk", "scaffoldlegit",
+	"legit", "speedbridge", "godbridge", "bridge", "bridging", "autobridge"})
 public final class SafeWalkHack extends Hack
 {
 	private final CheckboxSetting sneak =
@@ -24,8 +26,7 @@ public final class SafeWalkHack extends Hack
 	
 	private boolean sneaking;
 	
-	public SafeWalkHack()
-	{
+	public SafeWalkHack() {
 		super("SafeWalk", "Prevents you from falling off edges.");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
