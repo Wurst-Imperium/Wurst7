@@ -76,7 +76,7 @@ public final class SpambotHack extends Hack implements UpdateListener {
 				.replaceAll("%time%", getDate("HH:mm:ss"))
 				.replaceAll("%rand%", "" + rand.nextInt(1000))
 				.replaceAll("%user%", MC.player.getEntityName())
-				.replaceAll("%ruser%", getRandomFrom(MC.player.networkHandler.getPlayerList()).getEntityName());
+				.replaceAll("%ruser%", ((PlayerEntity) getRandomFrom(MC.player.networkHandler.getPlayerList())).getEntityName());
 		return newMessage;
 	}
 
@@ -86,6 +86,7 @@ public final class SpambotHack extends Hack implements UpdateListener {
 		return dtf.format(now);
 	}
 
-	private PlayerListEntry getRandomFrom(Collection<PlayerListEntry> from)
-		return (PlayerListEntry) from.toArray()[rand.nextInt(from.size())];
+	private Object getRandomFrom(Collection<PlayerListEntry> from) {
+		return from.toArray()[rand.nextInt(from.size())];
+	}
 }
