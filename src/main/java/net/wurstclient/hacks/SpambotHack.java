@@ -33,7 +33,8 @@ public final class SpambotHack extends Hack implements UpdateListener {
 
 	public SpambotHack() {
 		super("SpambotHack",
-				"Spams the chat!\n\n" + "Make sure you're using .say if your message.\n" + "starts with a dot.");
+				"Spams the chat!\n\n" + "Make sure you're using .say if your message\n"
+		+ "starts with a dot.");
 		setCategory(Category.CHAT);
 		addSetting(spamDelay);
 	}
