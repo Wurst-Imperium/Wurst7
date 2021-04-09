@@ -61,8 +61,8 @@ public final class GlideHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onUpdate()
-	{
+	public void onUpdate() {
+		if (MC.options.keySneak.isPressed()) return;
 		ClientPlayerEntity player = MC.player;
 		Vec3d v = player.getVelocity();
 		
