@@ -20,10 +20,15 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.WurstClient;
 
+import java.util.regex.Pattern;
+
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractParentElement
 	implements TickableElement, Drawable
 {
+	private static final Pattern UUID_PATTERN = Pattern.compile("^<<(.{36})>>");
+	private static final String CMD_PREFIX = ".";
+
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
 		ordinal = 0),
@@ -34,10 +39,24 @@ public abstract class ScreenMixin extends AbstractParentElement
 	{
 		if(toHud)
 			return;
-		
-		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
-		WurstClient.MC.getNetworkHandler().sendPacket(packet);
-		ci.cancel();
+
+		/*
+		 * Possible solution #1
+		 */
+		// Some Mods use a <<UUID>> prefix to cloak their commands from servers
+		// Allow those commands through
+		if (UUID_PATTERN.matcher(message).find())
+			return;
+
+
+		/*
+		 * Possible Solution #2
+		 */
+		if (message.startsWith(CMD_PREFIX)) {
+			ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
+			WurstClient.MC.getNetworkHandler().sendPacket(packet);
+			ci.cancel();
+		}
 	}
 	
 	@Inject(at = {@At("HEAD")},
