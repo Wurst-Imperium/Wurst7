@@ -29,7 +29,7 @@ public class DistCmd extends Command {
 
         if (Allcords.startsWith("cvt")){
 
-            String[] arrOfSTR = Allcords.split(":", 0); Allcords.split(":",0);
+            String[] arrOfSTR = Allcords.split(":", 0);
             String cordsWithSpace = arrOfSTR[1];
             String[] Cordsarray = cordsWithSpace.split(" ",0);
             if (Cordsarray.length < 2)
@@ -41,9 +41,9 @@ public class DistCmd extends Command {
 
             int netherX =  cvtX / 8;
             int netherZ = cvtZ / 8;
-            ChatUtils.message("Neter cords For "+ cvtX + " "+ cvtZ + " is " + netherX + " " + netherZ);
+            ChatUtils.message("Nether cords For "+ cvtX + " "+ cvtZ + " is " + netherX + " " + netherZ);
         }else {
-            String[] arrOfStr = Allcords.split(":", 0); Allcords.split(":",0);
+            String[] arrOfStr = Allcords.split(":", 0);
             String FromCord;
             String ToCord;
             FromCord = arrOfStr[0];
