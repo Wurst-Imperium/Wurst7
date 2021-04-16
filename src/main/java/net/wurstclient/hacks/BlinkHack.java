@@ -11,6 +11,7 @@ import java.util.ArrayDeque;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
@@ -19,6 +20,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
+@SearchTags({"LagSwitch", "lag switch"})
 public final class BlinkHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
