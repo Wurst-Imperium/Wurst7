@@ -21,7 +21,7 @@ public class DistCmd extends Command {
     public void call(String[] args) throws CmdException {
 
         if(args.length < 1)
-            throw new CmdError();
+            throw new CmdError("Enter Command Properly");
 
         String Allcords = String.join(" ", args);
         if(!Allcords.contains(":"))
