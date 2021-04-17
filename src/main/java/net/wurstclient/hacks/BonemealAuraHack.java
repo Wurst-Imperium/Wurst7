@@ -199,11 +199,12 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
+		Comparator<BlockPos> c = Comparator.<BlockPos> comparingDouble(
+			pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))).reversed();
+		
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.filter(validator).sorted(c)
 			.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 	
