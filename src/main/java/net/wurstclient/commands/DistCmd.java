@@ -1,94 +1,88 @@
+/*
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 package net.wurstclient.commands;
 
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.command.CmdException;
-import net.wurstclient.util.ChatUtils;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
-import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
-import java.lang.Math;
-
+import net.wurstclient.util.ChatUtils;
 
 public class DistCmd extends Command {
 
+    int fx;
+    int fz;
+    int tx;
+    int tz;
 
     public DistCmd() {
-        super("dist", "Gets Distance between 2 Cordinates\nYou can convert Overworld Cords To Nether cords With cvt:<x> <z>\n ", ".dist <x> <z>:<x> <z>", ".dist cvt:<x> <z>");
+        super("dist", "Gets Distance between 2 Coordinates\n ", ".dist <x> <z> <x> <z>", "Convert Overworld coordinates To Nether \ncoordinates .dist cvt <x> <z>");
     }
 
     @Override
     public void call(String[] args) throws CmdException {
-
-        if(args.length < 1)
+        if (args.length < 1)
             throw new CmdError("Enter Command Properly");
 
-        String Allcords = String.join(" ", args);
-        if(!Allcords.contains(":"))
-            throw new CmdError("Separate Cordinates With : ");
+        if (("cvt".equalsIgnoreCase(args[0]))) {
+            try {
+                int cvtX = Integer.parseInt(args[1]);
+                int cvtZ = Integer.parseInt(args[2]);
+                ChatUtils.message("Nether cords For " + cvtX + " " + cvtZ + " is " + cvtX / 8 + " " + cvtZ / 8);
 
-        if (Allcords.startsWith("cvt")){
-
-            String[] arrOfSTR = Allcords.split(":", 0);
-            String cordsWithSpace = arrOfSTR[1];
-            String[] Cordsarray = cordsWithSpace.split(" ",0);
-            if (Cordsarray.length < 2)
-                throw new CmdError("Provide Cordinates Properly");
-            int cvtX;
-            int cvtZ;
-            cvtX = Integer.parseInt(Cordsarray[0]);
-            cvtZ = Integer.parseInt(Cordsarray[1]);
-
-            int netherX =  cvtX / 8;
-            int netherZ = cvtZ / 8;
-            ChatUtils.message("Nether cords For "+ cvtX + " "+ cvtZ + " is " + netherX + " " + netherZ);
-        }else {
-            String[] arrOfStr = Allcords.split(":", 0);
-            String FromCord;
-            String ToCord;
-            FromCord = arrOfStr[0];
-            ToCord = arrOfStr[1];
-            String[] FromCordStrip = FromCord.split(" ",0);
-            String[] ToCordStrip = ToCord.split(" ", 0);
-            if (FromCordStrip.length < 2 || ToCordStrip.length < 2)
-                throw new CmdError("Provide Cordinates Properly");
-
-            int fx;
-            int fz;
-            int tx;
-            int tz;
-            if (FromCordStrip[0].equals("~")){
-                BlockPos playerPos = new BlockPos(MC.player.getPos());
-                fx = playerPos.getX();
-                fz = playerPos.getZ();
-
-            }else{
-                fx = Integer.parseInt(FromCordStrip[0]);
-                fz = Integer.parseInt(FromCordStrip[1]);
+            } catch (Exception e) {
+                throw new CmdError("Invalid Coordinates");
             }
-            if (ToCordStrip[0].equals("~")){
+
+        } else {
+
+            if (args.length <= 3) {
+                throw new CmdError("Invalid Coordinates");
+            }
+
+            if (args[0].equals("~")) {
                 BlockPos playerPos = new BlockPos(MC.player.getPos());
-                tx = playerPos.getX();
-                tz = playerPos.getZ();
+                fx = Math.round(playerPos.getX());
+                fz = Math.round(playerPos.getZ());
 
-            }else{
-                tx = Integer.parseInt(ToCordStrip[0]);
-                tz = Integer.parseInt(ToCordStrip[1]);
+            } else {
+                try {
+                    fx = Integer.parseInt(args[0]);
+                    fz = Integer.parseInt(args[1]);
+                } catch (Exception e) {
+                    throw new CmdError("Coordinates should be numbers only");
+                }
+            }
+            if (args[2].equals("~")) {
+                BlockPos playerPos = new BlockPos(MC.player.getPos());
+                tx = Math.round(playerPos.getX());
+                tz = Math.round(playerPos.getZ());
 
+            } else {
+                try {
+                    tx = Integer.parseInt(args[2]);
+                    tz = Integer.parseInt(args[3]);
+
+                } catch (Exception e) {
+                    throw new CmdError("Coordinates should be numbers only");
+                }
             }
             double dist;
-            dist=Math.sqrt((tx-fx)*(tx-fx) + (tz-fz)*(tz-fz));
-
-            int FinalDist = (int) Math.round(dist) + 1;
-
-            ChatUtils.message("Distance From " + Math.round(fx) + " " + Math.round(fz) +" To "+ Math.round(tx) +" "+ Math.round(tz)+ " is "  + FinalDist +  " Blocks Away");
+            try {
+                dist = Math.sqrt((tx - fx) * (tx - fx) + (tz - fz) * (tz - fz));
+                int FinalDist = (int) Math.round(dist) + 1;
+                ChatUtils.message("Distance From " + Math.round(fx) + " " + Math.round(fz) + " To " + Math.round(tx) + " " + Math.round(tz) + " is " + FinalDist + " Blocks Away");
+            } catch (Exception e) {
+                ChatUtils.message("Invalid Coordinates");
+            }
 
         }
-
-
-
     }
-
 }
 
 
