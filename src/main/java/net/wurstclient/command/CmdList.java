@@ -29,6 +29,7 @@ public final class CmdList
 	public final DigCmd digCmd = new DigCmd();
 	public final DropCmd dropCmd = new DropCmd();
 	public final DupeCmd dupeCmd = new DupeCmd();
+	public final DistCmd distCmd = new DistCmd();
 	public final EnabledHaxCmd enabledHaxCmd = new EnabledHaxCmd();
 	public final EnchantCmd enchantCmd = new EnchantCmd();
 	public final ExcavateCmd excavateCmd = new ExcavateCmd();
@@ -64,7 +65,7 @@ public final class CmdList
 	public final UnbindCmd unbindCmd = new UnbindCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
-	public final DistCmd distCmd = new DistCmd();
+	
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
