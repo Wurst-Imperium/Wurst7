@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixin;
 
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -49,6 +52,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private float lastPitch;
 	@Shadow
 	private ClientPlayNetworkHandler networkHandler;
+	@Shadow
+	@Final
+	protected MinecraftClient client;
+	
+	private Screen tempCurrentScreen;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
 		GameProfile gameProfile_1)
@@ -128,17 +136,30 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cir.setReturnValue(false);
 	}
 	
-	@Redirect(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/screen/Screen;isPauseScreen()Z",
-			ordinal = 0),
-		method = {"updateNausea()V"})
-	private boolean onUpdateNausea(Screen screen)
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0), method = {"updateNausea()V"})
+	private void beforeUpdateNausea(CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
-			return true;
+		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
+			return;
 		
-		return screen.isPauseScreen();
+		tempCurrentScreen = client.currentScreen;
+		client.currentScreen = null;
+	}
+	
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 1), method = {"updateNausea()V"})
+	private void afterUpdateNausea(CallbackInfo ci)
+	{
+		if(tempCurrentScreen == null)
+			return;
+		
+		client.currentScreen = tempCurrentScreen;
+		tempCurrentScreen = null;
 	}
 	
 	@Override
@@ -178,6 +199,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		return super.clipAtLedge()
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+	}
+	
+	@Override
+	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
+	{
+		Vec3d result = super.adjustMovementForSneaking(movement, type);
+		
+		if(movement != null)
+			WurstClient.INSTANCE.getHax().safeWalkHack
+				.onClipAtLedge(!movement.equals(result));
+		
+		return result;
 	}
 	
 	@Override
