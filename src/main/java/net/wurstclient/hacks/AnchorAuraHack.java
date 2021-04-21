@@ -218,7 +218,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(!unchargedAnchors.isEmpty())
+		if(!unchargedAnchors.isEmpty()
+			&& hasItem(item -> item == Items.GLOWSTONE))
 		{
 			charge(unchargedAnchors);
 			// TODO: option to wait until next tick?
@@ -226,13 +227,14 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(!autoPlace.isChecked())
+		if(!autoPlace.isChecked()
+			|| !hasItem(item -> item == Items.RESPAWN_ANCHOR))
 			return;
 		
 		ArrayList<Entity> targets = getNearbyTargets();
 		ArrayList<BlockPos> newAnchors = placeAnchorsNear(targets);
 		
-		if(!newAnchors.isEmpty())
+		if(!newAnchors.isEmpty() && hasItem(item -> item == Items.GLOWSTONE))
 		{
 			// TODO: option to wait until next tick?
 			charge(newAnchors);
@@ -271,7 +273,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		selectItem(item -> item != Items.GLOWSTONE);
+		if(!selectItem(item -> item != Items.GLOWSTONE))
+			return;
 		
 		boolean shouldSwing = false;
 		
@@ -288,7 +291,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		selectItem(item -> item == Items.GLOWSTONE);
+		if(!selectItem(item -> item == Items.GLOWSTONE))
+			return;
 		
 		boolean shouldSwing = false;
 		
@@ -300,7 +304,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			MC.player.swingHand(Hand.MAIN_HAND);
 	}
 	
-	private void selectItem(Predicate<Item> item)
+	private boolean selectItem(Predicate<Item> item)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
@@ -309,7 +313,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		for(int slot = 0; slot < maxInvSlot; slot++)
 		{
 			ItemStack stack = inventory.getStack(slot);
-			if(stack.isEmpty() || !item.test(stack.getItem()))
+			if(!item.test(stack.getItem()))
 				continue;
 			
 			if(slot < 9)
@@ -327,8 +331,27 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				im.windowClick_PICKUP(inventory.selectedSlot + 36);
 			}
 			
-			return;
+			return true;
 		}
+		
+		return false;
+	}
+	
+	private boolean hasItem(Predicate<Item> item)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
+		
+		for(int slot = 0; slot < maxInvSlot; slot++)
+		{
+			ItemStack stack = inventory.getStack(slot);
+			if(!item.test(stack.getItem()))
+				continue;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private boolean rightClickBlock(BlockPos pos)
@@ -401,9 +424,10 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
-			faceBlocks.getSelected().face(hitVec);
+			if(!selectItem(item -> item == Items.RESPAWN_ANCHOR))
+				return false;
 			
-			selectItem(item -> item == Items.RESPAWN_ANCHOR);
+			faceBlocks.getSelected().face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,
