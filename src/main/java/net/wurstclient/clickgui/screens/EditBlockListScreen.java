@@ -162,12 +162,13 @@ public final class EditBlockListScreen extends Screen
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 300);
+		
 		blockNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
-		GL11.glTranslated(0, 0, 300);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
 			drawStringWithShadow(matrixStack, client.textRenderer,

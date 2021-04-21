@@ -11,9 +11,11 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
 public enum RenderUtils
@@ -43,6 +45,31 @@ public enum RenderUtils
 		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
 	}
 	
+	public static void applyRegionalRenderOffset()
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
+		BlockPos blockPos = getCameraBlockPos();
+		
+		int regionX = (blockPos.getX() >> 9) * 512;
+		int regionZ = (blockPos.getZ() >> 9) * 512;
+		
+		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
+	}
+	
+	public static void applyRegionalRenderOffset(Chunk chunk)
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
+		
+		int regionX = (chunk.getPos().getStartX() >> 9) * 512;
+		int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
+		
+		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
+	}
+	
 	public static void applyCameraRotationOnly()
 	{
 		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
@@ -54,6 +81,11 @@ public enum RenderUtils
 	public static Vec3d getCameraPos()
 	{
 		return BlockEntityRenderDispatcher.INSTANCE.camera.getPos();
+	}
+	
+	public static BlockPos getCameraBlockPos()
+	{
+		return BlockEntityRenderDispatcher.INSTANCE.camera.getBlockPos();
 	}
 	
 	public static void drawSolidBox()

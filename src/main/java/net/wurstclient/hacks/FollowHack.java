@@ -149,6 +149,10 @@ public final class FollowHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		if(entity == null)
 		{
 			Stream<Entity> stream =
@@ -175,7 +179,7 @@ public final class FollowHack extends Hack
 					
 					Box box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-					return MC.world.isSpaceEmpty(box);
+					return !MC.world.isSpaceEmpty(box);
 				});
 			
 			if(filterMonsters.isChecked())

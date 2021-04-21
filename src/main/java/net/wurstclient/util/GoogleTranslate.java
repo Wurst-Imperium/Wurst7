@@ -90,7 +90,7 @@ public class GoogleTranslate
 	
 	private String parseHTML(String html)
 	{
-		String regex = "class=\"t0\">([^<]*)<\\/div>";
+		String regex = "class=\"result-container\">([^<]*)<\\/div>";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		
 		Matcher matcher = pattern.matcher(html);

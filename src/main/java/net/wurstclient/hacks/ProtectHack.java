@@ -152,6 +152,9 @@ public final class ProtectHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().followHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
@@ -242,7 +245,7 @@ public final class ProtectHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
+				return !MC.world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
