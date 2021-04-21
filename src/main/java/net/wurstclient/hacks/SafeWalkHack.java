@@ -47,7 +47,7 @@ public final class SafeWalkHack extends Hack
 	
 	public void onClipAtLedge(boolean clipping)
 	{
-		if(!isEnabled() || !sneak.isChecked())
+		if(!isEnabled() || !sneak.isChecked() || !MC.player.isOnGround())
 		{
 			if(sneaking)
 				setSneaking(false);
