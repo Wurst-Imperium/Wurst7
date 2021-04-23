@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -151,12 +152,17 @@ public final class PotionCmd extends Command
 		if(MathUtils.isInteger(input))
 			id = Integer.parseInt(input);
 		else
-		{
-			StatusEffect effect =
-				Registry.STATUS_EFFECT.get(new Identifier(input));
-			
-			id = StatusEffect.getRawId(effect);
-		}
+			try
+			{
+				Identifier identifier = new Identifier(input);
+				StatusEffect effect = Registry.STATUS_EFFECT.get(identifier);
+				
+				id = StatusEffect.getRawId(effect);
+				
+			}catch(InvalidIdentifierException e)
+			{
+				throw new CmdSyntaxError("Invalid effect: " + input);
+			}
 		
 		if(id < 1)
 			throw new CmdSyntaxError();
