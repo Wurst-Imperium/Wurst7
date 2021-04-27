@@ -7,46 +7,44 @@
  */
 package net.wurstclient.altmanager;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameMode;
 
 public final class AltRenderer
 {
-	private static final HashSet<String> loadedSkins = new HashSet<>();
+	private static final HashMap<String, Identifier> loadedSkins =
+		new HashMap<>();
 	
 	private static void bindSkinTexture(String name)
 	{
-		Identifier location = AbstractClientPlayerEntity.getSkinId(name);
-		
-		if(loadedSkins.contains(name))
+		if(loadedSkins.get(name) == null)
 		{
-			RenderSystem.setShaderTexture(0, location);
-			return;
+			UUID uuid = PlayerEntity
+				.getUuidFromProfile(new GameProfile((UUID)null, name));
+			
+			PlayerListEntry entry = new PlayerListEntry(
+				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
+					GameMode.CREATIVE, new LiteralText(name)));
+			
+			loadedSkins.put(name, entry.getSkinTexture());
 		}
 		
-		// try
-		// {
-		// PlayerSkinTexture img =
-		// AbstractClientPlayerEntity.loadSkin(location, name);
-		// img.load(mc.getResourceManager());
-		//
-		// }catch(IOException e)
-		// {
-		// e.printStackTrace();
-		// }
-		
-		RenderSystem.setShaderTexture(0, location);
-		loadedSkins.add(name);
+		RenderSystem.setShaderTexture(0, loadedSkins.get(name));
 	}
 	
 	public static void drawAltFace(MatrixStack matrixStack, String name, int x,
