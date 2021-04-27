@@ -535,7 +535,6 @@ public final class AltManagerScreen extends Screen
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glEnable(GL11.GL_BLEND);
 				
@@ -544,8 +543,6 @@ public final class AltManagerScreen extends Screen
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
 				RenderSystem.setShaderColor(0, 1, 0, opacity);
-				
-				bufferBuilder.vertex(matrix, 0, 0, 0).next();
 				
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION);
@@ -556,7 +553,6 @@ public final class AltManagerScreen extends Screen
 				bufferBuilder.end();
 				BufferRenderer.draw(bufferBuilder);
 				
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);
 			}
