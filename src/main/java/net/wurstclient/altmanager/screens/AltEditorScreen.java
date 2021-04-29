@@ -105,7 +105,7 @@ public abstract class AltEditorScreen extends Screen
 			String stars = "";
 			for(int i = 0; i < text.length(); i++)
 				stars += "*";
-			return OrderedText.styledString(stars, Style.EMPTY);
+			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
 		});
 		passwordBox.setMaxLength(256);
 		children.add(passwordBox);

@@ -71,6 +71,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void resetPlayerPosition()
 	{
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), method_36454(),
+			method_36455());
 	}
 }

@@ -145,7 +145,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		// calculate starting position
 		double arrowPosX = player.lastRenderX
 			+ (player.getX() - player.lastRenderX) * partialTicks
-			- Math.cos(Math.toRadians(player.yaw)) * 0.16;
+			- Math.cos(Math.toRadians(player.method_36454())) * 0.16;
 		
 		double arrowPosY = player.lastRenderY
 			+ (player.getY() - player.lastRenderY) * partialTicks
@@ -153,13 +153,13 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		double arrowPosZ = player.lastRenderZ
 			+ (player.getZ() - player.lastRenderZ) * partialTicks
-			- Math.sin(Math.toRadians(player.yaw)) * 0.16;
+			- Math.sin(Math.toRadians(player.method_36454())) * 0.16;
 		
 		// Motion factor. Arrows go faster than snowballs and all that...
 		double arrowMotionFactor = item instanceof RangedWeaponItem ? 1.0 : 0.4;
 		
-		double yaw = Math.toRadians(player.yaw);
-		double pitch = Math.toRadians(player.pitch);
+		double yaw = Math.toRadians(player.method_36454());
+		double pitch = Math.toRadians(player.method_36455());
 		
 		// calculate starting motion
 		double arrowMotionX =
