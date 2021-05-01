@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -157,6 +157,7 @@ public final class FightBotHack extends Hack
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		pathFinder = new EntityPathFinder(MC.player);
 		
@@ -205,7 +206,7 @@ public final class FightBotHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
+				return !MC.world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())

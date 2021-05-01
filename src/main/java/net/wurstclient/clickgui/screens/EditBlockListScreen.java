@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -162,12 +162,13 @@ public final class EditBlockListScreen extends Screen
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 300);
+		
 		blockNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
-		GL11.glTranslated(0, 0, 300);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
 			drawStringWithShadow(matrixStack, client.textRenderer,
