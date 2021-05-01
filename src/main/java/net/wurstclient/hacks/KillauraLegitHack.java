@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -195,7 +195,7 @@ public final class KillauraLegitHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.isSpaceEmpty(box);
+				return !world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
@@ -269,8 +269,9 @@ public final class KillauraLegitHack extends Hack
 			return true;
 		
 		// if not facing center, check if facing anything in boundingBox
-		return bb.raycast(eyesPos,
-			eyesPos.add(lookVec.multiply(range.getValue()))) != null;
+		return bb
+			.raycast(eyesPos, eyesPos.add(lookVec.multiply(range.getValue())))
+			.isPresent();
 	}
 	
 	private boolean faceVectorClient(Vec3d vec)
