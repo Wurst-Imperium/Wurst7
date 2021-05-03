@@ -63,7 +63,11 @@ public final class EditItemListScreen extends Screen {
 		children.add(itemNameField);
 
 		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30, 20, new LiteralText("Add"), b -> {
-			itemList.add(itemToAdd);
+			if (itemList.getSearchType() == null) {
+				itemList.add(itemToAdd);
+			} else {
+				itemList.add(itemNameField.getText());
+			}
 			itemNameField.setText("");
 		}));
 
@@ -80,11 +84,13 @@ public final class EditItemListScreen extends Screen {
 		addButton(doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20, new LiteralText("Done"),
 				b -> client.openScreen(prevScreen)));
 
-		addButton(searchTypeButton = new ButtonWidget(8, 8, 130, 20,
-				new LiteralText("Search Type: " + itemList.getSearchType().getCurrent()), b -> {
-					searchTypeButton.setMessage(new LiteralText("Search Type: " + itemList.getSearchType().getNext()));
-				}));
-
+		if (itemList.getSearchType() != null) {
+			addButton(searchTypeButton = new ButtonWidget(8, 8, 130, 20,
+					new LiteralText("Search Type: " + itemList.getSearchType().getCurrent()), b -> {
+						searchTypeButton
+								.setMessage(new LiteralText("Search Type: " + itemList.getSearchType().getNext()));
+					}));
+		}
 	}
 
 	@Override
@@ -136,6 +142,9 @@ public final class EditItemListScreen extends Screen {
 		itemNameField.tick();
 
 		itemToAdd = Registry.ITEM.get(getItemIDFromField());
+		if (itemList.getSearchType() == null) {
+			addButton.active = itemToAdd != null;
+		}
 
 		removeButton.active = listGui.selected >= 0 && listGui.selected < listGui.list.size();
 	}

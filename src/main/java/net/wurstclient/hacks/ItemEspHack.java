@@ -42,7 +42,7 @@ public final class ItemEspHack extends Hack
 					+ "\u00a7lFancy\u00a7r mode shows larger boxes\n" + "that look better.",
 			BoxSize.values(), BoxSize.FANCY);
 
-	private ItemListSetting itemSearch = new ItemListSetting("Search List",
+	private ItemListSetting itemSearch = new ItemListSetting(new SearchType(), "Search List",
 			"Use this to search for specific items!\n" + SearchType._DISABLED + ": Just marks everything\n"
 					+ SearchType._ITEMID + ": Consider the Id\n" + SearchType._NAME + ": Consider the name\n"
 					+ "(all are case sensitive)",

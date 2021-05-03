@@ -35,14 +35,25 @@ import net.wurstclient.util.SearchType;
 public final class ItemListSetting extends Setting {
 	private final ArrayList<String> itemNames = new ArrayList<>();
 	private final String[] defaultNames;
-	private final SearchType searchType = new SearchType();
+	private SearchType searchType = null;
 
 	public ItemListSetting(String name, String description, String... items) {
 		super(name, description);
-
 		Arrays.stream(items).parallel().map(s -> Registry.ITEM.get(new Identifier(s))).filter(Objects::nonNull)
 				.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted().forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
+	}
+
+	public ItemListSetting(SearchType sType, String name, String description, String... items) {
+		super(name, description);
+		searchType = sType;
+		Arrays.stream(items).parallel().map(s -> Registry.ITEM.get(new Identifier(s))).filter(Objects::nonNull)
+				.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted().forEachOrdered(s -> itemNames.add(s));
+		defaultNames = itemNames.toArray(new String[0]);
+	}
+
+	public void setSearchType(SearchType sType) {
+		this.searchType = sType;
 	}
 
 	public SearchType getSearchType() {
@@ -80,10 +91,8 @@ public final class ItemListSetting extends Setting {
 	}
 
 	public void add(String name) {
-
-		if (Collections.binarySearch(itemNames, name) >= 0) {
+		if (Collections.binarySearch(itemNames, name) >= 0)
 			return;
-		}
 
 		itemNames.add(name);
 		Collections.sort(itemNames);
