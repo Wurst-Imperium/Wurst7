@@ -239,7 +239,6 @@ public final class EditItemListScreen extends Screen {
 			}
 			ItemStack stack = new ItemStack(item);
 			TextRenderer fr = mc.textRenderer;
-
 			String displayName = renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);

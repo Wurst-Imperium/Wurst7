@@ -73,7 +73,11 @@ public final class ItemListSetting extends Setting {
 	}
 
 	private Identifier getRegistryId(String str) {
-		return Registry.ITEM.getId(Registry.ITEM.get(new Identifier(str.toLowerCase())));
+		try {
+			return Registry.ITEM.getId(Registry.ITEM.get(new Identifier(str.toLowerCase())));
+		} catch (Exception e) {
+			return Registry.ITEM.getId(Registry.ITEM.get(new Identifier("air")));
+		}
 	}
 
 	public List<String> getItemNames() {

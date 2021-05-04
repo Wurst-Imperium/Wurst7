@@ -43,9 +43,9 @@ public final class ItemEspHack extends Hack
 			BoxSize.values(), BoxSize.FANCY);
 
 	private ItemListSetting itemSearch = new ItemListSetting(new SearchType(), "Search List",
-			"Use this to search for specific items!\n" + SearchType._DISABLED + ": Just marks everything\n"
-					+ SearchType._ITEMID + ": Consider the Id\n" + SearchType._NAME + ": Consider the name\n"
-					+ "(all are case sensitive)",
+			"Use this to search for specific items!\n" + SearchType._DISABLED + ": Will disable the setting\n"
+					+ SearchType._ITEMID + ": Each input name is actually an item id\n" + SearchType._NAME
+					+ ": Each input name is the name of an item\n",
 			"");
 
 	private int itemBox;
