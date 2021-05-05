@@ -285,8 +285,8 @@ public final class KillauraLegitHack extends Hack
 		float oldYaw = MC.player.prevYaw;
 		float oldPitch = MC.player.prevPitch;
 		
-		MC.player.method_36456(limitAngleChange(oldYaw, rotation.getYaw(), 30));
-		MC.player.method_36457(rotation.getPitch());
+		MC.player.setYaw(limitAngleChange(oldYaw, rotation.getYaw(), 30));
+		MC.player.setPitch(rotation.getPitch());
 		
 		return Math.abs(oldYaw - rotation.getYaw())
 			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;

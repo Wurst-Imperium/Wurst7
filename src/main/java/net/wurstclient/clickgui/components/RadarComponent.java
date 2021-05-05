@@ -91,7 +91,7 @@ public final class RadarComponent extends Component
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
-			GL11.glRotated(180 + player.method_36454(), 0, 0, 1);
+			GL11.glRotated(180 + player.getYaw(), 0, 0, 1);
 		
 		float xa1 = 0;
 		float xa2 = 2;
@@ -147,8 +147,7 @@ public final class RadarComponent extends Component
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));
 			double angle;
 			if(hack.isRotateEnabled())
-				angle =
-					Math.toRadians(player.method_36454() - neededRotation - 90);
+				angle = Math.toRadians(player.getYaw() - neededRotation - 90);
 			else
 				angle = Math.toRadians(180 - neededRotation - 90);
 			double renderX = Math.sin(angle) * distance;

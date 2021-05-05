@@ -226,8 +226,7 @@ public final class BowAimbotHack extends Hack
 			- player.getZ();
 		
 		// set yaw
-		MC.player
-			.method_36456((float)Math.toDegrees(Math.atan2(posZ, posX)) - 90);
+		MC.player.setYaw((float)Math.toDegrees(Math.atan2(posZ, posX)) - 90);
 		
 		// calculate needed pitch
 		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
@@ -244,7 +243,7 @@ public final class BowAimbotHack extends Hack
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
 		else
-			MC.player.method_36457(neededPitch);
+			MC.player.setPitch(neededPitch);
 	}
 	
 	private Entity filterEntities(Stream<Entity> s)

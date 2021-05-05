@@ -47,7 +47,7 @@ public final class HeadRollHack extends Hack implements UpdateListener
 		float pitch = MathHelper.sin(timer * (float)Math.PI) * 90F;
 		
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(MC.player.method_36454(),
-				pitch, MC.player.isOnGround()));
+			new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(), pitch,
+				MC.player.isOnGround()));
 	}
 }
