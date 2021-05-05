@@ -414,7 +414,6 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
@@ -429,7 +428,6 @@ public final class AltManagerScreen extends Screen
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
 			errorTimer--;

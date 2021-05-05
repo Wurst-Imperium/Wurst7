@@ -293,7 +293,6 @@ public final class FeatureButton extends Component
 	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = feature.getName();
@@ -303,7 +302,6 @@ public final class FeatureButton extends Component
 		
 		tr.draw(matrixStack, name, tx, ty, 0xF0F0F0);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

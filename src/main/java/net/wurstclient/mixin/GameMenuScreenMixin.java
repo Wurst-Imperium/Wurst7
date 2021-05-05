@@ -92,7 +92,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);

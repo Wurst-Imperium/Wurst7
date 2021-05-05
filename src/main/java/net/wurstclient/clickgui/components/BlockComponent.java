@@ -114,14 +114,12 @@ public final class BlockComponent extends Component
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
 		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
 		
 		renderIcon(matrixStack, stack, x3, y1, true);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

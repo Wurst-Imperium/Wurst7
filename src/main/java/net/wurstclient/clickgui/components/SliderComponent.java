@@ -308,7 +308,6 @@ public final class SliderComponent extends Component
 		int y1, boolean renderAsDisabled)
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
@@ -318,7 +317,6 @@ public final class SliderComponent extends Component
 		tr.draw(matrixStack, name, x1, y1 + 2, color);
 		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

@@ -150,8 +150,6 @@ public abstract class NavigatorScreen extends Screen
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -187,7 +185,6 @@ public abstract class NavigatorScreen extends Screen
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
@@ -270,7 +267,6 @@ public abstract class NavigatorScreen extends Screen
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// outline
-		GL11.glLineWidth(1F);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
@@ -342,7 +338,6 @@ public abstract class NavigatorScreen extends Screen
 		
 		// outline
 		float yi1 = y1 + 0.1F;
-		GL11.glLineWidth(1F);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);

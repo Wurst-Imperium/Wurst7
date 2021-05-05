@@ -215,7 +215,6 @@ public final class CheckboxComponent extends Component
 	private void drawName(MatrixStack matrixStack, int x3, int y1)
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();
 		int tx = x3 + 2;
@@ -223,7 +222,6 @@ public final class CheckboxComponent extends Component
 		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
 		MC.textRenderer.draw(matrixStack, name, tx, ty, color);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

@@ -505,11 +505,9 @@ public class PathFinder
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
 		matrixStack.push();
@@ -521,7 +519,6 @@ public class PathFinder
 			int renderedThings = 0;
 			
 			// queue (yellow)
-			GL11.glLineWidth(2);
 			RenderSystem.setShaderColor(1, 1, 0, 0.75F);
 			for(PathPos element : queue.toArray())
 			{
@@ -533,7 +530,6 @@ public class PathFinder
 			}
 			
 			// processed (red)
-			GL11.glLineWidth(2);
 			for(Entry<PathPos, PathPos> entry : prevPosMap.entrySet())
 			{
 				if(renderedThings >= 5000)
@@ -552,14 +548,9 @@ public class PathFinder
 		
 		// path (blue)
 		if(debugMode)
-		{
-			GL11.glLineWidth(4);
 			RenderSystem.setShaderColor(0, 0, 1, 0.75F);
-		}else
-		{
-			GL11.glLineWidth(2);
+		else
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
-		}
 		for(int i = 0; i < path.size() - 1; i++)
 			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
 		
@@ -567,7 +558,6 @@ public class PathFinder
 		
 		// GL resets
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);

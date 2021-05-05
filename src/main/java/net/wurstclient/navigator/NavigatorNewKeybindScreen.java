@@ -137,10 +137,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		// title bar
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		drawCenteredString(matrixStack, client.textRenderer, "New Keybind",
 			middleX, 32, 0xffffff);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -188,19 +186,16 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				drawBox(matrixStack, x1, y1, x2, y2);
 				
 				// text
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getDescription(), x1 + 1, y1 + 1, 0xffffff);
 				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getCommand(), x1 + 1,
 					y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_BLEND);
 			}
 		}
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
@@ -232,11 +227,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);

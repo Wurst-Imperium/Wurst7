@@ -108,8 +108,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		// GL settings
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
@@ -128,7 +126,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
@@ -154,9 +151,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 					e.getHeight() + extraSize, e.getWidth() + extraSize);
 				
 				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				GL11.glDisable(GL11.GL_LIGHTING);
 				RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 				RenderUtils.drawOutlinedBox(matrixStack,
 					new Box(-0.5, 0, -0.5, 0.5, 1, 0.5));
@@ -183,7 +178,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		int regionX, int regionZ)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 		

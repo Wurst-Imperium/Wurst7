@@ -264,7 +264,6 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		int y1)
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
@@ -273,7 +272,6 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		tr.draw(matrixStack, name, x1, y1 + 2, color);
 		tr.draw(matrixStack, value, x4 + 2, y1 + 2, color);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

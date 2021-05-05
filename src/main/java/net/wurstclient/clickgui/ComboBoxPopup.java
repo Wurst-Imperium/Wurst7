@@ -153,9 +153,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		Enum<?> value)
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

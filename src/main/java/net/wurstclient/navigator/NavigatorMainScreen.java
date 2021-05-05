@@ -241,11 +241,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// search bar
 		if(!clickTimerRunning)
 		{
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			WurstClient.MC.textRenderer.draw(matrixStack, "Search: ",
 				middleX - 150, 32, 0xffffff);
 			searchBar.render(matrixStack, mouseX, mouseY, partialTicks);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -301,7 +299,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// background
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				0.75F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -327,7 +324,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			BufferRenderer.draw(bufferBuilder);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(matrixStack, lines[i], xt1 + 2,
 					yt1 + 1 + i * fr.fontHeight, 0xffffff);
@@ -459,7 +455,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		BufferRenderer.draw(bufferBuilder);
 		
 		// arrow shadow
-		GL11.glLineWidth(1);
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
@@ -473,11 +468,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// text
 		if(!clickTimerRunning)
 		{
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			String buttonText = feature.getName();
 			client.textRenderer.draw(matrixStack, buttonText, area.x + 4,
 				area.y + 4, 0xffffff);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}

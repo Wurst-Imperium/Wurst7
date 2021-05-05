@@ -459,7 +459,6 @@ public final class ClickGui
 		updateColors();
 		
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// GL11.glShadeModel(GL11.GL_SMOOTH);
@@ -491,11 +490,9 @@ public final class ClickGui
 			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
 		}
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		renderPopupsAndTooltip(matrixStack, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
@@ -553,7 +550,6 @@ public final class ClickGui
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// background
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				0.75F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -579,7 +575,6 @@ public final class ClickGui
 			BufferRenderer.draw(bufferBuilder);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(matrixStack, lines[i], xt1 + 2,
 					yt1 + 2 + i * fr.fontHeight, 0xffffff);
@@ -641,8 +636,6 @@ public final class ClickGui
 		
 		if(mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2)
 			tooltip = "";
-		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		if(!window.isMinimized())
 		{
@@ -891,7 +884,6 @@ public final class ClickGui
 		BufferRenderer.draw(bufferBuilder);
 		
 		// window title
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = MC.textRenderer;
 		String title =

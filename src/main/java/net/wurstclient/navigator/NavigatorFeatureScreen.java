@@ -316,10 +316,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		// title bar
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, 0xffffff);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -351,7 +349,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int windowY = bgy1 + scroll + window.getY();
 		matrixStack.push();
 		matrixStack.translate(bgx1, windowY, 0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		{
 			int x1 = 0;
@@ -454,17 +451,14 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
@@ -479,7 +473,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		matrixStack.push();
 		matrixStack.translate(bgx1, bgy1 + scroll - 13, 0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
 			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
 		matrixStack.pop();
@@ -509,11 +502,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			drawCenteredString(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
@@ -522,7 +513,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
