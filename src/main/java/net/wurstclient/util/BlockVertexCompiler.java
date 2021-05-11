@@ -30,7 +30,24 @@ public enum BlockVertexCompiler
 	{
 		return () -> blocks.parallelStream()
 			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
+	}
+	
+	public static Callable<ArrayList<int[]>> createTask(
+		HashSet<BlockPos> blocks, int regionX, int regionZ)
+	{
+		return () -> blocks.parallelStream()
+			.flatMap(pos -> getVertices(pos, blocks).stream())
+			.map(v -> applyRegionOffset(v, regionX, regionZ))
+			.collect(Collectors.toCollection(ArrayList::new));
+	}
+	
+	private static int[] applyRegionOffset(int[] vertex, int regionX,
+		int regionZ)
+	{
+		vertex[0] -= regionX;
+		vertex[2] -= regionZ;
+		return vertex;
 	}
 	
 	private static ArrayList<int[]> getVertices(BlockPos pos,
