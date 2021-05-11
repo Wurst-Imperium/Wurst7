@@ -341,7 +341,7 @@ public final class AutoFishHack extends Hack
 		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
 			bobber.getZ() - regionZ);
 		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(matrixStack, validRangeBox);
+		RenderUtils.drawOutlinedBox(validRangeBox, matrixStack);
 		matrixStack.pop();
 	}
 	

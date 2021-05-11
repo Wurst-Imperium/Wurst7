@@ -80,7 +80,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		mobBox = new VertexBuffer();
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(mobBox, bb);
+		RenderUtils.drawOutlinedBox(bb, mobBox);
 	}
 	
 	@Override

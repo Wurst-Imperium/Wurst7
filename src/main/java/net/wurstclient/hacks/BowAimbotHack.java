@@ -353,11 +353,11 @@ public final class BowAimbotHack extends Hack
 		
 		// draw outline
 		RenderSystem.setShaderColor(1, 0, 0, 0.5F * velocity);
-		RenderUtils.drawOutlinedBox(matrixStack, TARGET_BOX);
+		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
 		
 		// draw box
 		RenderSystem.setShaderColor(1, 0, 0, 0.25F * velocity);
-		RenderUtils.drawSolidBox(matrixStack, TARGET_BOX);
+		RenderUtils.drawSolidBox(TARGET_BOX, matrixStack);
 		
 		matrixStack.pop();
 		

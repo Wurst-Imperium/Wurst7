@@ -80,8 +80,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			matrixStack.push();
 			matrixStack.translate(entity.getX(), entity.getY(), entity.getZ());
 			
-			RenderUtils.drawOutlinedBox(matrixStack, FAKE_BLOCK_BOX);
-			RenderUtils.drawSolidBox(matrixStack, FAKE_BLOCK_BOX);
+			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX, matrixStack);
+			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX, matrixStack);
 			
 			matrixStack.pop();
 		}

@@ -185,7 +185,7 @@ public final class FreecamHack extends Hack
 		matrixStack.scale(fakePlayer.getWidth() + 0.1F,
 			fakePlayer.getHeight() + 0.1F, fakePlayer.getWidth() + 0.1F);
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(matrixStack, bb);
+		RenderUtils.drawOutlinedBox(bb, matrixStack);
 		matrixStack.pop();
 		
 		// line

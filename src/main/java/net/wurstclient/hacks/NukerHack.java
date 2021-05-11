@@ -266,10 +266,10 @@ public final class NukerHack extends Hack
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(matrixStack, box);
+		RenderUtils.drawSolidBox(box, matrixStack);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(matrixStack, box);
+		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();
 		

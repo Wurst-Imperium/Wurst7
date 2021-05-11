@@ -180,7 +180,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			}
 			
 			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-			RenderUtils.drawOutlinedBox(matrixStack, bb);
+			RenderUtils.drawOutlinedBox(bb, matrixStack);
 			
 			matrixStack.pop();
 		}
