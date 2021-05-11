@@ -16,9 +16,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -26,6 +28,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -57,6 +60,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		"Filter invisible", "Won't show invisible mobs.", false);
 	
 	private final ArrayList<MobEntity> mobs = new ArrayList<>();
+	private VertexBuffer mobBox;
 	
 	public MobEspHack()
 	{
@@ -73,6 +77,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		
+		mobBox = new VertexBuffer();
+		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+		RenderUtils.drawOutlinedBox(mobBox, bb);
 	}
 	
 	@Override
@@ -81,6 +89,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		
+		if(mobBox != null)
+			mobBox.close();
 	}
 	
 	@Override
@@ -142,6 +153,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		int regionX, int regionZ)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		for(MobEntity e : mobs)
 		{
@@ -158,8 +170,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			float f = MC.player.distanceTo(e) / 20F;
 			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			
-			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-			RenderUtils.drawOutlinedBox(matrixStack, bb);
+			Shader shader = RenderSystem.getShader();
+			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
+			mobBox.setShader(matrixStack.peek().getModel(), matrix4f, shader);
 			
 			matrixStack.pop();
 		}
@@ -168,32 +181,42 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, double partialTicks,
 		int regionX, int regionZ)
 	{
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+			VertexFormats.POSITION_COLOR);
+		
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		
 		for(MobEntity e : mobs)
 		{
+			Vec3d interpolationOffset = new Vec3d(e.getX(), e.getY(), e.getZ())
+				.subtract(e.prevX, e.prevY, e.prevZ).multiply(1 - partialTicks);
+			
 			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
-					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks));
+				.subtract(interpolationOffset).subtract(regionX, 0, regionZ);
 			
 			float f = MC.player.distanceTo(e) / 20F;
-			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+			float r = MathHelper.clamp(2 - f, 0, 1);
+			float g = MathHelper.clamp(f, 0, 1);
 			
-			bufferBuilder.vertex(matrix, (float)start.x - regionX,
-				(float)start.y, (float)start.z - regionZ).next();
-			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
-				(float)end.z - regionZ).next();
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.color(r, g, 0, 0.5F).next();
+			
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.color(r, g, 0, 0.5F).next();
 		}
+		
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
+		
 	}
 	
 	private enum Style

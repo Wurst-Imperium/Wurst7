@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -197,6 +198,51 @@ public enum RenderUtils
 		BufferRenderer.draw(bufferBuilder);
 	}
 	
+	public static void drawSolidBox(VertexBuffer vertexBuffer, Box bb)
+	{
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		drawSolidBox(bufferBuilder, bb);
+		bufferBuilder.end();
+		
+		vertexBuffer.upload(bufferBuilder);
+	}
+	
+	public static void drawSolidBox(BufferBuilder bufferBuilder, Box bb)
+	{
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+	}
+	
 	public static void drawOutlinedBox(MatrixStack matrixStack)
 	{
 		drawOutlinedBox(matrixStack, DEFAULT_AABB);
@@ -295,6 +341,57 @@ public enum RenderUtils
 			.next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
+	}
+	
+	public static void drawOutlinedBox(VertexBuffer vertexBuffer, Box bb)
+	{
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		drawOutlinedBox(bufferBuilder, bb);
+		bufferBuilder.end();
+		
+		vertexBuffer.upload(bufferBuilder);
+	}
+	
+	public static void drawOutlinedBox(BufferBuilder bufferBuilder, Box bb)
+	{
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
 	}
 	
 	public static void drawCrossBox(MatrixStack matrixStack)
