@@ -12,6 +12,8 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -27,6 +29,7 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ListWidget;
+import net.wurstclient.util.MathUtils;
 
 public final class EditBlockListScreen extends Screen
 {
@@ -144,7 +147,13 @@ public final class EditBlockListScreen extends Screen
 	{
 		blockNameField.tick();
 		
-		blockToAdd = BlockUtils.getBlockFromName(blockNameField.getText());
+		String nameOrId = blockNameField.getText();
+		if(MathUtils.isInteger(nameOrId))
+			blockToAdd =
+				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
+		else
+			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
+		
 		addButton.active = blockToAdd != null;
 		
 		removeButton.active =
@@ -155,7 +164,6 @@ public final class EditBlockListScreen extends Screen
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		drawCenteredString(matrixStack, client.textRenderer,
@@ -174,19 +182,23 @@ public final class EditBlockListScreen extends Screen
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"block name or ID", 68, height - 50, 0x808080);
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
-		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 55, 216, height - 37, 0xff000000);
-		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
-		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd), 52,
-			height - 52, false);
+		int border = blockNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
+		
+		fill(matrixStack, 48, height - 56, 64, height - 36, border);
+		fill(matrixStack, 49, height - 55, 64, height - 37, black);
+		fill(matrixStack, 214, height - 56, 244, height - 55, border);
+		fill(matrixStack, 214, height - 37, 244, height - 36, border);
+		fill(matrixStack, 244, height - 56, 246, height - 36, border);
+		fill(matrixStack, 214, height - 55, 243, height - 52, black);
+		fill(matrixStack, 214, height - 40, 243, height - 37, black);
+		fill(matrixStack, 214, height - 55, 216, height - 37, black);
+		fill(matrixStack, 242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
+		
+		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd),
+			width / 2 - 164, height - 52, false);
 	}
 	
 	private static class ListGui extends ListWidget
@@ -236,14 +248,16 @@ public final class EditBlockListScreen extends Screen
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			ItemStack stack = new ItemStack(BlockUtils.getBlockFromName(name));
+			Block block = BlockUtils.getBlockFromName(name);
+			ItemStack stack = new ItemStack(block);
 			TextRenderer fr = mc.textRenderer;
 			
 			String displayName =
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + BlockUtils.getBlockFromName(name),
+			fr.draw(matrixStack,
+				"ID: " + Block.getRawIdFromState(block.getDefaultState()),
 				x + 28, y + 18, 0xa0a0a0);
 		}
 		
@@ -252,18 +266,21 @@ public final class EditBlockListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
+				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+				modelViewStack.push();
+				modelViewStack.translate(x, y, 0);
 				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
+					modelViewStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
+					modelViewStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
-				matrixStack.pop();
+				
+				modelViewStack.pop();
+				RenderSystem.applyModelViewMatrix();
 				
 				matrixStack.push();
 				matrixStack.translate(x, y, 0);
@@ -279,18 +296,20 @@ public final class EditBlockListScreen extends Screen
 				
 			}else
 			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
+				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+				modelViewStack.push();
+				modelViewStack.translate(x, y, 0);
 				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
+					modelViewStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
+					modelViewStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
 				
-				matrixStack.pop();
+				modelViewStack.pop();
+				RenderSystem.applyModelViewMatrix();
 				
 				return stack.getName().getString();
 			}
