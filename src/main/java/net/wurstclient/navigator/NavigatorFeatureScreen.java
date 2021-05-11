@@ -56,6 +56,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private ArrayList<ButtonData> buttonDatas = new ArrayList<>();
 	
 	private Window window = new Window("");
+	private int windowComponentY;
 	
 	public NavigatorFeatureScreen(Feature feature, NavigatorMainScreen parent)
 	{
@@ -147,7 +148,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(!settings.isEmpty())
 		{
 			text += "\n\nSettings:";
-			window.setY(getStringHeight(text) + 2);
+			windowComponentY = getStringHeight(text) + 2;
 			
 			for(int i = 0; i < Math.ceil(window.getInnerHeight() / 9.0); i++)
 				text += "\n";
@@ -283,7 +284,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
-			x - middleX + 154, y - 60 - scroll - window.getY(), button, window);
+			x - middleX + 154, y - 60 - scroll - windowComponentY, button,
+			window);
 	}
 	
 	private void goBack()
@@ -322,6 +324,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// background
 		int bgx1 = middleX - 154;
+		window.setX(bgx1);
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
@@ -329,11 +332,10 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		setColorToBackground();
 		drawQuads(matrixStack, bgx1, bgy1, bgx2,
 			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
-				bgy1 + scroll + window.getY())));
+				bgy1 + scroll + windowComponentY)));
 		drawQuads(matrixStack, bgx1,
-			Math.max(bgy1,
-				Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
-					bgy1 + scroll + window.getY() + window.getInnerHeight())),
+			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
+				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
@@ -346,7 +348,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		WurstClient.INSTANCE.getGui().setTooltip("");
 		window.validate();
 		
-		int windowY = bgy1 + scroll + window.getY();
+		int windowY = bgy1 + scroll + windowComponentY;
+		window.setY(windowY - 13);
 		matrixStack.push();
 		matrixStack.translate(bgx1, windowY, 0);
 		

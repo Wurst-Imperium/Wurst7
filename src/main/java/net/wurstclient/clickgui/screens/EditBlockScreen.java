@@ -10,6 +10,8 @@ package net.wurstclient.clickgui.screens;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
@@ -23,6 +25,7 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.MathUtils;
 
 public final class EditBlockScreen extends Screen
 {
@@ -65,8 +68,14 @@ public final class EditBlockScreen extends Screen
 	
 	private void done()
 	{
-		String value = blockField.getText();
-		Block block = BlockUtils.getBlockFromName(value);
+		Block block;
+		String nameOrId = blockField.getText();
+		
+		if(MathUtils.isInteger(nameOrId))
+			block =
+				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
+		else
+			block = BlockUtils.getBlockFromName(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -115,26 +124,42 @@ public final class EditBlockScreen extends Screen
 		
 		boolean lblAbove =
 			!blockField.getText().isEmpty() || blockField.isFocused();
-		String lblText = lblAbove ? "Block name or ID:" : "block name or ID";
+		String lblText =
+			lblAbove ? "Block ID or number:" : "block ID or number";
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
 		drawStringWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
-		fill(matrixStack, 48, -56, 64, -36, 0xffa0a0a0);
-		fill(matrixStack, 49, -55, 64, -37, 0xff000000);
-		fill(matrixStack, 214, -56, 244, -55, 0xffa0a0a0);
-		fill(matrixStack, 214, -37, 244, -36, 0xffa0a0a0);
-		fill(matrixStack, 244, -56, 246, -36, 0xffa0a0a0);
-		fill(matrixStack, 214, -55, 243, -52, 0xff000000);
-		fill(matrixStack, 214, -40, 243, -37, 0xff000000);
-		fill(matrixStack, 215, -55, 216, -37, 0xff000000);
-		fill(matrixStack, 242, -55, 245, -37, 0xff000000);
+		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
 		
-		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
-		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
+		fill(matrixStack, 48, -56, 64, -36, border);
+		fill(matrixStack, 49, -55, 64, -37, black);
+		fill(matrixStack, 214, -56, 244, -55, border);
+		fill(matrixStack, 214, -37, 244, -36, border);
+		fill(matrixStack, 244, -56, 246, -36, border);
+		fill(matrixStack, 214, -55, 243, -52, black);
+		fill(matrixStack, 214, -40, 243, -37, black);
+		fill(matrixStack, 215, -55, 216, -37, black);
+		fill(matrixStack, 242, -55, 245, -37, black);
 		
 		matrixStack.pop();
+		
+		Block blockToAdd;
+		String nameOrId = blockField.getText();
+		
+		if(MathUtils.isInteger(nameOrId))
+			blockToAdd =
+				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
+		else
+			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
+		
+		if(blockToAdd == null)
+			blockToAdd = Blocks.AIR;
+		
+		renderIcon(matrixStack, new ItemStack(blockToAdd),
+			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	
 	@Override
@@ -152,11 +177,12 @@ public final class EditBlockScreen extends Screen
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		matrixStack.push();
+		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.push();
 		
-		matrixStack.translate(x, y, 0);
+		modelViewStack.translate(x, y, 0);
 		float scale = large ? 1.5F : 0.75F;
-		matrixStack.scale(scale, scale, scale);
+		modelViewStack.scale(scale, scale, scale);
 		
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
@@ -165,7 +191,8 @@ public final class EditBlockScreen extends Screen
 			0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		matrixStack.pop();
+		modelViewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);

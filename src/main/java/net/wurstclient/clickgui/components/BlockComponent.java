@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,6 +28,7 @@ import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 
@@ -95,6 +97,8 @@ public final class BlockComponent extends Component
 		{
 			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);
 			tooltip += "\n\u00a76ID:\u00a7r " + setting.getBlockName();
+			tooltip += "\n\u00a76Block #:\u00a7r "
+				+ Block.getRawIdFromState(setting.getBlock().getDefaultState());
 			tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
 			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
 			gui.setTooltip(tooltip);
@@ -140,15 +144,16 @@ public final class BlockComponent extends Component
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		matrixStack.push();
+		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.push();
 		
-		matrixStack.translate(x, y, 0);
+		Window parent = getParent();
+		modelViewStack.translate(parent.getX(),
+			parent.getY() + 13 + parent.getScrollOffset(), 0);
+		modelViewStack.translate(x, y, 0);
 		float scale = large ? 1.5F : 0.75F;
-		// matrixStack.scale(scale, scale, scale);
-		matrixStack.scale(scale, scale, scale);
+		modelViewStack.scale(scale, scale, scale);
 		
-		// RenderSystem.enableTexture();
-		// RenderSystem.setShader(GameRenderer::method_34542);
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
@@ -156,7 +161,8 @@ public final class BlockComponent extends Component
 			0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		matrixStack.pop();
+		modelViewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);
