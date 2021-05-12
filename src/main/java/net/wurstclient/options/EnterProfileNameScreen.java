@@ -93,7 +93,7 @@ public final class EnterProfileNameScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			"Name your new profile", width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(matrixStack, mouseX, mouseY, partialTicks);

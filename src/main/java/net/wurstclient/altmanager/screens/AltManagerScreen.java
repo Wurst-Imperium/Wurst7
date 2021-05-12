@@ -402,11 +402,11 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
-			4, 16777215);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer, "Alt Manager", width / 2, 4,
+			16777215);
+		drawCenteredText(matrixStack, textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
-		drawCenteredString(
+		drawCenteredText(
 			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);

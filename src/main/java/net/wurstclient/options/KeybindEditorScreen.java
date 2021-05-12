@@ -97,7 +97,7 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		

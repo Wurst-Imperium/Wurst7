@@ -348,7 +348,7 @@ public abstract class AltEditorScreen extends Screen
 			width / 2 - 100, 47, 10526880);
 		drawStringWithShadow(matrixStack, textRenderer, "Password",
 			width / 2 - 100, 87, 10526880);
-		drawCenteredString(matrixStack, textRenderer, message, width / 2, 142,
+		drawCenteredText(matrixStack, textRenderer, message, width / 2, 142,
 			16777215);
 		
 		// text boxes

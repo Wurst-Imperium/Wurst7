@@ -318,7 +318,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		// title bar
-		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
+		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, 0xffffff);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -454,7 +454,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
@@ -508,7 +508,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);

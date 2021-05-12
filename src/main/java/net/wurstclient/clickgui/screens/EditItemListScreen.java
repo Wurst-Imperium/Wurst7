@@ -172,7 +172,7 @@ public final class EditItemListScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		

@@ -157,9 +157,9 @@ public final class KeybindManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, textRenderer, "Keybind Manager",
+		drawCenteredText(matrixStack, textRenderer, "Keybind Manager",
 			width / 2, 8, 0xffffff);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			"Keybinds: " + listGui.getItemCount(), width / 2, 20, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

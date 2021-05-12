@@ -118,7 +118,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		// title bar
-		drawCenteredString(matrixStack, client.textRenderer, "Remove Keybind",
+		drawCenteredText(matrixStack, client.textRenderer, "Remove Keybind",
 			middleX, 32, 0xffffff);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -210,7 +210,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);

@@ -211,15 +211,15 @@ public class ServerFinderScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredString(matrixStack, textRenderer, "Server Finder",
-			width / 2, 20, 16777215);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer, "Server Finder", width / 2,
+			20, 16777215);
+		drawCenteredText(matrixStack, textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
 			10526880);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			"to the IP you type into the field below.", width / 2, 50,
 			10526880);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, 10526880);
 		
@@ -231,8 +231,8 @@ public class ServerFinderScreen extends Screen
 			width / 2 - 100, height / 4 + 60, 10526880);
 		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, textRenderer, state.toString(),
-			width / 2, height / 4 + 73, 10526880);
+		drawCenteredText(matrixStack, textRenderer, state.toString(), width / 2,
+			height / 4 + 73, 10526880);
 		
 		drawStringWithShadow(matrixStack, textRenderer,
 			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,

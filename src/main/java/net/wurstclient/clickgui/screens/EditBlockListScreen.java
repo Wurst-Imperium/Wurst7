@@ -166,7 +166,7 @@ public final class EditBlockListScreen extends Screen
 	{
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
