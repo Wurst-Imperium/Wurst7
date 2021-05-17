@@ -15,13 +15,17 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 
 public final class PathRenderer
 {
 	public static void renderArrow(MatrixStack matrixStack, BlockPos start,
 		BlockPos end)
 	{
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
 		int startX = start.getX();
 		int startY = start.getY();
 		int startZ = start.getZ();
@@ -30,73 +34,64 @@ public final class PathRenderer
 		int endY = end.getY();
 		int endZ = end.getZ();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		
 		matrixStack.push();
+		Matrix4f matrix = matrixStack.peek().getModel();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		{
-			bufferBuilder.vertex(matrix, startX, startY, startZ).next();
-			bufferBuilder.vertex(matrix, endX, endY, endZ).next();
-		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		// main line
+		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
+		bufferBuilder.vertex(matrix, endX, endY, endZ).next();
 		
 		matrixStack.translate(endX, endY, endZ);
+		
 		float scale = 1 / 16F;
 		matrixStack.scale(scale, scale, scale);
 		
-		// GL11.glRotated(Math.toDegrees(Math.atan2(endY - startY, startZ -
-		// endZ)) + 90, 1, 0, 0);
-		matrixStack.multiply(new Quaternion(1, 0, 0,
-			(float)(Math.toDegrees(Math.atan2(endY - startY, startZ - endZ))
-				+ 90)));
-		// GL11.glRotated(Math.toDegrees(Math.atan2(endX - startX,
-		// Math.sqrt(Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2)))),
-		// 0, 0, 1);
-		matrixStack.multiply(new Quaternion(0, 0, 1,
-			(float)Math.toDegrees(Math.atan2(endX - startX, Math.sqrt(
-				Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2))))));
+		int xDiff = endX - startX;
+		int yDiff = endY - startY;
+		int zDiff = endZ - startZ;
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		{
-			bufferBuilder.vertex(matrix, 0, 2, 1).next();
-			bufferBuilder.vertex(matrix, -1, 2, 0).next();
-			
-			bufferBuilder.vertex(matrix, -1, 2, 0).next();
-			bufferBuilder.vertex(matrix, 0, 2, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, 2, -1).next();
-			bufferBuilder.vertex(matrix, 1, 2, 0).next();
-			
-			bufferBuilder.vertex(matrix, 1, 2, 0).next();
-			bufferBuilder.vertex(matrix, 0, 2, 1).next();
-			
-			bufferBuilder.vertex(matrix, 1, 2, 0).next();
-			bufferBuilder.vertex(matrix, -1, 2, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, 2, 1).next();
-			bufferBuilder.vertex(matrix, 0, 2, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, 1, 2, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, -1, 2, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, 0, 2, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, 0, 2, 1).next();
-		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
+		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		
+		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
+		float zAngle = (float)Math.atan2(xDiff, yzDiff);
+		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		
+		// arrow head
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		
 		matrixStack.pop();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	public static void renderNode(MatrixStack matrixStack, BlockPos pos)
@@ -111,46 +106,46 @@ public final class PathRenderer
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
-		{
-			// middle part
-			bufferBuilder.vertex(matrix, 0, 0, 1).next();
-			bufferBuilder.vertex(matrix, -1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, -1, 0, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, 0, -1).next();
-			bufferBuilder.vertex(matrix, 1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, 1, 0, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, 1).next();
-			
-			// top part
-			bufferBuilder.vertex(matrix, 0, 1, 0).next();
-			bufferBuilder.vertex(matrix, 1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, 1, 0).next();
-			bufferBuilder.vertex(matrix, -1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, 1, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, 1, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, 1).next();
-			
-			// bottom part
-			bufferBuilder.vertex(matrix, 0, -1, 0).next();
-			bufferBuilder.vertex(matrix, 1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, -1, 0).next();
-			bufferBuilder.vertex(matrix, -1, 0, 0).next();
-			
-			bufferBuilder.vertex(matrix, 0, -1, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, -1).next();
-			
-			bufferBuilder.vertex(matrix, 0, -1, 0).next();
-			bufferBuilder.vertex(matrix, 0, 0, 1).next();
-		}
+		
+		// middle part
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
+		// top part
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
+		// bottom part
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 		
