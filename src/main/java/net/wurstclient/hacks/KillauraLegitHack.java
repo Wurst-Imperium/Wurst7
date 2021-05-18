@@ -314,7 +314,11 @@ public final class KillauraLegitHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -327,9 +331,11 @@ public final class KillauraLegitHack extends Hack
 		float green = 2 - red;
 		
 		matrixStack.translate(
-			target.prevX + (target.getX() - target.prevX) * partialTicks,
+			target.prevX + (target.getX() - target.prevX) * partialTicks
+				- regionX,
 			target.prevY + (target.getY() - target.prevY) * partialTicks,
-			target.prevZ + (target.getZ() - target.prevZ) * partialTicks);
+			target.prevZ + (target.getZ() - target.prevZ) * partialTicks
+				- regionZ);
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),
 			target.getWidth());
