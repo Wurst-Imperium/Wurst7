@@ -271,11 +271,15 @@ public final class NukerLegitHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
-			currentBlock.getZ());
+		matrixStack.translate(currentBlock.getX() - regionX,
+			currentBlock.getY(), currentBlock.getZ() - regionZ);
 		
 		// get progress
 		float progress;
@@ -298,14 +302,17 @@ public final class NukerLegitHack extends Hack
 		
 		// draw box
 		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);
+		
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(matrixStack);
 		
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
