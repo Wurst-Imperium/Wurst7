@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
@@ -673,6 +674,12 @@ public enum RenderUtils
 	
 	public static void drawArrow(Vec3d from, Vec3d to, MatrixStack matrixStack)
 	{
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
 		double startX = from.x;
 		double startY = from.y;
 		double startZ = from.z;
@@ -681,33 +688,28 @@ public enum RenderUtils
 		double endY = to.y;
 		double endZ = to.z;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
-		
 		matrixStack.push();
+		Matrix4f matrix = matrixStack.peek().getModel();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
 		bufferBuilder
 			.vertex(matrix, (float)startX, (float)startY, (float)startZ).next();
 		bufferBuilder.vertex(matrix, (float)endX, (float)endY, (float)endZ)
 			.next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.translate(endX, endY, endZ);
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
-		double angleX = Math.atan2(endY - startY, startZ - endZ);
-		GL11.glRotated(Math.toDegrees(angleX) + 90, 1, 0, 0);
+		double xDiff = endX - startX;
+		double yDiff = endY - startY;
+		double zDiff = endZ - startZ;
 		
-		double angleZ = Math.atan2(endX - startX,
-			Math.sqrt(Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2)));
-		GL11.glRotated(Math.toDegrees(angleZ), 0, 0, 1);
+		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
+		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
+		float zAngle = (float)Math.atan2(xDiff, yzDiff);
+		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();
 		
@@ -737,9 +739,87 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.pop();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+	}
+	
+	public static void drawArrow(Vec3d from, Vec3d to,
+		VertexBuffer vertexBuffer)
+	{
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		drawArrow(from, to, bufferBuilder);
+		
+		bufferBuilder.end();
+		vertexBuffer.upload(bufferBuilder);
+	}
+	
+	public static void drawArrow(Vec3d from, Vec3d to,
+		BufferBuilder bufferBuilder)
+	{
+		double startX = from.x;
+		double startY = from.y;
+		double startZ = from.z;
+		
+		double endX = to.x;
+		double endY = to.y;
+		double endZ = to.z;
+		
+		Matrix4f matrix = new Matrix4f();
+		matrix.loadIdentity();
+		
+		bufferBuilder
+			.vertex(matrix, (float)startX, (float)startY, (float)startZ).next();
+		bufferBuilder.vertex(matrix, (float)endX, (float)endY, (float)endZ)
+			.next();
+		
+		matrix.multiplyByTranslation((float)endX, (float)endY, (float)endZ);
+		matrix.multiply(Matrix4f.scale(0.1F, 0.1F, 0.1F));
+		
+		double xDiff = endX - startX;
+		double yDiff = endY - startY;
+		double zDiff = endZ - startZ;
+		
+		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
+		matrix.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		
+		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
+		float zAngle = (float)Math.atan2(xDiff, yzDiff);
+		matrix.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 	}
 }

@@ -21,9 +21,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
@@ -34,6 +41,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
@@ -77,7 +85,7 @@ public final class TunnellerHack extends Hack
 	private int length;
 	
 	private Task[] tasks;
-	private int[] displayLists = new int[5];
+	private VertexBuffer[] vertexBuffers = new VertexBuffer[5];
 	
 	private BlockPos currentBlock;
 	private float progress;
@@ -126,9 +134,6 @@ public final class TunnellerHack extends Hack
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		for(int i = 0; i < displayLists.length; i++)
-			displayLists[i] = GL11.glGenLists(1);
-		
 		ClientPlayerEntity player = MC.player;
 		start = new BlockPos(player.getPos());
 		direction = player.getHorizontalFacing();
@@ -140,7 +145,7 @@ public final class TunnellerHack extends Hack
 			new PlaceTorchTask(), new WaitForFallingBlocksTask(),
 			new DigTunnelTask(), new WalkForwardTask()};
 		
-		// updateCyanList();
+		updateCyanBuffer();
 	}
 	
 	@Override
@@ -157,8 +162,9 @@ public final class TunnellerHack extends Hack
 			currentBlock = null;
 		}
 		
-		for(int displayList : displayLists)
-			GL11.glDeleteLists(displayList, 1);
+		for(VertexBuffer buffer : vertexBuffers)
+			if(buffer != null)
+				buffer.close();
 	}
 	
 	@Override
@@ -201,10 +207,30 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		for(int displayList : displayLists)
-			GL11.glCallList(displayList);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			VertexBuffer buffer = vertexBuffers[i];
+			if(buffer == null)
+				continue;
+			
+			switch(i)
+			{
+				case 0 -> RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+				case 1 -> RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+				case 2 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
+				case 3 -> RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+				case 4 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
+			}
+			
+			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+			Shader shader = RenderSystem.getShader();
+			buffer.setShader(viewMatrix, projMatrix, shader);
+		}
 		
 		if(currentBlock != null)
 		{
@@ -212,8 +238,12 @@ public final class TunnellerHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			matrixStack.translate(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
 			{
 				matrixStack.translate(0.5, 0.5, 0.5);
@@ -237,29 +267,36 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	// private void updateCyanList(MatrixStack matrixStack)
-	// {
-	// GL11.glNewList(displayLists[0], GL11.GL_COMPILE);
-	//
-	// matrixStack.push();
-	// matrixStack.translate(start.getX(), start.getY(), start.getZ());
-	// matrixStack.translate(0.5, 0.5, 0.5);
-	//
-	// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-	// bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-	// VertexFormats.POSITION);
-	// RenderUtils.drawNode(matrixStack,
-	// new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
-	// bufferBuilder.end();
-	// BufferRenderer.draw(bufferBuilder);
-	//
-	// RenderUtils.drawArrow(matrixStack,
-	// Vec3d.of(direction.getVector()).multiply(0.25),
-	// Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
-	//
-	// matrixStack.pop();
-	// GL11.glEndList();
-	// }
+	private void updateCyanBuffer()
+	{
+		if(vertexBuffers[0] != null)
+			vertexBuffers[0].close();
+		
+		vertexBuffers[0] = new VertexBuffer();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		Vec3d offset = Vec3d.ofCenter(start).subtract(regionX, 0, regionZ);
+		
+		Box nodeBox =
+			new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25).offset(offset);
+		RenderUtils.drawNode(nodeBox, bufferBuilder);
+		
+		Vec3d arrowStart =
+			Vec3d.of(direction.getVector()).multiply(0.25).add(offset);
+		Vec3d arrowEnd = Vec3d.of(direction.getVector())
+			.multiply(Math.max(0.5, length)).add(offset);
+		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
+		
+		bufferBuilder.end();
+		vertexBuffers[0].upload(bufferBuilder);
+	}
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
 	{
@@ -350,9 +387,21 @@ public final class TunnellerHack extends Hack
 			ArrayList<BlockPos> blocks = new ArrayList<>();
 			getAllInBox(from, to).forEach(blocks::add);
 			
-			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
-			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+			if(vertexBuffers[1] != null)
+				vertexBuffers[1].close();
+			
+			vertexBuffers[1] = new VertexBuffer();
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+				VertexFormats.POSITION);
 			
 			currentBlock = null;
 			for(BlockPos pos : blocks)
@@ -366,14 +415,12 @@ public final class TunnellerHack extends Hack
 				
 				if(currentBlock == null)
 					currentBlock = pos;
-					
-				// matrixStack.push();
-				// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-				// RenderUtils.drawOutlinedBox(matrixStack, box);
-				// matrixStack.pop();
+				
+				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			}
 			
-			GL11.glEndList();
+			bufferBuilder.end();
+			vertexBuffers[1].upload(bufferBuilder);
 			
 			if(currentBlock == null)
 			{
@@ -383,9 +430,8 @@ public final class TunnellerHack extends Hack
 				
 				length++;
 				if(limit.getValueI() == 0 || length < limit.getValueI())
-				{
-					// updateCyanList(matrixStack);
-				}else
+					updateCyanBuffer();
+				else
 				{
 					ChatUtils.message("Tunnel completed.");
 					setEnabled(false);
@@ -451,18 +497,28 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : BlockUtils.getAllInBox(from, to))
 				if(!BlockUtils.getState(pos).isFullCube(MC.world, pos))
 					blocks.add(pos);
-					
-			// GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
-			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			// RenderSystem.setShaderColor(1, 1, 0, 0.5F);
-			// for(BlockPos pos : blocks)
-			// {
-			// matrixStack.push();
-			// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-			// RenderUtils.drawOutlinedBox(matrixStack, box);
-			// matrixStack.pop();
-			// }
-			// GL11.glEndList();
+				
+			if(vertexBuffers[2] != null)
+				vertexBuffers[2].close();
+			
+			vertexBuffers[2] = new VertexBuffer();
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+				VertexFormats.POSITION);
+			
+			for(BlockPos pos : blocks)
+				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
+			
+			bufferBuilder.end();
+			vertexBuffers[2].upload(bufferBuilder);
 			
 			return !blocks.isEmpty();
 		}
@@ -585,17 +641,27 @@ public final class TunnellerHack extends Hack
 			
 			ChatUtils.error("The tunnel is flooded, cannot continue.");
 			
-			// GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
-			// Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
-			// RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			// for(BlockPos pos : liquids)
-			// {
-			// matrixStack.push();
-			// matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-			// RenderUtils.drawOutlinedBox(matrixStack, box);
-			// matrixStack.pop();
-			// }
-			// GL11.glEndList();
+			if(vertexBuffers[3] != null)
+				vertexBuffers[3].close();
+			
+			vertexBuffers[3] = new VertexBuffer();
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+				VertexFormats.POSITION);
+			
+			for(BlockPos pos : liquids)
+				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
+			
+			bufferBuilder.end();
+			vertexBuffers[3].upload(bufferBuilder);
 			return true;
 		}
 		
@@ -657,8 +723,8 @@ public final class TunnellerHack extends Hack
 			{
 				lastTorch = null;
 				nextTorch = new BlockPos(MC.player.getPos());
-				GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
-				GL11.glEndList();
+				if(vertexBuffers[4] != null)
+					vertexBuffers[4].close();
 				return false;
 			}
 			
@@ -668,12 +734,20 @@ public final class TunnellerHack extends Hack
 			if(lastTorch != null)
 				nextTorch = lastTorch.offset(direction,
 					size.getSelected().torchDistance);
-				
-			// GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
-			// RenderSystem.setShaderColor(1, 1, 0, 0.5F);
-			// Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
-			// RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
-			// GL11.glEndList();
+			
+			if(vertexBuffers[4] != null)
+				vertexBuffers[4].close();
+			
+			vertexBuffers[4] = new VertexBuffer();
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Vec3d torchVec =
+				Vec3d.ofBottomCenter(nextTorch).subtract(regionX, 0, regionZ);
+			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0),
+				vertexBuffers[4]);
 			
 			BlockPos player = new BlockPos(MC.player.getPos());
 			if(getDistance(player, nextTorch) > 4)
