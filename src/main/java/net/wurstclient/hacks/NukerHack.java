@@ -246,15 +246,19 @@ public final class NukerHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-			currentBlock.getZ());
+		GL11.glTranslated(currentBlock.getX() - regionX, currentBlock.getY(),
+			currentBlock.getZ() - regionZ);
 		if(p < 1)
 		{
 			GL11.glTranslated(0.5, 0.5, 0.5);

@@ -270,11 +270,15 @@ public final class NukerLegitHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-			currentBlock.getZ());
+		GL11.glTranslated(currentBlock.getX() - regionX, currentBlock.getY(),
+			currentBlock.getZ() - regionZ);
 		
 		// get progress
 		float progress;

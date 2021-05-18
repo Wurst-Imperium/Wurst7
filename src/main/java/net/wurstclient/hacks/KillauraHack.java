@@ -304,7 +304,11 @@ public final class KillauraHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -318,11 +322,13 @@ public final class KillauraHack extends Hack
 		
 		GL11.glTranslated(
 			renderTarget.prevX
-				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
+				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
+				- regionX,
 			renderTarget.prevY
 				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
 			renderTarget.prevZ
-				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
+				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
+				- regionZ);
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());
