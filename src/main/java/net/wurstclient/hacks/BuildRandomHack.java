@@ -141,10 +141,15 @@ public final class BuildRandomHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		GL11.glTranslated(lastPos.getX(), lastPos.getY(), lastPos.getZ());
+		GL11.glTranslated(lastPos.getX() - regionX, lastPos.getY(),
+			lastPos.getZ() - regionZ);
 		
 		// get color
 		float red = partialTicks * 2F;
