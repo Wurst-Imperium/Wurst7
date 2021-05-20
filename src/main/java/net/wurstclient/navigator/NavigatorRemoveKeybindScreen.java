@@ -193,8 +193,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;

@@ -45,8 +45,10 @@ public abstract class TitleScreenMixin extends Screen
 		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
 			
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("menu.online")))
