@@ -108,8 +108,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	public TpAuraHack()
 	{
-		super("TP-Aura", "Automatically attacks the closest valid entity\n"
-			+ "while teleporting around it.");
+		super("TP-Aura");
 		setCategory(Category.COMBAT);
 		
 		addSetting(range);

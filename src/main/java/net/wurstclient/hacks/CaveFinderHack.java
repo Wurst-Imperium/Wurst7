@@ -83,8 +83,7 @@ public final class CaveFinderHack extends Hack
 	
 	public CaveFinderHack()
 	{
-		super("CaveFinder",
-			"Helps you to find caves by\n" + "highlighting them in red.");
+		super("CaveFinder");
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);

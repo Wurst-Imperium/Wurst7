@@ -57,12 +57,7 @@ public final class RadarHack extends Hack implements UpdateListener
 	
 	public RadarHack()
 	{
-		super("Radar",
-			"Shows the location of nearby entities.\n"
-				+ "\u00a7cred\u00a7r - players\n"
-				+ "\u00a76orange\u00a7r - monsters\n"
-				+ "\u00a7agreen\u00a7r - animals\n"
-				+ "\u00a77gray\u00a7r - others\n");
+		super("Radar");
 		
 		setCategory(Category.RENDER);
 		addSetting(radius);

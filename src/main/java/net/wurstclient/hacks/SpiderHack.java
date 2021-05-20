@@ -17,7 +17,7 @@ public final class SpiderHack extends Hack implements UpdateListener
 {
 	public SpiderHack()
 	{
-		super("Spider", "Allows you to climb up walls like a spider.");
+		super("Spider");
 		setCategory(Category.MOVEMENT);
 	}
 	

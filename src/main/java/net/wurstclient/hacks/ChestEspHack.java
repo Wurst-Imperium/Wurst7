@@ -56,12 +56,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	public ChestEspHack()
 	{
-		super("ChestESP",
-			"Highlights nearby chests.\n"
-				+ "\u00a7agreen\u00a7r - normal chests & barrels\n"
-				+ "\u00a76orange\u00a7r - trapped chests\n"
-				+ "\u00a7bcyan\u00a7r - ender chests\n"
-				+ "\u00a7dpurple\u00a7r - shulker boxes");
+		super("ChestESP");
 		
 		setCategory(Category.RENDER);
 		addSetting(style);

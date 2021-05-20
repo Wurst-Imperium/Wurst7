@@ -52,7 +52,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	
 	public ItemEspHack()
 	{
-		super("ItemESP", "Highlights nearby items.");
+		super("ItemESP");
 		setCategory(Category.RENDER);
 		
 		addSetting(names);

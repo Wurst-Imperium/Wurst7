@@ -16,8 +16,7 @@ public final class NoPumpkinHack extends Hack
 {
 	public NoPumpkinHack()
 	{
-		super("NoPumpkin",
-			"Blocks the overlay when wearing a pumpkin on your head.");
+		super("NoPumpkin");
 		setCategory(Category.RENDER);
 	}
 }

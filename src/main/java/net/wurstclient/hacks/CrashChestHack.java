@@ -22,13 +22,7 @@ public final class CrashChestHack extends Hack
 {
 	public CrashChestHack()
 	{
-		super("CrashChest", "Generates a chest that essentially bans people\n"
-			+ "from the server if they have too many copies\n"
-			+ "of it in their inventory. \u00a7c\u00a7lWARNING:\u00a7r \u00a7cThis cannot\n"
-			+ "\u00a7cbe undone. Use with caution!\u00a7r\n\n"
-			+ "If copies are instead placed in a chest, anyone\n"
-			+ "who opens the chest will be kicked from the\n"
-			+ "server (just once).");
+		super("CrashChest");
 		
 		setCategory(Category.ITEMS);
 	}

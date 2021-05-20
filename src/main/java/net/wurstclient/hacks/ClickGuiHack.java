@@ -39,7 +39,7 @@ public final class ClickGuiHack extends Hack
 	
 	public ClickGuiHack()
 	{
-		super("ClickGUI", "Window-based ClickGUI.");
+		super("ClickGUI");
 		addSetting(opacity);
 		addSetting(bgRed);
 		addSetting(bgGreen);

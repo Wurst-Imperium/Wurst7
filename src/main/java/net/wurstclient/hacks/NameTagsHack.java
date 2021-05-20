@@ -16,9 +16,7 @@ public final class NameTagsHack extends Hack
 {
 	public NameTagsHack()
 	{
-		super("NameTags", "Changes the scale of the nametags so you can\n"
-			+ "always read them.\n" + "Also allows you to see the nametags of\n"
-			+ "sneaking players.");
+		super("NameTags");
 		
 		setCategory(Category.RENDER);
 	}

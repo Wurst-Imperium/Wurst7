@@ -20,10 +20,7 @@ public final class AutoSignHack extends Hack
 	
 	public AutoSignHack()
 	{
-		super("AutoSign",
-			"Instantly writes whatever text you want on every sign\n"
-				+ "you place. Once activated, you can write normally on\n"
-				+ "the first sign to specify the text for all other signs.");
+		super("AutoSign");
 		setCategory(Category.BLOCKS);
 	}
 	

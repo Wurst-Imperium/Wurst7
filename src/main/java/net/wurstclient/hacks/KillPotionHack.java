@@ -23,11 +23,7 @@ public final class KillPotionHack extends Hack
 {
 	public KillPotionHack()
 	{
-		super("KillPotion",
-			"Generates a potion that can kill almost anything,\n"
-				+ "including players in Creative mode. Does not\n"
-				+ "work on undead mobs, since they are\n" + "already dead.\n\n"
-				+ "Requires Creative mode.");
+		super("KillPotion");
 		
 		setCategory(Category.ITEMS);
 	}

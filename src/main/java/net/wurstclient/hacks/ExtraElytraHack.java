@@ -44,7 +44,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 	
 	public ExtraElytraHack()
 	{
-		super("ExtraElytra", "Makes the Elytra easier to use.");
+		super("ExtraElytra");
 		setCategory(Category.MOVEMENT);
 		addSetting(instantFly);
 		addSetting(speedCtrl);

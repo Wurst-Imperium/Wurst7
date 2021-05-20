@@ -27,10 +27,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	
 	public OpenWaterEspHack()
 	{
-		super("OpenWaterESP",
-			"Shows whether or not you are fishing in 'open water' and\n"
-				+ "draws a box around the area used for the open water\n"
-				+ "calculation.");
+		super("OpenWaterESP");
 		
 		setCategory(Category.RENDER);
 	}

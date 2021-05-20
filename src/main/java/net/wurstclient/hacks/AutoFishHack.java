@@ -66,9 +66,7 @@ public final class AutoFishHack extends Hack
 	
 	public AutoFishHack()
 	{
-		super("AutoFish", "Automatically catches fish using your\n"
-			+ "best fishing rod. If it finds a better\n"
-			+ "rod while fishing, it will automatically\n" + "switch to it.");
+		super("AutoFish");
 		
 		setCategory(Category.OTHER);
 		addSetting(validRange);

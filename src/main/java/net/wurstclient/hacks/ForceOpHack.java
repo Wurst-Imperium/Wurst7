@@ -47,8 +47,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	
 	public ForceOpHack()
 	{
-		super("ForceOP",
-			"Cracks AuthMe passwords.\n" + "Can be used to get OP.");
+		super("ForceOP");
 		setCategory(Category.CHAT);
 	}
 	

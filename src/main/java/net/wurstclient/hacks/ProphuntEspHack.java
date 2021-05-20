@@ -27,8 +27,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	
 	public ProphuntEspHack()
 	{
-		super("ProphuntESP", "Allows you to see fake blocks in Prophunt.\n"
-			+ "Made for Mineplex Prophunt. Might not work on other servers.");
+		super("ProphuntESP");
 		setCategory(Category.RENDER);
 	}
 	

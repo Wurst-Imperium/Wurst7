@@ -23,8 +23,7 @@ public final class TrollPotionHack extends Hack
 {
 	public TrollPotionHack()
 	{
-		super("TrollPotion",
-			"Generates a potion with many annoying effects on it.");
+		super("TrollPotion");
 		setCategory(Category.ITEMS);
 	}
 	
