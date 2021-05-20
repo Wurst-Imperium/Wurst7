@@ -43,9 +43,7 @@ public final class AntiAfkHack extends Hack
 	
 	public AntiAfkHack()
 	{
-		super("AntiAFK",
-			"Walks around randomly to hide you from AFK detectors.\n"
-				+ "Needs at least 3x3 blocks of free space.");
+		super("AntiAFK");
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);

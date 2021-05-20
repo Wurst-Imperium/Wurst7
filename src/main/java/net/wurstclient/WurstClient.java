@@ -21,6 +21,7 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Util;
 import net.wurstclient.altmanager.AltManager;
@@ -198,6 +199,14 @@ public enum WurstClient
 		}
 		
 		return encFolder;
+	}
+	
+	public String translate(String key)
+	{
+		if(otfs.translationsOtf.getForceEnglish().isChecked())
+			return IMC.getLanguageManager().getEnglish().get(key);
+		else
+			return I18n.translate(key);
 	}
 	
 	public WurstAnalytics getAnalytics()

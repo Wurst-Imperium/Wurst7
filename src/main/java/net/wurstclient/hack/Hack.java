@@ -24,6 +24,13 @@ public abstract class Hack extends Feature
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
 	
+	public Hack(String name)
+	{
+		this.name = Objects.requireNonNull(name);
+		description = "description.wurst.hack." + name.toLowerCase();
+		addPossibleKeybind(name, "Toggle " + name);
+	}
+	
 	public Hack(String name, String description)
 	{
 		this.name = Objects.requireNonNull(name);
@@ -45,7 +52,7 @@ public abstract class Hack extends Feature
 	@Override
 	public final String getDescription()
 	{
-		return description;
+		return WURST.translate(description);
 	}
 	
 	@Override

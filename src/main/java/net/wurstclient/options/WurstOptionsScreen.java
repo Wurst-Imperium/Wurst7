@@ -55,6 +55,8 @@ public class WurstOptionsScreen extends Screen
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
 		WurstAnalytics analytics = wurst.getAnalytics();
 		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
+		CheckboxSetting forceEnglish =
+			wurst.getOtfs().translationsOtf.getForceEnglish();
 		
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
@@ -80,6 +82,11 @@ public class WurstOptionsScreen extends Screen
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
 			vanillaSpoofOtf.getDescription(),
 			b -> vanillaSpoofOtf.doPrimaryAction());
+		
+		new WurstOptionsButton(-154, 96,
+			() -> "Force English: " + (forceEnglish.isChecked() ? "ON" : "OFF"),
+			forceEnglish.getDescription(),
+			b -> forceEnglish.setChecked(!forceEnglish.isChecked()));
 	}
 	
 	private void addManagerButtons()

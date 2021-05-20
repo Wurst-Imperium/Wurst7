@@ -37,6 +37,7 @@
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
+    "LanguageManagerMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
