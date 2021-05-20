@@ -333,10 +333,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		setColorToBackground();
 		drawQuads(matrixStack, bgx1, bgy1, bgx2,
-			Math.max(bgy1, Math.min(bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
-				bgy1 + scroll + windowComponentY)));
+			Math.max(bgy1,
+				Math.min(bgy2
+					- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
+					bgy1 + scroll + windowComponentY)));
 		drawQuads(matrixStack, bgx1,
-			Math.max(bgy1, Math.min(bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
+			Math.max(bgy1, Math.min(bgy2
+				- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
 				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);

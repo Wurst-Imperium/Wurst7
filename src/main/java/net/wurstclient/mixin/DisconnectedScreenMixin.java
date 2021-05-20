@@ -56,8 +56,8 @@ public class DisconnectedScreenMixin extends Screen
 			new LiteralText("Reconnect"),
 			b -> LastServerRememberer.reconnect(parent)));
 		
-		autoReconnectButton =
-			method_37063(new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
+		autoReconnectButton = method_37063(
+			new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
 				new LiteralText("AutoReconnect"), b -> pressAutoReconnect()));
 		
 		if(WurstClient.INSTANCE.getHax().autoReconnectHack.isEnabled())

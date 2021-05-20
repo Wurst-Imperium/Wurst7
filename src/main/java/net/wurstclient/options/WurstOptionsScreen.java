@@ -42,8 +42,9 @@ public class WurstOptionsScreen extends Screen
 	@Override
 	public void init()
 	{
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		method_37063(
+			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();

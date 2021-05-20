@@ -67,7 +67,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void removeFeedbackAndBugReportButtons()
 	{
-		((IScreen)this).getButtons().removeIf(this::isFeedbackOrBugReportButton);
+		((IScreen)this).getButtons()
+			.removeIf(this::isFeedbackOrBugReportButton);
 		children().removeIf(this::isFeedbackOrBugReportButton);
 	}
 	

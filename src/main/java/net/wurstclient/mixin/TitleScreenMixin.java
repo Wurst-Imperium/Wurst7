@@ -42,7 +42,7 @@ public abstract class TitleScreenMixin extends Screen
 			new LiteralText("Alt Manager"),
 			b -> client.openScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
-
+		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
 			if(!(d instanceof ClickableWidget button))

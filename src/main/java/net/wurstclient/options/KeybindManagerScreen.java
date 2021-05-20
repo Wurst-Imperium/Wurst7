@@ -45,14 +45,15 @@ public final class KeybindManagerScreen extends Screen
 			100, 20, new LiteralText("Add"),
 			b -> client.openScreen(new KeybindEditorScreen(this))));
 		
-		method_37063(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
-			20, new LiteralText("Edit"), b -> edit()));
+		method_37063(editButton = new ButtonWidget(width / 2 + 2, height - 52,
+			100, 20, new LiteralText("Edit"), b -> edit()));
 		
-		method_37063(removeButton = new ButtonWidget(width / 2 - 102, height - 28,
-			100, 20, new LiteralText("Remove"), b -> remove()));
+		method_37063(removeButton = new ButtonWidget(width / 2 - 102,
+			height - 28, 100, 20, new LiteralText("Remove"), b -> remove()));
 		
-		method_37063(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		method_37063(
+			backButton = new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		method_37063(
 			new ButtonWidget(8, 8, 100, 20, new LiteralText("Reset Keybinds"),

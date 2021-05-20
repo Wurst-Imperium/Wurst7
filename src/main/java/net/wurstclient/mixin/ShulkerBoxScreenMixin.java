@@ -50,11 +50,11 @@ public abstract class ShulkerBoxScreenMixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			method_37063(new ButtonWidget(x + backgroundWidth - 108, y + 4, 50, 12,
-				new LiteralText("Steal"), b -> steal()));
+			method_37063(new ButtonWidget(x + backgroundWidth - 108, y + 4, 50,
+				12, new LiteralText("Steal"), b -> steal()));
 			
-			method_37063(new ButtonWidget(x + backgroundWidth - 56, y + 4, 50, 12,
-				new LiteralText("Store"), b -> store()));
+			method_37063(new ButtonWidget(x + backgroundWidth - 56, y + 4, 50,
+				12, new LiteralText("Store"), b -> store()));
 		}
 		
 		if(autoSteal.isEnabled())

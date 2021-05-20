@@ -57,8 +57,8 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		lastServerButton = method_37063(new ButtonWidget(width / 2 - 154, 10, 100,
-			20, new LiteralText("Last Server"), b -> LastServerRememberer
+		lastServerButton = method_37063(new ButtonWidget(width / 2 - 154, 10,
+			100, 20, new LiteralText("Last Server"), b -> LastServerRememberer
 				.joinLastServer((MultiplayerScreen)(Object)this)));
 		
 		method_37063(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,

@@ -66,14 +66,14 @@ public final class EditBlockListScreen extends Screen
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		addChild(blockNameField);
 		
-		method_37063(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
-			20, new LiteralText("Add"), b -> {
+		method_37063(addButton = new ButtonWidget(width / 2 - 2, height - 56,
+			30, 20, new LiteralText("Add"), b -> {
 				blockList.add(blockToAdd);
 				blockNameField.setText("");
 			}));
 		
-		method_37063(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
-			100, 20, new LiteralText("Remove Selected"),
+		method_37063(removeButton = new ButtonWidget(width / 2 + 52,
+			height - 56, 100, 20, new LiteralText("Remove Selected"),
 			b -> blockList.remove(listGui.selected)));
 		
 		method_37063(new ButtonWidget(width - 108, 8, 100, 20,

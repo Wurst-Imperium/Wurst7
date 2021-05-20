@@ -26,8 +26,8 @@ public abstract class ButtonWidgetMixin extends PressableWidget
 	}
 	
 	@Override
-	protected void renderBackground(MatrixStack matrixStack, MinecraftClient client,
-		int mouseX, int mouseY)
+	protected void renderBackground(MatrixStack matrixStack,
+		MinecraftClient client, int mouseX, int mouseY)
 	{
 		int i = getYImage(isHovered());
 		drawTexture(matrixStack, x, y, 0, 46 + i * 20, width / 2, height / 2);

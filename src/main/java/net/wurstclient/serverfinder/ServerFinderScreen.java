@@ -50,13 +50,14 @@ public class ServerFinderScreen extends Screen
 			new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20,
 				new LiteralText("Search"), b -> searchOrCancel()));
 		
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, new LiteralText("Tutorial"),
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12,
+			200, 20, new LiteralText("Tutorial"),
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		method_37063(
+			new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, new LiteralText(""));

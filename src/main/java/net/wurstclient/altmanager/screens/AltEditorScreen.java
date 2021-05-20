@@ -76,11 +76,12 @@ public abstract class AltEditorScreen extends Screen
 			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
 				new LiteralText(getDoneButtonText()), b -> pressDoneButton()));
 		
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+		method_37063(
+			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
+				new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200,
-			20, new LiteralText("Random Name"),
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
+			200, 20, new LiteralText("Random Name"),
 			b -> emailBox.setText(NameGenerator.generateName())));
 		
 		method_37063(stealSkinButton =
@@ -88,8 +89,9 @@ public abstract class AltEditorScreen extends Screen
 				128, 20, new LiteralText("Steal Skin"),
 				b -> message = stealSkin(getEmail())));
 		
-		method_37063(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
-			20, new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
+		method_37063(
+			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
+				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
 		
 		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
 			20, new LiteralText(""));

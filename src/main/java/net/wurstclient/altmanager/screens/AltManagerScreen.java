@@ -98,8 +98,8 @@ public final class AltManagerScreen extends Screen
 		method_37063(starButton = new ButtonWidget(width / 2 - 154, height - 28,
 			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
 		
-		method_37063(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, new LiteralText("Edit"), b -> pressEdit()));
+		method_37063(editButton = new ButtonWidget(width / 2 - 76, height - 28,
+			74, 20, new LiteralText("Edit"), b -> pressEdit()));
 		
 		method_37063(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
 			74, 20, new LiteralText("Delete"), b -> pressDelete()));

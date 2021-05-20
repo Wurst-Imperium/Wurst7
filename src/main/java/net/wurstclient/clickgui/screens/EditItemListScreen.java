@@ -65,14 +65,14 @@ public final class EditItemListScreen extends Screen
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		addChild(itemNameField);
 		
-		method_37063(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
-			20, new LiteralText("Add"), b -> {
+		method_37063(addButton = new ButtonWidget(width / 2 - 2, height - 56,
+			30, 20, new LiteralText("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
 			}));
 		
-		method_37063(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
-			100, 20, new LiteralText("Remove Selected"),
+		method_37063(removeButton = new ButtonWidget(width / 2 + 52,
+			height - 56, 100, 20, new LiteralText("Remove Selected"),
 			b -> itemList.remove(listGui.selected)));
 		
 		method_37063(new ButtonWidget(width - 108, 8, 100, 20,

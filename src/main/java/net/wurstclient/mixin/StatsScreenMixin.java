@@ -40,7 +40,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		
 		updateWurstButtonText(toggleWurstButton);
 		method_37063(toggleWurstButton);
-
+		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
 			if(!(d instanceof ClickableWidget button))
