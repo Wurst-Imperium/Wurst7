@@ -13,13 +13,15 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorNewKeybindScreen extends NavigatorScreen
@@ -68,10 +70,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				}
 			});
 		okButton.active = selectedCommand != null;
-		addButton(okButton);
+		method_37063(okButton);
 		
 		// cancel button
-		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+		method_37063(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
 			new LiteralText("Cancel"), b -> WurstClient.MC.openScreen(parent)));
 	}
 	
@@ -149,7 +151,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
+			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -209,8 +211,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget button))
+				continue;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();

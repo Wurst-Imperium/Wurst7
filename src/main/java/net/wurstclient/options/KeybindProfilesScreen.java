@@ -45,17 +45,17 @@ public final class KeybindProfilesScreen extends Screen
 		listGui = new ListGui(client, this,
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
-		addButton(new ButtonWidget(8, 8, 100, 20,
+		method_37063(new ButtonWidget(8, 8, 100, 20,
 			new LiteralText("Open Folder"), b -> openFolder()));
 		
-		addButton(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
+		method_37063(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
 			new LiteralText("New Profile"), b -> client.openScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
-		loadButton = addButton(new ButtonWidget(width / 2 - 50, height - 48,
+		loadButton = method_37063(new ButtonWidget(width / 2 - 50, height - 48,
 			100, 20, new LiteralText("Load"), b -> loadSelected()));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
+		method_37063(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
 			new LiteralText("Cancel"), b -> openPrevScreen()));
 	}
 	

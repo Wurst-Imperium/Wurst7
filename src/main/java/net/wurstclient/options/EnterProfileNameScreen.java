@@ -47,13 +47,13 @@ public final class EnterProfileNameScreen extends Screen
 		valueField.setText("");
 		valueField.setSelectionStart(0);
 		
-		children.add(valueField);
+		addChild(valueField);
 		setInitialFocus(valueField);
 		valueField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
-		addButton(doneButton);
+		method_37063(doneButton);
 	}
 	
 	private void done()

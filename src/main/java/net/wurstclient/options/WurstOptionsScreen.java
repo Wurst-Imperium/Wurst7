@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -24,6 +25,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -40,7 +42,7 @@ public class WurstOptionsScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
 			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		addSettingButtons();
@@ -153,8 +155,11 @@ public class WurstOptionsScreen extends Screen
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget button))
+				continue;
+			
 			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
 			
@@ -195,7 +200,7 @@ public class WurstOptionsScreen extends Screen
 				this.tooltip = Arrays.asList(lines2);
 			}
 			
-			addButton(this);
+			method_37063(this);
 		}
 		
 		@Override

@@ -15,17 +15,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.options.WurstOptionsScreen;
 
 @Mixin(GameMenuScreen.class)
@@ -57,7 +57,7 @@ public abstract class GameMenuScreenMixin extends Screen
 			204, 20, new LiteralText("            Options"),
 			b -> openWurstOptions());
 		
-		addButton(wurstOptionsButton);
+		method_37063(wurstOptionsButton);
 	}
 	
 	private void openWurstOptions()
@@ -67,16 +67,16 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void removeFeedbackAndBugReportButtons()
 	{
-		buttons.removeIf(this::isFeedbackOrBugReportButton);
-		children.removeIf(this::isFeedbackOrBugReportButton);
+		((IScreen)this).getButtons().removeIf(this::isFeedbackOrBugReportButton);
+		children().removeIf(this::isFeedbackOrBugReportButton);
 	}
 	
-	private boolean isFeedbackOrBugReportButton(Element element)
+	private boolean isFeedbackOrBugReportButton(Object element)
 	{
-		if(element == null || !(element instanceof AbstractButtonWidget))
+		if(element == null || !(element instanceof ClickableWidget))
 			return false;
 		
-		AbstractButtonWidget button = (AbstractButtonWidget)element;
+		ClickableWidget button = (ClickableWidget)element;
 		String message = button.getMessage().getString();
 		
 		return message != null

@@ -16,12 +16,14 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorRemoveKeybindScreen extends NavigatorScreen
@@ -48,10 +50,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		removeButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
 			new LiteralText("Remove"), b -> remove());
 		removeButton.active = !selectedKey.isEmpty();
-		addButton(removeButton);
+		method_37063(removeButton);
 		
 		// cancel button
-		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+		method_37063(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
 			new LiteralText("Cancel"), b -> client.openScreen(parent)));
 	}
 	
@@ -130,7 +132,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
+			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -189,8 +191,11 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget button))
+				continue;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();

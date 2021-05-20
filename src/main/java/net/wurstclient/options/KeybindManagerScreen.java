@@ -41,20 +41,20 @@ public final class KeybindManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addButton(addButton = new ButtonWidget(width / 2 - 102, height - 52,
+		method_37063(addButton = new ButtonWidget(width / 2 - 102, height - 52,
 			100, 20, new LiteralText("Add"),
 			b -> client.openScreen(new KeybindEditorScreen(this))));
 		
-		addButton(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
+		method_37063(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
 			20, new LiteralText("Edit"), b -> edit()));
 		
-		addButton(removeButton = new ButtonWidget(width / 2 - 102, height - 28,
+		method_37063(removeButton = new ButtonWidget(width / 2 - 102, height - 28,
 			100, 20, new LiteralText("Remove"), b -> remove()));
 		
-		addButton(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
+		method_37063(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
 			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		addButton(
+		method_37063(
 			new ButtonWidget(8, 8, 100, 20, new LiteralText("Reset Keybinds"),
 				b -> client.openScreen(new ConfirmScreen(confirmed -> {
 					if(confirmed)
@@ -65,7 +65,7 @@ public final class KeybindManagerScreen extends Screen
 					"Are you sure you want to reset your keybinds?"),
 					new LiteralText("This cannot be undone!")))));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		method_37063(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Profiles..."),
 			b -> client.openScreen(new KeybindProfilesScreen(this))));
 	}

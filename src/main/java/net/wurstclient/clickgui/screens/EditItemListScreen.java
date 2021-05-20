@@ -63,19 +63,19 @@ public final class EditItemListScreen extends Screen
 		
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
-		children.add(itemNameField);
+		addChild(itemNameField);
 		
-		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
+		method_37063(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
 			20, new LiteralText("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
 			}));
 		
-		addButton(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
+		method_37063(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
 			100, 20, new LiteralText("Remove Selected"),
 			b -> itemList.remove(listGui.selected)));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		method_37063(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
 			b -> client.openScreen(new ConfirmScreen(b2 -> {
 				if(b2)
@@ -84,7 +84,7 @@ public final class EditItemListScreen extends Screen
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
-		addButton(
+		method_37063(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
 				new LiteralText("Done"), b -> client.openScreen(prevScreen)));
 	}

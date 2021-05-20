@@ -20,8 +20,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -42,6 +43,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -106,12 +108,12 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
 				});
-			addButton(primaryButton);
+			method_37063(primaryButton);
 		}
 		
 		// help button
 		// if(hasHelp)
-		// addButton(new ButtonWidget(
+		// method_37063(new ButtonWidget(
 		// width / 2 + (hasPrimaryAction ? 2 : -151), height - 65,
 		// hasPrimaryAction ? 149 : 302, 20, "Help", b -> {
 		// MiscUtils.openLink("https://www.wurstclient.net/wiki/"
@@ -331,17 +333,17 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		setColorToBackground();
 		drawQuads(matrixStack, bgx1, bgy1, bgx2,
-			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
+			Math.max(bgy1, Math.min(bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
 				bgy1 + scroll + windowComponentY)));
 		drawQuads(matrixStack, bgx1,
-			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
+			Math.max(bgy1, Math.min(bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
 				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
+			bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
@@ -481,8 +483,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		matrixStack.pop();
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget button))
+				continue;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();

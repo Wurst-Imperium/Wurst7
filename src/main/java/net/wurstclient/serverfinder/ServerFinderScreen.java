@@ -46,29 +46,29 @@ public class ServerFinderScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(searchButton =
+		method_37063(searchButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20,
 				new LiteralText("Search"), b -> searchOrCancel()));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
 			20, new LiteralText("Tutorial"),
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
 			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, new LiteralText(""));
 		ipBox.setMaxLength(200);
 		ipBox.setTextFieldFocused(true);
-		children.add(ipBox);
+		addChild(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
 			height / 4 + 58, 26, 12, new LiteralText(""));
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
-		children.add(maxThreadsBox);
+		addChild(maxThreadsBox);
 		
 		setInitialFocus(ipBox);
 		state = ServerFinderState.NOT_RUNNING;

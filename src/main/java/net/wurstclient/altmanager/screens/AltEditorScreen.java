@@ -72,23 +72,23 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
-		addButton(doneButton =
+		method_37063(doneButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
 				new LiteralText(getDoneButtonText()), b -> pressDoneButton()));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
 			20, new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200,
+		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200,
 			20, new LiteralText("Random Name"),
 			b -> emailBox.setText(NameGenerator.generateName())));
 		
-		addButton(stealSkinButton =
+		method_37063(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
 				128, 20, new LiteralText("Steal Skin"),
 				b -> message = stealSkin(getEmail())));
 		
-		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
+		method_37063(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
 			20, new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
 		
 		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
@@ -96,7 +96,7 @@ public abstract class AltEditorScreen extends Screen
 		emailBox.setMaxLength(48);
 		emailBox.setTextFieldFocused(true);
 		emailBox.setText(getDefaultEmail());
-		children.add(emailBox);
+		addChild(emailBox);
 		
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
@@ -108,7 +108,7 @@ public abstract class AltEditorScreen extends Screen
 			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
 		});
 		passwordBox.setMaxLength(256);
-		children.add(passwordBox);
+		addChild(passwordBox);
 		
 		setInitialFocus(emailBox);
 	}

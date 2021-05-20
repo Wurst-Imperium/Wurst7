@@ -25,10 +25,11 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -42,6 +43,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
@@ -82,33 +84,33 @@ public final class AltManagerScreen extends Screen
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
-		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
+		method_37063(useButton = new ButtonWidget(width / 2 - 154, height - 52,
 			100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
-		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
+		method_37063(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
 			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+		method_37063(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
 			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
-		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
+		method_37063(starButton = new ButtonWidget(width / 2 - 154, height - 28,
 			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
 		
-		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
+		method_37063(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
 			20, new LiteralText("Edit"), b -> pressEdit()));
 		
-		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
+		method_37063(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
 			74, 20, new LiteralText("Delete"), b -> pressDelete()));
 		
-		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
+		method_37063(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(importButton = new ButtonWidget(8, 8, 50, 20,
+		method_37063(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
 		
-		addButton(exportButton = new ButtonWidget(58, 8, 50, 20,
+		method_37063(exportButton = new ButtonWidget(58, 8, 50, 20,
 			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	
@@ -440,8 +442,11 @@ public final class AltManagerScreen extends Screen
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget button))
+				continue;
+			
 			if(!button.isHovered())
 				continue;
 			

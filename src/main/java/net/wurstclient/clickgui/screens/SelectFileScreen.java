@@ -51,14 +51,14 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addButton(new ButtonWidget(8, 8, 100, 20,
+		method_37063(new ButtonWidget(8, 8, 100, 20,
 			new LiteralText("Open Folder"), b -> openFolder()));
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		method_37063(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
 		
-		doneButton = addButton(new ButtonWidget(width / 2 - 102, height - 48,
+		doneButton = method_37063(new ButtonWidget(width / 2 - 102, height - 48,
 			100, 20, new LiteralText("Done"), b -> done()));
-		addButton(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
+		method_37063(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
 			new LiteralText("Cancel"), b -> openPrevScreen()));
 	}
 	
