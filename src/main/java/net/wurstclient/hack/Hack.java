@@ -31,13 +31,6 @@ public abstract class Hack extends Feature
 		addPossibleKeybind(name, "Toggle " + name);
 	}
 	
-	public Hack(String name, String description)
-	{
-		this.name = Objects.requireNonNull(name);
-		this.description = Objects.requireNonNull(description);
-		addPossibleKeybind(name, "Toggle " + name);
-	}
-	
 	@Override
 	public final String getName()
 	{
