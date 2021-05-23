@@ -27,7 +27,14 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
@@ -36,6 +43,8 @@ import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -80,8 +89,8 @@ public final class CaveFinderHack extends Hack
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
-	private int displayList;
-	private boolean displayListUpToDate;
+	private VertexBuffer vertexBuffer;
+	private boolean bufferUpToDate;
 	
 	public CaveFinderHack()
 	{
@@ -101,8 +110,7 @@ public final class CaveFinderHack extends Hack
 		pool1 = MinPriorityThreadFactory.newFixedThreadPool();
 		pool2 = new ForkJoinPool();
 		
-		displayList = GL11.glGenLists(1);
-		displayListUpToDate = false;
+		bufferUpToDate = false;
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
@@ -119,7 +127,10 @@ public final class CaveFinderHack extends Hack
 		stopPool2Tasks();
 		pool1.shutdownNow();
 		pool2.shutdownNow();
-		GL11.glDeleteLists(displayList, 1);
+		
+		if(vertexBuffer != null)
+			vertexBuffer.close();
+		
 		chunksToUpdate.clear();
 	}
 	
@@ -195,8 +206,8 @@ public final class CaveFinderHack extends Hack
 		if(!compileVerticesTask.isDone())
 			return;
 		
-		if(!displayListUpToDate)
-			setDisplayListFromTask();
+		if(!bufferUpToDate)
+			setBufferFromTask();
 	}
 	
 	@Override
@@ -210,18 +221,22 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		// generate rainbow color
-		// float x = System.currentTimeMillis() % 2000 / 1000F;
-		// float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
-		//
-		// RenderSystem.setShaderColor(1, 0, 0, alpha);
-		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-		// VertexFormats.POSITION);
-		// GL11.glCallList(displayList);
-		// bufferBuilder.end();
-		// BufferRenderer.draw(bufferBuilder);
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
+		
+		RenderSystem.setShaderColor(1, 0, 0, alpha);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		if(vertexBuffer != null)
+		{
+			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+			Shader shader = RenderSystem.getShader();
+			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+		}
 		
 		matrixStack.pop();
 		
@@ -352,7 +367,7 @@ public final class CaveFinderHack extends Hack
 			compileVerticesTask = null;
 		}
 		
-		displayListUpToDate = false;
+		bufferUpToDate = false;
 	}
 	
 	private boolean areAllChunkSearchersDone()
@@ -421,32 +436,48 @@ public final class CaveFinderHack extends Hack
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
 		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		Callable<ArrayList<int[]>> task =
-			BlockVertexCompiler.createTask(matchingBlocks);
+			BlockVertexCompiler.createTask(matchingBlocks, regionX, regionZ);
 		
 		compileVerticesTask = pool2.submit(task);
 	}
 	
-	private void setDisplayListFromTask()
+	private void setBufferFromTask()
 	{
-		// ArrayList<int[]> vertices;
-		//
-		// try
-		// {
-		// vertices = compileVerticesTask.get();
-		//
-		// }catch(InterruptedException | ExecutionException e)
-		// {
-		// throw new RuntimeException(e);
-		// }
-		//
-		// GL11.glNewList(displayList, GL11.GL_COMPILE);
-		// for(int[] vertex : vertices)
-		// bufferBuilder.vertex(matrix, vertex[0], vertex[1], vertex[2])
-		// .next();
-		// GL11.glEndList();
+		ArrayList<int[]> vertices = getVerticesFromTask();
 		
-		displayListUpToDate = true;
+		if(vertexBuffer != null)
+			vertexBuffer.close();
+		
+		vertexBuffer = new VertexBuffer();
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		
+		for(int[] vertex : vertices)
+			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
+		
+		bufferBuilder.end();
+		vertexBuffer.upload(bufferBuilder);
+		
+		bufferUpToDate = true;
+	}
+	
+	public ArrayList<int[]> getVerticesFromTask()
+	{
+		try
+		{
+			return compileVerticesTask.get();
+			
+		}catch(InterruptedException | ExecutionException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private enum Area
