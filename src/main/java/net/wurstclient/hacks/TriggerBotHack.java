@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -89,6 +90,9 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
+
+	private final CheckboxSetting stopNearbyPlayers = new CheckboxSetting(
+			"Safe AFK farm", "The hack is go idle when other players are nearby.", false);
 	
 	public TriggerBotHack()
 	{
@@ -111,6 +115,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
+		addSetting(stopNearbyPlayers);
 	}
 	
 	@Override
@@ -143,6 +148,9 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		if(MC.crosshairTarget == null
 			|| !(MC.crosshairTarget instanceof EntityHitResult))
+			return;
+
+		if(isNearbyPlayerPresent())
 			return;
 		
 		Entity target = ((EntityHitResult)MC.crosshairTarget).getEntity();
@@ -233,5 +241,18 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
 		return stream.findFirst().isPresent();
+	}
+
+	private boolean isNearbyPlayerPresent()
+	{
+		ClientWorld world = MC.world;
+		PlayerEntity player = MC.player;
+
+		Stream<Entity> stream = StreamSupport.stream(world.getEntities().spliterator(), true)
+				.filter(e -> !e.removed)
+				.filter(e -> e instanceof PlayerEntity)
+				.filter(e -> e != player);
+
+		return stream.count() > 0;
 	}
 }
