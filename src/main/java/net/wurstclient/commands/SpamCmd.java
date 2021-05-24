@@ -117,17 +117,13 @@ public final class SpamCmd extends Command {
 	@Override
 	public void call(String[] args) throws CmdException, Exception {
 
-		// Warning for less than 3 arguments
+		// Warnings
 
 		if (args.length < 4)
 			throw new CmdSyntaxError("There should be 4 Arguments - Do .help spam for more info");
-
-		// Warning for more than 3 arguments
 		
 		String toChange1 = "";
-		
-		// Convert all arguments after the first 3 arguments into 1 string for conversion.
-		
+				
 		if (args.length > 3) {
 			StringBuilder message = new StringBuilder();
 			
@@ -140,18 +136,12 @@ public final class SpamCmd extends Command {
 			toChange1 = message.toString();
 		}
 
-		// Warning for incorrect input of Length
-
 		if (!isInteger(args[0]))
 			throw new CmdSyntaxError("First Argument is Length - Should be an Intiger");
 
-		// Warning for incorrect input of Delay
-
 		if (!isInteger(args[1]))
 			throw new CmdSyntaxError("Second Argument is Delay - Should be an Intiger");
-		
-		// Remove percent sign from chanceInputString1.
-		
+				
 		String chanceInputString1 = args[2];
 		
 		if (chanceInputString1.contains("%")) {
@@ -160,25 +150,14 @@ public final class SpamCmd extends Command {
 		
 		if (!(chanceInputString1.length() == 2))
 			throw new CmdSyntaxError("Use two numbers to represent your Chance - 00 to 99 Supported.");
-		// Warning for incorrect input of Chance
 		
 		if (!isInteger(chanceInputString1))
 			throw new CmdSyntaxError("Third Argument is Chance - Should be an Intiger");
-		
-		// Convert chanceInputString1 to chanceInputString if requirements met.
-		
-		String chanceInputString = chanceInputString1;
-		
-		// Make ChanceInputString into an int
-		
-		int chanceInput = Integer.parseInt(chanceInputString);
-		
-		// Make compatible with Math.Random()
-		
+				
+		String chanceInputString = chanceInputString1;	
+		int chanceInput = Integer.parseInt(chanceInputString);		
 		double chance = ((double) chanceInput) / 100;
 		
-		// Apply repeatLength and repeatDelay from args input
-
 		int repeatLenght = Integer.parseInt(args[0]);
 		int repeatDelay = Integer.parseInt(args[1]);
 		
@@ -189,27 +168,10 @@ public final class SpamCmd extends Command {
 		Thread thread = new Thread() {
 			public void run() {
 				System.out.println("Spam Thread Running");
-
-				// Repeat for how many times as defined in int repeatLength
-
 				for (int j = 0; j < repeatLenght; j++) {
-
-					// Temporarily changes string temp to string toChange for each repetition
-
 					String temp = toChange;
-
-					// Repeats for each character
-
 					for (int i = 0; i < temp.length(); i++) {
-
-						// Gets a random value and checks if it is below a probability to get a %
-						// chance.
-
 						if ((Math.random() < chance)) {
-
-							// Set string temp to string temp after a character has gone through the
-							// function findMapping()
-
 							try {
 								temp = temp.replace(temp.charAt(i), findMapping(temp.charAt(i)));
 							} catch (Exception e) {
@@ -218,22 +180,9 @@ public final class SpamCmd extends Command {
 							}
 						}
 					}
-
-					// Sets string message to string temp
-
 					String message = String.join(" ", temp);
-
-					// Prepares a network packet for Minecraft containing string message
-
 					ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
-
-					// Sends the packet with the message to the game server
-
 					MC.getNetworkHandler().sendPacket(packet);
-
-					// Delays the loop that repeats the message by an amount specified in int
-					// releatDelay
-
 					try {
 						TimeUnit.MILLISECONDS.sleep(repeatDelay);
 					} catch (InterruptedException e) {
@@ -251,9 +200,6 @@ public final class SpamCmd extends Command {
 	// Function findMapping()
 
 	private static char findMapping(char c) throws Exception {
-
-		// Repeats for every set of mappings
-
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 
 			// Checks if a mapping key matches with the character
@@ -271,9 +217,6 @@ public final class SpamCmd extends Command {
 		return c;
 	}
 
-	// Function isInteger(), used to see if <length> and <delay> inputs are correct
-	// to see if a string is an integer
-
 	private static boolean isInteger(String s) {
 
 		try {
@@ -289,7 +232,7 @@ public final class SpamCmd extends Command {
 		} catch (NullPointerException e) {
 			return false;
 		}
-		// Only got here if we didn't return false
+		// Only got here if we didn't return false, backup failsafe.
 		return true;
 	}
 
