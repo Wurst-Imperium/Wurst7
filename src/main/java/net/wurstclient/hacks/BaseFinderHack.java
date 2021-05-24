@@ -15,9 +15,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -87,9 +88,13 @@ public final class BaseFinderHack extends Hack
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
 	private final ArrayList<int[]> vertices = new ArrayList<>();
+	private VertexBuffer vertexBuffer;
 	
 	private int messageTimer = 0;
 	private int counter;
+	
+	private Integer oldRegionX;
+	private Integer oldRegionZ;
 	
 	public BaseFinderHack()
 	{
@@ -97,6 +102,7 @@ public final class BaseFinderHack extends Hack
 			"Finds player bases by searching for man-made blocks.\n"
 				+ "The blocks that it finds will be highlighted in red.\n"
 				+ "Good for finding faction bases.");
+		
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
 	}
@@ -136,8 +142,14 @@ public final class BaseFinderHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		
 		matchingBlocks.clear();
 		vertices.clear();
+		oldRegionX = null;
+		oldRegionZ = null;
+		
+		if(vertexBuffer != null)
+			vertexBuffer.close();
 	}
 	
 	@Override
@@ -148,25 +160,20 @@ public final class BaseFinderHack extends Hack
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		RenderSystem.setShaderColor(1F, 0F, 0F, 0.15F);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(1, 0, 0, 0.15F);
 		
-		// vertices
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		if(vertexBuffer != null)
 		{
-			for(int[] vertex : vertices)
-				bufferBuilder.vertex(matrix, vertex[0], vertex[1], vertex[2])
-					.next();
+			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+			Shader shader = RenderSystem.getShader();
+			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.pop();
 		
@@ -180,6 +187,34 @@ public final class BaseFinderHack extends Hack
 	public void onUpdate()
 	{
 		int modulo = MC.player.age % 64;
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		Integer regionX = (camPos.getX() >> 9) * 512;
+		Integer regionZ = (camPos.getZ() >> 9) * 512;
+		
+		if(modulo == 0 || !regionX.equals(oldRegionX)
+			|| !regionZ.equals(oldRegionZ))
+		{
+			if(vertexBuffer != null)
+				vertexBuffer.close();
+			
+			vertexBuffer = new VertexBuffer();
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			
+			for(int[] vertex : vertices)
+				bufferBuilder
+					.vertex(vertex[0] - regionX, vertex[1], vertex[2] - regionZ)
+					.next();
+			
+			bufferBuilder.end();
+			vertexBuffer.upload(bufferBuilder);
+			
+			oldRegionX = regionX;
+			oldRegionZ = regionZ;
+		}
 		
 		// reset matching blocks
 		if(modulo == 0)
