@@ -65,9 +65,13 @@ public final class BaseFinderHack extends Hack
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
 	private final ArrayList<int[]> vertices = new ArrayList<>();
+	private int displayList;
 	
 	private int messageTimer = 0;
 	private int counter;
+	
+	private Integer oldRegionX;
+	private Integer oldRegionZ;
 	
 	public BaseFinderHack()
 	{
@@ -104,6 +108,7 @@ public final class BaseFinderHack extends Hack
 		// reset timer
 		messageTimer = 0;
 		blockNames = new ArrayList<>(naturalBlocks.getBlockNames());
+		displayList = GL11.glGenLists(1);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -114,8 +119,13 @@ public final class BaseFinderHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		
 		matchingBlocks.clear();
 		vertices.clear();
+		oldRegionX = null;
+		oldRegionZ = null;
+		
+		GL11.glDeleteLists(displayList, 1);
 	}
 	
 	@Override
@@ -128,18 +138,12 @@ public final class BaseFinderHack extends Hack
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1F, 0F, 0F, 0.15F);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
-		// vertices
-		GL11.glBegin(GL11.GL_QUADS);
-		{
-			for(int[] vertex : vertices)
-				GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
-		}
-		GL11.glEnd();
+		GL11.glColor4f(1, 0, 0, 0.15F);
+		GL11.glCallList(displayList);
 		
 		GL11.glPopMatrix();
 		
@@ -154,6 +158,28 @@ public final class BaseFinderHack extends Hack
 	public void onUpdate()
 	{
 		int modulo = MC.player.age % 64;
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		Integer regionX = (camPos.getX() >> 9) * 512;
+		Integer regionZ = (camPos.getZ() >> 9) * 512;
+		
+		if(modulo == 0 || !regionX.equals(oldRegionX)
+			|| !regionZ.equals(oldRegionZ))
+		{
+			GL11.glNewList(displayList, GL11.GL_COMPILE);
+			
+			GL11.glBegin(GL11.GL_QUADS);
+			
+			for(int[] vertex : vertices)
+				GL11.glVertex3d(vertex[0] - regionX, vertex[1],
+					vertex[2] - regionZ);
+			
+			GL11.glEnd();
+			GL11.glEndList();
+			
+			oldRegionX = regionX;
+			oldRegionZ = regionZ;
+		}
 		
 		// reset matching blocks
 		if(modulo == 0)

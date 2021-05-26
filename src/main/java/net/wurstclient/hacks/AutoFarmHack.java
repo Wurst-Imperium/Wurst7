@@ -508,6 +508,9 @@ public final class AutoFarmHack extends Hack
 	private void updateDisplayList(List<BlockPos> blocksToHarvest,
 		List<BlockPos> blocksToReplant)
 	{
+		if(BlockEntityRenderDispatcher.INSTANCE.camera == null)
+			return;
+		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
