@@ -211,9 +211,9 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		RenderUtils.applyRegionalRenderOffset();
 		
-		// generate rainbow color
+		// generate color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
 		
@@ -421,24 +421,19 @@ public final class CaveFinderHack extends Hack
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
 		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		Callable<ArrayList<int[]>> task =
-			BlockVertexCompiler.createTask(matchingBlocks);
+			BlockVertexCompiler.createTask(matchingBlocks, regionX, regionZ);
 		
 		compileVerticesTask = pool2.submit(task);
 	}
 	
 	private void setDisplayListFromTask()
 	{
-		ArrayList<int[]> vertices;
-		
-		try
-		{
-			vertices = compileVerticesTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
+		ArrayList<int[]> vertices = getVerticesFromTask();
 		
 		GL11.glNewList(displayList, GL11.GL_COMPILE);
 		for(int[] vertex : vertices)
@@ -446,6 +441,18 @@ public final class CaveFinderHack extends Hack
 		GL11.glEndList();
 		
 		displayListUpToDate = true;
+	}
+	
+	public ArrayList<int[]> getVerticesFromTask()
+	{
+		try
+		{
+			return compileVerticesTask.get();
+			
+		}catch(InterruptedException | ExecutionException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private enum Area
