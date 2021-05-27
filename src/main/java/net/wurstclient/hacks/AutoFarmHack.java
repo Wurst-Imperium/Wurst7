@@ -7,13 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +16,13 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,6 +32,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
@@ -65,7 +66,9 @@ public final class AutoFarmHack extends Hack
 	private float progress;
 	private float prevProgress;
 	
-	private int displayList;
+	private VertexBuffer greenBuffer;
+	private VertexBuffer cyanBuffer;
+	private VertexBuffer redBuffer;
 	
 	private boolean busy;
 	
@@ -89,8 +92,6 @@ public final class AutoFarmHack extends Hack
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		displayList = GL11.glGenLists(1);
 	}
 	
 	@Override
@@ -108,7 +109,9 @@ public final class AutoFarmHack extends Hack
 		
 		prevBlocks.clear();
 		busy = false;
-		GL11.glDeleteLists(displayList, 1);
+		
+		Stream.of(greenBuffer, cyanBuffer, redBuffer).filter(Objects::nonNull)
+			.forEach(VertexBuffer::close);
 	}
 	
 	@Override
@@ -157,7 +160,7 @@ public final class AutoFarmHack extends Hack
 			harvest(blocksToHarvest);
 		
 		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
-		// updateDisplayList(matrixStack, blocksToHarvest, blocksToReplant);
+		updateVertexBuffers(blocksToHarvest, blocksToReplant);
 	}
 	
 	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
@@ -202,7 +205,27 @@ public final class AutoFarmHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		GL11.glCallList(displayList);
+		Matrix4f viewMatrix = matrixStack.peek().getModel();
+		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+		Shader shader = RenderSystem.getShader();
+		
+		if(greenBuffer != null)
+		{
+			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+			greenBuffer.setShader(viewMatrix, projMatrix, shader);
+		}
+		
+		if(cyanBuffer != null)
+		{
+			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+			cyanBuffer.setShader(viewMatrix, projMatrix, shader);
+		}
+		
+		if(redBuffer != null)
+		{
+			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			redBuffer.setShader(viewMatrix, projMatrix, shader);
+		}
 		
 		if(currentBlock != null)
 		{
@@ -485,48 +508,75 @@ public final class AutoFarmHack extends Hack
 		}
 	}
 	
-	// private void updateDisplayList(MatrixStack matrixStack,
-	// List<BlockPos> blocksToHarvest, List<BlockPos> blocksToReplant)
-	// {
-	// BlockPos camPos = RenderUtils.getCameraBlockPos();
-	// int regionX = (camPos.getX() >> 9) * 512;
-	// int regionZ = (camPos.getZ() >> 9) * 512;
-	//
-	// GL11.glNewList(displayList, GL11.GL_COMPILE);
-	// RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-	// for(BlockPos pos : blocksToHarvest)
-	// {
-	// matrixStack.push();
-	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
-	// pos.getZ() - regionZ);
-	// Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0,
-	// 15 / 16.0, 15 / 16.0);
-	// RenderUtils.drawOutlinedBox(matrixStack, box);
-	// matrixStack.pop();
-	// }
-	// RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-	// for(BlockPos pos : plants.keySet())
-	// {
-	// matrixStack.push();
-	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
-	// pos.getZ() - regionZ);
-	// Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-	// RenderUtils.drawNode(matrixStack, node);
-	// matrixStack.pop();
-	// }
-	// RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-	// for(BlockPos pos : blocksToReplant)
-	// {
-	// matrixStack.push();
-	// matrixStack.translate(pos.getX() - regionX, pos.getY(),
-	// pos.getZ() - regionZ);
-	// Box box = new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0,
-	// 15 / 16.0, 15 / 16.0);
-	// RenderUtils.drawOutlinedBox(matrixStack, box);
-	// matrixStack.pop();
-	// }
-	// GL11.glEndList();
-	// }
+	private void updateVertexBuffers(List<BlockPos> blocksToHarvest,
+		List<BlockPos> blocksToReplant)
+	{
+		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
+			return;
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
+		if(greenBuffer != null)
+			greenBuffer.close();
+		
+		greenBuffer = new VertexBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		double boxMin = 1 / 16.0;
+		double boxMax = 15 / 16.0;
+		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
+		
+		for(BlockPos pos : blocksToHarvest)
+		{
+			Box renderBox = box.offset(pos).offset(-regionX, 0, -regionZ);
+			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
+		}
+		
+		bufferBuilder.end();
+		greenBuffer.upload(bufferBuilder);
+		
+		if(cyanBuffer != null)
+			cyanBuffer.close();
+		
+		cyanBuffer = new VertexBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+		
+		for(BlockPos pos : plants.keySet())
+		{
+			Box renderNode = node.offset(pos).offset(-regionX, 0, -regionZ);
+			RenderUtils.drawNode(renderNode, bufferBuilder);
+		}
+		
+		bufferBuilder.end();
+		cyanBuffer.upload(bufferBuilder);
+		
+		if(redBuffer != null)
+			redBuffer.close();
+		
+		redBuffer = new VertexBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		for(BlockPos pos : blocksToReplant)
+		{
+			Box renderBox = box.offset(pos).offset(-regionX, 0, -regionZ);
+			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
+		}
+		
+		bufferBuilder.end();
+		redBuffer.upload(bufferBuilder);
+	}
 	
 	/**
 	 * Returns true if AutoFarm is currently harvesting or replanting something.
