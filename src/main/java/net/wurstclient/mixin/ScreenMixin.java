@@ -30,7 +30,7 @@ public abstract class ScreenMixin extends AbstractParentElement
 {
 	@Shadow
 	@Final
-	private List<Drawable> field_33816;
+	private List<Drawable> drawables;
 	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
@@ -61,6 +61,6 @@ public abstract class ScreenMixin extends AbstractParentElement
 	@Override
 	public List<Drawable> getButtons()
 	{
-		return field_33816;
+		return drawables;
 	}
 }
