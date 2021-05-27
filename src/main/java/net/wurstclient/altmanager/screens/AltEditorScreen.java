@@ -72,24 +72,24 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
-		method_37063(doneButton =
+		addDrawableChild(doneButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
 				new LiteralText(getDoneButtonText()), b -> pressDoneButton()));
 		
-		method_37063(
+		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
 				new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		method_37063(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
 			200, 20, new LiteralText("Random Name"),
 			b -> emailBox.setText(NameGenerator.generateName())));
 		
-		method_37063(stealSkinButton =
+		addDrawableChild(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
 				128, 20, new LiteralText("Steal Skin"),
 				b -> message = stealSkin(getEmail())));
 		
-		method_37063(
+		addDrawableChild(
 			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
 				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
 		
@@ -98,7 +98,7 @@ public abstract class AltEditorScreen extends Screen
 		emailBox.setMaxLength(48);
 		emailBox.setTextFieldFocused(true);
 		emailBox.setText(getDefaultEmail());
-		addChild(emailBox);
+		addSelectableChild(emailBox);
 		
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
@@ -110,7 +110,7 @@ public abstract class AltEditorScreen extends Screen
 			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
 		});
 		passwordBox.setMaxLength(256);
-		addChild(passwordBox);
+		addSelectableChild(passwordBox);
 		
 		setInitialFocus(emailBox);
 	}

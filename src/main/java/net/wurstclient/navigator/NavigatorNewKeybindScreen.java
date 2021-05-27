@@ -70,10 +70,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				}
 			});
 		okButton.active = selectedCommand != null;
-		method_37063(okButton);
+		addDrawableChild(okButton);
 		
 		// cancel button
-		method_37063(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
 			new LiteralText("Cancel"), b -> WurstClient.MC.openScreen(parent)));
 	}
 	

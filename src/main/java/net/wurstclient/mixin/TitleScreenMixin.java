@@ -38,8 +38,8 @@ public abstract class TitleScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		method_37063(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98, 20,
-			new LiteralText("Alt Manager"),
+		addDrawableChild(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98,
+			20, new LiteralText("Alt Manager"),
 			b -> client.openScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 		

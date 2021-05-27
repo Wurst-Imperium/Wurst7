@@ -57,7 +57,7 @@ public abstract class GameMenuScreenMixin extends Screen
 			204, 20, new LiteralText("            Options"),
 			b -> openWurstOptions());
 		
-		method_37063(wurstOptionsButton);
+		addDrawableChild(wurstOptionsButton);
 	}
 	
 	private void openWurstOptions()

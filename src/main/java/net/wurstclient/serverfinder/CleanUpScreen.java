@@ -48,52 +48,58 @@ public class CleanUpScreen extends Screen
 	@Override
 	public void init()
 	{
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-			() -> "Cancel", "", b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
+				() -> "Cancel", "", b -> client.openScreen(prevScreen)));
 		
-		method_37063(cleanUpButton = new CleanUpButton(width / 2 - 100,
+		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
 			"Start the Clean Up with the settings\n" + "you specified above.\n"
 				+ "It might look like the game is not\n"
 				+ "responding for a couple of seconds.",
 			b -> cleanUp()));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
-			() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
-			"Servers that clearly don't exist.",
-			b -> cleanupUnknown = !cleanupUnknown));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
+				() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
+				"Servers that clearly don't exist.",
+				b -> cleanupUnknown = !cleanupUnknown));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
+		addDrawableChild(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
 			() -> "Outdated Servers: " + removeOrKeep(cleanupOutdated),
 			"Servers that run a different Minecraft\n" + "version than you.",
 			b -> cleanupOutdated = !cleanupOutdated));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
-			() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
-			"All servers that failed the last ping.\n"
-				+ "Make sure that the last ping is complete\n"
-				+ "before you do this. That means: Go back,\n"
-				+ "press the refresh button and wait until\n"
-				+ "all servers are done refreshing.",
-			b -> cleanupFailed = !cleanupFailed));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
+				() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
+				"All servers that failed the last ping.\n"
+					+ "Make sure that the last ping is complete\n"
+					+ "before you do this. That means: Go back,\n"
+					+ "press the refresh button and wait until\n"
+					+ "all servers are done refreshing.",
+				b -> cleanupFailed = !cleanupFailed));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 48 + 12,
-			() -> "\"Grief me\" Servers: " + removeOrKeep(cleanupGriefMe),
-			"All servers where the name starts with \"Grief me\"\n"
-				+ "Useful for removing servers found by ServerFinder.",
-			b -> cleanupGriefMe = !cleanupGriefMe));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 48 + 12,
+				() -> "\"Grief me\" Servers: " + removeOrKeep(cleanupGriefMe),
+				"All servers where the name starts with \"Grief me\"\n"
+					+ "Useful for removing servers found by ServerFinder.",
+				b -> cleanupGriefMe = !cleanupGriefMe));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
-			() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
-			"This will completely clear your server\n"
-				+ "list. \u00a7cUse with caution!\u00a7r",
-			b -> removeAll = !removeAll));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
+				() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
+				"This will completely clear your server\n"
+					+ "list. \u00a7cUse with caution!\u00a7r",
+				b -> removeAll = !removeAll));
 		
-		method_37063(new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
-			() -> "Rename all Servers: " + yesOrNo(cleanupRename),
-			"Renames your servers to \"Grief me #1\",\n"
-				+ "\"Grief me #2\", etc.",
-			b -> cleanupRename = !cleanupRename));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
+				() -> "Rename all Servers: " + yesOrNo(cleanupRename),
+				"Renames your servers to \"Grief me #1\",\n"
+					+ "\"Grief me #2\", etc.",
+				b -> cleanupRename = !cleanupRename));
 	}
 	
 	private String yesOrNo(boolean b)

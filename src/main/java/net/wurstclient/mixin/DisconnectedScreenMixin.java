@@ -52,11 +52,11 @@ public class DisconnectedScreenMixin extends Screen
 		int backButtonY =
 			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
 		
-		method_37063(new ButtonWidget(backButtonX, backButtonY + 24, 200, 20,
-			new LiteralText("Reconnect"),
+		addDrawableChild(new ButtonWidget(backButtonX, backButtonY + 24, 200,
+			20, new LiteralText("Reconnect"),
 			b -> LastServerRememberer.reconnect(parent)));
 		
-		autoReconnectButton = method_37063(
+		autoReconnectButton = addDrawableChild(
 			new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
 				new LiteralText("AutoReconnect"), b -> pressAutoReconnect()));
 		

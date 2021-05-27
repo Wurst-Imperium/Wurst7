@@ -67,7 +67,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		searchBar.setDrawsBackground(false);
 		searchBar.setMaxLength(128);
 		
-		addChild(searchBar);
+		addSelectableChild(searchBar);
 		setInitialFocus(searchBar);
 		searchBar.setTextFieldFocused(true);
 		

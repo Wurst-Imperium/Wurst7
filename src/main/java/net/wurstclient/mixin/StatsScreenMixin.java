@@ -39,7 +39,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 			height - 28, 150, 20, new LiteralText(""), this::toggleWurst);
 		
 		updateWurstButtonText(toggleWurstButton);
-		method_37063(toggleWurstButton);
+		addDrawableChild(toggleWurstButton);
 		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{

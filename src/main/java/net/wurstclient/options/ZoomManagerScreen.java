@@ -39,26 +39,26 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
-		method_37063(
+		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
 				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		method_37063(
+		addDrawableChild(
 			keyButton = new ButtonWidget(width / 2 - 79, height / 4 + 24 - 16,
 				158, 20, new LiteralText("Zoom Key: " + zoomKeyName),
 				b -> client.openScreen(new PressAKeyScreen(this))));
 		
-		method_37063(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16, 50,
-			20, new LiteralText("More"), b -> level.increaseValue()));
+		addDrawableChild(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16,
+			50, 20, new LiteralText("More"), b -> level.increaseValue()));
 		
-		method_37063(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16, 50,
-			20, new LiteralText("Less"), b -> level.decreaseValue()));
+		addDrawableChild(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16,
+			50, 20, new LiteralText("Less"), b -> level.decreaseValue()));
 		
-		method_37063(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16, 50,
-			20, new LiteralText("Default"),
+		addDrawableChild(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16,
+			50, 20, new LiteralText("Default"),
 			b -> level.setValue(level.getDefaultValue())));
 		
-		method_37063(scrollButton =
+		addDrawableChild(scrollButton =
 			new ButtonWidget(width / 2 - 79, height / 4 + 96 - 16, 158, 20,
 				new LiteralText(
 					"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),

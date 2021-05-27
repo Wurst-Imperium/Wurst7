@@ -57,13 +57,13 @@ public final class EditBlockScreen extends Screen
 		blockField.setText(valueString);
 		blockField.setSelectionStart(0);
 		
-		addChild(blockField);
+		addSelectableChild(blockField);
 		setInitialFocus(blockField);
 		blockField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
-		method_37063(doneButton);
+		addDrawableChild(doneButton);
 	}
 	
 	private void done()

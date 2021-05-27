@@ -108,7 +108,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
 				});
-			method_37063(primaryButton);
+			addDrawableChild(primaryButton);
 		}
 		
 		// help button

@@ -84,33 +84,35 @@ public final class AltManagerScreen extends Screen
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
-		method_37063(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, new LiteralText("Login"), b -> pressLogin()));
+		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
+			height - 52, 100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
-		method_37063(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
 			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		method_37063(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
 			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
-		method_37063(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
+		addDrawableChild(
+			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
+				new LiteralText("Favorite"), b -> pressFavorite()));
 		
-		method_37063(editButton = new ButtonWidget(width / 2 - 76, height - 28,
-			74, 20, new LiteralText("Edit"), b -> pressEdit()));
+		addDrawableChild(editButton = new ButtonWidget(width / 2 - 76,
+			height - 28, 74, 20, new LiteralText("Edit"), b -> pressEdit()));
 		
-		method_37063(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, new LiteralText("Delete"), b -> pressDelete()));
+		addDrawableChild(
+			deleteButton = new ButtonWidget(width / 2 + 2, height - 28, 74, 20,
+				new LiteralText("Delete"), b -> pressDelete()));
 		
-		method_37063(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		method_37063(importButton = new ButtonWidget(8, 8, 50, 20,
+		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
 		
-		method_37063(exportButton = new ButtonWidget(58, 8, 50, 20,
+		addDrawableChild(exportButton = new ButtonWidget(58, 8, 50, 20,
 			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	

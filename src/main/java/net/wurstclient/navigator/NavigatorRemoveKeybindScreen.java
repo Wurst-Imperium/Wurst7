@@ -50,10 +50,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		removeButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
 			new LiteralText("Remove"), b -> remove());
 		removeButton.active = !selectedKey.isEmpty();
-		method_37063(removeButton);
+		addDrawableChild(removeButton);
 		
 		// cancel button
-		method_37063(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
 			new LiteralText("Cancel"), b -> client.openScreen(parent)));
 	}
 	
