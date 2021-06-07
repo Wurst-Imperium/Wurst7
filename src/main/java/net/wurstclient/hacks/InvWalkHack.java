@@ -54,7 +54,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	
 	public InvWalkHack()
 	{
-		super("InvWalk", "Allows you to move, while in inventory screen");
+		super("InvWalk", "Enables movement in inventory and container screens");
 		setCategory(Category.MOVEMENT);
 		addSetting(exception);
 	}
