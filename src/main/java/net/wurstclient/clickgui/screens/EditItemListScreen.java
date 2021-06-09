@@ -64,6 +64,7 @@ public final class EditItemListScreen extends Screen
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		children.add(itemNameField);
+		itemNameField.setMaxLength(64);
 		
 		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
 			20, new LiteralText("Add"), b -> {
@@ -176,20 +177,17 @@ public final class EditItemListScreen extends Screen
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 300);
+		
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
-		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(0, 0, 300);
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"item name or ID", 68, height - 50, 0x808080);
-			GL11.glPopMatrix();
-		}
 		
 		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
 		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
