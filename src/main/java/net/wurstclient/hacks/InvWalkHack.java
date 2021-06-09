@@ -44,7 +44,7 @@ import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.navigator.NavigatorScreen;
 import net.wurstclient.settings.CheckboxSetting;
 
-@SearchTags({"inventory walk"})
+@SearchTags({"inventory walk", "InvMove"})
 public final class InvWalkHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting exception =
@@ -96,12 +96,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		((KeyBinding)sprintKey).setPressed(sprintKey.isActallyPressed());
 		
 		IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
-		((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
-		
-		//KeyBinding sneakKey = MC.options.keySneak;
-		//if (((IKeyBinding)sneakKey).isActallyPressed())
-			//MC.options.keySneak.setPressed(true);
-		
+		((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());	
 			
 	}
 	 private boolean avoid()
