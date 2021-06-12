@@ -177,7 +177,7 @@ public final class EditItemListScreen extends Screen
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
-	  matrixStack.push();
+	        matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
