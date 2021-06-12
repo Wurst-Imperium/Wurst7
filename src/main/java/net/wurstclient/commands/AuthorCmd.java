@@ -10,7 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtString;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -30,10 +30,10 @@ public final class AuthorCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
-		ItemStack heldItem = MC.player.inventory.getMainHandStack();
+		ItemStack heldItem = MC.player.getInventory().getMainHandStack();
 		int heldItemID = Item.getRawId(heldItem.getItem());
 		int writtenBookID = Item.getRawId(Items.WRITTEN_BOOK);
 		
@@ -42,6 +42,6 @@ public final class AuthorCmd extends Command
 				"You must hold a written book in your main hand.");
 		
 		String author = String.join(" ", args);
-		heldItem.putSubTag("author", StringTag.of(author));
+		heldItem.putSubTag("author", NbtString.of(author));
 	}
 }

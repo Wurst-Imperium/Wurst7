@@ -7,7 +7,7 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;

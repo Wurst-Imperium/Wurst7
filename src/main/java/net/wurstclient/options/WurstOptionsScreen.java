@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -24,6 +25,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -40,8 +42,9 @@ public class WurstOptionsScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -141,21 +144,25 @@ public class WurstOptionsScreen extends Screen
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredString(matrixStack, tr, "Wurst Options", middleX, y1,
+		drawCenteredText(matrixStack, tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		drawCenteredString(matrixStack, tr, "Settings", middleX - 104, y2,
+		drawCenteredText(matrixStack, tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredString(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredString(matrixStack, tr, "Links", middleX + 104, y2,
-			0xcccccc);
+		drawCenteredText(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredText(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
 			
@@ -196,7 +203,7 @@ public class WurstOptionsScreen extends Screen
 				this.tooltip = Arrays.asList(lines2);
 			}
 			
-			addButton(this);
+			addDrawableChild(this);
 		}
 		
 		@Override

@@ -9,19 +9,22 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
 
 public interface RenderListener extends Listener
 {
-	public void onRender(float partialTicks);
+	public void onRender(MatrixStack matrixStack, float partialTicks);
 	
 	public static class RenderEvent extends Event<RenderListener>
 	{
+		private final MatrixStack matrixStack;
 		private final float partialTicks;
 		
-		public RenderEvent(float partialTicks)
+		public RenderEvent(MatrixStack matrixStack, float partialTicks)
 		{
+			this.matrixStack = matrixStack;
 			this.partialTicks = partialTicks;
 		}
 		
@@ -29,7 +32,7 @@ public interface RenderListener extends Listener
 		public void fire(ArrayList<RenderListener> listeners)
 		{
 			for(RenderListener listener : listeners)
-				listener.onRender(partialTicks);
+				listener.onRender(matrixStack, partialTicks);
 		}
 		
 		@Override

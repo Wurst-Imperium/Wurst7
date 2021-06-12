@@ -57,16 +57,17 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		lastServerButton = addButton(new ButtonWidget(width / 2 - 154, 10, 100,
-			20, new LiteralText("Last Server"), b -> LastServerRememberer
-				.joinLastServer((MultiplayerScreen)(Object)this)));
+		lastServerButton =
+			addDrawableChild(new ButtonWidget(width / 2 - 154, 10, 100, 20,
+				new LiteralText("Last Server"), b -> LastServerRememberer
+					.joinLastServer((MultiplayerScreen)(Object)this)));
 		
-		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
-			new LiteralText("Server Finder"), b -> client.openScreen(
+		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100,
+			20, new LiteralText("Server Finder"), b -> client.openScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
 		
-		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
-			new LiteralText("Clean Up"), b -> client.openScreen(
+		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100,
+			20, new LiteralText("Clean Up"), b -> client.openScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 	

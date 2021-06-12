@@ -9,7 +9,7 @@ package net.wurstclient.options;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -39,25 +39,26 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		addButton(
+		addDrawableChild(
 			keyButton = new ButtonWidget(width / 2 - 79, height / 4 + 24 - 16,
 				158, 20, new LiteralText("Zoom Key: " + zoomKeyName),
 				b -> client.openScreen(new PressAKeyScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16, 50, 20,
-			new LiteralText("More"), b -> level.increaseValue()));
+		addDrawableChild(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16,
+			50, 20, new LiteralText("More"), b -> level.increaseValue()));
 		
-		addButton(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16, 50, 20,
-			new LiteralText("Less"), b -> level.decreaseValue()));
+		addDrawableChild(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16,
+			50, 20, new LiteralText("Less"), b -> level.decreaseValue()));
 		
-		addButton(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16, 50, 20,
-			new LiteralText("Default"),
+		addDrawableChild(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16,
+			50, 20, new LiteralText("Default"),
 			b -> level.setValue(level.getDefaultValue())));
 		
-		addButton(scrollButton =
+		addDrawableChild(scrollButton =
 			new ButtonWidget(width / 2 - 79, height / 4 + 96 - 16, 158, 20,
 				new LiteralText(
 					"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
@@ -87,7 +88,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, textRenderer, "Zoom Manager", width / 2,
+		drawCenteredText(matrixStack, textRenderer, "Zoom Manager", width / 2,
 			40, 0xffffff);
 		drawStringWithShadow(matrixStack, textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
@@ -129,7 +130,7 @@ public final class PathCmd extends Command
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
+			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
@@ -192,9 +193,10 @@ public final class PathCmd extends Command
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		pathFinder.renderPath(debugMode.isChecked(), depthTest.isChecked());
+		pathFinder.renderPath(matrixStack, debugMode.isChecked(),
+			depthTest.isChecked());
 	}
 	
 	public BlockPos getLastGoal()

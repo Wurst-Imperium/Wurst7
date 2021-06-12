@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -33,7 +34,7 @@ public final class InvseeCmd extends Command implements RenderListener
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Survival mode only.");
 			return;
@@ -44,7 +45,7 @@ public final class InvseeCmd extends Command implements RenderListener
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		boolean found = false;
 		

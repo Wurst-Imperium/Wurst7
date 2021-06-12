@@ -11,6 +11,10 @@ import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -120,12 +124,12 @@ public final class BuildRandomHack extends Hack
 		if(!checkItem.isChecked())
 			return true;
 		
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(lastPos == null)
 			return;
@@ -134,21 +138,18 @@ public final class BuildRandomHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		GL11.glTranslated(lastPos.getX() - regionX, lastPos.getY(),
+		matrixStack.translate(lastPos.getX() - regionX, lastPos.getY(),
 			lastPos.getZ() - regionZ);
 		
 		// get color
@@ -156,16 +157,16 @@ public final class BuildRandomHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(matrixStack);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(matrixStack);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
@@ -229,8 +230,8 @@ public final class BuildRandomHack extends Hack
 			
 			// face block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			

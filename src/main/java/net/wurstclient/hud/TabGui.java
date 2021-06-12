@@ -18,7 +18,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
-import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.other_features.TabGuiOtf;
@@ -119,12 +118,11 @@ public final class TabGui implements KeyPressListener
 			return;
 		
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		Window sr = WurstClient.MC.getWindow();
 		
 		int x = 2;
@@ -140,7 +138,7 @@ public final class TabGui implements KeyPressListener
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		int textY = 1;
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
 		for(int i = 0; i < tabs.size(); i++)
 		{
 			String tabName = tabs.get(i).name;
@@ -152,13 +150,11 @@ public final class TabGui implements KeyPressListener
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
-		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if(tabOpened)
 		{
-			GL11.glPushMatrix();
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			matrixStack.push();
 			
 			Tab tab = tabs.get(selected);
 			int tabX = x + width + 2;
@@ -173,7 +169,6 @@ public final class TabGui implements KeyPressListener
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			
 			int tabTextY = 1;
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			for(int i = 0; i < tab.features.size(); i++)
 			{
 				Feature feature = tab.features.get(i);
@@ -190,90 +185,100 @@ public final class TabGui implements KeyPressListener
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
-			
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		matrixStack.pop();
 		GL11.glEnable(GL11.GL_CULL_FACE);
 	}
 	
 	private void drawBox(int x1, int y1, int x2, int y2)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		float[] acColor = gui.getAcColor();
-		float opacity = gui.getOpacity();
-		
-		// color
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
-		
-		// box
-		GL11.glBegin(GL11.GL_QUADS);
-		{
-			GL11.glVertex2i(x1, y1);
-			GL11.glVertex2i(x2, y1);
-			GL11.glVertex2i(x2, y2);
-			GL11.glVertex2i(x1, y2);
-		}
-		GL11.glEnd();
-		
-		// outline positions
-		double xi1 = x1 - 0.1;
-		double xi2 = x2 + 0.1;
-		double yi1 = y1 - 0.1;
-		double yi2 = y2 + 0.1;
-		
-		// outline
-		GL11.glLineWidth(1);
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		{
-			GL11.glVertex2d(xi1, yi1);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi2, yi2);
-			GL11.glVertex2d(xi1, yi2);
-		}
-		GL11.glEnd();
-		
-		// shadow positions
-		xi1 -= 0.9;
-		xi2 += 0.9;
-		yi1 -= 0.9;
-		yi2 += 0.9;
-		
-		// top left
-		GL11.glBegin(GL11.GL_POLYGON);
-		{
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			GL11.glVertex2d(x1, y1);
-			GL11.glVertex2d(x2, y1);
-			GL11.glColor4f(0, 0, 0, 0);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi1, yi1);
-			GL11.glVertex2d(xi1, yi2);
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			GL11.glVertex2d(x1, y2);
-		}
-		GL11.glEnd();
-		
-		// bottom right
-		GL11.glBegin(GL11.GL_POLYGON);
-		{
-			GL11.glVertex2d(x2, y2);
-			GL11.glVertex2d(x2, y1);
-			GL11.glColor4f(0, 0, 0, 0);
-			GL11.glVertex2d(xi2, yi1);
-			GL11.glVertex2d(xi2, yi2);
-			GL11.glVertex2d(xi1, yi2);
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.75F);
-			GL11.glVertex2d(x1, y2);
-		}
-		GL11.glEnd();
+		// ClickGui gui = WurstClient.INSTANCE.getGui();
+		// float[] bgColor = gui.getBgColor();
+		// float[] acColor = gui.getAcColor();
+		// float opacity = gui.getOpacity();
+		//
+		// // color
+		// RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		// opacity);
+		//
+		// // box
+		// bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		// VertexFormats.POSITION);
+		// {
+		// bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // outline positions
+		// double xi1 = x1 - 0.1;
+		// double xi2 = x2 + 0.1;
+		// double yi1 = y1 - 0.1;
+		// double yi2 = y2 + 0.1;
+		//
+		// // outline
+		// GL11.glLineWidth(1);
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.5F);
+		// bufferBuilder.begin(VertexFormat.DrawMode.LINE_LOOP,
+		// VertexFormats.POSITION);
+		// {
+		// bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // shadow positions
+		// xi1 -= 0.9;
+		// xi2 += 0.9;
+		// yi1 -= 0.9;
+		// yi2 += 0.9;
+		//
+		// // top left
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		// RenderSystem.setShaderColor(0, 0, 0, 0);
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
+		//
+		// // bottom right
+		// bufferBuilder.begin(VertexFormat.DrawMode.POLYGON,
+		// VertexFormats.POSITION);
+		// {
+		// bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		// bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		// RenderSystem.setShaderColor(0, 0, 0, 0);
+		// bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
+		// bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
+		// bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
+		// RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+		// 0.75F);
+		// bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		// }
+		// bufferBuilder.end();
+		// BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private static final class Tab
