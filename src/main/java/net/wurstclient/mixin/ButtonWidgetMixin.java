@@ -10,14 +10,14 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 @Mixin(ButtonWidget.class)
-public abstract class ButtonWidgetMixin extends AbstractPressableButtonWidget
+public abstract class ButtonWidgetMixin extends PressableWidget
 {
 	public ButtonWidgetMixin(WurstClient wurst, int i, int j, int k, int l,
 		Text text)
@@ -26,8 +26,8 @@ public abstract class ButtonWidgetMixin extends AbstractPressableButtonWidget
 	}
 	
 	@Override
-	protected void renderBg(MatrixStack matrixStack, MinecraftClient client,
-		int mouseX, int mouseY)
+	protected void renderBackground(MatrixStack matrixStack,
+		MinecraftClient client, int mouseX, int mouseY)
 	{
 		int i = getYImage(isHovered());
 		drawTexture(matrixStack, x, y, 0, 46 + i * 20, width / 2, height / 2);

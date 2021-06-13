@@ -14,7 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.Identifier;
@@ -44,7 +44,7 @@ public final class GiveCmd extends Command
 		if(args.length < 1)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
@@ -82,7 +82,7 @@ public final class GiveCmd extends Command
 		if(nbt != null)
 			try
 			{
-				CompoundTag tag = StringNbtReader.parse(nbt);
+				NbtCompound tag = StringNbtReader.parse(nbt);
 				stack.setTag(tag);
 				
 			}catch(CommandSyntaxException e)
@@ -114,7 +114,7 @@ public final class GiveCmd extends Command
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getStack(i).isEmpty())
+			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

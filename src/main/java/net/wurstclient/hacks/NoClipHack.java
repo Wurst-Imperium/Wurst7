@@ -58,7 +58,7 @@ public final class NoClipHack extends Hack implements UpdateListener,
 		player.fallDistance = 0;
 		player.setOnGround(false);
 		
-		player.abilities.flying = false;
+		player.getAbilities().flying = false;
 		player.setVelocity(0, 0, 0);
 		
 		float speed = 0.2F;

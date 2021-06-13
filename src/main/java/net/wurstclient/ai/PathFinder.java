@@ -14,7 +14,10 @@ import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
@@ -26,9 +29,9 @@ public class PathFinder
 	private final WurstClient wurst = WurstClient.INSTANCE;
 	
 	private final boolean invulnerable =
-		WurstClient.MC.player.abilities.creativeMode;
+		WurstClient.MC.player.getAbilities().creativeMode;
 	private final boolean creativeFlying =
-		WurstClient.MC.player.abilities.flying;
+		WurstClient.MC.player.getAbilities().flying;
 	protected final boolean flying =
 		creativeFlying || wurst.getHax().flightHack.isEnabled();
 	private final boolean immuneToFallDamage =
@@ -495,74 +498,66 @@ public class PathFinder
 		return path;
 	}
 	
-	public void renderPath(boolean debugMode, boolean depthTest)
+	public void renderPath(MatrixStack matrixStack, boolean debugMode,
+		boolean depthTest)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
-		GL11.glTranslated(0.5, 0.5, 0.5);
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
+		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
 		{
 			int renderedThings = 0;
 			
 			// queue (yellow)
-			GL11.glLineWidth(2);
-			GL11.glColor4f(1, 1, 0, 0.75F);
+			RenderSystem.setShaderColor(1, 1, 0, 0.75F);
 			for(PathPos element : queue.toArray())
 			{
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(element);
+				PathRenderer.renderNode(matrixStack, element);
 				renderedThings++;
 			}
 			
 			// processed (red)
-			GL11.glLineWidth(2);
 			for(Entry<PathPos, PathPos> entry : prevPosMap.entrySet())
 			{
 				if(renderedThings >= 5000)
 					break;
 				
 				if(entry.getKey().isJumping())
-					GL11.glColor4f(1, 0, 1, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 1, 0.75F);
 				else
-					GL11.glColor4f(1, 0, 0, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
-				PathRenderer.renderArrow(entry.getValue(), entry.getKey());
+				PathRenderer.renderArrow(matrixStack, entry.getValue(),
+					entry.getKey());
 				renderedThings++;
 			}
 		}
 		
 		// path (blue)
 		if(debugMode)
-		{
-			GL11.glLineWidth(4);
-			GL11.glColor4f(0, 0, 1, 0.75F);
-		}else
-		{
-			GL11.glLineWidth(2);
-			GL11.glColor4f(0, 1, 0, 0.75F);
-		}
+			RenderSystem.setShaderColor(0, 0, 1, 0.75F);
+		else
+			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);
@@ -574,7 +569,7 @@ public class PathFinder
 			throw new IllegalStateException("Path is not formatted!");
 		
 		// check player abilities
-		if(invulnerable != WurstClient.MC.player.abilities.creativeMode
+		if(invulnerable != WurstClient.MC.player.getAbilities().creativeMode
 			|| flying != (creativeFlying
 				|| wurst.getHax().flightHack.isEnabled())
 			|| immuneToFallDamage != (invulnerable

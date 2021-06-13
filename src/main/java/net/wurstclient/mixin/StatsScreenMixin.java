@@ -12,15 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.StatsListener;
 import net.minecraft.client.gui.screen.StatsScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IScreen;
 
 @Mixin(StatsScreen.class)
 public abstract class StatsScreenMixin extends Screen implements StatsListener
@@ -37,10 +39,15 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 			height - 28, 150, 20, new LiteralText(""), this::toggleWurst);
 		
 		updateWurstButtonText(toggleWurstButton);
-		addButton(toggleWurstButton);
+		addDrawableChild(toggleWurstButton);
 		
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("gui.done")))
 				continue;

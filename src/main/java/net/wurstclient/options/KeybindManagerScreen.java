@@ -41,20 +41,21 @@ public final class KeybindManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addButton(addButton = new ButtonWidget(width / 2 - 102, height - 52,
-			100, 20, new LiteralText("Add"),
+		addDrawableChild(addButton = new ButtonWidget(width / 2 - 102,
+			height - 52, 100, 20, new LiteralText("Add"),
 			b -> client.openScreen(new KeybindEditorScreen(this))));
 		
-		addButton(editButton = new ButtonWidget(width / 2 + 2, height - 52, 100,
-			20, new LiteralText("Edit"), b -> edit()));
+		addDrawableChild(editButton = new ButtonWidget(width / 2 + 2,
+			height - 52, 100, 20, new LiteralText("Edit"), b -> edit()));
 		
-		addButton(removeButton = new ButtonWidget(width / 2 - 102, height - 28,
-			100, 20, new LiteralText("Remove"), b -> remove()));
+		addDrawableChild(removeButton = new ButtonWidget(width / 2 - 102,
+			height - 28, 100, 20, new LiteralText("Remove"), b -> remove()));
 		
-		addButton(backButton = new ButtonWidget(width / 2 + 2, height - 28, 100,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			backButton = new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
+				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
 		
-		addButton(
+		addDrawableChild(
 			new ButtonWidget(8, 8, 100, 20, new LiteralText("Reset Keybinds"),
 				b -> client.openScreen(new ConfirmScreen(confirmed -> {
 					if(confirmed)
@@ -65,7 +66,7 @@ public final class KeybindManagerScreen extends Screen
 					"Are you sure you want to reset your keybinds?"),
 					new LiteralText("This cannot be undone!")))));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Profiles..."),
 			b -> client.openScreen(new KeybindProfilesScreen(this))));
 	}
@@ -157,9 +158,9 @@ public final class KeybindManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, textRenderer, "Keybind Manager",
+		drawCenteredText(matrixStack, textRenderer, "Keybind Manager",
 			width / 2, 8, 0xffffff);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			"Keybinds: " + listGui.getItemCount(), width / 2, 20, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

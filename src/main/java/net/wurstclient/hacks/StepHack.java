@@ -105,15 +105,15 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		ClientPlayNetworkHandler netHandler = player.networkHandler;
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
+		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
 			player.isOnGround()));
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
+		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
 			player.isOnGround()));
 		
-		player.updatePosition(player.getX(), player.getY() + 1 * stepHeight,
+		player.setPosition(player.getX(), player.getY() + 1 * stepHeight,
 			player.getZ());
 	}
 	

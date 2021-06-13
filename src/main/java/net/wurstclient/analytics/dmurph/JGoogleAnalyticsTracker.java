@@ -79,6 +79,7 @@ import java.util.regex.MatchResult;
  *
  * @author Daniel Murphy, Stefan Brozinski
  */
+@SuppressWarnings("removal")
 public class JGoogleAnalyticsTracker
 {
 	public static enum DispatchMode

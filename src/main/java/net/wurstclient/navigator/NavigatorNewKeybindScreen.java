@@ -11,13 +11,17 @@ import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorNewKeybindScreen extends NavigatorScreen
@@ -66,10 +70,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				}
 			});
 		okButton.active = selectedCommand != null;
-		addButton(okButton);
+		addDrawableChild(okButton);
 		
 		// cancel button
-		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
 			new LiteralText("Cancel"), b -> WurstClient.MC.openScreen(parent)));
 	}
 	
@@ -135,10 +139,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		// title bar
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(matrixStack, client.textRenderer, "New Keybind",
+		drawCenteredText(matrixStack, client.textRenderer, "New Keybind",
 			middleX, 32, 0xffffff);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -149,7 +151,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
+			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -173,31 +175,29 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				{
 					hoveredCommand = pkb;
 					if(pkb == selectedCommand)
-						GL11.glColor4f(0F, 1F, 0F, 0.375F);
+						RenderSystem.setShaderColor(0F, 1F, 0F, 0.375F);
 					else
-						GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
+						RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F,
+							0.375F);
 				}else if(pkb == selectedCommand)
-					GL11.glColor4f(0F, 1F, 0F, 0.25F);
+					RenderSystem.setShaderColor(0F, 1F, 0F, 0.25F);
 				else
-					GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+					RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 				
 				// button
-				drawBox(x1, y1, x2, y2);
+				drawBox(matrixStack, x1, y1, x2, y2);
 				
 				// text
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getDescription(), x1 + 1, y1 + 1, 0xffffff);
 				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getCommand(), x1 + 1,
 					y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_BLEND);
 			}
 		}
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
@@ -211,8 +211,13 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();
@@ -221,20 +226,18 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 			// color
 			if(!button.active)
-				GL11.glColor4f(0F, 0F, 0F, 0.25F);
+				RenderSystem.setShaderColor(0F, 0F, 0F, 0.25F);
 			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
 				&& mouseY <= y2)
-				GL11.glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);

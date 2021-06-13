@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -55,9 +53,7 @@ public final class HackListHUD implements UpdateListener
 			
 		}else
 			textColor = 0x04ffffff;
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
+			
 		// YesCheat+ mode indicator
 		// YesCheatSpf yesCheatSpf = WurstClient.INSTANCE.special.yesCheatSpf;
 		// if(yesCheatSpf.modeIndicator.isChecked())

@@ -71,7 +71,7 @@ public class FlyPathProcessor extends PathProcessor
 		}
 		
 		lockControls();
-		MC.player.abilities.flying = creativeFlying;
+		MC.player.getAbilities().flying = creativeFlying;
 		boolean x = posVec.x < nextBox.minX || posVec.x > nextBox.maxX;
 		boolean y = posVec.y < nextBox.minY || posVec.y > nextBox.maxY;
 		boolean z = posVec.z < nextBox.minZ || posVec.z > nextBox.maxZ;
@@ -116,7 +116,7 @@ public class FlyPathProcessor extends PathProcessor
 			if(!creativeFlying && MC.player.getPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.speed.getValue())
 			{
-				MC.player.updatePosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			
@@ -134,7 +134,7 @@ public class FlyPathProcessor extends PathProcessor
 			if(!creativeFlying && MC.player.getPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.speed.getValue())
 			{
-				MC.player.updatePosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			

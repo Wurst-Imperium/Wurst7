@@ -9,10 +9,19 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -86,6 +95,8 @@ public final class SliderComponent extends Component
 		boolean hSlider = hovering && mouseY >= y3 || dragging;
 		boolean renderAsDisabled = setting.isDisabled() || setting.isLocked();
 		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		if(hovering && mouseY < y3)
 			setTooltip();
 		else if(hSlider && !dragging)
@@ -98,9 +109,9 @@ public final class SliderComponent extends Component
 			hSlider = false;
 		}
 		
-		drawBackground(x1, x2, x3, x4, y1, y2, y4, y5);
-		drawRail(x3, x4, y4, y5, hSlider, renderAsDisabled);
-		drawKnob(x1, x2, y2, y3, hSlider, renderAsDisabled);
+		drawBackground(matrixStack, x1, x2, x3, x4, y1, y2, y4, y5);
+		drawRail(matrixStack, x3, x4, y4, y5, hSlider, renderAsDisabled);
+		drawKnob(matrixStack, x1, x2, y2, y3, hSlider, renderAsDisabled);
 		drawNameAndValue(matrixStack, x1, x2, y1, renderAsDisabled);
 	}
 	
@@ -152,47 +163,56 @@ public final class SliderComponent extends Component
 		GUI.setTooltip(tooltip);
 	}
 	
-	private void drawBackground(int x1, int x2, int x3, int x4, int y1, int y2,
-		int y4, int y5)
+	private void drawBackground(MatrixStack matrixStack, int x1, int x2, int x3,
+		int x4, int y1, int y2, int y4, int y5)
 	{
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
-		GL11.glBegin(GL11.GL_QUADS);
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y4);
-		GL11.glVertex2i(x2, y4);
-		GL11.glVertex2i(x2, y1);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
 		
-		GL11.glVertex2i(x1, y5);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y5);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y4, 0).next();
+		bufferBuilder.vertex(matrix, x2, y4, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		
-		GL11.glVertex2i(x1, y4);
-		GL11.glVertex2i(x1, y5);
-		GL11.glVertex2i(x3, y5);
-		GL11.glVertex2i(x3, y4);
+		bufferBuilder.vertex(matrix, x1, y5, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y5, 0).next();
 		
-		GL11.glVertex2i(x4, y4);
-		GL11.glVertex2i(x4, y5);
-		GL11.glVertex2i(x2, y5);
-		GL11.glVertex2i(x2, y4);
+		bufferBuilder.vertex(matrix, x1, y4, 0).next();
+		bufferBuilder.vertex(matrix, x1, y5, 0).next();
+		bufferBuilder.vertex(matrix, x3, y5, 0).next();
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
 		
-		GL11.glEnd();
+		bufferBuilder.vertex(matrix, x4, y4, 0).next();
+		bufferBuilder.vertex(matrix, x4, y5, 0).next();
+		bufferBuilder.vertex(matrix, x2, y5, 0).next();
+		bufferBuilder.vertex(matrix, x2, y4, 0).next();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawRail(int x3, int x4, int y4, int y5, boolean hSlider,
-		boolean renderAsDisabled)
+	private void drawRail(MatrixStack matrixStack, int x3, int x4, int y4,
+		int y5, boolean hSlider, boolean renderAsDisabled)
 	{
 		float[] bgColor = GUI.getBgColor();
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		double xl1 = x3;
-		double xl2 = x4;
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		float xl1 = x3;
+		float xl2 = x4;
 		if(!renderAsDisabled && setting.isLimited())
 		{
 			double ratio = (x4 - x3) / setting.getRange();
@@ -201,78 +221,93 @@ public final class SliderComponent extends Component
 		}
 		
 		// limit
-		GL11.glColor4f(1, 0, 0, hSlider ? opacity * 1.5F : opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2d(x3, y4);
-		GL11.glVertex2d(x3, y5);
-		GL11.glVertex2d(xl1, y5);
-		GL11.glVertex2d(xl1, y4);
-		GL11.glVertex2d(xl2, y4);
-		GL11.glVertex2d(xl2, y5);
-		GL11.glVertex2d(x4, y5);
-		GL11.glVertex2d(x4, y4);
-		GL11.glEnd();
+		RenderSystem.setShaderColor(1, 0, 0,
+			hSlider ? opacity * 1.5F : opacity);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
+		bufferBuilder.vertex(matrix, x3, y5, 0).next();
+		bufferBuilder.vertex(matrix, xl1, y5, 0).next();
+		bufferBuilder.vertex(matrix, xl1, y4, 0).next();
+		bufferBuilder.vertex(matrix, xl2, y4, 0).next();
+		bufferBuilder.vertex(matrix, xl2, y5, 0).next();
+		bufferBuilder.vertex(matrix, x4, y5, 0).next();
+		bufferBuilder.vertex(matrix, x4, y4, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hSlider ? opacity * 1.5F : opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2d(xl1, y4);
-		GL11.glVertex2d(xl1, y5);
-		GL11.glVertex2d(xl2, y5);
-		GL11.glVertex2d(xl2, y4);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xl1, y4, 0).next();
+		bufferBuilder.vertex(matrix, xl1, y5, 0).next();
+		bufferBuilder.vertex(matrix, xl2, y5, 0).next();
+		bufferBuilder.vertex(matrix, xl2, y4, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x3, y4);
-		GL11.glVertex2i(x3, y5);
-		GL11.glVertex2i(x4, y5);
-		GL11.glVertex2i(x4, y4);
-		GL11.glEnd();
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
+		bufferBuilder.vertex(matrix, x3, y5, 0).next();
+		bufferBuilder.vertex(matrix, x4, y5, 0).next();
+		bufferBuilder.vertex(matrix, x4, y4, 0).next();
+		bufferBuilder.vertex(matrix, x3, y4, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawKnob(int x1, int x2, int y2, int y3, boolean hSlider,
-		boolean renderAsDisabled)
+	private void drawKnob(MatrixStack matrixStack, int x1, int x2, int y2,
+		int y3, boolean hSlider, boolean renderAsDisabled)
 	{
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
 		double percentage = (setting.getValue() - setting.getMinimum())
 			/ (setting.getMaximum() - setting.getMinimum());
-		double xk1 = x1 + (x2 - x1 - 8) * percentage;
-		double xk2 = xk1 + 8;
-		double yk1 = y3 + 1.5;
-		double yk2 = y2 - 1.5;
+		float xk1 = x1 + (x2 - x1 - 8) * (float)percentage;
+		float xk2 = xk1 + 8;
+		float yk1 = y3 + 1.5F;
+		float yk2 = y2 - 1.5F;
 		
 		// knob
 		if(renderAsDisabled)
-			GL11.glColor4f(0.5F, 0.5F, 0.5F, 0.75F);
+			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
 		{
 			float f = (float)(2 * percentage);
-			GL11.glColor4f(f, 2 - f, 0, hSlider ? 1 : 0.75F);
+			RenderSystem.setShaderColor(f, 2 - f, 0, hSlider ? 1 : 0.75F);
 		}
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2d(xk1, yk1);
-		GL11.glVertex2d(xk1, yk2);
-		GL11.glVertex2d(xk2, yk2);
-		GL11.glVertex2d(xk2, yk1);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+		bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
+		bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+		bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(xk1, yk1);
-		GL11.glVertex2d(xk1, yk2);
-		GL11.glVertex2d(xk2, yk2);
-		GL11.glVertex2d(xk2, yk1);
-		GL11.glEnd();
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+		bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
+		bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
+		bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
+		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1, boolean renderAsDisabled)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
@@ -282,7 +317,6 @@ public final class SliderComponent extends Component
 		tr.draw(matrixStack, name, x1, y1 + 2, color);
 		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

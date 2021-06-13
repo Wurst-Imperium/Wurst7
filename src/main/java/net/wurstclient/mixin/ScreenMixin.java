@@ -7,7 +7,11 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -15,15 +19,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IScreen;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractParentElement
-	implements TickableElement, Drawable
+	implements Drawable, IScreen
 {
+	@Shadow
+	@Final
+	private List<Drawable> drawables;
+	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
 		ordinal = 0),
@@ -48,5 +56,11 @@ public abstract class ScreenMixin extends AbstractParentElement
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled())
 			ci.cancel();
+	}
+	
+	@Override
+	public List<Drawable> getButtons()
+	{
+		return drawables;
 	}
 }

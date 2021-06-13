@@ -106,10 +106,10 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(!isEating())
-			oldSlot = MC.player.inventory.selectedSlot;
+			oldSlot = MC.player.getInventory().selectedSlot;
 		
 		// set slot
-		MC.player.inventory.selectedSlot = bestSlot;
+		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// eat food
 		MC.options.keyUse.setPressed(true);
@@ -126,7 +126,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-food items
-			Item item = MC.player.inventory.getStack(i).getItem();
+			Item item = MC.player.getInventory().getStack(i).getItem();
 			if(!item.isFood())
 				continue;
 			
@@ -166,7 +166,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private boolean shouldEat()
 	{
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 			return false;
 		
 		if(!MC.player.canConsume(false))
@@ -220,7 +220,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		MC.options.keyUse.setPressed(false);
 		
-		MC.player.inventory.selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;
 	}
 	

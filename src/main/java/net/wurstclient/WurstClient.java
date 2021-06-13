@@ -20,7 +20,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Util;
 import net.wurstclient.altmanager.AltManager;
@@ -57,7 +57,7 @@ public enum WurstClient
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
 	public static final String VERSION = "7.15.2";
-	public static final String MC_VERSION = "1.16.5";
+	public static final String MC_VERSION = "1.17";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
