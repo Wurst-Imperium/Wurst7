@@ -64,6 +64,7 @@ public final class EditItemListScreen extends Screen
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		addSelectableChild(itemNameField);
+		itemNameField.setMaxLength(64);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
 			height - 56, 30, 20, new LiteralText("Add"), b -> {
@@ -169,41 +170,41 @@ public final class EditItemListScreen extends Screen
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		drawCenteredText(matrixStack, client.textRenderer,
-			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
-			12, 0xffffff);
+			itemList.getName() + " (" + listGui.getItemCount() + ")", 
+			width / 2, 12, 0xffffff);
+		
+		matrixStack.push();
+		matrixStack.translate(0, 0, 300);
 		
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
-		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
-		{
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
+		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())	
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"item name or ID", 68, height - 50, 0x808080);
-			matrixStack.pop();
-		}
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
-		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
-		fill(matrixStack, 215, height - 55, 216, height - 37, 0xff000000);
-		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
-		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd), 52,
-			height - 52, false);
+		int border = itemNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
+		
+		fill(matrixStack, 48, height - 56, 64, height - 36, border);
+		fill(matrixStack, 49, height - 55, 64, height - 37, black);
+		fill(matrixStack, 214, height - 56, 244, height - 55, border);
+		fill(matrixStack, 214, height - 37, 244, height - 36, border);
+		fill(matrixStack, 244, height - 56, 246, height - 36, border);
+		fill(matrixStack, 214, height - 55, 243, height - 52, black);
+		fill(matrixStack, 214, height - 40, 243, height - 37, black);
+		fill(matrixStack, 215, height - 55, 216, height - 37, black);
+		fill(matrixStack, 242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
+		
+		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
+			width / 2 - 164, height - 52, false);
 	}
 	
 	private static class ListGui extends ListWidget
@@ -270,18 +271,21 @@ public final class EditItemListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
+				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+				modelViewStack.push();
+				modelViewStack.translate(x, y, 0);
 				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
+					modelViewStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
+					modelViewStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
-				matrixStack.pop();
+				
+				modelViewStack.pop();
+				RenderSystem.applyModelViewMatrix();
 				
 				matrixStack.push();
 				matrixStack.translate(x, y, 0);
@@ -297,18 +301,20 @@ public final class EditItemListScreen extends Screen
 				
 			}else
 			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
+				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+				modelViewStack.push();
+				modelViewStack.translate(x, y, 0);
 				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
+					modelViewStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
+					modelViewStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
 				
-				matrixStack.pop();
+				modelViewStack.pop();
+				RenderSystem.applyModelViewMatrix();
 				
 				return stack.getName().getString();
 			}
