@@ -64,7 +64,6 @@ public final class EditItemListScreen extends Screen
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		addSelectableChild(itemNameField);
-		itemNameField.setMaxLength(64);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
 			height - 56, 30, 20, new LiteralText("Add"), b -> {
