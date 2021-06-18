@@ -7,8 +7,6 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -26,6 +24,7 @@ import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -91,7 +90,8 @@ public final class RadarComponent extends Component
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
-			GL11.glRotated(180 + player.getYaw(), 0, 0, 1);
+			matrixStack.multiply(
+				Vec3f.POSITIVE_Z.getDegreesQuaternion(180 + player.getYaw()));
 		
 		float xa1 = 0;
 		float xa2 = 2;
