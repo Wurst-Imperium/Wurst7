@@ -258,8 +258,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onMouseClick(double x, double y, int button)
 	{
 		// popups
-		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(
-			x - middleX + 154, y - 60 - scroll + 13, button))
+		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
+			button))
 			return;
 		
 		// back button
@@ -479,12 +479,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// scissor box
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		matrixStack.push();
-		matrixStack.translate(bgx1, bgy1 + scroll - 13, 0);
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
-			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
-		matrixStack.pop();
-		
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
@@ -523,6 +517,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
+		
+		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
+			mouseX, mouseY);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
