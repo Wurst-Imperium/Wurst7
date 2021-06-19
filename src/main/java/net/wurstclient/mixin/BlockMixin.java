@@ -53,4 +53,30 @@ public abstract class BlockMixin implements ItemConvertible
 		if(cir.getReturnValueF() < 1)
 			cir.setReturnValue(1F);
 	}
+	
+	@Inject(at = {@At("HEAD")},
+			method = {"getSlipperiness()F"},
+			cancellable = true)
+		private void onGetSlipperiness(CallbackInfoReturnable<Float> cir)
+		{
+			HackList hax = WurstClient.INSTANCE.getHax();
+			if(hax == null || !hax.noSlowdownHack.isEnabled() || !hax.noSlowdownHack.getNoIce())
+				return;
+			
+			if(cir.getReturnValueF() < 0.6)
+				cir.setReturnValue(0.6F);
+		}
+	
+	@Inject(at = {@At("HEAD")},
+			method = {"getJumpVelocityMultiplier()F"},
+			cancellable = true)
+		private void onGetJumpVelocityMultiplier(CallbackInfoReturnable<Float> cir)
+		{
+			HackList hax = WurstClient.INSTANCE.getHax();
+			if(hax == null || !hax.noSlowdownHack.isEnabled() || !hax.noSlowdownHack.getHoneyJump())
+				return;
+			
+			if(cir.getReturnValueF() < 1)
+				cir.setReturnValue(1F);
+		}
 }
