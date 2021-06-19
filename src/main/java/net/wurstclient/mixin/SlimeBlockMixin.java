@@ -35,7 +35,8 @@ public abstract class SlimeBlockMixin extends TransparentBlock
 			cancellable = true)
 	private void onBounce(Entity entity, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noSlowdownHack.getSlimeUtil())
+		NoSlowdownHack hax = WurstClient.INSTANCE.getHax().noSlowdownHack;
+		if(hax.isEnabled() && hax.getSlimeUtil())
 		ci.cancel();
 	}
 	
@@ -46,7 +47,8 @@ public abstract class SlimeBlockMixin extends TransparentBlock
 			cancellable = true)
 	private void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) 
 	{
-		if (WurstClient.INSTANCE.getHax().noSlowdownHack.getSlimeUtil())
+		NoSlowdownHack hax = WurstClient.INSTANCE.getHax().noSlowdownHack;
+		if (hax.isEnabled() && hax.getSlimeUtil())
 			ci.cancel();
 			
 	}
