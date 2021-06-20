@@ -41,22 +41,16 @@ public final class NoSlowdownHack extends Hack
 	
 	public boolean getNoIce()
 	{
-	if (noIce.isChecked())
-		return true;
-	        return false;
+		return noIce.isChecked();
 	}
 	
 	public boolean getHoneyJump()
 	{
-	if (honeyJump.isChecked())
-		return true;
-		return false;
+		return honeyJump.isChecked();
 	}
 	
 	public boolean getSlimeUtil()
 	{
-	if (slimeUtil.isChecked())
-		return true;
-		return false;
+		return slimeUtil.isChecked();
 	}
 }
