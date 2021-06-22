@@ -20,6 +20,7 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
+import net.wurstclient.hacks.StepHack;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, CommandOutput
