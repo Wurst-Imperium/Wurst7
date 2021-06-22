@@ -44,6 +44,8 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 			ordinal = 3)
 	private boolean onAdjustMovementForCollisions(boolean x)
 	{
-		return WurstClient.INSTANCE.getHax().stepHack.getAdvancedStep() || x;
-	}	
+	        StepHack hax = WurstClient.INSTANCE.getHax().stepHack;
+		
+		return  hax.isEnabled() && hax.getAdvancedStep() || x;
+	}		
 }
