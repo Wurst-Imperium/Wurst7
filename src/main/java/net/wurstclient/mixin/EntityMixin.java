@@ -21,7 +21,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
-
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, CommandOutput
 {
