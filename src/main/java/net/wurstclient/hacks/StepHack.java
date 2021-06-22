@@ -30,6 +30,11 @@ public final class StepHack extends Hack implements UpdateListener
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.LEGIT);
 	
+	private final CheckboxSetting advancedStep = new CheckboxSetting(
+			"Advanced Step", "Allows step to work even while mid-air.\n"
+					+ "Makes traveling a lot smoother.",
+			false);
+	
 	private final SliderSetting height =
 		new SliderSetting("Height", "Only works in \u00a7lSimple\u00a7r mode.",
 			1, 1, 10, 1, ValueDisplay.INTEGER);
@@ -40,6 +45,12 @@ public final class StepHack extends Hack implements UpdateListener
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(height);
+		addSetting(advancedStep);
+	}
+	
+	public boolean getAdvancedStep()
+	{
+		return advancedStep.isChecked();
 	}
 	
 	@Override
