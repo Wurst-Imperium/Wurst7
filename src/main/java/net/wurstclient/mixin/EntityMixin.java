@@ -10,14 +10,17 @@ package net.wurstclient.mixin;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
+
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, CommandOutput
@@ -35,4 +38,13 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 		if(!event.isCancelled())
 			entity.setVelocity(velocity);
 	}
+	
+	@ModifyVariable(
+			method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+			at = @At("STORE"),
+			ordinal = 3)
+	private boolean onAdjustMovementForCollisions(boolean x)
+	{
+		return WurstClient.INSTANCE.getHax().stepHack.getAdvancedStep() || x;
+	}	
 }
