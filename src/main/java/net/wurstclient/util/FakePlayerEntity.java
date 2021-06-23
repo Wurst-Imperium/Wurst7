@@ -35,7 +35,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void copyInventory()
 	{
-		inventory.clone(player.inventory);
+		getInventory().clone(player.getInventory());
 	}
 	
 	private void copyPlayerModel(Entity from, Entity to)
@@ -61,16 +61,17 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void spawn()
 	{
-		world.addEntity(getEntityId(), this);
+		world.addEntity(getId(), this);
 	}
 	
 	public void despawn()
 	{
-		removed = true;
+		discard();
 	}
 	
 	public void resetPlayerPosition()
 	{
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(),
+			getPitch());
 	}
 }

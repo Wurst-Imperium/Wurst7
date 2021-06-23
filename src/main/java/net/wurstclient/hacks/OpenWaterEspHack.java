@@ -9,6 +9,9 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -22,9 +25,6 @@ import net.wurstclient.util.RenderUtils;
 @SearchTags({"open water esp", "AutoFishESP", "auto fish esp"})
 public final class OpenWaterEspHack extends Hack implements RenderListener
 {
-	private int openWaterBox;
-	private int shallowWaterBox;
-	
 	public OpenWaterEspHack()
 	{
 		super("OpenWaterESP");
@@ -49,21 +49,6 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	@Override
 	public void onEnable()
 	{
-		Box bb = new Box(-2, -1, -2, 3, 2, 3);
-		
-		openWaterBox = GL11.glGenLists(1);
-		GL11.glNewList(openWaterBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(bb);
-		GL11.glEndList();
-		
-		shallowWaterBox = GL11.glGenLists(1);
-		GL11.glNewList(shallowWaterBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 0, 0.5F);
-		RenderUtils.drawCrossBox(bb);
-		RenderUtils.drawOutlinedBox(bb);
-		GL11.glEndList();
-		
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -71,54 +56,61 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	public void onDisable()
 	{
 		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(openWaterBox, 1);
-		GL11.glDeleteLists(shallowWaterBox, 1);
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		FishingBobberEntity bobber = MC.player.fishHook;
 		if(bobber != null)
-			drawOpenWater(bobber);
+			drawOpenWater(matrixStack, bobber);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void drawOpenWater(FishingBobberEntity bobber)
+	private void drawOpenWater(MatrixStack matrixStack,
+		FishingBobberEntity bobber)
 	{
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
 		BlockPos pos = bobber.getBlockPos();
-		GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+		matrixStack.translate(pos.getX() - regionX, pos.getY(),
 			pos.getZ() - regionZ);
-		boolean inOpenWater = isInOpenWater(bobber);
-		GL11.glCallList(inOpenWater ? openWaterBox : shallowWaterBox);
-		GL11.glPopMatrix();
+		
+		Box bb = new Box(-2, -1, -2, 3, 2, 3);
+		
+		if(isInOpenWater(bobber))
+		{
+			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+			RenderUtils.drawOutlinedBox(bb, matrixStack);
+			
+		}else
+		{
+			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			RenderUtils.drawCrossBox(bb, matrixStack);
+			RenderUtils.drawOutlinedBox(bb, matrixStack);
+		}
+		
+		matrixStack.pop();
 	}
 	
 	private boolean isInOpenWater(FishingBobberEntity bobber)

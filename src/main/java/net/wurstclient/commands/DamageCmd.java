@@ -31,7 +31,7 @@ public final class DamageCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 			throw new CmdError("Cannot damage in creative mode.");
 		
 		int amount = parseAmount(args[0]);
@@ -70,6 +70,6 @@ public final class DamageCmd extends Command
 	private void sendPosition(double x, double y, double z, boolean onGround)
 	{
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
+			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
 	}
 }

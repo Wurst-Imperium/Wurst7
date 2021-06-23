@@ -56,7 +56,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 		true);
 	
 	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
-		Blocks.GRASS_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
+		Blocks.DIRT_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
 	
 	public TillauraHack()
 	{
@@ -88,7 +88,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			return;
 		
 		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		if(stack.isEmpty() || !(stack.getItem() instanceof HoeItem))
 			return;
 		

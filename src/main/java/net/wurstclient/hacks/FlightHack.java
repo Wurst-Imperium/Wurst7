@@ -52,17 +52,17 @@ public final class FlightHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		player.abilities.flying = false;
+		player.getAbilities().flying = false;
 		player.flyingSpeed = speed.getValueF();
 		
 		player.setVelocity(0, 0, 0);
-		Vec3d velcity = player.getVelocity();
+		Vec3d velocity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
-			player.setVelocity(velcity.add(0, speed.getValue(), 0));
+			player.setVelocity(velocity.add(0, speed.getValue(), 0));
 		
 		if(MC.options.keySneak.isPressed())
-			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
+			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
 	}
 	
 	@Override

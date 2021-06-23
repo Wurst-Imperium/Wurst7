@@ -117,7 +117,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(!speedCtrl.isChecked())
 			return;
 		
-		float yaw = (float)Math.toRadians(MC.player.yaw);
+		float yaw = (float)Math.toRadians(MC.player.getYaw());
 		Vec3d forward = new Vec3d(-MathHelper.sin(yaw) * 0.05, 0,
 			MathHelper.cos(yaw) * 0.05);
 		

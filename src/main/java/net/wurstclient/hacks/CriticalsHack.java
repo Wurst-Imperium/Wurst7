@@ -107,7 +107,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	private void sendPos(double x, double y, double z, boolean onGround)
 	{
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
+			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
 	}
 	
 	private void doMiniJump()

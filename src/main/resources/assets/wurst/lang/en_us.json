@@ -116,6 +116,7 @@
   "description.wurst.hack.servercrasher": "Generates an item that can\ncrash 1.15.x servers.\n§oCreative mode only.§r",
   "description.wurst.hack.skinderp": "Randomly toggles parts of your skin.",
   "description.wurst.hack.sneak": "Makes you sneak automatically.",
+  "description.wurst.hack.snowshoe": "Allows you to walk on powder snow.",
   "description.wurst.hack.speedhack": "Allows you to run ~2.5x faster than you would by sprinting and jumping.\n\n§6§lWARNING:§r Patched in NoCheat+ version 3.13.2.\nWill only bypass older versions of NoCheat+.\nType §l/ncp version§r to check a server's NoCheat+ version.",
   "description.wurst.hack.speednuker": "Faster version of Nuker that cannot bypass NoCheat+.",
   "description.wurst.hack.spider": "Allows you to climb up walls like a spider.",

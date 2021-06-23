@@ -303,7 +303,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean selectItem(Predicate<Item> item)
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
 		
@@ -336,7 +336,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean hasItem(Predicate<Item> item)
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
 		
 		for(int slot = 0; slot < maxInvSlot; slot++)
@@ -468,7 +468,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
@@ -582,8 +582,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		
 		SPAM("Packet spam", v -> {
 			Rotation rotation = RotationUtils.getNeededRotations(v);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 		});

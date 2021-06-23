@@ -48,22 +48,22 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, 60, 200, 20,
+		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
 			new LiteralText("Change Key"),
 			b -> client.openScreen(new PressAKeyScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200, 20,
-			new LiteralText("Save"), b -> save()));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
+			20, new LiteralText("Save"), b -> save()));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200, 20,
-			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
+			20, new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
 		commandField.setMaxLength(65536);
-		children.add(commandField);
+		addSelectableChild(commandField);
 		setInitialFocus(commandField);
-		commandField.setSelected(true);
+		commandField.setTextFieldFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -97,7 +97,7 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		

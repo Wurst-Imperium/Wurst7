@@ -126,7 +126,8 @@ public final class RemoteViewHack extends Hack
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			
@@ -252,7 +253,8 @@ public final class RemoteViewHack extends Hack
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
@@ -276,7 +278,7 @@ public final class RemoteViewHack extends Hack
 	public void onUpdate()
 	{
 		// validate entity
-		if(entity.removed || ((LivingEntity)entity).getHealth() <= 0)
+		if(entity.isRemoved() || ((LivingEntity)entity).getHealth() <= 0)
 		{
 			setEnabled(false);
 			return;
@@ -284,10 +286,11 @@ public final class RemoteViewHack extends Hack
 		
 		// update position, rotation, etc.
 		MC.player.copyPositionAndRotation(entity);
-		MC.player.resetPosition(entity.getX(),
+		MC.player.setPos(entity.getX(),
 			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
 				+ entity.getEyeHeight(entity.getPose()),
 			entity.getZ());
+		MC.player.resetPosition();
 		MC.player.setVelocity(Vec3d.ZERO);
 		
 		// set entity invisible

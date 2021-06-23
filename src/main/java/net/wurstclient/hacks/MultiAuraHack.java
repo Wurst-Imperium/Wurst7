@@ -174,7 +174,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)
@@ -257,8 +257,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			RotationUtils.Rotation rotations = RotationUtils
 				.getNeededRotations(entity.getBoundingBox().getCenter());
 			
-			WurstClient.MC.player.networkHandler
-				.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
+			WurstClient.MC.player.networkHandler.sendPacket(
+				new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
 					rotations.getPitch(), MC.player.isOnGround()));
 			
 			WURST.getHax().criticalsHack.doCritical();

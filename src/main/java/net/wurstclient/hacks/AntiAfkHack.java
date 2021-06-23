@@ -10,6 +10,10 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -55,7 +59,7 @@ public final class AntiAfkHack extends Hack
 		start = new BlockPos(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
-		creativeFlying = MC.player.abilities.flying;
+		creativeFlying = MC.player.getAbilities().flying;
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -87,7 +91,7 @@ public final class AntiAfkHack extends Hack
 			return;
 		}
 		
-		MC.player.abilities.flying = creativeFlying;
+		MC.player.getAbilities().flying = creativeFlying;
 		
 		if(useAi.isChecked())
 		{
@@ -166,13 +170,15 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!useAi.isChecked())
 			return;
 		
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	private class RandomPathFinder extends PathFinder

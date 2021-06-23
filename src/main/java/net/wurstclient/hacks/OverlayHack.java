@@ -9,6 +9,10 @@ package net.wurstclient.hacks;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -38,7 +42,7 @@ public final class OverlayHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(MC.crosshairTarget == null
 			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
@@ -55,42 +59,39 @@ public final class OverlayHack extends Hack implements RenderListener
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set position
-		GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		
 		// get progress
 		float progress =
 			IMC.getInteractionManager().getCurrentBreakingProgress();
 		
 		// set size
-		GL11.glTranslated(0.5, 0.5, 0.5);
-		GL11.glScaled(progress, progress, progress);
-		GL11.glTranslated(-0.5, -0.5, -0.5);
+		matrixStack.translate(0.5, 0.5, 0.5);
+		matrixStack.scale(progress, progress, progress);
+		matrixStack.translate(-0.5, -0.5, -0.5);
 		
 		// get color
 		float red = progress * 2F;
 		float green = 2 - red;
 		
 		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(matrixStack);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(matrixStack);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}

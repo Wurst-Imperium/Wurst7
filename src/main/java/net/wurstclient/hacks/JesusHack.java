@@ -97,8 +97,8 @@ public final class JesusHack extends Hack
 		PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket)event.getPacket();
 		
 		// check if packet contains a position
-		if(!(packet instanceof PlayerMoveC2SPacket.PositionOnly
-			|| packet instanceof PlayerMoveC2SPacket.Both))
+		if(!(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround
+			|| packet instanceof PlayerMoveC2SPacket.Full))
 			return;
 		
 		// check inWater
@@ -140,10 +140,11 @@ public final class JesusHack extends Hack
 		
 		// create new packet
 		Packet<?> newPacket;
-		if(packet instanceof PlayerMoveC2SPacket.PositionOnly)
-			newPacket = new PlayerMoveC2SPacket.PositionOnly(x, y, z, true);
+		if(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround)
+			newPacket =
+				new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, true);
 		else
-			newPacket = new PlayerMoveC2SPacket.Both(x, y, z, packet.getYaw(0),
+			newPacket = new PlayerMoveC2SPacket.Full(x, y, z, packet.getYaw(0),
 				packet.getPitch(0), true);
 		
 		// send new packet

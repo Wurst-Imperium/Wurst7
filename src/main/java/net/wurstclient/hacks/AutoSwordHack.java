@@ -108,10 +108,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// skip empty slots
-			if(MC.player.inventory.getStack(i).isEmpty())
+			if(MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.inventory.getStack(i).getItem();
+			Item item = MC.player.getInventory().getStack(i).getItem();
 			
 			// get damage
 			float value = getValue(item);
@@ -130,10 +130,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.inventory.selectedSlot;
+			oldSlot = MC.player.getInventory().selectedSlot;
 		
 		// set slot
-		MC.player.inventory.selectedSlot = bestSlot;
+		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// start timer
 		timer = releaseTime.getValueI();
@@ -171,7 +171,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		if(oldSlot != -1)
 		{
-			MC.player.inventory.selectedSlot = oldSlot;
+			MC.player.getInventory().selectedSlot = oldSlot;
 			oldSlot = -1;
 		}
 	}

@@ -13,8 +13,8 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -42,10 +42,10 @@ public final class PotionCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		if(!(stack.getItem() instanceof PotionItem))
 			throw new CmdError("You must hold a potion in your main hand.");
 		
@@ -60,7 +60,7 @@ public final class PotionCmd extends Command
 			throw new CmdSyntaxError();
 		
 		// get effects to start with
-		ListTag effects;
+		NbtList effects;
 		switch(args[0].toLowerCase())
 		{
 			case "add":
@@ -68,7 +68,7 @@ public final class PotionCmd extends Command
 			break;
 			
 			case "set":
-			effects = new ListTag();
+			effects = new NbtList();
 			break;
 			
 			default:
@@ -78,7 +78,7 @@ public final class PotionCmd extends Command
 		// add new effects
 		for(int i = 0; i < (args.length - 1) / 3; i++)
 		{
-			CompoundTag effect = new CompoundTag();
+			NbtCompound effect = new NbtCompound();
 			
 			effect.putInt("Id", parseEffectId(args[1 + i * 3]));
 			effect.putInt("Amplifier", parseInt(args[2 + i * 3]) - 1);
@@ -87,21 +87,21 @@ public final class PotionCmd extends Command
 			effects.add(effect);
 		}
 		
-		CompoundTag nbt = new CompoundTag();
+		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
 		stack.setTag(nbt);
 		ChatUtils.message("Potion modified.");
 	}
 	
-	private ListTag convertEffectsToNbt(ItemStack stack)
+	private NbtList convertEffectsToNbt(ItemStack stack)
 	{
-		ListTag nbt = new ListTag();
+		NbtList nbt = new NbtList();
 		List<StatusEffectInstance> effects =
 			PotionUtil.getCustomPotionEffects(stack);
 		
 		for(StatusEffectInstance effect : effects)
 		{
-			CompoundTag tag = new CompoundTag();
+			NbtCompound tag = new NbtCompound();
 			
 			int id = StatusEffect.getRawId(effect.getEffectType());
 			tag.putInt("Id", id);
@@ -124,7 +124,7 @@ public final class PotionCmd extends Command
 		List<StatusEffectInstance> oldEffects =
 			PotionUtil.getCustomPotionEffects(stack);
 		
-		ListTag newEffects = new ListTag();
+		NbtList newEffects = new NbtList();
 		for(StatusEffectInstance oldEffect : oldEffects)
 		{
 			int oldId = StatusEffect.getRawId(oldEffect.getEffectType());
@@ -132,14 +132,14 @@ public final class PotionCmd extends Command
 			if(oldId == id)
 				continue;
 			
-			CompoundTag effect = new CompoundTag();
+			NbtCompound effect = new NbtCompound();
 			effect.putInt("Id", oldId);
 			effect.putInt("Amplifier", oldEffect.getAmplifier());
 			effect.putInt("Duration", oldEffect.getDuration());
 			newEffects.add(effect);
 		}
 		
-		CompoundTag nbt = new CompoundTag();
+		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", newEffects);
 		stack.setTag(nbt);
 		ChatUtils.message("Effect removed.");

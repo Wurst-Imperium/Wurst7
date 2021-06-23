@@ -7,49 +7,44 @@
  */
 package net.wurstclient.altmanager;
 
-import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.MinecraftClient;
+import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.texture.PlayerSkinTexture;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-import net.wurstclient.WurstClient;
+import net.minecraft.world.GameMode;
 
 public final class AltRenderer
 {
-	private static final MinecraftClient mc = WurstClient.MC;
-	private static final HashSet<String> loadedSkins = new HashSet<>();
+	private static final HashMap<String, Identifier> loadedSkins =
+		new HashMap<>();
 	
 	private static void bindSkinTexture(String name)
 	{
-		Identifier location = AbstractClientPlayerEntity.getSkinId(name);
-		
-		if(loadedSkins.contains(name))
+		if(loadedSkins.get(name) == null)
 		{
-			mc.getTextureManager().bindTexture(location);
-			return;
-		}
-		
-		try
-		{
-			PlayerSkinTexture img =
-				AbstractClientPlayerEntity.loadSkin(location, name);
-			img.load(mc.getResourceManager());
+			UUID uuid = PlayerEntity
+				.getUuidFromProfile(new GameProfile((UUID)null, name));
 			
-		}catch(IOException e)
-		{
-			e.printStackTrace();
+			PlayerListEntry entry = new PlayerListEntry(
+				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
+					GameMode.CREATIVE, new LiteralText(name)));
+			
+			loadedSkins.put(name, entry.getSkinTexture());
 		}
 		
-		mc.getTextureManager().bindTexture(location);
-		loadedSkins.add(name);
+		RenderSystem.setShaderTexture(0, loadedSkins.get(name));
 	}
 	
 	public static void drawAltFace(MatrixStack matrixStack, String name, int x,
@@ -61,9 +56,9 @@ public final class AltRenderer
 			GL11.glEnable(GL11.GL_BLEND);
 			
 			if(selected)
-				GL11.glColor4f(1, 1, 1, 1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			else
-				GL11.glColor4f(0.9F, 0.9F, 0.9F, 1);
+				RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1);
 			
 			// Face
 			int fw = 192;
@@ -99,7 +94,7 @@ public final class AltRenderer
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glColor4f(1, 1, 1, 1);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;
@@ -231,7 +226,7 @@ public final class AltRenderer
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glColor4f(1, 1, 1, 1);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;

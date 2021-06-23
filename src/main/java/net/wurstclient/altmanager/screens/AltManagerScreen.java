@@ -22,18 +22,28 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
@@ -74,33 +84,35 @@ public final class AltManagerScreen extends Screen
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
-		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, new LiteralText("Login"), b -> pressLogin()));
+		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
+			height - 52, 100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
-		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
 			b -> client.openScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
 			b -> client.openScreen(new AddAltScreen(this, altManager))));
 		
-		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
+		addDrawableChild(
+			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
+				new LiteralText("Favorite"), b -> pressFavorite()));
 		
-		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, new LiteralText("Edit"), b -> pressEdit()));
+		addDrawableChild(editButton = new ButtonWidget(width / 2 - 76,
+			height - 28, 74, 20, new LiteralText("Edit"), b -> pressEdit()));
 		
-		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, new LiteralText("Delete"), b -> pressDelete()));
+		addDrawableChild(
+			deleteButton = new ButtonWidget(width / 2 + 2, height - 28, 74, 20,
+				new LiteralText("Delete"), b -> pressDelete()));
 		
-		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
 			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
 		
-		addButton(importButton = new ButtonWidget(8, 8, 50, 20,
+		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
 		
-		addButton(exportButton = new ButtonWidget(58, 8, 50, 20,
+		addDrawableChild(exportButton = new ButtonWidget(58, 8, 50, 20,
 			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	
@@ -374,6 +386,10 @@ public final class AltManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
@@ -390,11 +406,11 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
-			4, 16777215);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer, "Alt Manager", width / 2, 4,
+			16777215);
+		drawCenteredText(matrixStack, textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
-		drawCenteredString(
+		drawCenteredText(
 			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);
@@ -402,22 +418,20 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glColor4f(1, 0, 0, errorTimer / 16F);
+			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				GL11.glVertex2d(0, 0);
-				GL11.glVertex2d(width, 0);
-				GL11.glVertex2d(width, height);
-				GL11.glVertex2d(0, height);
-			}
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, height, 0).next();
+			bufferBuilder.vertex(matrix, 0, height, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
 			errorTimer--;
@@ -430,8 +444,13 @@ public final class AltManagerScreen extends Screen
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.isHovered())
 				continue;
 			
@@ -516,10 +535,13 @@ public final class AltManagerScreen extends Screen
 		{
 			Alt alt = list.get(id);
 			
+			Matrix4f matrix = matrixStack.peek().getModel();
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			RenderSystem.setShader(GameRenderer::getPositionShader);
+			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glEnable(GL11.GL_BLEND);
 				
@@ -527,18 +549,17 @@ public final class AltManagerScreen extends Screen
 					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
-				GL11.glColor4f(0, 1, 0, opacity);
+				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				GL11.glBegin(GL11.GL_QUADS);
-				{
-					GL11.glVertex2d(x - 2, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2 + 30);
-					GL11.glVertex2d(x - 2, y - 2 + 30);
-				}
-				GL11.glEnd();
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
+				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 				
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);
 			}

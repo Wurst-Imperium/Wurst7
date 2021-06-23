@@ -65,12 +65,12 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		for(int i = 0; i < 36; i++)
 		{
 			// filter out non-bowl items and empty bowl slot
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			if(stack == null || stack.getItem() != Items.BOWL || i == 9)
 				continue;
 			
 			// check if empty bowl slot contains a non-bowl item
-			ItemStack emptyBowlStack = MC.player.inventory.getStack(9);
+			ItemStack emptyBowlStack = MC.player.getInventory().getStack(9);
 			boolean swap = !emptyBowlStack.isEmpty()
 				&& emptyBowlStack.getItem() != Items.BOWL;
 			
@@ -99,10 +99,10 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			
 			// save old slot
 			if(oldSlot == -1)
-				oldSlot = MC.player.inventory.selectedSlot;
+				oldSlot = MC.player.getInventory().selectedSlot;
 			
 			// set slot
-			MC.player.inventory.selectedSlot = soupInHotbar;
+			MC.player.getInventory().selectedSlot = soupInHotbar;
 			
 			// eat soup
 			MC.options.keyUse.setPressed(true);
@@ -125,7 +125,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			
 			if(stack != null && stack.getItem() instanceof MushroomStewItem)
 				return i;
@@ -183,7 +183,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		MC.options.keyUse.setPressed(false);
 		
 		// reset slot
-		MC.player.inventory.selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;
 	}
 }

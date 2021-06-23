@@ -20,18 +20,18 @@ import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.resource.SynchronousResourceReloader;
 import net.wurstclient.mixinterface.ILanguageManager;
 
 @Mixin(LanguageManager.class)
 public abstract class LanguageManagerMixin
-	implements SynchronousResourceReloadListener, ILanguageManager
+	implements SynchronousResourceReloader, ILanguageManager
 {
 	private TranslationStorage english;
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"apply(Lnet/minecraft/resource/ResourceManager;)V"})
-	private void onApply(ResourceManager manager, CallbackInfo ci)
+		method = {"reload(Lnet/minecraft/resource/ResourceManager;)V"})
+	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
 		LanguageDefinition englishDef =
 			new LanguageDefinition("en_us", "US", "English", false);

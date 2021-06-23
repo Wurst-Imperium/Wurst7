@@ -161,7 +161,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)
@@ -239,7 +239,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WURST.getHax().autoSwordHack.setSlot();
 		
 		// teleport
-		player.updatePosition(entity.getX() + random.nextInt(3) * 2 - 2,
+		player.setPosition(entity.getX() + random.nextInt(3) * 2 - 2,
 			entity.getY(), entity.getZ() + random.nextInt(3) * 2 - 2);
 		
 		// check cooldown
@@ -249,8 +249,8 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		// attack entity
 		RotationUtils.Rotation rotations = RotationUtils
 			.getNeededRotations(entity.getBoundingBox().getCenter());
-		WurstClient.MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
+		WurstClient.MC.player.networkHandler.sendPacket(
+			new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
 				rotations.getPitch(), MC.player.isOnGround()));
 		
 		WURST.getHax().criticalsHack.doCritical();

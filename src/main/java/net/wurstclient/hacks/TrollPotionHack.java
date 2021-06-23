@@ -9,8 +9,8 @@ package net.wurstclient.hacks;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
@@ -31,7 +31,7 @@ public final class TrollPotionHack extends Hack
 	public void onEnable()
 	{
 		// check gamemode
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -40,16 +40,16 @@ public final class TrollPotionHack extends Hack
 		
 		// generate potion
 		ItemStack stack = new ItemStack(Items.SPLASH_POTION);
-		ListTag effects = new ListTag();
+		NbtList effects = new NbtList();
 		for(int i = 1; i <= 23; i++)
 		{
-			CompoundTag effect = new CompoundTag();
+			NbtCompound effect = new NbtCompound();
 			effect.putInt("Amplifier", Integer.MAX_VALUE);
 			effect.putInt("Duration", Integer.MAX_VALUE);
 			effect.putInt("Id", i);
 			effects.add(effect);
 		}
-		CompoundTag nbt = new CompoundTag();
+		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
 		stack.setTag(nbt);
 		String name = "\u00a7rSplash Potion of Trolling";
@@ -68,7 +68,7 @@ public final class TrollPotionHack extends Hack
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getStack(i).isEmpty())
+			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

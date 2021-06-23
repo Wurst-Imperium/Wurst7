@@ -34,7 +34,7 @@ public final class TpCmd extends Command
 		BlockPos pos = argsToPos(args);
 		
 		ClientPlayerEntity player = MC.player;
-		player.updatePosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -57,7 +57,7 @@ public final class TpCmd extends Command
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
+			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
