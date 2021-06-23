@@ -1,0 +1,23 @@
+{
+    "description.wurst.hack.anchoraura": "自動放置（可選）、充電和引爆重生錨，以殺死你周圍的人。",
+    "description.wurst.hack.antiafk": "隨機走動，以隱藏你的AFK檢測器。需要至少3x3方塊的自由空間。",
+    "description.wurst.hack.antiblind": "防止失明。\n與 OptiFine 不相容。",
+    "description.wurst.hack.anticactus": "保護你免受仙人掌的傷害。",
+    "description.wurst.hack.antiknockback": "防止你被玩家和生物擊退。",
+    "description.wurst.hack.antispam": "透過在 repeated\nmessages中添加一個計數器來阻止聊天垃圾訊息。",
+    "description.wurst.hack.antiwaterpush": "防止你被水擊退。",
+    "description.wurst.hack.antiwobble": "禁用由噁心和傳送門引起的晃動效果。",
+    "description.wurst.hack.autoarmor": "自動管理你的盔甲。",
+    "description.wurst.hack.autobuild": "自動建造東西。\n放置一個單一的方塊來開始建造。",
+    "description.wurst.hack.autodrop": "自動丟棄不需要的物品。",
+    "description.wurst.hack.autoleave": "當你的生命值很低時，會自動離開伺服器。",
+    "description.wurst.hack.autoeat": "必要時自動吃食物。",
+    "description.wurst.hack.autofarm": "自動收割和重新種植作物。\n可處理小麥、胡蘿蔔、土豆、甜菜、瓜類、\n仙人掌、甘蔗、海帶、竹子、地獄疙瘩和可可豆。",
+    "description.wurst.hack.autofish": "自動使用你最好的釣竿來捕魚。\n如果它在捕魚時發現了一個更好的魚竿，將會自動切換到它。",
+    "description.wurst.hack.automine": "自動挖掘你看的任何方塊。",
+    "description.wurst.hack.autopotion": "當你的生命值很低時，會自動投擲恢復藥水。",
+    "description.wurst.hack.autoreconnect": "當你從伺服器上退出時，會自動重新連線。",
+    "description.wurst.hack.autorespawn": "每當你死亡時，都會自動重生。",
+    "description.wurst.hack.autosign": "瞬間在你放置的每個告示牌上寫下你想要的任何文字。\n一旦啟用，你可以在第一個告示牌上正常寫字，\n以指定所有其他告示牌的文字(複製告示牌文字)。",
+    "description.wurst.hack.autosoup": "當你的生命值低時，將會自動吃湯。\n注意：這個Hack忽略了飢餓值，並假設吃湯會直接補充你的生命值。如果你所玩的伺服器沒有設定成這樣，請使用AutoEat(自動食用)代替。"
+}
