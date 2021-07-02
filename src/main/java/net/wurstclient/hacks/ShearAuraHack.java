@@ -61,11 +61,6 @@ public final class ShearAuraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Shears the weakest sheep.",
 		Priority.values(), Priority.ANGLE);
 
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
-			false);
-
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
 
@@ -75,7 +70,6 @@ public final class ShearAuraHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
-		addSetting(filterBabies);
 	}
 	
 	@Override
@@ -121,9 +115,6 @@ public final class ShearAuraHack extends Hack
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> heldStack.getItem() instanceof ShearsItem)
 			.filter(e -> ((SheepEntity) e).isShearable());
-		
-		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !e.isBaby());
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;
