@@ -7,15 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
@@ -23,7 +15,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShearsItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
@@ -41,37 +35,43 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import org.lwjgl.opengl.GL11;
 
-@SearchTags({"feed aura", "BreedAura", "breed aura", "AutoBreeder",
-	"auto breeder"})
-public final class FeedAuraHack extends Hack
+import java.util.Comparator;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+@SearchTags({"shear aura", "ShearAura", "shear aura", "AutoShearer",
+	"auto shearer"})
+public final class ShearAuraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far FeedAura will reach\n" + "to feed animals.\n"
+		"Determines how far ShearAura will reach\n" + "to shear sheep.\n"
 			+ "Anything that is further away than the\n"
 			+ "specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
-	
+
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which animal will be fed first.\n"
-			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires\n"
+		"Determines which sheep will be sheared first.\n"
+			+ "\u00a7lDistance\u00a7r - Shears the closest sheep.\n"
+			+ "\u00a7lAngle\u00a7r - Shears the sheep that requires\n"
 			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
+			+ "\u00a7lHealth\u00a7r - Shears the weakest sheep.",
 		Priority.values(), Priority.ANGLE);
-	
+
 	private final CheckboxSetting filterBabies =
 		new CheckboxSetting("Filter babies",
 			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
 			false);
-	
+
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
-	
-	public FeedAuraHack()
+
+	public ShearAuraHack()
 	{
-		super("FeedAura", "Automatically feeds animals around you.");
+		super("ShearAura", "Automatically shears sheep around you.");
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
@@ -84,12 +84,12 @@ public final class FeedAuraHack extends Hack
 		// disable other auras
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().feedAuraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
-		WURST.getHax().shearAuraHack.setEnabled(false);
 
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PostMotionListener.class, this);
@@ -116,11 +116,11 @@ public final class FeedAuraHack extends Hack
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<AnimalEntity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.isRemoved()).filter(e -> e instanceof AnimalEntity)
+			.filter(e -> !e.isRemoved()).filter(e -> e instanceof SheepEntity)
 			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e.isBreedingItem(heldStack))
-			.filter(AnimalEntity::canEat);
+			.filter(e -> heldStack.getItem() instanceof ShearsItem)
+			.filter(e -> ((SheepEntity) e).isShearable());
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(e -> !e.isBaby());
