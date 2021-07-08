@@ -7,8 +7,13 @@
  */
 package net.wurstclient.commands;
 
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.c2s.play.BookUpdateC2SPacket;
@@ -62,7 +67,11 @@ public final class DupeCmd extends Command
 			NbtString.of("If you can see this, it didn't work"));
 		bookStack.putSubTag("pages", listTag);
 		
-		MC.player.networkHandler.sendPacket(new BookUpdateC2SPacket(bookStack,
-			true, MC.player.getInventory().selectedSlot));
+		ArrayList<String> pages = listTag.stream().map(NbtElement::asString)
+			.collect(Collectors.toCollection(ArrayList::new));
+		
+		MC.player.networkHandler.sendPacket(
+			new BookUpdateC2SPacket(MC.player.getInventory().selectedSlot,
+				pages, Optional.of("If you can see this, it didn't work")));
 	}
 }
