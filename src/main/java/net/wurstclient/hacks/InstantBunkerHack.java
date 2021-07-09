@@ -140,7 +140,6 @@ public final class InstantBunkerHack extends Hack
 			if(MC.player.isOnGround())
 			{
 				setEnabled(false);
-				return;
 			}
 		}
 		

@@ -93,8 +93,8 @@ public final class SelectFileScreen extends Screen
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
-		client.openScreen(
-			new ConfirmScreen(c -> confirmReset(c), title, message));
+		client
+			.openScreen(new ConfirmScreen(this::confirmReset, title, message));
 	}
 	
 	private void confirmReset(boolean confirmed)

@@ -97,7 +97,7 @@ public class PlayerSkinProviderMixin
 			
 			MinecraftClient.getInstance().execute(() -> {
 				RenderSystem.recordRenderCall(() -> {
-					ImmutableList.of(Type.SKIN, Type.CAPE).forEach((type) -> {
+					ImmutableList.of(Type.SKIN, Type.CAPE).forEach(type -> {
 						if(map.containsKey(type))
 							loadSkin(map.get(type), type, callback);
 					});

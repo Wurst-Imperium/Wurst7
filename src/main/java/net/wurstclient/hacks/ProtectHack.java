@@ -146,8 +146,7 @@ public final class ProtectHack extends Hack
 	{
 		if(friend != null)
 			return "Protecting " + friend.getName().getString();
-		else
-			return "Protect";
+		return "Protect";
 	}
 	
 	@Override

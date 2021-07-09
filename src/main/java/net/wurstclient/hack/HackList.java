@@ -167,7 +167,7 @@ public final class HackList implements UpdateListener
 	public final XRayHack xRayHack = new XRayHack();
 	
 	private final TreeMap<String, Hack> hax =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+		new TreeMap<>(String::compareToIgnoreCase);
 	
 	private final EnabledHacksFile enabledHacksFile;
 	private final Path profilesFolder =
@@ -236,7 +236,7 @@ public final class HackList implements UpdateListener
 		try(Stream<Path> files = Files.list(profilesFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{

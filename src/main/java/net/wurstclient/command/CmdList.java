@@ -65,7 +65,7 @@ public final class CmdList
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	
 	private final TreeMap<String, Command> cmds =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+		new TreeMap<>(String::compareToIgnoreCase);
 	
 	public CmdList()
 	{

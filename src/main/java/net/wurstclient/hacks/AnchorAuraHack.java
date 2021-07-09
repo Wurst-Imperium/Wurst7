@@ -206,8 +206,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		ArrayList<BlockPos> anchors = getNearbyAnchors();
 		
 		Map<Boolean, ArrayList<BlockPos>> anchorsByCharge = anchors.stream()
-			.collect(Collectors.partitioningBy(pos -> isChargedAnchor(pos),
-				Collectors.toCollection(() -> new ArrayList<>())));
+			.collect(Collectors.partitioningBy(this::isChargedAnchor,
+				Collectors.toCollection(ArrayList::new)));
 		
 		ArrayList<BlockPos> chargedAnchors = anchorsByCharge.get(true);
 		ArrayList<BlockPos> unchargedAnchors = anchorsByCharge.get(false);
@@ -458,7 +458,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.RESPAWN_ANCHOR)
 			.sorted(furthestFromPlayer)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private ArrayList<Entity> getNearbyTargets()
@@ -506,7 +506,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		return stream.sorted(furthestFromPlayer)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
@@ -533,7 +533,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			.filter(this::isReplaceable).filter(this::hasClickableNeighbor)
 			.filter(pos -> !targetBB.intersects(new Box(pos)))
 			.sorted(closestToTarget)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isReplaceable(BlockPos pos)

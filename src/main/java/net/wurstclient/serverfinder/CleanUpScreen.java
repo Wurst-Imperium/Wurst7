@@ -221,15 +221,13 @@ public class CleanUpScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
 			
-			ClickableWidget button = (ClickableWidget)d;
-			
-			if(!button.isHovered() || !(button instanceof CleanUpButton))
+			if(!button.isHovered()
+				|| !(button instanceof CleanUpButton cuButton))
 				continue;
 			
-			CleanUpButton cuButton = (CleanUpButton)button;
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
@@ -251,7 +249,7 @@ public class CleanUpScreen extends Screen
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new LiteralText[0]);
+				this.tooltip = Arrays.asList();
 			else
 			{
 				String[] lines = tooltip.split("\n");

@@ -152,12 +152,20 @@ public final class NameGenerator
 		}
 		
 		int special = (int)Math.round(Math.random() * 8);
-		if(special == 3)
+		switch(special)
+		{
+			case 3:
 			name = "xX".concat(name).concat("Xx");
-		else if(special == 4)
+			break;
+			case 4:
 			name = name.concat("LP");
-		else if(special == 5)
+			break;
+			case 5:
 			name = name.concat("HD");
+			break;
+			default:
+			break;
+		}
 		
 		return name;
 	}

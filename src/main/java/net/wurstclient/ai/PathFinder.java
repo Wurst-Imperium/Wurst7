@@ -395,7 +395,7 @@ public class PathFinder
 	private float getCost(BlockPos current, BlockPos next)
 	{
 		float[] costs = {0.5F, 0.5F};
-		BlockPos[] positions = new BlockPos[]{current, next};
+		BlockPos[] positions = {current, next};
 		
 		for(int i = 0; i < positions.length; i++)
 		{
@@ -442,7 +442,7 @@ public class PathFinder
 	
 	public int countProcessedBlocks()
 	{
-		return prevPosMap.keySet().size();
+		return prevPosMap.size();
 	}
 	
 	public int getQueueSize()

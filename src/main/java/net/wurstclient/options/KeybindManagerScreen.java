@@ -128,15 +128,23 @@ public final class KeybindManagerScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
 			if(editButton.active)
 				editButton.onPress();
 			else
 				addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
+			break;
+			case GLFW.GLFW_KEY_DELETE:
 			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+			break;
+			case GLFW.GLFW_KEY_ESCAPE:
 			backButton.onPress();
+			break;
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}

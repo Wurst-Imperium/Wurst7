@@ -88,7 +88,7 @@ public class ServerFinderScreen extends Screen
 		checked = 0;
 		working = 0;
 		
-		new Thread(() -> findServers(), "Server Finder").start();
+		new Thread(this::findServers, "Server Finder").start();
 	}
 	
 	private void findServers()

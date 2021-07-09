@@ -90,6 +90,6 @@ public final class KaboomHack extends Hack implements UpdateListener
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.sorted(Comparator.comparingDouble(
 				pos -> -eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

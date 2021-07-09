@@ -482,10 +482,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;
@@ -554,7 +552,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		return getStringHeight(text);
 	}
 	
-	public abstract class ButtonData extends Rectangle
+	public abstract static class ButtonData extends Rectangle
 	{
 		public String buttonText;
 		public Color color;

@@ -322,9 +322,8 @@ public final class KillauraLegitHack extends Hack
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
-		if(target instanceof LivingEntity)
+		if(target instanceof LivingEntity le)
 		{
-			LivingEntity le = (LivingEntity)target;
 			p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
 		}
 		float red = p * 2F;

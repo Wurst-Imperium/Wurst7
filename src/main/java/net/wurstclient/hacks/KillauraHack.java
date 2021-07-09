@@ -313,9 +313,8 @@ public final class KillauraHack extends Hack
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
-		if(renderTarget instanceof LivingEntity)
+		if(renderTarget instanceof LivingEntity le)
 		{
-			LivingEntity le = (LivingEntity)renderTarget;
 			p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
 		}
 		float red = p * 2F;

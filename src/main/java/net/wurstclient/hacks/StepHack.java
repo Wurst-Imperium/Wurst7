@@ -92,7 +92,7 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		ArrayList<Box> blockCollisions = MC.world
 			.getBlockCollisions(player, box).map(VoxelShape::getBoundingBox)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(Box bb : blockCollisions)
 			if(bb.maxY > stepHeight)

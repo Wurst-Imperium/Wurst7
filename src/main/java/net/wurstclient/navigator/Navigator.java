@@ -62,7 +62,7 @@ public final class Navigator
 			
 			if(index1 == index2)
 				return 0;
-			else if(index1 == -1)
+			if(index1 == -1)
 				return 1;
 			else if(index2 == -1)
 				return -1;

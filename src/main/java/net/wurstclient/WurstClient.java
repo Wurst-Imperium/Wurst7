@@ -223,7 +223,7 @@ public enum WurstClient
 		try(Stream<Path> files = Files.list(settingsProfileFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{
@@ -269,10 +269,7 @@ public enum WurstClient
 			return cmd;
 		
 		OtherFeature otf = getOtfs().getOtfByName(name);
-		if(otf != null)
-			return otf;
-		
-		return null;
+		return otf;
 	}
 	
 	public KeybindList getKeybinds()

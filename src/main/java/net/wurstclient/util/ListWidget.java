@@ -262,26 +262,24 @@ public abstract class ListWidget extends AbstractParentElement
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
 		updateScrollingState(mouseX, mouseY, button);
-		if(isVisible() && isMouseInList(mouseX, mouseY))
-		{
-			int i = getItemAtPosition(mouseX, mouseY);
-			if(i == -1 && button == 0)
-			{
-				clickedHeader(
-					(int)(mouseX - (left + width / 2 - getRowWidth() / 2)),
-					(int)(mouseY - top) + (int)scrollAmount - 4);
-				return true;
-			}else if(i != -1 && selectItem(i, button, mouseX, mouseY))
-			{
-				if(children().size() > i)
-					setFocused(children().get(i));
-				
-				setDragging(true);
-				return true;
-			}else
-				return scrolling;
-		}else
+		if(!isVisible() || !isMouseInList(mouseX, mouseY))
 			return false;
+		int i = getItemAtPosition(mouseX, mouseY);
+		if(i == -1 && button == 0)
+		{
+			clickedHeader(
+				(int)(mouseX - (left + width / 2 - getRowWidth() / 2)),
+				(int)(mouseY - top) + (int)scrollAmount - 4);
+			return true;
+		}else if(i != -1 && selectItem(i, button, mouseX, mouseY))
+		{
+			if(children().size() > i)
+				setFocused(children().get(i));
+			
+			setDragging(true);
+			return true;
+		}else
+			return scrolling;
 	}
 	
 	@Override
@@ -299,7 +297,7 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))
 			return true;
-		else if(isVisible() && button == 0 && scrolling)
+		if(isVisible() && button == 0 && scrolling)
 		{
 			if(mouseY < top)
 				scrollAmount = 0.0D;
@@ -332,11 +330,8 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(!isVisible())
 			return false;
-		else
-		{
-			scrollAmount -= amount * itemHeight / 2.0D;
-			return true;
-		}
+		scrollAmount -= amount * itemHeight / 2.0D;
+		return true;
 	}
 	
 	@Override
@@ -344,7 +339,7 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(!isVisible())
 			return false;
-		else if(super.keyPressed(keyCode, scanCode, modifiers))
+		if(super.keyPressed(keyCode, scanCode, modifiers))
 			return true;
 		else if(keyCode == 264)
 		{

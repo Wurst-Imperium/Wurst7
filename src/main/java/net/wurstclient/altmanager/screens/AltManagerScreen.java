@@ -446,10 +446,8 @@ public final class AltManagerScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
 			
 			if(!button.isHovered())
 				continue;

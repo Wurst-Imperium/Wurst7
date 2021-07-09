@@ -55,10 +55,9 @@ public final class GoToCmd extends Command
 		if(args.length == 1 && args[0].equals("-path"))
 		{
 			BlockPos goal = WURST.getCmds().pathCmd.getLastGoal();
-			if(goal != null)
-				pathFinder = new PathFinder(goal);
-			else
+			if(goal == null)
 				throw new CmdError("No previous position on .path.");
+			pathFinder = new PathFinder(goal);
 		}else
 		{
 			BlockPos goal = argsToPos(args);
@@ -108,8 +107,7 @@ public final class GoToCmd extends Command
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
 		BlockPos playerPos = new BlockPos(MC.player.getPos());
-		int[] player =
-			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
+		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		
 		for(int i = 0; i < 3; i++)

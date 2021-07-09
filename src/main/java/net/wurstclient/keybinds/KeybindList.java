@@ -95,7 +95,7 @@ public final class KeybindList
 		try(Stream<Path> files = Files.list(profilesFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{

@@ -132,12 +132,20 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
 			addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
+			break;
+			case GLFW.GLFW_KEY_DELETE:
 			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+			break;
+			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
+			break;
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -296,23 +304,21 @@ public final class EditItemListScreen extends Screen
 				
 				return "\u00a7ounknown item\u00a7r";
 				
-			}else
-			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
-				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
-				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
-				
-				DiffuseLighting.enableGuiDepthLighting();
-				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-				DiffuseLighting.disableGuiDepthLighting();
-				
-				matrixStack.pop();
-				
-				return stack.getName().getString();
 			}
+			matrixStack.push();
+			matrixStack.translate(x, y, 0);
+			if(large)
+				matrixStack.scale(1.5F, 1.5F, 1.5F);
+			else
+				matrixStack.scale(0.75F, 0.75F, 0.75F);
+			
+			DiffuseLighting.enableGuiDepthLighting();
+			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
+			DiffuseLighting.disableGuiDepthLighting();
+			
+			matrixStack.pop();
+			
+			return stack.getName().getString();
 		}
 	}
 }
