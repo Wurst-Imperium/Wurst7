@@ -327,15 +327,15 @@ public final class MobSpawnEspHack extends Hack
 				return;
 			
 			red.addAll(blocks.stream()
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
-				.filter(pos -> world.getLightLevel(LightType.SKY, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
+				.filter(pos -> world.getLightLevel(LightType.SKY, pos) < 1)
 				.collect(Collectors.toList()));
 			
 			if(Thread.interrupted())
 				return;
 			
 			yellow.addAll(blocks.stream().filter(pos -> !red.contains(pos))
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
 				.collect(Collectors.toList()));
 			doneScanning = true;
 		}
