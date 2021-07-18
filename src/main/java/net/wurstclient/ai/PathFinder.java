@@ -36,8 +36,8 @@ public class PathFinder
 		creativeFlying || wurst.getHax().flightHack.isEnabled();
 	private final boolean immuneToFallDamage =
 		invulnerable || wurst.getHax().noFallHack.isEnabled();
-	private final boolean noWaterSlowdown = false;
-	// TODO: wurst.getHax().noSlowdownHack.blockWaterSlowness();
+	private final boolean noWaterSlowdown =
+		wurst.getHax().antiWaterPushHack.isPreventingSlowdown();
 	private final boolean jesus = wurst.getHax().jesusHack.isEnabled();
 	private final boolean spider = wurst.getHax().spiderHack.isEnabled();
 	protected boolean fallingAllowed = true;
@@ -574,9 +574,8 @@ public class PathFinder
 				|| wurst.getHax().flightHack.isEnabled())
 			|| immuneToFallDamage != (invulnerable
 				|| wurst.getHax().noFallHack.isEnabled())
-			// TODO:
-			// || noWaterSlowdown !=
-			// wurst.getHax().noSlowdownHack.blockWaterSlowness()
+			|| noWaterSlowdown != wurst.getHax().antiWaterPushHack
+				.isPreventingSlowdown()
 			|| jesus != wurst.getHax().jesusHack.isEnabled()
 			|| spider != wurst.getHax().spiderHack.isEnabled())
 			return false;
