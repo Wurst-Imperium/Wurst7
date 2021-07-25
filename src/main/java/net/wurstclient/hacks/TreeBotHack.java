@@ -19,27 +19,18 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -53,6 +44,8 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.treebot.Tree;
+import net.wurstclient.treebot.TreeBotUtils;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -62,14 +55,6 @@ import net.wurstclient.util.RotationUtils;
 public final class TreeBotHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private static final List<Block> LOG_BLOCKS =
-		Arrays.asList(Blocks.OAK_LOG, Blocks.SPRUCE_LOG, Blocks.BIRCH_LOG,
-			Blocks.JUNGLE_LOG, Blocks.ACACIA_LOG, Blocks.DARK_OAK_LOG);
-	
-	private static final List<Block> LEAVES_BLOCKS = Arrays.asList(
-		Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.BIRCH_LEAVES,
-		Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES);
-	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far TreeBot will reach to break blocks.", 4.5, 1, 6, 0.05,
 		ValueDisplay.DECIMAL);
@@ -154,7 +139,7 @@ public final class TreeBotHack extends Hack
 			return;
 		}
 		
-		tree.getLogs().removeIf(Predicate.not(this::isLog));
+		tree.getLogs().removeIf(Predicate.not(TreeBotUtils::isLog));
 		tree.compileBuffer();
 		
 		if(tree.getLogs().isEmpty())
@@ -231,13 +216,8 @@ public final class TreeBotHack extends Hack
 		
 		return tree.getLogs().stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(this::hasLineOfSight)
+			.filter(TreeBotUtils::hasLineOfSight)
 			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private boolean hasLineOfSight(BlockPos pos)
-	{
-		return getLineOfSightSide(RotationUtils.getEyesPos(), pos) != null;
 	}
 	
 	private void breakBlocks(ArrayList<BlockPos> blocksInRange)
@@ -271,7 +251,8 @@ public final class TreeBotHack extends Hack
 	
 	private boolean breakBlock(BlockPos pos)
 	{
-		Direction side = getLineOfSightSide(RotationUtils.getEyesPos(), pos);
+		Direction side =
+			TreeBotUtils.getLineOfSightSide(RotationUtils.getEyesPos(), pos);
 		
 		Vec3d relCenter = BlockUtils.getBoundingBox(pos)
 			.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter();
@@ -296,84 +277,19 @@ public final class TreeBotHack extends Hack
 		return true;
 	}
 	
-	private Direction getLineOfSightSide(Vec3d eyesPos, BlockPos pos)
-	{
-		Direction[] sides = Direction.values();
-		
-		Vec3d relCenter = BlockUtils.getBoundingBox(pos)
-			.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter();
-		Vec3d center = Vec3d.of(pos).add(relCenter);
-		
-		Vec3d[] hitVecs = new Vec3d[sides.length];
-		for(int i = 0; i < sides.length; i++)
-		{
-			Vec3i dirVec = sides[i].getVector();
-			Vec3d relHitVec = new Vec3d(relCenter.x * dirVec.getX(),
-				relCenter.y * dirVec.getY(), relCenter.z * dirVec.getZ());
-			hitVecs[i] = center.add(relHitVec);
-		}
-		
-		double[] distancesSq = new double[sides.length];
-		boolean[] linesOfSight = new boolean[sides.length];
-		
-		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
-		for(int i = 0; i < sides.length; i++)
-		{
-			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
-			
-			// no need to raytrace the rear sides,
-			// they can't possibly have line of sight
-			if(distancesSq[i] >= distanceSqToCenter)
-				continue;
-			
-			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
-		}
-		
-		Direction side = null;
-		for(int i = 0; i < sides.length; i++)
-		{
-			// require line of sight
-			if(!linesOfSight[i])
-				continue;
-			
-			// start with the first side that has LOS
-			if(side == null)
-			{
-				side = sides[i];
-				continue;
-			}
-			
-			// then pick the closest side
-			if(distancesSq[i] < distancesSq[side.ordinal()])
-				side = sides[i];
-		}
-		
-		// will be null if no LOS was found
-		return side;
-	}
-	
-	private boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
-		
-		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
-	}
-	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		RenderSystem.setShader(GameRenderer::getPositionShader);
+		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
-			drawTreeFinder(matrixStack);
+			treeFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+				pathCmd.isDepthTest());
+		
 		if(angleFinder != null)
-		{
-			PathCmd pathCmd = WURST.getCmds().pathCmd;
 			angleFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 				pathCmd.isDepthTest());
-		}
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -393,13 +309,6 @@ public final class TreeBotHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private void drawTreeFinder(MatrixStack matrixStack)
-	{
-		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		treeFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
-			pathCmd.isDepthTest());
 	}
 	
 	private void drawTree(MatrixStack matrixStack)
@@ -450,63 +359,11 @@ public final class TreeBotHack extends Hack
 		matrixStack.pop();
 	}
 	
-	private boolean isTreeStump(BlockPos pos)
-	{
-		if(!isLog(pos))
-			return false;
-		
-		if(isLog(pos.down()))
-			return false;
-		
-		analyzeTree(pos);
-		
-		// ignore large trees (for now)
-		if(tree.getLogs().size() > 6)
-			return false;
-		
-		return true;
-	}
-	
-	private boolean isLog(BlockPos pos)
-	{
-		return LOG_BLOCKS.contains(BlockUtils.getBlock(pos));
-	}
-	
-	private boolean isLeaves(BlockPos pos)
-	{
-		return LEAVES_BLOCKS.contains(BlockUtils.getBlock(pos));
-	}
-	
-	private void analyzeTree(BlockPos stump)
-	{
-		ArrayList<BlockPos> logs = new ArrayList<>(Arrays.asList(stump));
-		ArrayDeque<BlockPos> queue = new ArrayDeque<>(Arrays.asList(stump));
-		
-		for(int i = 0; i < 1024; i++)
-		{
-			if(queue.isEmpty())
-				break;
-			
-			BlockPos current = queue.pollFirst();
-			
-			for(BlockPos next : getNeighbors(current))
-			{
-				if(logs.contains(next))
-					continue;
-				
-				logs.add(next);
-				queue.add(next);
-			}
-		}
-		
-		tree = new Tree(stump, logs);
-	}
-	
 	private ArrayList<BlockPos> getNeighbors(BlockPos pos)
 	{
 		return BlockUtils
 			.getAllInBoxStream(pos.add(-1, -1, -1), pos.add(1, 1, 1))
-			.filter(this::isLog)
+			.filter(TreeBotUtils::isLog)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -580,10 +437,10 @@ public final class TreeBotHack extends Hack
 			path = path.subList(processor.getIndex(), path.size());
 			
 			return path.stream().flatMap(pos -> Stream.of(pos, pos.up()))
-				.distinct().filter(TreeBotHack.this::isLeaves)
+				.distinct().filter(TreeBotUtils::isLeaves)
 				.filter(
 					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-				.filter(TreeBotHack.this::hasLineOfSight)
+				.filter(TreeBotUtils::hasLineOfSight)
 				.collect(Collectors.toCollection(ArrayList::new));
 		}
 		
@@ -608,7 +465,7 @@ public final class TreeBotHack extends Hack
 		@Override
 		protected boolean isMineable(BlockPos pos)
 		{
-			return isLeaves(pos);
+			return TreeBotUtils.isLeaves(pos);
 		}
 		
 		@Override
@@ -621,6 +478,48 @@ public final class TreeBotHack extends Hack
 		{
 			return isTreeStump(pos.north()) || isTreeStump(pos.east())
 				|| isTreeStump(pos.south()) || isTreeStump(pos.west());
+		}
+		
+		private boolean isTreeStump(BlockPos pos)
+		{
+			if(!TreeBotUtils.isLog(pos))
+				return false;
+			
+			if(TreeBotUtils.isLog(pos.down()))
+				return false;
+			
+			analyzeTree(pos);
+			
+			// ignore large trees (for now)
+			if(tree.getLogs().size() > 6)
+				return false;
+			
+			return true;
+		}
+		
+		private void analyzeTree(BlockPos stump)
+		{
+			ArrayList<BlockPos> logs = new ArrayList<>(Arrays.asList(stump));
+			ArrayDeque<BlockPos> queue = new ArrayDeque<>(Arrays.asList(stump));
+			
+			for(int i = 0; i < 1024; i++)
+			{
+				if(queue.isEmpty())
+					break;
+				
+				BlockPos current = queue.pollFirst();
+				
+				for(BlockPos next : getNeighbors(current))
+				{
+					if(logs.contains(next))
+						continue;
+					
+					logs.add(next);
+					queue.add(next);
+				}
+			}
+			
+			tree = new Tree(stump, logs);
 		}
 		
 		@Override
@@ -647,7 +546,7 @@ public final class TreeBotHack extends Hack
 		@Override
 		protected boolean isMineable(BlockPos pos)
 		{
-			return isLeaves(pos);
+			return TreeBotUtils.isLeaves(pos);
 		}
 		
 		@Override
@@ -670,7 +569,7 @@ public final class TreeBotHack extends Hack
 				if(eyesVec.squaredDistanceTo(Vec3d.of(log)) > rangeSq)
 					continue;
 				
-				if(getLineOfSightSide(eyes, log) != null)
+				if(TreeBotUtils.getLineOfSightSide(eyes, log) != null)
 					return true;
 			}
 			
@@ -681,71 +580,6 @@ public final class TreeBotHack extends Hack
 		public void reset()
 		{
 			angleFinder = new AngleFinder(angleFinder);
-		}
-	}
-	
-	private static class Tree implements AutoCloseable
-	{
-		private final BlockPos stump;
-		private final ArrayList<BlockPos> logs;
-		private VertexBuffer vertexBuffer;
-		
-		public Tree(BlockPos stump, ArrayList<BlockPos> logs)
-		{
-			this.stump = stump;
-			this.logs = logs;
-			compileBuffer();
-		}
-		
-		public void compileBuffer()
-		{
-			if(vertexBuffer != null)
-				vertexBuffer.close();
-			
-			vertexBuffer = new VertexBuffer();
-			
-			int regionX = (stump.getX() >> 9) * 512;
-			int regionZ = (stump.getZ() >> 9) * 512;
-			
-			double boxMin = 1 / 16.0;
-			double boxMax = 15 / 16.0;
-			Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			
-			RenderUtils.drawCrossBox(
-				box.offset(stump).offset(-regionX, 0, -regionZ), bufferBuilder);
-			
-			for(BlockPos log : logs)
-				RenderUtils.drawOutlinedBox(
-					box.offset(log).offset(-regionX, 0, -regionZ),
-					bufferBuilder);
-			
-			bufferBuilder.end();
-			vertexBuffer.upload(bufferBuilder);
-		}
-		
-		@Override
-		public void close()
-		{
-			vertexBuffer.close();
-		}
-		
-		public BlockPos getStump()
-		{
-			return stump;
-		}
-		
-		public ArrayList<BlockPos> getLogs()
-		{
-			return logs;
-		}
-		
-		public VertexBuffer getVertexBuffer()
-		{
-			return vertexBuffer;
 		}
 	}
 }
