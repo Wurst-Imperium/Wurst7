@@ -12,9 +12,7 @@ import net.wurstclient.util.ChatUtils;
 public final class CmdSyntaxError extends CmdException
 {
 	public CmdSyntaxError()
-	{
-		super();
-	}
+	{}
 	
 	public CmdSyntaxError(String message)
 	{

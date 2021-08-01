@@ -113,8 +113,7 @@ public final class TunnellerHack extends Hack
 	{
 		if(limit.getValueI() == 0)
 			return getName();
-		else
-			return getName() + " [" + length + "/" + limit.getValueI() + "]";
+		return getName() + " [" + length + "/" + limit.getValueI() + "]";
 	}
 	
 	@Override
@@ -796,7 +795,7 @@ public final class TunnellerHack extends Hack
 		}
 	}
 	
-	private class WaitForFallingBlocksTask extends Task
+	private static class WaitForFallingBlocksTask extends Task
 	{
 		@Override
 		public boolean canRun()

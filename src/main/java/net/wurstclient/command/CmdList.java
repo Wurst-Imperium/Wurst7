@@ -28,7 +28,6 @@ public final class CmdList
 	public final DamageCmd damageCmd = new DamageCmd();
 	public final DigCmd digCmd = new DigCmd();
 	public final DropCmd dropCmd = new DropCmd();
-	public final DupeCmd dupeCmd = new DupeCmd();
 	public final EnabledHaxCmd enabledHaxCmd = new EnabledHaxCmd();
 	public final EnchantCmd enchantCmd = new EnchantCmd();
 	public final ExcavateCmd excavateCmd = new ExcavateCmd();
@@ -66,7 +65,7 @@ public final class CmdList
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	
 	private final TreeMap<String, Command> cmds =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+		new TreeMap<>(String::compareToIgnoreCase);
 	
 	public CmdList()
 	{

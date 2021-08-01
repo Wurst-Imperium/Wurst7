@@ -56,7 +56,7 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.15.3";
+	public static final String VERSION = "7.16";
 	public static final String MC_VERSION = "1.17.1";
 	
 	private WurstAnalytics analytics;
@@ -223,7 +223,7 @@ public enum WurstClient
 		try(Stream<Path> files = Files.list(settingsProfileFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{
@@ -269,10 +269,7 @@ public enum WurstClient
 			return cmd;
 		
 		OtherFeature otf = getOtfs().getOtfByName(name);
-		if(otf != null)
-			return otf;
-		
-		return null;
+		return otf;
 	}
 	
 	public KeybindList getKeybinds()

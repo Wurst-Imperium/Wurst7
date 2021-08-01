@@ -206,8 +206,8 @@ public final class ClickGui
 			if(popup.getOwner().getParent().isClosing())
 				popup.close();
 			
-		windows.removeIf(w -> w.isClosing());
-		popups.removeIf(p -> p.isClosing());
+		windows.removeIf(Window::isClosing);
+		popups.removeIf(Popup::isClosing);
 	}
 	
 	public void handleMouseRelease(double mouseX, double mouseY,
@@ -258,7 +258,7 @@ public final class ClickGui
 				if(popup.getOwner().getParent().isClosing())
 					popup.close();
 				
-			popups.removeIf(p -> p.isClosing());
+			popups.removeIf(Popup::isClosing);
 		}
 		
 		return popupClicked;
@@ -276,7 +276,7 @@ public final class ClickGui
 			if(popup.getOwner().getParent().isClosing())
 				popup.close();
 			
-		popups.removeIf(p -> p.isClosing());
+		popups.removeIf(Popup::isClosing);
 	}
 	
 	private boolean handlePopupMouseClick(double mouseX, double mouseY,
@@ -1064,8 +1064,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
 			
 		}else
 		{
@@ -1142,9 +1140,9 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
 		}
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private void renderCloseButton(MatrixStack matrixStack, int x1, int y1,

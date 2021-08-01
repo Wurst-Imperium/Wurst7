@@ -77,4 +77,9 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 		if(preventSlowdown.isChecked())
 			event.setInWater(false);
 	}
+	
+	public boolean isPreventingSlowdown()
+	{
+		return preventSlowdown.isChecked();
+	}
 }

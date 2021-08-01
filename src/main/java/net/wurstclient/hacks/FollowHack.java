@@ -146,8 +146,7 @@ public final class FollowHack extends Hack
 	{
 		if(entity != null)
 			return "Following " + entity.getName().getString();
-		else
-			return "Follow";
+		return "Follow";
 	}
 	
 	@Override

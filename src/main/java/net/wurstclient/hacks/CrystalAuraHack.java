@@ -9,18 +9,19 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
@@ -50,120 +51,117 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
 
-@SearchTags({"anchor aura", "CrystalAura", "crystal aura"})
-public final class AnchorAuraHack extends Hack implements UpdateListener
+@SearchTags({"crystal aura"})
+public final class CrystalAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far AnchorAura will reach\n"
-			+ "to place, charge and detonate anchors.",
+		"Determines how far CrystalAura will reach\n"
+			+ "to place and detonate crystals.",
 		6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting autoPlace =
-		new CheckboxSetting("Auto-place anchors",
-			"When enabled, AnchorAura will automatically\n"
-				+ "place anchors near valid entities.\n"
-				+ "When disabled, AnchorAura will only charge\n"
-				+ "and detonate manually placed anchors.",
+		new CheckboxSetting("Auto-place crystals",
+			"When enabled, CrystalAura will automatically\n"
+				+ "place crystals near valid entities.\n"
+				+ "When disabled, CrystalAura will only\n"
+				+ "detonate manually placed crystals.",
 			true);
 	
 	private final EnumSetting<FaceBlocks> faceBlocks =
-		new EnumSetting<>("Face anchors",
-			"Whether or not AnchorAura should face\n"
+		new EnumSetting<>("Face crystals",
+			"Whether or not CrystalAura should face\n"
 				+ "the correct direction when placing and\n"
-				+ "right-clicking respawn anchors.\n\n"
+				+ "left-clicking end crystals.\n\n"
 				+ "Slower but can help with anti-cheat\n" + "plugins.",
 			FaceBlocks.values(), FaceBlocks.OFF);
 	
-	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Ensures that you don't reach through\n"
-			+ "blocks when placing or right-clicking\n" + "respawn anchors.\n\n"
-			+ "Slower but can help with anti-cheat\n" + "plugins.",
-		false);
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"Ensures that you don't reach through\n"
+				+ "blocks when placing or left-clicking\n" + "end crystals.\n\n"
+				+ "Slower but can help with anti-cheat\n" + "plugins.",
+			false);
 	
 	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
-		new EnumSetting<>("Take items from",
-			"Where to look for respawn anchors\n" + "and glowstone.",
+		new EnumSetting<>("Take items from", "Where to look for end crystals.",
 			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
 	
 	private final CheckboxSetting filterPlayers =
 		new CheckboxSetting("Filter players",
-			"Won't target other players\n" + "when auto-placing anchors.\n\n"
+			"Won't target other players\n" + "when auto-placing crystals.\n\n"
 				+ "They can still take damage if\n"
 				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
+				+ "target or an existing crystal.",
 			false);
 	
 	private final CheckboxSetting filterMonsters =
 		new CheckboxSetting("Filter monsters",
 			"Won't target zombies, creepers, etc.\n"
-				+ "when auto-placing anchors.\n\n"
+				+ "when auto-placing crystals.\n\n"
 				+ "They can still take damage if\n"
 				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
+				+ "target or an existing crystal.",
 			true);
 	
-	private final CheckboxSetting filterAnimals =
-		new CheckboxSetting("Filter animals",
-			"Won't target pigs, cows, etc.\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterAnimals = new CheckboxSetting(
+		"Filter animals",
+		"Won't target pigs, cows, etc.\n" + "when auto-placing crystals.\n\n"
+			+ "They can still take damage if\n"
+			+ "they get too close to a valid\n"
+			+ "target or an existing crystal.",
+		true);
 	
 	private final CheckboxSetting filterTraders =
 		new CheckboxSetting("Filter traders",
 			"Won't target villagers, wandering traders, etc.\n"
-				+ "when auto-placing anchors.\n\n"
+				+ "when auto-placing crystals.\n\n"
 				+ "They can still take damage if\n"
 				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
+				+ "target or an existing crystal.",
 			true);
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
 			"Won't target iron golems,\n" + "snow golems and shulkers.\n"
-				+ "when auto-placing anchors.\n\n"
+				+ "when auto-placing crystals.\n\n"
 				+ "They can still take damage if\n"
 				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
+				+ "target or an existing crystal.",
 			true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible",
-		"Won't target invisible entities\n" + "when auto-placing anchors.\n\n"
+		"Won't target invisible entities\n" + "when auto-placing crystals.\n\n"
 			+ "They can still take damage if\n"
 			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
+			+ "target or an existing crystal.",
 		false);
 	
-	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named",
-		"Won't target name-tagged entities\n" + "when auto-placing anchors.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
-		false);
+	private final CheckboxSetting filterNamed =
+		new CheckboxSetting("Filter named",
+			"Won't target name-tagged entities\n"
+				+ "when auto-placing crystals.\n\n"
+				+ "They can still take damage if\n"
+				+ "they get too close to a valid\n"
+				+ "target or an existing crystal.",
+			false);
 	
 	private final CheckboxSetting filterStands =
 		new CheckboxSetting("Filter armor stands",
-			"Won't target armor stands.\n" + "when auto-placing anchors.\n\n"
+			"Won't target armor stands.\n" + "when auto-placing crystals.\n\n"
 				+ "They can still take damage if\n"
 				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
+				+ "target or an existing crystal.",
 			true);
 	
-	public AnchorAuraHack()
+	public CrystalAuraHack()
 	{
-		super("AnchorAura",
-			"Automatically places (optional), charges,\n"
-				+ "and detonates respawn anchors to kill\n"
-				+ "entities around you.");
+		super("CrystalAura", "Automatically places (optional) and\n"
+			+ "detonates end crystals to kill\n" + "entities around you.");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
@@ -185,6 +183,16 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		// disable other killauras
+		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().killauraHack.setEnabled(false);
+		WURST.getHax().killauraLegitHack.setEnabled(false);
+		WURST.getHax().multiAuraHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
+		WURST.getHax().triggerBotHack.setEnabled(false);
+		WURST.getHax().tpAuraHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -197,54 +205,25 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.world.getDimension().isRespawnAnchorWorking())
+		ArrayList<Entity> crystals = getNearbyCrystals();
+		
+		if(!crystals.isEmpty())
 		{
-			ChatUtils.error("Respawn anchors don't explode in this dimension.");
-			setEnabled(false);
-		}
-		
-		ArrayList<BlockPos> anchors = getNearbyAnchors();
-		
-		Map<Boolean, ArrayList<BlockPos>> anchorsByCharge = anchors.stream()
-			.collect(Collectors.partitioningBy(this::isChargedAnchor,
-				Collectors.toCollection(ArrayList::new)));
-		
-		ArrayList<BlockPos> chargedAnchors = anchorsByCharge.get(true);
-		ArrayList<BlockPos> unchargedAnchors = anchorsByCharge.get(false);
-		
-		if(!chargedAnchors.isEmpty())
-		{
-			detonate(chargedAnchors);
-			return;
-		}
-		
-		if(!unchargedAnchors.isEmpty()
-			&& hasItem(item -> item == Items.GLOWSTONE))
-		{
-			charge(unchargedAnchors);
-			// TODO: option to wait until next tick?
-			detonate(unchargedAnchors);
+			detonate(crystals);
 			return;
 		}
 		
 		if(!autoPlace.isChecked()
-			|| !hasItem(item -> item == Items.RESPAWN_ANCHOR))
+			|| !hasItem(item -> item == Items.END_CRYSTAL))
 			return;
 		
 		ArrayList<Entity> targets = getNearbyTargets();
-		ArrayList<BlockPos> newAnchors = placeAnchorsNear(targets);
-		
-		if(!newAnchors.isEmpty() && hasItem(item -> item == Items.GLOWSTONE))
-		{
-			// TODO: option to wait until next tick?
-			charge(newAnchors);
-			detonate(newAnchors);
-		}
+		placeCrystalsNear(targets);
 	}
 	
-	private ArrayList<BlockPos> placeAnchorsNear(ArrayList<Entity> targets)
+	private ArrayList<BlockPos> placeCrystalsNear(ArrayList<Entity> targets)
 	{
-		ArrayList<BlockPos> newAnchors = new ArrayList<>();
+		ArrayList<BlockPos> newCrystals = new ArrayList<>();
 		
 		boolean shouldSwing = false;
 		for(Entity target : targets)
@@ -252,10 +231,10 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			ArrayList<BlockPos> freeBlocks = getFreeBlocksNear(target);
 			
 			for(BlockPos pos : freeBlocks)
-				if(placeAnchor(pos))
+				if(placeCrystal(pos))
 				{
 					shouldSwing = true;
-					newAnchors.add(pos);
+					newCrystals.add(pos);
 					
 					// TODO optional speed limit(?)
 					break;
@@ -265,42 +244,18 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(shouldSwing)
 			MC.player.swingHand(Hand.MAIN_HAND);
 		
-		return newAnchors;
+		return newCrystals;
 	}
 	
-	private void detonate(ArrayList<BlockPos> chargedAnchors)
+	private void detonate(ArrayList<Entity> crystals)
 	{
-		if(isSneaking())
-			return;
+		for(Entity e : crystals)
+		{
+			faceBlocks.getSelected().face(e.getBoundingBox().getCenter());
+			MC.interactionManager.attackEntity(MC.player, e);
+		}
 		
-		if(!selectItem(item -> item != Items.GLOWSTONE))
-			return;
-		
-		boolean shouldSwing = false;
-		
-		for(BlockPos pos : chargedAnchors)
-			if(rightClickBlock(pos))
-				shouldSwing = true;
-			
-		if(shouldSwing)
-			MC.player.swingHand(Hand.MAIN_HAND);
-	}
-	
-	private void charge(ArrayList<BlockPos> unchargedAnchors)
-	{
-		if(isSneaking())
-			return;
-		
-		if(!selectItem(item -> item == Items.GLOWSTONE))
-			return;
-		
-		boolean shouldSwing = false;
-		
-		for(BlockPos pos : unchargedAnchors)
-			if(rightClickBlock(pos))
-				shouldSwing = true;
-			
-		if(shouldSwing)
+		if(!crystals.isEmpty())
 			MC.player.swingHand(Hand.MAIN_HAND);
 	}
 	
@@ -354,44 +309,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		return false;
 	}
 	
-	private boolean rightClickBlock(BlockPos pos)
-	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
-		
-		for(Direction side : Direction.values())
-		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
-			
-			// check if hitVec is within range (6 blocks)
-			if(distanceSqHitVec > 36)
-				continue;
-			
-			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
-				continue;
-			
-			if(checkLOS.isChecked() && MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
-				continue;
-			
-			faceBlocks.getSelected().face(hitVec);
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean placeAnchor(BlockPos pos)
+	private boolean placeCrystal(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = Math.pow(range.getValue(), 2);
@@ -424,7 +342,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
-			if(!selectItem(item -> item == Items.RESPAWN_ANCHOR))
+			if(!selectItem(item -> item == Items.END_CRYSTAL))
 				return false;
 			
 			faceBlocks.getSelected().face(hitVec);
@@ -439,24 +357,19 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		return false;
 	}
 	
-	private ArrayList<BlockPos> getNearbyAnchors()
+	private ArrayList<Entity> getNearbyCrystals()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeD = range.getValue();
-		int rangeI = (int)Math.ceil(rangeD);
-		double rangeSq = Math.pow(rangeD + 0.5, 2);
+		ClientPlayerEntity player = MC.player;
+		double rangeSq = Math.pow(range.getValue(), 2);
 		
-		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
+		Comparator<Entity> furthestFromPlayer = Comparator
+			.<Entity> comparingDouble(e -> MC.player.squaredDistanceTo(e))
+			.reversed();
 		
-		Comparator<BlockPos> furthestFromPlayer =
-			Comparator.<BlockPos> comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))).reversed();
-		
-		return BlockUtils.getAllInBoxStream(min, max)
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.RESPAWN_ANCHOR)
+		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+			.filter(e -> e instanceof EndCrystalEntity)
+			.filter(e -> !e.isRemoved())
+			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.sorted(furthestFromPlayer)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
@@ -530,7 +443,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		
 		return BlockUtils.getAllInBoxStream(min, max)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(this::isReplaceable).filter(this::hasClickableNeighbor)
+			.filter(this::isReplaceable).filter(this::hasCrystalBase)
 			.filter(pos -> !targetBB.intersects(new Box(pos)))
 			.sorted(closestToTarget)
 			.collect(Collectors.toCollection(ArrayList::new));
@@ -541,36 +454,16 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		return BlockUtils.getState(pos).getMaterial().isReplaceable();
 	}
 	
-	private boolean hasClickableNeighbor(BlockPos pos)
+	private boolean hasCrystalBase(BlockPos pos)
 	{
-		return isClickableNeighbor(pos.up()) || isClickableNeighbor(pos.down())
-			|| isClickableNeighbor(pos.north())
-			|| isClickableNeighbor(pos.east())
-			|| isClickableNeighbor(pos.south())
-			|| isClickableNeighbor(pos.west());
+		Block block = BlockUtils.getBlock(pos.down());
+		return block == Blocks.BEDROCK || block == Blocks.OBSIDIAN;
 	}
 	
 	private boolean isClickableNeighbor(BlockPos pos)
 	{
 		return BlockUtils.canBeClicked(pos)
 			&& !BlockUtils.getState(pos).getMaterial().isReplaceable();
-	}
-	
-	private boolean isChargedAnchor(BlockPos pos)
-	{
-		try
-		{
-			return BlockUtils.getState(pos).get(RespawnAnchorBlock.CHARGES) > 0;
-			
-		}catch(IllegalArgumentException e)
-		{
-			return false;
-		}
-	}
-	
-	private boolean isSneaking()
-	{
-		return MC.player.isSneaking() || WURST.getHax().sneakHack.isEnabled();
 	}
 	
 	private enum FaceBlocks

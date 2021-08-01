@@ -7,17 +7,16 @@
  */
 package net.wurstclient.ai;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class PathQueue
 {
 	private final PriorityQueue<PathQueue.Entry> queue =
-		new PriorityQueue<>((e1, e2) -> {
-			return Float.compare(e1.priority, e2.priority);
-		});
+		new PriorityQueue<>(Comparator.comparing(e1 -> e1.priority));
 	
-	private class Entry
+	private static class Entry
 	{
 		private PathPos pos;
 		private float priority;

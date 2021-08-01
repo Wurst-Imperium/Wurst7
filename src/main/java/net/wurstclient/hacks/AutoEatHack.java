@@ -227,19 +227,19 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	public static enum FoodPriority
 	{
 		HIGH_HUNGER("High Food Points",
-			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())),
+			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)),
 		
 		HIGH_SATURATION("High Saturation",
 			Comparator.<FoodComponent> comparingDouble(
-				food -> food.getSaturationModifier())),
+				FoodComponent::getSaturationModifier)),
 		
 		LOW_HUNGER("Low Food Points",
-			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())
+			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)
 				.reversed()),
 		
 		LOW_SATURATION("Low Saturation",
 			Comparator.<FoodComponent> comparingDouble(
-				food -> food.getSaturationModifier()).reversed());
+				FoodComponent::getSaturationModifier).reversed());
 		
 		private final String name;
 		private final Comparator<FoodComponent> comparator;

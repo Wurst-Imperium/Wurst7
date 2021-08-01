@@ -133,7 +133,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(button == 0)
 		{
 			leftClick(hoveredFeature);
-			return;
 		}
 		
 		// right click
