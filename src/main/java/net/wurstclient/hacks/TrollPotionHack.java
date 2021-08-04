@@ -52,7 +52,7 @@ public final class TrollPotionHack extends Hack
 		}
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
-		stack.setTag(nbt);
+		stack.setNbt(nbt);
 		String name = "\u00a7rSplash Potion of Trolling";
 		stack.setCustomName(new LiteralText(name));
 		

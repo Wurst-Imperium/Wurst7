@@ -80,7 +80,7 @@ public final class AltManagerScreen extends Screen
 		listGui = new ListGui(client, this, altManager.getList());
 		
 		if(altManager.getList().isEmpty() && shouldAsk)
-			client.openScreen(new ConfirmScreen(this::confirmGenerate,
+			client.setScreen(new ConfirmScreen(this::confirmGenerate,
 				new LiteralText("Your alt list is empty."), new LiteralText(
 					"Would you like some random alts to get started?")));
 		
@@ -89,11 +89,11 @@ public final class AltManagerScreen extends Screen
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
-			b -> client.openScreen(new DirectLoginScreen(this))));
+			b -> client.setScreen(new DirectLoginScreen(this))));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
-			b -> client.openScreen(new AddAltScreen(this, altManager))));
+			b -> client.setScreen(new AddAltScreen(this, altManager))));
 		
 		addDrawableChild(
 			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
@@ -107,7 +107,7 @@ public final class AltManagerScreen extends Screen
 				new LiteralText("Delete"), b -> pressDelete()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
@@ -184,7 +184,7 @@ public final class AltManagerScreen extends Screen
 		if(alt.isCracked())
 		{
 			LoginManager.changeCrackedName(alt.getEmail());
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			return;
 		}
 		
@@ -198,7 +198,7 @@ public final class AltManagerScreen extends Screen
 		
 		altManager.setChecked(listGui.selected,
 			client.getSession().getUsername());
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private void pressFavorite()
@@ -217,7 +217,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		client.openScreen(new EditAltScreen(this, altManager, alt));
+		client.setScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -235,7 +235,7 @@ public final class AltManagerScreen extends Screen
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
 			message, new LiteralText("Delete"), new LiteralText("Cancel"));
-		client.openScreen(screen);
+		client.setScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -368,7 +368,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		client.openScreen(this);
+		client.setScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -376,7 +376,7 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		client.openScreen(this);
+		client.setScreen(this);
 	}
 	
 	@Override

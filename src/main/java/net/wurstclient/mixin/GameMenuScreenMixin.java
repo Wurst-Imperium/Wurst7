@@ -62,7 +62,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void openWurstOptions()
 	{
-		client.openScreen(new WurstOptionsScreen(this));
+		client.setScreen(new WurstOptionsScreen(this));
 	}
 	
 	private void removeFeedbackAndBugReportButtons()

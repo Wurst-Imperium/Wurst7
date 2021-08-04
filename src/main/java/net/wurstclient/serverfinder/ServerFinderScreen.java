@@ -57,7 +57,7 @@ public class ServerFinderScreen extends Screen
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
-				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, new LiteralText(""));

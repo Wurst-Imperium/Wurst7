@@ -69,7 +69,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private void done()
@@ -94,7 +94,7 @@ public final class SelectFileScreen extends Screen
 				+ "Are you sure you want to do this?");
 		
 		client
-			.openScreen(new ConfirmScreen(this::confirmReset, title, message));
+			.setScreen(new ConfirmScreen(this::confirmReset, title, message));
 	}
 	
 	private void confirmReset(boolean confirmed)
@@ -102,7 +102,7 @@ public final class SelectFileScreen extends Screen
 		if(confirmed)
 			setting.resetFolder();
 		
-		client.openScreen(SelectFileScreen.this);
+		client.setScreen(SelectFileScreen.this);
 	}
 	
 	@Override

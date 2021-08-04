@@ -80,13 +80,13 @@ public final class ModifyCmd extends Command
 		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
-		if(!stack.hasTag())
-			stack.setTag(new NbtCompound());
+		if(!stack.hasNbt())
+			stack.setNbt(new NbtCompound());
 		
 		try
 		{
 			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.getTag().copyFrom(tag);
+			stack.getNbt().copyFrom(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -103,7 +103,7 @@ public final class ModifyCmd extends Command
 		try
 		{
 			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.setTag(tag);
+			stack.setNbt(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -117,7 +117,7 @@ public final class ModifyCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		NbtPath path = parseNbtPath(stack.getTag(), args[1]);
+		NbtPath path = parseNbtPath(stack.getNbt(), args[1]);
 		
 		if(path == null)
 			throw new CmdError("The path does not exist.");

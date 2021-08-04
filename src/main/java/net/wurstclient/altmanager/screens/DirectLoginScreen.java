@@ -37,7 +37,7 @@ public final class DirectLoginScreen extends AltEditorScreen
 			message = LoginManager.login(getEmail(), getPassword());
 		
 		if(message.isEmpty())
-			client.openScreen(new TitleScreen());
+			client.setScreen(new TitleScreen());
 		else
 			doErrorEffect();
 	}

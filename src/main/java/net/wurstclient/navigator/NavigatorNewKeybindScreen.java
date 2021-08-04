@@ -62,7 +62,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(parent.getFeature().getName());
-					WurstClient.MC.openScreen(parent);
+					WurstClient.MC.setScreen(parent);
 				}else
 				{
 					choosingKey = true;
@@ -74,7 +74,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> WurstClient.MC.openScreen(parent)));
+			new LiteralText("Cancel"), b -> WurstClient.MC.setScreen(parent)));
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
 		}else if(keyCode == 1)
-			WurstClient.MC.openScreen(parent);
+			WurstClient.MC.setScreen(parent);
 	}
 	
 	@Override

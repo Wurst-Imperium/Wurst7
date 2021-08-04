@@ -115,7 +115,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.openScreen((Screen)null);
+			WurstClient.MC.setScreen((Screen)null);
 			return;
 		}
 		
@@ -212,7 +212,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(clickTimer < 4)
 				clickTimer++;
 			else
-				WurstClient.MC.openScreen(
+				WurstClient.MC.setScreen(
 					new NavigatorFeatureScreen(expandingFeature, this));
 		else if(!expanding && clickTimer > -1)
 			clickTimer--;

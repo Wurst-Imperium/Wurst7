@@ -40,7 +40,7 @@ public abstract class TitleScreenMixin extends Screen
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98,
 			20, new LiteralText("Alt Manager"),
-			b -> client.openScreen(new AltManagerScreen(this,
+			b -> client.setScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 		
 		for(Drawable d : ((IScreen)this).getButtons())

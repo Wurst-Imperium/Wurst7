@@ -53,7 +53,7 @@ public final class KillPotionHack extends Hack
 		effects.add(effect);
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
-		stack.setTag(nbt);
+		stack.setNbt(nbt);
 		String name = "\u00a7rSplash Potion of \u00a74\u00a7lINSTANT DEATH";
 		stack.setCustomName(new LiteralText(name));
 		

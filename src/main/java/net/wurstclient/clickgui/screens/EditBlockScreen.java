@@ -81,7 +81,7 @@ public final class EditBlockScreen extends Screen
 		if(block != null)
 			setting.setBlock(block);
 		
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public final class EditBlockScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			break;
 		}
 		

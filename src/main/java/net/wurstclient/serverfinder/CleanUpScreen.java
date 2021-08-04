@@ -50,7 +50,7 @@ public class CleanUpScreen extends Screen
 	{
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-				() -> "Cancel", "", b -> client.openScreen(prevScreen)));
+				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -130,7 +130,7 @@ public class CleanUpScreen extends Screen
 			}
 		
 		saveServerList();
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private boolean shouldRemove(ServerInfo server)

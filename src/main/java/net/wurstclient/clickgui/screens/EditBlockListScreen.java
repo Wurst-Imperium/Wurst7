@@ -79,16 +79,16 @@ public final class EditBlockListScreen extends Screen
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
-			b -> client.openScreen(new ConfirmScreen(b2 -> {
+			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
-				client.openScreen(EditBlockListScreen.this);
+				client.setScreen(EditBlockListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override

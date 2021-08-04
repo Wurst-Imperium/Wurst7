@@ -83,7 +83,7 @@ public final class GiveCmd extends Command
 			try
 			{
 				NbtCompound tag = StringNbtReader.parse(nbt);
-				stack.setTag(tag);
+				stack.setNbt(tag);
 				
 			}catch(CommandSyntaxException e)
 			{

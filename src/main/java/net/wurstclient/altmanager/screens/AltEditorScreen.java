@@ -78,7 +78,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
-				new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
 			200, 20, new LiteralText("Random Name"),

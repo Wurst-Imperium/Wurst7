@@ -172,7 +172,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// add keybind
-						WurstClient.MC.openScreen(new NavigatorNewKeybindScreen(
+						WurstClient.MC.setScreen(new NavigatorNewKeybindScreen(
 							possibleKeybinds, NavigatorFeatureScreen.this));
 					}
 				};
@@ -234,7 +234,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						client.openScreen(new NavigatorRemoveKeybindScreen(
+						client.setScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
@@ -293,7 +293,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private void goBack()
 	{
 		parent.setExpanding(false);
-		client.openScreen(parent);
+		client.setScreen(parent);
 	}
 	
 	@Override

@@ -51,7 +51,7 @@ public final class BlockListEditButton extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		WurstClient.MC.openScreen(
+		WurstClient.MC.setScreen(
 			new EditBlockListScreen(WurstClient.MC.currentScreen, setting));
 	}
 	

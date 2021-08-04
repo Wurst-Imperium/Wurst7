@@ -47,6 +47,6 @@ public final class EditAltScreen extends AltEditorScreen
 	protected void pressDoneButton()
 	{
 		altManager.edit(editedAlt, getEmail(), getPassword());
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 }

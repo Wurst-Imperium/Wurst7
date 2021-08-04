@@ -62,7 +62,7 @@ public final class EnterProfileNameScreen extends Screen
 		if(!value.isEmpty())
 			callback.accept(value);
 		
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public final class EnterProfileNameScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			break;
 		}
 		
