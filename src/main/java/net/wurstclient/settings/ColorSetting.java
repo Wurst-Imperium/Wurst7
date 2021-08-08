@@ -5,6 +5,8 @@ import com.google.gson.JsonPrimitive;
 import java.awt.Color;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ColorComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
@@ -31,6 +33,7 @@ public class ColorSetting extends Setting
     public final void setColor(Color color)
     {
         this.color = color;
+        WurstClient.INSTANCE.saveSettings();
     }
 
     public Color getColor()
@@ -75,7 +78,7 @@ public class ColorSetting extends Setting
         String command = ".setcolor " + featureName.toLowerCase() + " ";
         command = command + getName().toLowerCase().replace(" ", "_") + " ";
 
-        LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet();
+        LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
         pkb.add(new PossibleKeybind(command, "Set color of " + fullName));
 
         return pkb;
