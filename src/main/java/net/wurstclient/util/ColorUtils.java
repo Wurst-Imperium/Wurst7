@@ -2,10 +2,12 @@ package net.wurstclient.util;
 
 import java.awt.Color;
 
-public enum ColorUtils {
+public enum ColorUtils
+{
     ;
 
-    public static Color parse(String color) throws Exception {
+    public static Color parse(String color) throws Exception
+    {
         // TODO: alpha parsing (if needed)
 
         String[] rgb = color.split(",");

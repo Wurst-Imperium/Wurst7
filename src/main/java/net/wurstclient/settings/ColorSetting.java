@@ -58,10 +58,12 @@ public class ColorSetting extends Setting
         if (!JsonUtils.isString(json))
             return;
 
-        try {
+        try
+        {
             setColor(ColorUtils.parse(json.getAsString()));
-        } catch (Exception ignored) {
         }
+        catch (Exception ignored)
+        {}
     }
 
     @Override

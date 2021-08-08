@@ -148,14 +148,16 @@ public final class EditColorScreen extends Screen
     }
 
     @Override
-    public void tick() {
+    public void tick()
+    {
         redValueField.tick();
         greenValueField.tick();
         blueValueField.tick();
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
         TextRenderer tr = MC.textRenderer;
 
         renderBackground(matrixStack);
@@ -223,7 +225,8 @@ public final class EditColorScreen extends Screen
     }
 
     @Override
-    public void resize(MinecraftClient client, int width, int height) {
+    public void resize(MinecraftClient client, int width, int height)
+    {
         String r = redValueField.getText();
         String g = greenValueField.getText();
         String b = blueValueField.getText();
@@ -236,34 +239,39 @@ public final class EditColorScreen extends Screen
     }
 
     @Override
-    public boolean isPauseScreen() {
+    public boolean isPauseScreen()
+    {
         return false;
     }
 
     @Override
-    public boolean shouldCloseOnEsc() {
+    public boolean shouldCloseOnEsc()
+    {
         return false;
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
         if (mouseX >= paletteX &&
             mouseX <= paletteX + paletteWidth &&
             mouseY >= paletteY &&
-            mouseY <= paletteY + paletteHeight
-        ) {
+            mouseY <= paletteY + paletteHeight)
+        {
             if (paletteAsBufferedImage == null)
                 return super.mouseClicked(mouseX, mouseY, button);
 
             int x = (int) Math.round((mouseX - paletteX) / paletteWidth * paletteAsBufferedImage.getWidth());
             int y = (int) Math.round((mouseY - paletteY) / paletteHeight * paletteAsBufferedImage.getHeight());
 
-            if (x > 0 && y > 0 && x < paletteAsBufferedImage.getWidth() && y < paletteAsBufferedImage.getHeight()) {
+            if (x > 0 && y > 0 && x < paletteAsBufferedImage.getWidth() && y < paletteAsBufferedImage.getHeight())
+            {
                 int rgb = paletteAsBufferedImage.getRGB(x, y);
                 Color color = new Color(rgb, true);
 
                 // Set color if pixel has no alpha
-                if (color.getAlpha() >= 255) {
+                if (color.getAlpha() >= 255)
+                {
                     setColor(color);
                 }
             }
