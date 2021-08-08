@@ -56,7 +56,7 @@ public class ColorSetting extends Setting
             return;
 
         try {
-            this.setColor(ColorUtils.parse(json.getAsString()));
+            setColor(ColorUtils.parse(json.getAsString()));
         } catch (Exception ignored) {
         }
     }
@@ -64,20 +64,20 @@ public class ColorSetting extends Setting
     @Override
     public final JsonElement toJson()
     {
-        return new JsonPrimitive(this.color.getRed() + "," + this.color.getGreen() + "," + this.color.getBlue());
+        return new JsonPrimitive(color.getRed() + "," + color.getGreen() + "," + color.getBlue());
     }
 
     @Override
     public final Set<PossibleKeybind> getPossibleKeybinds(String featureName)
     {
-        String fullName = featureName + " " + this.getName();
+        String fullName = featureName + " " + getName();
 
         String command = ".setcolor " + featureName.toLowerCase() + " ";
-        command = command + this.getName().toLowerCase().replace(" ", "_") + " ";
+        command = command + getName().toLowerCase().replace(" ", "_") + " ";
 
         LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet();
         pkb.add(new PossibleKeybind(command, "Set color of " + fullName));
 
-        return new LinkedHashSet();
+        return pkb;
     }
 }
