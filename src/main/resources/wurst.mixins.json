@@ -50,6 +50,7 @@
     "ServerListMixin",
     "ShulkerBoxScreenMixin",
     "SignEditScreenMixin",
+    "SodiumBlockOcclusionCacheMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
