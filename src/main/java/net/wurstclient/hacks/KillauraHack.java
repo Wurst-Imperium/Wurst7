@@ -12,6 +12,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.entity.mob.*;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -20,11 +21,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -93,7 +89,10 @@ public final class KillauraHack extends Hack
 	
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
 		"Filter pigmen", "Won't attack zombie pigmen.", false);
-	
+
+	private final CheckboxSetting filterZombieVillagers = new CheckboxSetting(
+			"Filter zombie villagers", "Won't attack zombie villagers", false);
+
 	private final CheckboxSetting filterEndermen =
 		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
 	
@@ -150,6 +149,7 @@ public final class KillauraHack extends Hack
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
+		addSetting(filterZombieVillagers);
 	}
 	
 	@Override
@@ -227,7 +227,10 @@ public final class KillauraHack extends Hack
 		
 		if(filterEndermen.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndermanEntity));
-		
+
+		if(filterZombieVillagers.isChecked())
+			stream = stream.filter(e -> !(e instanceof ZombieVillagerEntity));
+
 		if(filterAnimals.isChecked())
 			stream = stream.filter(
 				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
@@ -261,7 +264,7 @@ public final class KillauraHack extends Hack
 		
 		if(filterCrystals.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
-		
+
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;
 		if(target == null)
