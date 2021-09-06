@@ -53,9 +53,9 @@ public final class CmdList
 	public final SvCmd svCmd = new SvCmd();
 	public final SayCmd sayCmd = new SayCmd();
 	public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
+	public final SetColorCmd setColorCmd = new SetColorCmd();
 	public final SetModeCmd setModeCmd = new SetModeCmd();
 	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
-	public final SetColorCmd setColorCmd = new SetColorCmd();
 	public final SettingsCmd settingsCmd = new SettingsCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();

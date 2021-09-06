@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
+
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -16,8 +18,6 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-import java.awt.*;
-
 @DontSaveState
 @DontBlock
 @SearchTags({"click gui", "WindowGUI", "window gui", "HackMenu", "hack menu"})
@@ -25,20 +25,19 @@ public final class ClickGuiHack extends Hack
 {
 	private final SliderSetting opacity = new SliderSetting("Opacity", 0.5,
 		0.15, 0.85, 0.01, ValueDisplay.PERCENTAGE);
-
-	private final ColorSetting bg = new ColorSetting("BG", "Set the background color of the features menu",
-			new Color(64,64,64));
-	private final ColorSetting ac = new ColorSetting("AC", "Set the accent color of the features menu",
-			new Color(16,16,16));
-
+	
+	private final ColorSetting bgColor =
+		new ColorSetting("BG", "Background color", new Color(64, 64, 64));
+	
+	private final ColorSetting acColor =
+		new ColorSetting("AC", "Accent color", new Color(16, 16, 16));
+	
 	public ClickGuiHack()
 	{
 		super("ClickGUI", "Window-based ClickGUI.");
 		addSetting(opacity);
-
-		addSetting(bg);
-		addSetting(ac);
-
+		addSetting(bgColor);
+		addSetting(acColor);
 	}
 	
 	@Override
@@ -55,19 +54,11 @@ public final class ClickGuiHack extends Hack
 	
 	public float[] getBgColor()
 	{
-		Color color = bg.getColor();
-		float red = color.getRed() / 255F;
-		float green = color.getGreen() / 255F;
-		float blue = color.getBlue() / 255F;
-		return new float[]{red, green, blue};
+		return bgColor.getColorF();
 	}
 	
 	public float[] getAcColor()
 	{
-		Color color = ac.getColor();
-		float red = color.getRed() / 255F;
-		float green = color.getGreen() / 255F;
-		float blue = color.getBlue() / 255F;
-		return new float[]{red, green, blue};
+		return acColor.getColorF();
 	}
 }
