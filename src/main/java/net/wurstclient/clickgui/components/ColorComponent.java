@@ -82,7 +82,7 @@ public final class ColorComponent extends Component
 				GUI.setTooltip(tooltip);
 			}
 		
-		drawBackground(matrixStack, x1, x2, y1, y2);
+		drawBackground(matrixStack, x1, x2, y1, y3);
 		drawBox(matrixStack, x1, x2, y2, y3, hovering && mouseY >= y3);
 		
 		drawNameAndValue(matrixStack, x1, x2, y1 + 2);
@@ -176,7 +176,7 @@ public final class ColorComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return MC.textRenderer.getWidth(setting.getName()) + 13;
+		return MC.textRenderer.getWidth(setting.getName() + "#FFFFFF") + 6;
 	}
 	
 	@Override
