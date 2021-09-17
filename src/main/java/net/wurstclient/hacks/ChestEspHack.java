@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -46,6 +47,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IWorld;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
@@ -54,6 +56,23 @@ import net.wurstclient.util.RotationUtils;
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
+	private final ColorSetting basicColor = new ColorSetting("Chest color",
+		"Normal chests will be\n" + "highlighted in this color.", Color.GREEN);
+	
+	private final ColorSetting trapColor = new ColorSetting("Trap color",
+		"Trapped chests will be\n" + "highlighted in this color.",
+		new Color(0xFF8000));
+	
+	private final ColorSetting enderColor = new ColorSetting("Ender color",
+		"Ender chests will be\n" + "highlighted in this color.", Color.CYAN);
+	
+	private final ColorSetting shulkerColor = new ColorSetting("Shulker color",
+		"Shulker boxes will be\n" + "highlighted in this color.",
+		Color.MAGENTA);
+	
+	private final ColorSetting cartColor = new ColorSetting("Cart color",
+		"Minecarts will be\n" + "highlighted in this color.", Color.GREEN);
+	
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
@@ -68,14 +87,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	public ChestEspHack()
 	{
-		super("ChestESP",
-			"Highlights nearby chests.\n"
-				+ "\u00a7agreen\u00a7r - normal chests & barrels\n"
-				+ "\u00a76orange\u00a7r - trapped chests\n"
-				+ "\u00a7bcyan\u00a7r - ender chests\n"
-				+ "\u00a7dpurple\u00a7r - shulker boxes");
+		super("ChestESP", "Highlights nearby chests.");
 		
 		setCategory(Category.RENDER);
+		addSetting(basicColor);
+		addSetting(trapColor);
+		addSetting(enderColor);
+		addSetting(shulkerColor);
+		addSetting(cartColor);
 		addSetting(style);
 	}
 	
@@ -234,11 +253,16 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		if(style.getSelected().boxes)
 		{
 			RenderSystem.setShader(GameRenderer::getPositionShader);
-			renderBoxes(matrixStack, basicChests, 0, 1, 0, regionX, regionZ);
-			renderBoxes(matrixStack, trapChests, 1, 0.5F, 0, regionX, regionZ);
-			renderBoxes(matrixStack, enderChests, 0, 1, 1, regionX, regionZ);
-			renderBoxes(matrixStack, shulkerBoxes, 1, 0, 1, regionX, regionZ);
-			renderBoxes(matrixStack, minecartBoxes, 0, 1, 0, regionX, regionZ);
+			renderBoxes(matrixStack, basicChests, basicColor.getColorF(),
+				regionX, regionZ);
+			renderBoxes(matrixStack, trapChests, trapColor.getColorF(), regionX,
+				regionZ);
+			renderBoxes(matrixStack, enderChests, enderColor.getColorF(),
+				regionX, regionZ);
+			renderBoxes(matrixStack, shulkerBoxes, shulkerColor.getColorF(),
+				regionX, regionZ);
+			renderBoxes(matrixStack, minecartBoxes, cartColor.getColorF(),
+				regionX, regionZ);
 		}
 		
 		if(style.getSelected().lines)
@@ -249,32 +273,48 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 			
-			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+			float[] basicColorF = basicColor.getColorF();
+			RenderSystem.setShaderColor(basicColorF[0], basicColorF[1],
+				basicColorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, basicChests, regionX, regionZ);
-			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
-			RenderSystem.setShaderColor(1, 0.5F, 0, 0.5F);
+			float[] trapColorF = trapColor.getColorF();
+			RenderSystem.setShaderColor(trapColorF[0], trapColorF[1],
+				trapColorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, trapChests, regionX, regionZ);
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
-			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+			float[] enderColorF = enderColor.getColorF();
+			RenderSystem.setShaderColor(enderColorF[0], enderColorF[1],
+				enderColorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, enderChests, regionX, regionZ);
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 			
-			RenderSystem.setShaderColor(1, 0, 1, 0.5F);
+			float[] shulkerColorF = shulkerColor.getColorF();
+			RenderSystem.setShaderColor(shulkerColorF[0], shulkerColorF[1],
+				shulkerColorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
+			
+			float[] cartColorF = cartColor.getColorF();
+			RenderSystem.setShaderColor(cartColorF[0], cartColorF[1],
+				cartColorF[2], 0.5F);
+			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+				VertexFormats.POSITION);
+			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
 		}
@@ -307,7 +347,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack, ArrayList<Box> boxes,
-		float red, float green, float blue, int regionX, int regionZ)
+		float[] colorF, int regionX, int regionZ)
 	{
 		for(Box box : boxes)
 		{
@@ -319,14 +359,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			matrixStack.scale((float)(box.maxX - box.minX),
 				(float)(box.maxY - box.minY), (float)(box.maxZ - box.minZ));
 			
-			RenderSystem.setShaderColor(red, green, blue, 0.25F);
+			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getModel();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			solidBox.setShader(viewMatrix, projMatrix, shader);
 			
-			RenderSystem.setShaderColor(red, green, blue, 0.5F);
+			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 			outlinedBox.setShader(viewMatrix, projMatrix, shader);
 			
 			matrixStack.pop();
