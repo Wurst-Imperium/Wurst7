@@ -55,18 +55,18 @@ public final class AutoFishHack extends Hack
 {
 	private final SliderSetting validRange = new SliderSetting("Valid range",
 			"Any bites that occur outside of this range\n" + "will be ignored.\n\n"
-					+ "Increase your range if bites are not being\n"
-					+ "detected, decrease it if other people's\n"
-					+ "bites are being detected as yours.",
+				+ "Increase your range if bites are not being\n"
+				+ "detected, decrease it if other people's\n"
+				+ "bites are being detected as yours.",
 			1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 
 	private final SliderSetting reelInDelayRange = new SliderSetting("Reel in delay",
 			"Amount of ticks it waits until reeling in\n"
-					+ "when a fish bites.\n"
-					+ "From 25 and higher will start missing catches.\n\n"
-					+ "Randomizer: higher value means more chance the\n"
-					+ "randomizer picks a higher number which results\n"
-					+ "in more chance reeling in too late.",
+				+ "when a fish bites.\n"
+				+ "From 25 and higher will start missing catches.\n\n"
+				+ "Randomizer: higher value means more chance the\n"
+				+ "randomizer picks a higher number which results\n"
+				+ "in more chance reeling in too late.",
 			0, 0, 50, 1, ValueDisplay.DECIMAL);
 
 	private final SliderSetting castRodDelay = new SliderSetting("Cast rod delay",
@@ -83,8 +83,8 @@ public final class AutoFishHack extends Hack
 
 	private final CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
 			"Shows where bites are occurring and where\n"
-					+ "they will be detected. Useful for optimizing\n"
-					+ "your 'Valid range' setting.",
+				+ "they will be detected. Useful for optimizing\n"
+				+ "your 'Valid range' setting.",
 			false);
 
 	private final ColorSetting ddColor = new ColorSetting("DD color",
@@ -161,7 +161,7 @@ public final class AutoFishHack extends Hack
 		if(scheduledWindowClick != -1)
 		{
 			IMC.getInteractionManager()
-					.windowClick_PICKUP(scheduledWindowClick);
+				.windowClick_PICKUP(scheduledWindowClick);
 			castRodTimer = castRodDelay.getValueI();
 			return;
 		}
@@ -229,8 +229,8 @@ public final class AutoFishHack extends Hack
 	{
 		if(debugDraw.isChecked())
 			validRangeBox = new Box(-validRange.getValue(), -1 / 16.0,
-					-validRange.getValue(), validRange.getValue(), 1 / 16.0,
-					validRange.getValue());
+				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
+				validRange.getValue());
 	}
 
 	private void updateBestRod()
@@ -291,7 +291,7 @@ public final class AutoFishHack extends Hack
 		{
 			if(firstEmptySlot >= 9)
 				IMC.getInteractionManager()
-						.windowClick_QUICK_MOVE(36 + inventory.selectedSlot);
+					.windowClick_QUICK_MOVE(36 + inventory.selectedSlot);
 
 			IMC.getInteractionManager().windowClick_QUICK_MOVE(bestRodSlot);
 
@@ -299,7 +299,7 @@ public final class AutoFishHack extends Hack
 		{
 			IMC.getInteractionManager().windowClick_PICKUP(bestRodSlot);
 			IMC.getInteractionManager()
-					.windowClick_PICKUP(36 + inventory.selectedSlot);
+				.windowClick_PICKUP(36 + inventory.selectedSlot);
 
 			scheduledWindowClick = -bestRodSlot;
 		}
@@ -326,7 +326,7 @@ public final class AutoFishHack extends Hack
 		// check position
 		FishingBobberEntity bobber = player.fishHook;
 		if(Math.abs(sound.getX() - bobber.getX()) > validRange.getValue()
-				|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
+			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
 			return;
 
 		// check open water
@@ -394,11 +394,11 @@ public final class AutoFishHack extends Hack
 	}
 
 	private void drawValidRange(MatrixStack matrixStack,
-								FishingBobberEntity bobber, int regionX, int regionZ)
+			FishingBobberEntity bobber, int regionX, int regionZ)
 	{
 		matrixStack.push();
 		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
-				bobber.getZ() - regionZ);
+			bobber.getZ() - regionZ);
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		RenderUtils.drawOutlinedBox(validRangeBox, matrixStack);
@@ -415,13 +415,13 @@ public final class AutoFishHack extends Hack
 		{
 			matrixStack.push();
 			matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
-					lastSoundPos.z - regionZ);
+				lastSoundPos.z - regionZ);
 			float[] colorF = ddColor.getColorF();
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-					VertexFormats.POSITION);
+				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)-0.125)
-					.next();
+				.next();
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
