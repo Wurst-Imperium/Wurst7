@@ -74,7 +74,7 @@ public final class AutoFishHack extends Hack
 			15, 1, 100, 1, ValueDisplay.DECIMAL);
 
 	private final CheckboxSetting randomizeReelInDelay = new CheckboxSetting("Randomize reeling delay",
-			"Randomizes the reeling delay from 0 to set value",
+			"Randomizes the reeling delay from 0 to set value.",
 			false);
 
 	private final CheckboxSetting shallowWaterWarning = new CheckboxSetting("Shallow water warning",
