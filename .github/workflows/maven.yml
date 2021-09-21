@@ -1,4 +1,4 @@
-name: 自动构建/发版
+name: Automatic build/issue
 
 on:
   push:
@@ -26,6 +26,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "exp"
         prerelease: true
-        title: "wurst 自动构建版本"
+        title: "wurst Automatic build versions"
         files: |
           build/libs/*.jar
