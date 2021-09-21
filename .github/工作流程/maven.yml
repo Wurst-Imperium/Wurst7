@@ -2,7 +2,7 @@ name: 自动构建/发版
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
 jobs:
   build:
@@ -26,6 +26,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "exp"
         prerelease: true
-        title: "wurst 没汉化 自动构建版本"
+        title: "wurst 自动构建版本"
         files: |
           build/libs/*.jar
