@@ -351,6 +351,7 @@ public final class MobSpawnEspHack extends Hack
 				VertexFormats.POSITION_COLOR);
 			
 			new ArrayList<>(red).stream()
+				.filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {
