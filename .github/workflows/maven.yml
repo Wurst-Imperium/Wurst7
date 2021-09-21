@@ -16,12 +16,10 @@ jobs:
       with:
         java-version: '16'
         distribution: 'adopt'
-    - name: Build wurst7.17
-      run: |
-        cd wurst7.17
-        chmod +x gradlew
-        ./gradlew build
-        cd ..
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: 用Gradle构建
+      run: ./gradlew build
     - name: 自动释放
       uses: marvinpinto/action-automatic-releases@v1.2.1
       with:
@@ -30,4 +28,4 @@ jobs:
         prerelease: true
         title: "wurst Automatic build versions"
         files: |
-          wurst7.17/build/libs/*.jar
+          build/libs/*.jar
