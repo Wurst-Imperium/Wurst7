@@ -24,8 +24,8 @@ jobs:
       uses: marvinpinto/action-automatic-releases@v1.2.1
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "exp"
-        prerelease: true
+        automatic_release_tag: "sodium x-ray"
+        prerelease: false
         title: "wurst Automatic build versions"
         files: |
           build/libs/*.jar
