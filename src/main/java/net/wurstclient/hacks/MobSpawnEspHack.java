@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.lwjgl.opengl.GL11;
 
@@ -367,6 +368,7 @@ public final class MobSpawnEspHack extends Hack
 				});
 			
 			new ArrayList<>(yellow).stream()
+				.filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {
