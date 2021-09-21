@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,12 +27,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -87,9 +84,6 @@ public final class BaseFinderHack extends Hack
 		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:tuff",
 		"minecraft:vine", "minecraft:water", "minecraft:white_tulip");
 	
-	private final ColorSetting color = new ColorSetting("Color",
-		"Man-made blocks will be\n" + "highlighted in this color.", Color.RED);
-	
 	private ArrayList<String> blockNames;
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
@@ -106,12 +100,11 @@ public final class BaseFinderHack extends Hack
 	{
 		super("BaseFinder",
 			"Finds player bases by searching for man-made blocks.\n"
-				+ "The blocks that it finds will be highlighted in the\n"
-				+ "selected color.\n" + "Good for finding faction bases.");
+				+ "The blocks that it finds will be highlighted in red.\n"
+				+ "Good for finding faction bases.");
 		
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
-		addSetting(color);
 	}
 	
 	@Override
@@ -171,9 +164,8 @@ public final class BaseFinderHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.15F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.15F);
 		
 		if(vertexBuffer != null)
 		{
@@ -195,9 +187,6 @@ public final class BaseFinderHack extends Hack
 	public void onUpdate()
 	{
 		int modulo = MC.player.age % 64;
-		
-		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
-			return;
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		Integer regionX = (camPos.getX() >> 9) * 512;

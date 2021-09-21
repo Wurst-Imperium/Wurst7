@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
@@ -31,7 +30,6 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -39,15 +37,11 @@ import net.wurstclient.util.RotationUtils;
 	"arrow trajectories"})
 public final class TrajectoriesHack extends Hack implements RenderListener
 {
-	private final ColorSetting color =
-		new ColorSetting("Color", "Color of the trajectory.", Color.GREEN);
-	
 	public TrajectoriesHack()
 	{
 		super("Trajectories",
 			"Predicts the flight path of arrows and throwable items.");
 		setCategory(Category.RENDER);
-		addSetting(color);
 	}
 	
 	@Override
@@ -102,8 +96,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		
 		for(Vec3d point : path)
 			bufferBuilder
@@ -120,15 +113,14 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		double renderX = end.x - camPos.x;
 		double renderY = end.y - camPos.y;
 		double renderZ = end.z - camPos.z;
-		float[] colorF = color.getColorF();
 		
 		matrixStack.push();
 		matrixStack.translate(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
 		
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);
 		
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		RenderUtils.drawOutlinedBox(matrixStack);
 		
 		matrixStack.pop();

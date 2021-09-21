@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
@@ -33,7 +32,7 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -42,6 +41,12 @@ import net.wurstclient.util.RotationUtils;
 public final class ItemEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
+	private final CheckboxSetting names = new CheckboxSetting("Show item names",
+		"Sorry, this is currently broken!\n"
+			+ "19w39a changed how nameplates work\n"
+			+ "and we haven't figured it out yet.",
+		true);
+	
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
@@ -52,9 +57,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			+ "that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
-	private final ColorSetting color = new ColorSetting("Color",
-		"Items will be highlighted in this color.", Color.YELLOW);
-	
 	private final ArrayList<ItemEntity> items = new ArrayList<>();
 	
 	public ItemEspHack()
@@ -62,9 +64,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		super("ItemESP", "Highlights nearby items.");
 		setCategory(Category.RENDER);
 		
+		addSetting(names);
 		addSetting(style);
 		addSetting(boxSize);
-		addSetting(color);
 	}
 	
 	@Override
@@ -150,13 +152,22 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				float[] colorF = color.getColorF();
-				RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
-					0.5F);
+				RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 				RenderUtils.drawOutlinedBox(new Box(-0.5, 0, -0.5, 0.5, 1, 0.5),
 					matrixStack);
 				
 				matrixStack.pop();
+			}
+			
+			if(names.isChecked())
+			{
+				// ItemStack stack = e.getStack();
+				// GameRenderer.renderFloatingText(MC.textRenderer,
+				// stack.getCount() + "x "
+				// + stack.getName().asFormattedString(),
+				// 0, 1, 0, 0, MC.getEntityRenderManager().cameraYaw,
+				// MC.getEntityRenderManager().cameraPitch, false);
+				// GL11.glDisable(GL11.GL_LIGHTING);
 			}
 			
 			matrixStack.pop();
@@ -168,8 +179,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

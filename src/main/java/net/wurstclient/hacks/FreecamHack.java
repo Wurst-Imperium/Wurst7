@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
-
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -35,7 +33,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -51,12 +48,8 @@ public final class FreecamHack extends Hack
 {
 	private final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
-	
 	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
 		"Draws a line to your character's actual position.", false);
-	
-	private final ColorSetting color =
-		new ColorSetting("Tracer color", Color.WHITE);
 	
 	private FakePlayerEntity fakePlayer;
 	
@@ -67,7 +60,6 @@ public final class FreecamHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
-		addSetting(color);
 	}
 	
 	@Override
@@ -184,8 +176,7 @@ public final class FreecamHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		RenderSystem.setShaderColor(1, 1, 1, 0.5F);
 		
 		// box
 		matrixStack.push();

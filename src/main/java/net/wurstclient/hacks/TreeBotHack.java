@@ -113,11 +113,8 @@ public final class TreeBotHack extends Hack
 		angleFinder = null;
 		processor = null;
 		
-		if(tree != null)
-		{
-			tree.close();
-			tree = null;
-		}
+		tree.close();
+		tree = null;
 		
 		if(currentBlock != null)
 		{
