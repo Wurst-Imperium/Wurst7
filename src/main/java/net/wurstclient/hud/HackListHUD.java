@@ -193,9 +193,12 @@ public final class HackListHUD implements UpdateListener
 		@Override
 		public boolean equals(Object obj)
 		{
-			if(!(obj instanceof HackListEntry other))
+			// do not use Java 16 syntax here,
+			// it breaks Eclipse's Clean Up feature
+			if(!(obj instanceof HackListEntry))
 				return false;
 			
+			HackListEntry other = (HackListEntry)obj;
 			return hack == other.hack;
 		}
 		
