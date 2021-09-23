@@ -189,5 +189,20 @@ public final class HackListHUD implements UpdateListener
 			this.offset = offset;
 			prevOffset = offset;
 		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			if(!(obj instanceof HackListEntry other))
+				return false;
+			
+			return hack == other.hack;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return hack.hashCode();
+		}
 	}
 }
