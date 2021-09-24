@@ -17,7 +17,7 @@ public final class ServerFinderOtf extends OtherFeature
 {
 	public ServerFinderOtf()
 	{
-		super("ServerFinder",
+		super("服务器查找器",
 			"Allows you to find easy-to-grief Minecraft servers quickly\n"
 				+ "and easily. To use it, press the 'Server Finder' button\n"
 				+ "on the server selection screen.");
