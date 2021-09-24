@@ -16,7 +16,7 @@ public final class JumpCmd extends Command
 {
 	public JumpCmd()
 	{
-		super("jump", "Makes you jump.");
+		super("jump", "使你跳一下.");
 	}
 	
 	@Override
@@ -26,7 +26,7 @@ public final class JumpCmd extends Command
 			throw new CmdSyntaxError();
 		
 		if(!MC.player.isOnGround() && !WURST.getHax().jetpackHack.isEnabled())
-			throw new CmdError("Can't jump in mid-air.");
+			throw new CmdError("不能在空中跳跃.");
 		
 		MC.player.jump();
 	}
