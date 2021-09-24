@@ -48,16 +48,16 @@ public class ServerFinderScreen extends Screen
 	{
 		addDrawableChild(searchButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20,
-				new LiteralText("Search"), b -> searchOrCancel()));
+				new LiteralText("搜索"), b -> searchOrCancel()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100,
-			height / 4 + 120 + 12, 200, 20, new LiteralText("Tutorial"),
+			height / 4 + 120 + 12, 200, 20, new LiteralText("教程"),
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
-				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
+				new LiteralText("返回"), b -> client.setScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, new LiteralText(""));
@@ -88,7 +88,7 @@ public class ServerFinderScreen extends Screen
 		checked = 0;
 		working = 0;
 		
-		new Thread(this::findServers, "Server Finder").start();
+		new Thread(this::findServers, "服务器查找器").start();
 	}
 	
 	private void findServers()
@@ -212,19 +212,19 @@ public class ServerFinderScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredText(matrixStack, textRenderer, "Server Finder", width / 2,
+		drawCenteredText(matrixStack, textRenderer, "服务器查找器", width / 2,
 			20, 16777215);
 		drawCenteredText(matrixStack, textRenderer,
-			"This will search for servers with similar IPs", width / 2, 40,
+			"这将搜索具有相似 IP 的服务器", width / 2, 40,
 			10526880);
 		drawCenteredText(matrixStack, textRenderer,
-			"to the IP you type into the field below.", width / 2, 50,
+			"到您在下面的字段中键入的 IP.", width / 2, 50,
 			10526880);
 		drawCenteredText(matrixStack, textRenderer,
-			"The servers it finds will be added to your server list.",
+			"它找到的服务器将添加到您的服务器列表中.",
 			width / 2, 60, 10526880);
 		
-		drawStringWithShadow(matrixStack, textRenderer, "Server address:",
+		drawStringWithShadow(matrixStack, textRenderer, "服务器地址:",
 			width / 2 - 100, height / 4 + 24, 10526880);
 		ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		
@@ -236,7 +236,7 @@ public class ServerFinderScreen extends Screen
 			height / 4 + 73, 10526880);
 		
 		drawStringWithShadow(matrixStack, textRenderer,
-			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
+			"已检查: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
 			10526880);
 		drawStringWithShadow(matrixStack, textRenderer, "Working: " + working,
 			width / 2 - 100, height / 4 + 94, 10526880);
@@ -254,12 +254,12 @@ public class ServerFinderScreen extends Screen
 	enum ServerFinderState
 	{
 		NOT_RUNNING(""),
-		SEARCHING("\u00a72Searching..."),
-		RESOLVING("\u00a72Resolving..."),
-		UNKNOWN_HOST("\u00a74Unknown Host!"),
-		CANCELLED("\u00a74Cancelled!"),
-		DONE("\u00a72Done!"),
-		ERROR("\u00a74An error occurred!");
+		SEARCHING("\u00a72搜索..."),
+		RESOLVING("\u00a72解决..."),
+		UNKNOWN_HOST("\u00a74未知的主机!"),
+		CANCELLED("\u00a74取消!"),
+		DONE("\u00a72完成!"),
+		ERROR("\u00a74发生错误!");
 		
 		private final String name;
 		
