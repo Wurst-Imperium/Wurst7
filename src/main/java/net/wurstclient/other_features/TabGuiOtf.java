@@ -22,8 +22,7 @@ public final class TabGuiOtf extends OtherFeature
 	
 	public TabGuiOtf()
 	{
-		super("TabGui", "Allows you to quickly toggle hacks while playing.\n"
-			+ "Use the arrow keys to navigate.");
+		super("TabGui", "允许您在玩游戏时快速切换黑客.使用箭头键导航.");
 		
 		addSetting(status);
 	}
@@ -35,8 +34,8 @@ public final class TabGuiOtf extends OtherFeature
 	
 	private enum Status
 	{
-		ENABLED("Enabled"),
-		DISABLED("Disabled");
+		ENABLED("启用"),
+		DISABLED("已禁用");
 		
 		private final String name;
 		
