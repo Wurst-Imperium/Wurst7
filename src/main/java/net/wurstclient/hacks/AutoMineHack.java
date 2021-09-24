@@ -25,7 +25,7 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	
 	public AutoMineHack()
 	{
-		super("AutoMine", "Automatically mines any block that you look at.");
+		super("自动挖", "自动挖你正在看着的方块");
 		setCategory(Category.BLOCKS);
 	}
 	
