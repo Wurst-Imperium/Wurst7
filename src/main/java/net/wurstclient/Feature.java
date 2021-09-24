@@ -70,7 +70,7 @@ public abstract class Feature
 		
 		if(settings.containsKey(key))
 			throw new IllegalArgumentException(
-				"Duplicate setting: " + getName() + " " + key);
+				"重复设置: " + getName() + " " + key);
 		
 		settings.put(key, setting);
 		possibleKeybinds.addAll(setting.getPossibleKeybinds(getName()));

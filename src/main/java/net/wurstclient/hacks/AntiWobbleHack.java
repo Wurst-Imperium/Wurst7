@@ -17,8 +17,7 @@ public final class AntiWobbleHack extends Hack
 {
 	public AntiWobbleHack()
 	{
-		super("AntiWobble",
-			"Disables the wobble effect caused\n" + "by nausea and portals.");
+		super("反恶心","禁用由恶心和传送门引起的摆动效果");
 		setCategory(Category.RENDER);
 	}
 }

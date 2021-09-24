@@ -49,7 +49,7 @@ import net.wurstclient.util.json.JsonException;
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener, RenderListener
 {
-	private final FileSetting templateSetting = new FileSetting("Template",
+	private final FileSetting templateSetting = new FileSetting("模板",
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to\n"
 			+ "add your own or to edit / delete the\n"
@@ -57,9 +57,8 @@ public final class AutoBuildHack extends Hack
 			+ "'Reset to Defaults' button or\n" + "delete the folder.",
 		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
-	private final SliderSetting range = new SliderSetting("Range",
-		"How far to reach when placing blocks.\n" + "Recommended values:\n"
-			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
+	private final SliderSetting range = new SliderSetting("范围",
+		"放置方块时能碰到的最远距离\n推荐值:Vanilla:6.0,NoCheat+:4.25",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting checkLOS =
@@ -69,14 +68,13 @@ public final class AutoBuildHack extends Hack
 				+ "plugins but slows down building.",
 			false);
 	
-	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
-		"Builds small templates (<= 64 blocks) instantly.\n"
-			+ "For best results, stand close to the block you're placing.",
+	private final CheckboxSetting instaBuild = new CheckboxSetting("瞬间构建",
+		"瞬间构建小型模板(≤64个方块)\n部分模板使用时会有残缺\n为了达到最好的效果\n请站在你放置的障碍物附近.",
 		true);
 	
 	private final CheckboxSetting fastPlace = new CheckboxSetting(
-		"Always FastPlace",
-		"Builds as if FastPlace was enabled,\n" + "even if it's not.", true);
+		"总是FastPlace",
+		"构建时带有FastPlace的效果,\n但不会启用FastPlace", true);
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
@@ -84,8 +82,7 @@ public final class AutoBuildHack extends Hack
 	
 	public AutoBuildHack()
 	{
-		super("AutoBuild", "Builds things automatically.\n"
-			+ "Place a single block to start building.");
+		super("自动构建", "自动构建东西.放置一个块开始构建");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);

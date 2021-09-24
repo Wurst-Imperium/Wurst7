@@ -24,7 +24,7 @@ public final class TpCmd extends Command
 {
 	public TpCmd()
 	{
-		super("tp", "Teleports you up to 10 blocks away.", ".tp <x> <y> <z>",
+		super("tp", "将你传送至10个方块以外", ".tp <x> <y> <z>",
 			".tp <entity>");
 	}
 	
@@ -42,7 +42,7 @@ public final class TpCmd extends Command
 		switch(args.length)
 		{
 			default:
-			throw new CmdSyntaxError("Invalid coordinates.");
+			throw new CmdSyntaxError("无效的坐标");
 			
 			case 1:
 			return argsToEntityPos(args[0]);
@@ -86,7 +86,7 @@ public final class TpCmd extends Command
 				&& MathUtils.isInteger(xyz[i].substring(1)))
 				pos[i] = player[i] + Integer.parseInt(xyz[i].substring(1));
 			else
-				throw new CmdSyntaxError("Invalid coordinates.");
+				throw new CmdSyntaxError("无效的坐标");
 			
 		return new BlockPos(pos[0], pos[1], pos[2]);
 	}
