@@ -119,18 +119,16 @@ public final class KeybindList
 		addKB(set, "b", "fastplace;fastbreak");
 		addKB(set, "b", "fastplace;fastbreak");
 		addKB(set, "c", "fullbright");
-		addKB(set, "g", "flight");
+		addKB(set, "g", "飞行");
 		addKB(set, "semicolon", "speednuker");
 		addKB(set, "h", "say /home");
-		addKB(set, "j", "jesus");
-		addKB(set, "k", "multiaura");
-		addKB(set, "n", "nuker");
-		addKB(set, "r", "killaura");
+		addKB(set, "j", "水上漂");
+		addKB(set, "k", "无限光环");
+		addKB(set, "r", "杀戮光环");
 		addKB(set, "right.shift", "navigator");
 		addKB(set, "right.control", "clickgui");
-		addKB(set, "u", "freecam");
-		addKB(set, "x", "x-ray");
-		addKB(set, "y", "sneak");
+		addKB(set, "u", "灵魂出窍");
+		addKB(set, "x", "透视");
 		return Collections.unmodifiableSet(set);
 	}
 	
