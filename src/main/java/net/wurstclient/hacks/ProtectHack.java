@@ -52,58 +52,56 @@ public final class ProtectHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final CheckboxSetting useAi =
-		new CheckboxSetting("Use AI (experimental)", false);
+		new CheckboxSetting("使用 AI(实验性)", false);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
+		"排除玩家", "", true);
 	
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
+		"排除睡觉", "", false);
 	
 	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
+		new SliderSetting("排除飞行","",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
+		"排除怪物", "", false);
 	
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
+		"排除猪人", "", false);
 	
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
+		new CheckboxSetting("排除末影人", "", false);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
+		"排除动物", "", false);
 	
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
+		new CheckboxSetting("排除幼年生物",
+			"", false);
 	
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
+		new CheckboxSetting("排除宠物",
+			"", false);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
+		new CheckboxSetting("排除商人",
+			"", false);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
+		new CheckboxSetting("排除魔物",
+			"", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
+		"排除隐形", "", false);
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
+		"排除命名", "", false);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
+		"排除盔甲架", "", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", true);
+		"排除末影水晶", "", true);
 	
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
@@ -117,9 +115,7 @@ public final class ProtectHack extends Hack
 	
 	public ProtectHack()
 	{
-		super("Protect",
-			"A bot that follows the closest entity and protects it from other entities.\n"
-				+ "Use .protect to protect a specific entity instead of the closest one.");
+		super("保护","跟踪最接近的实体并保护它,\n使其不受其他实体的伤害\n使用[.protect + 实体名]来保护一个特定的实体");
 		
 		setCategory(Category.COMBAT);
 		addSetting(useAi);

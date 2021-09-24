@@ -24,27 +24,25 @@ import net.wurstclient.settings.CheckboxSetting;
 public final class ExtraElytraHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting instantFly = new CheckboxSetting(
-		"Instant fly", "Jump to fly, no weird double-jump needed!", true);
+		"随飞", "跳起来就飞，不需要烦人的跳两次", true);
 	
 	private final CheckboxSetting speedCtrl = new CheckboxSetting(
-		"Speed control", "Control your speed with the Forward and Back keys.\n"
-			+ "(default: W and S)\n" + "No fireworks needed!",
+		"速控", "通过W和S键控制飞行速度(不需要烟花)",
 		true);
 	
 	private final CheckboxSetting heightCtrl =
-		new CheckboxSetting("Height control",
-			"Control your height with the Jump and Sneak keys.\n"
-				+ "(default: Spacebar and Shift)\n" + "No fireworks needed!",
+		new CheckboxSetting("高控",
+			"通过空格键和潜行键控制高度(不需要烟花)",
 			false);
 	
 	private final CheckboxSetting stopInWater =
-		new CheckboxSetting("Stop flying in water", true);
+		new CheckboxSetting("在水中时停止飞行", true);
 	
 	private int jumpTimer;
 	
 	public ExtraElytraHack()
 	{
-		super("ExtraElytra", "Makes the Elytra easier to use.");
+		super("更好的鞘翅", "使鞘翅变得便于使用");
 		setCategory(Category.MOVEMENT);
 		addSetting(instantFly);
 		addSetting(speedCtrl);

@@ -16,7 +16,7 @@ public final class NoOverlayHack extends Hack
 {
 	public NoOverlayHack()
 	{
-		super("NoOverlay", "Blocks the overlays of water and lava.");
+		super("防液糊脸","防止水和岩浆的挡住屏幕");
 		setCategory(Category.RENDER);
 	}
 }

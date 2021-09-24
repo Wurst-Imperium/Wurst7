@@ -17,8 +17,8 @@ import net.wurstclient.util.BlockUtils;
 @SearchTags({"hand noclip", "hand no clip"})
 public final class HandNoClipHack extends Hack
 {
-	private final BlockListSetting blocks = new BlockListSetting("Blocks",
-		"The blocks you want to reach through walls.", "minecraft:barrel",
+	private final BlockListSetting blocks = new BlockListSetting("方块",
+		"你想要穿墙触发的方块", "minecraft:barrel",
 		"minecraft:black_shulker_box", "minecraft:blue_shulker_box",
 		"minecraft:brown_shulker_box", "minecraft:chest",
 		"minecraft:cyan_shulker_box", "minecraft:dispenser",
@@ -34,9 +34,7 @@ public final class HandNoClipHack extends Hack
 	
 	public HandNoClipHack()
 	{
-		super("HandNoClip",
-			"Allows you to reach specific blocks through walls.");
-		
+		super("鬼手","允许穿过墙壁触发特殊方块(如隔墙开箱子)");
 		setCategory(Category.BLOCKS);
 		addSetting(blocks);
 	}

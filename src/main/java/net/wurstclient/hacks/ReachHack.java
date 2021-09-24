@@ -17,11 +17,11 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ReachHack extends Hack
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 6, 1, 10, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("范围", 6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	public ReachHack()
 	{
-		super("Reach", "Allows you to reach further.");
+		super("远触","允许你触发更远的东西");
 		setCategory(Category.OTHER);
 		addSetting(range);
 	}

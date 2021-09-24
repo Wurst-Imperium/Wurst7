@@ -47,8 +47,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	
 	public ForceOpHack()
 	{
-		super("ForceOP",
-			"Cracks AuthMe passwords.\n" + "Can be used to get OP.");
+		super("破解OP", "暴力破解OP\n(暴力破解指的是,你用OP的账号进入服务器后,\n开启这个功能,点击Start,就会自动猜测OP的登录密码,\n并尝试使用登录指令进行登录,快则几分钟,慢则几千亿年)");
 		setCategory(Category.CHAT);
 	}
 	

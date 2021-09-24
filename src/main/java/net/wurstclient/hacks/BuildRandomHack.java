@@ -41,13 +41,13 @@ import net.wurstclient.util.RotationUtils.Rotation;
 public final class BuildRandomHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
 		"\u00a7lFast\u00a7r mode can place blocks behind other blocks.\n"
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
 	private final CheckboxSetting checkItem =
-		new CheckboxSetting("Check held item",
+		new CheckboxSetting("检手",
 			"Only builds when you are actually holding a block.\n"
 				+ "Turn this off to build with fire, water, lava,\n"
 				+ "spawn eggs, or if you just want to right click\n"
@@ -55,7 +55,7 @@ public final class BuildRandomHack extends Hack
 			true);
 	
 	private final CheckboxSetting fastPlace = new CheckboxSetting(
-		"Always FastPlace",
+		"总是FastPlace",
 		"Builds as if FastPlace was enabled,\n" + "even if it's not.", false);
 	
 	private final Random random = new Random();
@@ -63,7 +63,7 @@ public final class BuildRandomHack extends Hack
 	
 	public BuildRandomHack()
 	{
-		super("BuildRandom", "Randomly places blocks around you.");
+		super("随机放方块", "在你周围随机放置方块");
 		setCategory(Category.BLOCKS);
 		addSetting(mode);
 		addSetting(checkItem);
@@ -188,7 +188,6 @@ public final class BuildRandomHack extends Hack
 			MC.player.swingHand(Hand.MAIN_HAND);
 		}
 		IMC.setItemUseCooldown(4);
-		
 		lastPos = pos;
 		return true;
 	}

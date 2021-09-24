@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.lwjgl.opengl.GL11;
 
@@ -74,8 +75,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	public MobSpawnEspHack()
 	{
-		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + "\u00a7eyellow\u00a7r"
+		super("高亮生物出生点", "突出显示生物可以产生的区域\n" + "\u00a7eyellow\u00a7r"
 				+ " - mobs can spawn at night\n" + "\u00a7cred\u00a7r"
 				+ " - mobs can always spawn");
 		setCategory(Category.RENDER);
@@ -350,6 +350,7 @@ public final class MobSpawnEspHack extends Hack
 				VertexFormats.POSITION_COLOR);
 			
 			new ArrayList<>(red).stream()
+				.filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {
@@ -367,6 +368,7 @@ public final class MobSpawnEspHack extends Hack
 				});
 			
 			new ArrayList<>(yellow).stream()
+				.filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {

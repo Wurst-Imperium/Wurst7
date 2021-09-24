@@ -16,7 +16,7 @@ public final class NoWebHack extends Hack implements UpdateListener
 {
 	public NoWebHack()
 	{
-		super("NoWeb", "Prevents you from getting slowed down by cobwebs.");
+		super("反蛛网","防止你被蜘蛛网减速");
 		setCategory(Category.MOVEMENT);
 	}
 	

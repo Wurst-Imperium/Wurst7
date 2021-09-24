@@ -53,9 +53,9 @@ public final class NukerHack extends Hack
 	implements UpdateListener, LeftClickListener, RenderListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("范围", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
 		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
 			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
 			+ "type. Left-click on a block to select it.\n"
@@ -68,15 +68,13 @@ public final class NukerHack extends Hack
 		Mode.values(), Mode.NORMAL);
 	
 	private final BlockSetting id =
-		new BlockSetting("ID", "The type of block to break in ID mode.\n"
-			+ "air = won't break anything", "minecraft:air", true);
+		new BlockSetting("ID", "将被打破的方块类型\n设为空气则不会破坏任何东西\n(在ID模式下)", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId =
-		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
-			+ "on blocks or restarting Nuker.", false);
+		new CheckboxSetting("Lock ID", "防止通过点击方块或重新启动此功能来更改方块ID\n(因为有时方块的ID会改变)", false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
-		"MultiID List", "The types of blocks to break in MultiID mode.",
+		"MultiID List", "将被打破的方块类型\n(在多方块模式下)",
 		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
 		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
 		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
@@ -90,7 +88,7 @@ public final class NukerHack extends Hack
 	
 	public NukerHack()
 	{
-		super("Nuker", "Automatically breaks blocks around you.");
+		super("矿井", "自动破坏你周围的方块");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);

@@ -47,23 +47,17 @@ import net.wurstclient.util.RotationUtils;
 public final class FeedAuraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far FeedAura will reach\n" + "to feed animals.\n"
-			+ "Anything that is further away than the\n"
-			+ "specified value will not be fed.",
+	private final SliderSetting range = new SliderSetting("范围",
+		"自动喂食给定距离内的生物",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which animal will be fed first.\n"
-			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires\n"
-			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
+	private final EnumSetting<Priority> priority = new EnumSetting<>("优先级",
+		"攻击优先级的定义:\n§l[距离]§r:距离最近的实体\n§l[角度]§r:§b[Angle]§r值最小的实体\n§b[Angle]§r值:攻击某实体时,\n你的头部旋转的角度\n§l[生命值]§r生命值最低的实体",
 		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
+		new CheckboxSetting("排除幼年生物",
+			"不喂食幼年生物\n节省食物,但不会加快幼年生物的生长",
 			false);
 	
 	private AnimalEntity target;
@@ -71,7 +65,7 @@ public final class FeedAuraHack extends Hack
 	
 	public FeedAuraHack()
 	{
-		super("FeedAura", "Automatically feeds animals around you.");
+		super("喂食光环", "自动喂食周围的动物");
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
@@ -217,13 +211,13 @@ public final class FeedAuraHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("距离", e -> MC.player.squaredDistanceTo(e)),
 		
-		ANGLE("Angle",
+		ANGLE("角度",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("Health", e -> e instanceof LivingEntity
+		HEALTH("生命值", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;

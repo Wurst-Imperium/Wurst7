@@ -19,10 +19,10 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 {
 	public CreativeFlightHack()
 	{
-		super("CreativeFlight",
-			"Allows you to you fly like in Creative Mode.\n\n"
-				+ "\u00a7c\u00a7lWARNING:\u00a7r"
-				+ " You will take fall damage if you don't use NoFall.");
+		super("创造飞行",
+			"让你像在创造模式中一样飞翔\n"
+				+ "\u00a7c\u00a7l警告:\u00a7r"
+				+ " 如果您不使用 NoFall，您将受到坠落伤害");
 		
 		setCategory(Category.MOVEMENT);
 	}

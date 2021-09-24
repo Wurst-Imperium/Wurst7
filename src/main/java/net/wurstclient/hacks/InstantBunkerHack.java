@@ -56,8 +56,7 @@ public final class InstantBunkerHack extends Hack
 	
 	public InstantBunkerHack()
 	{
-		super("InstantBunker",
-			"Builds a small bunker around you. Needs 57 blocks.");
+		super("自动\"城堡\"","在你周围构建一个小型\"城堡\",\n需要57个方块\n(其实就是在你周围构建一个类似城堡的建筑,\n把你围起来)");
 		setCategory(Category.BLOCKS);
 	}
 	
@@ -68,7 +67,7 @@ public final class InstantBunkerHack extends Hack
 		
 		if(!MC.player.isOnGround())
 		{
-			ChatUtils.error("Can't build this in mid-air.");
+			ChatUtils.error("Can't build this in mid-air");
 			setEnabled(false);
 			return;
 		}
@@ -77,13 +76,13 @@ public final class InstantBunkerHack extends Hack
 		
 		if(!(stack.getItem() instanceof BlockItem))
 		{
-			ChatUtils.error("You must have blocks in the main hand.");
+			ChatUtils.error("You must have blocks in the main hand");
 			setEnabled(false);
 			return;
 		}
 		
 		if(stack.getCount() < 57 && !MC.player.isCreative())
-			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
+			ChatUtils.warning("若没有足够的方块,\n\"城堡\"可能不完整");
 		
 		// get start pos and facings
 		BlockPos startPos = new BlockPos(MC.player.getPos());

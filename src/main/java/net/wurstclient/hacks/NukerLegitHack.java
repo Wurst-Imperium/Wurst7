@@ -49,9 +49,9 @@ public final class NukerLegitHack extends Hack
 	implements LeftClickListener, RenderListener, UpdateListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("范围", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
 		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
 			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
 			+ "type. Left-click on a block to select it.\n"
@@ -64,15 +64,13 @@ public final class NukerLegitHack extends Hack
 		Mode.values(), Mode.NORMAL);
 	
 	private final BlockSetting id =
-		new BlockSetting("ID", "The type of block to break in ID mode.\n"
-			+ "air = won't break anything", "minecraft:air", true);
+		new BlockSetting("ID", "在ID模式下将被破坏的方块.\n", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId =
-		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
-			+ "on blocks or restarting Nuker.", false);
+		new CheckboxSetting("锁定ID", "锁定方块的ID\n(因为有时某个方块的ID会改变)", false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
-		"MultiID List", "The types of blocks to break in MultiID mode.",
+		"多方块列表", "多方块模式下将被破坏的方块.",
 		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
 		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
 		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
@@ -83,9 +81,7 @@ public final class NukerLegitHack extends Hack
 	
 	public NukerLegitHack()
 	{
-		super("NukerLegit",
-			"Slower Nuker that bypasses all AntiCheat plugins.\n"
-				+ "Not required on normal NoCheat+ servers!");
+		super("矿井-","更慢的Nuker\n可绕过NoCheat+插件");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);

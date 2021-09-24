@@ -22,7 +22,7 @@ public final class SkinDerpHack extends Hack implements UpdateListener
 	
 	public SkinDerpHack()
 	{
-		super("SkinDerp", "Randomly toggles parts of your skin.");
+		super("SkinDerp", "使你的皮肤一直闪烁");
 		setCategory(Category.FUN);
 	}
 	

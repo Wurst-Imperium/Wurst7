@@ -47,50 +47,49 @@ public final class RemoteViewHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't view other players.", false);
+		"排除玩家", "", false);
 	
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't view sleeping players.", false);
+		"排除睡眠", "", false);
 	
 	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't view players that\n" + "are at least the given\n"
-				+ "distance above ground.",
+		new SliderSetting("排除飞行",
+			"",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't view zombies, creepers, etc.", true);
+		"排除怪物", "", true);
 	
 	private final CheckboxSetting filterPigmen =
-		new CheckboxSetting("Filter pigmen", "Won't view zombie pigmen.", true);
+		new CheckboxSetting("排除猪人", "", true);
 	
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't view endermen.", true);
+		new CheckboxSetting("排除末影人", "", true);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't view pigs, cows, etc.", true);
+		"排除动物", "", true);
 	
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't view baby pigs,\n" + "baby villagers, etc.", true);
+		new CheckboxSetting("排除幼年",
+			"", true);
 	
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't view tamed wolves,\n" + "tamed horses, etc.", true);
+		new CheckboxSetting("排除宠物",
+			"", true);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't view villagers, wandering traders, etc.", true);
+		new CheckboxSetting("排除商人",
+			"", true);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't view iron golems,\n" + "snow golems and shulkers.", true);
+		new CheckboxSetting("排除魔物",
+			"不进入铁傀儡,雪傀儡和潜影贝的视角", true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't view invisible entities.", false);
+		"排除隐形", "", false);
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't view armor stands.", true);
+		"排除盔甲架", "", true);
 	
 	private Entity entity = null;
 	private boolean wasInvisible;
@@ -99,8 +98,7 @@ public final class RemoteViewHack extends Hack
 	
 	public RemoteViewHack()
 	{
-		super("RemoteView", "Allows you to see the world as someone else.\n"
-			+ "Use the .rv command to make it target a specific entity.");
+		super("换视","让你进入其他实体的视角\n使用[.rv + 实体名]定义目标实体");
 		setCategory(Category.RENDER);
 		
 		addSetting(filterPlayers);
@@ -196,7 +194,7 @@ public final class RemoteViewHack extends Hack
 			// check if entity was found
 			if(entity == null)
 			{
-				ChatUtils.error("Could not find a valid entity.");
+				ChatUtils.error("找不到有效实体");
 				setEnabled(false);
 				return;
 			}

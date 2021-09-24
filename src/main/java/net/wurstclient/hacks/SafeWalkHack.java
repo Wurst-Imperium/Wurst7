@@ -20,13 +20,13 @@ import net.wurstclient.settings.CheckboxSetting;
 public final class SafeWalkHack extends Hack
 {
 	private final CheckboxSetting sneak =
-		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
+		new CheckboxSetting("在方块边缘时潜行", "假装正常地潜行,\n防止你被别人看出来在[开挂].", false);
 	
 	private boolean sneaking;
 	
 	public SafeWalkHack()
 	{
-		super("SafeWalk", "Prevents you from falling off edges.");
+		super("安全走路","防止你从方块边缘掉下来");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
 	}

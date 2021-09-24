@@ -74,11 +74,7 @@ public final class AutoFarmHack extends Hack
 	
 	public AutoFarmHack()
 	{
-		super("AutoFarm",
-			"Harvests and replants crops automatically.\n"
-				+ "Works with wheat, carrots, potatoes, beetroots,\n"
-				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
-				+ "bamboo, nether warts, and cocoa beans.");
+		super("自动农场","自动收割并再植作物");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);

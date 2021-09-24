@@ -52,18 +52,17 @@ public final class FreecamHack extends Hack
 	private final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
-		"Draws a line to your character's actual position.", false);
+	private final CheckboxSetting tracer = new CheckboxSetting("连线",
+		"画一条线,链接你视角的位置和你的实际位置", false);
 	
 	private final ColorSetting color =
-		new ColorSetting("Tracer color", Color.WHITE);
-	
+		new ColorSetting("追踪器颜色", Color.WHITE);
+
 	private FakePlayerEntity fakePlayer;
 	
 	public FreecamHack()
 	{
-		super("Freecam",
-			"Allows you to move the camera without moving your character.");
+		super("灵魂出窍","允许您在不移动角色的情况下移动相机");
 		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
@@ -121,13 +120,13 @@ public final class FreecamHack extends Hack
 		
 		player.setOnGround(false);
 		player.flyingSpeed = speed.getValueF();
-		Vec3d velocity = player.getVelocity();
+		Vec3d velcity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
-			player.setVelocity(velocity.add(0, speed.getValue(), 0));
+			player.setVelocity(velcity.add(0, speed.getValue(), 0));
 		
 		if(MC.options.keySneak.isPressed())
-			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
+			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
 	}
 	
 	@Override

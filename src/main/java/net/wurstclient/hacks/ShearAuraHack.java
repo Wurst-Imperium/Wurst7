@@ -47,13 +47,13 @@ import java.util.stream.StreamSupport;
 public final class ShearAuraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
+	private final SliderSetting range = new SliderSetting("范围",
 		"Determines how far ShearAura will reach\n" + "to shear sheep.\n"
 			+ "Anything that is further away than the\n"
 			+ "specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
+	private final EnumSetting<Priority> priority = new EnumSetting<>("优先权",
 		"Determines which sheep will be sheared first.\n"
 			+ "\u00a7lDistance\u00a7r - Shears the closest sheep.\n"
 			+ "\u00a7lAngle\u00a7r - Shears the sheep that requires\n"
@@ -66,7 +66,7 @@ public final class ShearAuraHack extends Hack
 
 	public ShearAuraHack()
 	{
-		super("ShearAura", "Automatically shears sheep around you.");
+		super("自动剪羊", "自动剪断你周围的羊群.");
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
@@ -209,13 +209,13 @@ public final class ShearAuraHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("距离", e -> MC.player.squaredDistanceTo(e)),
 		
-		ANGLE("Angle",
+		ANGLE("角度",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("Health", e -> e instanceof LivingEntity
+		HEALTH("生命", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;

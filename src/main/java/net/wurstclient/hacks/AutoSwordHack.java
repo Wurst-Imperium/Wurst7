@@ -28,7 +28,7 @@ import net.wurstclient.settings.SliderSetting;
 public final class AutoSwordHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Priority> priority =
-		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
+		new EnumSetting<>("优先级", Priority.values(), Priority.SPEED);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
 		"Switch back", "Switches back to the previously selected slot\n"
@@ -38,7 +38,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
 		"Time until AutoSword will switch back from\n"
 			+ "the weapon to the previously selected slot.\n\n"
-			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
+			+ "Only works when \u00a7lSwitch back\u00a7r is checked",
 		10, 1, 200, 1, v -> (int)v + " ticks");
 	
 	private int oldSlot;
@@ -46,9 +46,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	public AutoSwordHack()
 	{
-		super("AutoSword",
-			"Automatically uses the best weapon in your hotbar to attack entities.\n"
-				+ "Tip: This works with Killaura.");
+		super("自动剑", "自动使用你快捷栏中最好的剑攻击实体");
 		
 		setCategory(Category.COMBAT);
 		
@@ -180,8 +178,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	private enum Priority
 	{
-		SPEED("Speed (swords)"),
-		DAMAGE("Damage (axes)");
+		SPEED("速度(剑)"),
+		DAMAGE("伤害(斧头)");
 		
 		private final String name;
 		

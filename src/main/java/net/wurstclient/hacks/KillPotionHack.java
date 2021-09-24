@@ -25,16 +25,12 @@ import net.wurstclient.util.ChatUtils;
 public final class KillPotionHack extends Hack
 {
 	private final EnumSetting<PotionType> potionType =
-		new EnumSetting<>("Potion type", "The type of potion to generate.",
+		new EnumSetting<>("药水类型", "要生成的药水类型",
 			PotionType.values(), PotionType.SPLASH);
 	
 	public KillPotionHack()
 	{
-		super("KillPotion",
-			"Generates a potion that can kill almost anything,\n"
-				+ "including players in Creative mode. Does not\n"
-				+ "work on undead mobs, since they are\n" + "already dead.\n\n"
-				+ "Requires Creative mode.");
+		super("杀戮药水","生成一种几乎可以杀死任何东西的药水,包括创造模式下的玩家.对不死生物无效,因为它们已经死了\n需要创造模式");
 		
 		setCategory(Category.ITEMS);
 		addSetting(potionType);
@@ -46,7 +42,7 @@ public final class KillPotionHack extends Hack
 		// check gamemode
 		if(!MC.player.getAbilities().creativeMode)
 		{
-			ChatUtils.error("Creative mode only.");
+			ChatUtils.error("Creative mode only");
 			setEnabled(false);
 			return;
 		}
@@ -56,9 +52,9 @@ public final class KillPotionHack extends Hack
 		
 		// give potion
 		if(placeStackInHotbar(stack))
-			ChatUtils.message("Potion created.");
+			ChatUtils.message("药水创造.");
 		else
-			ChatUtils.error("Please clear a slot in your hotbar.");
+			ChatUtils.error("请清除您的快捷栏中的一个插槽.");
 		
 		setEnabled(false);
 	}
@@ -80,11 +76,11 @@ public final class KillPotionHack extends Hack
 	
 	private enum PotionType
 	{
-		NORMAL("Normal", "Potion", Items.POTION),
+		NORMAL("正常", "药水", Items.POTION),
 		
-		SPLASH("Splash", "Splash Potion", Items.SPLASH_POTION),
+		SPLASH("飞溅", "喷溅药水", Items.SPLASH_POTION),
 		
-		LINGERING("Lingering", "Lingering Potion", Items.LINGERING_POTION);
+		LINGERING("挥之不去", "滞留药水", Items.LINGERING_POTION);
 		
 		// does not work
 		// ARROW("Arrow", "Arrow", Items.TIPPED_ARROW);
@@ -119,7 +115,7 @@ public final class KillPotionHack extends Hack
 			effects.add(effect);
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("自定义药水效果", effects);
 			stack.setNbt(nbt);
 			
 			String name =

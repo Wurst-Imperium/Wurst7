@@ -16,15 +16,13 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"high jump"})
 public final class HighJumpHack extends Hack
 {
-	private final SliderSetting height = new SliderSetting("Height",
-		"Jump height in blocks.\n"
-			+ "This gets very inaccurate at higher values.",
+	private final SliderSetting height = new SliderSetting("高度",
+		"(注:设置的高度过高时无法控制跳跃高度)",
 		6, 1, 100, 1, ValueDisplay.INTEGER);
 	
 	public HighJumpHack()
 	{
-		super("HighJump", "Allows you to jump higher.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("跳高", "让你跳得更高");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(height);

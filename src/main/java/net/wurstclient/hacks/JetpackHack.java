@@ -17,8 +17,7 @@ public final class JetpackHack extends Hack implements UpdateListener
 {
 	public JetpackHack()
 	{
-		super("Jetpack", "Allows you to fly as if you had a jetpack.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("喷气背包", "按空格能飞,且受重力影响\n相当于AirJump(空跳,在空中跳)");
 		
 		setCategory(Category.MOVEMENT);
 	}

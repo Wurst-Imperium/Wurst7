@@ -70,25 +70,23 @@ import net.wurstclient.util.RotationUtils;
 public final class CaveFinderHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final EnumSetting<Area> area = new EnumSetting<>("Area",
-		"The area around the player to search in.\n"
-			+ "Higher values require a faster computer.",
+	private final EnumSetting<Area> area = new EnumSetting<>("区域范围",
+		"设置搜索的区域",
 		Area.values(), Area.D11);
 	
-	private final SliderSetting limit = new SliderSetting("Limit",
-		"The maximum number of blocks to display.\n"
-			+ "Higher values require a faster computer.",
+	private final SliderSetting limit = new SliderSetting("限制",
+		"最大范围",
 		5, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
 	
-	private final ColorSetting color = new ColorSetting("Color",
+	private final ColorSetting color = new ColorSetting("颜色",
 		"Caves will be highlighted\n" + "in this color.", Color.RED);
-	
+
 	private final SliderSetting opacity = new SliderSetting("Opacity",
 		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
 		0, 1, 0.01,
-		v -> v == 0 ? "Breathing" : ValueDisplay.PERCENTAGE.getValueString(v));
-	
+		v -> v == 0 ? "呼吸" : ValueDisplay.PERCENTAGE.getValueString(v));
+
 	private int prevLimit;
 	private boolean notify;
 	
@@ -106,8 +104,7 @@ public final class CaveFinderHack extends Hack
 	
 	public CaveFinderHack()
 	{
-		super("CaveFinder", "Helps you to find caves by\n"
-			+ "highlighting them in the\n" + "selected color.");
+		super("高亮矿洞", "帮助你找到洞穴以\n选定的颜色突出显示它们");
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);
@@ -233,12 +230,14 @@ public final class CaveFinderHack extends Hack
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
-		
+
 		if(opacity.getValue() > 0)
 			alpha = opacity.getValueF();
-		
+
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
+		
+		RenderSystem.setShaderColor(1, 0, 0, alpha);
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(vertexBuffer != null)
