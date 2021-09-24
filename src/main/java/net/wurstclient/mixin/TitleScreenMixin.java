@@ -27,32 +27,55 @@ import net.wurstclient.mixinterface.IScreen;
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
 {
+	private ClickableWidget realmsButton = null;
+	private ButtonWidget altsButton;
+	
 	private TitleScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("RETURN")}, method = {"initWidgetsNormal(II)V"})
-	private void onInitWidgetsNormal(int y, int spacingY, CallbackInfo ci)
+	@Inject(at = {@At("RETURN")}, method = {"init()V"})
+	private void onInitWidgetsNormal(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 2, y + spacingY * 2, 98,
-			20, new LiteralText("Alt Manager"),
-			b -> client.setScreen(new AltManagerScreen(this,
-				WurstClient.INSTANCE.getAltManager()))));
-		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
 			
+			ClickableWidget button = (ClickableWidget)d;
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("menu.online")))
 				continue;
 			
-			button.setWidth(98);
+			realmsButton = button;
+			break;
 		}
+		
+		if(realmsButton == null)
+			throw new IllegalStateException("Couldn't find realms button!");
+		
+		// make Realms button smaller
+		realmsButton.setWidth(98);
+		
+		// add AltManager button
+		addDrawableChild(altsButton = new ButtonWidget(width / 2 + 2,
+			realmsButton.y, 98, 20, new LiteralText("Alt Manager"),
+			b -> client.setScreen(new AltManagerScreen(this,
+				WurstClient.INSTANCE.getAltManager()))));
+	}
+	
+	@Inject(at = {@At("RETURN")}, method = {"tick()V"})
+	private void onTick(CallbackInfo ci)
+	{
+		if(realmsButton == null || altsButton == null)
+			return;
+			
+		// adjust AltManager button if Realms button has been moved
+		// happens when ModMenu is installed
+		altsButton.y = realmsButton.y;
 	}
 }
