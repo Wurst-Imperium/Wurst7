@@ -104,8 +104,8 @@ public final class AltsFile
 	
 	private static Alt loadAlt(String email, JsonObject jsonAlt)
 	{
-		String password = JsonUtils.getAsString(jsonAlt.get("password"), "");
-		String name = JsonUtils.getAsString(jsonAlt.get("name"), "");
+		String password = JsonUtils.getAsString(jsonAlt.get("密码"), "");
+		String name = JsonUtils.getAsString(jsonAlt.get("名字"), "");
 		boolean starred = JsonUtils.getAsBoolean(jsonAlt.get("starred"), false);
 		
 		return new Alt(email, password, name, starred);
@@ -137,8 +137,8 @@ public final class AltsFile
 		{
 			JsonObject jsonAlt = new JsonObject();
 			
-			jsonAlt.addProperty("password", alt.getPassword());
-			jsonAlt.addProperty("name", alt.getName());
+			jsonAlt.addProperty("密码", alt.getPassword());
+			jsonAlt.addProperty("名字", alt.getName());
 			jsonAlt.addProperty("starred", alt.isStarred());
 			
 			json.add(alt.getEmail(), jsonAlt);
