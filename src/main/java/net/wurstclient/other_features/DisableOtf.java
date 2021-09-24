@@ -18,8 +18,6 @@ public final class DisableOtf extends OtherFeature
 {
 	public DisableOtf()
 	{
-		super("Disable Wurst",
-			"To disable Wurst, go to the Statistics screen and press the \"Disable Wurst\" button.\n"
-				+ "It will turn into an \"Enable Wurst\" button once pressed.");
+		super("禁用香肠","要禁用香肠，请转到统计屏幕并按“禁用香肠”按钮.\n一旦按下它就会变成一个“启用Wurst”按钮.");
 	}
 }
