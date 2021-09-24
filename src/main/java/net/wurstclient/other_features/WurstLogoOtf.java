@@ -19,11 +19,11 @@ import net.wurstclient.settings.EnumSetting;
 public final class WurstLogoOtf extends OtherFeature
 {
 	private final EnumSetting<Visibility> visibility =
-		new EnumSetting<>("Visibility", Visibility.values(), Visibility.ALWAYS);
+		new EnumSetting<>("能见度", Visibility.values(), Visibility.ALWAYS);
 	
 	public WurstLogoOtf()
 	{
-		super("WurstLogo", "Shows the Wurst logo and version on the screen.");
+		super("香肠标志", "在屏幕上显示 Wurst 标志和版本.");
 		addSetting(visibility);
 	}
 	
@@ -34,9 +34,9 @@ public final class WurstLogoOtf extends OtherFeature
 	
 	public static enum Visibility
 	{
-		ALWAYS("Always", () -> true),
+		ALWAYS("总是", () -> true),
 		
-		ONLY_OUTDATED("Only when outdated",
+		ONLY_OUTDATED("仅当过时",
 			() -> WURST.getUpdater().isOutdated());
 		
 		private final String name;
