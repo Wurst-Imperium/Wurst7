@@ -18,7 +18,7 @@ public final class ExcavateCmd extends Command
 	public ExcavateCmd()
 	{
 		super("excavate",
-			"Automatically destroys all blocks in the selected area.",
+			"挖掘指定范围内的方块.",
 			".excavate <x1> <y1> <z1> <x2> <y2> <z2>");
 	}
 	
@@ -48,7 +48,7 @@ public final class ExcavateCmd extends Command
 				&& MathUtils.isInteger(xyz[i].substring(1)))
 				pos[i] = player[i] + Integer.parseInt(xyz[i].substring(1));
 			else
-				throw new CmdSyntaxError("Invalid coordinates.");
+				throw new CmdSyntaxError("无效坐标.");
 			
 		return new BlockPos(pos[0], pos[1], pos[2]);
 	}
