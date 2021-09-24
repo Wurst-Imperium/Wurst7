@@ -17,16 +17,12 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 public final class ThrowHack extends Hack implements RightClickListener
 {
-	private final SliderSetting amount = new SliderSetting("Amount",
-		"Amount of uses per click.", 16, 2, 1000000, 1, ValueDisplay.INTEGER);
+	private final SliderSetting amount = new SliderSetting("数量",
+		"每次点击后的使用量", 16, 2, 1000000, 1, ValueDisplay.INTEGER);
 	
 	public ThrowHack()
 	{
-		super("Throw",
-			"Uses an item multiple times. Can be used to throw\n"
-				+ "snowballs and eggs, spawn mobs, place minecarts, etc.\n"
-				+ "in very large quantities.\n\n"
-				+ "This can cause a lot of lag and even crash a server.");
+		super("重复","使你使用一次某个物品就相当于用很多次\n(适用于雪球,鸡蛋,刷怪蛋,放置矿车等)\n比如扔一次鸡蛋会飞出去很多个鸡蛋\n这可能会导致严重的延迟,\n甚至导致服务器崩溃.");
 		
 		setCategory(Category.OTHER);
 		addSetting(amount);
