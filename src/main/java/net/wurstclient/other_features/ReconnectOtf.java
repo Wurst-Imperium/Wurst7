@@ -15,8 +15,6 @@ public final class ReconnectOtf extends OtherFeature
 {
 	public ReconnectOtf()
 	{
-		super("Reconnect",
-			"Whenever you get kicked from a server, Wurst gives you a\n"
-				+ "\"Reconnect\" button that lets you instantly join again.");
+		super("重新连接","每当您被服务器踢出时，Wurst 都会为您提供一个“重新连接”按钮，让您可以立即再次加入.");
 	}
 }
