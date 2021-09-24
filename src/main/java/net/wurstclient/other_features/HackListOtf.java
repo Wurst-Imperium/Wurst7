@@ -107,11 +107,11 @@ public final class HackListOtf extends OtherFeature
 	
 	public static enum Mode
 	{
-		AUTO("Auto"),
+		AUTO("自动"),
 		
-		COUNT("Count"),
+		COUNT("计数"),
 		
-		HIDDEN("Hidden");
+		HIDDEN("隐藏");
 		
 		private final String name;
 		
@@ -129,9 +129,9 @@ public final class HackListOtf extends OtherFeature
 	
 	public static enum Position
 	{
-		LEFT("Left"),
+		LEFT("左边"),
 		
-		RIGHT("Right");
+		RIGHT("右边");
 		
 		private final String name;
 		
