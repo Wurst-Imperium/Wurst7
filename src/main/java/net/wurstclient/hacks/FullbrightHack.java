@@ -24,15 +24,20 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"§l伽马§r使亮度达到最大,与光影不兼容\n§l夜晚模式§r利用夜视效果工作,\n§o通常§r与光影一起工作",
+		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
+			+ "beyond 100%. Incompatible with shader packs.\n\n"
+			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
+			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
+			+ "shader packs.",
 		Method.values(), Method.GAMMA);
 	
-	private final CheckboxSetting fade = new CheckboxSetting("淡入淡出",
-		"使你开启Fullbright时,\n画面逐渐变亮,\n而不是突然变亮,\n关闭Fullbright时逐渐变暗,\n而不是突然变暗", true);
+	private final CheckboxSetting fade = new CheckboxSetting("Fade",
+		"Slowly fades between brightness and darkness.", true);
 	
 	private final SliderSetting defaultGamma =
-		new SliderSetting("默认亮度",
-			"当你关闭Fullbright时,\n将亮度设为这个值\n注:这段描述来自直接翻译",
+		new SliderSetting("Default brightness",
+			"Fullbright will set your brightness slider\n"
+				+ "back to this value when you turn it off.",
 			0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private boolean wasGammaChanged;
@@ -40,7 +45,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	public FullbrightHack()
 	{
-		super("Fullbright", "让你在黑暗中看得见");
+		super("Fullbright", "Allows you to see in the dark.");
 		setCategory(Category.RENDER);
 		addSetting(method);
 		addSetting(fade);

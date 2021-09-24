@@ -27,26 +27,29 @@ import net.wurstclient.util.BlockUtils;
 public final class AutoToolHack extends Hack
 	implements BlockBreakingProgressListener, UpdateListener
 {
-	private final CheckboxSetting useSwords = new CheckboxSetting("用剑",
-		"用剑砍断树叶,蜘蛛网等", false);
+	private final CheckboxSetting useSwords = new CheckboxSetting("Use swords",
+		"Uses swords to break leaves,\n" + "cobwebs, etc.", false);
 	
 	private final CheckboxSetting useHands =
 		new CheckboxSetting(
-			"用手", "当没有合适的工具时",
+			"Use hands", "Uses an empty hand or a\n"
+				+ "non-damageable item when\n" + "no applicable tool is found.",
 			true);
 	
 	private final CheckboxSetting repairMode = new CheckboxSetting(
-		"维修方式", "不使用耐久值即将为0的工具", false);
+		"Repair mode", "Won't use tools that are about to break.", false);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"回选", "使用工具后，自动切换回之前选择的物品槽",
+		"Switch back", "After using a tool, automatically switches\n"
+			+ "back to the previously selected slot.",
 		true);
 	
 	private int prevSelectedSlot;
 	
 	public AutoToolHack()
 	{
-		super("自动换工具", "当您破坏一个方块时,\n自动从物品栏中选择最快且最适用工具");
+		super("AutoTool", "Automatically equips the fastest applicable tool\n"
+			+ "in your hotbar when you try to break a block.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(useSwords);

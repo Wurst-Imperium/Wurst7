@@ -18,7 +18,10 @@ public final class AutoSwitchHack extends Hack implements UpdateListener
 {
 	public AutoSwitchHack()
 	{
-		super("自动变换手中物品", "快速从物品栏中变换你手中的物品");
+		super("AutoSwitch", "Switches the item in your hand all the time.\n\n"
+			+ "\u00a7lProTip:\u00a7r Use this in combination with BuildRandom while\n"
+			+ "having a lot of different colored wool or concrete\n"
+			+ "blocks in your hotbar.");
 		setCategory(Category.ITEMS);
 	}
 	

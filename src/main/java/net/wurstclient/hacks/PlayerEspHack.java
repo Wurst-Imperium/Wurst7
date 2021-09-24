@@ -46,23 +46,27 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	private final EnumSetting<Style> style =
-		new EnumSetting<>("风格", Style.values(), Style.LINES_AND_BOXES);
+		new EnumSetting<>("Style", Style.values(), Style.LINES_AND_BOXES);
 	
-	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("碰撞箱",
-		"§l准确§r模式显示每个生物的准确碰撞箱 \n§l人性化模式显示更大的碰撞箱，更容易被看到",
+	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
+		"\u00a7lAccurate\u00a7r mode shows the exact\n"
+			+ "hitbox of each player.\n"
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
+			+ "boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"排除睡眠", "", false);
+		"Filter sleeping", "Won't show sleeping players.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"排除隐形", "", false);
+		"Filter invisible", "Won't show invisible players.", false);
 	
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
 	public PlayerEspHack()
 	{
-		super("高亮玩家","高亮显示附近的玩家.\n白名单内的玩家将以蓝色显示");
+		super("PlayerESP", "Highlights nearby players.\n"
+			+ "ESP boxes of friends will appear in blue.");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);

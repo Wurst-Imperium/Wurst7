@@ -24,17 +24,19 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 public final class StepHack extends Hack implements UpdateListener
 {
-	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
-		"§l简单§r模式可跨过多个方块(启用高度滑块)\n§l安全§r模式可绕过NoCheat+",
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lSimple\u00a7r mode can step up multiple\n"
+			+ "blocks (enables Height slider).\n"
+			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.LEGIT);
 	
 	private final SliderSetting height =
-		new SliderSetting("高度", "仅在§l简单§r模式下使用",
+		new SliderSetting("Height", "Only works in \u00a7lSimple\u00a7r mode.",
 			1, 1, 10, 1, ValueDisplay.INTEGER);
 	
 	public StepHack()
 	{
-		super("Step", "允许你加强完整的块");
+		super("Step", "Allows you to step up full blocks.");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(height);
@@ -122,7 +124,7 @@ public final class StepHack extends Hack implements UpdateListener
 	
 	private enum Mode
 	{
-		SIMPLE("简单"),
+		SIMPLE("Simple"),
 		LEGIT("Legit");
 		
 		private final String name;

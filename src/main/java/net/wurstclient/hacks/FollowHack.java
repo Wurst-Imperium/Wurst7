@@ -117,7 +117,9 @@ public final class FollowHack extends Hack
 	
 	public FollowHack()
 	{
-		super("跟随","跟随最近的实体");
+		super("Follow",
+			"A bot that follows the closest entity.\n" + "Very annoying.\n\n"
+				+ "Use .follow to follow a specific entity.");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(distance);

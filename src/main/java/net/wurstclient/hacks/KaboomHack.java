@@ -26,11 +26,16 @@ import net.wurstclient.util.RotationUtils;
 public final class KaboomHack extends Hack implements UpdateListener
 {
 	private final SliderSetting power =
-		new SliderSetting("力量", 128, 32, 512, 32, ValueDisplay.INTEGER);
+		new SliderSetting("Power", 128, 32, 512, 32, ValueDisplay.INTEGER);
 	
 	public KaboomHack()
 	{
-		super("爆炸", "像爆炸一样破坏你周围的方块");
+		super("Kaboom",
+			"Breaks blocks around you like an explosion.\n"
+				+ "This can be a lot faster than Nuker if the server doesn't\n"
+				+ "have NoCheat+.\n"
+				+ "It works best with fast tools and weak blocks.\n"
+				+ "Note: This is not an actual explosion.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(power);

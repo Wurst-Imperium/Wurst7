@@ -43,20 +43,23 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	private final EnumSetting<Style> style =
-		new EnumSetting<>("风格", Style.values(), Style.BOXES);
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
-	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("碰撞体积",
-		"§l准确§r模式显示每个掉落物的准确碰撞箱\n§l人性化§r模式显示更大的碰撞箱,更容易被看到",
+	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
+		"\u00a7lAccurate\u00a7r mode shows the exact\n"
+			+ "hitbox of each item.\n"
+			+ "\u00a7lFancy\u00a7r mode shows larger boxes\n"
+			+ "that look better.",
 		BoxSize.values(), BoxSize.FANCY);
-
-	private final ColorSetting color = new ColorSetting("颜色",
-		"项目将以这种颜色突出显示.", Color.YELLOW);
-
+	
+	private final ColorSetting color = new ColorSetting("Color",
+		"Items will be highlighted in this color.", Color.YELLOW);
+	
 	private final ArrayList<ItemEntity> items = new ArrayList<>();
 	
 	public ItemEspHack()
 	{
-		super("ItemESP", "高亮显示附近的掉落物");
+		super("ItemESP", "Highlights nearby items.");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);
@@ -155,7 +158,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				
 				matrixStack.pop();
 			}
-			
 			
 			matrixStack.pop();
 		}

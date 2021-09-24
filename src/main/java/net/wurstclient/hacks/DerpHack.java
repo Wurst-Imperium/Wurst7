@@ -22,7 +22,8 @@ public final class DerpHack extends Hack implements UpdateListener
 	
 	public DerpHack()
 	{
-		super("Derp", "随机移动你的头.只对其他玩家可见");
+		super("Derp", "Randomly moves your head around.\n"
+			+ "Only visible to other players.");
 		setCategory(Category.FUN);
 	}
 	

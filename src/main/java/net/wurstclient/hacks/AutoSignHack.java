@@ -20,7 +20,10 @@ public final class AutoSignHack extends Hack
 	
 	public AutoSignHack()
 	{
-		super("§d自动木牌","自动在牌子上写字\n开启此功能后,请放下一个牌子,\n在牌子上写一段话作为§l样本§r,\n之后,你放牌子时会自动在牌子上写下\n你设置的§l样本§r内容");
+		super("AutoSign",
+			"Instantly writes whatever text you want on every sign\n"
+				+ "you place. Once activated, you can write normally on\n"
+				+ "the first sign to specify the text for all other signs.");
 		setCategory(Category.BLOCKS);
 	}
 	

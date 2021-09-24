@@ -27,7 +27,8 @@ public final class ServerCrasherHack extends Hack
 {
 	public ServerCrasherHack()
 	{
-		super("崩服","生成一个可以使1.15版本服务器崩溃的物品\n仅创造模式");
+		super("ServerCrasher", "Generates an item that can\n"
+			+ "crash 1.15.x servers.\n" + "\u00a7oCreative mode only.\u00a7r");
 		
 		setCategory(Category.ITEMS);
 	}
@@ -37,7 +38,7 @@ public final class ServerCrasherHack extends Hack
 	{
 		if(!MC.player.getAbilities().creativeMode)
 		{
-			ChatUtils.error("Creative mode only");
+			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
 			return;
 		}

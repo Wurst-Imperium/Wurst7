@@ -15,11 +15,11 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class TimerHack extends Hack
 {
 	private final SliderSetting speed =
-		new SliderSetting("速度", 2, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
+		new SliderSetting("Speed", 2, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
 	
 	public TimerHack()
 	{
-		super("变速", "§3改变§5几乎一切§3的速度.");
+		super("Timer", "Changes the speed of almost everything.");
 		setCategory(Category.OTHER);
 		addSetting(speed);
 	}

@@ -51,7 +51,7 @@ public final class ClickAuraHack extends Hack
 	implements UpdateListener, LeftClickListener
 {
 	private final SliderSetting range =
-		new SliderSetting("范围", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -62,7 +62,7 @@ public final class ClickAuraHack extends Hack
 		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"过滤玩家", "Won't attack other players.", false);
+		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't attack sleeping players.", false);
 	private final SliderSetting filterFlying =
@@ -108,7 +108,7 @@ public final class ClickAuraHack extends Hack
 	
 	public ClickAuraHack()
 	{
-		super("点击光环", "Automatically attacks the closest valid entity\n"
+		super("ClickAura", "Automatically attacks the closest valid entity\n"
 			+ "whenever you click.\n\n"
 			+ "\u00a7c\u00a7lWARNING:\u00a7r ClickAuras generally look more suspicious\n"
 			+ "than Killauras and are easier for plugins to detect.\n"

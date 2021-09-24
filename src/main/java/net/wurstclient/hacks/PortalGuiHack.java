@@ -16,7 +16,7 @@ public final class PortalGuiHack extends Hack
 {
 	public PortalGuiHack()
 	{
-		super("传送门GUI", "允许你在传送门内打开控制面板");
+		super("PortalGUI", "Allows you to open GUIs in portals.");
 		setCategory(Category.OTHER);
 	}
 }

@@ -17,7 +17,8 @@ public final class FastPlaceHack extends Hack implements UpdateListener
 {
 	public FastPlaceHack()
 	{
-		super("FastPlace", "以更快的速度放方块");
+		super("FastPlace", "Allows you to place blocks 5 times faster.\n"
+			+ "Tip: This can speed up other hacks like AutoBuild.");
 		setCategory(Category.BLOCKS);
 	}
 	

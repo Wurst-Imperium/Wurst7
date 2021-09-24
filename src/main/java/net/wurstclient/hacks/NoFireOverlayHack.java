@@ -16,7 +16,10 @@ public final class NoFireOverlayHack extends Hack
 {
 	public NoFireOverlayHack()
 	{
-		super("防火挡脸", "当你身上着火时,\n不显示屏幕上的火焰贴图");
+		super("NoFireOverlay",
+			"Blocks the overlay when you are on fire.\n\n"
+				+ "\u00a7c\u00a7lWARNING:\u00a7r This can cause you to burn\n"
+				+ "to death without noticing.");
 		
 		setCategory(Category.RENDER);
 	}

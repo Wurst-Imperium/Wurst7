@@ -17,7 +17,8 @@ public final class VClipCmd extends Command
 {
 	public VClipCmd()
 	{
-		super("vclip", "纵向TP,\r\n服务器中最大距离为10个方块", ".vclip <height>");
+		super("vclip", "Lets you clip through blocks vertically.\n"
+			+ "The maximum distance is 10 blocks.", ".vclip <height>");
 	}
 	
 	@Override

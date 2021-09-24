@@ -19,7 +19,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 {
 	public NoFallHack()
 	{
-		super("无摔伤", "去除掉落伤害");
+		super("NoFall", "Protects you from fall damage.");
 		setCategory(Category.MOVEMENT);
 	}
 	

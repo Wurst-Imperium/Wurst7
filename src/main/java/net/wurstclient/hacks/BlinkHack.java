@@ -24,8 +24,9 @@ import net.wurstclient.util.FakePlayerEntity;
 public final class BlinkHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
-	private final SliderSetting limit = new SliderSetting("限制",
-		"一旦给定数量的数据包被挂起,将自动重启此功能\n0 = 无限制",
+	private final SliderSetting limit = new SliderSetting("Limit",
+		"Automatically restarts Blink once\n" + "the given number of packets\n"
+			+ "have been suspended.\n\n" + "0 = no limit",
 		0, 0, 500, 1, v -> v == 0 ? "disabled" : (int)v + "");
 	
 	private final ArrayDeque<PlayerMoveC2SPacket> packets = new ArrayDeque<>();
@@ -33,7 +34,7 @@ public final class BlinkHack extends Hack
 	
 	public BlinkHack()
 	{
-		super("闪烁", "在启用时挂起所有动作更新\n(意思是移动时只移动视角,不移动玩家)\n视角移动后关闭次功能可将你的身体移动至视角位置");
+		super("Blink", "Suspends all motion updates while enabled.");
 		setCategory(Category.MOVEMENT);
 		addSetting(limit);
 	}

@@ -7,8 +7,6 @@
  */
 package net.wurstclient.commands;
 
-import java.util.stream.Stream;
-
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
@@ -17,6 +15,7 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.CmdUtils;
 
 @DontBlock
 public final class SetCheckboxCmd extends Command
@@ -24,7 +23,8 @@ public final class SetCheckboxCmd extends Command
 	public SetCheckboxCmd()
 	{
 		super("setcheckbox",
-			"通过指令更改功能复选框设置(子选项设置)",
+			"Changes a checkbox setting of a feature. Allows you\n"
+				+ "to toggle checkboxes through keybinds.",
 			".setcheckbox <feature> <setting> (on|off)",
 			".setcheckbox <feature> <setting> toggle");
 	}
@@ -35,35 +35,10 @@ public final class SetCheckboxCmd extends Command
 		if(args.length != 3)
 			throw new CmdSyntaxError();
 		
-		Feature feature = findFeature(args[0]);
-		Setting setting = findSetting(feature, args[1]);
+		Feature feature = CmdUtils.findFeature(args[0]);
+		Setting setting = CmdUtils.findSetting(feature, args[1]);
 		CheckboxSetting checkbox = getAsCheckbox(feature, setting);
 		setChecked(checkbox, args[2]);
-	}
-	
-	private Feature findFeature(String name) throws CmdError
-	{
-		Stream<Feature> stream = WURST.getNavigator().getList().stream();
-		stream = stream.filter(f -> name.equalsIgnoreCase(f.getName()));
-		Feature feature = stream.findFirst().orElse(null);
-		
-		if(feature == null)
-			throw new CmdError(
-				"A feature named \"" + name + "\" could not be found.");
-		
-		return feature;
-	}
-	
-	private Setting findSetting(Feature feature, String name) throws CmdError
-	{
-		name = name.replace("_", " ").toLowerCase();
-		Setting setting = feature.getSettings().get(name);
-		
-		if(setting == null)
-			throw new CmdError("A setting named \"" + name
-				+ "\" could not be found in " + feature.getName() + ".");
-		
-		return setting;
 	}
 	
 	private CheckboxSetting getAsCheckbox(Feature feature, Setting setting)

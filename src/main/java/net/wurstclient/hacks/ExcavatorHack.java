@@ -61,14 +61,15 @@ public final class ExcavatorHack extends Hack
 	private PathProcessor processor;
 	
 	private final SliderSetting range =
-		new SliderSetting("范围", 5, 2, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Range", 5, 2, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode =
-		new EnumSetting<>("模式", Mode.values(), Mode.FAST);
+		new EnumSetting<>("Mode", Mode.values(), Mode.FAST);
 	
 	public ExcavatorHack()
 	{
-		super("区域挖掘","自动破坏选定区域内的方块");
+		super("Excavator",
+			"Automatically breaks all blocks in the selected area.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -580,9 +581,9 @@ public final class ExcavatorHack extends Hack
 	
 	private static enum Mode
 	{
-		FAST("高速"),
+		FAST("Fast"),
 		
-		LEGIT("低速");
+		LEGIT("Legit");
 		
 		private final String name;
 		

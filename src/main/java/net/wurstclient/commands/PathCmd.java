@@ -31,10 +31,10 @@ public final class PathCmd extends Command
 	implements UpdateListener, RenderListener
 {
 	private final CheckboxSetting debugMode =
-		new CheckboxSetting("调试模式", false);
+		new CheckboxSetting("Debug mode", false);
 	
 	private final CheckboxSetting depthTest =
-		new CheckboxSetting("深度测试", false);
+		new CheckboxSetting("Depth test", false);
 	
 	private PathFinder pathFinder;
 	private boolean enabled;
@@ -44,9 +44,10 @@ public final class PathCmd extends Command
 	public PathCmd()
 	{
 		super("path",
-			"显示到达某个点的所需的最短路径\n适用于迷宫和洞穴",
-			".path <x> <y> <z>", ".path <实体名>", ".path -debug(调试模式)",
-			".path -depth(深度测试)", ".path -refresh(刷新)", "关闭: .path");
+			"Shows the shortest path to a specific point.\n"
+				+ "Useful for labyrinths and caves.",
+			".path <x> <y> <z>", ".path <entity>", ".path -debug",
+			".path -depth", ".path -refresh", "Turn off: .path");
 		
 		addSetting(debugMode);
 		addSetting(depthTest);
@@ -63,18 +64,18 @@ public final class PathCmd extends Command
 				case "-debug":
 				debugMode.setChecked(!debugMode.isChecked());
 				ChatUtils.message("Debug mode "
-					+ (debugMode.isChecked() ? "开" : "关") + ".");
+					+ (debugMode.isChecked() ? "on" : "off") + ".");
 				return;
 				
 				case "-depth":
 				depthTest.setChecked(!depthTest.isChecked());
 				ChatUtils.message("Depth test "
-					+ (depthTest.isChecked() ? "开" : "关") + ".");
+					+ (depthTest.isChecked() ? "on" : "off") + ".");
 				return;
 				
 				case "-refresh":
 				if(lastGoal == null)
-					throw new CmdError("无法刷新:没有以前的路径.");
+					throw new CmdError("Cannot refresh: no previous path.");
 				refresh = true;
 				break;
 			}
@@ -114,7 +115,7 @@ public final class PathCmd extends Command
 		switch(args.length)
 		{
 			default:
-			throw new CmdSyntaxError("无效坐标.");
+			throw new CmdSyntaxError("Invalid coordinates.");
 			
 			case 1:
 			return argsToEntityPos(args[0]);
@@ -158,7 +159,7 @@ public final class PathCmd extends Command
 				&& MathUtils.isInteger(xyz[i].substring(1)))
 				pos[i] = player[i] + Integer.parseInt(xyz[i].substring(1));
 			else
-				throw new CmdSyntaxError("无效坐标.");
+				throw new CmdSyntaxError("Invalid coordinates.");
 			
 		return new BlockPos(pos[0], pos[1], pos[2]);
 	}
@@ -177,13 +178,13 @@ public final class PathCmd extends Command
 			if(foundPath)
 				path = pathFinder.formatPath();
 			else
-				ChatUtils.error("找不到路径.");
+				ChatUtils.error("Could not find a path.");
 			
 			EVENTS.remove(UpdateListener.class, this);
 			
 			System.out.println("Done after " + passedTime + "ms");
 			if(debugMode.isChecked())
-				System.out.println("长度: " + path.size() + ", 处理: "
+				System.out.println("Length: " + path.size() + ", processed: "
 					+ pathFinder.countProcessedBlocks() + ", queue: "
 					+ pathFinder.getQueueSize() + ", cost: "
 					+ pathFinder.getCost(pathFinder.getCurrentPos()));

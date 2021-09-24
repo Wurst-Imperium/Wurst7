@@ -32,7 +32,14 @@ public final class TooManyHaxCmd extends Command
 	public TooManyHaxCmd()
 	{
 		super("toomanyhax",
-			"当TooManyHax被启用时，\n一些功能会被暂时性地禁用,\n你可以在此处设置将要禁用的功能", ".toomanyhax block <功能名>\n禁用某功能", ".toomanyhax unblock <功能名>\n取消禁用某功能", ".toomanyhax block-all\n禁用所有功能", ".toomanyhax unblock-all\n取消禁用所有功能", ".toomanyhax list [<页数>]\n显示禁用列表", ".toomanyhax load-profile <预设名>\n加载预设", ".toomanyhax save-profile <预设名>\n设置预设", ".toomanyhax list-profiles [<页数>]\n预设列表", "预设储存路径'.minecraft/wurst/toomanyhax'.");
+			"Allows to manage which hacks should be blocked\n"
+				+ "when TooManyHax is enabled.",
+			".toomanyhax block <feature>", ".toomanyhax unblock <feature>",
+			".toomanyhax block-all", ".toomanyhax unblock-all",
+			".toomanyhax list [<page>]", ".toomanyhax load-profile <file>",
+			".toomanyhax save-profile <file>",
+			".toomanyhax list-profiles [<page>]",
+			"Profiles are saved in '.minecraft/wurst/toomanyhax'.");
 	}
 	
 	@Override

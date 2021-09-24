@@ -43,8 +43,9 @@ public final class BaseFinderHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final BlockListSetting naturalBlocks = new BlockListSetting(
-		"自然方块",
-		"这些方块将被认为是自然生成的\n它们不会被作为玩家基础而高亮显示",
+		"Natural Blocks",
+		"These blocks will be considered\n" + "part of natural generation.\n\n"
+			+ "They will NOT be highlighted\n" + "as player bases.",
 		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
 		"minecraft:allium", "minecraft:amethyst_block",
 		"minecraft:amethyst_cluster", "minecraft:andesite",
@@ -86,8 +87,8 @@ public final class BaseFinderHack extends Hack
 		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:tuff",
 		"minecraft:vine", "minecraft:water", "minecraft:white_tulip");
 	
-	private final ColorSetting color = new ColorSetting("颜色",
-		"人造块将以这种颜色突出显示.", Color.RED);
+	private final ColorSetting color = new ColorSetting("Color",
+		"Man-made blocks will be\n" + "highlighted in this color.", Color.RED);
 	
 	private ArrayList<String> blockNames;
 	
@@ -103,7 +104,10 @@ public final class BaseFinderHack extends Hack
 	
 	public BaseFinderHack()
 	{
-		super("高亮基地","通过搜索人造方块寻找玩家基地,\n并用红色高亮显示\n§l很适合寻找玩家基地");
+		super("BaseFinder",
+			"Finds player bases by searching for man-made blocks.\n"
+				+ "The blocks that it finds will be highlighted in the\n"
+				+ "selected color.\n" + "Good for finding faction bases.");
 		
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);

@@ -27,7 +27,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	
 	public MileyCyrusHack()
 	{
-		super("不停潜行", "让你抽搐");
+		super("MileyCyrus", "Makes you twerk.");
 		setCategory(Category.FUN);
 		addSetting(twerkSpeed);
 	}

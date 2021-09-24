@@ -22,7 +22,8 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	
 	public AnnoyCmd()
 	{
-		super("annoy", "通过重复某个玩家说的话来激怒那个玩家", ".annoy <目标玩家>", "关闭此功能: .annoy");
+		super("annoy", "Annoys a player by repeating everything they say.",
+			".annoy <player>", "Turn off: .annoy");
 	}
 	
 	@Override
@@ -38,7 +39,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		}else
 		{
 			if(!enabled)
-				throw new CmdError(".annoy 已关闭.");
+				throw new CmdError(".annoy is already turned off.");
 			
 			disable();
 		}
@@ -54,7 +55,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		
 		ClientPlayerEntity player = MC.player;
 		if(player != null && target.equals(player.getName().getString()))
-			ChatUtils.warning("惹恼自己是个坏主意!");
+			ChatUtils.warning("Annoying yourself is a bad idea!");
 		
 		EVENTS.add(ChatInputListener.class, this);
 		enabled = true;
@@ -66,7 +67,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		
 		if(target != null)
 		{
-			ChatUtils.message("不再烦人" + target + ".");
+			ChatUtils.message("No longer annoying " + target + ".");
 			target = null;
 		}
 		

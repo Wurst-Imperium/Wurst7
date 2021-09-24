@@ -16,7 +16,7 @@ public final class TrueSightHack extends Hack
 {
 	public TrueSightHack()
 	{
-		super("真视", "让你能看见隐身的实体.");
+		super("TrueSight", "Allows you to see invisible entities.");
 		setCategory(Category.RENDER);
 	}
 }

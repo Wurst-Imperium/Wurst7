@@ -30,7 +30,7 @@ public final class PotionCmd extends Command
 {
 	public PotionCmd()
 	{
-		super("potion", "改变持有药水的效果.",
+		super("potion", "Changes the effects of the held potion.",
 			".potion add (<effect> <amplifier> <duration>)...",
 			".potion set (<effect> <amplifier> <duration>)...",
 			".potion remove <effect>");
@@ -43,11 +43,11 @@ public final class PotionCmd extends Command
 			throw new CmdSyntaxError();
 		
 		if(!MC.player.getAbilities().creativeMode)
-			throw new CmdError("仅限创造模式.");
+			throw new CmdError("Creative mode only.");
 		
 		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		if(!(stack.getItem() instanceof PotionItem))
-			throw new CmdError("你的主手必须拿着药水.");
+			throw new CmdError("You must hold a potion in your main hand.");
 		
 		// remove
 		if(args[0].equalsIgnoreCase("remove"))

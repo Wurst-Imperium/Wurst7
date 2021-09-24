@@ -22,7 +22,8 @@ public final class ViewNbtCmd extends Command
 {
 	public ViewNbtCmd()
 	{
-		super("viewnbt", "显示一个物品的NBT数据", ".viewnbt","复制到剪贴板: .viewnbt copy");
+		super("viewnbt", "Shows you the NBT data of an item.", ".viewnbt",
+			"Copy to clipboard: .viewnbt copy");
 	}
 	
 	@Override
@@ -31,7 +32,7 @@ public final class ViewNbtCmd extends Command
 		ClientPlayerEntity player = MC.player;
 		ItemStack stack = player.getInventory().getMainHandStack();
 		if(stack.isEmpty())
-			throw new CmdError("你必须把一个物品放在主手");
+			throw new CmdError("You must hold an item in your main hand.");
 		
 		NbtCompound tag = stack.getNbt();
 		String nbt = tag == null ? "" : tag.asString();
@@ -44,7 +45,7 @@ public final class ViewNbtCmd extends Command
 			
 			case "copy":
 			MC.keyboard.setClipboard(nbt);
-			ChatUtils.message("NBT数据复制成功");
+			ChatUtils.message("NBT data copied to clipboard.");
 			break;
 			
 			default:

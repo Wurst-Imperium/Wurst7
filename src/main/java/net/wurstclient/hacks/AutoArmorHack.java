@@ -38,24 +38,29 @@ public final class AutoArmorHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting useEnchantments = new CheckboxSetting(
-		"附魔", "计算护甲强度时是否考虑附魔",
+		"Use enchantments", "Whether or not to consider the Protection\n"
+			+ "enchantment when calculating armor strength.",
 		true);
 	
 	private final CheckboxSetting swapWhileMoving = new CheckboxSetting(
-		"移动",
-		"是否在玩家移动时交换盔甲\n§c§l警告:§r如果不开挂,\n这种操作是不可能的,\n这可能会引起怀疑",
+		"Swap while moving",
+		"Whether or not to swap armor pieces\n"
+			+ "while the player is moving.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r" + " This would not be possible\n"
+			+ "without cheats. It may raise suspicion.",
 		false);
 	
 	private final SliderSetting delay =
-		new SliderSetting("延迟",
-			"交换下一个盔甲之前等待的时间",
+		new SliderSetting("Delay",
+			"Amount of ticks to wait before swapping\n"
+				+ "the next piece of armor.",
 			2, 0, 20, 1, ValueDisplay.INTEGER);
 	
 	private int timer;
 	
 	public AutoArmorHack()
 	{
-		super("自动装甲", "自动管理你的盔甲");
+		super("AutoArmor", "Manages your armor automatically.");
 		setCategory(Category.COMBAT);
 		addSetting(useEnchantments);
 		addSetting(swapWhileMoving);

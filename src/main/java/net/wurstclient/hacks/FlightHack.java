@@ -22,11 +22,13 @@ public final class FlightHack extends Hack
 	implements UpdateListener, IsPlayerInWaterListener
 {
 	public final SliderSetting speed =
-		new SliderSetting("速度", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Speed", 1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
 	
 	public FlightHack()
 	{
-		super("飞行", "使你保持飞行");
+		super("Flight",
+			"Allows you to you fly.\n\n" + "\u00a7c\u00a7lWARNING:\u00a7r"
+				+ " You will take fall damage if you don't use NoFall.");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
 	}

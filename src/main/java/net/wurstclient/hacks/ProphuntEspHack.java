@@ -30,7 +30,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	
 	public ProphuntEspHack()
 	{
-		super("高亮假块","允许你看到假方块\n此功能是为Mineplex服务器制作的,\n在其他服务器可能失效");
+		super("ProphuntESP", "Allows you to see fake blocks in Prophunt.\n"
+			+ "Made for Mineplex Prophunt. Might not work on other servers.");
 		setCategory(Category.RENDER);
 	}
 	

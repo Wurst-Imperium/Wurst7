@@ -16,7 +16,9 @@ public final class NameTagsHack extends Hack
 {
 	public NameTagsHack()
 	{
-		super("ID标签", "改变玩家名标签的大小,\n以便你永远能看到其他玩家的方位");
+		super("NameTags", "Changes the scale of the nametags so you can\n"
+			+ "always read them.\n" + "Also allows you to see the nametags of\n"
+			+ "sneaking players.");
 		
 		setCategory(Category.RENDER);
 	}

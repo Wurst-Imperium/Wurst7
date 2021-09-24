@@ -26,10 +26,10 @@ public final class SettingsCmd extends Command
 {
 	public SettingsCmd()
 	{
-		super("settings", "设置功能配置预设",
+		super("settings", "Allows you to make profiles of your settings.",
 			".settings load-profile <file>", ".settings save-profile <file>",
 			".settings list-profiles [<page>]",
-			"配置文件保存在 '.minecraft/wurst/settings'.");
+			"Profiles are saved in '.minecraft/wurst/settings'.");
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public final class SettingsCmd extends Command
 		try
 		{
 			WURST.loadSettingsProfile(name);
-			ChatUtils.message("已加载设置: " + name);
+			ChatUtils.message("Settings loaded: " + name);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -82,7 +82,7 @@ public final class SettingsCmd extends Command
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			throw new CmdError("无法加载个人资料: " + e.getMessage());
+			throw new CmdError("Couldn't load profile: " + e.getMessage());
 		}
 	}
 	
@@ -96,12 +96,12 @@ public final class SettingsCmd extends Command
 		try
 		{
 			WURST.saveSettingsProfile(name);
-			ChatUtils.message("设置已保存: " + name);
+			ChatUtils.message("Settings saved: " + name);
 			
 		}catch(IOException | JsonException e)
 		{
 			e.printStackTrace();
-			throw new CmdError("无法保存个人资料: " + e.getMessage());
+			throw new CmdError("Couldn't save profile: " + e.getMessage());
 		}
 	}
 	
@@ -125,7 +125,7 @@ public final class SettingsCmd extends Command
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
-			throw new CmdSyntaxError("无效页面: " + page);
+			throw new CmdSyntaxError("Invalid page: " + page);
 		
 		String total = "Total: " + files.size() + " profile";
 		total += files.size() != 1 ? "s" : "";
@@ -146,7 +146,7 @@ public final class SettingsCmd extends Command
 			return 1;
 		
 		if(!MathUtils.isInteger(args[1]))
-			throw new CmdSyntaxError("不是数字: " + args[1]);
+			throw new CmdSyntaxError("Not a number: " + args[1]);
 		
 		return Integer.parseInt(args[1]);
 	}

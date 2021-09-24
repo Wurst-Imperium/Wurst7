@@ -19,7 +19,7 @@ public final class LsdHack extends Hack
 {
 	public LsdHack()
 	{
-		super("LSD", "引起幻觉");
+		super("LSD", "Causes hallucinations.");
 		setCategory(Category.FUN);
 	}
 	

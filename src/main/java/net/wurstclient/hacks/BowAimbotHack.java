@@ -67,64 +67,69 @@ import net.wurstclient.util.RotationUtils;
 public final class BowAimbotHack extends Hack
 	implements UpdateListener, RenderListener, GUIRenderListener
 {
-	private final EnumSetting<Priority> priority = new EnumSetting<>("优先级",
-		"攻击优先级的定义:\n§l[距离]§r:距离最近的实体\n§l[角度]§r:§b[Angle]§r值最小的实体\n§b[Angle]§r值:攻击某实体时,你的头部旋转的角度\n §l[生命值]§r生命值最低的实体",
+	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
+		"Determines which entity will be attacked first.\n"
+			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
+			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
+			+ "the least head movement.\n"
+			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
 	private final SliderSetting predictMovement =
-		new SliderSetting("预测运动",
-			"控制BowAibot预测算法的强度",
+		new SliderSetting("Predict movement",
+			"Controls the strength of BowAimbot's\n"
+				+ "movement prediction algorithm.",
 			0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"排除玩家", "Won't attack other players.", false);
+		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"排除睡眠", "Won't attack sleeping players.", false);
+		"Filter sleeping", "Won't attack sleeping players.", false);
 	private final SliderSetting filterFlying =
-		new SliderSetting("排除飞行",
+		new SliderSetting("Filter flying",
 			"Won't attack players that\n" + "are at least the given\n"
 				+ "distance above ground.",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"排除怪物", "Won't attack zombies, creepers, etc.", false);
+		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"排除猪人", "Won't attack zombie pigmen.", false);
+		"Filter pigmen", "Won't attack zombie pigmen.", false);
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("排除末影人", "Won't attack endermen.", false);
+		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"排除动物", "Won't attack pigs, cows, etc.", false);
+		"Filter animals", "Won't attack pigs, cows, etc.", false);
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("排除幼年",
+		new CheckboxSetting("Filter babies",
 			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("排除宠物",
+		new CheckboxSetting("Filter pets",
 			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("排除商人",
+		new CheckboxSetting("Filter traders",
 			"Won't attack villagers, wandering traders, etc.", false);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("排除魔物",
+		new CheckboxSetting("Filter golems",
 			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"排除隐形", "Won't attack invisible entities.", false);
+		"Filter invisible", "Won't attack invisible entities.", false);
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"排除命名", "Won't attack name-tagged entities.", false);
+		"Filter named", "Won't attack name-tagged entities.", false);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"排除盔甲架", "Won't attack armor stands.", false);
+		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"排除末影水晶", "Won't attack end crystals.", false);
-		
-	private final ColorSetting color = new ColorSetting("ESP 颜色",
+		"Filter end crystals", "Won't attack end crystals.", false);
+	
+	private final ColorSetting color = new ColorSetting("ESP color",
 		"Color of the box that BowAimbot\n" + "draws around the target.",
 		Color.RED);
-
+	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
 	
@@ -133,7 +138,7 @@ public final class BowAimbotHack extends Hack
 	
 	public BowAimbotHack()
 	{
-		super("自瞄", "自动瞄准(使用弓或弩时)");
+		super("BowAimbot", "Automatically aims your bow or crossbow.");
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
@@ -154,7 +159,7 @@ public final class BowAimbotHack extends Hack
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
-
+		
 		addSetting(color);
 	}
 	
@@ -354,12 +359,12 @@ public final class BowAimbotHack extends Hack
 		
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		float[] colorF = color.getColorF();
-
+		
 		// draw outline
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
 			0.5F * velocity);
 		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
-
+		
 		// draw box
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
 			0.25F * velocity);
@@ -424,13 +429,13 @@ public final class BowAimbotHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("距离", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
 		
-		ANGLE("角度",
+		ANGLE("Angle",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("生命值", e -> e instanceof LivingEntity
+		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;

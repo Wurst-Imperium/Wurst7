@@ -36,7 +36,14 @@ public final class TooManyHaxHack extends Hack
 	
 	public TooManyHaxHack()
 	{
-		super("TooManyHax","阻止您不想要的任何功能.");
+		super("TooManyHax",
+			"Blocks any features that you don't want.\n"
+				+ "Allows you to make sure that you don't accidentally\n"
+				+ "enable the wrong hack and get banned for it.\n"
+				+ "For those who want to \"only hack a little bit\".\n\n"
+				+ "Use the \u00a76.toomanyhax\u00a7r command to choose\n"
+				+ "which features to block.\n"
+				+ "Type \u00a76.help toomanyhax\u00a7r for more info.");
 		setCategory(Category.OTHER);
 		
 		Path wurstFolder = WURST.getWurstFolder();

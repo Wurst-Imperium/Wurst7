@@ -38,13 +38,15 @@ import net.wurstclient.util.RotationUtils;
 public final class BonemealAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
-		new SliderSetting("范围", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
-	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
-		"§l快速§r模式可以同时在多个对象上使用骨粉\n§l慢速§r模式可以绕过NoCheat+",
+		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lFast\u00a7r mode can use bone meal on\n"
+			+ "multiple blocks at once.\n"
+			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
 	private final EnumSetting<AutomationLevel> automationLevel =
-		new EnumSetting<>("自动化",
+		new EnumSetting<>("Automation",
 			"How much of the bone-mealing process to automate.\n"
 				+ "\u00a7lRight Click\u00a7r simply right clicks plants with the bone\n"
 				+ "meal in your hand.\n"
@@ -55,17 +57,19 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			AutomationLevel.values(), AutomationLevel.RIGHT_CLICK);
 	
 	private final CheckboxSetting saplings =
-		new CheckboxSetting("树苗", true);
-	private final CheckboxSetting crops = new CheckboxSetting("作物",
-		"小麦，胡萝卜，土豆和甜菜根", true);
+		new CheckboxSetting("Saplings", true);
+	private final CheckboxSetting crops = new CheckboxSetting("Crops",
+		"Wheat, carrots, potatoes and beetroots.", true);
 	private final CheckboxSetting stems =
-		new CheckboxSetting("茎", "南瓜和西瓜", true);
-	private final CheckboxSetting cocoa = new CheckboxSetting("可可豆", true);
-	private final CheckboxSetting other = new CheckboxSetting("其他", false);
+		new CheckboxSetting("Stems", "Pumpkins and melons.", true);
+	private final CheckboxSetting cocoa = new CheckboxSetting("Cocoa", true);
+	private final CheckboxSetting other = new CheckboxSetting("Other", false);
 	
 	public BonemealAuraHack()
 	{
-		super("自动骨粉", "自动对周围特定类型的植物使用骨粉");
+		super("BonemealAura",
+			"Automatically uses bone meal on specific types of plants.\n"
+				+ "Use the checkboxes to specify the types of plants.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -297,9 +301,9 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	
 	private enum Mode
 	{
-		FAST("快速"),
+		FAST("Fast"),
 		
-		LEGIT("慢速");
+		LEGIT("Legit");
 		
 		private final String name;
 		
@@ -317,11 +321,11 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	
 	private enum AutomationLevel
 	{
-		RIGHT_CLICK("右击", 0),
+		RIGHT_CLICK("Right Click", 0),
 		
-		HOTBAR("物品栏", 9),
+		HOTBAR("Hotbar", 9),
 		
-		INVENTORY("背包", 36);
+		INVENTORY("Inventory", 36);
 		
 		private final String name;
 		private final int maxInvSlot;

@@ -28,14 +28,15 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 		new GoogleTranslate();
 	
 	private final EnumSetting<FromLanguage> langFrom = new EnumSetting<>(
-		"翻译自", FromLanguage.values(), FromLanguage.AUTO_DETECT);
+		"Translate from", FromLanguage.values(), FromLanguage.AUTO_DETECT);
 	
 	private final EnumSetting<ToLanguage> langTo = new EnumSetting<>(
-		"翻译成", ToLanguage.values(), ToLanguage.ENGLISH);
+		"Translate to", ToLanguage.values(), ToLanguage.ENGLISH);
 	
 	public ChatTranslatorHack()
 	{
-		super("聊天翻译", "使用谷歌翻译来翻译玩家的聊天内容");
+		super("ChatTranslator",
+			"Translates incoming chat messages using Google Translate.");
 		setCategory(Category.CHAT);
 		
 		addSetting(langFrom);
@@ -66,7 +67,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 			{
 				e.printStackTrace();
 			}
-		}, "聊天翻译器").start();
+		}, "ChatTranslator").start();
 	}
 	
 	private void translate(ChatInputEvent event)
@@ -94,7 +95,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	
 	public static enum FromLanguage
 	{
-		AUTO_DETECT("自动检测", "auto"),
+		AUTO_DETECT("Detect Language", "auto"),
 		AFRIKAANS("Afrikaans", "af"),
 		ARABIC("Arabic", "ar"),
 		CZECH("Czech", "cs"),
@@ -141,8 +142,8 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 		AFRIKAANS("Afrikaans", "af"),
 		ARABIC("Arabic", "ar"),
 		CZECH("Czech", "cs"),
-		CHINESE_SIMPLIFIED("简体中文", "zh-CN"),
-		CHINESE_TRADITIONAL("繁体中文", "zh-TW"),
+		CHINESE_SIMPLIFIED("Chinese (simplified)", "zh-CN"),
+		CHINESE_TRADITIONAL("Chinese (traditional)", "zh-TW"),
 		DANISH("Danish", "da"),
 		DUTCH("Dutch", "nl"),
 		ENGLISH("English", "en"),

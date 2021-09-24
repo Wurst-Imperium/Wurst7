@@ -16,8 +16,8 @@ public final class RvCmd extends Command
 {
 	public RvCmd()
 	{
-		super("rv", "将RemoteView的目标设为特定的实体",
-			".rv <实体名>");
+		super("rv", "Makes RemoteView target a specific entity.",
+			".rv <entity>");
 	}
 	
 	@Override

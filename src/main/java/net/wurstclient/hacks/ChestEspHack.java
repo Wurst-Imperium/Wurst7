@@ -56,25 +56,25 @@ import net.wurstclient.util.RotationUtils;
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	private final ColorSetting basicColor = new ColorSetting("箱子颜色",
-		"正常的箱子将以这种颜色突出显示。.", Color.GREEN);
-
+	private final ColorSetting basicColor = new ColorSetting("Chest color",
+		"Normal chests will be\n" + "highlighted in this color.", Color.GREEN);
+	
 	private final ColorSetting trapColor = new ColorSetting("Trap color",
-		"被困的箱子将以这种颜色突出显示。.",
+		"Trapped chests will be\n" + "highlighted in this color.",
 		new Color(0xFF8000));
-
-	private final ColorSetting enderColor = new ColorSetting("末影箱color",
-		"末影箱将以这种颜色突出显示.", Color.CYAN);
-
-	private final ColorSetting shulkerColor = new ColorSetting("潜影盒 color",
+	
+	private final ColorSetting enderColor = new ColorSetting("Ender color",
+		"Ender chests will be\n" + "highlighted in this color.", Color.CYAN);
+	
+	private final ColorSetting shulkerColor = new ColorSetting("Shulker color",
 		"Shulker boxes will be\n" + "highlighted in this color.",
 		Color.MAGENTA);
-
-	private final ColorSetting cartColor = new ColorSetting("矿车 color",
+	
+	private final ColorSetting cartColor = new ColorSetting("Cart color",
 		"Minecarts will be\n" + "highlighted in this color.", Color.GREEN);
-
+	
 	private final EnumSetting<Style> style =
-		new EnumSetting<>("风格", Style.values(), Style.BOXES);
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
 	private final ArrayList<Box> basicChests = new ArrayList<>();
 	private final ArrayList<Box> trapChests = new ArrayList<>();
@@ -87,7 +87,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	public ChestEspHack()
 	{
-		super("高亮箱子", "突出附近的箱子");
+		super("ChestESP", "Highlights nearby chests.");
 		
 		setCategory(Category.RENDER);
 		addSetting(basicColor);
@@ -95,6 +95,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		addSetting(enderColor);
 		addSetting(shulkerColor);
 		addSetting(cartColor);
+		addSetting(style);
 	}
 	
 	@Override
@@ -271,6 +272,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+			
 			float[] basicColorF = basicColor.getColorF();
 			RenderSystem.setShaderColor(basicColorF[0], basicColorF[1],
 				basicColorF[2], 0.5F);
@@ -306,7 +308,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
 			bufferBuilder.end();
 			BufferRenderer.draw(bufferBuilder);
-
+			
 			float[] cartColorF = cartColor.getColorF();
 			RenderSystem.setShaderColor(cartColorF[0], cartColorF[1],
 				cartColorF[2], 0.5F);

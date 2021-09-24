@@ -43,7 +43,7 @@ public final class PlayerFinderHack extends Hack
 	
 	public PlayerFinderHack()
 	{
-		super("雷声漏洞","通过雷声漏洞,\n在雷雨天气中找到远处的玩家");
+		super("PlayerFinder", "Finds far away players during thunderstorms.");
 		setCategory(Category.RENDER);
 	}
 	
@@ -72,7 +72,7 @@ public final class PlayerFinderHack extends Hack
 		if(pos == null || pos.equals(lastPos))
 			return;
 		
-		ChatUtils.message("PlayerFinder检测到附近有玩家 "
+		ChatUtils.message("PlayerFinder has detected a player near "
 			+ pos.toShortString() + ".");
 		lastPos = pos;
 	}

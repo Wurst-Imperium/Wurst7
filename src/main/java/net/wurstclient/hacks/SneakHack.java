@@ -23,7 +23,7 @@ import net.wurstclient.settings.EnumSetting;
 public final class SneakHack extends Hack
 	implements PreMotionListener, PostMotionListener
 {
-	private final EnumSetting<SneakMode> mode = new EnumSetting<>("模式",
+	private final EnumSetting<SneakMode> mode = new EnumSetting<>("Mode",
 		"\u00a7lPacket\u00a7r mode makes it look like you're\n"
 			+ "sneaking without slowing you down.\n"
 			+ "\u00a7lLegit\u00a7r mode actually makes you sneak.",
@@ -31,7 +31,7 @@ public final class SneakHack extends Hack
 	
 	public SneakHack()
 	{
-		super("潜行", "一直潜行");
+		super("Sneak", "Makes you sneak automatically.");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 	}
@@ -107,7 +107,7 @@ public final class SneakHack extends Hack
 	
 	private enum SneakMode
 	{
-		PACKET("数据包"),
+		PACKET("Packet"),
 		LEGIT("Legit");
 		
 		private final String name;

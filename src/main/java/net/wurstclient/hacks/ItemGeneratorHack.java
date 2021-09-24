@@ -24,12 +24,12 @@ import net.wurstclient.util.ChatUtils;
 @SearchTags({"item generator", "drop infinite"})
 public final class ItemGeneratorHack extends Hack implements UpdateListener
 {
-	private final SliderSetting speed = new SliderSetting("速度",
+	private final SliderSetting speed = new SliderSetting("Speed",
 		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton\n"
 			+ "of lag and can easily crash the game!",
 		1, 1, 36, 1, ValueDisplay.INTEGER);
 	
-	private final SliderSetting stackSize = new SliderSetting("堆积体积",
+	private final SliderSetting stackSize = new SliderSetting("Stack size",
 		"How many items to place in each stack.\n"
 			+ "Doesn't seem to affect performance.",
 		1, 1, 64, 1, ValueDisplay.INTEGER);
@@ -38,7 +38,9 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	
 	public ItemGeneratorHack()
 	{
-		super("造垃圾","快速生成若干个随机的物品并扔出.\n§o仅创造模式§r");
+		super("ItemGenerator",
+			"Generates random items and drops them on the ground.\n"
+				+ "\u00a7oCreative mode only.\u00a7r");
 		
 		setCategory(Category.ITEMS);
 		addSetting(speed);
@@ -52,7 +54,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		
 		if(!MC.player.getAbilities().creativeMode)
 		{
-			ChatUtils.error("仅限创造模式.");
+			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
 		}
 	}

@@ -20,13 +20,17 @@ import net.wurstclient.settings.EnumSetting;
 @SearchTags({"Crits"})
 public final class CriticalsHack extends Hack implements LeftClickListener
 {
-	private final EnumSetting<Mode> mode = new EnumSetting<>("模式",
-		"§l数据包§r:发送数据包,不需要真正地跳跃\n§l小跳§r:进行一个微小的跳跃,这足以打出暴击伤害\n§l全跳§r:使你正常跳跃",
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lPacket\u00a7r mode sends packets to server without actually\n"
+			+ "moving you at all.\n\n"
+			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to\n"
+			+ "get a critical hit.\n\n"
+			+ "\u00a7lFull Jump\u00a7r mode makes you jump normally.",
 		Mode.values(), Mode.PACKET);
 	
 	public CriticalsHack()
 	{
-		super("暴击", "刀刀暴击");
+		super("Criticals", "Changes all your hits to critical hits.");
 		setCategory(Category.COMBAT);
 		addSetting(mode);
 	}
@@ -120,9 +124,9 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	
 	private enum Mode
 	{
-		PACKET("数据包"),
-		MINI_JUMP("小跳"),
-		FULL_JUMP("全跳");
+		PACKET("Packet"),
+		MINI_JUMP("Mini Jump"),
+		FULL_JUMP("Full Jump");
 		
 		private final String name;
 		

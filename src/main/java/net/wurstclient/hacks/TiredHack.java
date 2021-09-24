@@ -16,7 +16,8 @@ public final class TiredHack extends Hack implements UpdateListener
 {
 	public TiredHack()
 	{
-		super("疲惫", "让你看起来像2015年4月的Alexander\n仅其他玩家可见.");
+		super("Tired", "Makes you look like Alexander\n"
+			+ "back in April 2015.\n" + "Only visible to other players.");
 		setCategory(Category.FUN);
 	}
 	

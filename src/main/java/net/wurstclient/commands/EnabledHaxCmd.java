@@ -26,11 +26,11 @@ public final class EnabledHaxCmd extends Command
 {
 	public EnabledHaxCmd()
 	{
-		super("enabledhax", "将你现在已开启的功能保存为预设.",
-			".enabledhax load-profile <预设名>(加载预设)",
-			".enabledhax save-profile <预设名>(保存预设)",
-			".enabledhax list-profiles [<页数>](查看现有的预设)",
-			"预设保存路径 '.minecraft/wurst/enabled hacks'.");
+		super("enabledhax", "Allows you to make profiles of enabled hacks.",
+			".enabledhax load-profile <file>",
+			".enabledhax save-profile <file>",
+			".enabledhax list-profiles [<page>]",
+			"Profiles are saved in '.minecraft/wurst/enabled hacks'.");
 	}
 	
 	@Override
@@ -68,22 +68,22 @@ public final class EnabledHaxCmd extends Command
 		try
 		{
 			WURST.getHax().loadProfile(name);
-			ChatUtils.message("黑客加载: " + name);
+			ChatUtils.message("Hacks loaded: " + name);
 			
 		}catch(NoSuchFileException e)
 		{
-			throw new CmdError("个人资料'" + name + "'不存在.");
+			throw new CmdError("Profile '" + name + "' doesn't exist.");
 			
 		}catch(JsonException e)
 		{
 			e.printStackTrace();
 			throw new CmdError(
-				"配置文件'" + name + "' 已损坏: " + e.getMessage());
+				"Profile '" + name + "' is corrupted: " + e.getMessage());
 			
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			throw new CmdError("无法加载个人资料: " + e.getMessage());
+			throw new CmdError("Couldn't load profile: " + e.getMessage());
 		}
 	}
 	
@@ -97,12 +97,12 @@ public final class EnabledHaxCmd extends Command
 		try
 		{
 			WURST.getHax().saveProfile(name);
-			ChatUtils.message("黑客已保存: " + name);
+			ChatUtils.message("Hacks saved: " + name);
 			
 		}catch(IOException | JsonException e)
 		{
 			e.printStackTrace();
-			throw new CmdError("无法保存个人资料: " + e.getMessage());
+			throw new CmdError("Couldn't save profile: " + e.getMessage());
 		}
 	}
 	
@@ -126,7 +126,7 @@ public final class EnabledHaxCmd extends Command
 		pages = Math.max(pages, 1);
 		
 		if(page > pages || page < 1)
-			throw new CmdSyntaxError("无效页面: " + page);
+			throw new CmdSyntaxError("Invalid page: " + page);
 		
 		String total = "Total: " + files.size() + " profile";
 		total += files.size() != 1 ? "s" : "";
@@ -147,7 +147,7 @@ public final class EnabledHaxCmd extends Command
 			return 1;
 		
 		if(!MathUtils.isInteger(args[1]))
-			throw new CmdSyntaxError("不是数字: " + args[1]);
+			throw new CmdSyntaxError("Not a number: " + args[1]);
 		
 		return Integer.parseInt(args[1]);
 	}

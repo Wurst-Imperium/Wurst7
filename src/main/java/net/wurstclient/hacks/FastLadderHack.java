@@ -19,7 +19,7 @@ public final class FastLadderHack extends Hack implements UpdateListener
 {
 	public FastLadderHack()
 	{
-		super("快速爬梯子", "让你爬梯子的速度更快");
+		super("FastLadder", "Allows you to climb up ladders faster.");
 		setCategory(Category.MOVEMENT);
 	}
 	

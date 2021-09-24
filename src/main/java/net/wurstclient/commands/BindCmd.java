@@ -14,9 +14,10 @@ public final class BindCmd extends Command
 {
 	public BindCmd()
 	{
-		super("bind", "通过指令快速设置快捷键", ".bind <key> <hacks>",
-			".bind <按键名> <功能名>(增加功能快捷键)",
-			".bind <按键名> <指令>(增加指令快捷键)", "需要设置多个[功能/指令]时,\n用 ';'符号分隔,", "需要使用完整功能请用.binds指令");
+		super("bind", "Shortcut for '.binds add'.", ".bind <key> <hacks>",
+			".bind <key> <commands>",
+			"Multiple hacks/commands must be separated by ';'.",
+			"Use .binds for more options.");
 	}
 	
 	@Override

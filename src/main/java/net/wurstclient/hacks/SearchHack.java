@@ -65,15 +65,17 @@ import net.wurstclient.util.RotationUtils;
 public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final BlockSetting block = new BlockSetting("方块",
-		"需要搜索的方块.", "minecraft:diamond_ore", false);
+	private final BlockSetting block = new BlockSetting("Block",
+		"The type of block to search for.", "minecraft:diamond_ore", false);
 	
-	private final EnumSetting<Area> area = new EnumSetting<>("范围",
-		"搜索的范围",
+	private final EnumSetting<Area> area = new EnumSetting<>("Area",
+		"The area around the player to search in.\n"
+			+ "Higher values require a faster computer.",
 		Area.values(), Area.D11);
 	
-	private final SliderSetting limit = new SliderSetting("限制",
-		"",
+	private final SliderSetting limit = new SliderSetting("Limit",
+		"The maximum number of blocks to display.\n"
+			+ "Higher values require a faster computer.",
 		4, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
 	private int prevLimit;
@@ -93,7 +95,8 @@ public final class SearchHack extends Hack
 	
 	public SearchHack()
 	{
-		super("搜索","通过以彩虹色突出显示它们来帮助您找到特定的块");
+		super("Search", "Helps you to find specific blocks by\n"
+			+ "highlighting them in rainbow color.");
 		setCategory(Category.RENDER);
 		addSetting(block);
 		addSetting(area);

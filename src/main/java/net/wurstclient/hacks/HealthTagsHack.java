@@ -21,7 +21,7 @@ public final class HealthTagsHack extends Hack
 {
 	public HealthTagsHack()
 	{
-		super("血量标签", "在其他玩家的名字标签中显示玩家的血量");
+		super("HealthTags", "Shows the health of players in their nametags.");
 		setCategory(Category.RENDER);
 	}
 	

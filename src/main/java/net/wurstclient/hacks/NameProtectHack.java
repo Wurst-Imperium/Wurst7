@@ -18,7 +18,7 @@ public final class NameProtectHack extends Hack
 {
 	public NameProtectHack()
 	{
-		super("ID保护", "隐藏所有玩家名字");
+		super("NameProtect", "Hides all player names.");
 		setCategory(Category.RENDER);
 	}
 	
