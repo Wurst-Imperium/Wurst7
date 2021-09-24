@@ -103,7 +103,7 @@ public enum WurstClient
 		otfs = new OtfList();
 		
 		Path settingsFile = wurstFolder.resolve("settings.json");
-		settingsProfileFolder = wurstFolder.resolve("settings");
+		settingsProfileFolder = wurstFolder.resolve("设置");
 		this.settingsFile = new SettingsFile(settingsFile, hax, cmds, otfs);
 		this.settingsFile.load();
 		hax.tooManyHaxHack.loadBlockedHacksFile();
