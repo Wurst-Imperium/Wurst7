@@ -51,65 +51,59 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	private Random random = new Random();
 	
 	private final SliderSetting range =
-		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("范围", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
-			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
+	private final EnumSetting<Priority> priority = new EnumSetting<>("优先级",
+		"§l[距离]§r:距离最近的实体\r\n§l[角度]§r:§b[A]§r值最小的实体\n注:此处译者为方便解释而设了一个变量\n§b[A]§r值:你的头部转动到面向某实体所需的旋转角度\n§l[生命值]§r生命值最低的实体",
 		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
+		"排除玩家", "", true);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
+		"排除睡眠", "", true);
 	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
+		new SliderSetting("排除飞行",
+			"",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
+		"排除怪物", "", false);
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
+		"排除猪人", "不会攻击僵尸猪人.", false);
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
+		new CheckboxSetting("排除末影人", "不会攻击末影人.", false);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
+		"排除动物", "不会攻击猪、牛等", false);
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
+		new CheckboxSetting("排除婴儿",
+			"不会攻击小猪、小村民等.", false);
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
+		new CheckboxSetting("排除宠物",
+			"不会攻击驯服的狼、驯服的马等", true);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
+		new CheckboxSetting("排除交易者",
+			"不会攻击村民、流浪商人等.", true);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
+		new CheckboxSetting("排除魔物",
+			"不会攻击铁傀儡、雪傀儡和潜影贝。", true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
+		"排除隐形", "不会攻击隐形实体.", true);
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
+		"排除已命名", "不会攻击带有名称标签的实体.", true);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
+		"排除盔甲架", "不会攻击盔甲架.", true);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", false);
+		"排除末晶", "不会攻击末影水晶.", true);
 	
 	public TpAuraHack()
 	{
-		super("TP-Aura", "Automatically attacks the closest valid entity\n"
-			+ "while teleporting around it.");
+		super("传送光环", "自动攻击最近的有效实体在它周围传送时.");
 		setCategory(Category.COMBAT);
 		
 		addSetting(range);
@@ -262,13 +256,13 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("距离", e -> MC.player.squaredDistanceTo(e)),
 		
-		ANGLE("Angle",
+		ANGLE("角度",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
 		
-		HEALTH("Health", e -> e instanceof LivingEntity
+		HEALTH("生命值", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
 		
 		private final String name;
