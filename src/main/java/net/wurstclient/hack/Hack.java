@@ -93,6 +93,7 @@ public abstract class Hack extends Feature
 	public final String getPrimaryAction()
 	{
 		return enabled ? "Disable" : "Enable";
+		return enabled ? "禁用" : "启用";
 	}
 	
 	@Override
