@@ -43,57 +43,51 @@ import net.wurstclient.util.FakePlayerEntity;
 public final class TriggerBotHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("范围", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
+		"排除玩家", "", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
+		"排除睡眠", "", false);
 	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
+		new SliderSetting("排除飞行","",
 			0, 0, 2, 0.05,
 			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
+		"排除怪物", "", false);
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
+		"排除猪人", "", false);
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
+		new CheckboxSetting("排除末影人", "", false);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
+		"排除动物", "", false);
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
+		new CheckboxSetting("排除幼年",
+			"", false);
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
+		new CheckboxSetting("排除宠物","", false);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
+		new CheckboxSetting("排除商人","", false);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
+		new CheckboxSetting("排除魔物","", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
+		"排除隐形", "", false);
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
+		"排除命名", "", false);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
+		"排除盔甲架", "", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", false);
+		"排除末影水晶", "", false);
 	
 	public TriggerBotHack()
 	{
-		super("TriggerBot",
-			"Automatically attacks the entity you're looking at.");
+		super("触发机器人","自动攻击您正在查看的实体.");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(filterPlayers);
