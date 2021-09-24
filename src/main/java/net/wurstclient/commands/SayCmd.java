@@ -19,8 +19,7 @@ public final class SayCmd extends Command
 	public SayCmd()
 	{
 		super("say",
-			"Sends the given chat message, even if it starts with a\n" + "dot.",
-			".say <message>");
+			"发送给定的聊天消息,\n使你的消息可以以一个点开始\n如果不用.say指令,\n且发送的内容以点号开始,\n将会被判定为指令,\n一些服务器利用这点做出了反作弊插件,\n比如把登录指令改为\".l\"或\".login\"", ".say <消息>");
 	}
 	
 	@Override

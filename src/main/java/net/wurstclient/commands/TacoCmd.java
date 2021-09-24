@@ -36,7 +36,7 @@ public final class TacoCmd extends Command
 	
 	public TacoCmd()
 	{
-		super("taco", "Spawns a dancing taco on your hotbar.\n"
+		super("taco", "在你的物品栏上方生成一个塔可.\n"
 			+ "\"I love that little guy. So cute!\" -WiZARD");
 		setCategory(Category.FUN);
 	}

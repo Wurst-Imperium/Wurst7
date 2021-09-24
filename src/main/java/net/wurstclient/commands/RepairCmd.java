@@ -20,7 +20,7 @@ public final class RepairCmd extends Command
 {
 	public RepairCmd()
 	{
-		super("repair", "Repairs the held item. Requires creative mode.",
+		super("repair", "修理持有的物品 仅创造模式",
 			".repair");
 	}
 	
@@ -33,7 +33,7 @@ public final class RepairCmd extends Command
 		ClientPlayerEntity player = MC.player;
 		
 		if(!player.getAbilities().creativeMode)
-			throw new CmdError("Creative mode only.");
+			throw new CmdError("仅限创造模式.");
 		
 		ItemStack stack = getHeldStack(player);
 		stack.setDamage(0);
@@ -41,7 +41,7 @@ public final class RepairCmd extends Command
 			.sendPacket(new CreativeInventoryActionC2SPacket(
 				36 + player.getInventory().selectedSlot, stack));
 		
-		ChatUtils.message("Item repaired.");
+		ChatUtils.message("物品已修复.");
 	}
 	
 	private ItemStack getHeldStack(ClientPlayerEntity player) throws CmdError
@@ -49,13 +49,13 @@ public final class RepairCmd extends Command
 		ItemStack stack = player.getInventory().getMainHandStack();
 		
 		if(stack.isEmpty())
-			throw new CmdError("You need an item in your hand.");
+			throw new CmdError("您需要手上的物品.");
 		
 		if(!stack.isDamageable())
-			throw new CmdError("This item can't take damage.");
+			throw new CmdError("此物品不会受到损坏.");
 		
 		if(!stack.isDamaged())
-			throw new CmdError("This item is not damaged.");
+			throw new CmdError("此商品未损坏.");
 		
 		return stack;
 	}
