@@ -28,8 +28,7 @@ public final class VanillaSpoofOtf extends OtherFeature
 	
 	public VanillaSpoofOtf()
 	{
-		super("VanillaSpoof", "Bypasses anti-Fabric plugins by\n"
-			+ "pretending to be a vanilla client.");
+		super("香草恶搞", "通过伪装成 vanilla 客户端绕过反结构插件.");
 		addSetting(spoof);
 		
 		EVENTS.add(ConnectionPacketOutputListener.class, this);
@@ -70,7 +69,7 @@ public final class VanillaSpoofOtf extends OtherFeature
 	@Override
 	public String getPrimaryAction()
 	{
-		return isEnabled() ? "Disable" : "Enable";
+		return isEnabled() ? "禁用" : "启用";
 	}
 	
 	@Override
