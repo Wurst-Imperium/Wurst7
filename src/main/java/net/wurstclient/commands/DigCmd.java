@@ -19,9 +19,8 @@ public final class DigCmd extends Command
 	public DigCmd()
 	{
 		super("dig",
-			"Automatically digs out the selected area,\n"
-				+ "starting in the front-left-top corner.",
-			".dig <length> <width> <height>", ".dig stop");
+			"自动挖出选定区域，在前左上角.",
+			".dig  <长> <宽> <高>(设定挖掘范围)", ".dig stop(停止挖掘)");
 	}
 	
 	@Override
@@ -38,9 +37,9 @@ public final class DigCmd extends Command
 		if(args.length != 3)
 			throw new CmdSyntaxError();
 		
-		int length = tryParseInt(args[0], "length");
-		int width = tryParseInt(args[1], "width");
-		int height = tryParseInt(args[2], "height");
+        int length = this.tryParseInt(args[0], "length");
+        int width = this.tryParseInt(args[1], "width");
+        int height = this.tryParseInt(args[2], "height");
 		
 		ClientPlayerEntity player = MC.player;
 		Direction direction = player.getHorizontalFacing();
@@ -72,11 +71,11 @@ public final class DigCmd extends Command
 			
 		}catch(NumberFormatException e)
 		{
-			throw new CmdSyntaxError("Invalid " + name + ": " + input);
+			throw new CmdSyntaxError("无效的 " + name + ": " + input);
 		}
 		
 		if(i == 0)
-			throw new CmdSyntaxError(name + " can't be zero");
+			throw new CmdSyntaxError(name + " 不能为零");
 		
 		return i;
 	}

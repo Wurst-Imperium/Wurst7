@@ -95,12 +95,12 @@ public final class BlockComponent extends Component
 			gui.setTooltip(setting.getDescription());
 		else if(hBlock)
 		{
-			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);
+			String tooltip = "\u00a76名字:\u00a7r " + getBlockName(stack);
 			tooltip += "\n\u00a76ID:\u00a7r " + setting.getBlockName();
 			tooltip += "\n\u00a76Block #:\u00a7r "
 				+ Block.getRawIdFromState(setting.getBlock().getDefaultState());
-			tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
-			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
+			tooltip += "\n\n\u00a7e[左键单击]\u00a7r to edit";
+			tooltip += "\n\u00a7e[右键点击]\u00a7r to reset";
 			gui.setTooltip(tooltip);
 		}
 		

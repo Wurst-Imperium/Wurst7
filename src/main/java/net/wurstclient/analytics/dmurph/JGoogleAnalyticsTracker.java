@@ -103,7 +103,7 @@ public class JGoogleAnalyticsTracker
 	private static Logger logger =
 		Logger.getLogger(JGoogleAnalyticsTracker.class.getName());
 	private static final ThreadGroup asyncThreadGroup =
-		new ThreadGroup("Async Google Analytics Threads");
+		new ThreadGroup("异步 Google Analytics 线程");
 	private static long asyncThreadsRunning = 0;
 	private static Proxy proxy = Proxy.NO_PROXY;
 	private static LinkedList<String> fifo = new LinkedList<>();
@@ -370,7 +370,7 @@ public class JGoogleAnalyticsTracker
 	{
 		if(argPageURL == null)
 			throw new IllegalArgumentException(
-				"Page URL cannot be null, Google will not track the data.");
+				"页面 URL 不能为空，Google 不会跟踪数据.");
 		AnalyticsRequestData data = new AnalyticsRequestData();
 		data.setHostName(argHostName);
 		data.setPageTitle(argPageTitle);
@@ -401,7 +401,7 @@ public class JGoogleAnalyticsTracker
 	{
 		if(argPageURL == null)
 			throw new IllegalArgumentException(
-				"Page URL cannot be null, Google will not track the data.");
+				"页面 URL 不能为空，Google 不会跟踪数据.");
 		AnalyticsRequestData data = new AnalyticsRequestData();
 		data.setHostName(argHostName);
 		data.setPageTitle(argPageTitle);
@@ -473,13 +473,13 @@ public class JGoogleAnalyticsTracker
 		if(!enabled)
 		{
 			logger.log(Level.CONFIG,
-				"Ignoring tracking request, enabled is false");
+				"忽略跟踪请求，启用为 false");
 			return;
 		}
 		if(argData == null)
-			throw new NullPointerException("Data cannot be null");
+			throw new NullPointerException("数据不能为空");
 		if(builder == null)
-			throw new NullPointerException("Class was not initialized");
+			throw new NullPointerException("类未初始化");
 		final String url = builder.buildURL(argData);
 		final String userAgent = configData.getUserAgent();
 		
@@ -522,7 +522,7 @@ public class JGoogleAnalyticsTracker
 			}
 			if(!backgroundThreadMayRun)
 				logger.log(Level.SEVERE,
-					"A tracker request has been added to the queue but the background thread isn't running.",
+					"跟踪器请求已添加到队列中，但后台线程未运行.",
 					url);
 			break;
 		}

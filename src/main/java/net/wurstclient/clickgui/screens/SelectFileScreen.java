@@ -52,14 +52,14 @@ public final class SelectFileScreen extends Screen
 		listGui = new ListGui(client, this, setting.listFiles());
 		
 		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Open Folder"), b -> openFolder()));
+			new LiteralText("打开文件夹"), b -> openFolder()));
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
+			new LiteralText("重置为默认值"), b -> askToConfirmReset()));
 		
 		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
-			height - 48, 100, 20, new LiteralText("Done"), b -> done()));
+			height - 48, 100, 20, new LiteralText("完成"), b -> done()));
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			new LiteralText("Cancel"), b -> openPrevScreen()));
+			new LiteralText("取消"), b -> openPrevScreen()));
 	}
 	
 	private void openFolder()

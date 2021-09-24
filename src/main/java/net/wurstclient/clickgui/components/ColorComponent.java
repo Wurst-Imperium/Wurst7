@@ -77,8 +77,8 @@ public final class ColorComponent extends Component
 				String tooltip = "\u00a7cR:\u00a7r" + setting.getRed();
 				tooltip += " \u00a7aG:\u00a7r" + setting.getGreen();
 				tooltip += " \u00a79B:\u00a7r" + setting.getBlue();
-				tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
-				tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
+				tooltip += "\n\n\u00a7e[左键点击]\u00a7r to edit";
+				tooltip += "\n\u00a7e[右键点击]\u00a7r to reset";
 				GUI.setTooltip(tooltip);
 			}
 		

@@ -19,10 +19,10 @@ public final class DropCmd extends Command implements UpdateListener
 	
 	public DropCmd()
 	{
-		super("drop", "Drops all your items on the ground.", ".drop",
-			"Slow mode: .drop slow",
-			"If regular .drop kicks you from the server,",
-			"use slow mode instead.");
+		super("drop", "把你的所有物品丢到地上.", ".drop",
+			"低速模式: .drop slow",
+			"使用常规的 .drop 可能会被踢出服务器,",
+			"使用低速模式.");
 	}
 	
 	@Override

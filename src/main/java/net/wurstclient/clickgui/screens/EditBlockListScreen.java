@@ -68,27 +68,27 @@ public final class EditBlockListScreen extends Screen
 		blockNameField.setMaxLength(256);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, new LiteralText("Add"), b -> {
+			height - 56, 30, 20, new LiteralText("添加"), b -> {
 				blockList.add(blockToAdd);
 				blockNameField.setText("");
 			}));
 		
 		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, new LiteralText("Remove Selected"),
+			height - 56, 100, 20, new LiteralText("删除选定"),
 			b -> blockList.remove(listGui.selected)));
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"),
+			new LiteralText("重置为默认值"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
 				client.setScreen(EditBlockListScreen.this);
-			}, new LiteralText("Reset to Defaults"),
-				new LiteralText("Are you sure?")))));
+			}, new LiteralText("重置为默认值"),
+				new LiteralText("你确定吗?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+				new LiteralText("完成"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override

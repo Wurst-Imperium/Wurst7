@@ -33,13 +33,13 @@ public final class WurstAnalytics
 	public void setEnabled(boolean enabled)
 	{
 		if(!enabled)
-			trackEvent("options", "analytics", "disable");
+			trackEvent("选项", "analytics", "禁用");
 		
 		tracker.setEnabled(enabled);
 		configFile.save(tracker);
 		
 		if(enabled)
-			trackEvent("options", "analytics", "enable");
+			trackEvent("选项", "analytics", "启用");
 	}
 	
 	public void trackPageView(String url, String title)

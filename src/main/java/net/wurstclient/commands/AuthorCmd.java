@@ -20,8 +20,7 @@ public final class AuthorCmd extends Command
 {
 	public AuthorCmd()
 	{
-		super("author", "Changes the author of a written book.\n"
-			+ "Requires creative mode.", ".author <author>");
+		super("author", "改变一本书的作者信息\n仅创造模式", ".author <author>");
 	}
 	
 	@Override

@@ -21,15 +21,14 @@ public final class EnchantCmd extends Command
 {
 	public EnchantCmd()
 	{
-		super("enchant", "Enchants an item with everything,\n"
-			+ "except for silk touch and curses.", ".enchant");
+		super("enchant", "附魔几乎任何东西(使用前把需要附魔的物品放在主手)", ".enchant");
 	}
 	
 	@Override
 	public void call(String[] args) throws CmdException
 	{
 		if(!MC.player.getAbilities().creativeMode)
-			throw new CmdError("Creative mode only.");
+			throw new CmdError("仅限创造模式.");
 		
 		if(args.length > 1)
 			throw new CmdSyntaxError();
