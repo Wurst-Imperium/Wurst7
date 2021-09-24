@@ -50,7 +50,7 @@ import net.wurstclient.altmanager.NameGenerator;
 public abstract class AltEditorScreen extends Screen
 {
 	private final Path skinFolder =
-		WurstClient.INSTANCE.getWurstFolder().resolve("skins");
+		WurstClient.INSTANCE.getWurstFolder().resolve("皮肤");
 	
 	protected final Screen prevScreen;
 	
@@ -78,20 +78,20 @@ public abstract class AltEditorScreen extends Screen
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
-				new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+				new LiteralText("取消"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
-			200, 20, new LiteralText("Random Name"),
+			200, 20, new LiteralText("随机名称"),
 			b -> emailBox.setText(NameGenerator.generateName())));
 		
 		addDrawableChild(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
-				128, 20, new LiteralText("Steal Skin"),
+				128, 20, new LiteralText("盗取皮肤"),
 				b -> message = stealSkin(getEmail())));
 		
 		addDrawableChild(
 			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
-				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
+				new LiteralText("打开皮肤文件夹"), b -> openSkinFolder()));
 		
 		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
 			20, new LiteralText(""));
@@ -130,7 +130,7 @@ public abstract class AltEditorScreen extends Screen
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			message = "\u00a74\u00a7lSkin folder could not be created.";
+			message = "\u00a74\u00a7l无法创建皮肤文件夹.";
 		}
 	}
 	
@@ -197,12 +197,12 @@ public abstract class AltEditorScreen extends Screen
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lSkin could not be saved.";
+			return "\u00a74\u00a7l皮肤无法保存.";
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lPlayer does not exist.";
+			return "\u00a74\u00a7l玩家不存在.";
 		}
 	}
 	
@@ -351,7 +351,7 @@ public abstract class AltEditorScreen extends Screen
 		drawStringWithShadow(matrixStack, textRenderer,
 			"E-Mail (for premium alts)", width / 2 - 100, 47, 10526880);
 		drawStringWithShadow(matrixStack, textRenderer,
-			"Password (leave blank for cracked alts)", width / 2 - 100, 87,
+			"密码（对于已被破解的代理，请留空）。", width / 2 - 100, 87,
 			10526880);
 		drawCenteredText(matrixStack, textRenderer, message, width / 2, 142,
 			16777215);
