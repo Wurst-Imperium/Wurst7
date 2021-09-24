@@ -30,7 +30,7 @@ public class WurstServerPinger
 		server = new ServerInfo("", ip + ":" + port, false);
 		
 		new Thread(() -> pingInCurrentThread(ip, port),
-			"Wurst Server Pinger #" + threadNumber.incrementAndGet()).start();
+			"Wurst 服务器 Pinger #" + threadNumber.incrementAndGet()).start();
 	}
 	
 	private void pingInCurrentThread(String ip, int port)
@@ -41,16 +41,16 @@ public class WurstServerPinger
 		try
 		{
 			pinger.add(server, () -> {});
-			System.out.println("Ping successful: " + ip + ":" + port);
+			System.out.println("ping 成功: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)
 		{
-			System.out.println("Unknown host: " + ip + ":" + port);
+			System.out.println("未知的主机: " + ip + ":" + port);
 			failed = true;
 			
 		}catch(Exception e2)
 		{
-			System.out.println("Ping failed: " + ip + ":" + port);
+			System.out.println("Ping 失败: " + ip + ":" + port);
 			failed = true;
 		}
 		
