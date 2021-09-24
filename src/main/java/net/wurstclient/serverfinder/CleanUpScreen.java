@@ -53,7 +53,7 @@ public class CleanUpScreen extends Screen
 				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
-			height / 4 + 144 + 12, () -> "Clean Up",
+			height / 4 + 144 + 12, () -> "清理",
 			"Start the Clean Up with the settings\n" + "you specified above.\n"
 				+ "It might look like the game is not\n"
 				+ "responding for a couple of seconds.",
@@ -61,18 +61,18 @@ public class CleanUpScreen extends Screen
 		
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
-				() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
+				() -> "未知主机: " + removeOrKeep(cleanupUnknown),
 				"Servers that clearly don't exist.",
 				b -> cleanupUnknown = !cleanupUnknown));
 		
 		addDrawableChild(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
-			() -> "Outdated Servers: " + removeOrKeep(cleanupOutdated),
+			() -> "过时的服务器: " + removeOrKeep(cleanupOutdated),
 			"Servers that run a different Minecraft\n" + "version than you.",
 			b -> cleanupOutdated = !cleanupOutdated));
 		
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
-				() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
+				() -> "Ping 失败: " + removeOrKeep(cleanupFailed),
 				"All servers that failed the last ping.\n"
 					+ "Make sure that the last ping is complete\n"
 					+ "before you do this. That means: Go back,\n"
@@ -89,14 +89,14 @@ public class CleanUpScreen extends Screen
 		
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
-				() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
+				() -> "\u00a7c删除所有服务器: " + yesOrNo(removeAll),
 				"This will completely clear your server\n"
 					+ "list. \u00a7cUse with caution!\u00a7r",
 				b -> removeAll = !removeAll));
 		
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
-				() -> "Rename all Servers: " + yesOrNo(cleanupRename),
+				() -> "重命名所有服务器: " + yesOrNo(cleanupRename),
 				"Renames your servers to \"Grief me #1\",\n"
 					+ "\"Grief me #2\", etc.",
 				b -> cleanupRename = !cleanupRename));
