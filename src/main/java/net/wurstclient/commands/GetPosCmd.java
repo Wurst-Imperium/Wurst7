@@ -17,8 +17,8 @@ public final class GetPosCmd extends Command
 {
 	public GetPosCmd()
 	{
-		super("getpos", "Shows your current position.", ".getpos",
-			"Copy to clipboard: .getpos copy");
+		super("getpos", "显示你当前的坐标(三维坐标)", ".getpos",
+			"复制到剪贴板: .getpos copy");
 	}
 	
 	@Override
@@ -30,12 +30,12 @@ public final class GetPosCmd extends Command
 		switch(String.join(" ", args).toLowerCase())
 		{
 			case "":
-			ChatUtils.message("Position: " + posString);
+			ChatUtils.message("位置: " + posString);
 			break;
 			
 			case "copy":
 			MC.keyboard.setClipboard(posString);
-			ChatUtils.message("Position copied to clipboard.");
+			ChatUtils.message("位置已复制到剪贴板.");
 			break;
 			
 			default:
