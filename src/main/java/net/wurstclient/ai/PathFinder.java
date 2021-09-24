@@ -84,7 +84,7 @@ public class PathFinder
 	public void think()
 	{
 		if(done)
-			throw new IllegalStateException("Path was already found!");
+			throw new IllegalStateException("路径已经找到!");
 		
 		int i = 0;
 		for(; i < thinkSpeed && !checkFailed(); i++)
@@ -515,9 +515,9 @@ public class PathFinder
 	public ArrayList<PathPos> formatPath()
 	{
 		if(!done && !failed)
-			throw new IllegalStateException("No path found!");
+			throw new IllegalStateException("未找到路径!");
 		if(!path.isEmpty())
-			throw new IllegalStateException("Path was already formatted!");
+			throw new IllegalStateException("路径已经格式化!");
 		
 		// get last position
 		PathPos pos;
@@ -613,7 +613,7 @@ public class PathFinder
 	public boolean isPathStillValid(int index)
 	{
 		if(path.isEmpty())
-			throw new IllegalStateException("Path is not formatted!");
+			throw new IllegalStateException("路径未格式化!");
 		
 		// check player abilities
 		if(invulnerable != WurstClient.MC.player.getAbilities().creativeMode
