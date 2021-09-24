@@ -20,3 +20,12 @@ jobs:
       run: chmod +x gradlew
     - name: 用Gradle构建
       run: ./gradlew build
+    - name: 自动释放
+      uses: marvinpinto/action-automatic-releases@v1.2.1
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "exp"
+        prerelease: true
+        title: "wurst Automatic build versions"
+        files: |
+          build/libs/Wurst-Client-v7.17.1-MC1.17.1-sources.jar
