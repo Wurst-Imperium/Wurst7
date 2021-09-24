@@ -96,7 +96,7 @@ public final class FileSetting extends Setting
 		ArrayList<Path> files = listFiles();
 		if(files.isEmpty())
 			throw new IllegalStateException(
-				"Created default files but folder is still empty!");
+				"创建了默认文件但文件夹仍然是空的!");
 		
 		return files;
 	}
