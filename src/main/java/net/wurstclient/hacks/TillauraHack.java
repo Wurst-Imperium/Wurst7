@@ -41,18 +41,15 @@ import net.wurstclient.util.RotationUtils;
 	"auto hoe"})
 public final class TillauraHack extends Hack implements UpdateListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
-		"How far Tillaura will reach to till blocks.", 5, 1, 6, 0.05,
+	private final SliderSetting range = new SliderSetting("范围",
+		"可触及的最远距离", 5, 1, 6, 0.05,
 		ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting multiTill =
-		new CheckboxSetting("MultiTill", "Tills multiple blocks at once.\n"
-			+ "Faster, but can't bypass NoCheat+.", false);
+		new CheckboxSetting("多重", "一次触发多个块.但不能绕过 NoCheat+", false);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Prevents Tillaura from reaching through blocks.\n"
-			+ "Good for NoCheat+ servers,\n" + "but unnecessary in vanilla.",
+		"检查视线","防止你的手穿过方块\n适用于NoCheat+服务器",
 		true);
 	
 	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
@@ -60,9 +57,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 	
 	public TillauraHack()
 	{
-		super("Tillaura",
-			"Automatically turns dirt, grass, etc. into farmland.\n"
-				+ "Not to be confused with Killaura.");
+		super("种地光环", "自动将泥土/草等变成农田.不要与Killaura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
