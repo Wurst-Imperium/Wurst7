@@ -26,12 +26,8 @@ public final class ModifyCmd extends Command
 {
 	public ModifyCmd()
 	{
-		super("modify", "Allows you to modify NBT data of items.",
-			".modify add <nbt_data>", ".modify set <nbt_data>",
-			".modify remove <nbt_path>", "Use $ for colors, use $$ for $.", "",
-			"Example:",
-			".modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}",
-			"(changes the item's name to \u00a7cRed Name\u00a7r)");
+		super("modify", "通过指令修改物品的NBT数据.",
+			".modify add <nbt数据>(添加NBT数据)", ".modify set <nbt数据>设置NBT数据)", ".modify remove <nbt路径> (删除NBT数据)", "用$表示颜色,\n用$$表示$(需要用到$符号时用$$表示)", "", "举个栗子:", ".modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}", "(changes the item's name to §cRed Name§r)");
 	}
 	
 	@Override
@@ -40,7 +36,7 @@ public final class ModifyCmd extends Command
 		ClientPlayerEntity player = MC.player;
 		
 		if(!player.getAbilities().creativeMode)
-			throw new CmdError("Creative mode only.");
+			throw new CmdError("仅限创造模式");
 		
 		if(args.length < 2)
 			throw new CmdSyntaxError();
