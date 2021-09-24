@@ -20,7 +20,7 @@ public final class EditAltScreen extends AltEditorScreen
 	public EditAltScreen(Screen prevScreen, AltManager altManager,
 		Alt editedAlt)
 	{
-		super(prevScreen, new LiteralText("Edit Alt"));
+		super(prevScreen, new LiteralText("编辑 Alt"));
 		this.altManager = altManager;
 		this.editedAlt = editedAlt;
 	}
