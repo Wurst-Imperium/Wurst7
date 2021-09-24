@@ -8,7 +8,6 @@
 package net.wurstclient.altmanager;
 
 import java.net.Proxy;
-import java.util.Optional;
 
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
@@ -36,8 +35,7 @@ public final class LoginManager
 			WurstClient.IMC
 				.setSession(new Session(auth.getSelectedProfile().getName(),
 					auth.getSelectedProfile().getId().toString(),
-					auth.getAuthenticatedToken(), Optional.empty(),
-					Optional.empty(), Session.AccountType.MOJANG));
+					auth.getAuthenticatedToken(), "mojang"));
 			return "";
 			
 		}catch(AuthenticationUnavailableException e)
@@ -62,7 +60,6 @@ public final class LoginManager
 	
 	public static void changeCrackedName(String newName)
 	{
-		WurstClient.IMC.setSession(new Session(newName, "", "",
-			Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
+		WurstClient.IMC.setSession(new Session(newName, "", "", "mojang"));
 	}
 }

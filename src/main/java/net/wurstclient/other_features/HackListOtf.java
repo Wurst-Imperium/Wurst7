@@ -7,8 +7,12 @@
  */
 package net.wurstclient.other_features;
 
+import java.util.Comparator;
+
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
+import net.wurstclient.hack.Hack;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
@@ -29,8 +33,17 @@ public final class HackListOtf extends OtherFeature
 	private final EnumSetting<Position> position =
 		new EnumSetting<>("位置", Position.values(), Position.LEFT);
 	
+	private final EnumSetting<SortBy> sortBy =
+		new EnumSetting<>("Sort by", SortBy.values(), SortBy.NAME);
+	
+	private final CheckboxSetting revSort =
+		new CheckboxSetting("Reverse sorting", false);
+	
 	private final CheckboxSetting animations =
 		new CheckboxSetting("动画", true);
+	
+	private SortBy prevSortBy;
+	private Boolean prevRevSort;
 	
 	public HackListOtf()
 	{
@@ -40,6 +53,8 @@ public final class HackListOtf extends OtherFeature
 		
 		addSetting(mode);
 		addSetting(position);
+		addSetting(sortBy);
+		addSetting(revSort);
 		addSetting(animations);
 	}
 	
@@ -56,6 +71,38 @@ public final class HackListOtf extends OtherFeature
 	public boolean isAnimations()
 	{
 		return animations.isChecked();
+	}
+	
+	public Comparator<Hack> getComparator()
+	{
+		if(revSort.isChecked())
+			return sortBy.getSelected().comparator.reversed();
+		
+		return sortBy.getSelected().comparator;
+	}
+	
+	public boolean shouldSort()
+	{
+		try
+		{
+			// width of a renderName could change at any time
+			// must sort the HackList every tick
+			if(sortBy.getSelected() == SortBy.WIDTH)
+				return true;
+			
+			if(sortBy.getSelected() != prevSortBy)
+				return true;
+			
+			if(!Boolean.valueOf(revSort.isChecked()).equals(prevRevSort))
+				return true;
+			
+			return false;
+			
+		}finally
+		{
+			prevSortBy = sortBy.getSelected();
+			prevRevSort = revSort.isChecked();
+		}
 	}
 	
 	public static enum Mode
@@ -91,6 +138,29 @@ public final class HackListOtf extends OtherFeature
 		private Position(String name)
 		{
 			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
+	public static enum SortBy
+	{
+		NAME("Name", (a, b) -> a.getName().compareToIgnoreCase(b.getName())),
+		
+		WIDTH("Width", Comparator.comparingInt(
+			h -> WurstClient.MC.textRenderer.getWidth(h.getRenderName())));
+		
+		private final String name;
+		private final Comparator<Hack> comparator;
+		
+		private SortBy(String name, Comparator<Hack> comparator)
+		{
+			this.name = name;
+			this.comparator = comparator;
 		}
 		
 		@Override
