@@ -46,18 +46,18 @@ public final class KeybindProfilesScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
 		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Open Folder"), b -> openFolder()));
+			new LiteralText("打开文件夹"), b -> openFolder()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			new LiteralText("New Profile"), b -> client.setScreen(
+			new LiteralText("新的配置文件"), b -> client.setScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
 		loadButton =
 			addDrawableChild(new ButtonWidget(width / 2 - 50, height - 48, 100,
-				20, new LiteralText("Load"), b -> loadSelected()));
+				20, new LiteralText("加载"), b -> loadSelected()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
-			new LiteralText("Cancel"), b -> openPrevScreen()));
+			new LiteralText("取消"), b -> openPrevScreen()));
 	}
 	
 	private void openFolder()
@@ -172,14 +172,14 @@ public final class KeybindProfilesScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, "Keybind Profiles",
+		drawCenteredText(matrixStack, client.textRenderer, "键绑定配置文件",
 			width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		if(loadButton.isHovered() && !loadButton.active)
 			renderTooltip(matrixStack,
-				Arrays.asList(new LiteralText("You must first select a file.")),
+				Arrays.asList(new LiteralText("您必须先选择一个文件.")),
 				mouseX, mouseY);
 	}
 	
