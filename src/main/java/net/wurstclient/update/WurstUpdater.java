@@ -71,13 +71,13 @@ public final class WurstUpdater implements UpdateListener
 			if(latestVersion == null)
 				throw new NullPointerException("Latest version is missing!");
 			
-			System.out.println("[Updater] Current version: " + currentVersion);
-			System.out.println("[Updater] Latest version: " + latestVersion);
+			System.out.println("[更新] 当前版本: " + currentVersion);
+			System.out.println("[更新] 最新版本: " + latestVersion);
 			outdated = currentVersion.shouldUpdateTo(latestVersion);
 			
 		}catch(Exception e)
 		{
-			System.err.println("[Updater] An error occurred!");
+			System.err.println("[更新程序] 发生错误!");
 			e.printStackTrace();
 		}
 		
