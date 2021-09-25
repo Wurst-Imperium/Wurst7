@@ -22,7 +22,7 @@ public final class NoWeatherHack extends Hack
 		new CheckboxSetting("Change World Time", false);
 	
 	private final SliderSetting time =
-		new SliderSetting("Time", 6000, 0, 23900, 100, ValueDisplay.INTEGER);
+		new SliderSetting("时间", 6000, 0, 23900, 100, ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting changeMoonPhase =
 		new CheckboxSetting("Change Moon Phase", false);
@@ -32,8 +32,7 @@ public final class NoWeatherHack extends Hack
 	
 	public NoWeatherHack()
 	{
-		super("NoWeather", "Allows you to alter the client-side weather,\n"
-			+ "time and moon phase.");
+		super("变天", "允许您更改客户端的天气\n时间和月亮位置阶段");
 		setCategory(Category.RENDER);
 		
 		addSetting(disableRain);
