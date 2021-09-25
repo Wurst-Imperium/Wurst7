@@ -83,9 +83,7 @@ public final class NukerLegitHack extends Hack
 	
 	public NukerLegitHack()
 	{
-		super("NukerLegit",
-			"Slower Nuker that bypasses all AntiCheat plugins.\n"
-				+ "Not required on normal NoCheat+ servers!");
+		super("矿井-","更慢的Nuker\n可绕过NoCheat+插件");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
