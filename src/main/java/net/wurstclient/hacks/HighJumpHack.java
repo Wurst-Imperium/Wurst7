@@ -23,8 +23,7 @@ public final class HighJumpHack extends Hack
 	
 	public HighJumpHack()
 	{
-		super("HighJump", "Allows you to jump higher.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("跳高", "让你跳得更高");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(height);
