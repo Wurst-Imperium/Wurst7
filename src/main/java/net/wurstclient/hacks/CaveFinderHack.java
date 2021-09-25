@@ -106,8 +106,7 @@ public final class CaveFinderHack extends Hack
 	
 	public CaveFinderHack()
 	{
-		super("CaveFinder", "Helps you to find caves by\n"
-			+ "highlighting them in the\n" + "selected color.");
+		super("高亮矿洞", "帮助你找到洞穴以\n选定的颜色突出显示它们");
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);
