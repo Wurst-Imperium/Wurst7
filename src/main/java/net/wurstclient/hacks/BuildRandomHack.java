@@ -63,7 +63,7 @@ public final class BuildRandomHack extends Hack
 	
 	public BuildRandomHack()
 	{
-		super("BuildRandom", "Randomly places blocks around you.");
+		super("随机放方块", "在你周围随机放置方块");
 		setCategory(Category.BLOCKS);
 		addSetting(mode);
 		addSetting(checkItem);
