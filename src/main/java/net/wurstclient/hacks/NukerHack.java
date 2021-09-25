@@ -90,7 +90,7 @@ public final class NukerHack extends Hack
 	
 	public NukerHack()
 	{
-		super("Nuker", "Automatically breaks blocks around you.");
+		super("矿井", "自动破坏你周围的方块");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
