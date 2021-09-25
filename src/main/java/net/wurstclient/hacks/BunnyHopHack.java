@@ -24,7 +24,7 @@ public final class BunnyHopHack extends Hack implements UpdateListener
 	
 	public BunnyHopHack()
 	{
-		super("BunnyHop", "Makes you jump automatically.");
+		super("一直乱跳", "像兔子一样一直跳.");
 		setCategory(Category.MOVEMENT);
 		addSetting(jumpIf);
 	}
