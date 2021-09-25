@@ -74,8 +74,7 @@ public final class SpeedNukerHack extends Hack
 	
 	public SpeedNukerHack()
 	{
-		super("SpeedNuker",
-			"Faster version of Nuker that cannot bypass NoCheat+.");
+		super("矿井+", "更快的的Nuker,无法绕过NoCheat+.");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
