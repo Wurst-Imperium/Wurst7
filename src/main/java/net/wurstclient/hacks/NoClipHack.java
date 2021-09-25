@@ -23,9 +23,7 @@ public final class NoClipHack extends Hack implements UpdateListener,
 {
 	public NoClipHack()
 	{
-		super("NoClip", "Allows you to freely move through blocks.\n"
-			+ "A block (e.g. sand) must fall on your head to activate it.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take damage while moving through blocks!");
+		super("穿墙", "允许你穿过方块\n当你被沙子埋住时使用");
 		setCategory(Category.MOVEMENT);
 	}
 	
