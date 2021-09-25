@@ -30,7 +30,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	
 	public CriticalsHack()
 	{
-		super("Criticals", "Changes all your hits to critical hits.");
+		super("暴击", "刀刀暴击");
 		setCategory(Category.COMBAT);
 		addSetting(mode);
 	}
