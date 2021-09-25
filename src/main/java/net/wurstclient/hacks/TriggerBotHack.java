@@ -92,8 +92,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	public TriggerBotHack()
 	{
-		super("TriggerBot",
-			"Automatically attacks the entity you're looking at.");
+		super("触发机器人","自动攻击您正在查看的实体");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(filterPlayers);
