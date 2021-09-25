@@ -117,8 +117,7 @@ public final class KillauraLegitHack extends Hack
 	
 	public KillauraLegitHack()
 	{
-		super("KillauraLegit", "Slower Killaura that is harder to detect.\n"
-			+ "Not required on normal NoCheat+ servers!");
+		super("杀戮光环-", "比Killaura更慢,\r\n因此更难被NoCheat+插件发现");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);
