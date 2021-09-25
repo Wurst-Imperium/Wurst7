@@ -30,11 +30,7 @@ public final class KillPotionHack extends Hack
 	
 	public KillPotionHack()
 	{
-		super("KillPotion",
-			"Generates a potion that can kill almost anything,\n"
-				+ "including players in Creative mode. Does not\n"
-				+ "work on undead mobs, since they are\n" + "already dead.\n\n"
-				+ "Requires Creative mode.");
+		super("杀戮药水","生成一种几乎可以杀死任何东西的药水,包括创造模式下的玩家.对不死生物无效,因为它们已经死了\n需要创造模式");
 		
 		setCategory(Category.ITEMS);
 		addSetting(potionType);
