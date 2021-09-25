@@ -39,8 +39,7 @@ public final class GlideHack extends Hack implements UpdateListener
 	
 	public GlideHack()
 	{
-		super("Glide", "Makes you glide down slowly when falling.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("缓降", "使你掉落得更慢");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(fallSpeed);
