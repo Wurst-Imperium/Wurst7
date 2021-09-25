@@ -56,8 +56,7 @@ public final class InstantBunkerHack extends Hack
 	
 	public InstantBunkerHack()
 	{
-		super("InstantBunker",
-			"Builds a small bunker around you. Needs 57 blocks.");
+		super("自动\"城堡\"","在你周围构建一个小型\"城堡\",\n需要57个方块\n(其实就是在你周围构建一个类似城堡的建筑,\n把你围起来)");
 		setCategory(Category.BLOCKS);
 	}
 	
