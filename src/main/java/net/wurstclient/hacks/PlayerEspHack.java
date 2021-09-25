@@ -41,7 +41,7 @@ import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"player esp", "PlayerTracers", "player tracers"})
+@SearchTags({"player esp", "PlayerTracers", "player tracers","PlayerESP"})
 public final class PlayerEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
@@ -65,8 +65,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	
 	public PlayerEspHack()
 	{
-		super("PlayerESP", "Highlights nearby players.\n"
-			+ "ESP boxes of friends will appear in blue.");
+		super("高亮玩家","高亮显示附近的玩家.\n白名单内的玩家将以蓝色显示");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);
