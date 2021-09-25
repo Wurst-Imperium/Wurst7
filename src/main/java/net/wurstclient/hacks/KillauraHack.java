@@ -58,33 +58,29 @@ import net.wurstclient.util.RotationUtils;
 public final class KillauraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
+	private final SliderSetting range = new SliderSetting("范围",
 		"Determines how far Killaura will reach\n" + "to attack entities.\n"
 			+ "Anything that is further away than the\n"
 			+ "specified value will not be attacked.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
-			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
+	private final EnumSetting<Priority> priority = new EnumSetting<>("优先级",
+		"§l[距离]§r:距离最近的实体\n§l[角度]§r:§b[A]§r值最小的实体\n注:此处译者为方便解释而设了一个变量\n§b[A]§r值:你的头部转动到面向某实体所需的旋转角度\n§l[生命值]§r生命值最低的实体",
 		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
+		"排除玩家", "", true);
 	
 	private final CheckboxSetting filterSleeping =
-		new CheckboxSetting("Filter sleeping",
+		new CheckboxSetting("排除睡觉",
 			"Won't attack sleeping players.\n\n"
 				+ "Useful for servers like Mineplex that place\n"
 				+ "sleeping players on the ground to make them\n"
 				+ "look like corpses.",
-			false);
+			true);
 	
 	private final SliderSetting filterFlying = new SliderSetting(
-		"Filter flying",
+		"排除飞行",
 		"Won't attack players that are at least\n"
 			+ "the given distance above ground.\n\n"
 			+ "Useful for servers that place a flying\n"
@@ -93,49 +89,49 @@ public final class KillauraHack extends Hack
 		v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
+		"排除怪物", "", false);
 	
 	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
+		"排除猪人", "", true);
 	
 	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
+		new CheckboxSetting("排除末影人", "", true);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
+		"排除动物", "", true);
 	
 	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
+		new CheckboxSetting("排除幼年",
+			"", true);
 	
 	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
+		new CheckboxSetting("排除宠物",
+			"", true);
 	
 	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
+		new CheckboxSetting("排除商人",
+			"", true);
 	
 	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
+		new CheckboxSetting("排除魔物",
+			"不攻击铁傀儡,雪傀儡和潜影贝", true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
+		"排除隐形", "", true);
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
+		"排除命名", "", true);
 	
 	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
+		"排除盔甲架", "", true);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", false);
+		"排除末影水晶", "", true);
 	
 	private Entity target;
 	private Entity renderTarget;
 	
 	public KillauraHack()
 	{
-		super("Killaura", "Automatically attacks entities around you.");
+		super("杀戮光环", "自动攻击你周围的实体");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);
