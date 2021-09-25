@@ -30,12 +30,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	
 	public KaboomHack()
 	{
-		super("Kaboom",
-			"Breaks blocks around you like an explosion.\n"
-				+ "This can be a lot faster than Nuker if the server doesn't\n"
-				+ "have NoCheat+.\n"
-				+ "It works best with fast tools and weak blocks.\n"
-				+ "Note: This is not an actual explosion.");
+		super("爆炸", "像爆炸一样破坏你周围的方块");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(power);
