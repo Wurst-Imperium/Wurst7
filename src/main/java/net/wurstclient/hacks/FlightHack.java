@@ -26,9 +26,7 @@ public final class FlightHack extends Hack
 	
 	public FlightHack()
 	{
-		super("Flight",
-			"Allows you to you fly.\n\n" + "\u00a7c\u00a7lWARNING:\u00a7r"
-				+ " You will take fall damage if you don't use NoFall.");
+		super("飞行", "使你保持飞行");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
 	}
