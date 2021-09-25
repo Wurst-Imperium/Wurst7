@@ -39,34 +39,32 @@ import net.wurstclient.settings.EnumSetting;
 public final class AutoEatHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
-		"Eat while walking", "Slows you down, not recommended.", false);
+		"行走时", "会让你速度变慢", false);
 	
 	private final EnumSetting<FoodPriority> foodPriority =
-		new EnumSetting<>("Prefer food with", FoodPriority.values(),
+		new EnumSetting<>("优先级", FoodPriority.values(),
 			FoodPriority.HIGH_SATURATION);
 	
 	private final CheckboxSetting allowHunger =
-		new CheckboxSetting("Allow hunger effect",
-			"Rotten flesh applies a harmless 'hunger' effect.\n"
-				+ "It is safe to eat and useful as emergency food.",
+		new CheckboxSetting("允许饥饿效果",
+			"",
 			true);
 	
 	private final CheckboxSetting allowPoison =
-		new CheckboxSetting("Allow poison effect",
+		new CheckboxSetting("允许中毒效果",
 			"Poisoned food applies damage over time.\n" + "Not recommended.",
 			false);
 	
 	private final CheckboxSetting allowChorus =
-		new CheckboxSetting("Allow chorus fruit",
-			"Eating chorus fruit teleports you to a random location.\n"
-				+ "Not recommended.",
+		new CheckboxSetting("允许紫颂果",
+			"",
 			false);
 	
 	private int oldSlot = -1;
 	
 	public AutoEatHack()
 	{
-		super("AutoEat", "Automatically eats food when necessary.");
+		super("自动进食", "必要时自动进食");
 		setCategory(Category.ITEMS);
 		addSetting(eatWhileWalking);
 		addSetting(foodPriority);
