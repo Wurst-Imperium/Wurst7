@@ -104,10 +104,7 @@ public final class BaseFinderHack extends Hack
 	
 	public BaseFinderHack()
 	{
-		super("BaseFinder",
-			"Finds player bases by searching for man-made blocks.\n"
-				+ "The blocks that it finds will be highlighted in the\n"
-				+ "selected color.\n" + "Good for finding faction bases.");
+		super("高亮基地","通过搜索人造方块寻找玩家基地,\n并用红色高亮显示\n§l很适合寻找玩家基地");
 		
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
