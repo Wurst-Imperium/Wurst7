@@ -57,12 +57,12 @@ public final class RadarHack extends Hack implements UpdateListener
 	
 	public RadarHack()
 	{
-		super("Radar",
-			"Shows the location of nearby entities.\n"
-				+ "\u00a7cred\u00a7r - players\n"
-				+ "\u00a76orange\u00a7r - monsters\n"
-				+ "\u00a7agreen\u00a7r - animals\n"
-				+ "\u00a77gray\u00a7r - others\n");
+		super("雷达",
+			"在一个小地图中显示附近实体的位\n"
+				+ "\u00a7c红色\u00a7r - 玩家\n"
+				+ "\u00a76橙色\u00a7r - 怪物\n"
+				+ "\u00a7a绿色\u00a7r - 动物\n"
+				+ "\u00a77灰色\u00a7r - 其他\n");
 		
 		setCategory(Category.RENDER);
 		addSetting(radius);
@@ -73,7 +73,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		addSetting(filterAnimals);
 		addSetting(filterInvisible);
 		
-		window = new Window("Radar");
+		window = new Window("雷达");
 		window.setPinned(true);
 		window.setInvisible(true);
 		window.add(new RadarComponent(this));
