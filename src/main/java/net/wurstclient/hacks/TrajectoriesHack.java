@@ -44,8 +44,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	
 	public TrajectoriesHack()
 	{
-		super("Trajectories",
-			"Predicts the flight path of arrows and throwable items.");
+		super("抛物线","预测投掷物品的抛物线");
 		setCategory(Category.RENDER);
 		addSetting(color);
 	}
