@@ -99,8 +99,7 @@ public final class RemoteViewHack extends Hack
 	
 	public RemoteViewHack()
 	{
-		super("RemoteView", "Allows you to see the world as someone else.\n"
-			+ "Use the .rv command to make it target a specific entity.");
+		super("换视","让你进入其他实体的视角\n使用[.rv + 实体名]定义目标实体");
 		setCategory(Category.RENDER);
 		
 		addSetting(filterPlayers);
