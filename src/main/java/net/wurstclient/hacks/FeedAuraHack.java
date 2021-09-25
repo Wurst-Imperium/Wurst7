@@ -71,7 +71,7 @@ public final class FeedAuraHack extends Hack
 	
 	public FeedAuraHack()
 	{
-		super("FeedAura", "Automatically feeds animals around you.");
+		super("喂食光环", "自动喂食周围的动物.");
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
