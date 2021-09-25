@@ -43,7 +43,7 @@ public final class PlayerFinderHack extends Hack
 	
 	public PlayerFinderHack()
 	{
-		super("PlayerFinder", "Finds far away players during thunderstorms.");
+		super("雷声漏洞","通过雷声漏洞,\n在雷雨天气中找到远处的玩家");
 		setCategory(Category.RENDER);
 	}
 	
