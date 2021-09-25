@@ -20,13 +20,12 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	VelocityFromFluidListener, IsPlayerInWaterListener
 {
 	private final CheckboxSetting preventSlowdown = new CheckboxSetting(
-		"Prevent slowdown", "Allows you to walk underwater at full speed.\n"
-			+ "Some servers consider this a speedhack.",
+		"反减速", "允许你以全速在水下行走有些服务器认为这是一个加速器.",
 		false);
 	
 	public AntiWaterPushHack()
 	{
-		super("AntiWaterPush", "Prevents you from getting pushed by water.");
+		super("反水流", "防止你被水推");
 		setCategory(Category.MOVEMENT);
 		addSetting(preventSlowdown);
 	}
