@@ -25,8 +25,7 @@ public final class OverlayHack extends Hack implements RenderListener
 {
 	public OverlayHack()
 	{
-		super("Overlay",
-			"Renders the Nuker animation whenever you mine a block.");
+		super("挖堀进度","渲染挖掘动画(显示挖掘进度)");
 		setCategory(Category.RENDER);
 	}
 	
