@@ -34,7 +34,7 @@ import net.wurstclient.settings.CheckboxSetting;
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
+	private final CheckboxSetting useAi = new CheckboxSetting("使用AI", true);
 	
 	private int timer;
 	private Random random = new Random();
@@ -47,9 +47,7 @@ public final class AntiAfkHack extends Hack
 	
 	public AntiAfkHack()
 	{
-		super("AntiAFK",
-			"Walks around randomly to hide you from AFK detectors.\n"
-				+ "Needs at least 3x3 blocks of free space.");
+		super("反AFK","随机走动,以隐藏你的AFK检测器需要至少3x3块的自由空间.");
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
