@@ -46,9 +46,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	public AutoSwordHack()
 	{
-		super("AutoSword",
-			"Automatically uses the best weapon in your hotbar to attack entities.\n"
-				+ "Tip: This works with Killaura.");
+		super("自动剑", "自动使用你快捷栏中最好的剑攻击实体");
 		
 		setCategory(Category.COMBAT);
 		
