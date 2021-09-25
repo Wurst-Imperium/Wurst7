@@ -19,7 +19,7 @@ public final class TimerHack extends Hack
 	
 	public TimerHack()
 	{
-		super("Timer", "Changes the speed of almost everything.");
+		super("变速", "§3改变§5几乎一切§3的速度.");
 		setCategory(Category.OTHER);
 		addSetting(speed);
 	}
