@@ -1,5 +1,5 @@
 # Wurst Client v7
-
+⚡ 汉化不易, 欢迎支持[微信/qq](https://docs.qq.com/doc/DYWJKZ2ZtdmVPZmVY?groupUin=T5BcGlDMhmyDFAE2uMfQvQ%253D%253D&ADUIN=750215287&ADSESSION=1632535109&ADTAG=CLIENT.QQ.5827_.0&ADPUBNO=27151&jumpuin=750215287)
 ## Downloads (for users)
 
 https://www.wurstclient.net/download/
