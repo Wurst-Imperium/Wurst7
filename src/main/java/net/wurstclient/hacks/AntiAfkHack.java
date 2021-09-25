@@ -47,7 +47,7 @@ public final class AntiAfkHack extends Hack
 	
 	public AntiAfkHack()
 	{
-		super("反AFK","随机走动,以隐藏你的AFK检测器需要至少3x3块的自由空间.");
+		super("反挂机","随机走动以将您从AFK检测器中隐藏起来需要至少3x3块的可用空间");
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
