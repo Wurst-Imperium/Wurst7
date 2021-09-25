@@ -60,9 +60,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 	
 	public TillauraHack()
 	{
-		super("Tillaura",
-			"Automatically turns dirt, grass, etc. into farmland.\n"
-				+ "Not to be confused with Killaura.");
+		super("种地光环", "自动将泥土/草等变成农田.不要与Killaura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
