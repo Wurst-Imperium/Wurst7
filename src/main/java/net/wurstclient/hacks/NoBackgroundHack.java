@@ -17,8 +17,7 @@ public final class NoBackgroundHack extends Hack
 {
 	public NoBackgroundHack()
 	{
-		super("NoBackground",
-			"Removes the dark background\n" + "behind inventories.");
+		super("无黑背景","去除背包等界面背后的黑暗背景");
 		setCategory(Category.RENDER);
 	}
 }
