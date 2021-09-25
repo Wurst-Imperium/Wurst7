@@ -21,8 +21,7 @@ public final class NavigatorHack extends Hack
 {
 	public NavigatorHack()
 	{
-		super("Navigator",
-			"A searchable GUI that learns your preferences over time.");
+		super("Navigator","搜索面板(触控面板),用于搜索Wurst的功能");
 	}
 	
 	@Override
