@@ -34,7 +34,7 @@ public final class BlinkHack extends Hack
 	
 	public BlinkHack()
 	{
-		super("Blink", "Suspends all motion updates while enabled.");
+		super("闪烁", "在启用时挂起所有动作更新\n(意思是移动时只移动视角,不移动玩家)\n视角移动后关闭次功能可将你的身体移动至视角位置");
 		setCategory(Category.MOVEMENT);
 		addSetting(limit);
 	}
