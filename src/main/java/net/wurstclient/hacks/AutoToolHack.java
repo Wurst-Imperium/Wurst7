@@ -48,8 +48,7 @@ public final class AutoToolHack extends Hack
 	
 	public AutoToolHack()
 	{
-		super("AutoTool", "Automatically equips the fastest applicable tool\n"
-			+ "in your hotbar when you try to break a block.");
+		super("自动换工具", "当您破坏一个方块时,\n自动从物品栏中选择最快且最适用工具");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(useSwords);
