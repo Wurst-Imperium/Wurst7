@@ -95,8 +95,7 @@ public final class SearchHack extends Hack
 	
 	public SearchHack()
 	{
-		super("Search", "Helps you to find specific blocks by\n"
-			+ "highlighting them in rainbow color.");
+		super("搜索","通过以彩虹色突出显示它们来帮助您找到特定的块");
 		setCategory(Category.RENDER);
 		addSetting(block);
 		addSetting(area);
