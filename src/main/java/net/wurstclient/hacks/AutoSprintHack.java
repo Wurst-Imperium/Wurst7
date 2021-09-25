@@ -18,7 +18,7 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 {
 	public AutoSprintHack()
 	{
-		super("AutoSprint", "Makes you sprint automatically.");
+		super("自动疾跑", "行走时自动疾跑");
 		setCategory(Category.MOVEMENT);
 	}
 	
