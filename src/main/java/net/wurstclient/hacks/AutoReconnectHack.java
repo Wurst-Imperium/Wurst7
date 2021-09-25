@@ -18,8 +18,7 @@ public final class AutoReconnectHack extends Hack
 {
 	public AutoReconnectHack()
 	{
-		super("AutoReconnect", "Automatically reconnects when you get\n"
-			+ "kicked from the server.");
+		super("自动重连", "当您被踢出服务器时自动重新连接");
 		setCategory(Category.OTHER);
 	}
 }
