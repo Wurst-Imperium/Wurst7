@@ -18,11 +18,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 {
 	public SpeedHackHack()
 	{
-		super("SpeedHack",
-			"Allows you to run ~2.5x faster than you would by sprinting and jumping.\n\n"
-				+ "\u00a76\u00a7lWARNING:\u00a7r Patched in NoCheat+ version 3.13.2.\n"
-				+ "Will only bypass older versions of NoCheat+.\n"
-				+ "Type \u00a7l/ncp version\u00a7r to check a server's NoCheat+ version.");
+		super("加速","使您的跑步速度比短跑和跳跃快约2.5倍");
 		setCategory(Category.MOVEMENT);
 	}
 	
