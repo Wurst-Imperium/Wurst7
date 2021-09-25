@@ -117,9 +117,7 @@ public final class ProtectHack extends Hack
 	
 	public ProtectHack()
 	{
-		super("Protect",
-			"A bot that follows the closest entity and protects it from other entities.\n"
-				+ "Use .protect to protect a specific entity instead of the closest one.");
+		super("保护","跟踪最接近的实体并保护它,\n使其不受其他实体的伤害\n使用[.protect + 实体名]来保护一个特定的实体");
 		
 		setCategory(Category.COMBAT);
 		addSetting(useAi);
