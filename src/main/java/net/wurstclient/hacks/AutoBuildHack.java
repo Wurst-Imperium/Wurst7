@@ -49,7 +49,7 @@ import net.wurstclient.util.json.JsonException;
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener, RenderListener
 {
-	private final FileSetting templateSetting = new FileSetting("Template",
+	private final FileSetting templateSetting = new FileSetting("模板",
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to\n"
 			+ "add your own or to edit / delete the\n"
@@ -57,26 +57,23 @@ public final class AutoBuildHack extends Hack
 			+ "'Reset to Defaults' button or\n" + "delete the folder.",
 		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
-	private final SliderSetting range = new SliderSetting("Range",
+	private final SliderSetting range = new SliderSetting("范围",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting checkLOS =
-		new CheckboxSetting("Check line of sight",
-			"Makes sure that you don't reach through walls\n"
-				+ "when placing blocks. Can help with AntiCheat\n"
-				+ "plugins but slows down building.",
+		new CheckboxSetting("检查视线",
+			"确保您在放置方块时不会穿过墙壁/和可以帮助反作弊\n插件但会减慢构建速度.",
 			false);
 	
-	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
-		"Builds small templates (<= 64 blocks) instantly.\n"
-			+ "For best results, stand close to the block you're placing.",
+	private final CheckboxSetting instaBuild = new CheckboxSetting("瞬间构建",
+		"瞬间构建小型模板(≤64个方块)\n部分模板使用时会有残缺\n为了达到最好的效果\n请站在你放置的障碍物附近",
 		true);
 	
 	private final CheckboxSetting fastPlace = new CheckboxSetting(
-		"Always FastPlace",
-		"Builds as if FastPlace was enabled,\n" + "even if it's not.", true);
+		"总是FastPlace",
+		"构建时带有FastPlace的效果,\n但不会启用FastPlace", true);
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
@@ -84,8 +81,7 @@ public final class AutoBuildHack extends Hack
 	
 	public AutoBuildHack()
 	{
-		super("AutoBuild", "Builds things automatically.\n"
-			+ "Place a single block to start building.");
+		super("自动构建", "自动构建东西.放置一个块开始构建");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
