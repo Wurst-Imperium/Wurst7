@@ -29,8 +29,7 @@ public final class TrollPotionHack extends Hack
 	
 	public TrollPotionHack()
 	{
-		super("TrollPotion",
-			"Generates a potion with many annoying effects on it.");
+		super("巨魔药水","生成具有许多恼人效果的药水");
 		
 		setCategory(Category.ITEMS);
 		addSetting(potionType);
