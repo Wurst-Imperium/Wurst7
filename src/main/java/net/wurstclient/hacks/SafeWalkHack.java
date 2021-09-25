@@ -26,7 +26,7 @@ public final class SafeWalkHack extends Hack
 	
 	public SafeWalkHack()
 	{
-		super("SafeWalk", "Prevents you from falling off edges.");
+		super("安全走路","防止你从方块边缘掉下来");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
 	}
