@@ -62,8 +62,7 @@ public final class FreecamHack extends Hack
 	
 	public FreecamHack()
 	{
-		super("Freecam",
-			"Allows you to move the camera without moving your character.");
+		super("灵魂出窍","允许您在不移动角色的情况下移动相机");
 		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
