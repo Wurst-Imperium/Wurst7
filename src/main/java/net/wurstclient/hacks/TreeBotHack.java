@@ -55,8 +55,8 @@ import net.wurstclient.util.RotationUtils;
 public final class TreeBotHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
-		"How far TreeBot will reach to break blocks.", 4.5, 1, 6, 0.05,
+	private final SliderSetting range = new SliderSetting("范围",
+		"TreeBot 可以达到多远来打破块", 4.5, 1, 6, 0.05,
 		ValueDisplay.DECIMAL);
 	
 	private TreeFinder treeFinder;
@@ -70,10 +70,7 @@ public final class TreeBotHack extends Hack
 	
 	public TreeBotHack()
 	{
-		super("TreeBot",
-			"An experimental bot that automatically\n"
-				+ "walks around and chops down trees.\n"
-				+ "Limited to small trees for now.");
+		super("树木机器人","一个可以自动四处走动并砍伐树木的实验机器人.\n目前仅限于小树");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 	}
@@ -82,13 +79,13 @@ public final class TreeBotHack extends Hack
 	public String getRenderName()
 	{
 		if(treeFinder != null && !treeFinder.isDone() && !treeFinder.isFailed())
-			return getName() + " [Searching]";
+			return getName() + " [搜索]";
 		
 		if(processor != null && !processor.isDone())
-			return getName() + " [Going]";
+			return getName() + " [正在去]";
 		
 		if(tree != null && !tree.getLogs().isEmpty())
-			return getName() + " [Chopping]";
+			return getName() + " [砍木头中]";
 		
 		return getName();
 	}
