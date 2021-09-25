@@ -160,7 +160,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	public AnchorAuraHack()
 	{
-		super("锚定光环","自动放置(可选)充电和引爆重生锚以杀死您周围的实体.");
+		super("重生锚光环","自动放置(可选)充电和引爆重生锚以杀死您周围的实体.");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
