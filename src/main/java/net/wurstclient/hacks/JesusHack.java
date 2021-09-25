@@ -39,8 +39,7 @@ public final class JesusHack extends Hack
 	
 	public JesusHack()
 	{
-		super("Jesus", "Allows you to walk on water.\n"
-			+ "Jesus used this hack ~2000 years ago.");
+		super("水上漂", "在水面走");
 		setCategory(Category.MOVEMENT);
 		addSetting(bypass);
 	}
