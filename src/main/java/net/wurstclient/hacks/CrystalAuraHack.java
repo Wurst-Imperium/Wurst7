@@ -160,8 +160,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	
 	public CrystalAuraHack()
 	{
-		super("CrystalAura", "Automatically places (optional) and\n"
-			+ "detonates end crystals to kill\n" + "entities around you.");
+		super("水晶光环", "自动放置（可选）并引爆末影水晶以杀死您周围的实体");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
