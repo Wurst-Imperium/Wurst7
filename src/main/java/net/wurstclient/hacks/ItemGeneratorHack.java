@@ -38,9 +38,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	
 	public ItemGeneratorHack()
 	{
-		super("ItemGenerator",
-			"Generates random items and drops them on the ground.\n"
-				+ "\u00a7oCreative mode only.\u00a7r");
+		super("造垃圾","快速生成若干个随机的物品并扔出.\n§o仅创造模式§r");
 		
 		setCategory(Category.ITEMS);
 		addSetting(speed);
