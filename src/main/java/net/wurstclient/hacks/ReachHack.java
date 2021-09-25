@@ -21,7 +21,7 @@ public final class ReachHack extends Hack
 	
 	public ReachHack()
 	{
-		super("Reach", "Allows you to reach further.");
+		super("远触","允许你触发更远的东西");
 		setCategory(Category.OTHER);
 		addSetting(range);
 	}
