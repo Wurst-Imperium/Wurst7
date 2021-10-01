@@ -207,10 +207,8 @@ public final class MobSpawnEspHack extends Hack
 			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-		{
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-			
-		}else
+		else
 			return;
 		
 		ArrayList<Chunk> chunks = new ArrayList<>();
@@ -322,7 +320,7 @@ public final class MobSpawnEspHack extends Hack
 				return;
 			
 			red.addAll(blocks.stream()
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
 				.filter(pos -> world.getLightLevel(LightType.SKY, pos) < 8)
 				.collect(Collectors.toList()));
 			
@@ -330,7 +328,7 @@ public final class MobSpawnEspHack extends Hack
 				return;
 			
 			yellow.addAll(blocks.stream().filter(pos -> !red.contains(pos))
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
 				.collect(Collectors.toList()));
 			doneScanning = true;
 		}
