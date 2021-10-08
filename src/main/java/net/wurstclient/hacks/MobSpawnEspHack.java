@@ -7,17 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.Objects;
 
 import org.lwjgl.opengl.GL11;
 
@@ -208,10 +201,8 @@ public final class MobSpawnEspHack extends Hack
 			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-		{
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-			
-		}else
+		else
 			return;
 		
 		ArrayList<Chunk> chunks = new ArrayList<>();
@@ -350,8 +341,7 @@ public final class MobSpawnEspHack extends Hack
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION_COLOR);
 			
-			new ArrayList<>(red).stream()
-				.filter(Objects::nonNull)
+			new ArrayList<>(red).stream().filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {
@@ -368,8 +358,7 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 0, 0, 0.5F).next();
 				});
 			
-			new ArrayList<>(yellow).stream()
-				.filter(Objects::nonNull)
+			new ArrayList<>(yellow).stream().filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 					pos.getZ() - regionZ))
 				.forEach(pos -> {
