@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
+import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.hacks.NavigatorHack;
 import net.wurstclient.hacks.TooManyHaxHack;
 
@@ -76,7 +77,7 @@ public abstract class Hack extends Feature
 		
 		this.enabled = enabled;
 		
-		if(!(this instanceof NavigatorHack))
+		if(!(this instanceof NavigatorHack || this instanceof ClickGuiHack))
 			WURST.getHud().getHackList().updateState(this);
 		
 		if(enabled)

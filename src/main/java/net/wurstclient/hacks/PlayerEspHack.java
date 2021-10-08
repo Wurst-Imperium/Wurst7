@@ -27,6 +27,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -189,35 +190,51 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, double partialTicks,
 		int regionX, int regionZ)
 	{
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+			VertexFormats.POSITION_COLOR);
+		
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		
 		for(PlayerEntity e : players)
 		{
+			Vec3d interpolationOffset = new Vec3d(e.getX(), e.getY(), e.getZ())
+				.subtract(e.prevX, e.prevY, e.prevZ).multiply(1 - partialTicks);
+			
 			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
-					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks));
+				.subtract(interpolationOffset).subtract(regionX, 0, regionZ);
+			
+			float r, g, b;
 			
 			if(WURST.getFriends().contains(e.getEntityName()))
-				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
-			else
+			{
+				r = 0;
+				g = 0;
+				b = 1;
+				
+			}else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
-				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+				r = MathHelper.clamp(2 - f, 0, 1);
+				g = MathHelper.clamp(f, 0, 1);
+				b = 0;
 			}
 			
-			bufferBuilder.vertex(matrix, (float)start.x - regionX,
-				(float)start.y, (float)start.z - regionZ).next();
-			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
-				(float)end.z - regionZ).next();
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.color(r, g, b, 0.5F).next();
+			
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.color(r, g, b, 0.5F).next();
 		}
+		
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
