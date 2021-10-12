@@ -44,8 +44,7 @@ public final class FastBreakHack extends Hack
 	{
 		if(legitMode.isChecked())
 			return getName() + "Legit";
-		else
-			return getName();
+		return getName();
 	}
 	
 	@Override

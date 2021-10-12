@@ -56,7 +56,7 @@ public final class BlockComponent extends Component
 			Screen currentScreen = WurstClient.MC.currentScreen;
 			EditBlockScreen editScreen =
 				new EditBlockScreen(currentScreen, setting);
-			WurstClient.MC.openScreen(editScreen);
+			WurstClient.MC.setScreen(editScreen);
 			
 		}else if(mouseButton == 1)
 			setting.resetToDefault();
@@ -190,7 +190,6 @@ public final class BlockComponent extends Component
 	{
 		if(stack.isEmpty())
 			return "\u00a7ounknown block\u00a7r";
-		else
-			return stack.getName().getString();
+		return stack.getName().getString();
 	}
 }

@@ -153,17 +153,13 @@ public final class SearchHack extends Hack
 		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
-		if(packet instanceof BlockUpdateS2CPacket)
+		if(packet instanceof BlockUpdateS2CPacket change)
 		{
-			BlockUpdateS2CPacket change = (BlockUpdateS2CPacket)packet;
 			BlockPos pos = change.getPos();
 			chunk = world.getChunk(pos);
 			
-		}else if(packet instanceof ChunkDeltaUpdateS2CPacket)
+		}else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
 		{
-			ChunkDeltaUpdateS2CPacket change =
-				(ChunkDeltaUpdateS2CPacket)packet;
-			
 			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
 			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
 			if(changedBlocks.isEmpty())
@@ -171,9 +167,8 @@ public final class SearchHack extends Hack
 			
 			chunk = world.getChunk(changedBlocks.get(0));
 			
-		}else if(packet instanceof ChunkDataS2CPacket)
+		}else if(packet instanceof ChunkDataS2CPacket chunkData)
 		{
-			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
 			
 		}else
@@ -405,13 +400,12 @@ public final class SearchHack extends Hack
 	{
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		Callable<HashSet<BlockPos>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator
-					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-				.limit(maxBlocks)
-				.collect(Collectors.toCollection(() -> new HashSet<>()));
+		Callable<HashSet<BlockPos>> task = () -> searchers.values()
+			.parallelStream()
+			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+			.sorted(Comparator
+				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}

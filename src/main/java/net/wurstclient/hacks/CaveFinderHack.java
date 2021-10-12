@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,8 +54,10 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
@@ -77,6 +80,15 @@ public final class CaveFinderHack extends Hack
 			+ "Higher values require a faster computer.",
 		5, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	
+	private final ColorSetting color = new ColorSetting("Color",
+		"Caves will be highlighted\n" + "in this color.", Color.RED);
+	
+	private final SliderSetting opacity = new SliderSetting("Opacity",
+		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
+		0, 1, 0.01,
+		v -> v == 0 ? "Breathing" : ValueDisplay.PERCENTAGE.getValueString(v));
+	
 	private int prevLimit;
 	private boolean notify;
 	
@@ -98,6 +110,8 @@ public final class CaveFinderHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(color);
+		addSetting(opacity);
 	}
 	
 	@Override
@@ -144,17 +158,13 @@ public final class CaveFinderHack extends Hack
 		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
-		if(packet instanceof BlockUpdateS2CPacket)
+		if(packet instanceof BlockUpdateS2CPacket change)
 		{
-			BlockUpdateS2CPacket change = (BlockUpdateS2CPacket)packet;
 			BlockPos pos = change.getPos();
 			chunk = world.getChunk(pos);
 			
-		}else if(packet instanceof ChunkDeltaUpdateS2CPacket)
+		}else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
 		{
-			ChunkDeltaUpdateS2CPacket change =
-				(ChunkDeltaUpdateS2CPacket)packet;
-			
 			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
 			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
 			if(changedBlocks.isEmpty())
@@ -162,12 +172,9 @@ public final class CaveFinderHack extends Hack
 			
 			chunk = world.getChunk(changedBlocks.get(0));
 			
-		}else if(packet instanceof ChunkDataS2CPacket)
-		{
-			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
+		}else if(packet instanceof ChunkDataS2CPacket chunkData)
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-			
-		}else
+		else
 			return;
 		
 		chunksToUpdate.add(chunk);
@@ -226,7 +233,11 @@ public final class CaveFinderHack extends Hack
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
 		
-		RenderSystem.setShaderColor(1, 0, 0, alpha);
+		if(opacity.getValue() > 0)
+			alpha = opacity.getValueF();
+		
+		float[] colorF = color.getColorF();
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(vertexBuffer != null)
@@ -392,13 +403,12 @@ public final class CaveFinderHack extends Hack
 	{
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		Callable<HashSet<BlockPos>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator
-					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-				.limit(maxBlocks)
-				.collect(Collectors.toCollection(() -> new HashSet<>()));
+		Callable<HashSet<BlockPos>> task = () -> searchers.values()
+			.parallelStream()
+			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+			.sorted(Comparator
+				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}

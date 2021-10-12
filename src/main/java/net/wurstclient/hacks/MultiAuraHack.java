@@ -139,6 +139,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
@@ -245,7 +246,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
 		ArrayList<Entity> entities =
-			stream.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			stream.collect(Collectors.toCollection(ArrayList::new));
 		if(entities.isEmpty())
 			return;
 		

@@ -49,8 +49,7 @@ public final class LoginManager
 			if(e.getMessage().contains("Invalid username or password.")
 				|| e.getMessage().toLowerCase().contains("account migrated"))
 				return "\u00a74\u00a7lWrong password! (or shadowbanned)";
-			else
-				return "\u00a74\u00a7lCannot contact authentication server!";
+			return "\u00a74\u00a7lCannot contact authentication server!";
 			
 		}catch(NullPointerException e)
 		{

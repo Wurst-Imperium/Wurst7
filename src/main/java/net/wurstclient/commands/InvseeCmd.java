@@ -51,16 +51,15 @@ public final class InvseeCmd extends Command implements RenderListener
 		
 		for(Entity entity : MC.world.getEntities())
 		{
-			if(!(entity instanceof OtherClientPlayerEntity))
+			if(!(entity instanceof OtherClientPlayerEntity player))
 				continue;
 			
-			OtherClientPlayerEntity player = (OtherClientPlayerEntity)entity;
 			String otherPlayerName = player.getName().getString();
 			if(!otherPlayerName.equalsIgnoreCase(targetName))
 				continue;
 			
 			ChatUtils.message("Showing inventory of " + otherPlayerName + ".");
-			MC.openScreen(new InventoryScreen(player));
+			MC.setScreen(new InventoryScreen(player));
 			found = true;
 			break;
 		}

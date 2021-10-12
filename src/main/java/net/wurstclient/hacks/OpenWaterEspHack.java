@@ -42,8 +42,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		
 		if(isInOpenWater(bobber))
 			return getName() + " [open]";
-		else
-			return getName() + " [shallow]";
+		return getName() + " [shallow]";
 	}
 	
 	@Override
@@ -101,14 +100,13 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		if(isInOpenWater(bobber))
 		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(bb, matrixStack);
 			
 		}else
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			RenderUtils.drawCrossBox(bb, matrixStack);
-			RenderUtils.drawOutlinedBox(bb, matrixStack);
 		}
+		RenderUtils.drawOutlinedBox(bb, matrixStack);
 		
 		matrixStack.pop();
 	}

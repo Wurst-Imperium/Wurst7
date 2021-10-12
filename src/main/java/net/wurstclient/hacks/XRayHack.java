@@ -168,7 +168,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
-		MC.openScreen(new EditBlockListScreen(prevScreen, ores));
+		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
 	private boolean isVisible(Block block)

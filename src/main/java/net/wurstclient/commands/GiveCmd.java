@@ -63,7 +63,7 @@ public final class GiveCmd extends Command
 			if(!MathUtils.isInteger(args[1]))
 				throw new CmdSyntaxError("Not a number: " + args[1]);
 			
-			amount = Integer.valueOf(args[1]);
+			amount = Integer.parseInt(args[1]);
 			
 			if(amount < 1)
 				throw new CmdError("Amount cannot be less than 1.");
@@ -83,7 +83,7 @@ public final class GiveCmd extends Command
 			try
 			{
 				NbtCompound tag = StringNbtReader.parse(nbt);
-				stack.setTag(tag);
+				stack.setNbt(tag);
 				
 			}catch(CommandSyntaxException e)
 			{
@@ -92,10 +92,9 @@ public final class GiveCmd extends Command
 			}
 		
 		// give item
-		if(placeStackInHotbar(stack))
-			ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
-		else
+		if(!placeStackInHotbar(stack))
 			throw new CmdError("Please clear a slot in your hotbar.");
+		ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
 	}
 	
 	private Item getItem(String id) throws CmdSyntaxError

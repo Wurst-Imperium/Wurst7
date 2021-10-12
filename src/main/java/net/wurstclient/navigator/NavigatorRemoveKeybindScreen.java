@@ -54,7 +54,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> client.openScreen(parent)));
+			new LiteralText("Cancel"), b -> client.setScreen(parent)));
 	}
 	
 	private void remove()
@@ -87,14 +87,14 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		WurstClient.INSTANCE.getNavigator()
 			.addPreference(parent.getFeature().getName());
 		
-		client.openScreen(parent);
+		client.setScreen(parent);
 	}
 	
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
 		if(keyCode == 1)
-			client.openScreen(parent);
+			client.setScreen(parent);
 	}
 	
 	@Override
@@ -193,10 +193,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;

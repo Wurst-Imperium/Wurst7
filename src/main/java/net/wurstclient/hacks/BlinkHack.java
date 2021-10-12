@@ -44,9 +44,8 @@ public final class BlinkHack extends Hack
 	{
 		if(limit.getValueI() == 0)
 			return getName() + " [" + packets.size() + "]";
-		else
-			return getName() + " [" + packets.size() + "/" + limit.getValueI()
-				+ "]";
+		return getName() + " [" + packets.size() + "/" + limit.getValueI()
+			+ "]";
 	}
 	
 	@Override

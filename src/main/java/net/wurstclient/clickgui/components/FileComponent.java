@@ -50,7 +50,7 @@ public final class FileComponent extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		WurstClient.MC.openScreen(
+		WurstClient.MC.setScreen(
 			new SelectFileScreen(WurstClient.MC.currentScreen, setting));
 	}
 	

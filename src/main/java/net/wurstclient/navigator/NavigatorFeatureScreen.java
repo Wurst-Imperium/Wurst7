@@ -172,7 +172,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// add keybind
-						WurstClient.MC.openScreen(new NavigatorNewKeybindScreen(
+						WurstClient.MC.setScreen(new NavigatorNewKeybindScreen(
 							possibleKeybinds, NavigatorFeatureScreen.this));
 					}
 				};
@@ -234,7 +234,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						client.openScreen(new NavigatorRemoveKeybindScreen(
+						client.setScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
@@ -293,7 +293,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private void goBack()
 	{
 		parent.setExpanding(false);
-		client.openScreen(parent);
+		client.setScreen(parent);
 	}
 	
 	@Override
@@ -482,10 +482,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;
@@ -554,7 +552,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		return getStringHeight(text);
 	}
 	
-	public abstract class ButtonData extends Rectangle
+	public abstract static class ButtonData extends Rectangle
 	{
 		public String buttonText;
 		public Color color;

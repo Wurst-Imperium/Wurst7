@@ -180,16 +180,14 @@ public final class BuildRandomHack extends Hack
 		{
 			if(!placeBlockLegit(pos))
 				return false;
-			
-			IMC.setItemUseCooldown(4);
 		}else
 		{
 			if(!placeBlockSimple_old(pos))
 				return false;
 			
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
 		}
+		IMC.setItemUseCooldown(4);
 		
 		lastPos = pos;
 		return true;

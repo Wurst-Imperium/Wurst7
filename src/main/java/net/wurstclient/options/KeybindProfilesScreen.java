@@ -49,7 +49,7 @@ public final class KeybindProfilesScreen extends Screen
 			new LiteralText("Open Folder"), b -> openFolder()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			new LiteralText("New Profile"), b -> client.openScreen(
+			new LiteralText("New Profile"), b -> client.setScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
 		loadButton =
@@ -106,7 +106,7 @@ public final class KeybindProfilesScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override

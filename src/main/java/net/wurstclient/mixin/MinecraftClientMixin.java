@@ -121,8 +121,7 @@ public abstract class MinecraftClientMixin
 	{
 		if(wurstSession != null)
 			return wurstSession;
-		else
-			return session;
+		return session;
 	}
 	
 	@Override

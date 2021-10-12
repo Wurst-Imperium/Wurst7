@@ -42,6 +42,6 @@ public final class AuthorCmd extends Command
 				"You must hold a written book in your main hand.");
 		
 		String author = String.join(" ", args);
-		heldItem.putSubTag("author", NbtString.of(author));
+		heldItem.setSubNbt("author", NbtString.of(author));
 	}
 }

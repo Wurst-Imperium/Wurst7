@@ -63,7 +63,7 @@ public final class TabGui implements KeyPressListener
 				tabMap.get(feature.getCategory()).add(feature);
 			
 		tabs.addAll(tabMap.values());
-		tabs.forEach(tab -> tab.updateSize());
+		tabs.forEach(Tab::updateSize);
 		updateSize();
 	}
 	

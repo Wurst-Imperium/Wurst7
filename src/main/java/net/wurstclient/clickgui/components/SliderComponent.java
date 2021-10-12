@@ -65,7 +65,7 @@ public final class SliderComponent extends Component
 	private void handleLeftClick()
 	{
 		if(Screen.hasControlDown())
-			MC.openScreen(new EditSliderScreen(MC.currentScreen, setting));
+			MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
 		else
 			dragging = true;
 	}

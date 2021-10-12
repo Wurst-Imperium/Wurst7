@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
+
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -39,6 +41,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
@@ -61,6 +64,9 @@ public final class AutoFishHack extends Hack
 			+ "your 'Valid range' setting.",
 		false);
 	
+	private final ColorSetting ddColor = new ColorSetting("DD color",
+		"Color of the debug draw, if enabled.", Color.RED);
+	
 	private int bestRodValue;
 	private int bestRodSlot;
 	
@@ -80,6 +86,7 @@ public final class AutoFishHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(validRange);
 		addSetting(debugDraw);
+		addSetting(ddColor);
 	}
 	
 	@Override
@@ -338,7 +345,8 @@ public final class AutoFishHack extends Hack
 		matrixStack.push();
 		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
 			bobber.getZ() - regionZ);
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+		float[] colorF = ddColor.getColorF();
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		RenderUtils.drawOutlinedBox(validRangeBox, matrixStack);
 		matrixStack.pop();
 	}
@@ -354,7 +362,8 @@ public final class AutoFishHack extends Hack
 			matrixStack.push();
 			matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
 				lastSoundPos.z - regionZ);
-			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			float[] colorF = ddColor.getColorF();
+			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)-0.125)

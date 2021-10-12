@@ -102,7 +102,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		
 		// get valid blocks
 		ArrayList<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), (p) -> isCorrectBlock(p));
+			getValidBlocks(range.getValue(), this::isCorrectBlock);
 		
 		if(validBlocks.isEmpty())
 			return;
@@ -198,7 +198,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(validator).sorted(c)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)
@@ -215,7 +215,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		if(block instanceof SaplingBlock
 			&& ((SaplingBlock)block).isFertilizable(world, pos, state, true))
 			return saplings.isChecked();
-		else if(block instanceof CropBlock
+		if(block instanceof CropBlock
 			&& ((CropBlock)block).isFertilizable(world, pos, state, true))
 			return crops.isChecked();
 		else if(block instanceof StemBlock

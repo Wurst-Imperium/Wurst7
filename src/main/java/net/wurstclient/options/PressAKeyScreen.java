@@ -34,7 +34,7 @@ public class PressAKeyScreen extends Screen
 		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(getKeyName(keyCode, scanCode));
 		
-		client.openScreen((Screen)prevScreen);
+		client.setScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
 	

@@ -161,7 +161,7 @@ public final class JesusHack extends Hack
 			.getBlockCollisions(MC.player,
 				MC.player.getBoundingBox().offset(0, -0.5, 0))
 			.map(VoxelShape::getBoundingBox)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(Box bb : blockCollisions)
 		{

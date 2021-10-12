@@ -55,7 +55,7 @@ public final class AutoBuildHack extends Hack
 			+ "add your own or to edit / delete the\n"
 			+ "default templates.\n\n" + "If you mess up, simply press the\n"
 			+ "'Reset to Defaults' button or\n" + "delete the folder.",
-		"autobuild", folder -> DefaultAutoBuildTemplates.createFiles(folder));
+		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
@@ -290,10 +290,9 @@ public final class AutoBuildHack extends Hack
 		HitResult hitResult = MC.crosshairTarget;
 		if(hitResult == null || hitResult.getPos() == null
 			|| hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult))
+			|| !(hitResult instanceof BlockHitResult blockHitResult))
 			return;
 		
-		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
 		BlockPos hitResultPos = blockHitResult.getBlockPos();
 		if(!BlockUtils.canBeClicked(hitResultPos))
 			return;

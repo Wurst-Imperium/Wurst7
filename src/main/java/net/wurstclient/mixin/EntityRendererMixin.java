@@ -88,7 +88,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
 		int k = (int)(g * 255.0F) << 24;
 		
-		TextRenderer textRenderer = this.getFontRenderer();
+		TextRenderer textRenderer = this.getTextRenderer();
 		float h = -textRenderer.getWidth(text) / 2;
 		
 		textRenderer.draw(text.asOrderedText(), h, j, 553648127, false,
@@ -102,7 +102,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 	}
 	
 	@Shadow
-	public TextRenderer getFontRenderer()
+	public TextRenderer getTextRenderer()
 	{
 		return null;
 	}

@@ -66,7 +66,7 @@ public final class EditSliderScreen extends Screen
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
 		
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public final class EditSliderScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			break;
 		}
 		

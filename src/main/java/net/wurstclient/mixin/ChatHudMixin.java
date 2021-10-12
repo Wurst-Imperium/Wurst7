@@ -53,8 +53,8 @@ public class ChatHudMixin extends DrawableHelper
 		shadow$addMessage(chatText, chatLineId, client.inGameHud.getTicks(),
 			false);
 		
-		LOGGER.info("[CHAT] {}", chatText.getString().replaceAll("\r", "\\\\r")
-			.replaceAll("\n", "\\\\n"));
+		LOGGER.info("[CHAT] {}",
+			chatText.getString().replace("\r", "\\r").replace("\n", "\\n"));
 		ci.cancel();
 	}
 	

@@ -143,6 +143,7 @@ public final class KillauraLegitHack extends Hack
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
@@ -321,11 +322,8 @@ public final class KillauraLegitHack extends Hack
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
-		if(target instanceof LivingEntity)
-		{
-			LivingEntity le = (LivingEntity)target;
+		if(target instanceof LivingEntity le)
 			p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
-		}
 		float red = p * 2F;
 		float green = 2 - red;
 		

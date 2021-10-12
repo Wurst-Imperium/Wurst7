@@ -39,10 +39,9 @@ public class Keybind implements Comparable<Keybind>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if(obj == null || !(obj instanceof Keybind))
+		if(obj == null || !(obj instanceof Keybind otherKeybind))
 			return false;
 		
-		Keybind otherKeybind = (Keybind)obj;
 		return key.equalsIgnoreCase(otherKeybind.key);
 	}
 	

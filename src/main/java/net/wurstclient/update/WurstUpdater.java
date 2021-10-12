@@ -29,7 +29,7 @@ public final class WurstUpdater implements UpdateListener
 	{
 		if(thread == null)
 		{
-			thread = new Thread(() -> checkForUpdates(), "WurstUpdater");
+			thread = new Thread(this::checkForUpdates, "WurstUpdater");
 			thread.start();
 			return;
 		}

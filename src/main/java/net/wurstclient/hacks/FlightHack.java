@@ -34,6 +34,7 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().creativeFlightHack.setEnabled(false);
 		WURST.getHax().jetpackHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);

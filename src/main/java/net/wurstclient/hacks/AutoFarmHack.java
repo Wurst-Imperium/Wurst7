@@ -121,8 +121,7 @@ public final class AutoFarmHack extends Hack
 		
 		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(pos -> BlockUtils.canBeClicked(pos))
-			.collect(Collectors.toList());
+			.filter(BlockUtils::canBeClicked).collect(Collectors.toList());
 		
 		registerPlants(blocks);
 		
@@ -274,7 +273,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
-		else if(block instanceof GourdBlock)
+		if(block instanceof GourdBlock)
 			return true;
 		else if(block instanceof SugarCaneBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock

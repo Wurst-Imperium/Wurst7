@@ -10,9 +10,7 @@ package net.wurstclient.util.json;
 public final class JsonException extends Exception
 {
 	public JsonException()
-	{
-		super();
-	}
+	{}
 	
 	public JsonException(String message)
 	{

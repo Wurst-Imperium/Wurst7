@@ -50,7 +50,7 @@ public class CleanUpScreen extends Screen
 	{
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-				() -> "Cancel", "", b -> client.openScreen(prevScreen)));
+				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -130,7 +130,7 @@ public class CleanUpScreen extends Screen
 			}
 		
 		saveServerList();
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private boolean shouldRemove(ServerInfo server)
@@ -221,15 +221,13 @@ public class CleanUpScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
 			
-			ClickableWidget button = (ClickableWidget)d;
-			
-			if(!button.isHovered() || !(button instanceof CleanUpButton))
+			if(!button.isHovered()
+				|| !(button instanceof CleanUpButton cuButton))
 				continue;
 			
-			CleanUpButton cuButton = (CleanUpButton)button;
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
@@ -251,7 +249,7 @@ public class CleanUpScreen extends Screen
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new LiteralText[0]);
+				this.tooltip = Arrays.asList();
 			else
 			{
 				String[] lines = tooltip.split("\n");

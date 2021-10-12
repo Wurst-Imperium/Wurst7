@@ -101,7 +101,6 @@ public final class CmdProcessor implements ChatOutputListener
 		
 		public CmdNotFoundException(String input)
 		{
-			super();
 			this.input = input;
 		}
 		

@@ -79,16 +79,16 @@ public final class EditBlockListScreen extends Screen
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
-			b -> client.openScreen(new ConfirmScreen(b2 -> {
+			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
-				client.openScreen(EditBlockListScreen.this);
+				client.setScreen(EditBlockListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override
@@ -133,12 +133,20 @@ public final class EditBlockListScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
 			addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
+			break;
+			case GLFW.GLFW_KEY_DELETE:
 			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+			break;
+			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
+			break;
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -295,25 +303,23 @@ public final class EditBlockListScreen extends Screen
 				
 				return "\u00a7ounknown block\u00a7r";
 				
-			}else
-			{
-				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-				modelViewStack.push();
-				modelViewStack.translate(x, y, 0);
-				if(large)
-					modelViewStack.scale(1.5F, 1.5F, 1.5F);
-				else
-					modelViewStack.scale(0.75F, 0.75F, 0.75F);
-				
-				DiffuseLighting.enableGuiDepthLighting();
-				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-				DiffuseLighting.disableGuiDepthLighting();
-				
-				modelViewStack.pop();
-				RenderSystem.applyModelViewMatrix();
-				
-				return stack.getName().getString();
 			}
+			MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+			modelViewStack.push();
+			modelViewStack.translate(x, y, 0);
+			if(large)
+				modelViewStack.scale(1.5F, 1.5F, 1.5F);
+			else
+				modelViewStack.scale(0.75F, 0.75F, 0.75F);
+			
+			DiffuseLighting.enableGuiDepthLighting();
+			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
+			DiffuseLighting.disableGuiDepthLighting();
+			
+			modelViewStack.pop();
+			RenderSystem.applyModelViewMatrix();
+			
+			return stack.getName().getString();
 		}
 	}
 }

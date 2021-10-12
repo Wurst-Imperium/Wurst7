@@ -89,7 +89,7 @@ public final class PotionCmd extends Command
 		
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
-		stack.setTag(nbt);
+		stack.setNbt(nbt);
 		ChatUtils.message("Potion modified.");
 	}
 	
@@ -141,7 +141,7 @@ public final class PotionCmd extends Command
 		
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", newEffects);
-		stack.setTag(nbt);
+		stack.setNbt(nbt);
 		ChatUtils.message("Effect removed.");
 	}
 	

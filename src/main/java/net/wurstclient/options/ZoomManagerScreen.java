@@ -41,12 +41,12 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
-				new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(
 			keyButton = new ButtonWidget(width / 2 - 79, height / 4 + 24 - 16,
 				158, 20, new LiteralText("Zoom Key: " + zoomKeyName),
-				b -> client.openScreen(new PressAKeyScreen(this))));
+				b -> client.setScreen(new PressAKeyScreen(this))));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16,
 			50, 20, new LiteralText("More"), b -> level.increaseValue()));

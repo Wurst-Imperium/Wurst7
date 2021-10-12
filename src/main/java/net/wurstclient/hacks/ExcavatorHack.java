@@ -396,8 +396,7 @@ public final class ExcavatorHack extends Hack
 			return;
 		}
 		
-		if(MC.crosshairTarget != null
-			&& MC.crosshairTarget instanceof BlockHitResult)
+		if(MC.crosshairTarget instanceof BlockHitResult)
 		{
 			// set posLookingAt
 			posLookingAt = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
@@ -502,7 +501,7 @@ public final class ExcavatorHack extends Hack
 		}
 		
 		// get remaining blocks
-		Predicate<BlockPos> pClickable = pos -> BlockUtils.canBeClicked(pos);
+		Predicate<BlockPos> pClickable = BlockUtils::canBeClicked;
 		area.remainingBlocks =
 			(int)area.blocksList.parallelStream().filter(pClickable).count();
 		
@@ -576,7 +575,7 @@ public final class ExcavatorHack extends Hack
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private static enum Mode
