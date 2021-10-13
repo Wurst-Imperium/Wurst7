@@ -2,5 +2,18 @@
   "description.wurst.hack.anchoraura": "Platziert automatisch Seelenanker um dich herum, lädt diese mit Glowstone auf, und sprengt sie dann, um damit Mobs und Spieler um dich herum zu killen.",
   "description.wurst.hack.antiafk": "Läuft zufällig durch die Gegend, um dich vor Anti-AFK Plugins zu verstecken.\nBenötigt mindestens 3x3 Blöcke freien Platz.",
   "description.wurst.hack.antiblind": "Verhindert den Blindheitseffekt.\nNicht kompatibel mit OptiFine.",
+  "description.wurst.hack.anticactus": "Schützt dich vor Kakteen.",
+  "description.wurst.hack.antiknockback": "Verhindert dass du von Mobs und Spielern weggeschubst wirst.",
+  "description.wurst.hack.antispam": "Blockiert Chat-Spam indem es wiederholte Nachrichten durch einen Zähler ersetzt.",
+  "description.wurst.hack.antiwaterpush": "Verhindert dass du von fließendem Wasser weggeschubst wirst.",
+  "description.wurst.hack.antiwobble": "Entfernt den Wabbel-Effekt von Übelkeit und Netherportalen.",
+  "description.wurst.hack.autoarmor": "Zieht automatisch deine beste Rüstung an.",
+  "description.wurst.hack.autobuild": "Baut die ausgewählte Vorlage (Template) automatisch.\nPlatziere manuell einen Block, um Bauprozess zu starten.",
+  "description.wurst.hack.autodrop": "Lässt ungewollte Items automatisch fallen.",
+  "description.wurst.hack.autoleave": "Verlässt automatisch den Server wenn deine Gesundheit niedrig ist.",
+  "description.wurst.hack.autoeat": "Isst automatisch Essen.",
+  "description.wurst.hack.autofarm": "Erntet und re-plantet Pflanzen automatisch.\nDas funktioniert mit Weizen, Karotten, Kartoffeln, Rote Beete, Kürbissen, Melonen, Kakteen, Zuckerrohr, Seetang, Bambus, Netherwarzen, und Kakaobohnen.",
+  "description.wurst.hack.autofish": "Angelt automatisch mit deiner besten Angel. Wenn es beim Angeln eine noch bessere Angel findet, wechselt es automatisch.",
+  "description.wurst.hack.automine": "Baut automatisch den Block ab, den du gerade anguckst.",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen."
 }
