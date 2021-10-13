@@ -83,7 +83,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-154, 72,
 			() -> "Spoof Vanilla: "
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
-			vanillaSpoofOtf.getDescription(),
+			vanillaSpoofOtf.getWrappedDescription(200),
 			b -> vanillaSpoofOtf.doPrimaryAction());
 		
 		new WurstOptionsButton(-154, 96,
@@ -165,12 +165,15 @@ public class WurstOptionsScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
 			
-			if(!button.isHovered()
-				|| !(button instanceof WurstOptionsButton woButton))
+			ClickableWidget button = (ClickableWidget)d;
+			
+			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
+			
+			WurstOptionsButton woButton = (WurstOptionsButton)button;
 			
 			if(woButton.tooltip.isEmpty())
 				continue;
