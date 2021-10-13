@@ -1,4 +1,6 @@
 {
+  "description.wurst.hack.anchoraura": "Platziert automatisch Seelenanker um dich\nherum, lädt diese mit Glowstone auf, und\nsprengt sie dann, um damit Mobs und Spieler\num dich herum zu killen.",
   "description.wurst.hack.antiafk": "Läuft zufällig durch die Gegend, um dich vor Anti-AFK\nPlugins zu verstecken.\nBenötigt mindestens 3x3 Blöcke freien Platz.",
+  "description.wurst.hack.antiblind": "Verhindert den Blindheitseffekt.\nNicht kompatibel mit OptiFine.",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen."
 }
