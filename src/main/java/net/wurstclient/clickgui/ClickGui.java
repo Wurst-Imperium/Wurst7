@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -118,7 +119,7 @@ public final class ClickGui
 		JsonObject json;
 		try(BufferedReader reader = Files.newBufferedReader(windowsFile))
 		{
-			json = JsonUtils.JSON_PARSER.parse(reader).getAsJsonObject();
+			json = JsonParser.parseReader(reader).getAsJsonObject();
 			
 		}catch(NoSuchFileException e)
 		{

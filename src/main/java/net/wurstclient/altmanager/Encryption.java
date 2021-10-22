@@ -33,6 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -102,7 +103,7 @@ public final class Encryption
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
-			return JsonUtils.JSON_PARSER.parse(loadEncryptedFile(path));
+			return JsonParser.parseString(loadEncryptedFile(path));
 			
 		}catch(JsonParseException e)
 		{
