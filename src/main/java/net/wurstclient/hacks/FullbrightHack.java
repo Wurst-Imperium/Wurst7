@@ -45,7 +45,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	public FullbrightHack()
 	{
-		super("Fullbright", "Allows you to see in the dark.");
+		super("Fullbright");
 		setCategory(Category.RENDER);
 		addSetting(method);
 		addSetting(fade);

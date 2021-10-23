@@ -39,10 +39,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 	
 	public AutoSoupHack()
 	{
-		super("AutoSoup", "Automatically eats soup when your health is low.\n\n"
-			+ "\u00a7lNote:\u00a7r This hack ignores hunger and assumes that eating\n"
-			+ "soup directly refills your health. If the server you are\n"
-			+ "playing on is not configured to do that, use AutoEat instead.");
+		super("AutoSoup");
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);

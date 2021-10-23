@@ -35,8 +35,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	
 	public AutoPotionHack()
 	{
-		super("AutoPotion", "Automatically throws splash potions of\n"
-			+ "instant health when your health is low.");
+		super("AutoPotion");
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);

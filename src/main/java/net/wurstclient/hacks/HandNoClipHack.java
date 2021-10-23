@@ -34,8 +34,7 @@ public final class HandNoClipHack extends Hack
 	
 	public HandNoClipHack()
 	{
-		super("HandNoClip",
-			"Allows you to reach specific blocks through walls.");
+		super("HandNoClip");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(blocks);

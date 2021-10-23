@@ -56,8 +56,7 @@ public final class InstantBunkerHack extends Hack
 	
 	public InstantBunkerHack()
 	{
-		super("InstantBunker",
-			"Builds a small bunker around you. Needs 57 blocks.");
+		super("InstantBunker");
 		setCategory(Category.BLOCKS);
 	}
 	

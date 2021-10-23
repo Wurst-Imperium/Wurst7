@@ -68,10 +68,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	public MobSpawnEspHack()
 	{
-		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + "\u00a7eyellow\u00a7r"
-				+ " - mobs can spawn at night\n" + "\u00a7cred\u00a7r"
-				+ " - mobs can always spawn");
+		super("MobSpawnESP");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);

@@ -66,8 +66,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	
 	public PlayerEspHack()
 	{
-		super("PlayerESP", "Highlights nearby players.\n"
-			+ "ESP boxes of friends will appear in blue.");
+		super("PlayerESP");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);

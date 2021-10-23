@@ -16,8 +16,7 @@ public final class CameraNoClipHack extends Hack
 {
 	public CameraNoClipHack()
 	{
-		super("CameraNoClip",
-			"Allows the camera in 3rd person to go through walls.");
+		super("CameraNoClip");
 		
 		setCategory(Category.RENDER);
 	}

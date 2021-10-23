@@ -1,5 +1,15 @@
 # Wurst Client v7
 
+## ⚠ We Are Looking For Translators ⚠
+
+If you speak both English and some other language, please help us by translating Wurst. The translation files are located in `src/main/resources/assets/wurst/lang` and work the same as in other Minecraft mods.
+
+At the moment, only hack descriptions can be translated. Other descriptions and tooltips will become translatable in the future.
+
+Names of featues (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+
+See [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) for discussion about translations.
+
 ## Downloads (for users)
 
 https://www.wurstclient.net/download/

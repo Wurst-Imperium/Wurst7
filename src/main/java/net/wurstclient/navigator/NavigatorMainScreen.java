@@ -131,10 +131,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// left click
 		if(button == 0)
-		{
 			leftClick(hoveredFeature);
-		}
-		
+			
 		// right click
 		// if(button == 1)
 		// {
@@ -396,7 +394,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				renderAsHovered ? opacity * 1.5F : opacity);
 		
 		// tooltip
-		String tt = feature.getDescription();
+		String tt = feature.getWrappedDescription(200);
 		// if(feature.isBlocked())
 		// {
 		// if(tt == null)

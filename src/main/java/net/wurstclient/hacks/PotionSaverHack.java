@@ -18,8 +18,7 @@ public final class PotionSaverHack extends Hack implements PacketOutputListener
 {
 	public PotionSaverHack()
 	{
-		super("PotionSaver",
-			"Freezes all potion effects while you are standing still.");
+		super("PotionSaver");
 		setCategory(Category.OTHER);
 	}
 	

@@ -160,8 +160,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	
 	public CrystalAuraHack()
 	{
-		super("CrystalAura", "Automatically places (optional) and\n"
-			+ "detonates end crystals to kill\n" + "entities around you.");
+		super("CrystalAura");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);

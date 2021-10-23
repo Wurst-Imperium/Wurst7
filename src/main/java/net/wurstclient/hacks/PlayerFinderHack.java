@@ -43,7 +43,7 @@ public final class PlayerFinderHack extends Hack
 	
 	public PlayerFinderHack()
 	{
-		super("PlayerFinder", "Finds far away players during thunderstorms.");
+		super("PlayerFinder");
 		setCategory(Category.RENDER);
 	}
 	
