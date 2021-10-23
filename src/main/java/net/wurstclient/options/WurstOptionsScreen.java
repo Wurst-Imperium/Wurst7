@@ -87,8 +87,11 @@ public class WurstOptionsScreen extends Screen
 			b -> vanillaSpoofOtf.doPrimaryAction());
 		
 		new WurstOptionsButton(-154, 96,
-			() -> "Force English: " + (forceEnglish.isChecked() ? "ON" : "OFF"),
-			forceEnglish.getDescription(),
+			() -> "Translations: " + (!forceEnglish.isChecked() ? "ON" : "OFF"),
+			"§cThis is an experimental feature!\n"
+				+ "We don't have many translations yet. If you\n"
+				+ "speak both English and some other language,\n"
+				+ "please help us by adding more translations.",
 			b -> forceEnglish.setChecked(!forceEnglish.isChecked()));
 	}
 	

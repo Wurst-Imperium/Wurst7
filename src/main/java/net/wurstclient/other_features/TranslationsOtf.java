@@ -22,11 +22,16 @@ public final class TranslationsOtf extends OtherFeature
 		new CheckboxSetting("Force English",
 			"Displays the Wurst Client in English,\n"
 				+ "even if Minecraft is set to a\n" + "different language.",
-			false);
+			true);
 	
 	public TranslationsOtf()
 	{
-		super("Translations", "Localization settings.");
+		super("Translations",
+			"Localization settings.\n\n"
+				+ "§cThis is an experimental feature!\n"
+				+ "We don't have many translations yet. If you\n"
+				+ "speak both English and some other language,\n"
+				+ "please help us by adding more translations.");
 		addSetting(forceEnglish);
 	}
 	
