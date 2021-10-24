@@ -34,8 +34,7 @@ public final class FastBreakHack extends Hack
 	
 	public FastBreakHack()
 	{
-		super("FastBreak", "Allows you to break blocks faster.\n"
-			+ "Tip: This works with Nuker.");
+		super("FastBreak");
 		setCategory(Category.BLOCKS);
 		addSetting(legitMode);
 	}

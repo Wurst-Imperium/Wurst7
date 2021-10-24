@@ -84,8 +84,7 @@ public final class AutoBuildHack extends Hack
 	
 	public AutoBuildHack()
 	{
-		super("AutoBuild", "Builds things automatically.\n"
-			+ "Place a single block to start building.");
+		super("AutoBuild");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);

@@ -21,7 +21,7 @@ public final class HealthTagsHack extends Hack
 {
 	public HealthTagsHack()
 	{
-		super("HealthTags", "Shows the health of players in their nametags.");
+		super("HealthTags");
 		setCategory(Category.RENDER);
 	}
 	

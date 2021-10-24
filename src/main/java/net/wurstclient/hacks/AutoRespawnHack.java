@@ -17,7 +17,7 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 {
 	public AutoRespawnHack()
 	{
-		super("AutoRespawn", "Automatically respawns you whenever you die.");
+		super("AutoRespawn");
 		setCategory(Category.COMBAT);
 	}
 	

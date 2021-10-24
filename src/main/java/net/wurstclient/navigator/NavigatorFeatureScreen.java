@@ -138,7 +138,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			text += ", Category: " + feature.getCategory().getName();
 		
 		// description
-		String description = feature.getDescription();
+		String description = feature.getWrappedDescription(300);
 		if(!description.isEmpty())
 			text += "\n\nDescription:\n" + description;
 		
@@ -482,8 +482,10 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;

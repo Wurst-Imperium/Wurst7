@@ -66,7 +66,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	public AutoEatHack()
 	{
-		super("AutoEat", "Automatically eats food when necessary.");
+		super("AutoEat");
 		setCategory(Category.ITEMS);
 		addSetting(eatWhileWalking);
 		addSetting(foodPriority);

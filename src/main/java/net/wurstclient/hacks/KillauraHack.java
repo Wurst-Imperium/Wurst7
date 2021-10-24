@@ -135,7 +135,7 @@ public final class KillauraHack extends Hack
 	
 	public KillauraHack()
 	{
-		super("Killaura", "Automatically attacks entities around you.");
+		super("Killaura");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);

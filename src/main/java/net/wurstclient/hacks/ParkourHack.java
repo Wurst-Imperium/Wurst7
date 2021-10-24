@@ -19,10 +19,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 {
 	public ParkourHack()
 	{
-		super("Parkour",
-			"Makes you jump automatically when reaching\n"
-				+ "the edge of a block.\n"
-				+ "Useful for parkours and jump'n'runs.");
+		super("Parkour");
 		
 		setCategory(Category.MOVEMENT);
 	}

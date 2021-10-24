@@ -19,8 +19,7 @@ public final class PanicHack extends Hack implements UpdateListener
 {
 	public PanicHack()
 	{
-		super("Panic", "Instantly turns off all enabled hacks.\n"
-			+ "Be careful with this one!");
+		super("Panic");
 		setCategory(Category.OTHER);
 	}
 	
