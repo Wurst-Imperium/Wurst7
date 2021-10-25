@@ -22,5 +22,18 @@
   "description.wurst.hack.autosoup": "Isst automatisch Pilzsuppe, wenn deine Gesundheit niedrig ist.\n\n§lActung:§r Dieser Hack ignoriert das Hunger-System und tut so als ob Pilzsuppe direkt deine Gesundheit auffüllt. Wenn der Server auf dem du Spielst das nicht so macht, solttest du stattdeseen AutoEat benutzen.",
   "description.wurst.hack.autosprint": "Lässt dich automatisch sprinten.",
   "description.wurst.hack.autosteal": "Klaut automatisch alle Items aus allen Kisten und Shulkerboxen, die du öffnest.",
+  "description.wurst.hack.autoswim": "Aktiviert automatisch die Schwimm-Animation.",
+  "description.wurst.hack.autoswitch": "Wechselt ständig durch alle Items in deiner Hotbar.\n\n§lProTip:§r Benutz' das in Kombination mit BuildRandom während deine gesamte Hotbar mit bunten Woll- oder Zementblöcken gefüllt ist.",
+  "description.wurst.hack.autosword": "Wechselt automatisch auf die beste Waffe in deiner Hotbar, wenn du einen Mob oder Spieler angreifst.\nTip: Das funktioniert auch mit Killaura.",
+  "description.wurst.hack.autotool": "Wechselt automatisch auf das beste passende Werkzeug in deiner Hotbar, wenn du versuchst, einen Block abzubauen.",
+  "description.wurst.hack.autototem": "Platziert automatisch Totems der Unsterblichkeit in deiner Nebenhand.",
+  "description.wurst.hack.autowalk": "Lässt dich automatisch vorwärts gehen.",
+  "description.wurst.hack.basefinder": "Findet Spieler-Basen indem es nach unnatürlichen Blöcken sucht.\nDie gefundenen Blöcke werden dann in der gewählten Farbe hervorgehoben.\nGut geeignet, um Basen auf Faction-Servern zu finden.",
+  "description.wurst.hack.blink": "Stoppt alle Bewegungs-Updates während es aktiviert ist.",
+  "description.wurst.hack.boatfly": "Lässt dich mit Booten fliegen.",
+  "description.wurst.hack.bonemealaura": "Benutzt automatisch Knochenmehl auf bestimmten Arten von Plfanzen.\nBenutze die Kästchen in den Einstellungen, um die Arten von Pflanzen zu bestimmen.",
+  "description.wurst.hack.bowaimbot": "Zielt automatisch mit deinem Bogen oder deiner Armbrust.",
+  "description.wurst.hack.buildrandom": "Platziert zufällig Blöcke um dich herum.",
+  "description.wurst.hack.bunnyhop": "Lässt dich automatisch hüpfen.",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen."
 }
