@@ -18,7 +18,7 @@ public final class AutoSwimHack extends Hack implements UpdateListener
 {
 	public AutoSwimHack()
 	{
-		super("AutoSwim", "Triggers the swimming animation automatically.");
+		super("AutoSwim");
 		setCategory(Category.MOVEMENT);
 	}
 	

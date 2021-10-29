@@ -28,6 +28,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -74,11 +75,7 @@ public final class AutoFarmHack extends Hack
 	
 	public AutoFarmHack()
 	{
-		super("AutoFarm",
-			"Harvests and replants crops automatically.\n"
-				+ "Works with wheat, carrots, potatoes, beetroots,\n"
-				+ "pumpkins, melons, cacti, sugar canes, kelp,\n"
-				+ "bamboo, nether warts, and cocoa beans.");
+		super("AutoFarm");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -279,7 +276,7 @@ public final class AutoFarmHack extends Hack
 			return ((CropBlock)block).isMature(state);
 		if(block instanceof GourdBlock)
 			return true;
-		else if(block instanceof SugarCaneBlock)
+		if(block instanceof SugarCaneBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
@@ -332,10 +329,10 @@ public final class AutoFarmHack extends Hack
 			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
 		
 		if(item == Items.COCOA_BEANS)
-			return BlockUtils.getBlock(pos.north()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.east()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.south()) == Blocks.JUNGLE_LOG
-				|| BlockUtils.getBlock(pos.west()) == Blocks.JUNGLE_LOG;
+			return BlockUtils.getState(pos.north()).isIn(BlockTags.JUNGLE_LOGS)
+				|| BlockUtils.getState(pos.east()).isIn(BlockTags.JUNGLE_LOGS)
+				|| BlockUtils.getState(pos.south()).isIn(BlockTags.JUNGLE_LOGS)
+				|| BlockUtils.getState(pos.west()).isIn(BlockTags.JUNGLE_LOGS);
 		
 		return false;
 	}

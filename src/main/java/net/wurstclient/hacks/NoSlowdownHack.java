@@ -16,8 +16,7 @@ public final class NoSlowdownHack extends Hack
 {
 	public NoSlowdownHack()
 	{
-		super("NoSlowdown", "Cancels slowness effects caused by\n"
-			+ "honey, soul sand and using items.");
+		super("NoSlowdown");
 		setCategory(Category.MOVEMENT);
 	}
 }

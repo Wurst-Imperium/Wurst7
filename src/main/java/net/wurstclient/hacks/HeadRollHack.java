@@ -19,8 +19,7 @@ public final class HeadRollHack extends Hack implements UpdateListener
 {
 	public HeadRollHack()
 	{
-		super("HeadRoll",
-			"Makes you nod all the time.\n" + "Only visible to other players.");
+		super("HeadRoll");
 		setCategory(Category.FUN);
 	}
 	

@@ -15,7 +15,7 @@ public final class LiquidsHack extends Hack implements HitResultRayTraceListener
 {
 	public LiquidsHack()
 	{
-		super("Liquids", "Allows you to place blocks in liquids.");
+		super("Liquids");
 		setCategory(Category.BLOCKS);
 	}
 	

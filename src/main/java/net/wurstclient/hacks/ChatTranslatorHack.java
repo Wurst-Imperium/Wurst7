@@ -35,8 +35,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	
 	public ChatTranslatorHack()
 	{
-		super("ChatTranslator",
-			"Translates incoming chat messages using Google Translate.");
+		super("ChatTranslator");
 		setCategory(Category.CHAT);
 		
 		addSetting(langFrom);

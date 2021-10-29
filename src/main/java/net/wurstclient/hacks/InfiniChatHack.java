@@ -16,11 +16,7 @@ public final class InfiniChatHack extends Hack
 {
 	public InfiniChatHack()
 	{
-		super("InfiniChat", "Removes the 256 character limit from the chat.\n"
-			+ "Useful for long commands that modify NBT data.\n\n"
-			+ "\u00a76\u00a7lNOTICE:\u00a7r Not recommended for talking to people.\n"
-			+ "Most servers will cut messages to 256\n"
-			+ "characters on their end.");
+		super("InfiniChat");
 		setCategory(Category.CHAT);
 	}
 }

@@ -67,9 +67,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	
 	public BonemealAuraHack()
 	{
-		super("BonemealAura",
-			"Automatically uses bone meal on specific types of plants.\n"
-				+ "Use the checkboxes to specify the types of plants.");
+		super("BonemealAura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);

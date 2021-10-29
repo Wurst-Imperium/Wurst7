@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
@@ -54,6 +55,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -124,6 +126,10 @@ public final class BowAimbotHack extends Hack
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
+	private final ColorSetting color = new ColorSetting("ESP color",
+		"Color of the box that BowAimbot\n" + "draws around the target.",
+		Color.RED);
+	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
 	
@@ -132,7 +138,7 @@ public final class BowAimbotHack extends Hack
 	
 	public BowAimbotHack()
 	{
-		super("BowAimbot", "Automatically aims your bow or crossbow.");
+		super("BowAimbot");
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
@@ -153,6 +159,8 @@ public final class BowAimbotHack extends Hack
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
+		
+		addSetting(color);
 	}
 	
 	@Override
@@ -350,13 +358,16 @@ public final class BowAimbotHack extends Hack
 		matrixStack.scale(v, v, v);
 		
 		RenderSystem.setShader(GameRenderer::getPositionShader);
+		float[] colorF = color.getColorF();
 		
 		// draw outline
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F * velocity);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
+			0.5F * velocity);
 		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
 		
 		// draw box
-		RenderSystem.setShaderColor(1, 0, 0, 0.25F * velocity);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
+			0.25F * velocity);
 		RenderUtils.drawSolidBox(TARGET_BOX, matrixStack);
 		
 		matrixStack.pop();

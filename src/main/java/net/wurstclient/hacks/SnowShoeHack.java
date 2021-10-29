@@ -17,7 +17,7 @@ public final class SnowShoeHack extends Hack
 {
 	public SnowShoeHack()
 	{
-		super("SnowShoe", "Allows you to walk on powder snow.");
+		super("SnowShoe");
 		setCategory(Category.MOVEMENT);
 	}
 }

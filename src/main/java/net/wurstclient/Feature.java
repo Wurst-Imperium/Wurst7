@@ -10,10 +10,14 @@ package net.wurstclient;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -41,6 +45,18 @@ public abstract class Feature
 	public abstract String getName();
 	
 	public abstract String getDescription();
+	
+	public String getWrappedDescription(int width)
+	{
+		List<StringVisitable> lines = MC.textRenderer.getTextHandler()
+			.wrapLines(getDescription(), width, Style.EMPTY);
+		
+		StringJoiner joiner = new StringJoiner("\n");
+		lines.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		
+		return joiner.toString();
+	}
 	
 	public Category getCategory()
 	{
