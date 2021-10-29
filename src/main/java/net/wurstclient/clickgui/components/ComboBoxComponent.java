@@ -149,7 +149,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		float[] bgColor = gui.getBgColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -172,7 +172,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		// background
@@ -203,7 +203,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
@@ -217,7 +217,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawArrow(MatrixStack matrixStack, int x2, int x3, int y1,
 		int y2, boolean hBox)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xa1 = x3 + 1;

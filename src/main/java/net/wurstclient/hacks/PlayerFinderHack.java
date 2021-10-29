@@ -103,7 +103,7 @@ public final class PlayerFinderHack extends Hack
 		
 		RenderSystem.setShaderColor(red, green, blue, 0.5F);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

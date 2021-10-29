@@ -367,7 +367,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			int x3 = x1 + 2;
 			int x5 = x2 - 2;
 			
-			Matrix4f matrix = matrixStack.peek().getModel();
+			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
