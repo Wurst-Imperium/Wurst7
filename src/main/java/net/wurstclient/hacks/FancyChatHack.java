@@ -19,10 +19,7 @@ public final class FancyChatHack extends Hack implements ChatOutputListener
 	
 	public FancyChatHack()
 	{
-		super("FancyChat", "Replaces ASCII characters in sent chat messages\n"
-			+ "with fancier unicode characters. Can be used to\n"
-			+ "bypass curse word filters on some servers.\n"
-			+ "Does not work on servers that block unicode\n" + "characters.");
+		super("FancyChat");
 		setCategory(Category.CHAT);
 	}
 	

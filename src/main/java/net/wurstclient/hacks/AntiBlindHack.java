@@ -16,8 +16,7 @@ public final class AntiBlindHack extends Hack
 {
 	public AntiBlindHack()
 	{
-		super("AntiBlind",
-			"Prevents blindness.\n" + "Incompatible with OptiFine.");
+		super("AntiBlind");
 		setCategory(Category.RENDER);
 	}
 }

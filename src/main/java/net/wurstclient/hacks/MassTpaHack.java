@@ -34,8 +34,7 @@ public final class MassTpaHack extends Hack
 	
 	public MassTpaHack()
 	{
-		super("MassTPA", "Sends a TPA request to all players.\n"
-			+ "Stops if someone accepts.");
+		super("MassTPA");
 		setCategory(Category.CHAT);
 	}
 	

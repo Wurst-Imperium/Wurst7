@@ -30,8 +30,7 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 	
 	public AntiKnockbackHack()
 	{
-		super("AntiKnockback",
-			"Prevents you from getting pushed by players and mobs.");
+		super("AntiKnockback");
 		
 		setCategory(Category.COMBAT);
 		addSetting(hStrength);

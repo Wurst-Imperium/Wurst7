@@ -104,11 +104,7 @@ public final class BaseFinderHack extends Hack
 	
 	public BaseFinderHack()
 	{
-		super("BaseFinder",
-			"Finds player bases by searching for man-made blocks.\n"
-				+ "The blocks that it finds will be highlighted in the\n"
-				+ "selected color.\n" + "Good for finding faction bases.");
-		
+		super("BaseFinder");
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
 		addSetting(color);
@@ -149,7 +145,6 @@ public final class BaseFinderHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
 		matchingBlocks.clear();
 		vertices.clear();
 		oldRegionX = null;

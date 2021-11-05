@@ -117,9 +117,7 @@ public final class ProtectHack extends Hack
 	
 	public ProtectHack()
 	{
-		super("Protect",
-			"A bot that follows the closest entity and protects it from other entities.\n"
-				+ "Use .protect to protect a specific entity instead of the closest one.");
+		super("Protect");
 		
 		setCategory(Category.COMBAT);
 		addSetting(useAi);

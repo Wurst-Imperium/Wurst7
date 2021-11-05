@@ -44,8 +44,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	
 	public TrajectoriesHack()
 	{
-		super("Trajectories",
-			"Predicts the flight path of arrows and throwable items.");
+		super("Trajectories");
 		setCategory(Category.RENDER);
 		addSetting(color);
 	}

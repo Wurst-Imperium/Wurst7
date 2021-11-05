@@ -58,6 +58,8 @@ public class WurstOptionsScreen extends Screen
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
 		WurstAnalytics analytics = wurst.getAnalytics();
 		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
+		CheckboxSetting forceEnglish =
+			wurst.getOtfs().translationsOtf.getForceEnglish();
 		
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
@@ -81,8 +83,16 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-154, 72,
 			() -> "Spoof Vanilla: "
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
-			vanillaSpoofOtf.getDescription(),
+			vanillaSpoofOtf.getWrappedDescription(200),
 			b -> vanillaSpoofOtf.doPrimaryAction());
+		
+		new WurstOptionsButton(-154, 96,
+			() -> "Translations: " + (!forceEnglish.isChecked() ? "ON" : "OFF"),
+			"§cThis is an experimental feature!\n"
+				+ "We don't have many translations yet. If you\n"
+				+ "speak both English and some other language,\n"
+				+ "please help us by adding more translations.",
+			b -> forceEnglish.setChecked(!forceEnglish.isChecked()));
 	}
 	
 	private void addManagerButtons()
@@ -158,12 +168,15 @@ public class WurstOptionsScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
 			
-			if(!button.isHovered()
-				|| !(button instanceof WurstOptionsButton woButton))
+			ClickableWidget button = (ClickableWidget)d;
+			
+			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
+			
+			WurstOptionsButton woButton = (WurstOptionsButton)button;
 			
 			if(woButton.tooltip.isEmpty())
 				continue;

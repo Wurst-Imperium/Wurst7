@@ -99,8 +99,7 @@ public final class RemoteViewHack extends Hack
 	
 	public RemoteViewHack()
 	{
-		super("RemoteView", "Allows you to see the world as someone else.\n"
-			+ "Use the .rv command to make it target a specific entity.");
+		super("RemoteView");
 		setCategory(Category.RENDER);
 		
 		addSetting(filterPlayers);

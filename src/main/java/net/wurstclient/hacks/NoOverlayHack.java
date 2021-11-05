@@ -16,7 +16,7 @@ public final class NoOverlayHack extends Hack
 {
 	public NoOverlayHack()
 	{
-		super("NoOverlay", "Blocks the overlays of water and lava.");
+		super("NoOverlay");
 		setCategory(Category.RENDER);
 	}
 }

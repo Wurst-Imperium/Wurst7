@@ -96,11 +96,7 @@ public final class TunnellerHack extends Hack
 	
 	public TunnellerHack()
 	{
-		super("Tunneller", "Automatically digs a tunnel.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r Although this bot will try to avoid\n"
-			+ "lava and other dangers, there is no guarantee\n"
-			+ "that it won't die. Only send it out with gear\n"
-			+ "that you don't mind losing.");
+		super("Tunneller");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(size);
