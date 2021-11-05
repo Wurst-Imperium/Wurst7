@@ -23,6 +23,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.util.Session;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -35,6 +36,7 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -50,6 +52,8 @@ public abstract class MinecraftClientMixin
 	private LanguageManager languageManager;
 	@Shadow
 	private ClientPlayerEntity player;
+	@Shadow
+    public ClientWorld world;
 	@Shadow
 	@Final
 	private Session session;
@@ -145,6 +149,12 @@ public abstract class MinecraftClientMixin
 	public IClientPlayerEntity getPlayer()
 	{
 		return (IClientPlayerEntity)player;
+	}
+	
+	@Override
+	public IWorld getWorld()
+	{
+		return (IWorld)world;
 	}
 	
 	@Override

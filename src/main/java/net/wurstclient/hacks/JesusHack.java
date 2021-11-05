@@ -157,8 +157,8 @@ public final class JesusHack extends Hack
 		boolean foundSolid = false;
 		
 		// check collision boxes below player
-		ArrayList<Box> blockCollisions = MC.world
-			.getBlockCollisions(MC.player,
+		ArrayList<Box> blockCollisions = IMC.getWorld()
+			.getBlockCollisionsStream(MC.player,
 				MC.player.getBoundingBox().offset(0, -0.5, 0))
 			.map(VoxelShape::getBoundingBox)
 			.collect(Collectors.toCollection(ArrayList::new));

@@ -50,7 +50,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 		Box adjustedBox = box.offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
 		
 		Stream<VoxelShape> blockCollisions =
-			MC.world.getBlockCollisions(MC.player, adjustedBox);
+			IMC.getWorld().getBlockCollisionsStream(MC.player, adjustedBox);
 		
 		if(blockCollisions.findAny().isPresent())
 			return;
