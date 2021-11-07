@@ -31,7 +31,7 @@
   "description.wurst.hack.basefinder": "通过寻找人为放置的方块找到玩家的基地。\n假如这种方块被找到将会被高亮。",
   "description.wurst.hack.blink": "暂停所有动作更新，并在关闭时继续。",
   "description.wurst.hack.boatfly": "允许你使用船飞天。",
-  "description.wurst.hack.bonemealaura": "在指定的作物上自动使用骨粉。\n使用检查器来指定作物。",
+  "description.wurst.hack.bonemealaura": "在指定的作物上自动使用骨粉。",
   "description.wurst.hack.bowaimbot": "使用弓弩时自动瞄准。",
   "description.wurst.hack.buildrandom": "在你的附近随机放置方块。",
   "description.wurst.hack.bunnyhop": "让你自动跳跃。",
