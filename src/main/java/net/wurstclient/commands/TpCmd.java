@@ -10,8 +10,15 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -34,7 +41,7 @@ public final class TpCmd extends Command
 		BlockPos pos = argsToPos(args);
 		
 		ClientPlayerEntity player = MC.player;
-		player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		player.setPosition(pos.getX() + 0.5, pos.getY()+0.0, pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -46,14 +53,27 @@ public final class TpCmd extends Command
 			
 			case 1:
 			return argsToEntityPos(args[0]);
-			
+
 			case 3:
 			return argsToXyzPos(args);
+			case 0:
+			MinecraftClient client = MinecraftClient.getInstance();
+			HitResult hit = client.crosshairTarget;
+			if(hit.getType()==HitResult.Type.BLOCK) {
+				BlockHitResult blockHit = (BlockHitResult) hit;
+				BlockPos blockPos = blockHit.getBlockPos();
+				BlockState blockState = client.world.getBlockState(blockPos);
+				Block block = blockState.getBlock();
+				return new BlockPos(blockPos.getX() + 0.0, blockPos.getY()+1.0, blockPos.getZ() + 0.0);
+			}else{
+				throw new CmdError("Not found target");
+			}
 		}
 	}
 	
 	private BlockPos argsToEntityPos(String name) throws CmdError
 	{
+		//#################
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
