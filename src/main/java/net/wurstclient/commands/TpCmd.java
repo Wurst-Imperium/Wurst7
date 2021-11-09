@@ -64,7 +64,7 @@ public final class TpCmd extends Command
 				BlockPos blockPos = blockHit.getBlockPos();
 				BlockState blockState = client.world.getBlockState(blockPos);
 				Block block = blockState.getBlock();
-				return new BlockPos(blockPos.getX() + 0.0, blockPos.getY()+1.0, blockPos.getZ() + 0.0);
+				return new BlockPos(blockPos.getX(), blockPos.getY()+1.0, blockPos.getZ());
 			}else{
 				throw new CmdError("Not found target");
 			}
