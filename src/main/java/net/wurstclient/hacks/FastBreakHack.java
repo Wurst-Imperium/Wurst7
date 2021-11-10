@@ -14,63 +14,60 @@ import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.BlockBreakingProgressListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"FastMine", "SpeedMine", "SpeedyGonzales", "fast break",
-	"fast mine", "speed mine", "speedy gonzales", "NoBreakDelay",
-	"no break delay"})
+	"fast mine", "speed mine", "speedy gonzales"})
 public final class FastBreakHack extends Hack
-	implements UpdateListener, BlockBreakingProgressListener
+	implements BlockBreakingProgressListener
 {
-	private final CheckboxSetting legitMode = new CheckboxSetting("Legit mode",
-		"Only removes the delay between breaking blocks,\n"
-			+ "without speeding up the breaking process itself.\n\n"
-			+ "This is slower, but usually bypasses anti-cheat\n"
-			+ "plugins. Use it if regular FastBreak is not\n" + "working.",
-		false);
+	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		Mode.values(), Mode.NORMAL);
+	
+	private final SliderSetting speed = new SliderSetting("Speed",
+		2, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	public FastBreakHack()
 	{
 		super("FastBreak");
 		setCategory(Category.BLOCKS);
-		addSetting(legitMode);
+		addSetting(mode);
+		addSetting(speed);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		if(legitMode.isChecked())
-			return getName() + "Legit";
-		return getName();
+		switch (mode.getSelected())
+		{
+			case NORMAL:
+			return getName() + " [" + speed.getValueString() + "x]";
+			
+			default:
+			return getName() + " [" + mode.getSelected() + "]";
+		}
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(BlockBreakingProgressListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(BlockBreakingProgressListener.class, this);
-	}
-	
-	@Override
-	public void onUpdate()
-	{
-		IMC.getInteractionManager().setBlockHitDelay(0);
 	}
 	
 	@Override
 	public void onBlockBreakingProgress(BlockBreakingProgressEvent event)
 	{
-		if(legitMode.isChecked())
+		if(mode.getSelected() != Mode.INSTANT)
 			return;
 		
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
@@ -82,5 +79,30 @@ public final class FastBreakHack extends Hack
 		BlockPos blockPos = event.getBlockPos();
 		Direction direction = event.getDirection();
 		im.sendPlayerActionC2SPacket(action, blockPos, direction);
+	}
+	
+	public float getHardnessModifier()
+	{
+		return isEnabled() && mode.getSelected() == Mode.NORMAL
+			? speed.getValueF() : 1;
+	}
+	
+	private enum Mode
+	{
+		NORMAL("Normal"),
+		INSTANT("Instant");
+		
+		private final String name;
+		
+		private Mode(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }

@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "AbstractBlockMixin",
   	"AbstractBlockStateMixin",
     "ArmorItemMixin",
     "BackgroundRendererMixin",

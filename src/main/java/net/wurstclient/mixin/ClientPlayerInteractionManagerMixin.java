@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -41,6 +42,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	private MinecraftClient client;
 	@Shadow
+	private BlockPos currentBreakingPos;
+	@Shadow
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
@@ -62,6 +65,25 @@ public abstract class ClientPlayerInteractionManagerMixin
 		BlockBreakingProgressEvent event =
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
 		EventManager.fire(event);
+	}
+	
+	@Inject(at = {@At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;breakBlock(Lnet/minecraft/util/math/BlockPos;)Z",
+		ordinal = 1)},
+		method = {
+			"attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
+	private void onAttackBlockBreakBlock(BlockPos pos, Direction direction,
+		CallbackInfoReturnable<Boolean> cir)
+	{
+		BlockState block = this.client.world.getBlockState(pos);
+		
+		if (block.calcBlockBreakingDelta(this.client.player,
+			this.client.player.world, pos)
+			/ WurstClient.INSTANCE.getHax().fastBreakHack.getHardnessModifier()
+			< 1)
+			this.sendPlayerAction(
+				PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos,
+				direction);
 	}
 	
 	@Inject(at = {@At("HEAD")},
@@ -86,6 +108,16 @@ public abstract class ClientPlayerInteractionManagerMixin
 			return;
 		
 		cir.setReturnValue(true);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "isCurrentlyBreaking(Lnet/minecraft/util/math/BlockPos;)Z",
+		cancellable = true)
+	private void onIsCurrentlyBreaking(BlockPos pos,
+		CallbackInfoReturnable<Boolean> cir)
+	{
+		if (WurstClient.INSTANCE.getHax().noSwitchResetHack.isEnabled())
+			cir.setReturnValue(pos.equals(this.currentBreakingPos));
 	}
 	
 	@Override
