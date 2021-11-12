@@ -40,7 +40,7 @@
   "description.wurst.hack.chattranslator": "从聊天栏的信息利用Google翻译成你所指定的语言(在中国大陆内不起效,除非你懂得如何重新起效)。",
   "description.wurst.hack.chestesp": "按你所设定的颜色高亮附近的箱子,潜影盒,陷阱箱,末影箱。",
   "description.wurst.hack.clickaura": "当瞄准的时候。自动攻击你附近有效的实体\n\n§c§l警告：§r 此功能通常来说比 Killaura 更加容易被发现且被检测出来，这极力推荐使用 Killaura 或者 TriggerBot 作为替代。",
-  "description.wurst.hack.clickgui": "基于类Windows样点击版GUI(有分类)。",
+  "description.wurst.hack.clickgui": "基于窗口的点击式GUI(有分类)。",
   "description.wurst.hack.crashchest": "生成一个容易封禁玩家的箱子，如果他们复制大量的箱子在他们背包里面 §c§l警告：§r §c这个无法撤销。 请小心使用！§r\n\n如果复制出来被放在箱子里，无论谁打开箱子就会被踢出服务器 (只要一个)。",
   "description.wurst.hack.creativeflight": "可以跟创造模式的飞行没啥两样(即双击空格起飞)。\n\n§c§l警告：§r 如果你不使用 NoFall，会导致受到掉落伤害。",
   "description.wurst.hack.criticals": "将你的攻击全变为暴击。",
