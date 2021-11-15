@@ -102,8 +102,10 @@ public final class Alt implements Comparable<Alt>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if(!(obj instanceof Alt other))
+		if(!(obj instanceof Alt))
 			return false;
+		
+		Alt other = (Alt)obj;
 		
 		return email.equals(other.email) && cracked == other.cracked;
 	}
