@@ -93,7 +93,7 @@ public final class BlockComponent extends Component
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		else if(hBlock)
 		{
 			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);

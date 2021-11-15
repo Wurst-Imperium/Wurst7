@@ -97,7 +97,7 @@ public final class CheckboxComponent extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = setting.getDescription();
+		String tooltip = setting.getWrappedDescription(200);
 		
 		if(setting.isLocked())
 		{

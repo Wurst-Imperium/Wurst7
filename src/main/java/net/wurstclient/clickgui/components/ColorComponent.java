@@ -71,7 +71,7 @@ public final class ColorComponent extends Component
 		
 		if(hovering)
 			if(mouseY < y3)
-				GUI.setTooltip(setting.getDescription());
+				GUI.setTooltip(setting.getWrappedDescription(200));
 			else
 			{
 				String tooltip = "\u00a7cR:\u00a7r" + setting.getRed();

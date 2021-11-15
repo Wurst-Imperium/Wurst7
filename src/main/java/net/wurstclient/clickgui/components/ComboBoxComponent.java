@@ -121,7 +121,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		
 		drawBackground(matrixStack, x1, x4, y1, y2);
 		drawBox(matrixStack, x2, x4, y1, y2, hBox);
