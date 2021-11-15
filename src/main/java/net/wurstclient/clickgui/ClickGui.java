@@ -490,19 +490,15 @@ public final class ClickGui
 			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
 		}
 		
-		renderPopupsAndTooltip(matrixStack, mouseX, mouseY);
+		renderPopups(matrixStack, mouseX, mouseY);
+		renderTooltip(matrixStack, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopupsAndTooltip(MatrixStack matrixStack, int mouseX,
-		int mouseY)
+	public void renderPopups(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		
-		// popups
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -521,67 +517,70 @@ public final class ClickGui
 			
 			matrixStack.pop();
 		}
+	}
+	
+	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+	{
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		// tooltip
-		if(!tooltip.isEmpty())
+		if(tooltip.isEmpty())
+			return;
+		
+		String[] lines = tooltip.split("\n");
+		TextRenderer fr = MC.textRenderer;
+		
+		int tw = 0;
+		int th = lines.length * fr.fontHeight;
+		for(String line : lines)
 		{
-			String[] lines = tooltip.split("\n");
-			TextRenderer fr = MC.textRenderer;
-			
-			int tw = 0;
-			int th = lines.length * fr.fontHeight;
-			for(String line : lines)
-			{
-				int lw = fr.getWidth(line);
-				if(lw > tw)
-					tw = lw;
-			}
-			int sw = MC.currentScreen.width;
-			int sh = MC.currentScreen.height;
-			
-			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
-			int xt2 = xt1 + tw + 3;
-			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
-			int yt2 = yt1 + th + 2;
-			
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
-			
-			RenderSystem.setShader(GameRenderer::getPositionShader);
-			
-			// background
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				0.75F);
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
-			
-			// outline
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
-			
-			// text
-			for(int i = 0; i < lines.length; i++)
-				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 2 + i * fr.fontHeight, 0xffffff);
-			GL11.glEnable(GL11.GL_BLEND);
-			
-			matrixStack.pop();
+			int lw = fr.getWidth(line);
+			if(lw > tw)
+				tw = lw;
 		}
+		int sw = MC.currentScreen.width;
+		int sh = MC.currentScreen.height;
+		
+		int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
+		int xt2 = xt1 + tw + 3;
+		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
+		int yt2 = yt1 + th + 2;
+		
+		matrixStack.push();
+		matrixStack.translate(0, 0, 300);
+		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		// background
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], 0.75F);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
+		// outline
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
+		// text
+		for(int i = 0; i < lines.length; i++)
+			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				0xffffff);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		matrixStack.pop();
 	}
 	
 	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)

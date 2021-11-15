@@ -36,6 +36,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.command.Command;
@@ -319,6 +320,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		
 		// title bar
 		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, 0xffffff);
@@ -350,7 +353,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
-		WurstClient.INSTANCE.getGui().setTooltip("");
+		gui.setTooltip("");
 		window.validate();
 		
 		int windowY = bgy1 + scroll + windowComponentY;
@@ -518,8 +521,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
-			mouseX, mouseY);
+		// popups & tooltip
+		gui.renderPopups(matrixStack, mouseX, mouseY);
+		gui.renderTooltip(matrixStack, mouseX, mouseY);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
