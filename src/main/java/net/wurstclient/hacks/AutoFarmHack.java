@@ -283,16 +283,16 @@ public final class AutoFarmHack extends Hack
 		if(block instanceof CactusBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
-		else if(block instanceof KelpPlantBlock)
+		if(block instanceof KelpPlantBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
-		else if(block instanceof NetherWartBlock)
+		if(block instanceof NetherWartBlock)
 			return state.get(NetherWartBlock.AGE) >= 3;
-		else if(block instanceof BambooBlock)
+		if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
-		else if(block instanceof CocoaBlock)
+		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;

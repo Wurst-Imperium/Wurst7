@@ -272,15 +272,13 @@ public abstract class ListWidget extends AbstractParentElement
 				(int)(mouseY - top) + (int)scrollAmount - 4);
 			return true;
 		}
-		if(i != -1 && selectItem(i, button, mouseX, mouseY))
-		{
-			if(children().size() > i)
-				setFocused(children().get(i));
-			
-			setDragging(true);
-			return true;
-		}else
+		if(i == -1 || !selectItem(i, button, mouseX, mouseY))
 			return scrolling;
+		if(children().size() > i)
+			setFocused(children().get(i));
+		
+		setDragging(true);
+		return true;
 	}
 	
 	@Override
@@ -298,7 +296,7 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))
 			return true;
-		if(!isVisible() || (button != 0) || !scrolling)
+		if(!isVisible() || button != 0 || !scrolling)
 			return false;
 		if(mouseY < top)
 			scrollAmount = 0.0D;
@@ -344,12 +342,13 @@ public abstract class ListWidget extends AbstractParentElement
 		{
 			moveSelection(1);
 			return true;
-		}else if(keyCode == 265)
+		}
+		if(keyCode == 265)
 		{
 			moveSelection(-1);
 			return true;
-		}else
-			return false;
+		}
+		return false;
 	}
 	
 	protected void moveSelection(int by)
