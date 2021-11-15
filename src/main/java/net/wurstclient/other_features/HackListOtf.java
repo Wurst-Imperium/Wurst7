@@ -48,7 +48,7 @@ public final class HackListOtf extends OtherFeature
 	public HackListOtf()
 	{
 		super("HackList", "Shows a list of active hacks on the screen.\n"
-			+ "The \u00a7lLeft\u00a7r position should only be used while TabGui is\n"
+			+ "The \u00a7lLeft\u00a7r position should only be used while TabGUI is\n"
 			+ "disabled.");
 		
 		addSetting(mode);

@@ -22,7 +22,7 @@ public final class TabGuiOtf extends OtherFeature
 	
 	public TabGuiOtf()
 	{
-		super("TabGui", "Allows you to quickly toggle hacks while playing.\n"
+		super("TabGUI", "Allows you to quickly toggle hacks while playing.\n"
 			+ "Use the arrow keys to navigate.");
 		
 		addSetting(status);
