@@ -30,26 +30,29 @@ public final class HackListOtf extends OtherFeature
 			+ "\u00a7lHidden\u00a7r mode renders nothing.",
 		Mode.values(), Mode.AUTO);
 	
-	private final EnumSetting<Position> position =
-		new EnumSetting<>("Position", Position.values(), Position.LEFT);
+	private final EnumSetting<Position> position = new EnumSetting<>("Position",
+		"Which side of the screen the HackList should be shown on."
+			+ "\nChange this to \u00a7lRight\u00a7r when using TabGUI.",
+		Position.values(), Position.LEFT);
 	
-	private final EnumSetting<SortBy> sortBy =
-		new EnumSetting<>("Sort by", SortBy.values(), SortBy.NAME);
+	private final EnumSetting<SortBy> sortBy = new EnumSetting<>("Sort by",
+		"Determines how the HackList entries are sorted.\n"
+			+ "Only visible when \u00a76Mode\u00a7r is set to \u00a76Auto\u00a7r.",
+		SortBy.values(), SortBy.NAME);
 	
 	private final CheckboxSetting revSort =
 		new CheckboxSetting("Reverse sorting", false);
 	
-	private final CheckboxSetting animations =
-		new CheckboxSetting("Animations", true);
+	private final CheckboxSetting animations = new CheckboxSetting("Animations",
+		"When enabled, entries slide into and out of the HackList as hacks are enabled and disabled.",
+		true);
 	
 	private SortBy prevSortBy;
 	private Boolean prevRevSort;
 	
 	public HackListOtf()
 	{
-		super("HackList", "Shows a list of active hacks on the screen.\n"
-			+ "The \u00a7lLeft\u00a7r position should only be used while TabGUI is\n"
-			+ "disabled.");
+		super("HackList", "Shows a list of active hacks on the screen.");
 		
 		addSetting(mode);
 		addSetting(position);
