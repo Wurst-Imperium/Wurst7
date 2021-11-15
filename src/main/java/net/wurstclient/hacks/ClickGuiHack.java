@@ -23,11 +23,14 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"click gui", "WindowGUI", "window gui", "HackMenu", "hack menu"})
 public final class ClickGuiHack extends Hack
 {
-	private final ColorSetting bgColor = new ColorSetting("Background",
-		"Background color", new Color(64, 64, 64));
+	private final ColorSetting bgColor =
+		new ColorSetting("Background", "Background color", new Color(0x404040));
 	
 	private final ColorSetting acColor =
-		new ColorSetting("Accent", "Accent color", new Color(16, 16, 16));
+		new ColorSetting("Accent", "Accent color", new Color(0x101010));
+	
+	private final ColorSetting txtColor =
+		new ColorSetting("Text", "Text color", new Color(0xF0F0F0));
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity", 0.5,
 		0.15, 0.85, 0.01, ValueDisplay.PERCENTAGE);
@@ -40,6 +43,7 @@ public final class ClickGuiHack extends Hack
 		super("ClickGUI");
 		addSetting(bgColor);
 		addSetting(acColor);
+		addSetting(txtColor);
 		addSetting(opacity);
 		addSetting(ttOpacity);
 	}
@@ -59,6 +63,11 @@ public final class ClickGuiHack extends Hack
 	public float[] getAccentColor()
 	{
 		return acColor.getColorF();
+	}
+	
+	public int getTextColor()
+	{
+		return txtColor.getColorI();
 	}
 	
 	public float getOpacity()

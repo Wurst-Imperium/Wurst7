@@ -263,14 +263,16 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
 		int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
-		int color = 0xF0F0F0;
 		
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x4 + 2, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x4 + 2, y1 + 2, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

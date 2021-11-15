@@ -61,6 +61,7 @@ public final class FileComponent extends Component
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
@@ -130,9 +131,9 @@ public final class FileComponent extends Component
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		String text = setting.getName() + ": ";
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		fr.draw(matrixStack, setting.getSelectedFileName(), x3 + 2, y1 + 2,
-			0xf0f0f0);
+			txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

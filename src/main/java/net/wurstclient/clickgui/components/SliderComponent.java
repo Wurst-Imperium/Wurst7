@@ -307,15 +307,17 @@ public final class SliderComponent extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1, boolean renderAsDisabled)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

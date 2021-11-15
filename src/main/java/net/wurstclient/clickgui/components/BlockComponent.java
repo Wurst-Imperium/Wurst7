@@ -68,6 +68,7 @@ public final class BlockComponent extends Component
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		int x1 = getX();
@@ -120,7 +121,7 @@ public final class BlockComponent extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		
 		renderIcon(matrixStack, stack, x3, y1, true);
 		

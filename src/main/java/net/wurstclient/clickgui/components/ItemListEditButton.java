@@ -60,6 +60,7 @@ public final class ItemListEditButton extends Component
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		int x1 = getX();
@@ -122,8 +123,8 @@ public final class ItemListEditButton extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getItemNames().size();
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
+		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, txtColor);
 	}
 	
 	@Override

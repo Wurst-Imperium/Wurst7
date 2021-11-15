@@ -54,6 +54,7 @@ public final class ClickGui
 	
 	private float[] bgColor = new float[3];
 	private float[] acColor = new float[3];
+	private int txtColor;
 	private float opacity;
 	private float ttOpacity;
 	
@@ -579,7 +580,7 @@ public final class ClickGui
 		// text
 		for(int i = 0; i < lines.length; i++)
 			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
-				0xffffff);
+				txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		matrixStack.pop();
@@ -608,6 +609,7 @@ public final class ClickGui
 		opacity = clickGui.getOpacity();
 		ttOpacity = clickGui.getTooltipOpacity();
 		bgColor = clickGui.getBackgroundColor();
+		txtColor = clickGui.getTextColor();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
@@ -891,7 +893,7 @@ public final class ClickGui
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
 				.getString();
-		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
+		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -1217,6 +1219,11 @@ public final class ClickGui
 	public float[] getAcColor()
 	{
 		return acColor;
+	}
+	
+	public int getTxtColor()
+	{
+		return txtColor;
 	}
 	
 	public float getOpacity()
