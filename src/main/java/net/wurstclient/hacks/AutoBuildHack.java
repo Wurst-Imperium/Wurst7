@@ -293,7 +293,7 @@ public final class AutoBuildHack extends Hack
 			|| !(hitResult instanceof BlockHitResult))
 			return;
 		
-		BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
 		
 		BlockPos hitResultPos = blockHitResult.getBlockPos();
 		if(!BlockUtils.canBeClicked(hitResultPos))

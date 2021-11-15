@@ -130,7 +130,6 @@ public final class AutoToolHack extends Hack
 			if(useHands && isWrongTool(heldItem, pos))
 			{
 				selectFallbackSlot();
-				return;
 			}
 			
 			return;

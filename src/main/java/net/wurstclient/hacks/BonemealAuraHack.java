@@ -218,7 +218,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		if(block instanceof CropBlock
 			&& ((CropBlock)block).isFertilizable(world, pos, state, true))
 			return crops.isChecked();
-		else if(block instanceof StemBlock
+		if(block instanceof StemBlock
 			&& ((StemBlock)block).isFertilizable(world, pos, state, true))
 			return stems.isChecked();
 		else if(block instanceof CocoaBlock
