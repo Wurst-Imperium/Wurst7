@@ -55,6 +55,7 @@ public final class ClickGui
 	private float[] bgColor = new float[3];
 	private float[] acColor = new float[3];
 	private float opacity;
+	private float ttOpacity;
 	
 	private String tooltip = "";
 	
@@ -552,7 +553,8 @@ public final class ClickGui
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], 0.75F);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			ttOpacity);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
@@ -604,7 +606,8 @@ public final class ClickGui
 		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
 		
 		opacity = clickGui.getOpacity();
-		bgColor = clickGui.getBgColor();
+		ttOpacity = clickGui.getTooltipOpacity();
+		bgColor = clickGui.getBackgroundColor();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
@@ -614,7 +617,7 @@ public final class ClickGui
 			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
 			
 		}else
-			acColor = clickGui.getAcColor();
+			acColor = clickGui.getAccentColor();
 	}
 	
 	private void renderWindow(MatrixStack matrixStack, Window window,
