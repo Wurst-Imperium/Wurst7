@@ -28,9 +28,9 @@
 
   "depends": {
     "fabricloader": ">=0.11.3",
-    "fabric": ">=0.36.1",
-    "minecraft": ">=1.18-alpha.21.44.a",
-    "java": ">=16"
+    "fabric": ">=0.42.4",
+    "minecraft": ">=1.18-beta.2",
+    "java": ">=17"
   },
   "suggests": {
     "flamingo": "*"
