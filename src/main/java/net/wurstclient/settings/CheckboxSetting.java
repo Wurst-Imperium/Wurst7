@@ -18,6 +18,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.CheckboxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public class CheckboxSetting extends Setting implements CheckboxLock
 {
@@ -25,11 +26,17 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	private final boolean checkedByDefault;
 	private CheckboxLock lock;
 	
-	public CheckboxSetting(String name, String description, boolean checked)
+	public CheckboxSetting(String name, String description,
+		@Nullable Runnable changeCallback, boolean checked)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		this.checked = checked;
 		checkedByDefault = checked;
+	}
+
+	public CheckboxSetting(String name, String description, boolean checked)
+	{
+		this(name, description, null, checked);
 	}
 	
 	public CheckboxSetting(String name, boolean checked)
@@ -62,6 +69,8 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 		update();
 		
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public final boolean isLocked()

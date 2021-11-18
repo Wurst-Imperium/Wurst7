@@ -22,17 +22,24 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.ColorUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public final class ColorSetting extends Setting
 {
 	private Color color;
 	private final Color defaultColor;
-	
-	public ColorSetting(String name, String description, Color color)
+
+	public ColorSetting(String name, String description,
+		@Nullable Runnable changeCallback, Color color)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		this.color = Objects.requireNonNull(color);
 		defaultColor = color;
+	}
+
+	public ColorSetting(String name, String description, Color color)
+	{
+		this(name, description, null, color);
 	}
 	
 	public ColorSetting(String name, Color color)

@@ -18,6 +18,7 @@ import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public class SliderSetting extends Setting implements SliderLock
 {
@@ -33,10 +34,11 @@ public class SliderSetting extends Setting implements SliderLock
 	private double usableMin;
 	private double usableMax;
 	
-	public SliderSetting(String name, String description, double value,
-		double minimum, double maximum, double increment, ValueDisplay display)
+	public SliderSetting(String name, String description,
+		 @Nullable Runnable changeCallback, double value,
+		 double minimum, double maximum, double increment, ValueDisplay display)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		this.value = value;
 		defaultValue = value;
 		
@@ -48,6 +50,13 @@ public class SliderSetting extends Setting implements SliderLock
 		
 		this.increment = increment;
 		this.display = display;
+	}
+
+	public SliderSetting(String name, String description, double value,
+		double minimum, double maximum, double increment, ValueDisplay display)
+	{
+		this(name, description, null,
+			value, minimum, maximum, increment, display);
 	}
 	
 	public SliderSetting(String name, double value, double minimum,
@@ -100,6 +109,8 @@ public class SliderSetting extends Setting implements SliderLock
 		update();
 		
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public final void increaseValue()

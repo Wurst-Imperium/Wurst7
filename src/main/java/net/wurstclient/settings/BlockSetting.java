@@ -23,17 +23,18 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public final class BlockSetting extends Setting
 {
-	private String blockName = "";
+	private String blockName;
 	private final String defaultName;
 	private final boolean allowAir;
 	
 	public BlockSetting(String name, String description, String blockName,
-		boolean allowAir)
+		@Nullable Runnable changeCallback, boolean allowAir)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		
 		Block block = BlockUtils.getBlockFromName(blockName);
 		Objects.requireNonNull(block);
@@ -42,10 +43,11 @@ public final class BlockSetting extends Setting
 		defaultName = this.blockName;
 		this.allowAir = allowAir;
 	}
-	
-	public BlockSetting(String name, String blockName, boolean allowAir)
+
+	public BlockSetting(String name, String description, String blockName,
+		boolean allowAir)
 	{
-		this(name, "", blockName, allowAir);
+		this(name, description, blockName, null, allowAir);
 	}
 	
 	public Block getBlock()
@@ -73,6 +75,8 @@ public final class BlockSetting extends Setting
 		
 		blockName = newName;
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public void setBlockName(String blockName)
@@ -87,6 +91,8 @@ public final class BlockSetting extends Setting
 	{
 		blockName = defaultName;
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	@Override
@@ -110,7 +116,8 @@ public final class BlockSetting extends Setting
 				throw new JsonException();
 			
 			blockName = BlockUtils.getName(newBlock);
-			
+
+			notifyChange();
 		}catch(JsonException e)
 		{
 			e.printStackTrace();

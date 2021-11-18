@@ -29,21 +29,28 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
+import org.jetbrains.annotations.Nullable;
 
 public final class BlockListSetting extends Setting
 {
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public BlockListSetting(String name, String description, String... blocks)
+	public BlockListSetting(String name, String description,
+		@Nullable Runnable changeCallback, String... blocks)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		
 		Arrays.stream(blocks).parallel()
 			.map(s -> Registry.BLOCK.get(new Identifier(s)))
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
+	}
+
+	public BlockListSetting(String name, String description, String... blocks)
+	{
+		this(name, description, null, blocks);
 	}
 	
 	public List<String> getBlockNames()
@@ -60,6 +67,8 @@ public final class BlockListSetting extends Setting
 		blockNames.add(name);
 		Collections.sort(blockNames);
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public void remove(int index)
@@ -69,6 +78,8 @@ public final class BlockListSetting extends Setting
 		
 		blockNames.remove(index);
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public void resetToDefaults()
@@ -76,6 +87,8 @@ public final class BlockListSetting extends Setting
 		blockNames.clear();
 		blockNames.addAll(Arrays.asList(defaultNames));
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	@Override
@@ -96,7 +109,8 @@ public final class BlockListSetting extends Setting
 				.map(s -> Registry.BLOCK.get(new Identifier(s)))
 				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 				.sorted().forEachOrdered(s -> blockNames.add(s));
-			
+
+			notifyChange();
 		}catch(JsonException e)
 		{
 			e.printStackTrace();

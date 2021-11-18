@@ -27,6 +27,7 @@ import net.wurstclient.clickgui.components.FileComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public final class FileSetting extends Setting
 {
@@ -34,13 +35,20 @@ public final class FileSetting extends Setting
 	private String selectedFile = "";
 	private final Consumer<Path> createDefaultFiles;
 	
-	public FileSetting(String name, String description, String folderName,
+	public FileSetting(String name, String description,
+		@Nullable Runnable changeCallback, String folderName,
 		Consumer<Path> createDefaultFiles)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		folder = WurstClient.INSTANCE.getWurstFolder().resolve(folderName);
 		this.createDefaultFiles = createDefaultFiles;
 		setSelectedFileToDefault();
+	}
+
+	public FileSetting(String name, String description, String folderName,
+		Consumer<Path> createDefaultFiles)
+	{
+		this(name, description, null, folderName, createDefaultFiles);
 	}
 	
 	public Path getFolder()
@@ -68,6 +76,8 @@ public final class FileSetting extends Setting
 		
 		this.selectedFile = selectedFile;
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	private void setSelectedFileToDefault()
@@ -115,6 +125,8 @@ public final class FileSetting extends Setting
 		
 		setSelectedFileToDefault();
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public ArrayList<Path> listFiles()
@@ -150,7 +162,8 @@ public final class FileSetting extends Setting
 				throw new JsonException();
 			
 			selectedFile = newFile;
-			
+
+			notifyChange();
 		}catch(JsonException e)
 		{
 			e.printStackTrace();

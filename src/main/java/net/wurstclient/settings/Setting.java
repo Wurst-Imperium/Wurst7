@@ -19,16 +19,26 @@ import net.minecraft.text.Style;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.keybinds.PossibleKeybind;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Setting
 {
 	private final String name;
 	private final String description;
+	private final @Nullable Runnable changeCallback;
 	
-	public Setting(String name, String description)
+	protected Setting(String name, String description,
+		@Nullable Runnable changeCallback)
 	{
 		this.name = Objects.requireNonNull(name);
 		this.description = Objects.requireNonNull(description);
+		this.changeCallback = changeCallback;
+	}
+
+	protected final void notifyChange()
+	{
+		if(changeCallback != null)
+			changeCallback.run();
 	}
 	
 	public final String getName()

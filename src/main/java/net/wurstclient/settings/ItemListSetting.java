@@ -28,15 +28,17 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
+import org.jetbrains.annotations.Nullable;
 
 public final class ItemListSetting extends Setting
 {
 	private final ArrayList<String> itemNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public ItemListSetting(String name, String description, String... items)
+	public ItemListSetting(String name, String description,
+		@Nullable Runnable changeCallback, String... items)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		
 		Arrays.stream(items).parallel()
 			.map(s -> Registry.ITEM.get(new Identifier(s)))
@@ -44,6 +46,11 @@ public final class ItemListSetting extends Setting
 			.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted()
 			.forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
+	}
+
+	public ItemListSetting(String name, String description, String... items)
+	{
+		this(name, description, null, items);
 	}
 	
 	public List<String> getItemNames()
@@ -60,6 +67,8 @@ public final class ItemListSetting extends Setting
 		itemNames.add(name);
 		Collections.sort(itemNames);
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public void remove(int index)
@@ -69,6 +78,8 @@ public final class ItemListSetting extends Setting
 		
 		itemNames.remove(index);
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public void resetToDefaults()
@@ -76,6 +87,8 @@ public final class ItemListSetting extends Setting
 		itemNames.clear();
 		itemNames.addAll(Arrays.asList(defaultNames));
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	@Override
@@ -97,7 +110,8 @@ public final class ItemListSetting extends Setting
 				.filter(Objects::nonNull)
 				.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted()
 				.forEachOrdered(s -> itemNames.add(s));
-			
+
+			notifyChange();
 		}catch(JsonException e)
 		{
 			e.printStackTrace();

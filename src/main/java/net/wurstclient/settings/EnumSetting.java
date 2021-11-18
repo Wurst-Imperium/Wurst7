@@ -18,6 +18,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ComboBoxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
+import org.jetbrains.annotations.Nullable;
 
 public final class EnumSetting<T extends Enum<T>> extends Setting
 {
@@ -25,12 +26,18 @@ public final class EnumSetting<T extends Enum<T>> extends Setting
 	private T selected;
 	private final T defaultSelected;
 	
-	public EnumSetting(String name, String description, T[] values, T selected)
+	public EnumSetting(String name, String description,
+		@Nullable Runnable changeCallback, T[] values, T selected)
 	{
-		super(name, description);
+		super(name, description, changeCallback);
 		this.values = Objects.requireNonNull(values);
 		this.selected = Objects.requireNonNull(selected);
 		defaultSelected = selected;
+	}
+
+	public EnumSetting(String name, String description, T[] values, T selected)
+	{
+		this(name, description, null, values, selected);
 	}
 	
 	public EnumSetting(String name, T[] values, T selected)
@@ -57,6 +64,8 @@ public final class EnumSetting<T extends Enum<T>> extends Setting
 	{
 		this.selected = Objects.requireNonNull(selected);
 		WurstClient.INSTANCE.saveSettings();
+
+		notifyChange();
 	}
 	
 	public boolean setSelected(String selected)
