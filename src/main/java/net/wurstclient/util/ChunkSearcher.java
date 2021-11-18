@@ -16,7 +16,9 @@ import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import net.wurstclient.WurstClient;
 
 /**
@@ -63,6 +65,8 @@ public final class ChunkSearcher
 		int maxY = world.getTopY();
 		int maxZ = chunkPos.getEndZ();
 		
+		WorldChunk chunk = world.getChunk(ChunkSectionPos.getSectionCoord(minX), ChunkSectionPos.getSectionCoord(minZ));
+		
 		for(int x = minX; x <= maxX; x++)
 			for(int y = minY; y <= maxY; y++)
 				for(int z = minZ; z <= maxZ; z++)
@@ -71,7 +75,7 @@ public final class ChunkSearcher
 						return;
 					
 					BlockPos pos = new BlockPos(x, y, z);
-					Block block = BlockUtils.getBlock(pos);
+					Block block = chunk.getBlockState(pos).getBlock();
 					if(!this.block.equals(block))
 						continue;
 					
