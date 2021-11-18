@@ -7,45 +7,30 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
-import net.wurstclient.hack.Hack;
+import net.wurstclient.hack.BlockMatchHack;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RenderUtils;
+
+import java.awt.*;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @SearchTags({"base finder", "factions"})
-public final class BaseFinderHack extends Hack
+public final class BaseFinderHack extends BlockMatchHack
 	implements UpdateListener, RenderListener
 {
 	private final BlockListSetting naturalBlocks = new BlockListSetting(
 		"Natural Blocks",
 		"These blocks will be considered\n" + "part of natural generation.\n\n"
 			+ "They will NOT be highlighted\n" + "as player bases.",
+			this::updateBlockMatcher,
 		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
 		"minecraft:allium", "minecraft:amethyst_block",
 		"minecraft:amethyst_cluster", "minecraft:andesite",
@@ -89,25 +74,16 @@ public final class BaseFinderHack extends Hack
 	
 	private final ColorSetting color = new ColorSetting("Color",
 		"Man-made blocks will be\n" + "highlighted in this color.", Color.RED);
-	
-	private ArrayList<String> blockNames;
-	
-	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
-	private final ArrayList<int[]> vertices = new ArrayList<>();
-	private VertexBuffer vertexBuffer;
-	
-	private int messageTimer = 0;
-	private int counter;
-	
-	private Integer oldRegionX;
-	private Integer oldRegionZ;
-	
+
+	private int cachedMatchingCount = 0;
+
 	public BaseFinderHack()
 	{
 		super("BaseFinder");
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
 		addSetting(color);
+		setDisplayStyle(DisplayStyle.BLOCKS);
 	}
 	
 	@Override
@@ -116,25 +92,32 @@ public final class BaseFinderHack extends Hack
 		String name = getName() + " [";
 		
 		// counter
-		if(counter >= 10000)
+		if(cachedMatchingCount >= 10000)
 			name += "10000+ blocks";
-		else if(counter == 1)
+		else if(cachedMatchingCount == 1)
 			name += "1 block";
-		else if(counter == 0)
+		else if(cachedMatchingCount == 0)
 			name += "nothing";
 		else
-			name += counter + " blocks";
+			name += cachedMatchingCount + " blocks";
 		
 		name += " found]";
 		return name;
 	}
-	
+
+	private void updateBlockMatcher()
+	{
+		final Set<Block> blocks = naturalBlocks.getBlockNames().stream().map(
+			BlockUtils::getBlockFromName).collect(Collectors.toSet());
+		setBlockMatcher(b -> !blocks.contains(b));
+	}
+
 	@Override
 	public void onEnable()
 	{
-		// reset timer
-		messageTimer = 0;
-		blockNames = new ArrayList<>(naturalBlocks.getBlockNames());
+		super.onEnable();
+
+		updateBlockMatcher();
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -145,192 +128,24 @@ public final class BaseFinderHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		matchingBlocks.clear();
-		vertices.clear();
-		oldRegionX = null;
-		oldRegionZ = null;
-		
-		if(vertexBuffer != null)
-			vertexBuffer.close();
+		super.onDisable();
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
 		float[] colorF = color.getColorF();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.15F);
-		
-		if(vertexBuffer != null)
-		{
-			Matrix4f viewMatrix = matrixStack.peek().getModel();
-			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
-			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
-		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		render(matrixStack, colorF[0], colorF[1], colorF[2], 0.15F);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		int modulo = MC.player.age % 64;
-		
-		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
-			return;
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		Integer regionX = (camPos.getX() >> 9) * 512;
-		Integer regionZ = (camPos.getZ() >> 9) * 512;
-		
-		if(modulo == 0 || !regionX.equals(oldRegionX)
-			|| !regionZ.equals(oldRegionZ))
+		updateSearch();
+
+		if((MC.player.age & 31) == 0 && matchingWorld != null)
 		{
-			if(vertexBuffer != null)
-				vertexBuffer.close();
-			
-			vertexBuffer = new VertexBuffer();
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			
-			for(int[] vertex : vertices)
-				bufferBuilder
-					.vertex(vertex[0] - regionX, vertex[1], vertex[2] - regionZ)
-					.next();
-			
-			bufferBuilder.end();
-			vertexBuffer.upload(bufferBuilder);
-			
-			oldRegionX = regionX;
-			oldRegionZ = regionZ;
+			cachedMatchingCount = matchingWorld.chunks().stream().mapToInt(c -> c.getMatchChunk().getBitsSetAtLeastOnce()).sum();
 		}
-		
-		// reset matching blocks
-		if(modulo == 0)
-			matchingBlocks.clear();
-		
-		int stepSize = MC.world.getHeight() / 64;
-		int startY = MC.world.getTopY() - 1 - modulo * stepSize;
-		int endY = startY - stepSize;
-		
-		BlockPos playerPos =
-			new BlockPos(MC.player.getX(), 0, MC.player.getZ());
-		
-		// search matching blocks
-		loop: for(int y = startY; y > endY; y--)
-			for(int x = 64; x > -64; x--)
-				for(int z = 64; z > -64; z--)
-				{
-					if(matchingBlocks.size() >= 10000)
-						break loop;
-					
-					BlockPos pos = new BlockPos(playerPos.getX() + x, y,
-						playerPos.getZ() + z);
-					
-					if(Collections.binarySearch(blockNames,
-						BlockUtils.getName(pos)) >= 0)
-						continue;
-					
-					matchingBlocks.add(pos);
-				}
-			
-		if(modulo != 63)
-			return;
-		
-		// update timer
-		if(matchingBlocks.size() < 10000)
-			messageTimer--;
-		else
-		{
-			// show message
-			if(messageTimer <= 0)
-			{
-				ChatUtils
-					.warning("BaseFinder found \u00a7lA LOT\u00a7r of blocks.");
-				ChatUtils.message(
-					"To prevent lag, it will only show the first 10000 blocks.");
-			}
-			
-			// reset timer
-			messageTimer = 3;
-		}
-		
-		// update counter
-		counter = matchingBlocks.size();
-		
-		// calculate vertices
-		vertices.clear();
-		for(BlockPos pos : matchingBlocks)
-		{
-			if(!matchingBlocks.contains(pos.down()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 1, 0, 0);
-				addVertex(pos, 1, 0, 1);
-				addVertex(pos, 0, 0, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.up()))
-			{
-				addVertex(pos, 0, 1, 0);
-				addVertex(pos, 0, 1, 1);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 1, 1, 0);
-			}
-			
-			if(!matchingBlocks.contains(pos.north()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 0, 1, 0);
-				addVertex(pos, 1, 1, 0);
-				addVertex(pos, 1, 0, 0);
-			}
-			
-			if(!matchingBlocks.contains(pos.east()))
-			{
-				addVertex(pos, 1, 0, 0);
-				addVertex(pos, 1, 1, 0);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 1, 0, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.south()))
-			{
-				addVertex(pos, 0, 0, 1);
-				addVertex(pos, 1, 0, 1);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 0, 1, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.west()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 0, 0, 1);
-				addVertex(pos, 0, 1, 1);
-				addVertex(pos, 0, 1, 0);
-			}
-		}
-	}
-	
-	private void addVertex(BlockPos pos, int x, int y, int z)
-	{
-		vertices.add(new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z});
 	}
 }

@@ -9,38 +9,24 @@ package net.wurstclient.hacks;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.BlockMatchHack;
-import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.BlockUtils;
 
-import java.awt.*;
-
-@SearchTags({"cave finder"})
-public final class CaveFinderHack extends BlockMatchHack
+@SearchTags({"portal finder"})
+public final class PortalFinderHack extends BlockMatchHack
 	implements UpdateListener, RenderListener
 {
-	private final ColorSetting color = new ColorSetting("Color",
-		"Caves will be highlighted\n" + "in this color.", Color.RED);
-	
-	private final SliderSetting opacity = new SliderSetting("Opacity",
-		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
-		0, 1, 0.01,
-		v -> v == 0 ? "Breathing" : SliderSetting.ValueDisplay.PERCENTAGE.getValueString(v));
-
-	public CaveFinderHack()
+	public PortalFinderHack()
 	{
-		super("CaveFinder");
+		super("PortalFinder");
 		setCategory(Category.RENDER);
-		addSetting(color);
-		addSetting(opacity);
-		Block caveAir = BlockUtils.getBlockFromName("minecraft:cave_air");
-		setBlockMatcher(b -> b == caveAir);
+		Block portal = BlockUtils.getBlockFromName("minecraft:nether_portal");
+		setBlockMatcher(b -> b == portal);
+		setDisplayStyle(DisplayStyle.BOTH);
 	}
 
 	@Override
@@ -70,16 +56,6 @@ public final class CaveFinderHack extends BlockMatchHack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		float alpha;
-
-		if (opacity.getValue() > 0)
-			alpha = opacity.getValueF();
-		else {
-			float x = System.currentTimeMillis() % 2000 / 1000F;
-			alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
-		}
-
-		float[] colorF = color.getColorF();
-		render(matrixStack, colorF[0], colorF[1], colorF[2], alpha);
+		render(matrixStack, 0.9F, 0.15F, 1.F, 0.5F);
 	}
 }

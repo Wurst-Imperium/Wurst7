@@ -7,11 +7,6 @@
  */
 package net.wurstclient.util;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
@@ -19,40 +14,37 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
+import java.util.function.Predicate;
+
 /**
  * Searches a {@link Chunk} for a particular type of {@link Block}.
  */
 public final class ChunkSearcher
 {
+	public interface MatchContainer {
+		void set(int x, int y, int z);
+		void clear();
+	}
+
 	private final Chunk chunk;
-	private final Block block;
-	private final int dimensionId;
-	private final ArrayList<BlockPos> matchingBlocks = new ArrayList<>();
+	private final Predicate<Block> matcher;
+	private final MatchContainer matchingBlocks;
 	private ChunkSearcher.Status status = Status.IDLE;
-	private Future<?> future;
-	
-	public ChunkSearcher(Chunk chunk, Block block, int dimensionId)
+
+	public ChunkSearcher(Chunk chunk, Predicate<Block> blockMatcher, MatchContainer matchingBlocks)
 	{
 		this.chunk = chunk;
-		this.block = block;
-		this.dimensionId = dimensionId;
+		this.matcher = blockMatcher;
+		this.matchingBlocks = matchingBlocks;
 	}
 	
-	public void startSearching(ExecutorService pool)
+	public void search()
 	{
 		if(status != Status.IDLE)
-			throw new IllegalStateException();
-		
+			throw new IllegalStateException("Can't run search when in status " + status);
 		status = Status.SEARCHING;
-		future = pool.submit(this::searchNow);
-	}
-	
-	private void searchNow()
-	{
-		if(status == Status.IDLE || status == Status.DONE
-			|| !matchingBlocks.isEmpty())
-			throw new IllegalStateException();
-		
+		matchingBlocks.clear();
+
 		ChunkPos chunkPos = chunk.getPos();
 		ClientWorld world = WurstClient.MC.world;
 		
@@ -60,79 +52,40 @@ public final class ChunkSearcher
 		int minY = world.getBottomY();
 		int minZ = chunkPos.getStartZ();
 		int maxX = chunkPos.getEndX();
-		int maxY = world.getTopY();
+		int maxY = chunk.getHighestNonEmptySectionYOffset() + 15;
 		int maxZ = chunkPos.getEndZ();
-		
+
+		BlockPos.Mutable pos = new BlockPos.Mutable();
 		for(int x = minX; x <= maxX; x++)
-			for(int y = minY; y <= maxY; y++)
-				for(int z = minZ; z <= maxZ; z++)
+		{
+			pos.setX(x);
+			for (int y = minY; y <= maxY; y++)
+			{
+				if (status == Status.INTERRUPTED || Thread.interrupted())
+					return;
+				pos.setY(y);
+				for (int z = minZ; z <= maxZ; z++)
 				{
-					if(status == Status.INTERRUPTED || Thread.interrupted())
-						return;
-					
-					BlockPos pos = new BlockPos(x, y, z);
-					Block block = BlockUtils.getBlock(pos);
-					if(!this.block.equals(block))
-						continue;
-					
-					matchingBlocks.add(pos);
+					pos.setZ(z);
+					Block block = chunk.getBlockState(pos).getBlock();
+					if (this.matcher.test(block))
+						matchingBlocks.set(x, y, z);
 				}
-			
-		status = Status.DONE;
-	}
-	
-	public void cancelSearching()
-	{
-		new Thread(this::cancelNow, "ChunkSearcher-canceller").start();
-	}
-	
-	private void cancelNow()
-	{
-		if(future != null)
-			try
-			{
-				status = Status.INTERRUPTED;
-				future.get();
-				
-			}catch(InterruptedException | ExecutionException e)
-			{
-				e.printStackTrace();
 			}
-		
-		matchingBlocks.clear();
+		}
+			
 		status = Status.IDLE;
 	}
-	
-	public Chunk getChunk()
+
+	public void interrupt()
 	{
-		return chunk;
+		status = Status.INTERRUPTED;
 	}
-	
-	public Block getBlock()
-	{
-		return block;
-	}
-	
-	public int getDimensionId()
-	{
-		return dimensionId;
-	}
-	
-	public ArrayList<BlockPos> getMatchingBlocks()
-	{
-		return matchingBlocks;
-	}
-	
-	public ChunkSearcher.Status getStatus()
-	{
-		return status;
-	}
-	
-	public static enum Status
+
+	public enum Status
 	{
 		IDLE,
 		SEARCHING,
-		INTERRUPTED,
-		DONE;
+		INTERRUPTED
 	}
 }

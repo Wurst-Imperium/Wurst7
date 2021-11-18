@@ -7,107 +7,103 @@
  */
 package net.wurstclient.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.hacks.SearchHack;
+import net.minecraft.util.math.ChunkPos;
+import net.wurstclient.util.world.*;
+
+import java.util.Objects;
 
 /**
- * Converts a {@link HashSet} of block positions into an {@link ArrayList} of
- * vertices that can be used to render those blocks.
+ * Converts a chunk of {@link BlockMatchingWorld} into a
+ * {@link BufferBuilder} that can be used to render those blocks.
  * <p>
- * Used by {@link SearchHack Search} and similar hacks.
+ * Used by hacks descending from {@link net.wurstclient.hack.BlockMatchHack}.
  */
 public enum BlockVertexCompiler
 {
 	;
-	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks)
+
+	public static BufferBuilder compileVertices(BlockMatchingWorld matchingWorld, int cx, int cz)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.collect(Collectors.toCollection(ArrayList::new));
+		BufferBuilder buffer = BufferBuilderStorage.take();
+		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		int bx = cx << 4;
+		int bz = cz << 4;
+		BoolChunk chunk = Objects.requireNonNull(matchingWorld.getChunk(ChunkPos.toLong(cx, cz))).getMatchChunk();
+		if(chunk instanceof ArrayBoolChunk)
+			for(int y = 0; y < BoolChunk.HEIGHT; y++)
+				for(int z = 0; z < BoolChunk.LENGTH; z++)
+				{
+					short row = ((ArrayBoolChunk)chunk).getRow(y, z);
+					if(row != 0)
+						for(int x = 0; x < BoolChunk.WIDTH; x++)
+							if(((row >> x) & 1) == 1)
+								getVertices(buffer, bx + x, y, bz + z, matchingWorld);
+				}
+		else if(chunk instanceof SetBoolChunk)
+			for(Long pos : ((SetBoolChunk)chunk).getBlockPositions())
+				getVertices(buffer, BlockPos.unpackLongX(pos), BlockPos.unpackLongY(pos), BlockPos.unpackLongZ(pos), matchingWorld);
+		else
+			throw new UnsupportedOperationException();
+		buffer.end();
+		return buffer;
 	}
 	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks, int regionX, int regionZ)
+	@SuppressWarnings({"PointlessArithmeticExpression", "squid:S2184"})
+	public static void getVertices(BufferBuilder buffer, int x, int y, int z,
+								   BoolView matchingWorld)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.map(v -> applyRegionOffset(v, regionX, regionZ))
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private static int[] applyRegionOffset(int[] vertex, int regionX,
-		int regionZ)
-	{
-		vertex[0] -= regionX;
-		vertex[2] -= regionZ;
-		return vertex;
-	}
-	
-	private static ArrayList<int[]> getVertices(BlockPos pos,
-		HashSet<BlockPos> matchingBlocks)
-	{
-		ArrayList<int[]> vertices = new ArrayList<>();
-		
-		if(!matchingBlocks.contains(pos.down()))
+		int vx = x & 15;
+		int vz = z & 15;
+		if(y == 0 || !matchingWorld.get(x, y - 1, z))
 		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 0, 0, 1));
+			buffer.vertex(vx + 0, y + 0, vz + 0).next();
+			buffer.vertex(vx + 1, y + 0, vz + 0).next();
+			buffer.vertex(vx + 1, y + 0, vz + 1).next();
+			buffer.vertex(vx + 0, y + 0, vz + 1).next();
 		}
 		
-		if(!matchingBlocks.contains(pos.up()))
+		if(y == BoolChunk.HEIGHT - 1 || !matchingWorld.get(x, y + 1, z))
 		{
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 0));
+			buffer.vertex(vx + 0, y + 1, vz + 0).next();
+			buffer.vertex(vx + 0, y + 1, vz + 1).next();
+			buffer.vertex(vx + 1, y + 1, vz + 1).next();
+			buffer.vertex(vx + 1, y + 1, vz + 0).next();
 		}
 		
-		if(!matchingBlocks.contains(pos.north()))
+		if(!matchingWorld.get(x, y, z - 1))
 		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
+			buffer.vertex(vx + 0, y + 0, vz + 0).next();
+			buffer.vertex(vx + 0, y + 1, vz + 0).next();
+			buffer.vertex(vx + 1, y + 1, vz + 0).next();
+			buffer.vertex(vx + 1, y + 0, vz + 0).next();
+		}
+
+		if(!matchingWorld.get(x + 1, y, z))
+		{
+			buffer.vertex(vx + 1, y + 0, vz + 0).next();
+			buffer.vertex(vx + 1, y + 1, vz + 0).next();
+			buffer.vertex(vx + 1, y + 1, vz + 1).next();
+			buffer.vertex(vx + 1, y + 0, vz + 1).next();
 		}
 		
-		if(!matchingBlocks.contains(pos.east()))
+		if(!matchingWorld.get(x, y, z + 1))
 		{
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
+			buffer.vertex(vx + 0, y + 0, vz + 1).next();
+			buffer.vertex(vx + 1, y + 0, vz + 1).next();
+			buffer.vertex(vx + 1, y + 1, vz + 1).next();
+			buffer.vertex(vx + 0, y + 1, vz + 1).next();
 		}
 		
-		if(!matchingBlocks.contains(pos.south()))
+		if(!matchingWorld.get(x - 1, y, z))
 		{
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
+			buffer.vertex(vx + 0, y + 0, vz + 0).next();
+			buffer.vertex(vx + 0, y + 0, vz + 1).next();
+			buffer.vertex(vx + 0, y + 1, vz + 1).next();
+			buffer.vertex(vx + 0, y + 1, vz + 0).next();
 		}
-		
-		if(!matchingBlocks.contains(pos.west()))
-		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 0));
-		}
-		
-		return vertices;
-	}
-	
-	private static int[] getVertex(BlockPos pos, int x, int y, int z)
-	{
-		return new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z};
 	}
 }

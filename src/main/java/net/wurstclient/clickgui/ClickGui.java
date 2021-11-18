@@ -51,7 +51,9 @@ public final class ClickGui
 	private final ArrayList<Window> windows = new ArrayList<>();
 	private final ArrayList<Popup> popups = new ArrayList<>();
 	private final Path windowsFile;
-	
+
+	private float[] rainbowColor = new float[3];
+
 	private float[] bgColor = new float[3];
 	private float[] acColor = new float[3];
 	private int txtColor;
@@ -605,19 +607,22 @@ public final class ClickGui
 	public void updateColors()
 	{
 		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
-		
+
 		opacity = clickGui.getOpacity();
 		ttOpacity = clickGui.getTooltipOpacity();
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
+
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		rainbowColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
+		rainbowColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
+		rainbowColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
-			float x = System.currentTimeMillis() % 2000 / 1000F;
-			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
-			acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
-			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
-			
+			acColor[0] = rainbowColor[0];
+			acColor[1] = rainbowColor[1];
+			acColor[2] = rainbowColor[2];
 		}else
 			acColor = clickGui.getAccentColor();
 	}
@@ -1210,7 +1215,12 @@ public final class ClickGui
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
-	
+
+	public float[] getRainbowColor()
+	{
+		return rainbowColor;
+	}
+
 	public float[] getBgColor()
 	{
 		return bgColor;
