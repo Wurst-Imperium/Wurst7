@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.util.math.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,11 +31,27 @@ import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
 import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.mixinterface.IGameRenderer;
+import net.wurstclient.util.RenderUtils;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
 {
+	private static final MatrixStack SCREENSPACE_BOB_MATRIXSTACK = new MatrixStack();
+	private static final Matrix4f SCREENSPACE_BOB_MATRIX = SCREENSPACE_BOB_MATRIXSTACK.peek().getModel();
+
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/render/GameRenderer;bobViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V",
+		opcode = Opcodes.INVOKEVIRTUAL,
+		ordinal = 0),
+		method = {
+			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+	private void onBeforeRenderHurtBobbing(float partialTicks, long finishTimeNano,
+	    MatrixStack matrixStack, CallbackInfo ci)
+	{
+		RenderUtils.getScreenspaceMiddlePoint().set(0, 0, -1, 1);
+	}
+
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
 		ordinal = 0),
@@ -46,10 +63,15 @@ public abstract class GameRendererMixin
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 			return;
-		
+
+		SCREENSPACE_BOB_MATRIX.loadIdentity();
+		bobView(SCREENSPACE_BOB_MATRIXSTACK, partalTicks);
+		SCREENSPACE_BOB_MATRIX.invert();
+		RenderUtils.getScreenspaceMiddlePoint().transform(SCREENSPACE_BOB_MATRIX);
+
 		bobView(matrixStack, partalTicks);
 	}
 	

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.util;
 
+import net.minecraft.util.math.*;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,20 +20,20 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
 public enum RenderUtils
 {
 	;
-	
+
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
-	
+	private static Vector4f screenspaceMiddlePoint = new Vector4f();
+
+	public static Vector4f getScreenspaceMiddlePoint() {
+		return screenspaceMiddlePoint;
+	}
+
 	public static void scissorBox(int startX, int startY, int endX, int endY)
 	{
 		int width = endX - startX;

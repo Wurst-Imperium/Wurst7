@@ -20,13 +20,9 @@ import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
-import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.BufferBuilderStorage;
@@ -44,7 +40,7 @@ import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 public abstract class BlockMatchHack extends Hack
-    implements PacketInputListener, CameraTransformViewBobbingListener
+    implements PacketInputListener
 {
     protected final EnumSetting<BlockMatchHack.Area> area = new EnumSetting<>("Area",
             "The area around the player to search in.\n"
@@ -162,12 +158,10 @@ public abstract class BlockMatchHack extends Hack
         workerPool = new SearchWorkerThreadPoolExecutor();
 
         EVENTS.add(PacketInputListener.class, this);
-        EVENTS.add(CameraTransformViewBobbingListener.class, this);
     }
 
     public void onDisable()
     {
-        EVENTS.remove(CameraTransformViewBobbingListener.class, this);
         EVENTS.remove(PacketInputListener.class, this);
 
         matchingWorld.clear();
@@ -214,14 +208,6 @@ public abstract class BlockMatchHack extends Hack
         BlockMatchingChunk matchingChunk = matchingWorld.getChunk(chunk.getPos().toLong());
         if(matchingChunk != null)
             matchingChunk.queueUpdate(workerPool, bufferUploadQueue);
-    }
-
-    @Override
-    public void onCameraTransformViewBobbing(
-            CameraTransformViewBobbingEvent event)
-    {
-        if(displayStyle != DisplayStyle.BLOCKS)
-            event.cancel();
     }
 
     private void addSearchersInRange(ChunkPos center)
@@ -318,6 +304,8 @@ public abstract class BlockMatchHack extends Hack
 
         if(displayStyle == DisplayStyle.BLOCKS || displayStyle == DisplayStyle.BOTH)
         {
+            final Matrix4f untranslatedMatrix = matrixStack.peek().getModel();
+            final Matrix4f translatedMatrix = new Matrix4f();
             for(Map.Entry<Long, BlockMatchingChunk> entry : matchingWorld.chunkEntries())
             {
                 if(entry.getValue().getMatchChunk().isEmpty() || !frustum.isVisible(entry.getValue().getBoundingBox()))
@@ -325,25 +313,27 @@ public abstract class BlockMatchHack extends Hack
                 entry.getValue().getVertexBuffer().bind();
                 int cx = ChunkPos.getPackedX(entry.getKey());
                 int cz = ChunkPos.getPackedZ(entry.getKey());
-                matrixStack.push();
-                matrixStack.translate((cx << 4) - cam.x, -cam.y, (cz << 4) - cam.z);
+                translatedMatrix.load(untranslatedMatrix);
+                translatedMatrix.multiplyByTranslation(
+                        (float) ((cx << 4) - cam.x),
+                        (float) -cam.y,
+                        (float) ((cz << 4) - cam.z));
                 entry.getValue().getVertexBuffer().setShader(
-                        matrixStack.peek().getModel(),
+                        translatedMatrix,
                         RenderSystem.getProjectionMatrix(),
                         RenderSystem.getShader());
-                matrixStack.pop();
+
             }
         }
 
         if(displayStyle == DisplayStyle.TRACERS || displayStyle == DisplayStyle.BOTH)
         {
             GL11.glEnable(GL11.GL_LINE_SMOOTH);
-            matrixStack.push();
             BufferBuilder builder = Tessellator.getInstance().getBuffer();
             builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 
             final Matrix4f matrix = matrixStack.peek().getModel();
-            final Vec3d start = RotationUtils.getClientLookVec();
+            final Vector4f start = RenderUtils.getScreenspaceMiddlePoint();
             for(BlockMatchingChunk chunk : matchingWorld.chunks())
             {
                 if(!(chunk.getMatchChunk() instanceof SetBoolChunk))
@@ -353,14 +343,13 @@ public abstract class BlockMatchHack extends Hack
                     double x = BlockPos.unpackLongX(pos) - cam.x + 0.5;
                     double y = BlockPos.unpackLongY(pos) - cam.y + 0.5;
                     double z = BlockPos.unpackLongZ(pos) - cam.z + 0.5;
-                    builder.vertex(matrix, (float)start.x, (float)start.y, (float)start.z).next();
+                    builder.vertex(start.getX(), start.getY(), start.getZ()).next();
                     builder.vertex(matrix, (float)x, (float)y, (float)z).next();
                 }
             }
 
             builder.end();
             BufferRenderer.draw(builder);
-            matrixStack.pop();
             GL11.glDisable(GL11.GL_LINE_SMOOTH);
         }
 
