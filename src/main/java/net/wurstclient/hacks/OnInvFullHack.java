@@ -12,6 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -55,5 +56,11 @@ public final class OnInvFullHack extends Hack implements UpdateListener {
 		if (MC.player.getInventory().getEmptySlot() == -1) {
 			//
 		}
+	}
+	
+	// Send message to chat
+	private void sendMessage(String message) {
+		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
+		MC.getNetworkHandler().sendPacket(packet);
 	}
 }
