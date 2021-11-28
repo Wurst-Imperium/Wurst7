@@ -17,6 +17,9 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
+import net.wurstclient.command.CmdProcessor;
+import net.wurstclient.command.Command;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IMiningToolItem;
@@ -60,7 +63,13 @@ public final class OnInvFullHack extends Hack implements UpdateListener {
 	
 	// Send message to chat
 	private void sendMessage(String message) {
-		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
-		MC.getNetworkHandler().sendPacket(packet);
+		if (message.startsWith(".")) {
+			// Message is Wurst command
+			WURST.getCmdProcessor().process(message.substring(1));
+		} else {
+			// Otherwise, send to chat
+			ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
+			MC.getNetworkHandler().sendPacket(packet);
+		}
 	}
 }
