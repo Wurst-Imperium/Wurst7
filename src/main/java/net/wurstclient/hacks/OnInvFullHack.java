@@ -55,9 +55,13 @@ public final class OnInvFullHack extends Hack implements UpdateListener {
 	
 	@Override
 	public void onUpdate() {
-		if (debounce.isChecked() && lastCheckFull) return;
 		if (MC.player.getInventory().getEmptySlot() == -1) {
-			//
+			if (debounce.isChecked() && lastCheckFull) return;
+			sendMessage(action);
+			
+			lastCheckFull = true;
+		} else {
+			lastCheckFull = false;
 		}
 	}
 	
