@@ -26,12 +26,13 @@ import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"oninvfull", "inventory", "full", "automatic"})
 public final class OnInvFullHack extends Hack implements UpdateListener {
+	public static String action = ".t OnInvFull";
 	private CheckboxSetting debounce = new CheckboxSetting("Debounce",
 			"Disable this to run the action every tick repeatedly until inventory is no longer full.", true);
 	private boolean lastCheckFull = false;
 	
 	public OnInvFullHack() {
-		super("AutoSword");
+		super("OnInvFull");
 		
 		setCategory(Category.OTHER);
 		addSetting(debounce);

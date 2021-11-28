@@ -98,6 +98,7 @@
   "description.wurst.hack.noweb": "Prevents you from getting slowed down by cobwebs.",
   "description.wurst.hack.nuker": "Automatically breaks blocks around you.",
   "description.wurst.hack.nukerlegit": "Slower Nuker that bypasses all AntiCheat plugins.\nNot required on normal NoCheat+ servers!",
+  "description.wurst.hack.oninvfull": "Runs an action when your inventory is full. Useful for prison servers.",
   "description.wurst.hack.openwateresp": "Shows whether or not you are fishing in 'open water' and draws a box around the area used for the open water calculation.",
   "description.wurst.hack.overlay": "Renders the Nuker animation whenever you mine a block.",
   "description.wurst.hack.panic": "Instantly turns off all enabled hacks.\nBe careful with this one!",
