@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.screen.ScreenHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,33 +26,52 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GenericContainerScreen.class)
-public abstract class ContainerScreen54Mixin
-	extends HandledScreen<GenericContainerScreenHandler>
-	implements ScreenHandlerProvider<GenericContainerScreenHandler>
+@Mixin(HandledScreen.class)
+public abstract class AutoStealHandledScreenMixin<T extends ScreenHandler>
+	extends Screen
+	implements ScreenHandlerProvider<T>
 {
 	@Shadow
+	private int backgroundWidth;
+
+	@Shadow
+	private int backgroundHeight;
+
+	@Shadow
+	private int x;
+
+	@Shadow
+	private int y;
+
+	@Shadow
 	@Final
-	private int rows;
-	
+	private T handler;
+
+	@Shadow
+	private void shadow$onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {}
+
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
 	private int mode;
-	
-	public ContainerScreen54Mixin(WurstClient wurst,
-		GenericContainerScreenHandler container,
-		PlayerInventory playerInventory, Text name)
+
+	public AutoStealHandledScreenMixin(Text name)
 	{
-		super(container, playerInventory, name);
+		super(name);
 	}
-	
-	@Override
-	protected void init()
+
+	private boolean isTypeEnabled() {
+		Screen screenObj = (Screen)this;
+		return screenObj instanceof GenericContainerScreen || screenObj instanceof ShulkerBoxScreen;
+	}
+
+	@Inject(at = @At("TAIL"), method = "init")
+	protected void init(CallbackInfo info)
 	{
-		super.init();
-		
-		if(!WurstClient.INSTANCE.isEnabled())
+		if(!WurstClient.INSTANCE.isEnabled() || !isTypeEnabled())
 			return;
 		
 		if(autoSteal.areButtonsVisible())
@@ -67,12 +89,12 @@ public abstract class ContainerScreen54Mixin
 	
 	private void steal()
 	{
-		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
+		runInThread(() -> shiftClickSlots(0, handler.slots.size() - 36, 1));
 	}
 	
 	private void store()
 	{
-		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44, 2));
+		runInThread(() -> shiftClickSlots(handler.slots.size() - 36, handler.slots.size(), 2));
 	}
 	
 	private void runInThread(Runnable r)
@@ -102,8 +124,8 @@ public abstract class ContainerScreen54Mixin
 			waitForDelay();
 			if(this.mode != mode || client.currentScreen == null)
 				break;
-			
-			onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
+
+			shadow$onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
 		}
 	}
 	
