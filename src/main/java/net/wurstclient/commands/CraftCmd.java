@@ -40,19 +40,51 @@ public final class CraftCmd extends Command
     {
         super("craft",
                 "Adds an item to the AutoCraft crafting queue.\n",
-                ".craft <id>");
+                ".craft <id:count ...>");
+    }
+
+    private class ParsedArgument {
+        private String id;
+        private int count;
+        public ParsedArgument(String id, int count) {
+            this.id = id;
+            this.count = count;
+        }
+    }
+
+    private ParsedArgument parse(String info) throws CmdException {
+        if (info.contains(":")) {
+            String[] components = info.split(":");
+            String id = components[0];
+            int count = 0;
+            try {
+                count = Integer.parseInt(components[1]);
+            }
+            catch (NumberFormatException e) {
+                throw new CmdError("Invalid count: " + components[1]);
+            }
+            return new ParsedArgument(id, count);
+        }
+        return new ParsedArgument(info, 1);
     }
 
     @Override
     public void call(String[] args) throws CmdException
     {
-        if (args.length != 1) {
-            throw new CmdError("Incorrect number of arguments");
+        if (args.length == 0) {
+            throw new CmdError("Invalid number of arguments");
         }
-        Identifier itemId = new Identifier("minecraft:" + args[0]);
-        if (!Registry.ITEM.containsId(itemId)) {
-            throw new CmdError("Item either does not exist or has no recipe");
+        for (int i = 0; i < args.length; i++) {
+            ParsedArgument parsed = parse(args[i]);
+            Identifier itemId = new Identifier("minecraft:" + parsed.id);
+            if (!Registry.ITEM.containsId(itemId)) {
+                throw new CmdError("Item " + itemId + " either does not exist or has no recipe");
+            }
         }
-        autoCraft.queueCraft(itemId);
+        for (int i = 0; i < args.length; i++) {
+            ParsedArgument parsed = parse(args[i]);
+            Identifier itemId = new Identifier("minecraft:" + parsed.id);
+            autoCraft.queueCraft(itemId, parsed.count);
+        }
     }
 }
