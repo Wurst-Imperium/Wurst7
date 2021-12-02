@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HandledScreen.class)
-public abstract class AutoStealHandledScreenMixin<T extends ScreenHandler>
+public abstract class HandledScreenMixin<T extends ScreenHandler>
 	extends Screen
 	implements ScreenHandlerProvider<T>
 {
@@ -58,7 +58,7 @@ public abstract class AutoStealHandledScreenMixin<T extends ScreenHandler>
 		WurstClient.INSTANCE.getHax().autoStealHack;
 	private int mode;
 
-	public AutoStealHandledScreenMixin(Text name)
+	public HandledScreenMixin(Text name)
 	{
 		super(name);
 	}

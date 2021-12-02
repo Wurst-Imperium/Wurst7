@@ -174,6 +174,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return (int)Math.ceil((double)needed / recipe.getOutput().getCount()) * recipe.getOutput().getCount();
             }
         }
+        public boolean craft() {
+            try {
+                for (int i = 0; i < getNeededToCraft(recipes.get(0)) / recipes.get(0).getOutput().getCount(); i++) {
+                    Thread.sleep(100);
+                    if (!usingCraftingTable()) return false;
+                    MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
+                    Thread.sleep(100);
+                    if (!usingCraftingTable()) return false;
+                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
     }
 
     private int gcd(int a, int b) {
@@ -362,19 +377,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         if (node.children.size() == 0)
             return true;
-        if (!usingCraftingTable()) return false;
-        try {
-            for (int i = 0; i < node.getNeededToCraft(node.recipes.get(0)) / node.recipes.get(0).getOutput().getCount(); i++) {
-                Thread.sleep(100);
-                if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, node.recipes.get(0), false);
-                Thread.sleep(100);
-                if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        if (!node.craft()) return false;
         return true;
     }
 

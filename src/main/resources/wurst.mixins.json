@@ -7,8 +7,6 @@
   "client": [
   	"AbstractBlockStateMixin",
     "ArmorItemMixin",
-    "AutoStealHandledScreenMixin",
-    "AutoCraftHandledScreenMixin",
     "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
@@ -34,6 +32,7 @@
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
+    "HandledScreenMixin",
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",

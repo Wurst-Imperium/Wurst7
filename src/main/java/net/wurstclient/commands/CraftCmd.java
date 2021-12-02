@@ -86,5 +86,7 @@ public final class CraftCmd extends Command
             Identifier itemId = new Identifier("minecraft:" + parsed.id);
             autoCraft.queueCraft(itemId, parsed.count);
         }
+        if (!autoCraft.isEnabled())
+            autoCraft.setEnabled(true);
     }
 }
