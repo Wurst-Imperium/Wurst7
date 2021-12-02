@@ -3,6 +3,7 @@ package net.wurstclient.hacks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
@@ -16,6 +17,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -25,6 +28,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private List<CraftingQueueEntry> craftingQueue = new ArrayList<>();
 
     private boolean isCurrentlyCrafting = false;
+
+    private ReentrantLock slotUpdateLock = new ReentrantLock();
+    private Condition slotUpdateCondition = slotUpdateLock.newCondition();
 
     public AutoCraftHack() {
         super("AutoCraft");
@@ -174,18 +180,44 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return (int)Math.ceil((double)needed / recipe.getOutput().getCount()) * recipe.getOutput().getCount();
             }
         }
-        public boolean craft() {
+        private void awaitSlotUpdate() {
+            slotUpdateLock.lock();
             try {
-                for (int i = 0; i < getNeededToCraft(recipes.get(0)) / recipes.get(0).getOutput().getCount(); i++) {
-                    Thread.sleep(100);
-                    if (!usingCraftingTable()) return false;
-                    MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
-                    Thread.sleep(100);
-                    if (!usingCraftingTable()) return false;
-                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                }
-            } catch (InterruptedException e) {
+                slotUpdateCondition.await();
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+            finally {
+                slotUpdateLock.unlock();
+            }
+            try{
+                Thread.sleep(10);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        private int getNumberToCraft() {
+            for (int i = 1; i < 10; i++) {
+                System.out.println(MC.player.currentScreenHandler.slots.get(i).getStack() + ", " + MC.player.currentScreenHandler.slots.get(i).getStack().getCount());
+                if (MC.player.currentScreenHandler.slots.get(i).getStack().getCount() > 1) {
+                    return MC.player.currentScreenHandler.slots.get(i).getStack().getCount();
+                }
+            }
+            return 1;
+        }
+        private int getOutputNumber() {
+            return MC.player.currentScreenHandler.slots.get(0).getStack().getCount();
+        }
+        public boolean craft() {
+            for (int i = 0; i < getNeededToCraft(recipes.get(0)) / recipes.get(0).getOutput().getCount(); i++) {
+                if (!usingCraftingTable()) return false;
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
+                awaitSlotUpdate();
+                if (!usingCraftingTable()) return false;
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate();
             }
             return true;
         }
@@ -393,6 +425,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public void queueCraft(Identifier itemId, int count) {
         synchronized(craftingQueue) {
             craftingQueue.add(new CraftingQueueEntry(itemId, count));
+        }
+    }
+
+    public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
+        if (packet.getSlot() == 0) {
+            slotUpdateLock.lock();
+            try {
+                slotUpdateCondition.signalAll();
+            } finally {
+                slotUpdateLock.unlock();
+            }
         }
     }
 

@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.AutoCraftHack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +25,8 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientPlayNetworkHandlerMixin
 	implements ClientPlayPacketListener
 {
+	private final AutoCraftHack autoCraft = WurstClient.INSTANCE.getHax().autoCraftHack;
+
 	@Inject(at = {@At("HEAD")},
 		method = {"sendPacket(Lnet/minecraft/network/Packet;)V"},
 		cancellable = true)
@@ -32,5 +37,14 @@ public abstract class ClientPlayNetworkHandlerMixin
 		
 		if(event.isCancelled())
 			ci.cancel();
+	}
+
+	@Inject(at = {@At("TAIL")},
+			method = {"onScreenHandlerSlotUpdate(Lnet/minecraft/network/packet/s2c/play/ScreenHandlerSlotUpdateS2CPacket;)V"},
+			cancellable = true)
+	private void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
+	{
+		if (autoCraft.isEnabled())
+			autoCraft.notifySlotUpdate(packet);
 	}
 }
