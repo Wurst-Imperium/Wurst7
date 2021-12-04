@@ -39,7 +39,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 			ci.cancel();
 	}
 
-	@Inject(at = {@At("TAIL")},
+	@Inject(at = {@At("RETURN")},
 			method = {"onScreenHandlerSlotUpdate(Lnet/minecraft/network/packet/s2c/play/ScreenHandlerSlotUpdateS2CPacket;)V"},
 			cancellable = true)
 	private void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)

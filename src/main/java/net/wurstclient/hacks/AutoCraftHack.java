@@ -9,6 +9,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -17,7 +18,9 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
@@ -31,6 +34,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private ReentrantLock slotUpdateLock = new ReentrantLock();
     private Condition slotUpdateCondition = slotUpdateLock.newCondition();
+
+    private SlotUpdateInfo latestSlotUpdate;
+
+    private InventoryStorageQuery query = new InventoryStorageQuery();
+    private HashMap<Item, Integer> availabilityMap = new HashMap<>();
+    private HashMap<Item, Integer> totalAvailabilityMap = new HashMap<>();
+
+    private boolean doneCrafting = true;
 
     public AutoCraftHack() {
         super("AutoCraft");
@@ -65,6 +76,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     recipeMap.put(id, new ArrayList<Recipe<?>>());
                 recipeMap.get(id).add(recipe);
             }
+        }
+    }
+
+    private class SlotUpdateInfo {
+        public int slot;
+        public ItemStack itemStack;
+        public SlotUpdateInfo(int slot, ItemStack itemStack) {
+            this.slot = slot;
+            this.itemStack = itemStack;
         }
     }
 
@@ -180,10 +200,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return (int)Math.ceil((double)needed / recipe.getOutput().getCount()) * recipe.getOutput().getCount();
             }
         }
-        private void awaitSlotUpdate() {
+        private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem) {
             slotUpdateLock.lock();
             try {
-                slotUpdateCondition.await();
+                while (latestSlotUpdate == null || !latestSlotUpdate.itemStack.getItem().equals(item) || (!onlyConsiderItem && (latestSlotUpdate.itemStack.getCount() != amount || latestSlotUpdate.slot != slot))) {
+                    boolean gotSignal = slotUpdateCondition.await(1000, TimeUnit.MILLISECONDS);
+                    if (!gotSignal) {
+                        ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(0).getStack();
+                        if (craftingItem.getItem().equals(item) && (onlyConsiderItem || (craftingItem.getCount() == amount && slot == 0)))
+                            break;
+                    }
+                }
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -191,33 +218,51 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             finally {
                 slotUpdateLock.unlock();
             }
-            try{
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
-        private int getNumberToCraft() {
-            for (int i = 1; i < 10; i++) {
-                System.out.println(MC.player.currentScreenHandler.slots.get(i).getStack() + ", " + MC.player.currentScreenHandler.slots.get(i).getStack().getCount());
-                if (MC.player.currentScreenHandler.slots.get(i).getStack().getCount() > 1) {
-                    return MC.player.currentScreenHandler.slots.get(i).getStack().getCount();
-                }
+        private int calculateCraftingOutput() {
+            List<Ingredient> ingredients = recipes.get(0).getIngredients();
+            int output = Integer.MAX_VALUE;
+            for (Ingredient ing : ingredients) {
+                if (ing.getMatchingStacks().length == 0)
+                    continue;
+                ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
+                int amount = itemStack.getCount();
+                int outputFactor = (int)Math.floor((double)Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0), 64) / amount) * recipes.get(0).getOutput().getCount();
+                output = Math.min(output, outputFactor);
             }
-            return 1;
+            return output;
         }
-        private int getOutputNumber() {
-            return MC.player.currentScreenHandler.slots.get(0).getStack().getCount();
+        private void adjustTotalAvailability(Recipe<?> recipe, int craftingOutput) {
+            Item outputItem = recipe.getOutput().getItem();
+            totalAvailabilityMap.put(outputItem, totalAvailabilityMap.getOrDefault(outputItem, 0) + recipe.getOutput().getCount() * craftingOutput);
+            for (Ingredient ing : recipe.getIngredients()) {
+                if (ing.getMatchingStacks().length == 0)
+                    continue;
+                ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
+                totalAvailabilityMap.put(stack.getItem(), totalAvailabilityMap.getOrDefault(stack.getItem(), 0) - stack.getCount() * craftingOutput);
+            }
         }
         public boolean craft() {
-            for (int i = 0; i < getNeededToCraft(recipes.get(0)) / recipes.get(0).getOutput().getCount(); i++) {
+            int neededToCraft = getNeededToCraft(recipes.get(0));
+            int craftingOutput = 0;
+            while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
-                awaitSlotUpdate();
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), true);
+                awaitSlotUpdate(recipes.get(0).getOutput().getItem(), recipes.get(0).getOutput().getCount(), 0, false);
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate();
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
+                adjustTotalAvailability(recipes.get(0), craftingOutput);
+                neededToCraft -= craftingOutput;
+            }
+            for (int i = 0; i < neededToCraft / recipes.get(0).getOutput().getCount(); i++) {
+                if (!usingCraftingTable()) return false;
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
+                awaitSlotUpdate(recipes.get(0).getOutput().getItem(), recipes.get(0).getOutput().getCount(), 0, false);
+                if (!usingCraftingTable()) return false;
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
+                adjustTotalAvailability(recipes.get(0), 1);
             }
             return true;
         }
@@ -429,13 +474,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
-        if (packet.getSlot() == 0) {
-            slotUpdateLock.lock();
-            try {
-                slotUpdateCondition.signalAll();
-            } finally {
-                slotUpdateLock.unlock();
-            }
+        slotUpdateLock.lock();
+        try {
+            latestSlotUpdate = new SlotUpdateInfo(packet.getSlot(), packet.getItemStack());
+            slotUpdateCondition.signalAll();
+        } finally {
+            slotUpdateLock.unlock();
         }
     }
 
@@ -443,23 +487,23 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         isCurrentlyCrafting = true;
         new Thread(() -> {
             CraftingNode root = generateCraftingTree(itemId, count, true, 0, null, null);
-            InventoryStorageQuery query = new InventoryStorageQuery();
-            HashMap<Item, Integer> availability = query.getAvailabilityMap();
             Item item = Registry.ITEM.get(itemId);
-            int initialCount = availability.getOrDefault(item, 0);
-            availability.put(item, 0);
-            if (verifyNode(root, (HashMap<Item, Integer>)availability.clone())) {
-                if (!craftNode(root, availability)) {
+            int initialCount = availabilityMap.getOrDefault(item, 0);
+            availabilityMap.put(item, 0);
+            if (verifyNode(root, (HashMap<Item, Integer>)availabilityMap.clone())) {
+                if (!craftNode(root, availabilityMap)) {
                     int finalCount = query.getAvailable(item);
                     synchronized (craftingQueue) {
                         craftingQueue.get(0).count -= finalCount - initialCount;
                         if (craftingQueue.get(0).count <= 0)
                             craftingQueue.remove(0);
                     }
+                    availabilityMap.put(item, availabilityMap.getOrDefault(item, 0) + initialCount);
                     isCurrentlyCrafting = false;
                     return;
                 }
             }
+            availabilityMap.put(item, availabilityMap.getOrDefault(item, 0) + initialCount);
             synchronized(craftingQueue) {
                 craftingQueue.remove(0);
             }
@@ -477,9 +521,19 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     @Override
     public void onUpdate() {
         synchronized (craftingQueue) {
-            if (!isCurrentlyCrafting && craftingQueue.size() > 0 && usingCraftingTable()) {
-                CraftingQueueEntry entry = craftingQueue.get(0);
-                craft(entry.itemId, entry.count);
+            if (!isCurrentlyCrafting) {
+                if (craftingQueue.size() > 0 && usingCraftingTable()) {
+                    CraftingQueueEntry entry = craftingQueue.get(0);
+                    if (doneCrafting) {
+                        totalAvailabilityMap = query.getAvailabilityMap();
+                        availabilityMap = (HashMap<Item, Integer>)totalAvailabilityMap.clone();
+                        doneCrafting = false;
+                    }
+                    craft(entry.itemId, entry.count);
+                }
+                else {
+                    doneCrafting = true;
+                }
             }
         }
     }
