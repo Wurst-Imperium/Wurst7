@@ -221,13 +221,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         private int calculateCraftingOutput() {
             List<Ingredient> ingredients = recipes.get(0).getIngredients();
+            HashMap<Item, ItemStack> collected = collectIngredients(0);
             int output = Integer.MAX_VALUE;
             for (Ingredient ing : ingredients) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                int amount = itemStack.getCount();
-                int outputFactor = (int)Math.floor((double)Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0), 64) / amount) * recipes.get(0).getOutput().getCount();
+                int outputFactor = Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), 64) * recipes.get(0).getOutput().getCount();
                 output = Math.min(output, outputFactor);
             }
             return output;
