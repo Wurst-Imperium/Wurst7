@@ -7,7 +7,11 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
+import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.screen.ScreenHandlerType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoCraftHack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,6 +36,12 @@ public abstract class ClientPlayNetworkHandlerMixin
 		cancellable = true)
 	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
 	{
+		if (packet instanceof PlayerInteractBlockC2SPacket) {
+			PlayerInteractBlockC2SPacket blockPacket = (PlayerInteractBlockC2SPacket)packet;
+			if (autoCraft.isEnabled())
+				autoCraft.blockPositionClicked(blockPacket.getBlockHitResult().getBlockPos());
+		}
+
 		PacketOutputEvent event = new PacketOutputEvent(packet);
 		EventManager.fire(event);
 		
@@ -46,5 +56,23 @@ public abstract class ClientPlayNetworkHandlerMixin
 	{
 		if (autoCraft.isEnabled())
 			autoCraft.notifySlotUpdate(packet);
+	}
+
+	@Inject(at = {@At("RETURN")},
+			method = {"onOpenScreen(Lnet/minecraft/network/packet/s2c/play/OpenScreenS2CPacket;)V"},
+			cancellable = true)
+	private void onOpenScreen(OpenScreenS2CPacket packet, CallbackInfo ci)
+	{
+		if (autoCraft.isEnabled() && packet.getScreenHandlerType() == ScreenHandlerType.SHULKER_BOX)
+			autoCraft.storageContainerAccessed(packet.getSyncId());
+	}
+
+	@Inject(at = {@At("RETURN")},
+			method = {"onInventory(Lnet/minecraft/network/packet/s2c/play/InventoryS2CPacket;)V"},
+			cancellable = true)
+	private void onInventory(InventoryS2CPacket packet, CallbackInfo ci)
+	{
+		if (autoCraft.isEnabled())
+			autoCraft.storageContainerContent(packet.getSyncId(), packet.getContents());
 	}
 }

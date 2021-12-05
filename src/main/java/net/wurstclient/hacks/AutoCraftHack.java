@@ -1,6 +1,6 @@
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
@@ -9,9 +9,10 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
@@ -20,7 +21,6 @@ import net.wurstclient.hack.Hack;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
@@ -37,9 +37,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private SlotUpdateInfo latestSlotUpdate;
 
-    private InventoryStorageQuery query = new InventoryStorageQuery();
+    private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
+    private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
+
     private HashMap<Item, Integer> availabilityMap = new HashMap<>();
     private HashMap<Item, Integer> totalAvailabilityMap = new HashMap<>();
+
+    private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
     private boolean doneCrafting = true;
 
@@ -89,24 +93,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private abstract class StorageQuery {
-        public abstract int getAvailable(Item item);
         public abstract HashMap<Item, Integer> getAvailabilityMap();
         public abstract void acquire(Item item, int count);
     }
 
     private class InventoryStorageQuery extends StorageQuery {
         public InventoryStorageQuery() { }
-        @Override
-        public int getAvailable(Item item) {
-            int count = 0;
-            List<ItemStack> items = MC.player.getInventory().main;
-            for (ItemStack cur : items) {
-                if (item.equals(cur.getItem())) {
-                    count += cur.getCount();
-                }
-            }
-            return count;
-        }
         @Override
         public HashMap<Item, Integer> getAvailabilityMap() {
             HashMap<Item, Integer> res = new HashMap<>();
@@ -115,6 +107,28 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 res.put(cur.getItem(), res.getOrDefault(cur.getItem(), 0) + cur.getCount());
             }
             return res;
+        }
+        @Override
+        public void acquire(Item item, int count) { }
+    }
+
+    private class ContainerStorageQuery extends StorageQuery {
+        private HashMap<BlockPos, HashMap<Item, Integer>> containers;
+        public ContainerStorageQuery() {
+            containers = new HashMap<>();
+        }
+        public void updateContainer(HashMap<Item, Integer> content, BlockPos pos) {
+            containers.put(pos, content);
+        }
+        @Override
+        public HashMap<Item, Integer> getAvailabilityMap() {
+            HashMap<Item, Integer> globalAvailabilityMap = new HashMap<>();
+            for (HashMap<Item, Integer> map : containers.values()) {
+                for (Item item : map.keySet()) {
+                    globalAvailabilityMap.put(item, globalAvailabilityMap.getOrDefault(item, 0) + map.get(item));
+                }
+            }
+            return globalAvailabilityMap;
         }
         @Override
         public void acquire(Item item, int count) { }
@@ -390,15 +404,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return res;
     }
 
-    private class VerificationInfo {
-        public boolean success;
-        public int maxCraftable;
-        public VerificationInfo(boolean success, int maxCraftable) {
-            this.success = success;
-            this.maxCraftable = maxCraftable;
-        }
-    }
-
     private boolean verifyNode(CraftingNode node, HashMap<Item, Integer> availability) {
         int numAvailable = availability.getOrDefault(node.target, 0);
         if (numAvailable >= node.needed) {
@@ -494,6 +499,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    public void storageContainerAccessed(int syncId) { }
+
+    public void storageContainerContent(int syncId, List<ItemStack> content) {
+        HashMap<Item, Integer> contentMap = new HashMap<>();
+        for (int i = 0; i < content.size() - 36; i++) {
+            ItemStack stack = content.get(i);
+            if (stack.getCount() > 0)
+                contentMap.put(stack.getItem(), contentMap.getOrDefault(stack.getItem(), 0) + stack.getCount());
+        }
+        containerQuery.updateContainer(contentMap, latestBlockPos);
+    }
+
+    public void blockPositionClicked(BlockPos pos) {
+        latestBlockPos = pos;
+    }
+
     // This could (should) be done in O(1) time by modifying verifyNode, but O(log n) time seems to work without lagging
     private int getMaxCraftable(Identifier itemId, HashMap<Item, Integer> availability) {
         int count = 1;
@@ -513,8 +534,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        while (!verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>)availability.clone())) {
+        if (verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>)availability.clone())) {
+            while (verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>) availability.clone())) {
+                count++;
+            }
             count--;
+        }
+        else {
+            while (!verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>) availability.clone())) {
+                count--;
+            }
         }
         return count;
     }
@@ -531,7 +560,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             if (verifyNode(root, (HashMap<Item, Integer>)availabilityMap.clone())) {
                 if (!craftNode(root, availabilityMap)) {
-                    int finalCount = query.getAvailable(item);
+                    int finalCount = totalAvailabilityMap.getOrDefault(item, 0);
                     synchronized (craftingQueue) {
                         craftingQueue.get(0).count -= finalCount - initialCount;
                         if (craftingQueue.get(0).count <= 0)
@@ -564,7 +593,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (craftingQueue.size() > 0 && usingCraftingTable()) {
                     CraftingQueueEntry entry = craftingQueue.get(0);
                     if (doneCrafting) {
-                        totalAvailabilityMap = query.getAvailabilityMap();
+                        totalAvailabilityMap = inventoryQuery.getAvailabilityMap();
                         availabilityMap = (HashMap<Item, Integer>)totalAvailabilityMap.clone();
                         doneCrafting = false;
                     }
