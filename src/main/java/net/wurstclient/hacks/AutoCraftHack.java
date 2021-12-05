@@ -234,12 +234,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         private void adjustTotalAvailability(Recipe<?> recipe, int craftingOutput) {
             Item outputItem = recipe.getOutput().getItem();
-            totalAvailabilityMap.put(outputItem, totalAvailabilityMap.getOrDefault(outputItem, 0) + recipe.getOutput().getCount() * craftingOutput);
+            totalAvailabilityMap.put(outputItem, totalAvailabilityMap.getOrDefault(outputItem, 0) + craftingOutput);
             for (Ingredient ing : recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                totalAvailabilityMap.put(stack.getItem(), totalAvailabilityMap.getOrDefault(stack.getItem(), 0) - stack.getCount() * craftingOutput);
+                totalAvailabilityMap.put(stack.getItem(), totalAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
             }
         }
         public boolean craft() {
@@ -262,7 +262,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
-                adjustTotalAvailability(recipes.get(0), 1);
+                adjustTotalAvailability(recipes.get(0), recipes.get(0).getOutput().getCount());
             }
             return true;
         }
@@ -390,6 +390,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return res;
     }
 
+    private class VerificationInfo {
+        public boolean success;
+        public int maxCraftable;
+        public VerificationInfo(boolean success, int maxCraftable) {
+            this.success = success;
+            this.maxCraftable = maxCraftable;
+        }
+    }
+
     private boolean verifyNode(CraftingNode node, HashMap<Item, Integer> availability) {
         int numAvailable = availability.getOrDefault(node.target, 0);
         if (numAvailable >= node.needed) {
@@ -461,15 +470,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class CraftingQueueEntry {
         private Identifier itemId;
         private int count;
-        public CraftingQueueEntry(Identifier itemId, int count) {
+        private boolean craftAll;
+        public CraftingQueueEntry(Identifier itemId, int count, boolean craftAll) {
             this.itemId = itemId;
             this.count = count;
+            this.craftAll = craftAll;
         }
     }
 
-    public void queueCraft(Identifier itemId, int count) {
+    public void queueCraft(Identifier itemId, int count, boolean craftAll) {
         synchronized(craftingQueue) {
-            craftingQueue.add(new CraftingQueueEntry(itemId, count));
+            craftingQueue.add(new CraftingQueueEntry(itemId, count, craftAll));
         }
     }
 
@@ -483,13 +494,41 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private void craft(Identifier itemId, int count) {
+    // This could (should) be done in O(1) time by modifying verifyNode, but O(log n) time seems to work without lagging
+    private int getMaxCraftable(Identifier itemId, HashMap<Item, Integer> availability) {
+        int count = 1;
+        while (verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>) availability.clone())) {
+            count *= 2;
+        }
+        count /= 2;
+        int increment = count / 2;
+        if (increment > 0)
+            count--;
+        while (increment > 0) {
+            if (verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>)availability.clone())) {
+                count += increment;
+            }
+            else {
+                count -= increment;
+            }
+            increment /= 2;
+        }
+        while (!verifyNode(generateCraftingTree(itemId, count, true, 0, null, null), (HashMap<Item, Integer>)availability.clone())) {
+            count--;
+        }
+        return count;
+    }
+
+    private void craft(Identifier itemId, int count, boolean craftAll) {
         isCurrentlyCrafting = true;
         new Thread(() -> {
-            CraftingNode root = generateCraftingTree(itemId, count, true, 0, null, null);
+            CraftingNode root = generateCraftingTree(itemId, craftAll ? 1 : count, true, 0, null, null);
             Item item = Registry.ITEM.get(itemId);
             int initialCount = availabilityMap.getOrDefault(item, 0);
             availabilityMap.put(item, 0);
+            if (craftAll) {
+                root = generateCraftingTree(itemId, getMaxCraftable(itemId, availabilityMap), true, 0, null, null);
+            }
             if (verifyNode(root, (HashMap<Item, Integer>)availabilityMap.clone())) {
                 if (!craftNode(root, availabilityMap)) {
                     int finalCount = query.getAvailable(item);
@@ -529,7 +568,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         availabilityMap = (HashMap<Item, Integer>)totalAvailabilityMap.clone();
                         doneCrafting = false;
                     }
-                    craft(entry.itemId, entry.count);
+                    craft(entry.itemId, entry.count, entry.craftAll);
                 }
                 else {
                     doneCrafting = true;

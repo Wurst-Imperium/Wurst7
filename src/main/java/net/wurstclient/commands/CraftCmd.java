@@ -46,9 +46,11 @@ public final class CraftCmd extends Command
     private class ParsedArgument {
         private String id;
         private int count;
-        public ParsedArgument(String id, int count) {
+        private boolean craftAll;
+        public ParsedArgument(String id, int count, boolean craftAll) {
             this.id = id;
             this.count = count;
+            this.craftAll = craftAll;
         }
     }
 
@@ -57,15 +59,20 @@ public final class CraftCmd extends Command
             String[] components = info.split(":");
             String id = components[0];
             int count = 0;
-            try {
-                count = Integer.parseInt(components[1]);
+            boolean craftAll = false;
+            if (components[1].equals("all")) {
+                craftAll = true;
             }
-            catch (NumberFormatException e) {
-                throw new CmdError("Invalid count: " + components[1]);
+            else {
+                try {
+                    count = Integer.parseInt(components[1]);
+                } catch (NumberFormatException e) {
+                    throw new CmdError("Invalid count: " + components[1]);
+                }
             }
-            return new ParsedArgument(id, count);
+            return new ParsedArgument(id, count, craftAll);
         }
-        return new ParsedArgument(info, 1);
+        return new ParsedArgument(info, 1, false);
     }
 
     @Override
@@ -76,7 +83,7 @@ public final class CraftCmd extends Command
         }
         for (int i = 0; i < args.length; i++) {
             ParsedArgument parsed = parse(args[i]);
-            Identifier itemId = new Identifier("minecraft:" + parsed.id);
+            Identifier itemId = new Identifier("minecraft", parsed.id);
             if (!Registry.ITEM.containsId(itemId)) {
                 throw new CmdError("Item " + itemId + " either does not exist or has no recipe");
             }
@@ -84,7 +91,7 @@ public final class CraftCmd extends Command
         for (int i = 0; i < args.length; i++) {
             ParsedArgument parsed = parse(args[i]);
             Identifier itemId = new Identifier("minecraft:" + parsed.id);
-            autoCraft.queueCraft(itemId, parsed.count);
+            autoCraft.queueCraft(itemId, parsed.count, parsed.craftAll);
         }
         if (!autoCraft.isEnabled())
             autoCraft.setEnabled(true);
