@@ -271,15 +271,14 @@ public abstract class ListWidget extends AbstractParentElement
 				(int)(mouseX - (left + width / 2 - getRowWidth() / 2)),
 				(int)(mouseY - top) + (int)scrollAmount - 4);
 			return true;
-		}else if(i != -1 && selectItem(i, button, mouseX, mouseY))
-		{
-			if(children().size() > i)
-				setFocused(children().get(i));
-			
-			setDragging(true);
-			return true;
-		}else
+		}
+		if(i == -1 || !selectItem(i, button, mouseX, mouseY))
 			return scrolling;
+		if(children().size() > i)
+			setFocused(children().get(i));
+		
+		setDragging(true);
+		return true;
 	}
 	
 	@Override
@@ -297,32 +296,30 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))
 			return true;
-		if(isVisible() && button == 0 && scrolling)
-		{
-			if(mouseY < top)
-				scrollAmount = 0.0D;
-			else if(mouseY > bottom)
-				scrollAmount = getMaxScroll();
-			else
-			{
-				double d = getMaxScroll();
-				if(d < 1.0D)
-					d = 1.0D;
-				
-				int i = (int)((float)((bottom - top) * (bottom - top))
-					/ (float)getMaxPosition());
-				i = MathHelper.clamp(i, 32, bottom - top - 8);
-				double e = d / (bottom - top - i);
-				if(e < 1.0D)
-					e = 1.0D;
-				
-				scrollAmount += deltaY * e;
-				capYPosition();
-			}
-			
-			return true;
-		}else
+		if(!isVisible() || button != 0 || !scrolling)
 			return false;
+		if(mouseY < top)
+			scrollAmount = 0.0D;
+		else if(mouseY > bottom)
+			scrollAmount = getMaxScroll();
+		else
+		{
+			double d = getMaxScroll();
+			if(d < 1.0D)
+				d = 1.0D;
+			
+			int i = (int)((float)((bottom - top) * (bottom - top))
+				/ (float)getMaxPosition());
+			i = MathHelper.clamp(i, 32, bottom - top - 8);
+			double e = d / (bottom - top - i);
+			if(e < 1.0D)
+				e = 1.0D;
+			
+			scrollAmount += deltaY * e;
+			capYPosition();
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -341,16 +338,17 @@ public abstract class ListWidget extends AbstractParentElement
 			return false;
 		if(super.keyPressed(keyCode, scanCode, modifiers))
 			return true;
-		else if(keyCode == 264)
+		if(keyCode == 264)
 		{
 			moveSelection(1);
 			return true;
-		}else if(keyCode == 265)
+		}
+		if(keyCode == 265)
 		{
 			moveSelection(-1);
 			return true;
-		}else
-			return false;
+		}
+		return false;
 	}
 	
 	protected void moveSelection(int by)

@@ -43,8 +43,10 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
 			
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("gui.done")))

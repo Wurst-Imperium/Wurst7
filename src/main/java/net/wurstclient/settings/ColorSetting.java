@@ -53,6 +53,11 @@ public final class ColorSetting extends Setting
 		return new float[]{red, green, blue};
 	}
 	
+	public int getColorI()
+	{
+		return color.getRGB();
+	}
+	
 	public int getRed()
 	{
 		return color.getRed();
