@@ -288,9 +288,12 @@ public class PathFinder
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
+		// Can't see why isChunkLoaded() is deprecated. Still seems to be widely
+		// used with no replacement.
 		if(!WurstClient.MC.world.isChunkLoaded(pos))
 			return false;
 		

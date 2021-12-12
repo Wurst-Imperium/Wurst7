@@ -74,9 +74,10 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private boolean isFeedbackOrBugReportButton(Object element)
 	{
-		if(element == null || !(element instanceof ClickableWidget button))
+		if(element == null || !(element instanceof ClickableWidget))
 			return false;
 		
+		ClickableWidget button = (ClickableWidget)element;
 		String message = button.getMessage().getString();
 		
 		return message != null

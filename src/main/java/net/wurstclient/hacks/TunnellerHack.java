@@ -711,6 +711,7 @@ public final class TunnellerHack extends Hack
 	
 	private class PlaceTorchTask extends Task
 	{
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean canRun()
 		{
@@ -751,7 +752,9 @@ public final class TunnellerHack extends Hack
 			BlockState state = BlockUtils.getState(nextTorch);
 			if(!state.getMaterial().isReplaceable())
 				return false;
-			
+				
+			// Can't see why canPlaceAt() is deprecated. Still seems to be
+			// widely used with no replacement.
 			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
 		}
 		

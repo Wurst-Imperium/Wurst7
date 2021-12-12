@@ -53,7 +53,7 @@ public abstract class MinecraftClientMixin
 	@Shadow
 	private ClientPlayerEntity player;
 	@Shadow
-    public ClientWorld world;
+	public ClientWorld world;
 	@Shadow
 	@Final
 	private Session session;
