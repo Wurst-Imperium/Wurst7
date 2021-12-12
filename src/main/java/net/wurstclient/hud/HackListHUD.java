@@ -53,7 +53,7 @@ public final class HackListHUD implements UpdateListener
 				| (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
 			
 		}else
-			textColor = 0x04ffffff;
+			textColor = 0x04000000 | otf.getColor();
 		
 		int height = posY + activeHax.size() * 9;
 		Window sr = WurstClient.MC.getWindow();

@@ -16,6 +16,8 @@ https://www.wurstclient.net/download/
 
 ## Setup (for developers) (using Windows 10 & Eclipse)
 
+Requirements: [JDK 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot)
+
 1. Run these two commands in PowerShell:
 
 ```

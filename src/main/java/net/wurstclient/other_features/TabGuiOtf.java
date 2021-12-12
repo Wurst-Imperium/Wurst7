@@ -22,8 +22,9 @@ public final class TabGuiOtf extends OtherFeature
 	
 	public TabGuiOtf()
 	{
-		super("TabGui", "Allows you to quickly toggle hacks while playing.\n"
-			+ "Use the arrow keys to navigate.");
+		super("TabGUI", "Allows you to quickly toggle hacks while playing.\n"
+			+ "Use the arrow keys to navigate.\n\n"
+			+ "Change the \u00a76HackList \u00a76Position\u00a7r setting to \u00a76Right\u00a7r to prevent TabGUI from overlapping with the HackList.");
 		
 		addSetting(status);
 	}
