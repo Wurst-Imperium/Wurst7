@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,8 +34,7 @@ public final class FastBreakHack extends Hack
 	
 	public FastBreakHack()
 	{
-		super("FastBreak", "Allows you to break blocks faster.\n"
-			+ "Tip: This works with Nuker.");
+		super("FastBreak");
 		setCategory(Category.BLOCKS);
 		addSetting(legitMode);
 	}
@@ -45,8 +44,7 @@ public final class FastBreakHack extends Hack
 	{
 		if(legitMode.isChecked())
 			return getName() + "Legit";
-		else
-			return getName();
+		return getName();
 	}
 	
 	@Override

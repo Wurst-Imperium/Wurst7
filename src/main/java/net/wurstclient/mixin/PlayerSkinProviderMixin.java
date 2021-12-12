@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -97,7 +97,7 @@ public class PlayerSkinProviderMixin
 			
 			MinecraftClient.getInstance().execute(() -> {
 				RenderSystem.recordRenderCall(() -> {
-					ImmutableList.of(Type.SKIN, Type.CAPE).forEach((type) -> {
+					ImmutableList.of(Type.SKIN, Type.CAPE).forEach(type -> {
 						if(map.containsKey(type))
 							loadSkin(map.get(type), type, callback);
 					});

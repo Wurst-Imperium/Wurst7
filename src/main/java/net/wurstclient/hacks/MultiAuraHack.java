@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -110,8 +110,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	public MultiAuraHack()
 	{
-		super("MultiAura",
-			"Faster Killaura that attacks multiple entities at once.");
+		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
 		addSetting(useCooldown);
@@ -140,6 +139,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
@@ -175,7 +175,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)
@@ -199,7 +199,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.isSpaceEmpty(box);
+				return !world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
@@ -246,7 +246,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
 		ArrayList<Entity> entities =
-			stream.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			stream.collect(Collectors.toCollection(ArrayList::new));
 		if(entities.isEmpty())
 			return;
 		
@@ -258,8 +258,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			RotationUtils.Rotation rotations = RotationUtils
 				.getNeededRotations(entity.getBoundingBox().getCenter());
 			
-			WurstClient.MC.player.networkHandler
-				.sendPacket(new PlayerMoveC2SPacket.LookOnly(rotations.getYaw(),
+			WurstClient.MC.player.networkHandler.sendPacket(
+				new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
 					rotations.getPitch(), MC.player.isOnGround()));
 			
 			WURST.getHax().criticalsHack.doCritical();

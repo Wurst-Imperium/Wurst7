@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,8 +21,12 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -86,7 +90,7 @@ public final class NukerHack extends Hack
 	
 	public NukerHack()
 	{
-		super("Nuker", "Automatically breaks blocks around you.");
+		super("Nuker");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
@@ -159,13 +163,13 @@ public final class NukerHack extends Hack
 		
 		List<BlockPos> blocks2 = stream
 			.filter(pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(pos -> BlockUtils.canBeClicked(pos))
+			.filter(BlockUtils::canBeClicked)
 			.filter(mode.getSelected().getValidator(this))
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toList());
 		
-		if(player.abilities.creativeMode)
+		if(player.getAbilities().creativeMode)
 		{
 			Stream<BlockPos> stream2 = blocks2.parallelStream();
 			for(Set<BlockPos> set : prevBlocks)
@@ -230,7 +234,7 @@ public final class NukerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(currentBlock == null)
 			return;
@@ -239,41 +243,43 @@ public final class NukerHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-			currentBlock.getZ());
+		matrixStack.translate(currentBlock.getX() - regionX,
+			currentBlock.getY(), currentBlock.getZ() - regionZ);
 		if(p < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(p, p, p);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(box, matrixStack);
 		
-		GL11.glPopMatrix();
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(box, matrixStack);
+		
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		
@@ -281,7 +287,7 @@ public final class NukerHack extends Hack
 	
 	private enum Mode
 	{
-		NORMAL("Normal", n -> n.getName(), (n, p) -> true),
+		NORMAL("Normal", NukerHack::getName, (n, p) -> true),
 		
 		ID("ID",
 			n -> "IDNuker [" + n.id.getBlockName().replace("minecraft:", "")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,11 +16,7 @@ public final class InfiniChatHack extends Hack
 {
 	public InfiniChatHack()
 	{
-		super("InfiniChat", "Removes the 256 character limit from the chat.\n"
-			+ "Useful for long commands that modify NBT data.\n\n"
-			+ "\u00a76\u00a7lNOTICE:\u00a7r Not recommended for talking to people.\n"
-			+ "Most servers will cut messages to 256\n"
-			+ "characters on their end.");
+		super("InfiniChat");
 		setCategory(Category.CHAT);
 	}
 }

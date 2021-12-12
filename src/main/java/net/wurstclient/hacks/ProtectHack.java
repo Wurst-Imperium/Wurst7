@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -116,9 +117,7 @@ public final class ProtectHack extends Hack
 	
 	public ProtectHack()
 	{
-		super("Protect",
-			"A bot that follows the closest entity and protects it from other entities.\n"
-				+ "Use .protect to protect a specific entity instead of the closest one.");
+		super("Protect");
 		
 		setCategory(Category.COMBAT);
 		addSetting(useAi);
@@ -145,15 +144,18 @@ public final class ProtectHack extends Hack
 	{
 		if(friend != null)
 			return "Protecting " + friend.getName().getString();
-		else
-			return "Protect";
+		return "Protect";
 	}
 	
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().followHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
@@ -167,7 +169,8 @@ public final class ProtectHack extends Hack
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
@@ -206,7 +209,8 @@ public final class ProtectHack extends Hack
 	public void onUpdate()
 	{
 		// check if player died, friend died or disappeared
-		if(friend == null || friend.removed || !(friend instanceof LivingEntity)
+		if(friend == null || friend.isRemoved()
+			|| !(friend instanceof LivingEntity)
 			|| ((LivingEntity)friend).getHealth() <= 0
 			|| MC.player.getHealth() <= 0)
 		{
@@ -219,7 +223,7 @@ public final class ProtectHack extends Hack
 		// set enemy
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed)
+			.filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
@@ -242,7 +246,7 @@ public final class ProtectHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
+				return !MC.world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
@@ -340,7 +344,7 @@ public final class ProtectHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
 					target.getZ()) <= MC.player.squaredDistanceTo(
@@ -379,13 +383,14 @@ public final class ProtectHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!useAi.isChecked())
 			return;
 		
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	public void setFriend(Entity friend)

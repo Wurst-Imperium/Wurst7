@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,9 +26,7 @@ public final class FlightHack extends Hack
 	
 	public FlightHack()
 	{
-		super("Flight",
-			"Allows you to you fly.\n\n" + "\u00a7c\u00a7lWARNING:\u00a7r"
-				+ " You will take fall damage if you don't use NoFall.");
+		super("Flight");
 		setCategory(Category.MOVEMENT);
 		addSetting(speed);
 	}
@@ -36,6 +34,7 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().creativeFlightHack.setEnabled(false);
 		WURST.getHax().jetpackHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
@@ -54,17 +53,17 @@ public final class FlightHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		player.abilities.flying = false;
+		player.getAbilities().flying = false;
 		player.flyingSpeed = speed.getValueF();
 		
 		player.setVelocity(0, 0, 0);
-		Vec3d velcity = player.getVelocity();
+		Vec3d velocity = player.getVelocity();
 		
 		if(MC.options.keyJump.isPressed())
-			player.setVelocity(velcity.add(0, speed.getValue(), 0));
+			player.setVelocity(velocity.add(0, speed.getValue(), 0));
 		
 		if(MC.options.keySneak.isPressed())
-			player.setVelocity(velcity.subtract(0, speed.getValue(), 0));
+			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
 	}
 	
 	@Override

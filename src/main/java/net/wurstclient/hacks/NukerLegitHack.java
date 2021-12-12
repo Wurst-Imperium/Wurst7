@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,8 +16,12 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -79,9 +83,7 @@ public final class NukerLegitHack extends Hack
 	
 	public NukerLegitHack()
 	{
-		super("NukerLegit",
-			"Slower Nuker that bypasses all AntiCheat plugins.\n"
-				+ "Not required on normal NoCheat+ servers!");
+		super("NukerLegit");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -199,7 +201,7 @@ public final class NukerLegitHack extends Hack
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean breakBlockExtraLegit(BlockPos pos)
@@ -254,7 +256,7 @@ public final class NukerLegitHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(currentBlock == null)
 			return;
@@ -263,18 +265,19 @@ public final class NukerLegitHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-			currentBlock.getZ());
+		matrixStack.translate(currentBlock.getX() - regionX,
+			currentBlock.getY(), currentBlock.getZ() - regionZ);
 		
 		// get progress
 		float progress;
@@ -286,9 +289,9 @@ public final class NukerLegitHack extends Hack
 		// set size
 		if(progress < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(progress, progress, progress);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(progress, progress, progress);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
 		// get color
@@ -296,16 +299,19 @@ public final class NukerLegitHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
-		GL11.glPopMatrix();
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(matrixStack);
+		
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(matrixStack);
+		
+		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -51,14 +51,14 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addButton(new ButtonWidget(8, 8, 100, 20,
+		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
 			new LiteralText("Open Folder"), b -> openFolder()));
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
 		
-		doneButton = addButton(new ButtonWidget(width / 2 - 102, height - 48,
-			100, 20, new LiteralText("Done"), b -> done()));
-		addButton(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
+		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
+			height - 48, 100, 20, new LiteralText("Done"), b -> done()));
+		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
 			new LiteralText("Cancel"), b -> openPrevScreen()));
 	}
 	
@@ -69,7 +69,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private void done()
@@ -93,8 +93,7 @@ public final class SelectFileScreen extends Screen
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
-		client.openScreen(
-			new ConfirmScreen(c -> confirmReset(c), title, message));
+		client.setScreen(new ConfirmScreen(this::confirmReset, title, message));
 	}
 	
 	private void confirmReset(boolean confirmed)
@@ -102,7 +101,7 @@ public final class SelectFileScreen extends Screen
 		if(confirmed)
 			setting.resetFolder();
 		
-		client.openScreen(SelectFileScreen.this);
+		client.setScreen(SelectFileScreen.this);
 	}
 	
 	@Override
@@ -168,7 +167,7 @@ public final class SelectFileScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer, setting.getName(),
+		drawCenteredText(matrixStack, client.textRenderer, setting.getName(),
 			width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -39,8 +39,7 @@ public final class JesusHack extends Hack
 	
 	public JesusHack()
 	{
-		super("Jesus", "Allows you to walk on water.\n"
-			+ "Jesus used this hack ~2000 years ago.");
+		super("Jesus");
 		setCategory(Category.MOVEMENT);
 		addSetting(bypass);
 	}
@@ -98,8 +97,8 @@ public final class JesusHack extends Hack
 		PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket)event.getPacket();
 		
 		// check if packet contains a position
-		if(!(packet instanceof PlayerMoveC2SPacket.PositionOnly
-			|| packet instanceof PlayerMoveC2SPacket.Both))
+		if(!(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround
+			|| packet instanceof PlayerMoveC2SPacket.Full))
 			return;
 		
 		// check inWater
@@ -141,10 +140,11 @@ public final class JesusHack extends Hack
 		
 		// create new packet
 		Packet<?> newPacket;
-		if(packet instanceof PlayerMoveC2SPacket.PositionOnly)
-			newPacket = new PlayerMoveC2SPacket.PositionOnly(x, y, z, true);
+		if(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround)
+			newPacket =
+				new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, true);
 		else
-			newPacket = new PlayerMoveC2SPacket.Both(x, y, z, packet.getYaw(0),
+			newPacket = new PlayerMoveC2SPacket.Full(x, y, z, packet.getYaw(0),
 				packet.getPitch(0), true);
 		
 		// send new packet
@@ -161,7 +161,7 @@ public final class JesusHack extends Hack
 			.getBlockCollisions(MC.player,
 				MC.player.getBoundingBox().offset(0, -0.5, 0))
 			.map(VoxelShape::getBoundingBox)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(Box bb : blockCollisions)
 		{

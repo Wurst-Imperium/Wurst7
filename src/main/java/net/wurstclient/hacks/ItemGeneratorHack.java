@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,9 +38,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	
 	public ItemGeneratorHack()
 	{
-		super("ItemGenerator",
-			"Generates random items and drops them on the ground.\n"
-				+ "\u00a7oCreative mode only.\u00a7r");
+		super("ItemGenerator");
 		
 		setCategory(Category.ITEMS);
 		addSetting(speed);
@@ -52,7 +50,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	{
 		EVENTS.add(UpdateListener.class, this);
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,7 +32,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 {
 	public ScaffoldWalkHack()
 	{
-		super("ScaffoldWalk", "Automatically places blocks below your feet.");
+		super("ScaffoldWalk");
 		setCategory(Category.BLOCKS);
 	}
 	
@@ -62,7 +62,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-block items
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 				continue;
 			
@@ -86,13 +86,13 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			return;
 		
 		// set slot
-		int oldSlot = MC.player.inventory.selectedSlot;
-		MC.player.inventory.selectedSlot = newSlot;
+		int oldSlot = MC.player.getInventory().selectedSlot;
+		MC.player.getInventory().selectedSlot = newSlot;
 		
 		placeBlock(belowPlayer);
 		
 		// reset slot
-		MC.player.inventory.selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 	}
 	
 	private boolean placeBlock(BlockPos pos)
@@ -124,8 +124,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			
 			// place block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,

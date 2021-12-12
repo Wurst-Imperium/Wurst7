@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -88,7 +88,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
 		int k = (int)(g * 255.0F) << 24;
 		
-		TextRenderer textRenderer = this.getFontRenderer();
+		TextRenderer textRenderer = this.getTextRenderer();
 		float h = -textRenderer.getWidth(text) / 2;
 		
 		textRenderer.draw(text.asOrderedText(), h, j, 553648127, false,
@@ -102,7 +102,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 	}
 	
 	@Shadow
-	public TextRenderer getFontRenderer()
+	public TextRenderer getTextRenderer()
 	{
 		return null;
 	}

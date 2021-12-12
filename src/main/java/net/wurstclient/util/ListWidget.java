@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,9 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -139,10 +141,12 @@ public abstract class ListWidget extends AbstractParentElement
 			capYPosition();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			client.getTextureManager()
-				.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+			RenderSystem.setShaderTexture(0,
+				DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D)
 				.texture(left / 32.0F, (bottom + (int)scrollAmount) / 32.0F)
 				.color(32, 32, 32, 255).next();
@@ -169,10 +173,12 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA,
 				GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
 				GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-			RenderSystem.disableAlphaTest();
-			RenderSystem.shadeModel(7425);
+			// RenderSystem.disableAlphaTest();
+			// RenderSystem.shadeModel(7425);
 			RenderSystem.disableTexture();
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, top + 4, 0.0D).texture(0.0F, 1.0F)
 				.color(0, 0, 0, 0).next();
 			bufferBuilder.vertex(right, top + 4, 0.0D).texture(1.0F, 1.0F)
@@ -182,7 +188,8 @@ public abstract class ListWidget extends AbstractParentElement
 			bufferBuilder.vertex(left, top, 0.0D).texture(0.0F, 0.0F)
 				.color(0, 0, 0, 255).next();
 			tessellator.draw();
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, 1.0F)
 				.color(0, 0, 0, 255).next();
 			bufferBuilder.vertex(right, bottom, 0.0D).texture(1.0F, 1.0F)
@@ -202,42 +209,44 @@ public abstract class ListWidget extends AbstractParentElement
 				if(p < top)
 					p = top;
 				
-				bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-				bufferBuilder.vertex(i, bottom, 0.0D).texture(0.0F, 1.0F)
-					.color(0, 0, 0, 255).next();
-				bufferBuilder.vertex(j, bottom, 0.0D).texture(1.0F, 1.0F)
-					.color(0, 0, 0, 255).next();
-				bufferBuilder.vertex(j, top, 0.0D).texture(1.0F, 0.0F)
-					.color(0, 0, 0, 255).next();
-				bufferBuilder.vertex(i, top, 0.0D).texture(0.0F, 0.0F)
-					.color(0, 0, 0, 255).next();
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
+				bufferBuilder.vertex(i, bottom, 0.0D).color(0, 0, 0, 255)
+					.next();
+				bufferBuilder.vertex(j, bottom, 0.0D).color(0, 0, 0, 255)
+					.next();
+				bufferBuilder.vertex(j, top, 0.0D).color(0, 0, 0, 255).next();
+				bufferBuilder.vertex(i, top, 0.0D).color(0, 0, 0, 255).next();
 				tessellator.draw();
-				bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-				bufferBuilder.vertex(i, p + o, 0.0D).texture(0.0F, 1.0F)
-					.color(128, 128, 128, 255).next();
-				bufferBuilder.vertex(j, p + o, 0.0D).texture(1.0F, 1.0F)
-					.color(128, 128, 128, 255).next();
-				bufferBuilder.vertex(j, p, 0.0D).texture(1.0F, 0.0F)
-					.color(128, 128, 128, 255).next();
-				bufferBuilder.vertex(i, p, 0.0D).texture(0.0F, 0.0F)
-					.color(128, 128, 128, 255).next();
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
+				bufferBuilder.vertex(i, p + o, 0.0D).color(128, 128, 128, 255)
+					.next();
+				bufferBuilder.vertex(j, p + o, 0.0D).color(128, 128, 128, 255)
+					.next();
+				bufferBuilder.vertex(j, p, 0.0D).color(128, 128, 128, 255)
+					.next();
+				bufferBuilder.vertex(i, p, 0.0D).color(128, 128, 128, 255)
+					.next();
 				tessellator.draw();
-				bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-				bufferBuilder.vertex(i, p + o - 1, 0.0D).texture(0.0F, 1.0F)
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
+				bufferBuilder.vertex(i, p + o - 1, 0.0D)
 					.color(192, 192, 192, 255).next();
-				bufferBuilder.vertex(j - 1, p + o - 1, 0.0D).texture(1.0F, 1.0F)
+				bufferBuilder.vertex(j - 1, p + o - 1, 0.0D)
 					.color(192, 192, 192, 255).next();
-				bufferBuilder.vertex(j - 1, p, 0.0D).texture(1.0F, 0.0F)
-					.color(192, 192, 192, 255).next();
-				bufferBuilder.vertex(i, p, 0.0D).texture(0.0F, 0.0F)
-					.color(192, 192, 192, 255).next();
+				bufferBuilder.vertex(j - 1, p, 0.0D).color(192, 192, 192, 255)
+					.next();
+				bufferBuilder.vertex(i, p, 0.0D).color(192, 192, 192, 255)
+					.next();
 				tessellator.draw();
 			}
 			
 			renderDecorations(mouseX, mouseY);
 			RenderSystem.enableTexture();
-			RenderSystem.shadeModel(7424);
-			RenderSystem.enableAlphaTest();
+			// RenderSystem.shadeModel(7424);
+			// RenderSystem.enableAlphaTest();
 			RenderSystem.disableBlend();
 		}
 	}
@@ -253,26 +262,23 @@ public abstract class ListWidget extends AbstractParentElement
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
 		updateScrollingState(mouseX, mouseY, button);
-		if(isVisible() && isMouseInList(mouseX, mouseY))
-		{
-			int i = getItemAtPosition(mouseX, mouseY);
-			if(i == -1 && button == 0)
-			{
-				clickedHeader(
-					(int)(mouseX - (left + width / 2 - getRowWidth() / 2)),
-					(int)(mouseY - top) + (int)scrollAmount - 4);
-				return true;
-			}else if(i != -1 && selectItem(i, button, mouseX, mouseY))
-			{
-				if(children().size() > i)
-					setFocused(children().get(i));
-				
-				setDragging(true);
-				return true;
-			}else
-				return scrolling;
-		}else
+		if(!isVisible() || !isMouseInList(mouseX, mouseY))
 			return false;
+		int i = getItemAtPosition(mouseX, mouseY);
+		if(i == -1 && button == 0)
+		{
+			clickedHeader(
+				(int)(mouseX - (left + width / 2 - getRowWidth() / 2)),
+				(int)(mouseY - top) + (int)scrollAmount - 4);
+			return true;
+		}
+		if(i == -1 || !selectItem(i, button, mouseX, mouseY))
+			return scrolling;
+		if(children().size() > i)
+			setFocused(children().get(i));
+		
+		setDragging(true);
+		return true;
 	}
 	
 	@Override
@@ -290,32 +296,30 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))
 			return true;
-		else if(isVisible() && button == 0 && scrolling)
-		{
-			if(mouseY < top)
-				scrollAmount = 0.0D;
-			else if(mouseY > bottom)
-				scrollAmount = getMaxScroll();
-			else
-			{
-				double d = getMaxScroll();
-				if(d < 1.0D)
-					d = 1.0D;
-				
-				int i = (int)((float)((bottom - top) * (bottom - top))
-					/ (float)getMaxPosition());
-				i = MathHelper.clamp(i, 32, bottom - top - 8);
-				double e = d / (bottom - top - i);
-				if(e < 1.0D)
-					e = 1.0D;
-				
-				scrollAmount += deltaY * e;
-				capYPosition();
-			}
-			
-			return true;
-		}else
+		if(!isVisible() || button != 0 || !scrolling)
 			return false;
+		if(mouseY < top)
+			scrollAmount = 0.0D;
+		else if(mouseY > bottom)
+			scrollAmount = getMaxScroll();
+		else
+		{
+			double d = getMaxScroll();
+			if(d < 1.0D)
+				d = 1.0D;
+			
+			int i = (int)((float)((bottom - top) * (bottom - top))
+				/ (float)getMaxPosition());
+			i = MathHelper.clamp(i, 32, bottom - top - 8);
+			double e = d / (bottom - top - i);
+			if(e < 1.0D)
+				e = 1.0D;
+			
+			scrollAmount += deltaY * e;
+			capYPosition();
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -323,11 +327,8 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(!isVisible())
 			return false;
-		else
-		{
-			scrollAmount -= amount * itemHeight / 2.0D;
-			return true;
-		}
+		scrollAmount -= amount * itemHeight / 2.0D;
+		return true;
 	}
 	
 	@Override
@@ -335,18 +336,19 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		if(!isVisible())
 			return false;
-		else if(super.keyPressed(keyCode, scanCode, modifiers))
+		if(super.keyPressed(keyCode, scanCode, modifiers))
 			return true;
-		else if(keyCode == 264)
+		if(keyCode == 264)
 		{
 			moveSelection(1);
 			return true;
-		}else if(keyCode == 265)
+		}
+		if(keyCode == 265)
 		{
 			moveSelection(-1);
 			return true;
-		}else
-			return false;
+		}
+		return false;
 	}
 	
 	protected void moveSelection(int by)
@@ -389,15 +391,17 @@ public abstract class ListWidget extends AbstractParentElement
 				int r = left + width / 2 + getRowWidth() / 2;
 				RenderSystem.disableTexture();
 				float g = isFocused() ? 1.0F : 0.5F;
-				RenderSystem.color4f(g, g, g, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
+				RenderSystem.setShaderColor(g, g, g, 1.0F);
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
 				bufferBuilder.vertex(q, o + p + 2, 0.0D).next();
 				bufferBuilder.vertex(r, o + p + 2, 0.0D).next();
 				bufferBuilder.vertex(r, o - 2, 0.0D).next();
 				bufferBuilder.vertex(q, o - 2, 0.0D).next();
 				tessellator.draw();
-				RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
+				RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
 				bufferBuilder.vertex(q + 1, o + p + 1, 0.0D).next();
 				bufferBuilder.vertex(r - 1, o + p + 1, 0.0D).next();
 				bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
@@ -426,10 +430,12 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		client.getTextureManager()
-			.bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+		RenderSystem.setShaderTexture(0,
+			DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION_TEXTURE_COLOR);
 		bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, bottom / 32.0F)
 			.color(64, 64, 64, bottomAlpha).next();
 		bufferBuilder.vertex(left + width, bottom, 0.0D)

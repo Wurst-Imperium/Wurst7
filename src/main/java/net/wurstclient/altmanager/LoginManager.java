@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -49,8 +49,7 @@ public final class LoginManager
 			if(e.getMessage().contains("Invalid username or password.")
 				|| e.getMessage().toLowerCase().contains("account migrated"))
 				return "\u00a74\u00a7lWrong password! (or shadowbanned)";
-			else
-				return "\u00a74\u00a7lCannot contact authentication server!";
+			return "\u00a74\u00a7lCannot contact authentication server!";
 			
 		}catch(NullPointerException e)
 		{

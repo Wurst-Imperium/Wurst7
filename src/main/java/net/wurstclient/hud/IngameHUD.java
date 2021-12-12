@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,8 @@
 package net.wurstclient.hud;
 
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
@@ -35,7 +37,6 @@ public final class IngameHUD implements GUIRenderListener
 		
 		// GL settings
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		clickGui.updateColors();
 		
@@ -49,8 +50,7 @@ public final class IngameHUD implements GUIRenderListener
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		if(blend)
 			GL11.glEnable(GL11.GL_BLEND);

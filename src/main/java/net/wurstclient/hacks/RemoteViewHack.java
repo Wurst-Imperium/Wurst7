@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -99,8 +99,7 @@ public final class RemoteViewHack extends Hack
 	
 	public RemoteViewHack()
 	{
-		super("RemoteView", "Allows you to see the world as someone else.\n"
-			+ "Use the .rv command to make it target a specific entity.");
+		super("RemoteView");
 		setCategory(Category.RENDER);
 		
 		addSetting(filterPlayers);
@@ -127,7 +126,8 @@ public final class RemoteViewHack extends Hack
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			
@@ -146,7 +146,7 @@ public final class RemoteViewHack extends Hack
 					
 					Box box = e.getBoundingBox();
 					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-					return MC.world.isSpaceEmpty(box);
+					return !MC.world.isSpaceEmpty(box);
 				});
 			
 			if(filterMonsters.isChecked())
@@ -251,9 +251,10 @@ public final class RemoteViewHack extends Hack
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
 		{
 			entity = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true)
+				.stream(MC.world.getEntities().spliterator(), false)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
@@ -277,7 +278,7 @@ public final class RemoteViewHack extends Hack
 	public void onUpdate()
 	{
 		// validate entity
-		if(entity.removed || ((LivingEntity)entity).getHealth() <= 0)
+		if(entity.isRemoved() || ((LivingEntity)entity).getHealth() <= 0)
 		{
 			setEnabled(false);
 			return;
@@ -285,10 +286,11 @@ public final class RemoteViewHack extends Hack
 		
 		// update position, rotation, etc.
 		MC.player.copyPositionAndRotation(entity);
-		MC.player.resetPosition(entity.getX(),
+		MC.player.setPos(entity.getX(),
 			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
 				+ entity.getEyeHeight(entity.getPose()),
 			entity.getZ());
+		MC.player.resetPosition();
 		MC.player.setVelocity(Vec3d.ZERO);
 		
 		// set entity invisible

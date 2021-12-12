@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,10 +13,22 @@ import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -50,13 +62,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible players.", false);
 	
-	private int playerBox;
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
 	public PlayerEspHack()
 	{
-		super("PlayerESP", "Highlights nearby players.\n"
-			+ "ESP boxes of friends will appear in blue.");
+		super("PlayerESP");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);
@@ -71,12 +81,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		playerBox = GL11.glGenLists(1);
-		GL11.glNewList(playerBox, GL11.GL_COMPILE);
-		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(bb);
-		GL11.glEndList();
 	}
 	
 	@Override
@@ -85,9 +89,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(playerBox, 1);
-		playerBox = 0;
 	}
 	
 	@Override
@@ -98,7 +99,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		players.clear();
 		Stream<AbstractClientPlayerEntity> stream = world.getPlayers()
-			.parallelStream().filter(e -> !e.removed && e.getHealth() > 0)
+			.parallelStream().filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
@@ -121,92 +122,120 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// draw boxes
 		if(style.getSelected().boxes)
-			renderBoxes(partialTicks);
+			renderBoxes(matrixStack, partialTicks, regionX, regionZ);
 		
 		if(style.getSelected().lines)
-			renderTracers(partialTicks);
+			renderTracers(matrixStack, partialTicks, regionX, regionZ);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void renderBoxes(double partialTicks)
+	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
-		double extraSize = boxSize.getSelected().extraSize;
+		float extraSize = boxSize.getSelected().extraSize;
 		
 		for(PlayerEntity e : players)
 		{
-			GL11.glPushMatrix();
+			matrixStack.push();
 			
-			GL11.glTranslated(e.prevX + (e.getX() - e.prevX) * partialTicks,
+			matrixStack.translate(
+				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
 				e.prevY + (e.getY() - e.prevY) * partialTicks,
-				e.prevZ + (e.getZ() - e.prevZ) * partialTicks);
+				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
 			
-			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
-				e.getWidth() + extraSize);
+			matrixStack.scale(e.getWidth() + extraSize,
+				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
 			// set color
 			if(WURST.getFriends().contains(e.getEntityName()))
-				GL11.glColor4f(0, 0, 1, 0.5F);
+				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
 			else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
-				GL11.glColor4f(2 - f, f, 0, 0.5F);
+				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			}
 			
-			GL11.glCallList(playerBox);
+			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+			RenderUtils.drawOutlinedBox(bb, matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 	}
 	
-	private void renderTracers(double partialTicks)
+	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		GL11.glBegin(GL11.GL_LINES);
+		Matrix4f matrix = matrixStack.peek().getModel();
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION_COLOR);
+		
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		
 		for(PlayerEntity e : players)
 		{
+			Vec3d interpolationOffset = new Vec3d(e.getX(), e.getY(), e.getZ())
+				.subtract(e.prevX, e.prevY, e.prevZ).multiply(1 - partialTicks);
+			
 			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
-					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks));
+				.subtract(interpolationOffset).subtract(regionX, 0, regionZ);
+			
+			float r, g, b;
 			
 			if(WURST.getFriends().contains(e.getEntityName()))
-				GL11.glColor4f(0, 0, 1, 0.5F);
-			else
+			{
+				r = 0;
+				g = 0;
+				b = 1;
+				
+			}else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
-				GL11.glColor4f(2 - f, f, 0, 0.5F);
+				r = MathHelper.clamp(2 - f, 0, 1);
+				g = MathHelper.clamp(f, 0, 1);
+				b = 0;
 			}
 			
-			GL11.glVertex3d(start.x, start.y, start.z);
-			GL11.glVertex3d(end.x, end.y, end.z);
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.color(r, g, b, 0.5F).next();
+			
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.color(r, g, b, 0.5F).next();
 		}
-		GL11.glEnd();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private enum Style
@@ -236,12 +265,12 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private enum BoxSize
 	{
 		ACCURATE("Accurate", 0),
-		FANCY("Fancy", 0.1);
+		FANCY("Fancy", 0.1F);
 		
 		private final String name;
-		private final double extraSize;
+		private final float extraSize;
 		
-		private BoxSize(String name, double extraSize)
+		private BoxSize(String name, float extraSize)
 		{
 			this.name = name;
 			this.extraSize = extraSize;

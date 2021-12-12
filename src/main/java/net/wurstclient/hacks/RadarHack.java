@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -57,12 +57,7 @@ public final class RadarHack extends Hack implements UpdateListener
 	
 	public RadarHack()
 	{
-		super("Radar",
-			"Shows the location of nearby entities.\n"
-				+ "\u00a7cred\u00a7r - players\n"
-				+ "\u00a76orange\u00a7r - monsters\n"
-				+ "\u00a7agreen\u00a7r - animals\n"
-				+ "\u00a77gray\u00a7r - others\n");
+		super("Radar");
 		
 		setCategory(Category.RENDER);
 		addSetting(radius);
@@ -102,7 +97,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		entities.clear();
 		Stream<Entity> stream =
 			StreamSupport.stream(world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed && e != player)
+				.filter(e -> !e.isRemoved() && e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> e instanceof LivingEntity)
 				.filter(e -> ((LivingEntity)e).getHealth() > 0);

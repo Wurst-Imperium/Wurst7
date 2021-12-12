@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,15 +9,21 @@ package net.wurstclient.navigator;
 
 import java.util.Set;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorNewKeybindScreen extends NavigatorScreen
@@ -58,19 +64,27 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(parent.getFeature().getName());
-					WurstClient.MC.openScreen(parent);
+					WurstClient.MC.setScreen(parent);
 				}else
 				{
 					choosingKey = true;
 					okButton.active = false;
 				}
-			});
+			})
+		{
+			@Override
+			public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+			{
+				// empty method so that pressing Enter won't trigger this button
+				return false;
+			}
+		};
 		okButton.active = selectedCommand != null;
-		addButton(okButton);
+		addDrawableChild(okButton);
 		
 		// cancel button
-		addButton(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> WurstClient.MC.openScreen(parent)));
+		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
+			new LiteralText("Cancel"), b -> WurstClient.MC.setScreen(parent)));
 	}
 	
 	@Override
@@ -82,13 +96,21 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
-		}else if(keyCode == 1)
-			WurstClient.MC.openScreen(parent);
+		}else if(keyCode == GLFW.GLFW_KEY_ESCAPE
+			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+			client.setScreen(parent);
 	}
 	
 	@Override
 	protected void onMouseClick(double x, double y, int button)
 	{
+		// back button
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			WurstClient.MC.setScreen(parent);
+			return;
+		}
+		
 		// commands
 		if(hoveredCommand != null)
 		{
@@ -134,11 +156,12 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		// title bar
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(matrixStack, client.textRenderer, "New Keybind",
-			middleX, 32, 0xffffff);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		drawCenteredText(matrixStack, client.textRenderer, "New Keybind",
+			middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -149,7 +172,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
+			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -173,36 +196,34 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				{
 					hoveredCommand = pkb;
 					if(pkb == selectedCommand)
-						GL11.glColor4f(0F, 1F, 0F, 0.375F);
+						RenderSystem.setShaderColor(0F, 1F, 0F, 0.375F);
 					else
-						GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.375F);
+						RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F,
+							0.375F);
 				}else if(pkb == selectedCommand)
-					GL11.glColor4f(0F, 1F, 0F, 0.25F);
+					RenderSystem.setShaderColor(0F, 1F, 0F, 0.25F);
 				else
-					GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+					RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 				
 				// button
-				drawBox(x1, y1, x2, y2);
+				drawBox(matrixStack, x1, y1, x2, y2);
 				
 				// text
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				drawStringWithShadow(matrixStack, client.textRenderer,
-					pkb.getDescription(), x1 + 1, y1 + 1, 0xffffff);
+					pkb.getDescription(), x1 + 1, y1 + 1, txtColor);
 				drawStringWithShadow(matrixStack, client.textRenderer,
 					pkb.getCommand(), x1 + 1,
-					y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
+					y1 + 1 + client.textRenderer.fontHeight, txtColor);
 				GL11.glEnable(GL11.GL_BLEND);
 			}
 		}
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
 			drawStringWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, 0xffffff);
+				bgx1 + 2, textY, txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -211,8 +232,13 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();
@@ -221,22 +247,20 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 			// color
 			if(!button.active)
-				GL11.glColor4f(0F, 0F, 0F, 0.25F);
+				RenderSystem.setShaderColor(0F, 0F, 0F, 0.25F);
 			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
 				&& mouseY <= y2)
-				GL11.glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				GL11.glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
-				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
-				0xffffff);
+			drawCenteredText(matrixStack, client.textRenderer,
+				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
+				txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}
@@ -252,5 +276,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	protected void onMouseRelease(double x, double y, int button)
 	{
 		
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 }

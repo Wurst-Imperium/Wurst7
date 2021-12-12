@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -44,7 +44,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 	
 	public ExtraElytraHack()
 	{
-		super("ExtraElytra", "Makes the Elytra easier to use.");
+		super("ExtraElytra");
 		setCategory(Category.MOVEMENT);
 		addSetting(instantFly);
 		addSetting(speedCtrl);
@@ -117,7 +117,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(!speedCtrl.isChecked())
 			return;
 		
-		float yaw = (float)Math.toRadians(MC.player.yaw);
+		float yaw = (float)Math.toRadians(MC.player.getYaw());
 		Vec3d forward = new Vec3d(-MathHelper.sin(yaw) * 0.05, 0,
 			MathHelper.cos(yaw) * 0.05);
 		

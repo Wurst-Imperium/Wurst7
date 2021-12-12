@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -45,17 +45,18 @@ public final class KeybindProfilesScreen extends Screen
 		listGui = new ListGui(client, this,
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
-		addButton(new ButtonWidget(8, 8, 100, 20,
+		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
 			new LiteralText("Open Folder"), b -> openFolder()));
 		
-		addButton(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			new LiteralText("New Profile"), b -> client.openScreen(
+		addDrawableChild(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
+			new LiteralText("New Profile"), b -> client.setScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
-		loadButton = addButton(new ButtonWidget(width / 2 - 50, height - 48,
-			100, 20, new LiteralText("Load"), b -> loadSelected()));
+		loadButton =
+			addDrawableChild(new ButtonWidget(width / 2 - 50, height - 48, 100,
+				20, new LiteralText("Load"), b -> loadSelected()));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
 			new LiteralText("Cancel"), b -> openPrevScreen()));
 	}
 	
@@ -105,7 +106,7 @@ public final class KeybindProfilesScreen extends Screen
 	
 	private void openPrevScreen()
 	{
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -171,7 +172,7 @@ public final class KeybindProfilesScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer, "Keybind Profiles",
+		drawCenteredText(matrixStack, client.textRenderer, "Keybind Profiles",
 			width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

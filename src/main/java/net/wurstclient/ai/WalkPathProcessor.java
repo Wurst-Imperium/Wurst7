@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,7 +54,8 @@ public class WalkPathProcessor extends PathProcessor
 			if(index >= path.size())
 				done = true;
 			return;
-		}else if(posIndex > index)
+		}
+		if(posIndex > index)
 		{
 			index = posIndex + 1;
 			
@@ -65,7 +66,7 @@ public class WalkPathProcessor extends PathProcessor
 		}
 		
 		lockControls();
-		WurstClient.MC.player.abilities.flying = false;
+		WurstClient.MC.player.getAbilities().flying = false;
 		
 		// face next position
 		facePosition(nextPos);

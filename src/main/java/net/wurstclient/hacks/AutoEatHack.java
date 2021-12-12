@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -66,7 +66,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	public AutoEatHack()
 	{
-		super("AutoEat", "Automatically eats food when necessary.");
+		super("AutoEat");
 		setCategory(Category.ITEMS);
 		addSetting(eatWhileWalking);
 		addSetting(foodPriority);
@@ -106,10 +106,10 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(!isEating())
-			oldSlot = MC.player.inventory.selectedSlot;
+			oldSlot = MC.player.getInventory().selectedSlot;
 		
 		// set slot
-		MC.player.inventory.selectedSlot = bestSlot;
+		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// eat food
 		MC.options.keyUse.setPressed(true);
@@ -126,7 +126,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-food items
-			Item item = MC.player.inventory.getStack(i).getItem();
+			Item item = MC.player.getInventory().getStack(i).getItem();
 			if(!item.isFood())
 				continue;
 			
@@ -166,7 +166,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private boolean shouldEat()
 	{
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 			return false;
 		
 		if(!MC.player.canConsume(false))
@@ -220,26 +220,26 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		MC.options.keyUse.setPressed(false);
 		
-		MC.player.inventory.selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;
 	}
 	
 	public static enum FoodPriority
 	{
 		HIGH_HUNGER("High Food Points",
-			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())),
+			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)),
 		
 		HIGH_SATURATION("High Saturation",
 			Comparator.<FoodComponent> comparingDouble(
-				food -> food.getSaturationModifier())),
+				FoodComponent::getSaturationModifier)),
 		
 		LOW_HUNGER("Low Food Points",
-			Comparator.<FoodComponent> comparingInt(food -> food.getHunger())
+			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)
 				.reversed()),
 		
 		LOW_SATURATION("Low Saturation",
 			Comparator.<FoodComponent> comparingDouble(
-				food -> food.getSaturationModifier()).reversed());
+				FoodComponent::getSaturationModifier).reversed());
 		
 		private final String name;
 		private final Comparator<FoodComponent> comparator;

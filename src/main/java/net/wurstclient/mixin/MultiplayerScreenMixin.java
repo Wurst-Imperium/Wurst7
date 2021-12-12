@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -57,22 +57,26 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		lastServerButton = addButton(new ButtonWidget(width / 2 - 154, 10, 100,
-			20, new LiteralText("Last Server"), b -> LastServerRememberer
-				.joinLastServer((MultiplayerScreen)(Object)this)));
+		lastServerButton =
+			addDrawableChild(new ButtonWidget(width / 2 - 154, 10, 100, 20,
+				new LiteralText("Last Server"), b -> LastServerRememberer
+					.joinLastServer((MultiplayerScreen)(Object)this)));
 		
-		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100, 20,
-			new LiteralText("Server Finder"), b -> client.openScreen(
+		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100,
+			20, new LiteralText("Server Finder"), b -> client.setScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
 		
-		addButton(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100, 20,
-			new LiteralText("Clean Up"), b -> client.openScreen(
+		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100,
+			20, new LiteralText("Clean Up"), b -> client.setScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
 	public void onTick(CallbackInfo ci)
 	{
+		if(lastServerButton == null)
+			return;
+		
 		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	

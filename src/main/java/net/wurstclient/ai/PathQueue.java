@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,17 +7,16 @@
  */
 package net.wurstclient.ai;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class PathQueue
 {
 	private final PriorityQueue<PathQueue.Entry> queue =
-		new PriorityQueue<>((e1, e2) -> {
-			return Float.compare(e1.priority, e2.priority);
-		});
+		new PriorityQueue<>(Comparator.comparing(e1 -> e1.priority));
 	
-	private class Entry
+	private static class Entry
 	{
 		private PathPos pos;
 		private float priority;

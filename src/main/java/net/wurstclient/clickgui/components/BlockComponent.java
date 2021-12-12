@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,15 +9,26 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 
@@ -45,7 +56,7 @@ public final class BlockComponent extends Component
 			Screen currentScreen = WurstClient.MC.currentScreen;
 			EditBlockScreen editScreen =
 				new EditBlockScreen(currentScreen, setting);
-			WurstClient.MC.openScreen(editScreen);
+			WurstClient.MC.setScreen(editScreen);
 			
 		}else if(mouseButton == 1)
 			setting.resetToDefault();
@@ -57,6 +68,7 @@ public final class BlockComponent extends Component
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		int x1 = getX();
@@ -75,37 +87,44 @@ public final class BlockComponent extends Component
 		
 		ItemStack stack = new ItemStack(setting.getBlock());
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		else if(hBlock)
 		{
 			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);
 			tooltip += "\n\u00a76ID:\u00a7r " + setting.getBlockName();
+			tooltip += "\n\u00a76Block #:\u00a7r "
+				+ Block.getRawIdFromState(setting.getBlock().getDefaultState());
 			tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
 			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
 			gui.setTooltip(tooltip);
 		}
 		
 		// background
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], opacity);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			opacity);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 		
 		// setting name
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		
 		renderIcon(matrixStack, stack, x3, y1, true);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -126,20 +145,25 @@ public final class BlockComponent extends Component
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		GL11.glPushMatrix();
+		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.push();
 		
-		GL11.glTranslated(x, y, 0);
-		double scale = large ? 1.5 : 0.75;
-		GL11.glScaled(scale, scale, scale);
+		Window parent = getParent();
+		modelViewStack.translate(parent.getX(),
+			parent.getY() + 13 + parent.getScrollOffset(), 0);
+		modelViewStack.translate(x, y, 0);
+		float scale = large ? 1.5F : 0.75F;
+		modelViewStack.scale(scale, scale, scale);
 		
-		DiffuseLighting.enable();
+		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
 			0, 0);
-		DiffuseLighting.disable();
+		DiffuseLighting.disableGuiDepthLighting();
 		
-		GL11.glPopMatrix();
+		modelViewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);
@@ -148,11 +172,11 @@ public final class BlockComponent extends Component
 	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
 		boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		if(large)
-			GL11.glScaled(2, 2, 2);
+			matrixStack.scale(2, 2, 2);
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;
@@ -160,14 +184,13 @@ public final class BlockComponent extends Component
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 	
 	private String getBlockName(ItemStack stack)
 	{
 		if(stack.isEmpty())
 			return "\u00a7ounknown block\u00a7r";
-		else
-			return stack.getName().getString();
+		return stack.getName().getString();
 	}
 }

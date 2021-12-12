@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,7 +20,8 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Util;
 import net.wurstclient.altmanager.AltManager;
@@ -45,8 +46,6 @@ import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
-import net.wurstclient.sentry.NotEnoughCrashes;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
@@ -58,8 +57,8 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.7.2";
-	public static final String MC_VERSION = "1.16.4";
+	public static final String VERSION = "7.19";
+	public static final String MC_VERSION = "1.17.1";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -89,10 +88,6 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
-		
-		Path sentryFile = wurstFolder.resolve("sentry.json");
-		SentryConfig.setupSentry(sentryFile);
-		new NotEnoughCrashes().initStacktraceDeobfuscator();
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -206,6 +201,13 @@ public enum WurstClient
 		return encFolder;
 	}
 	
+	public String translate(String key)
+	{
+		if(otfs.translationsOtf.getForceEnglish().isChecked())
+			return IMC.getLanguageManager().getEnglish().get(key);
+		return I18n.translate(key);
+	}
+	
 	public WurstAnalytics getAnalytics()
 	{
 		return analytics;
@@ -229,7 +231,7 @@ public enum WurstClient
 		try(Stream<Path> files = Files.list(settingsProfileFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{
@@ -275,10 +277,7 @@ public enum WurstClient
 			return cmd;
 		
 		OtherFeature otf = getOtfs().getOtfByName(name);
-		if(otf != null)
-			return otf;
-		
-		return null;
+		return otf;
 	}
 	
 	public KeybindList getKeybinds()

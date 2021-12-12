@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -108,11 +108,7 @@ public final class ClickAuraHack extends Hack
 	
 	public ClickAuraHack()
 	{
-		super("ClickAura", "Automatically attacks the closest valid entity\n"
-			+ "whenever you click.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r ClickAuras generally look more suspicious\n"
-			+ "than Killauras and are easier for plugins to detect.\n"
-			+ "It is recommended to use Killaura or TriggerBot instead.");
+		super("ClickAura");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
@@ -138,6 +134,7 @@ public final class ClickAuraHack extends Hack
 	public void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
@@ -187,7 +184,7 @@ public final class ClickAuraHack extends Hack
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)
@@ -211,7 +208,7 @@ public final class ClickAuraHack extends Hack
 				
 				Box box = e.getBoundingBox();
 				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return world.isSpaceEmpty(box);
+				return !world.isSpaceEmpty(box);
 			});
 		
 		if(filterMonsters.isChecked())
@@ -267,8 +264,9 @@ public final class ClickAuraHack extends Hack
 		// face entity
 		Rotation rotation = RotationUtils
 			.getNeededRotations(target.getBoundingBox().getCenter());
-		PlayerMoveC2SPacket.LookOnly packet = new PlayerMoveC2SPacket.LookOnly(
-			rotation.getYaw(), rotation.getPitch(), MC.player.isOnGround());
+		PlayerMoveC2SPacket.LookAndOnGround packet =
+			new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
+				rotation.getPitch(), MC.player.isOnGround());
 		MC.player.networkHandler.sendPacket(packet);
 		
 		// attack entity

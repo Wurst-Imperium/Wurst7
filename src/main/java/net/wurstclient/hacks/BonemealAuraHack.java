@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,15 +12,11 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.Fertilizable;
-import net.minecraft.block.GrassBlock;
-import net.minecraft.block.SaplingBlock;
-import net.minecraft.block.StemBlock;
-import net.minecraft.item.BoneMealItem;
+import net.minecraft.block.*;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -44,9 +40,21 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lFast\u00a7r mode can use bone meal on multiple blocks at once.\n"
+		"\u00a7lFast\u00a7r mode can use bone meal on\n"
+			+ "multiple blocks at once.\n"
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
+	
+	private final EnumSetting<AutomationLevel> automationLevel =
+		new EnumSetting<>("Automation",
+			"How much of the bone-mealing process to automate.\n"
+				+ "\u00a7lRight Click\u00a7r simply right clicks plants with the bone\n"
+				+ "meal in your hand.\n"
+				+ "\u00a7lHotbar\u00a7r selects bone meal in your hotbar and then\n"
+				+ "uses it on plants.\n"
+				+ "\u00a7lInventory\u00a7r finds bone meal in your inventory,\n"
+				+ "moves it to your hotbar and then uses it.",
+			AutomationLevel.values(), AutomationLevel.RIGHT_CLICK);
 	
 	private final CheckboxSetting saplings =
 		new CheckboxSetting("Saplings", true);
@@ -59,13 +67,12 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	
 	public BonemealAuraHack()
 	{
-		super("BonemealAura",
-			"Automatically uses bone meal on specific types of plants.\n"
-				+ "Use the checkboxes to specify the types of plants.");
+		super("BonemealAura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
+		addSetting(automationLevel);
 		
 		addSetting(saplings);
 		addSetting(crops);
@@ -93,14 +100,24 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		if(IMC.getItemUseCooldown() > 0)
 			return;
 		
-		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof BoneMealItem))
-			return;
-		
 		// get valid blocks
 		ArrayList<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), (p) -> isCorrectBlock(p));
+			getValidBlocks(range.getValue(), this::isCorrectBlock);
+		
+		if(validBlocks.isEmpty())
+			return;
+		
+		// wait for AutoFarm
+		if(WURST.getHax().autoFarmHack.isBusy())
+			return;
+		
+		// check held item
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		if(stack.isEmpty() || stack.getItem() != Items.BONE_MEAL)
+		{
+			selectBonemeal();
+			return;
+		}
 		
 		if(mode.getSelected() == Mode.LEGIT)
 		{
@@ -128,6 +145,42 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		}
 	}
 	
+	private void selectBonemeal()
+	{
+		ClientPlayerEntity player = MC.player;
+		int maxInvSlot = automationLevel.getSelected().maxInvSlot;
+		
+		for(int slot = 0; slot < maxInvSlot; slot++)
+		{
+			if(slot == player.getInventory().selectedSlot)
+				continue;
+			
+			ItemStack stack = player.getInventory().getStack(slot);
+			if(stack.isEmpty() || stack.getItem() != Items.BONE_MEAL)
+				continue;
+			
+			if(slot < 9)
+				player.getInventory().selectedSlot = slot;
+			else if(player.getInventory().getEmptySlot() < 9)
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
+			else if(player.getInventory().getEmptySlot() != -1)
+			{
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(
+					player.getInventory().selectedSlot + 36);
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
+			}else
+			{
+				IMC.getInteractionManager().windowClick_PICKUP(
+					player.getInventory().selectedSlot + 36);
+				IMC.getInteractionManager().windowClick_PICKUP(slot);
+				IMC.getInteractionManager().windowClick_PICKUP(
+					player.getInventory().selectedSlot + 36);
+			}
+			
+			return;
+		}
+	}
+	
 	private ArrayList<BlockPos> getValidBlocks(double range,
 		Predicate<BlockPos> validator)
 	{
@@ -139,33 +192,39 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
+		Comparator<BlockPos> c = Comparator.<BlockPos> comparingDouble(
+			pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))).reversed();
+		
 		return BlockUtils.getAllInBox(min, max).stream()
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.filter(validator).sorted(c)
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)
 	{
 		Block block = BlockUtils.getBlock(pos);
+		BlockState state = BlockUtils.getState(pos);
+		ClientWorld world = MC.world;
 		
 		if(!(block instanceof Fertilizable) || block instanceof GrassBlock
-			|| !((Fertilizable)block).canGrow(MC.world, MC.world.random, pos,
-				BlockUtils.getState(pos)))
+			|| !((Fertilizable)block).canGrow(world, MC.world.random, pos,
+				state))
 			return false;
 		
-		if(block instanceof SaplingBlock)
+		if(block instanceof SaplingBlock
+			&& ((SaplingBlock)block).isFertilizable(world, pos, state, true))
 			return saplings.isChecked();
-		else if(block instanceof CropBlock)
+		if(block instanceof CropBlock
+			&& ((CropBlock)block).isFertilizable(world, pos, state, true))
 			return crops.isChecked();
-		else if(block instanceof StemBlock)
+		if(block instanceof StemBlock
+			&& ((StemBlock)block).isFertilizable(world, pos, state, true))
 			return stems.isChecked();
-		else if(block instanceof CocoaBlock)
+		if(block instanceof CocoaBlock
+			&& ((CocoaBlock)block).isFertilizable(world, pos, state, true))
 			return cocoa.isChecked();
-		else
-			return other.isChecked();
+		return other.isChecked();
 	}
 	
 	private boolean rightClickBlockLegit(BlockPos pos)
@@ -248,6 +307,30 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		private Mode(String name)
 		{
 			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
+	private enum AutomationLevel
+	{
+		RIGHT_CLICK("Right Click", 0),
+		
+		HOTBAR("Hotbar", 9),
+		
+		INVENTORY("Inventory", 36);
+		
+		private final String name;
+		private final int maxInvSlot;
+		
+		private AutomationLevel(String name, int maxInvSlot)
+		{
+			this.name = name;
+			this.maxInvSlot = maxInvSlot;
 		}
 		
 		@Override

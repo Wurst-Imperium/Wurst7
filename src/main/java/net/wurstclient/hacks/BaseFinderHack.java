@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,19 +7,33 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -33,50 +47,67 @@ public final class BaseFinderHack extends Hack
 		"These blocks will be considered\n" + "part of natural generation.\n\n"
 			+ "They will NOT be highlighted\n" + "as player bases.",
 		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
-		"minecraft:allium", "minecraft:andesite", "minecraft:azure_bluet",
-		"minecraft:bedrock", "minecraft:birch_leaves", "minecraft:birch_log",
-		"minecraft:blue_orchid", "minecraft:brown_mushroom",
-		"minecraft:brown_mushroom_block", "minecraft:bubble_column",
-		"minecraft:cave_air", "minecraft:clay", "minecraft:coal_ore",
-		"minecraft:cobweb", "minecraft:cornflower", "minecraft:dandelion",
+		"minecraft:allium", "minecraft:amethyst_block",
+		"minecraft:amethyst_cluster", "minecraft:andesite",
+		"minecraft:azure_bluet", "minecraft:bedrock", "minecraft:birch_leaves",
+		"minecraft:birch_log", "minecraft:blue_orchid",
+		"minecraft:brown_mushroom", "minecraft:brown_mushroom_block",
+		"minecraft:bubble_column", "minecraft:budding_amethyst",
+		"minecraft:calcite", "minecraft:cave_air", "minecraft:clay",
+		"minecraft:coal_ore", "minecraft:cobweb", "minecraft:copper_ore",
+		"minecraft:cornflower", "minecraft:dandelion",
 		"minecraft:dark_oak_leaves", "minecraft:dark_oak_log",
-		"minecraft:dead_bush", "minecraft:diamond_ore", "minecraft:diorite",
-		"minecraft:dirt", "minecraft:emerald_ore", "minecraft:fern",
-		"minecraft:gold_ore", "minecraft:granite", "minecraft:grass",
-		"minecraft:grass_block", "minecraft:gravel", "minecraft:ice",
-		"minecraft:infested_stone", "minecraft:iron_ore",
+		"minecraft:dead_bush", "minecraft:deepslate",
+		"minecraft:deepslate_coal_ore", "minecraft:deepslate_copper_ore",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_emerald_ore",
+		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
+		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
+		"minecraft:diamond_ore", "minecraft:diorite", "minecraft:dirt",
+		"minecraft:dripstone_block", "minecraft:emerald_ore", "minecraft:fern",
+		"minecraft:glow_lichen", "minecraft:gold_ore", "minecraft:granite",
+		"minecraft:grass", "minecraft:grass_block", "minecraft:gravel",
+		"minecraft:ice", "minecraft:infested_stone", "minecraft:iron_ore",
 		"minecraft:jungle_leaves", "minecraft:jungle_log", "minecraft:kelp",
-		"minecraft:kelp_plant", "minecraft:lapis_ore", "minecraft:large_fern",
+		"minecraft:kelp_plant", "minecraft:lapis_ore",
+		"minecraft:large_amethyst_bud", "minecraft:large_fern",
 		"minecraft:lava", "minecraft:lilac", "minecraft:lily_of_the_valley",
-		"minecraft:lily_pad", "minecraft:mossy_cobblestone",
-		"minecraft:mushroom_stem", "minecraft:nether_quartz_ore",
-		"minecraft:netherrack", "minecraft:oak_leaves", "minecraft:oak_log",
-		"minecraft:obsidian", "minecraft:orange_tulip", "minecraft:oxeye_daisy",
-		"minecraft:peony", "minecraft:pink_tulip", "minecraft:poppy",
-		"minecraft:red_mushroom", "minecraft:red_mushroom_block",
-		"minecraft:red_tulip", "minecraft:redstone_ore", "minecraft:rose_bush",
-		"minecraft:sand", "minecraft:sandstone", "minecraft:seagrass",
+		"minecraft:lily_pad", "minecraft:medium_amethyst_bud",
+		"minecraft:mossy_cobblestone", "minecraft:mushroom_stem",
+		"minecraft:nether_quartz_ore", "minecraft:netherrack",
+		"minecraft:oak_leaves", "minecraft:oak_log", "minecraft:obsidian",
+		"minecraft:orange_tulip", "minecraft:oxeye_daisy", "minecraft:peony",
+		"minecraft:pink_tulip", "minecraft:pointed_dripstone",
+		"minecraft:poppy", "minecraft:red_mushroom",
+		"minecraft:red_mushroom_block", "minecraft:red_tulip",
+		"minecraft:redstone_ore", "minecraft:rose_bush", "minecraft:sand",
+		"minecraft:sandstone", "minecraft:seagrass",
+		"minecraft:small_amethyst_bud", "minecraft:smooth_basalt",
 		"minecraft:snow", "minecraft:spawner", "minecraft:spruce_leaves",
 		"minecraft:spruce_log", "minecraft:stone", "minecraft:sunflower",
-		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:vine",
-		"minecraft:water", "minecraft:white_tulip");
+		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:tuff",
+		"minecraft:vine", "minecraft:water", "minecraft:white_tulip");
+	
+	private final ColorSetting color = new ColorSetting("Color",
+		"Man-made blocks will be\n" + "highlighted in this color.", Color.RED);
 	
 	private ArrayList<String> blockNames;
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
 	private final ArrayList<int[]> vertices = new ArrayList<>();
+	private VertexBuffer vertexBuffer;
 	
 	private int messageTimer = 0;
 	private int counter;
 	
+	private Integer oldRegionX;
+	private Integer oldRegionZ;
+	
 	public BaseFinderHack()
 	{
-		super("BaseFinder",
-			"Finds player bases by searching for man-made blocks.\n"
-				+ "The blocks that it finds will be highlighted in red.\n"
-				+ "Good for finding faction bases.");
+		super("BaseFinder");
 		setCategory(Category.RENDER);
 		addSetting(naturalBlocks);
+		addSetting(color);
 	}
 	
 	@Override
@@ -116,38 +147,43 @@ public final class BaseFinderHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		matchingBlocks.clear();
 		vertices.clear();
+		oldRegionX = null;
+		oldRegionZ = null;
+		
+		if(vertexBuffer != null)
+			vertexBuffer.close();
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1F, 0F, 0F, 0.15F);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		// vertices
-		GL11.glBegin(GL11.GL_QUADS);
+		float[] colorF = color.getColorF();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.15F);
+		
+		if(vertexBuffer != null)
 		{
-			for(int[] vertex : vertices)
-				GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
+			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+			Shader shader = RenderSystem.getShader();
+			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
 		}
-		GL11.glEnd();
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override
@@ -155,12 +191,44 @@ public final class BaseFinderHack extends Hack
 	{
 		int modulo = MC.player.age % 64;
 		
+		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
+			return;
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		Integer regionX = (camPos.getX() >> 9) * 512;
+		Integer regionZ = (camPos.getZ() >> 9) * 512;
+		
+		if(modulo == 0 || !regionX.equals(oldRegionX)
+			|| !regionZ.equals(oldRegionZ))
+		{
+			if(vertexBuffer != null)
+				vertexBuffer.close();
+			
+			vertexBuffer = new VertexBuffer();
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			
+			for(int[] vertex : vertices)
+				bufferBuilder
+					.vertex(vertex[0] - regionX, vertex[1], vertex[2] - regionZ)
+					.next();
+			
+			bufferBuilder.end();
+			vertexBuffer.upload(bufferBuilder);
+			
+			oldRegionX = regionX;
+			oldRegionZ = regionZ;
+		}
+		
 		// reset matching blocks
 		if(modulo == 0)
 			matchingBlocks.clear();
 		
-		int startY = 255 - modulo * 4;
-		int endY = startY - 4;
+		int stepSize = MC.world.getHeight() / 64;
+		int startY = MC.world.getTopY() - 1 - modulo * stepSize;
+		int endY = startY - stepSize;
 		
 		BlockPos playerPos =
 			new BlockPos(MC.player.getX(), 0, MC.player.getZ());
@@ -173,7 +241,8 @@ public final class BaseFinderHack extends Hack
 					if(matchingBlocks.size() >= 10000)
 						break loop;
 					
-					BlockPos pos = playerPos.add(x, y, z);
+					BlockPos pos = new BlockPos(playerPos.getX() + x, y,
+						playerPos.getZ() + z);
 					
 					if(Collections.binarySearch(blockNames,
 						BlockUtils.getName(pos)) >= 0)

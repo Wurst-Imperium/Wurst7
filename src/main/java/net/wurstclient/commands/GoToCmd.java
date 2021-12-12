@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,6 +10,7 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
@@ -54,10 +55,9 @@ public final class GoToCmd extends Command
 		if(args.length == 1 && args[0].equals("-path"))
 		{
 			BlockPos goal = WURST.getCmds().pathCmd.getLastGoal();
-			if(goal != null)
-				pathFinder = new PathFinder(goal);
-			else
+			if(goal == null)
 				throw new CmdError("No previous position on .path.");
+			pathFinder = new PathFinder(goal);
 		}else
 		{
 			BlockPos goal = argsToPos(args);
@@ -90,7 +90,7 @@ public final class GoToCmd extends Command
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
 			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
-			.filter(e -> !e.removed && e.getHealth() > 0)
+			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
@@ -107,8 +107,7 @@ public final class GoToCmd extends Command
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
 		BlockPos playerPos = new BlockPos(MC.player.getPos());
-		int[] player =
-			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
+		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		
 		for(int i = 0; i < 3; i++)
@@ -171,10 +170,11 @@ public final class GoToCmd extends Command
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	private void disable()

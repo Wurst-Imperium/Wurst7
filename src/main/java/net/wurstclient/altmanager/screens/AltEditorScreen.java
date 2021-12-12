@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,16 +25,24 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -63,31 +72,33 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
-		addButton(doneButton =
+		addDrawableChild(doneButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
 				new LiteralText(getDoneButtonText()), b -> pressDoneButton()));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
+				new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200,
-			20, new LiteralText("Random Name"),
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
+			200, 20, new LiteralText("Random Name"),
 			b -> emailBox.setText(NameGenerator.generateName())));
 		
-		addButton(stealSkinButton =
+		addDrawableChild(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
 				128, 20, new LiteralText("Steal Skin"),
 				b -> message = stealSkin(getEmail())));
 		
-		addButton(new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128,
-			20, new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
+		addDrawableChild(
+			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
+				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
 		
 		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
 			20, new LiteralText(""));
 		emailBox.setMaxLength(48);
-		emailBox.setSelected(true);
+		emailBox.setTextFieldFocused(true);
 		emailBox.setText(getDefaultEmail());
-		children.add(emailBox);
+		addSelectableChild(emailBox);
 		
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
@@ -96,10 +107,10 @@ public abstract class AltEditorScreen extends Screen
 			String stars = "";
 			for(int i = 0; i < text.length(); i++)
 				stars += "*";
-			return OrderedText.styledString(stars, Style.EMPTY);
+			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
 		});
 		passwordBox.setMaxLength(256);
-		children.add(passwordBox);
+		addSelectableChild(passwordBox);
 		
 		setInitialFocus(emailBox);
 	}
@@ -283,7 +294,7 @@ public abstract class AltEditorScreen extends Screen
 	{
 		URL profileURL =
 			URI.create("https://api.mojang.com/users/profiles/minecraft/")
-				.resolve(username).toURL();
+				.resolve(URLEncoder.encode(username, "UTF-8")).toURL();
 		
 		try(InputStream profileInputStream = profileURL.openStream())
 		{
@@ -324,6 +335,10 @@ public abstract class AltEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		// skin preview
 		AltRenderer.drawAltBack(matrixStack, emailBox.getText(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
@@ -331,11 +346,14 @@ public abstract class AltEditorScreen extends Screen
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
-		drawStringWithShadow(matrixStack, textRenderer, "Name or E-Mail",
-			width / 2 - 100, 47, 10526880);
-		drawStringWithShadow(matrixStack, textRenderer, "Password",
-			width / 2 - 100, 87, 10526880);
-		drawCenteredString(matrixStack, textRenderer, message, width / 2, 142,
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Name (for cracked alts), or", width / 2 - 100, 37, 10526880);
+		drawStringWithShadow(matrixStack, textRenderer,
+			"E-Mail (for premium alts)", width / 2 - 100, 47, 10526880);
+		drawStringWithShadow(matrixStack, textRenderer,
+			"Password (leave blank for cracked alts)", width / 2 - 100, 87,
+			10526880);
+		drawCenteredText(matrixStack, textRenderer, message, width / 2, 142,
 			16777215);
 		
 		// text boxes
@@ -345,22 +363,20 @@ public abstract class AltEditorScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glColor4f(1, 0, 0, errorTimer / 16F);
+			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				GL11.glVertex2d(0, 0);
-				GL11.glVertex2d(width, 0);
-				GL11.glVertex2d(width, height);
-				GL11.glVertex2d(0, height);
-			}
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, height, 0).next();
+			bufferBuilder.vertex(matrix, 0, height, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
 			errorTimer--;

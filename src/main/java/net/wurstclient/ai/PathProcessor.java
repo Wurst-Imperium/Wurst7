@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,7 @@ package net.wurstclient.ai;
 import java.util.ArrayList;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -21,9 +21,9 @@ public abstract class PathProcessor
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final MinecraftClient MC = WurstClient.MC;
 	
-	private static final KeyBinding[] CONTROLS = new KeyBinding[]{
-		MC.options.keyForward, MC.options.keyBack, MC.options.keyRight,
-		MC.options.keyLeft, MC.options.keyJump, MC.options.keySneak};
+	private static final KeyBinding[] CONTROLS =
+		{MC.options.keyForward, MC.options.keyBack, MC.options.keyRight,
+			MC.options.keyLeft, MC.options.keyJump, MC.options.keySneak};
 	
 	protected final ArrayList<PathPos> path;
 	protected int index;

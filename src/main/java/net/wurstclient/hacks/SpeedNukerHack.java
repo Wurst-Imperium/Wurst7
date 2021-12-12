@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,6 +24,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.BlockSetting;
@@ -36,6 +37,7 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"speed nuker", "FastNuker", "fast nuker"})
+@DontSaveState
 public final class SpeedNukerHack extends Hack
 	implements LeftClickListener, UpdateListener
 {
@@ -72,8 +74,7 @@ public final class SpeedNukerHack extends Hack
 	
 	public SpeedNukerHack()
 	{
-		super("SpeedNuker",
-			"Faster version of Nuker that cannot bypass NoCheat+.");
+		super("SpeedNuker");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -151,7 +152,7 @@ public final class SpeedNukerHack extends Hack
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	@Override

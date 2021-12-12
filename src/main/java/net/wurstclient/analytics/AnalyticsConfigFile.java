@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -58,9 +58,9 @@ public final class AnalyticsConfigFile
 		VisitorData visitorData = VisitorData.newSession(visitorID, firstLaunch,
 			lastLaunch, launches);
 		
-		// change visitor ID after 30 days
+		// change visitor ID after 3 days
 		if(visitorData.getTimestampCurrent()
-			- visitorData.getTimestampFirst() >= 2592000)
+			- visitorData.getTimestampFirst() >= 259200)
 			visitorData = VisitorData.newVisitor();
 		
 		return visitorData;

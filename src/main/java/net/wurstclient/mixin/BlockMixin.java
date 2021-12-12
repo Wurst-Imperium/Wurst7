@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -28,10 +28,11 @@ public abstract class BlockMixin implements ItemConvertible
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"},
+			"shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z"},
 		cancellable = true)
-	private static void onShouldDrawSide(BlockState state, BlockView blockView,
-		BlockPos blockPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+	private static void onShouldDrawSide(BlockState state, BlockView world,
+		BlockPos pos, Direction direction, BlockPos blockPos,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
 		EventManager.fire(event);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,8 +16,7 @@ public final class TiredHack extends Hack implements UpdateListener
 {
 	public TiredHack()
 	{
-		super("Tired", "Makes you look like Alexander\n"
-			+ "back in April 2015.\n" + "Only visible to other players.");
+		super("Tired");
 		setCategory(Category.FUN);
 	}
 	
@@ -40,7 +39,8 @@ public final class TiredHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			MC.player.yaw, MC.player.age % 100, MC.player.isOnGround()));
+		MC.player.networkHandler.sendPacket(
+			new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(),
+				MC.player.age % 100, MC.player.isOnGround()));
 	}
 }

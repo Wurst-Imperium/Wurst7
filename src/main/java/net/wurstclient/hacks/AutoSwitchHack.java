@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,10 +18,7 @@ public final class AutoSwitchHack extends Hack implements UpdateListener
 {
 	public AutoSwitchHack()
 	{
-		super("AutoSwitch", "Switches the item in your hand all the time.\n\n"
-			+ "\u00a7lProTip:\u00a7r Use this in combination with BuildRandom while\n"
-			+ "having a lot of different colored wool or concrete\n"
-			+ "blocks in your hotbar.");
+		super("AutoSwitch");
 		setCategory(Category.ITEMS);
 	}
 	
@@ -40,7 +37,7 @@ public final class AutoSwitchHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		
 		if(inventory.selectedSlot == 8)
 			inventory.selectedSlot = 0;

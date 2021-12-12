@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -30,11 +30,11 @@ public final class ViewNbtCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		ClientPlayerEntity player = MC.player;
-		ItemStack stack = player.inventory.getMainHandStack();
+		ItemStack stack = player.getInventory().getMainHandStack();
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		CompoundTag tag = stack.getTag();
+		NbtCompound tag = stack.getNbt();
 		String nbt = tag == null ? "" : tag.asString();
 		
 		switch(String.join(" ", args).toLowerCase())

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,10 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -53,14 +56,15 @@ public final class InstantBunkerHack extends Hack
 	
 	public InstantBunkerHack()
 	{
-		super("InstantBunker",
-			"Builds a small bunker around you. Needs 57 blocks.");
+		super("InstantBunker");
 		setCategory(Category.BLOCKS);
 	}
 	
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		if(!MC.player.isOnGround())
 		{
 			ChatUtils.error("Can't build this in mid-air.");
@@ -68,7 +72,7 @@ public final class InstantBunkerHack extends Hack
 			return;
 		}
 		
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		
 		if(!(stack.getItem() instanceof BlockItem))
 		{
@@ -133,10 +137,7 @@ public final class InstantBunkerHack extends Hack
 			MC.player.swingHand(Hand.MAIN_HAND);
 			
 			if(MC.player.isOnGround())
-			{
 				setEnabled(false);
-				return;
-			}
 		}
 		
 		// place next block
@@ -243,64 +244,60 @@ public final class InstantBunkerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(!building || blockIndex >= positions.size())
 			return;
 		
 		// scale and offset
-		double scale = 1.0 * 7.0 / 8.0;
+		float scale = 1.0F * 7.0F / 8.0F;
 		double offset = (1.0 - scale) / 2.0;
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2F);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// green box
 		{
 			GL11.glDepthMask(false);
-			GL11.glColor4f(0, 1, 0, 0.15F);
+			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
 			BlockPos pos = positions.get(blockIndex);
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-			GL11.glTranslated(offset, offset, offset);
-			GL11.glScaled(scale, scale, scale);
+			matrixStack.push();
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(offset, offset, offset);
+			matrixStack.scale(scale, scale, scale);
 			
-			RenderUtils.drawSolidBox();
+			RenderUtils.drawSolidBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 			GL11.glDepthMask(true);
 		}
 		
 		// black outlines
-		GL11.glColor4f(0, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(int i = blockIndex; i < positions.size(); i++)
 		{
 			BlockPos pos = positions.get(i);
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-			GL11.glTranslated(offset, offset, offset);
-			GL11.glScaled(scale, scale, scale);
+			matrixStack.push();
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(offset, offset, offset);
+			matrixStack.scale(scale, scale, scale);
 			
-			RenderUtils.drawOutlinedBox();
+			RenderUtils.drawOutlinedBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -27,7 +27,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	
 	public MileyCyrusHack()
 	{
-		super("MileyCyrus", "Makes you twerk.");
+		super("MileyCyrus");
 		setCategory(Category.FUN);
 		addSetting(twerkSpeed);
 	}

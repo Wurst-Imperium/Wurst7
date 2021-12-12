@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,15 +21,14 @@ public final class NavigatorHack extends Hack
 {
 	public NavigatorHack()
 	{
-		super("Navigator",
-			"A searchable GUI that learns your preferences over time.");
+		super("Navigator");
 	}
 	
 	@Override
 	public void onEnable()
 	{
 		if(!(MC.currentScreen instanceof NavigatorMainScreen))
-			MC.openScreen(new NavigatorMainScreen());
+			MC.setScreen(new NavigatorMainScreen());
 		
 		setEnabled(false);
 	}
