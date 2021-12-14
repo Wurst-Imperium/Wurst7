@@ -8,6 +8,8 @@
 package net.wurstclient.commands;
 
 import java.util.Comparator;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.StreamSupport;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -31,6 +33,11 @@ public final class GoToCmd extends Command
 	private PathFinder pathFinder;
 	private PathProcessor processor;
 	private boolean enabled;
+
+	private ReentrantLock doneLock = new ReentrantLock();
+	private Condition doneCondition = doneLock.newCondition();
+
+	private boolean doneProcessing = false;
 	
 	public GoToCmd()
 	{
@@ -57,17 +64,48 @@ public final class GoToCmd extends Command
 			BlockPos goal = WURST.getCmds().pathCmd.getLastGoal();
 			if(goal == null)
 				throw new CmdError("No previous position on .path.");
-			pathFinder = new PathFinder(goal);
+			setGoal(goal);
 		}else
 		{
 			BlockPos goal = argsToPos(args);
-			pathFinder = new PathFinder(goal);
+			setGoal(goal);
 		}
 		
 		// start
+		enable();
+	}
+
+	public void enable() {
 		enabled = true;
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+	}
+
+	public void setGoal(BlockPos goal) {
+		pathFinder = new PathFinder(goal);
+	}
+
+	public void waitUntilDone() {
+		doneLock.lock();
+		try {
+			while (!doneProcessing)
+				doneCondition.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			doneLock.unlock();
+		}
+	}
+
+	private void notifyDone() {
+		doneProcessing = true;
+		doneLock.lock();
+		try {
+			doneCondition.signalAll();
+		}
+		finally {
+			doneLock.unlock();
+		}
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -187,6 +225,8 @@ public final class GoToCmd extends Command
 		PathProcessor.releaseControls();
 		
 		enabled = false;
+
+		notifyDone();
 	}
 	
 	public boolean isActive()

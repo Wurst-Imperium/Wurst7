@@ -1,8 +1,10 @@
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.OffThreadException;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
@@ -13,8 +15,11 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.Category;
+import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
@@ -26,7 +31,7 @@ import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
 
-    private HashMap<Identifier, List<Recipe<?>>> recipeMap = null;
+    private HashMap<Identifier, List<CraftingProcess>> processMap = null;
 
     private List<CraftingQueueEntry> craftingQueue = new ArrayList<>();
 
@@ -35,6 +40,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private ReentrantLock slotUpdateLock = new ReentrantLock();
     private Condition slotUpdateCondition = slotUpdateLock.newCondition();
 
+    private ReentrantLock containerOpenLock = new ReentrantLock();
+    private Condition containerOpenCondition = containerOpenLock.newCondition();
+
     private SlotUpdateInfo latestSlotUpdate;
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
@@ -42,6 +50,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private HashMap<Item, Integer> availabilityMap = new HashMap<>();
     private HashMap<Item, Integer> totalAvailabilityMap = new HashMap<>();
+
+    private Pathfinder pathFinder = new WurstPathfinder();
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
@@ -52,8 +62,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         setCategory(Category.ITEMS);
     }
 
-    private void initRecipeMap() {
-        recipeMap = new HashMap<>();
+    private void initProcessMap() {
+        processMap = new HashMap<>();
         RecipeManager recipeManager = MC.world.getRecipeManager();
         Stream<Identifier> keys = recipeManager.keys();
         Iterator<Identifier> iter = keys.iterator();
@@ -71,14 +81,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 String[] components = path.split("_from_");
                 String sourceId = components[0];
                 Identifier baseId = new Identifier(id.getNamespace(), sourceId);
-                if (!recipeMap.containsKey(baseId))
-                    recipeMap.put(baseId, new ArrayList<Recipe<?>>());
-                recipeMap.get(baseId).add(recipe);
+                if (!processMap.containsKey(baseId))
+                    processMap.put(baseId, new ArrayList<>());
+                processMap.get(baseId).add(new RecipeCraftingProcess(recipe));
             }
             else {
-                if (!recipeMap.containsKey(id))
-                    recipeMap.put(id, new ArrayList<Recipe<?>>());
-                recipeMap.get(id).add(recipe);
+                if (!processMap.containsKey(id))
+                    processMap.put(id, new ArrayList<>());
+                processMap.get(id).add(new RecipeCraftingProcess(recipe));
             }
         }
     }
@@ -112,6 +122,19 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public void acquire(Item item, int count) { }
     }
 
+    private abstract class Pathfinder {
+        public abstract void path(BlockPos pos);
+    }
+
+    private class WurstPathfinder extends Pathfinder {
+        public void path(BlockPos pos) {
+            GoToCmd path = new GoToCmd();
+            path.setGoal(pos);
+            path.enable();
+            path.waitUntilDone();
+        }
+    }
+
     private class ContainerStorageQuery extends StorageQuery {
         private HashMap<BlockPos, HashMap<Item, Integer>> containers;
         public ContainerStorageQuery() {
@@ -130,69 +153,135 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return globalAvailabilityMap;
         }
+        private int takeItem(Item item, int count) {
+            ScreenHandler handler = MC.player.currentScreenHandler;
+            for (int i = 0; i < handler.slots.size() - 36; i++) {
+                if (count <= 0)
+                    break;
+                if (handler.getSlot(i).hasStack() && handler.getSlot(i).getStack().getItem().equals(item)) {
+                    count -= handler.getSlot(i).getStack().getCount();
+                    totalAvailabilityMap.put(item, totalAvailabilityMap.getOrDefault(item, 0) + handler.getSlot(i).getStack().getCount());
+                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.QUICK_MOVE, MC.player);
+                }
+            }
+            return count;
+        }
+        private void closeScreen() {
+            try {
+                MC.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+                MC.getNetworkHandler().onCloseScreen(new CloseScreenS2CPacket(MC.player.currentScreenHandler.syncId));
+            }
+            catch (OffThreadException e) {
+                e.printStackTrace();
+            }
+        }
         @Override
-        public void acquire(Item item, int count) { }
+        public void acquire(Item item, int count) {
+            for (BlockPos pos : containers.keySet()) {
+                if (count <= 0)
+                    break;
+                if (containers.get(pos).getOrDefault(item, 0) > 0) {
+                    pathFinder.path(pos.up());
+                    IMC.getInteractionManager().rightClickBlock(pos, Direction.NORTH, Vec3d.ZERO);
+                    awaitContainerOpen();
+                    count = takeItem(item, count);
+                    closeScreen();
+                }
+            }
+        }
     }
 
-    private class CraftingNode {
-        private List<CraftingNode> children;
-        private Item target;
-        private Fraction count;
-        private int needed;
-        private List<Recipe<?>> recipes;
-        private boolean isChoiceNode;
-        private int stackShift;
-        private boolean childOfChoiceNode;
-        private CraftingNode parent;
-        public CraftingNode(Item target, Fraction count, int needed, List<Recipe<?>> recipes) {
+    private abstract class CraftingProcess {
+        public abstract int getMultiplicity();
+    }
+
+    private class RecipeCraftingProcess extends CraftingProcess {
+        private Recipe<?> recipe;
+        public RecipeCraftingProcess(Recipe<?> recipe) {
+            this.recipe = recipe;
+        }
+        @Override
+        public int getMultiplicity() {
+            int res = 1;
+            for (Ingredient ing : recipe.getIngredients()) {
+                res = Math.max(res, ing.getMatchingStacks().length);
+            }
+            return res;
+        }
+    }
+
+    private class StorageCraftingProcess extends CraftingProcess {
+        private Item item;
+        public StorageCraftingProcess(Item item) {
+            this.item = item;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+    }
+
+    private abstract class Node {
+        protected List<Node> children;
+        protected Item target;
+        protected Fraction count;
+        protected int needed;
+        protected boolean isChoiceNode;
+        protected boolean childOfChoiceNode;
+        protected Node parent;
+        protected List<CraftingProcess> processes;
+        public Node(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
             isChoiceNode = false;
             childOfChoiceNode = false;
-            stackShift = 0;
             parent = null;
             children = new ArrayList<>();
+            this.processes = processes;
             this.target = target;
             this.count = count;
-            this.recipes = recipes;
             this.needed = needed;
         }
-        public CraftingNode setChoiceNode(boolean choiceNode) {
+        public Node setChoiceNode(boolean choiceNode) {
             isChoiceNode = choiceNode;
             return this;
         }
-        public CraftingNode setStackShift(int stackShift) {
-            this.stackShift = stackShift;
-            return this;
-        }
-        public CraftingNode setChildOfChoiceNode(boolean childOfChoiceNode) {
+        public Node setChildOfChoiceNode(boolean childOfChoiceNode) {
             this.childOfChoiceNode = childOfChoiceNode;
             return this;
         }
-        public void addChild(CraftingNode child) {
+        public void addChild(Node child) {
             child.parent = this;
             children.add(child);
         }
+        public abstract HashMap<Item, ItemStack> collectIngredients(int index);
+        public abstract boolean execute();
         @Override
         public int hashCode() {
             return target.hashCode();
         }
         @Override
         public boolean equals(Object other) {
-            if (other instanceof CraftingNode) {
-                CraftingNode o = (CraftingNode)other;
+            if (other instanceof Node) {
+                Node o = (Node)other;
                 return target.equals(o.target);
             }
             return false;
         }
-        public void set(CraftingNode other) {
-            this.children = other.children;
-            this.target = other.target;
-            this.count = other.count;
-            this.recipes = other.recipes;
-            this.needed = other.needed;
+    }
+
+    private class RecipeNode extends Node {
+        private int stackShift;
+        public RecipeNode(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
+            super(target, count, needed, processes);
+            stackShift = 0;
         }
+        public RecipeNode setStackShift(int stackShift) {
+            this.stackShift = stackShift;
+            return this;
+        }
+        @Override
         public HashMap<Item, ItemStack> collectIngredients(int index) {
             HashMap<Item, ItemStack> stackTypes = new HashMap<>();
-            for (Ingredient ing : recipes.get(0).getIngredients()) {
+            for (Ingredient ing : ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
@@ -206,12 +295,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return stackTypes;
         }
-        public int getNeededToCraft(Recipe<?> recipe) {
-            if (needed < recipe.getOutput().getCount()) {
-                return recipe.getOutput().getCount();
+        public int getNeededToCraft(RecipeCraftingProcess process) {
+            if (needed < process.recipe.getOutput().getCount()) {
+                return process.recipe.getOutput().getCount();
             }
             else {
-                return (int)Math.ceil((double)needed / recipe.getOutput().getCount()) * recipe.getOutput().getCount();
+                return (int)Math.ceil((double)needed / process.recipe.getOutput().getCount()) * process.recipe.getOutput().getCount();
             }
         }
         private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem) {
@@ -234,14 +323,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         private int calculateCraftingOutput() {
-            List<Ingredient> ingredients = recipes.get(0).getIngredients();
+            List<Ingredient> ingredients = ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients();
             HashMap<Item, ItemStack> collected = collectIngredients(0);
             int output = Integer.MAX_VALUE;
             for (Ingredient ing : ingredients) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                int outputFactor = Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), 64) * recipes.get(0).getOutput().getCount();
+                int outputFactor = Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), 64) * ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
                 output = Math.min(output, outputFactor);
             }
             return output;
@@ -256,28 +345,44 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 totalAvailabilityMap.put(stack.getItem(), totalAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
             }
         }
-        public boolean craft() {
-            int neededToCraft = getNeededToCraft(recipes.get(0));
+        @Override
+        public boolean execute() {
+            int neededToCraft = getNeededToCraft(((RecipeCraftingProcess)processes.get(0)));
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), true);
-                awaitSlotUpdate(recipes.get(0).getOutput().getItem(), recipes.get(0).getOutput().getCount(), 0, false);
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, true);
+                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false);
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
-                adjustTotalAvailability(recipes.get(0), craftingOutput);
+                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
-            for (int i = 0; i < neededToCraft / recipes.get(0).getOutput().getCount(); i++) {
+            for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, recipes.get(0), false);
-                awaitSlotUpdate(recipes.get(0).getOutput().getItem(), recipes.get(0).getOutput().getCount(), 0, false);
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, false);
+                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false);
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
-                adjustTotalAvailability(recipes.get(0), recipes.get(0).getOutput().getCount());
+                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
             }
+            return true;
+        }
+    }
+
+    private class StorageNode extends Node {
+        public StorageNode(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
+            super(target, count, needed, processes);
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients(int index) {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            containerQuery.acquire(target, needed);
             return true;
         }
     }
@@ -327,36 +432,28 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private int getMultiplicity(Recipe<?> recipe) {
-        int res = 1;
-        for (Ingredient ing : recipe.getIngredients()) {
-            res = Math.max(res, ing.getMatchingStacks().length);
-        }
-        return res;
-    }
-
-    private int getMultiplicity(List<Recipe<?>> recipes) {
+    private int getMultiplicity(List<CraftingProcess> processes) {
         int res = 0;
-        for (Recipe<?> recipe : recipes) {
-            res += getMultiplicity(recipe);
+        for (CraftingProcess process : processes) {
+            res += process.getMultiplicity();
         }
         return res;
     }
 
-    private void makeTree(CraftingNode root, HashSet<CraftingNode> nodes, boolean allowChoiceNode) {
-        List<Recipe<?>> recipes = root.recipes;
-        int multiplicity = getMultiplicity(recipes);
+    private void makeTree(Node root, HashSet<Node> nodes, boolean allowChoiceNode) {
+        List<CraftingProcess> processes = root.processes;
+        int multiplicity = getMultiplicity(processes);
         if (multiplicity > 1 && !allowChoiceNode) {
             root.setChildOfChoiceNode(true);
         }
         if (multiplicity > 1 && !root.childOfChoiceNode) {
             root.setChoiceNode(true);
-            for (Recipe<?> recipe : recipes) {
-                int m = getMultiplicity(recipe);
-                ArrayList<Recipe<?>> recipeList = new ArrayList<>();
-                recipeList.add(recipe);
+            for (CraftingProcess process : processes) {
+                int m = process.getMultiplicity();
+                ArrayList<CraftingProcess> processList = new ArrayList<>();
+                processList.add(process);
                 for (int i = 0; i < m; i++) {
-                    CraftingNode child = new CraftingNode(root.target, root.count, root.needed, recipeList).setStackShift(i).setChildOfChoiceNode(true);
+                    Node child = new RecipeNode(root.target, root.count, root.needed, processList).setStackShift(i).setChildOfChoiceNode(true);
                     root.addChild(child);
                     makeTree(child, nodes, true);
                 }
@@ -367,12 +464,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         HashMap<Item, ItemStack> ingredients = root.collectIngredients(0);
         for (ItemStack stack : ingredients.values()) {
             Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
-            List<Recipe<?>> itemRecipes = recipeMap.getOrDefault(itemIdentifier, new ArrayList<Recipe<?>>());
-            int newNeeded = new Fraction(root.getNeededToCraft(recipes.get(0)) * stack.getCount(), recipes.get(0).getOutput().getCount()).ceil();
-            CraftingNode child = new CraftingNode(stack.getItem(), root.count.mult(new Fraction(stack.getCount())).div(new Fraction(recipes.get(0).getOutput().getCount())), newNeeded, itemRecipes.size() > 0 ? itemRecipes : null);
+            List<CraftingProcess> itemProcesses = processMap.getOrDefault(itemIdentifier, new ArrayList<CraftingProcess>());
+            int newNeeded = new Fraction(((RecipeNode)root).getNeededToCraft((RecipeCraftingProcess)processes.get(0)) * stack.getCount(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount()).ceil();
+            Node child = new RecipeNode(stack.getItem(), root.count.mult(new Fraction(stack.getCount())).div(new Fraction(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount())), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
             if (!nodes.contains(child)) {
                 root.addChild(child);
-                if (itemRecipes.size() > 0) {
+                if (itemProcesses.size() > 0) {
                     makeTree(child, nodes, true);
                 }
             }
@@ -380,21 +477,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         nodes.remove(root);
     }
 
-    private CraftingNode generateCraftingTree(Identifier identifier, int numNeeded, boolean allowChoiceNode, int stackShift, HashSet<CraftingNode> nodes, List<Recipe<?>> recipes) {
+    private Node generateCraftingTree(Identifier identifier, int numNeeded, boolean allowChoiceNode, int stackShift, HashSet<Node> nodes, List<CraftingProcess> processes) {
         Item item = Registry.ITEM.get(identifier);
-        if (recipes == null)
-            recipes = recipeMap.getOrDefault(identifier, new ArrayList<>());
-        if (recipes.size() == 0)
-            return new CraftingNode(item, new Fraction(numNeeded), numNeeded, null);
-        CraftingNode root = new CraftingNode(item, new Fraction(numNeeded), numNeeded, recipes).setStackShift(stackShift);
+        if (processes == null)
+            processes = processMap.getOrDefault(identifier, new ArrayList<>());
+        if (processes.size() == 0)
+            return new RecipeNode(item, new Fraction(numNeeded), numNeeded, null);
+        Node root = new RecipeNode(item, new Fraction(numNeeded), numNeeded, processes).setStackShift(stackShift);
         if (nodes == null)
             nodes = new HashSet<>();
         makeTree(root, nodes, allowChoiceNode);
         return root;
     }
 
-    private HashSet<CraftingNode> getAncestors(CraftingNode node) {
-        HashSet<CraftingNode> res = new HashSet<>();
+    private HashSet<Node> getAncestors(Node node) {
+        HashSet<Node> res = new HashSet<>();
         if (node != null)
             node = node.parent;
         while (node != null) {
@@ -404,7 +501,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return res;
     }
 
-    private boolean verifyNode(CraftingNode node, HashMap<Item, Integer> availability) {
+    private boolean verifyNode(Node node, HashMap<Item, Integer> availability) {
         int numAvailable = availability.getOrDefault(node.target, 0);
         if (numAvailable >= node.needed) {
             availability.put(node.target, availability.get(node.target) - node.needed);
@@ -414,10 +511,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         if (numAvailable > 0) {
             availability.put(node.target, 0);
-            node = generateCraftingTree(Registry.ITEM.getId(node.target), node.needed - numAvailable, !node.childOfChoiceNode, node.stackShift, getAncestors(node), node.recipes);
+            node = generateCraftingTree(Registry.ITEM.getId(node.target), node.needed - numAvailable, !node.childOfChoiceNode, ((RecipeNode)node).stackShift, getAncestors(node), node.processes);
         }
         if (node.isChoiceNode) {
-            for (CraftingNode child : node.children) {
+            for (Node child : node.children) {
                 HashMap<Item, Integer> newAvailability = (HashMap<Item, Integer>)availability.clone();
                 if (verifyNode(child, newAvailability)) {
                     availability.clear();
@@ -428,12 +525,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         else {
-            for (CraftingNode child : node.children) {
+            for (Node child : node.children) {
                 if (!verifyNode(child, availability)) {
                     return false;
                 }
             }
-            availability.put(node.target, availability.getOrDefault(node.target, 0) + node.getNeededToCraft(node.recipes.get(0)) - node.needed);
+            availability.put(node.target, availability.getOrDefault(node.target, 0) + ((RecipeNode)node).getNeededToCraft((RecipeCraftingProcess)node.processes.get(0)) - node.needed);
             return true;
         }
     }
@@ -442,7 +539,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
     }
 
-    private boolean craftNode(CraftingNode node, HashMap<Item, Integer> availability) {
+    private boolean craftNode(Node node, HashMap<Item, Integer> availability) {
         int numAvailable = availability.getOrDefault(node.target, 0);
         if (numAvailable >= node.needed) {
             availability.put(node.target, numAvailable - node.needed);
@@ -450,10 +547,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         if (numAvailable > 0 && !node.isChoiceNode) {
             availability.put(node.target, 0);
-            node = generateCraftingTree(Registry.ITEM.getId(node.target), node.needed - numAvailable, !node.childOfChoiceNode, node.stackShift, getAncestors(node), node.recipes);
+            node = generateCraftingTree(Registry.ITEM.getId(node.target), node.needed - numAvailable, !node.childOfChoiceNode, ((RecipeNode)node).stackShift, getAncestors(node), node.processes);
         }
         if (node.isChoiceNode) {
-            for (CraftingNode child : node.children) {
+            for (Node child : node.children) {
                 if (verifyNode(child, (HashMap<Item, Integer>)availability.clone())) {
                     craftNode(child, availability);
                     return true;
@@ -461,14 +558,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         else {
-            for (CraftingNode child : node.children) {
+            for (Node child : node.children) {
                 craftNode(child, availability);
             }
-            availability.put(node.target, availability.getOrDefault(node.target, 0) + node.getNeededToCraft(node.recipes.get(0)) - node.needed);
+            availability.put(node.target, availability.getOrDefault(node.target, 0) + ((RecipeNode)node).getNeededToCraft((RecipeCraftingProcess)node.processes.get(0)) - node.needed);
         }
         if (node.children.size() == 0)
             return true;
-        if (!node.craft()) return false;
+        if (!node.execute()) return false;
         return true;
     }
 
@@ -484,6 +581,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public void queueCraft(Identifier itemId, int count, boolean craftAll) {
+        /*new Thread(() -> {
+            containerQuery.acquire(Registry.ITEM.get(new Identifier("minecraft", "iron_ingot")), 1);
+        }).start();*/
         synchronized(craftingQueue) {
             craftingQueue.add(new CraftingQueueEntry(itemId, count, craftAll));
         }
@@ -499,6 +599,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private void awaitContainerOpen() {
+        containerOpenLock.lock();
+        try {
+            containerOpenCondition.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            containerOpenLock.unlock();
+        }
+    }
+
     public void storageContainerAccessed(int syncId) { }
 
     public void storageContainerContent(int syncId, List<ItemStack> content) {
@@ -509,6 +620,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 contentMap.put(stack.getItem(), contentMap.getOrDefault(stack.getItem(), 0) + stack.getCount());
         }
         containerQuery.updateContainer(contentMap, latestBlockPos);
+        containerOpenLock.lock();
+        try {
+            containerOpenCondition.signalAll();
+        }
+        finally {
+            containerOpenLock.unlock();
+        }
     }
 
     public void blockPositionClicked(BlockPos pos) {
@@ -551,7 +669,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private void craft(Identifier itemId, int count, boolean craftAll) {
         isCurrentlyCrafting = true;
         new Thread(() -> {
-            CraftingNode root = generateCraftingTree(itemId, craftAll ? 1 : count, true, 0, null, null);
+            Node root = generateCraftingTree(itemId, craftAll ? 1 : count, true, 0, null, null);
             Item item = Registry.ITEM.get(itemId);
             int initialCount = availabilityMap.getOrDefault(item, 0);
             availabilityMap.put(item, 0);
@@ -581,8 +699,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     @Override
     public void onEnable() {
-        if (recipeMap == null)
-            initRecipeMap();
+        if (processMap == null)
+            initProcessMap();
         EVENTS.add(UpdateListener.class, this);
     }
 
