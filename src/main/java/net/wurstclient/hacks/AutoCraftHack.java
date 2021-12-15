@@ -310,7 +310,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                int outputFactor = Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), 64) * ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
+                int outputFactor = Math.min(totalAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), itemStack.getItem().getMaxCount()) * ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
                 output = Math.min(output, outputFactor);
             }
             return output;
