@@ -223,17 +223,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private abstract class Node {
         protected Item target;
-        protected Fraction count;
         protected int needed;
         protected List<CraftingProcess> processes;
-        public Node(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
+        protected int stackShift;
+        public Node(Item target, int needed, List<CraftingProcess> processes) {
             this.processes = processes;
             this.target = target;
-            this.count = count;
             this.needed = needed;
+            stackShift = 0;
         }
         public Node setNeeded(int needed) {
             this.needed = needed;
+            return this;
+        }
+        public Node setStackShift(int stackShift) {
+            this.stackShift = stackShift;
             return this;
         }
         public abstract HashMap<Item, ItemStack> collectIngredients(int index);
@@ -253,14 +257,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private class RecipeNode extends Node {
-        private int stackShift;
-        public RecipeNode(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
-            super(target, count, needed, processes);
-            stackShift = 0;
-        }
-        public RecipeNode setStackShift(int stackShift) {
-            this.stackShift = stackShift;
-            return this;
+        public RecipeNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients(int index) {
@@ -357,8 +355,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private class ChoiceNode extends Node {
-        public ChoiceNode(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
-            super(target, count, needed, processes);
+        public ChoiceNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients(int index) {
@@ -371,8 +369,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private class StorageNode extends Node {
-        public StorageNode(Item target, Fraction count, int needed, List<CraftingProcess> processes) {
-            super(target, count, needed, processes);
+        public StorageNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients(int index) {
@@ -501,6 +499,32 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
     }
 
+    private Node makeRootNode(Identifier identifier, int numNeeded) {
+        Item item = Registry.ITEM.get(identifier);
+        List<CraftingProcess> processes = processMap.getOrDefault(identifier, new ArrayList<>());
+        return makeNode(null, new ItemStack(item, numNeeded), processes).setNeeded(numNeeded);
+    }
+
+    private Node makeNode(Node root, ItemStack stack, List<CraftingProcess> itemProcesses) {
+        int newNeeded = 0;
+        if (root != null && !(root instanceof ChoiceNode)) {
+            List<CraftingProcess> processes = root.processes;
+            newNeeded = new Fraction(((RecipeNode) root).getNeededToCraft((RecipeCraftingProcess) processes.get(0)) * stack.getCount(), ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount()).ceil();
+        }
+        int multiplicity = getMultiplicity(itemProcesses);
+        Node node = null;
+        if (multiplicity > 1 && !(root instanceof ChoiceNode)) {
+            node = new ChoiceNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
+        }
+        else if (multiplicity == 0 || itemProcesses.get(0) instanceof RecipeCraftingProcess) {
+            node = new RecipeNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
+        }
+        else if (itemProcesses.get(0) instanceof StorageCraftingProcess) {
+            node = new StorageNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
+        }
+        return node;
+    }
+
     private List<Node> getChildren(Node root, HashSet<Node> nodes) {
         List<Node> children = new ArrayList<>();
         List<CraftingProcess> processes = root.processes;
@@ -512,7 +536,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 ArrayList<CraftingProcess> processList = new ArrayList<>();
                 processList.add(process);
                 for (int i = 0; i < m; i++) {
-                    Node child = new RecipeNode(root.target, root.count, root.needed, processList).setStackShift(i);
+                    Node child = makeNode(root, new ItemStack(root.target, root.needed), processList).setStackShift(i).setNeeded(root.needed);
                     children.add(child);
                 }
             }
@@ -522,30 +546,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             HashMap<Item, ItemStack> ingredients = root.collectIngredients(0);
             for (ItemStack stack : ingredients.values()) {
                 Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
-                List<CraftingProcess> itemProcesses = processMap.getOrDefault(itemIdentifier, new ArrayList<CraftingProcess>());
-                int newNeeded = new Fraction(((RecipeNode) root).getNeededToCraft((RecipeCraftingProcess)processes.get(0)) * stack.getCount(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount()).ceil();
-                int multiplicity = getMultiplicity(itemProcesses);
-                Node child;
-                if (multiplicity > 1) {
-                    child = new ChoiceNode(stack.getItem(), root.count.mult(new Fraction(stack.getCount())).div(new Fraction(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount())), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-                }
-                else {
-                    child = new RecipeNode(stack.getItem(), root.count.mult(new Fraction(stack.getCount())).div(new Fraction(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount())), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-                }
+                List<CraftingProcess> itemProcesses = processMap.getOrDefault(itemIdentifier, new ArrayList<>());
+                Node child = makeNode(root, stack, itemProcesses);
                 if (!nodes.contains(child)) {
                     children.add(child);
                 }
             }
             return children;
         }
-    }
-
-    private Node makeRootNode(Identifier identifier, int numNeeded) {
-        Item item = Registry.ITEM.get(identifier);
-        List<CraftingProcess> processes = processMap.getOrDefault(identifier, new ArrayList<>());
-        if (getMultiplicity(processes) > 1)
-            return new ChoiceNode(item, new Fraction(numNeeded), numNeeded, processes);
-        return new RecipeNode(item, new Fraction(numNeeded), numNeeded, processes);
     }
 
     private boolean craftNode(Node node, HashMap<Item, Integer> availability, HashSet<Node> visited) {
