@@ -232,6 +232,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.count = count;
             this.needed = needed;
         }
+        public Node setNeeded(int needed) {
+            this.needed = needed;
+            return this;
+        }
         public abstract HashMap<Item, ItemStack> collectIngredients(int index);
         public abstract boolean execute();
         @Override
@@ -435,6 +439,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private boolean verifyNode(Node node, HashMap<Item, Integer> availability, HashSet<Node> visited) {
+        if (node.needed <= 0)
+            return true;
         int numAvailable = availability.getOrDefault(node.target, 0);
         int neededOffset = 0;
         if (numAvailable >= node.needed) {
@@ -451,14 +457,26 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             children = getChildren(node, visited);
         }
         if (node instanceof ChoiceNode) {
+            int needed = node.needed;
             for (Node child : children) {
                 HashMap<Item, Integer> newAvailability = (HashMap<Item, Integer>)availability.clone();
-                if (verifyNode(child, newAvailability, visited)) {
+                boolean verification = verifyNode(child, newAvailability, visited);
+                if (!verification) {
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    int originalNeeded = child.needed;
+                    child.needed = maxCraftable;
+                    verifyNode(child, availability, visited);
+                    child.needed = originalNeeded;
+                    needed -= maxCraftable;
+                }
+                else {
                     availability.clear();
                     availability.putAll(newAvailability);
                     node.needed += neededOffset;
                     return true;
                 }
+                if (needed <= 0)
+                    return true;
             }
             node.needed += neededOffset;
             return false;
@@ -542,11 +560,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         List<Node> children = getChildren(node, visited);
         if (node instanceof ChoiceNode) {
+            int needed = node.needed;
             for (Node child : children) {
-                if (verifyNode(child, (HashMap<Item, Integer>)availability.clone(), visited)) {
+                int original = child.needed;
+                child.needed = needed;
+                boolean verification = verifyNode(child, (HashMap<Item, Integer>)availability.clone(), visited);
+                if (!verification) {
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    if (maxCraftable > 0) {
+                        child.needed = maxCraftable;
+                        craftNode(child, availability, visited);
+                        needed -= maxCraftable;
+                    }
+                }
+                else {
                     craftNode(child, availability, visited);
+                    child.needed = original;
                     return true;
                 }
+                child.needed = original;
             }
         }
         else {
@@ -656,6 +688,40 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 count--;
             }
         }
+        return count;
+    }
+
+    private int getMaxCraftable(Node node, HashMap<Item, Integer> availability) {
+        int originalNeeded = node.needed;
+        int count = 1;
+        while (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            count *= 2;
+        }
+        count /= 2;
+        int increment = count / 2;
+        if (increment > 0)
+            count--;
+        while (increment > 0) {
+            if (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
+                count += increment;
+            }
+            else {
+                count -= increment;
+            }
+            increment /= 2;
+        }
+        if (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
+            while (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+                count++;
+            }
+            count--;
+        }
+        else {
+            while (!verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+                count--;
+            }
+        }
+        node.needed = originalNeeded;
         return count;
     }
 
