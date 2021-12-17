@@ -139,6 +139,7 @@ public final class KillauraLegitHack extends Hack
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
+		addSetting(followMode);
 	}
 	
 	@Override
@@ -156,6 +157,7 @@ public final class KillauraLegitHack extends Hack
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(LeftClickEvent.class, this);
 	}
 	
 	@Override
@@ -163,7 +165,8 @@ public final class KillauraLegitHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		target = null;
+		EVENTS.remove(LeftClickEvent.class, this);
+		target = followEntity = null;		
 	}
 	
 	@Override
