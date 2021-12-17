@@ -11,14 +11,25 @@ import java.util.ArrayList;
 
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
+import net.minecraft.entity.Entity;
 
 public interface LeftClickListener extends Listener
 {
 	public void onLeftClick(LeftClickEvent event);
 	
-	public static class LeftClickEvent
-		extends CancellableEvent<LeftClickListener>
+	public static class LeftClickEvent extends CancellableEvent<LeftClickListener>
 	{
+		private Entity entity;
+		public LeftClickEvent(Entity entity)
+		{
+			this.entity = entity;
+		}
+		
+		public getEntity()
+		{
+			return this.entity;
+		}
+		
 		@Override
 		public void fire(ArrayList<LeftClickListener> listeners)
 		{
