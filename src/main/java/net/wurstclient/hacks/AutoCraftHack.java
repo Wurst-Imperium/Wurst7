@@ -93,6 +93,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private List<CraftingProcess> getProcesses(Identifier id) {
+        List<CraftingProcess> processes = processMap.getOrDefault(id, new ArrayList<>());
+        processes.add(new StorageCraftingProcess(Registry.ITEM.get(id)));
+        return processes;
+    }
+
     private class SlotUpdateInfo {
         public int slot;
         public ItemStack itemStack;
@@ -251,9 +257,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return verifyPreliminary(availability, visited);
         }
         private boolean craftPreliminary(HashMap<Item, Integer> availability, HashSet<Node> visited) {
+            boolean rememberVisit = shouldRememberVisit();
+            if (rememberVisit)
+                visited.add(this);
             int numAvailable = availability.getOrDefault(target, 0);
             if (numAvailable >= needed) {
                 availability.put(target, numAvailable - needed);
+                if (rememberVisit)
+                    visited.remove(this);
                 return true;
             }
             if (numAvailable > 0) {
@@ -261,24 +272,33 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 needed -= numAvailable;
             }
             List<Node> children = getChildren(this, visited);
-            if (craftInternal(availability, visited, children))
+            if (craftInternal(availability, visited, children)) {
+                if (rememberVisit)
+                    visited.remove(this);
                 return true;
-            if (children.size() == 0)
-                return true;
+            }
+            if (rememberVisit)
+                visited.remove(this);
             return execute();
         }
         private boolean verifyPreliminary(HashMap<Item, Integer> availability, HashSet<Node> visited) {
-            if (needed <= 0)
+            boolean rememberVisit = shouldRememberVisit();
+            if (rememberVisit)
+                visited.add(this);
+            if (needed <= 0) {
+                if (rememberVisit)
+                    visited.remove(this);
                 return true;
+            }
             int numAvailable = availability.getOrDefault(target, 0);
             int neededOffset = 0;
             if (numAvailable >= needed) {
                 availability.put(target, availability.get(target) - needed);
+                if (rememberVisit)
+                    visited.remove(this);
                 return true;
             }
             List<Node> children = getChildren(this, visited);
-            if (children.size() == 0)
-                return false;
             if (numAvailable > 0) {
                 availability.put(target, 0);
                 needed -= numAvailable;
@@ -287,8 +307,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             boolean res = verifyInternal(availability, visited, children);
             needed += neededOffset;
+            if (rememberVisit)
+                visited.remove(this);
             return res;
         }
+        protected abstract boolean shouldRememberVisit();
         protected abstract boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children);
         protected abstract boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children);
         public abstract HashMap<Item, ItemStack> collectIngredients();
@@ -325,12 +348,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
+        protected boolean shouldRememberVisit() {
+            return true;
+        }
+        @Override
         protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
-            visited.add(this);
+            if (children.size() == 0)
+                return true;
             for (Node child : children) {
                 child.craftPreliminary(availability, visited);
             }
-            visited.remove(this);
             availability.put(target, availability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
             return false;
         }
@@ -353,14 +380,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
-            visited.add(this);
+            if (children.size() == 0)
+                return false;
             for (Node child : children) {
                 if (!child.verifyPreliminary(availability, visited)) {
-                    visited.remove(this);
                     return false;
                 }
             }
-            visited.remove(this);
             availability.put(target, availability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
             return true;
         }
@@ -442,13 +468,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
+        protected boolean shouldRememberVisit() {
+            return false;
+        }
+        @Override
         protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
             for (Node child : children) {
                 int original = child.needed;
                 child.needed = needed;
                 boolean verification = child.verifyPreliminary((HashMap<Item, Integer>)availability.clone(), visited);
                 if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone(), (HashSet<Node>)visited.clone());
                     if (maxCraftable > 0) {
                         child.needed = maxCraftable;
                         child.craftPreliminary(availability, visited);
@@ -474,7 +504,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 HashMap<Item, Integer> newAvailability = (HashMap<Item, Integer>)availability.clone();
                 boolean verification = child.verifyPreliminary(newAvailability, visited);
                 if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone(), (HashSet<Node>)visited.clone());
                     int originalNeeded = child.needed;
                     child.needed = maxCraftable;
                     child.verifyPreliminary(availability, visited);
@@ -504,6 +534,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class StorageNode extends Node {
         public StorageNode(Item target, int needed, List<CraftingProcess> processes) {
             super(target, needed, processes);
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return true;
         }
         @Override
         protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
@@ -587,7 +621,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private Node makeRootNode(Identifier identifier, int numNeeded) {
         Item item = Registry.ITEM.get(identifier);
-        List<CraftingProcess> processes = processMap.getOrDefault(identifier, new ArrayList<>());
+        List<CraftingProcess> processes = getProcesses(identifier);
         return makeNode(null, new ItemStack(item, numNeeded), processes).setNeeded(numNeeded);
     }
 
@@ -631,7 +665,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             HashMap<Item, ItemStack> ingredients = root.collectIngredients();
             for (ItemStack stack : ingredients.values()) {
                 Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
-                List<CraftingProcess> itemProcesses = processMap.getOrDefault(itemIdentifier, new ArrayList<>());
+                List<CraftingProcess> itemProcesses = getProcesses(itemIdentifier);
                 Node child = makeNode(root, stack, itemProcesses);
                 if (!nodes.contains(child)) {
                     children.add(child);
@@ -738,10 +772,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return count;
     }
 
-    private int getMaxCraftable(Node node, HashMap<Item, Integer> availability) {
+    private int getMaxCraftable(Node node, HashMap<Item, Integer> availability, HashSet<Node> visited) {
         int originalNeeded = node.needed;
         int count = 1;
-        while (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        while (node.setNeeded(count).verifyPreliminary(availability, visited)) {
             count *= 2;
         }
         count /= 2;
@@ -749,7 +783,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         if (increment > 0)
             count--;
         while (increment > 0) {
-            if (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            if (node.setNeeded(count).verifyPreliminary(availability, visited)) {
                 count += increment;
             }
             else {
@@ -757,14 +791,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        if (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
-            while (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        if (node.setNeeded(count).verifyPreliminary(availability, visited)) {
+            while (node.setNeeded(count).verifyPreliminary(availability, visited)) {
                 count++;
             }
             count--;
         }
         else {
-            while (!node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            while (!node.setNeeded(count).verifyPreliminary(availability, visited)) {
                 count--;
             }
         }
