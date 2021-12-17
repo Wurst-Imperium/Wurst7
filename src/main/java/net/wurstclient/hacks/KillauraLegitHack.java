@@ -112,8 +112,11 @@ public final class KillauraLegitHack extends Hack
 		"Filter armor stands", "Won't attack armor stands.", false);
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
+	private final CheckboxSetting followMode = new CheckboxSetting(
+		"Hits only the selected player (Choice by blow)", false);
 	
 	private Entity target;
+	public Entity followEntity;
 	
 	public KillauraLegitHack()
 	{
@@ -245,7 +248,8 @@ public final class KillauraLegitHack extends Hack
 		if(filterCrystals.isChecked())
 			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		if(followMode.isChecked()) target = followEntity;
+		else target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
 		
