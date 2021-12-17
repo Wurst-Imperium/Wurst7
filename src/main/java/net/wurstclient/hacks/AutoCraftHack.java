@@ -240,8 +240,72 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.stackShift = stackShift;
             return this;
         }
-        public abstract HashMap<Item, ItemStack> collectIngredients(int index);
+        public boolean craft() {
+            HashMap<Item, Integer> availability = availabilityMap;
+            HashSet<Node> visited = new HashSet<>();
+            return craftPreliminary(availability, visited);
+        }
+        public boolean verify() {
+            HashMap<Item, Integer> availability = (HashMap<Item, Integer>)availabilityMap.clone();
+            HashSet<Node> visited = new HashSet<>();
+            return verifyPreliminary(availability, visited);
+        }
+        private boolean craftPreliminary(HashMap<Item, Integer> availability, HashSet<Node> visited) {
+            int numAvailable = availability.getOrDefault(target, 0);
+            if (numAvailable >= needed) {
+                availability.put(target, numAvailable - needed);
+                return true;
+            }
+            if (numAvailable > 0) {
+                availability.put(target, 0);
+                needed -= numAvailable;
+            }
+            List<Node> children = getChildren(this, visited);
+            if (craftInternal(availability, visited, children))
+                return true;
+            if (children.size() == 0)
+                return true;
+            return execute();
+        }
+        private boolean verifyPreliminary(HashMap<Item, Integer> availability, HashSet<Node> visited) {
+            if (needed <= 0)
+                return true;
+            int numAvailable = availability.getOrDefault(target, 0);
+            int neededOffset = 0;
+            if (numAvailable >= needed) {
+                availability.put(target, availability.get(target) - needed);
+                return true;
+            }
+            List<Node> children = getChildren(this, visited);
+            if (children.size() == 0)
+                return false;
+            if (numAvailable > 0) {
+                availability.put(target, 0);
+                needed -= numAvailable;
+                neededOffset += numAvailable;
+                children = getChildren(this, visited);
+            }
+            boolean res = verifyInternal(availability, visited, children);
+            needed += neededOffset;
+            return res;
+        }
+        protected abstract boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children);
+        protected abstract boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children);
+        public abstract HashMap<Item, ItemStack> collectIngredients();
         public abstract boolean execute();
+        public abstract int getOutputCount();
+        public int getNeededToCraft(int index) {
+            if (index < processes.size() && processes.get(index) instanceof RecipeCraftingProcess) {
+                RecipeCraftingProcess process = (RecipeCraftingProcess)processes.get(index);
+                if (needed < process.recipe.getOutput().getCount()) {
+                    return process.recipe.getOutput().getCount();
+                }
+                else {
+                    return (int)Math.ceil((double)needed / process.recipe.getOutput().getCount()) * process.recipe.getOutput().getCount();
+                }
+            }
+            return needed;
+        }
         @Override
         public int hashCode() {
             return target.hashCode();
@@ -261,7 +325,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients(int index) {
+        protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            visited.add(this);
+            for (Node child : children) {
+                child.craftPreliminary(availability, visited);
+            }
+            visited.remove(this);
+            availability.put(target, availability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
             HashMap<Item, ItemStack> stackTypes = new HashMap<>();
             for (Ingredient ing : ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
@@ -277,13 +351,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return stackTypes;
         }
-        public int getNeededToCraft(RecipeCraftingProcess process) {
-            if (needed < process.recipe.getOutput().getCount()) {
-                return process.recipe.getOutput().getCount();
+        @Override
+        protected boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            visited.add(this);
+            for (Node child : children) {
+                if (!child.verifyPreliminary(availability, visited)) {
+                    visited.remove(this);
+                    return false;
+                }
             }
-            else {
-                return (int)Math.ceil((double)needed / process.recipe.getOutput().getCount()) * process.recipe.getOutput().getCount();
-            }
+            visited.remove(this);
+            availability.put(target, availability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
+            return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
         }
         private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem) {
             slotUpdateLock.lock();
@@ -306,7 +389,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         private int calculateCraftingOutput() {
             List<Ingredient> ingredients = ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients();
-            HashMap<Item, ItemStack> collected = collectIngredients(0);
+            HashMap<Item, ItemStack> collected = collectIngredients();
             int output = Integer.MAX_VALUE;
             for (Ingredient ing : ingredients) {
                 if (ing.getMatchingStacks().length == 0)
@@ -329,7 +412,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public boolean execute() {
-            int neededToCraft = getNeededToCraft(((RecipeCraftingProcess)processes.get(0)));
+            int neededToCraft = getNeededToCraft(0);
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable()) return false;
@@ -359,12 +442,62 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients(int index) {
+        protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            for (Node child : children) {
+                int original = child.needed;
+                child.needed = needed;
+                boolean verification = child.verifyPreliminary((HashMap<Item, Integer>)availability.clone(), visited);
+                if (!verification) {
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    if (maxCraftable > 0) {
+                        child.needed = maxCraftable;
+                        child.craftPreliminary(availability, visited);
+                        needed -= maxCraftable;
+                    }
+                }
+                else {
+                    child.craftPreliminary(availability, visited);
+                    child.needed = original;
+                    return true;
+                }
+                child.needed = original;
+            }
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
+        }
+        @Override
+        protected boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            for (Node child : children) {
+                HashMap<Item, Integer> newAvailability = (HashMap<Item, Integer>)availability.clone();
+                boolean verification = child.verifyPreliminary(newAvailability, visited);
+                if (!verification) {
+                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
+                    int originalNeeded = child.needed;
+                    child.needed = maxCraftable;
+                    child.verifyPreliminary(availability, visited);
+                    child.needed = originalNeeded;
+                    needed -= maxCraftable;
+                }
+                else {
+                    availability.clear();
+                    availability.putAll(newAvailability);
+                    return true;
+                }
+                if (needed <= 0)
+                    return true;
+            }
+            return false;
         }
         @Override
         public boolean execute() {
             return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 0;
         }
     }
 
@@ -373,13 +506,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients(int index) {
+        protected boolean craftInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
+        }
+        @Override
+        protected boolean verifyInternal(HashMap<Item, Integer> availability, HashSet<Node> visited, List<Node> children) {
+            return containerQuery.getAvailabilityMap().getOrDefault(target, 0) >= needed;
         }
         @Override
         public boolean execute() {
             containerQuery.acquire(target, needed);
             return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
         }
     }
 
@@ -436,65 +581,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return res;
     }
 
-    private boolean verifyNode(Node node, HashMap<Item, Integer> availability, HashSet<Node> visited) {
-        if (node.needed <= 0)
-            return true;
-        int numAvailable = availability.getOrDefault(node.target, 0);
-        int neededOffset = 0;
-        if (numAvailable >= node.needed) {
-            availability.put(node.target, availability.get(node.target) - node.needed);
-            return true;
-        }
-        List<Node> children = getChildren(node, visited);
-        if (children.size() == 0)
-            return false;
-        if (numAvailable > 0) {
-            availability.put(node.target, 0);
-            node.needed -= numAvailable;
-            neededOffset += numAvailable;
-            children = getChildren(node, visited);
-        }
-        if (node instanceof ChoiceNode) {
-            int needed = node.needed;
-            for (Node child : children) {
-                HashMap<Item, Integer> newAvailability = (HashMap<Item, Integer>)availability.clone();
-                boolean verification = verifyNode(child, newAvailability, visited);
-                if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
-                    int originalNeeded = child.needed;
-                    child.needed = maxCraftable;
-                    verifyNode(child, availability, visited);
-                    child.needed = originalNeeded;
-                    needed -= maxCraftable;
-                }
-                else {
-                    availability.clear();
-                    availability.putAll(newAvailability);
-                    node.needed += neededOffset;
-                    return true;
-                }
-                if (needed <= 0)
-                    return true;
-            }
-            node.needed += neededOffset;
-            return false;
-        }
-        else {
-            visited.add(node);
-            for (Node child : children) {
-                if (!verifyNode(child, availability, visited)) {
-                    visited.remove(node);
-                    node.needed += neededOffset;
-                    return false;
-                }
-            }
-            visited.remove(node);
-            availability.put(node.target, availability.getOrDefault(node.target, 0) + ((RecipeNode)node).getNeededToCraft((RecipeCraftingProcess)node.processes.get(0)) - node.needed);
-            node.needed += neededOffset;
-            return true;
-        }
-    }
-
     private boolean usingCraftingTable() {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
     }
@@ -508,8 +594,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private Node makeNode(Node root, ItemStack stack, List<CraftingProcess> itemProcesses) {
         int newNeeded = 0;
         if (root != null && !(root instanceof ChoiceNode)) {
-            List<CraftingProcess> processes = root.processes;
-            newNeeded = new Fraction(((RecipeNode) root).getNeededToCraft((RecipeCraftingProcess) processes.get(0)) * stack.getCount(), ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount()).ceil();
+            newNeeded = new Fraction(root.getNeededToCraft(0) * stack.getCount(), root.getOutputCount()).ceil();
         }
         int multiplicity = getMultiplicity(itemProcesses);
         Node node = null;
@@ -543,7 +628,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return children;
         }
         else {
-            HashMap<Item, ItemStack> ingredients = root.collectIngredients(0);
+            HashMap<Item, ItemStack> ingredients = root.collectIngredients();
             for (ItemStack stack : ingredients.values()) {
                 Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
                 List<CraftingProcess> itemProcesses = processMap.getOrDefault(itemIdentifier, new ArrayList<>());
@@ -554,52 +639,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return children;
         }
-    }
-
-    private boolean craftNode(Node node, HashMap<Item, Integer> availability, HashSet<Node> visited) {
-        int numAvailable = availability.getOrDefault(node.target, 0);
-        if (numAvailable >= node.needed) {
-            availability.put(node.target, numAvailable - node.needed);
-            return true;
-        }
-        if (numAvailable > 0 && !(node instanceof ChoiceNode)) {
-            availability.put(node.target, 0);
-            node.needed -= numAvailable;
-        }
-        List<Node> children = getChildren(node, visited);
-        if (node instanceof ChoiceNode) {
-            int needed = node.needed;
-            for (Node child : children) {
-                int original = child.needed;
-                child.needed = needed;
-                boolean verification = verifyNode(child, (HashMap<Item, Integer>)availability.clone(), visited);
-                if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, (HashMap<Item, Integer>)availability.clone());
-                    if (maxCraftable > 0) {
-                        child.needed = maxCraftable;
-                        craftNode(child, availability, visited);
-                        needed -= maxCraftable;
-                    }
-                }
-                else {
-                    craftNode(child, availability, visited);
-                    child.needed = original;
-                    return true;
-                }
-                child.needed = original;
-            }
-        }
-        else {
-            visited.add(node);
-            for (Node child : children) {
-                craftNode(child, availability, visited);
-            }
-            visited.remove(node);
-            availability.put(node.target, availability.getOrDefault(node.target, 0) + ((RecipeNode)node).getNeededToCraft((RecipeCraftingProcess)node.processes.get(0)) - node.needed);
-        }
-        if (children.size() == 0)
-            return true;
-        return node.execute();
     }
 
     private class CraftingQueueEntry {
@@ -669,7 +708,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     // This could (should) be done in O(1) time by modifying verifyNode, but O(log n) time seems to work without lagging
     private int getMaxCraftable(Identifier itemId, HashMap<Item, Integer> availability) {
         int count = 1;
-        while (verifyNode(makeRootNode(itemId, count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        while (makeRootNode(itemId, count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
             count *= 2;
         }
         count /= 2;
@@ -677,7 +716,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         if (increment > 0)
             count--;
         while (increment > 0) {
-            if (verifyNode(makeRootNode(itemId, count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
+            if (makeRootNode(itemId, count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count += increment;
             }
             else {
@@ -685,14 +724,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        if (verifyNode(makeRootNode(itemId, count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
-            while (verifyNode(makeRootNode(itemId, count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        if (makeRootNode(itemId, count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            while (makeRootNode(itemId, count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count++;
             }
             count--;
         }
         else {
-            while (!verifyNode(makeRootNode(itemId, count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            while (!makeRootNode(itemId, count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count--;
             }
         }
@@ -702,7 +741,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private int getMaxCraftable(Node node, HashMap<Item, Integer> availability) {
         int originalNeeded = node.needed;
         int count = 1;
-        while (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        while (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
             count *= 2;
         }
         count /= 2;
@@ -710,7 +749,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         if (increment > 0)
             count--;
         while (increment > 0) {
-            if (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
+            if (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count += increment;
             }
             else {
@@ -718,14 +757,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        if (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>)availability.clone(), new HashSet<>())) {
-            while (verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+        if (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            while (node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count++;
             }
             count--;
         }
         else {
-            while (!verifyNode(node.setNeeded(count), (HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
+            while (!node.setNeeded(count).verifyPreliminary((HashMap<Item, Integer>) availability.clone(), new HashSet<>())) {
                 count--;
             }
         }
@@ -743,8 +782,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (craftAll) {
                 root = makeRootNode(itemId, getMaxCraftable(itemId, availabilityMap));
             }
-            if (verifyNode(root, (HashMap<Item, Integer>)availabilityMap.clone(), new HashSet<>())) {
-                if (!craftNode(root, availabilityMap, new HashSet<>())) {
+            if (root.verify()) {
+                if (!root.craft()) {
                     int finalCount = totalAvailabilityMap.getOrDefault(item, 0);
                     synchronized (craftingQueue) {
                         craftingQueue.get(0).count -= finalCount - initialCount;
