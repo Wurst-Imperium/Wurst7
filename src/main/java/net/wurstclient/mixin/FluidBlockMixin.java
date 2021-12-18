@@ -26,12 +26,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FluidBlockMixin
 {
 	
-	@SuppressWarnings("deprecation")
-	@Override
-	public VoxelShape getCollisionShape(BlockState blockState_1,
-		BlockView blockView_1, BlockPos blockPos_1,
-		ShapeContext entityContext_1)
-	{
+	@Inject(method = "getCollisionShape", at = @At(value = "HEAD"), cancellable = true)
+	private void getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir){
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax != null && hax.jesusHack.shouldBeSolid()) {
 			cir.setReturnValue(VoxelShapes.fullCube());
