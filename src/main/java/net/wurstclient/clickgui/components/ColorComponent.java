@@ -71,7 +71,7 @@ public final class ColorComponent extends Component
 		
 		if(hovering)
 			if(mouseY < y3)
-				GUI.setTooltip(setting.getDescription());
+				GUI.setTooltip(setting.getWrappedDescription(200));
 			else
 			{
 				String tooltip = "\u00a7cR:\u00a7r" + setting.getRed();
@@ -105,7 +105,7 @@ public final class ColorComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -129,7 +129,7 @@ public final class ColorComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(color[0], color[1], color[2],
@@ -161,14 +161,17 @@ public final class ColorComponent extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = MC.textRenderer;
 		
-		tr.draw(matrixStack, setting.getName(), x1, y1, 0xF0F0F0);
+		tr.draw(matrixStack, setting.getName(), x1, y1, txtColor);
 		
 		String value = ColorUtils.toHex(setting.getColor());
 		int valueWidth = tr.getWidth(value);
-		tr.draw(matrixStack, value, x2 - valueWidth, y1, 0xF0F0F0);
+		tr.draw(matrixStack, value, x2 - valueWidth, y1, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

@@ -61,6 +61,7 @@ public final class FileComponent extends Component
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		TextRenderer fr = WurstClient.MC.textRenderer;
@@ -80,13 +81,13 @@ public final class FileComponent extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		else if(hBox)
 		{
 			String tooltip = "\u00a7e[left-click]\u00a7r to select file";
@@ -130,9 +131,9 @@ public final class FileComponent extends Component
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		String text = setting.getName() + ": ";
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		fr.draw(matrixStack, setting.getSelectedFileName(), x3 + 2, y1 + 2,
-			0xf0f0f0);
+			txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

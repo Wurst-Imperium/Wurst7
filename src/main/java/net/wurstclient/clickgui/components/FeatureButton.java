@@ -164,7 +164,7 @@ public final class FeatureButton extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -195,7 +195,7 @@ public final class FeatureButton extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -215,7 +215,7 @@ public final class FeatureButton extends Component
 	{
 		float[] acColor = GUI.getAcColor();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -232,7 +232,7 @@ public final class FeatureButton extends Component
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		// separator
@@ -253,7 +253,7 @@ public final class FeatureButton extends Component
 		float ya1;
 		float ya2;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		if(isSettingsWindowOpen())
@@ -292,6 +292,9 @@ public final class FeatureButton extends Component
 	
 	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		TextRenderer tr = MC.textRenderer;
@@ -300,7 +303,7 @@ public final class FeatureButton extends Component
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		tr.draw(matrixStack, name, tx, ty, 0xF0F0F0);
+		tr.draw(matrixStack, name, tx, ty, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

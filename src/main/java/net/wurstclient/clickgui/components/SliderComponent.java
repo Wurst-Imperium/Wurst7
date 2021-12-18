@@ -150,7 +150,7 @@ public final class SliderComponent extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = setting.getDescription();
+		String tooltip = setting.getWrappedDescription(200);
 		
 		if(setting.isLocked())
 		{
@@ -169,7 +169,7 @@ public final class SliderComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -208,7 +208,7 @@ public final class SliderComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xl1 = x3;
@@ -264,7 +264,7 @@ public final class SliderComponent extends Component
 	private void drawKnob(MatrixStack matrixStack, int x1, int x2, int y2,
 		int y3, boolean hSlider, boolean renderAsDisabled)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		double percentage = (setting.getValue() - setting.getMinimum())
@@ -307,15 +307,17 @@ public final class SliderComponent extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1, boolean renderAsDisabled)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

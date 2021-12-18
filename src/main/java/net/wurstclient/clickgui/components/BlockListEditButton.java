@@ -62,6 +62,7 @@ public final class BlockListEditButton extends Component
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
+		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
 		int x1 = getX();
@@ -78,13 +79,13 @@ public final class BlockListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -124,8 +125,8 @@ public final class BlockListEditButton extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ": " + setting.getBlockNames().size();
-		fr.draw(matrixStack, text, x1, y1 + 2, 0xf0f0f0);
-		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, 0xf0f0f0);
+		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
+		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

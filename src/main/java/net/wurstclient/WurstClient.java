@@ -57,8 +57,8 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.18";
-	public static final String MC_VERSION = "1.17.1";
+	public static final String VERSION = "7.19";
+	public static final String MC_VERSION = "1.18.1";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -205,8 +205,7 @@ public enum WurstClient
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
 			return IMC.getLanguageManager().getEnglish().get(key);
-		else
-			return I18n.translate(key);
+		return I18n.translate(key);
 	}
 	
 	public WurstAnalytics getAnalytics()

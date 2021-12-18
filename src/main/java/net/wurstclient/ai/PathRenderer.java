@@ -35,7 +35,7 @@ public final class PathRenderer
 		int endZ = end.getZ();
 		
 		matrixStack.push();
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		// main line
 		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
@@ -101,7 +101,7 @@ public final class PathRenderer
 		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

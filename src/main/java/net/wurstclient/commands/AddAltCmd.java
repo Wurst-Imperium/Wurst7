@@ -8,7 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.util.ChatUtil;
+import net.minecraft.util.StringHelper;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.command.CmdException;
@@ -62,7 +62,7 @@ public final class AddAltCmd extends Command
 		for(PlayerListEntry entry : MC.player.networkHandler.getPlayerList())
 		{
 			String name = entry.getProfile().getName();
-			name = ChatUtil.stripTextFormat(name);
+			name = StringHelper.stripTextFormat(name);
 			
 			if(altManager.contains(name))
 				continue;

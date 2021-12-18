@@ -32,14 +32,12 @@ public enum JsonUtils
 	public static final Gson PRETTY_GSON =
 		new GsonBuilder().setPrettyPrinting().create();
 	
-	public static final JsonParser JSON_PARSER = new JsonParser();
-	
 	public static JsonElement parseFile(Path path)
 		throws IOException, JsonException
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
-			return JSON_PARSER.parse(reader);
+			return JsonParser.parseReader(reader);
 			
 		}catch(JsonParseException e)
 		{
@@ -55,7 +53,7 @@ public enum JsonUtils
 		{
 			InputStreamReader reader = new InputStreamReader(input);
 			BufferedReader bufferedReader = new BufferedReader(reader);
-			return new JsonParser().parse(bufferedReader);
+			return JsonParser.parseReader(bufferedReader);
 			
 		}catch(JsonParseException e)
 		{

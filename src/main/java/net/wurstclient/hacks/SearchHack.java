@@ -168,10 +168,8 @@ public final class SearchHack extends Hack
 			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-		{
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-			
-		}else
+		else
 			return;
 		
 		chunksToUpdate.add(chunk);
@@ -239,7 +237,7 @@ public final class SearchHack extends Hack
 		
 		if(vertexBuffer != null)
 		{
-			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);

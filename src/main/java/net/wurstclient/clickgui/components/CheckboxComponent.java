@@ -97,7 +97,7 @@ public final class CheckboxComponent extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = setting.getDescription();
+		String tooltip = setting.getWrappedDescription(200);
 		
 		if(setting.isLocked())
 		{
@@ -114,7 +114,7 @@ public final class CheckboxComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -136,7 +136,7 @@ public final class CheckboxComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -165,7 +165,7 @@ public final class CheckboxComponent extends Component
 	private void drawCheck(MatrixStack matrixStack, int x1, int y1,
 		boolean hovering)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xc1 = x1 + 2.5F;
@@ -214,13 +214,15 @@ public final class CheckboxComponent extends Component
 	
 	private void drawName(MatrixStack matrixStack, int x3, int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		String name = setting.getName();
 		int tx = x3 + 2;
 		int ty = y1 + 2;
-		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
-		MC.textRenderer.draw(matrixStack, name, tx, ty, color);
+		MC.textRenderer.draw(matrixStack, name, tx, ty, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

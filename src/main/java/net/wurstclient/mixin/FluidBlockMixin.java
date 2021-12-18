@@ -27,8 +27,7 @@ public abstract class FluidBlockMixin
 {
 	
 	@Inject(method = "getCollisionShape", at = @At(value = "HEAD"), cancellable = true)
-	public void getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
-	{
+	private void getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir){
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax != null && hax.jesusHack.shouldBeSolid()) {
 			cir.setReturnValue(VoxelShapes.fullCube());
