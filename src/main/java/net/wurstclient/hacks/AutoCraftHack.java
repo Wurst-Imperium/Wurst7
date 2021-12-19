@@ -11,7 +11,10 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ShulkerBoxScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -123,7 +126,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             HashMap<Item, Integer> res = new HashMap<>();
             List<ItemStack> items = MC.player.getInventory().main;
             for (ItemStack cur : items) {
-                res.put(cur.getItem(), res.getOrDefault(cur.getItem(), 0) + cur.getCount());
+                if (cur.getCount() > 0)
+                    res.put(cur.getItem(), res.getOrDefault(cur.getItem(), 0) + cur.getCount());
+            }
+            return res;
+        }
+        public HashMap<Item, Integer> getCurrentContainerAvailabilityMap() {
+            HashMap<Item, Integer> res = new HashMap<>();
+            List<Slot> slots = MC.player.currentScreenHandler.slots;
+            for (int i = 0; i < slots.size() - 36; i++) {
+                if (slots.get(i).getStack().getCount() > 0)
+                    res.put(slots.get(i).getStack().getItem(), res.getOrDefault(slots.get(i).getStack().getItem(), 0) + slots.get(i).getStack().getCount());
             }
             return res;
         }
@@ -162,7 +175,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return globalAvailabilityMap;
         }
-        private int takeItem(Item item, int count) {
+        private int takeItem(BlockPos containerPos, Item item, int count) {
+            int initialCount = count;
+            if (!containers.containsKey(containerPos))
+                return count;
+            HashMap<Item, Integer> container = containers.get(containerPos);
             ScreenHandler handler = MC.player.currentScreenHandler;
             for (int i = 0; i < handler.slots.size() - 36; i++) {
                 if (count <= 0)
@@ -192,6 +209,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                 }
             }
+            container.put(item, container.getOrDefault(item, 0) - (initialCount - count));
             return count;
         }
         @Override
@@ -201,7 +219,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     break;
                 if (containers.get(pos).getOrDefault(item, 0) > 0) {
                     containerManager.goToContainer(pos);
-                    count = takeItem(item, count);
+                    count = takeItem(pos, item, count);
                 }
             }
         }
@@ -257,6 +275,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             pathFinder.path(container.up());
             IMC.getInteractionManager().rightClickBlock(container, Direction.NORTH, Vec3d.ZERO);
             awaitContainerOpen();
+            System.out.println("REACHED");
             currentContainer = container;
         }
     }
@@ -276,6 +295,28 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             inventoryAvailability.putAll(other.inventoryAvailability);
             storageAvailability.clear();
             storageAvailability.putAll(other.storageAvailability);
+        }
+    }
+
+    private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem, boolean succeedAfterTimeout) {
+        slotUpdateLock.lock();
+        try {
+            while (latestSlotUpdate == null || !latestSlotUpdate.itemStack.getItem().equals(item) || (!onlyConsiderItem && (latestSlotUpdate.itemStack.getCount() != amount || latestSlotUpdate.slot != slot))) {
+                boolean gotSignal = slotUpdateCondition.await(1000, TimeUnit.MILLISECONDS);
+                if (succeedAfterTimeout)
+                    break;
+                if (!gotSignal) {
+                    ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(0).getStack();
+                    if (craftingItem.getItem().equals(item) && (onlyConsiderItem || (craftingItem.getCount() == amount && slot == 0)))
+                        break;
+                }
+            }
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        finally {
+            slotUpdateLock.unlock();
         }
     }
 
@@ -448,25 +489,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
         }
-        private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem) {
-            slotUpdateLock.lock();
-            try {
-                while (latestSlotUpdate == null || !latestSlotUpdate.itemStack.getItem().equals(item) || (!onlyConsiderItem && (latestSlotUpdate.itemStack.getCount() != amount || latestSlotUpdate.slot != slot))) {
-                    boolean gotSignal = slotUpdateCondition.await(1000, TimeUnit.MILLISECONDS);
-                    if (!gotSignal) {
-                        ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(0).getStack();
-                        if (craftingItem.getItem().equals(item) && (onlyConsiderItem || (craftingItem.getCount() == amount && slot == 0)))
-                            break;
-                    }
-                }
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            finally {
-                slotUpdateLock.unlock();
-            }
-        }
         private int calculateCraftingOutput() {
             List<Ingredient> ingredients = ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients();
             HashMap<Item, ItemStack> collected = collectIngredients();
@@ -505,20 +527,20 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, true);
-                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false);
+                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, false);
-                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false);
+                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
                 if (!usingCraftingTable()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
             }
             return true;
@@ -781,22 +803,36 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private boolean isStorageContainerHandler(ScreenHandler handler) {
+        return handler instanceof GenericContainerScreenHandler || handler instanceof ShulkerBoxScreenHandler || handler instanceof CraftingScreenHandler;
+    }
+
     public void storageContainerAccessed(int syncId) { }
 
     public void storageContainerContent(int syncId, List<ItemStack> content) {
-        HashMap<Item, Integer> contentMap = new HashMap<>();
-        for (int i = 0; i < content.size() - 36; i++) {
-            ItemStack stack = content.get(i);
-            if (stack.getCount() > 0)
-                contentMap.put(stack.getItem(), contentMap.getOrDefault(stack.getItem(), 0) + stack.getCount());
+        if (isStorageContainerHandler(MC.player.currentScreenHandler)) {
+            HashMap<Item, Integer> contentMap = new HashMap<>();
+            for (int i = 0; i < content.size() - 36; i++) {
+                ItemStack stack = content.get(i);
+                if (stack.getCount() > 0)
+                    contentMap.put(stack.getItem(), contentMap.getOrDefault(stack.getItem(), 0) + stack.getCount());
+            }
+            containerQuery.updateContainer(contentMap, latestBlockPos);
         }
-        containerQuery.updateContainer(contentMap, latestBlockPos);
         containerOpenLock.lock();
         try {
             containerOpenCondition.signalAll();
         }
         finally {
             containerOpenLock.unlock();
+        }
+    }
+
+    public void storageContainerClosed() {
+        if (!isStorageContainerHandler(MC.player.currentScreenHandler))
+            return;
+        if (!isCurrentlyCrafting) {
+            containerQuery.updateContainer(inventoryQuery.getCurrentContainerAvailabilityMap(), latestBlockPos);
         }
     }
 

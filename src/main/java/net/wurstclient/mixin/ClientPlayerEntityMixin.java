@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.hacks.AutoCraftHack;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,6 +58,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected MinecraftClient client;
 	
 	private Screen tempCurrentScreen;
+
+	private final AutoCraftHack autoCraft = WurstClient.INSTANCE.getHax().autoCraftHack;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
 		GameProfile gameProfile_1)
@@ -160,6 +163,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+
+	@Inject(at = {@At("HEAD")},
+			method = {"closeScreen"},
+			cancellable = true)
+	private void closeScreen(CallbackInfo ci)
+	{
+		if(autoCraft.isEnabled())
+			autoCraft.storageContainerClosed();
 	}
 	
 	@Override
