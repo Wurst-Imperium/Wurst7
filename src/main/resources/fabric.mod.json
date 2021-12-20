@@ -20,7 +20,8 @@
   "entrypoints": {
     "main": [
       "net.wurstclient.WurstInitializer"
-    ]
+    ],
+    "modmenu": [ "net.wurstclient.WurstModMenuRegistry" ]
   },
   "mixins": [
     "wurst.mixins.json"

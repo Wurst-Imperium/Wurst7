@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,23 +29,33 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.options.WurstOptionsScreen;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
 	private static final Identifier wurstTexture =
 		new Identifier("wurst", "wurst_128.png");
-	
+	private AtomicBoolean isModMenuPresent;
+
 	private ButtonWidget wurstOptionsButton;
 	
 	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
 	}
+
+	private boolean isModMenu(){
+		if(isModMenuPresent == null){
+			isModMenuPresent = new AtomicBoolean(FabricLoader.getInstance().isModLoaded("modmenu"));
+		}
+		return isModMenuPresent.get();
+	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"initWidgets()V"})
 	private void onInitWidgets(CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
+		if(!WurstClient.INSTANCE.isEnabled() || isModMenu())
 			return;
 		
 		addWurstOptionsButton();
@@ -90,7 +101,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
+		if(!WurstClient.INSTANCE.isEnabled() || isModMenu())
 			return;
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
