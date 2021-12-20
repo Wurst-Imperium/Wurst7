@@ -31,13 +31,13 @@ import net.wurstclient.Category;
 import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.BlockUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -349,12 +349,41 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class ContainerManager {
         private HashMap<Block, HashSet<BlockPos>> containers = new HashMap<>();
         private BlockPos currentContainer = null;
+        private BlockPos getNearestPathablePosition(BlockPos containerPos) {
+            int range = 5;
+            double closestLength = Double.POSITIVE_INFINITY;
+            BlockPos closestBlockPos = null;
+            Vec3d playerPos = MC.player.getPos();
+            Vec3d container = new Vec3d(containerPos.getX(), containerPos.getY(), containerPos.getZ());
+            for (int x = (int)container.x - range; x <= (int)container.x + range; x++) {
+                for (int y = (int)container.y - range; y <= (int)container.y + range; y++) {
+                    for (int z = (int)container.z - range; z <= (int)container.z + range; z++) {
+                        if (container.subtract(new Vec3d(x, y, z)).length() > range)
+                            continue;
+                        BlockPos currentPos = new BlockPos(x, y, z);
+                        if (MC.world.getBlockState(currentPos).isAir() &&
+                            MC.world.getBlockState(currentPos.up()).isAir() &&
+                            BlockUtils.canBeClicked(currentPos.down())) {
+                            double distance = new Vec3d(x, y, z).subtract(playerPos).lengthSquared();
+                            if (distance < closestLength) {
+                                closestLength = distance;
+                                closestBlockPos = currentPos;
+                            }
+                        }
+                    }
+                }
+            }
+            return closestBlockPos;
+        }
         public void goToContainer(BlockPos container) {
             if (container.equals(currentContainer))
                 return;
             if (MC.currentScreen != null)
                 closeScreen();
-            pathFinder.path(container.up());
+            BlockPos nearestPathablePosition = getNearestPathablePosition(container);
+            if (nearestPathablePosition == null)
+                nearestPathablePosition = container.up();
+            pathFinder.path(nearestPathablePosition);
             IMC.getInteractionManager().rightClickBlock(container, Direction.NORTH, Vec3d.ZERO);
             awaitContainerOpen();
             currentContainer = container;
