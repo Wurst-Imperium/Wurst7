@@ -64,6 +64,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private HashMap<Item, Integer> storageAvailabilityMap = new HashMap<>();
     private HashMap<Item, Integer> totalInventoryAvailabilityMap = new HashMap<>();
 
+    private HashSet<Block> containerBlockTypes;
+
     private Pathfinder pathFinder = new WurstPathfinder();
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
@@ -75,6 +77,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public AutoCraftHack() {
         super("AutoCraft");
         setCategory(Category.ITEMS);
+    }
+
+    private void initContainerBlockTypes() {
+        containerBlockTypes = new HashSet<>();
+        List<String> blockTypes = List.of("crafting_table", "chest", "furnace");
+        for (String type : blockTypes) {
+            containerBlockTypes.add(Registry.BLOCK.get(new Identifier("minecraft", type)));
+        }
     }
 
     private void initProcessMap() {
@@ -331,6 +341,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private class ContainerManager {
+        private HashMap<Block, HashSet<BlockPos>> containers = new HashMap<>();
         private BlockPos currentContainer = null;
         public void goToContainer(BlockPos container) {
             if (container.equals(currentContainer))
@@ -340,8 +351,38 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             pathFinder.path(container.up());
             IMC.getInteractionManager().rightClickBlock(container, Direction.NORTH, Vec3d.ZERO);
             awaitContainerOpen();
-            System.out.println("REACHED");
             currentContainer = container;
+        }
+        public void addContainer(Block block, BlockPos pos) {
+            HashSet<BlockPos> positions = containers.getOrDefault(block, new HashSet<>());
+            positions.add(pos);
+            containers.put(block, positions);
+        }
+        public void updateContainers(HashMap<Block, HashSet<BlockPos>> updated) {
+            for (Block b : updated.keySet()) {
+                HashSet<BlockPos> positions = containers.getOrDefault(b, new HashSet<>());
+                positions.addAll(updated.get(b));
+                containers.put(b, positions);
+            }
+        }
+        public BlockPos getClosestToPlayer(Block b) {
+            if (!containers.containsKey(b))
+                return null;
+            double shortestDistance = Double.POSITIVE_INFINITY;
+            BlockPos nearestPos = null;
+            Vec3d playerPos = MC.player.getPos();
+            for (BlockPos pos : containers.get(b)) {
+                Vec3d blockPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+                double distance = playerPos.subtract(blockPos).lengthSquared();
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestPos = pos;
+                }
+            }
+            return nearestPos;
+        }
+        public HashMap<Block, HashSet<BlockPos>> getContainers() {
+            return containers;
         }
     }
 
@@ -580,12 +621,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         public boolean execute() {
             if (!usingCraftingTable()) {
-                for (BlockPos pos : containerQuery.containers.keySet()) {
-                    if (MC.world.getBlockState(pos).getBlock().equals(Registry.BLOCK.get(new Identifier("minecraft", "crafting_table")))) {
-                        containerManager.goToContainer(pos);
-                        break;
-                    }
-                }
+                Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
+                BlockPos nearestCraftingTable = containerManager.getClosestToPlayer(craftingTable);
+                if (nearestCraftingTable != null)
+                    containerManager.goToContainer(nearestCraftingTable);
             }
             int neededToCraft = getNeededToCraft(0);
             int craftingOutput = 0;
@@ -866,7 +905,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private boolean isStorageContainerHandler(ScreenHandler handler) {
-        return handler instanceof GenericContainerScreenHandler || handler instanceof ShulkerBoxScreenHandler || handler instanceof CraftingScreenHandler;
+        return handler instanceof GenericContainerScreenHandler || handler instanceof ShulkerBoxScreenHandler;
     }
 
     public void storageContainerAccessed(int syncId) { }
@@ -880,6 +919,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     contentMap.put(stack.getItem(), contentMap.getOrDefault(stack.getItem(), 0) + stack.getCount());
             }
             containerQuery.updateContainer(contentMap, latestBlockPos);
+            containerManager.addContainer(MC.world.getBlockState(latestBlockPos).getBlock(), latestBlockPos);
         }
         containerOpenLock.lock();
         try {
@@ -972,6 +1012,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private void craft(Identifier itemId, int count, boolean craftAll) {
         isCurrentlyCrafting = true;
         new Thread(() -> {
+            containerManager.updateContainers(worldQuery.getLocations(containerBlockTypes));
             Node root = makeRootNode(itemId, craftAll ? 1 : count);
             Item item = Registry.ITEM.get(itemId);
             int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
@@ -983,9 +1024,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (!root.craft()) {
                     int finalCount = totalInventoryAvailabilityMap.getOrDefault(item, 0);
                     synchronized (craftingQueue) {
-                        craftingQueue.get(0).count -= finalCount - initialCount;
+                        craftingQueue.remove(0);
+                        /*craftingQueue.get(0).count -= finalCount - initialCount;
                         if (craftingQueue.get(0).count <= 0)
-                            craftingQueue.remove(0);
+                            craftingQueue.remove(0);*/
                     }
                     inventoryAvailabilityMap.put(item, inventoryAvailabilityMap.getOrDefault(item, 0) + initialCount);
                     isCurrentlyCrafting = false;
@@ -1004,6 +1046,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public void onEnable() {
         if (processMap == null)
             initProcessMap();
+        if (containerBlockTypes == null)
+            initContainerBlockTypes();
         EVENTS.add(UpdateListener.class, this);
     }
 
@@ -1011,7 +1055,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public void onUpdate() {
         synchronized (craftingQueue) {
             if (!isCurrentlyCrafting) {
-                if (craftingQueue.size() > 0 && usingCraftingTable()) {
+                if (craftingQueue.size() > 0) {
                     CraftingQueueEntry entry = craftingQueue.get(0);
                     if (doneCrafting) {
                         totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
