@@ -242,6 +242,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
         }
+        public void acquire(HashMap<Item, Integer> items) {
+            for (BlockPos pos : containers.keySet()) {
+                if (items.size() == 0)
+                    break;
+                HashMap<Item, Integer> container = containers.get(pos);
+                Set<Item> itemKeySet = new HashSet<>(items.keySet());
+                for (Item toAcquire : itemKeySet) {
+                    if (container.getOrDefault(toAcquire, 0) > 0) {
+                        containerManager.goToContainer(pos);
+                        items.put(toAcquire, takeItem(pos, toAcquire, items.getOrDefault(toAcquire, 0)));
+                        if (items.get(toAcquire) <= 0)
+                            items.remove(toAcquire);
+                    }
+                }
+            }
+        }
     }
 
     private class WorldStorageQuery extends StorageQuery<Block> {
@@ -330,16 +346,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private void closeScreen() {
-        try {
-            MC.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-            MC.getNetworkHandler().onCloseScreen(new CloseScreenS2CPacket(MC.player.currentScreenHandler.syncId));
-        }
-        catch (OffThreadException e) {
-            e.printStackTrace();
-        }
-    }
-
     private class ContainerManager {
         private HashMap<Block, HashSet<BlockPos>> containers = new HashMap<>();
         private BlockPos currentContainer = null;
@@ -352,6 +358,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             IMC.getInteractionManager().rightClickBlock(container, Direction.NORTH, Vec3d.ZERO);
             awaitContainerOpen();
             currentContainer = container;
+        }
+        private void closeScreen() {
+            currentContainer = null;
+            try {
+                MC.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+                MC.getNetworkHandler().onCloseScreen(new CloseScreenS2CPacket(MC.player.currentScreenHandler.syncId));
+            }
+            catch (OffThreadException e) {
+                e.printStackTrace();
+            }
         }
         public void addContainer(Block block, BlockPos pos) {
             HashSet<BlockPos> positions = containers.getOrDefault(block, new HashSet<>());
@@ -389,18 +405,49 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class CraftingState {
         private HashMap<Item, Integer> inventoryAvailability;
         private HashMap<Item, Integer> storageAvailability;
-        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability) {
+        private HashSet<Node> visited;
+        private boolean collectStorageNodes = false;
+        private List<StorageNode> storageNodes = new ArrayList<>();
+        private boolean success = false;
+        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashSet<Node> visited) {
             this.inventoryAvailability = inventoryAvailability;
             this.storageAvailability = storageAvailability;
+            this.visited = visited;
+        }
+        public CraftingState setSuccess(boolean value) {
+            success = value;
+            return this;
+        }
+        public CraftingState success() {
+            success = true;
+            return this;
+        }
+        public CraftingState failure() {
+            success = false;
+            return this;
+        }
+        public CraftingState setCollectStorageNodes(boolean value) {
+            collectStorageNodes = value;
+            return this;
         }
         public CraftingState clone() {
-            return new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone());
+            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashSet<Node>) visited.clone());
+            state.success = success;
+            state.collectStorageNodes = collectStorageNodes;
+            state.storageNodes = new ArrayList<>(storageNodes);
+            return state;
         }
         public void set(CraftingState other) {
             inventoryAvailability.clear();
             inventoryAvailability.putAll(other.inventoryAvailability);
             storageAvailability.clear();
             storageAvailability.putAll(other.storageAvailability);
+            visited.clear();
+            visited.addAll(other.visited);
+            success = other.success;
+            collectStorageNodes = other.collectStorageNodes;
+            storageNodes.clear();
+            storageNodes.addAll(other.storageNodes);
         }
     }
 
@@ -445,76 +492,76 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.stackShift = stackShift;
             return this;
         }
-        public boolean craft() {
+        public CraftingState craft() {
             HashMap<Item, Integer> inventoryAvailability = inventoryAvailabilityMap;
             HashMap<Item, Integer> storageAvailability = storageAvailabilityMap;
             HashSet<Node> visited = new HashSet<>();
-            return craftPreliminary(new CraftingState(inventoryAvailability, storageAvailability), visited);
+            return craftPreliminary(new CraftingState(inventoryAvailability, storageAvailability, visited));
         }
-        public boolean verify() {
+        public CraftingState verify() {
             HashMap<Item, Integer> inventoryAvailability = (HashMap<Item, Integer>) inventoryAvailabilityMap.clone();
             HashMap<Item, Integer> storageAvailability = (HashMap<Item, Integer>) storageAvailabilityMap.clone();
             HashSet<Node> visited = new HashSet<>();
-            return verifyPreliminary(new CraftingState(inventoryAvailability, storageAvailability), visited);
+            return verifyPreliminary(new CraftingState(inventoryAvailability, storageAvailability, visited).setCollectStorageNodes(true));
         }
-        private boolean craftPreliminary(CraftingState state, HashSet<Node> visited) {
+        private CraftingState craftPreliminary(CraftingState state) {
             boolean rememberVisit = shouldRememberVisit();
             if (rememberVisit)
-                visited.add(this);
+                state.visited.add(this);
             int numAvailable = state.inventoryAvailability.getOrDefault(target, 0);
             if (numAvailable >= needed) {
                 state.inventoryAvailability.put(target, numAvailable - needed);
                 if (rememberVisit)
-                    visited.remove(this);
-                return true;
+                    state.visited.remove(this);
+                return state.success();
             }
             if (numAvailable > 0) {
                 state.inventoryAvailability.put(target, 0);
                 needed -= numAvailable;
             }
-            List<Node> children = getChildren(this, visited);
-            if (craftInternal(state, visited, children)) {
+            List<Node> children = getChildren(this, state.visited);
+            if (craftInternal(state, children).success) {
                 if (rememberVisit)
-                    visited.remove(this);
-                return true;
+                    state.visited.remove(this);
+                return state.success();
             }
             if (rememberVisit)
-                visited.remove(this);
-            return execute();
+                state.visited.remove(this);
+            return state.setSuccess(execute());
         }
-        private boolean verifyPreliminary(CraftingState state, HashSet<Node> visited) {
+        private CraftingState verifyPreliminary(CraftingState state) {
             boolean rememberVisit = shouldRememberVisit();
             if (rememberVisit)
-                visited.add(this);
+                state.visited.add(this);
             if (needed <= 0) {
                 if (rememberVisit)
-                    visited.remove(this);
-                return true;
+                    state.visited.remove(this);
+                return state.success();
             }
             int numAvailable = state.inventoryAvailability.getOrDefault(target, 0);
             int neededOffset = 0;
             if (numAvailable >= needed) {
                 state.inventoryAvailability.put(target, state.inventoryAvailability.get(target) - needed);
                 if (rememberVisit)
-                    visited.remove(this);
-                return true;
+                    state.visited.remove(this);
+                return state.success();
             }
-            List<Node> children = getChildren(this, visited);
+            List<Node> children = getChildren(this, state.visited);
             if (numAvailable > 0) {
                 state.inventoryAvailability.put(target, 0);
                 needed -= numAvailable;
                 neededOffset += numAvailable;
-                children = getChildren(this, visited);
+                children = getChildren(this, state.visited);
             }
-            boolean res = verifyInternal(state, visited, children);
+            CraftingState res = verifyInternal(state, children);
             needed += neededOffset;
             if (rememberVisit)
-                visited.remove(this);
+                state.visited.remove(this);
             return res;
         }
         protected abstract boolean shouldRememberVisit();
-        protected abstract boolean craftInternal(CraftingState state, HashSet<Node> visited, List<Node> children);
-        protected abstract boolean verifyInternal(CraftingState state, HashSet<Node> visited, List<Node> children);
+        protected abstract CraftingState craftInternal(CraftingState state, List<Node> children);
+        protected abstract CraftingState verifyInternal(CraftingState state, List<Node> children);
         public abstract HashMap<Item, ItemStack> collectIngredients();
         public abstract boolean execute();
         public abstract int getOutputCount();
@@ -553,14 +600,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        protected boolean craftInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
+        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
             if (children.size() == 0)
-                return true;
+                return state.success();
             for (Node child : children) {
-                child.craftPreliminary(state, visited);
+                child.craftPreliminary(state);
             }
             state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
-            return false;
+            return state.failure();
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients() {
@@ -580,16 +627,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return stackTypes;
         }
         @Override
-        protected boolean verifyInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
+        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
             if (children.size() == 0)
-                return false;
+                return state.failure();
             for (Node child : children) {
-                if (!child.verifyPreliminary(state, visited)) {
-                    return false;
+                if (!child.verifyPreliminary(state).success) {
+                    return state.failure();
                 }
             }
             state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
-            return true;
+            return state.success();
         }
         @Override
         public int getOutputCount() {
@@ -660,53 +707,58 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        protected boolean craftInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
+        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
             for (Node child : children) {
                 int original = child.needed;
                 child.needed = needed;
-                boolean verification = child.verifyPreliminary(state.clone(), visited);
-                if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, state.clone(), (HashSet<Node>)visited.clone());
+                CraftingState verification = child.verifyPreliminary(state.clone());
+                if (!verification.success) {
+                    int maxCraftable = getMaxCraftable(child, state.clone());
                     if (maxCraftable > 0) {
                         child.needed = maxCraftable;
-                        child.craftPreliminary(state, visited);
+                        child.craftPreliminary(state);
                         needed -= maxCraftable;
                     }
                 }
                 else {
-                    child.craftPreliminary(state, visited);
+                    child.craftPreliminary(state);
                     child.needed = original;
-                    return true;
+                    return state.success();
                 }
                 child.needed = original;
             }
-            return false;
+            return state.failure();
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
         }
         @Override
-        protected boolean verifyInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
+        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
+            int originalNeeded = needed;
             for (Node child : children) {
                 CraftingState newState = state.clone();
-                boolean verification = child.verifyPreliminary(newState, visited);
-                if (!verification) {
-                    int maxCraftable = getMaxCraftable(child, state.clone(), (HashSet<Node>)visited.clone());
-                    int originalNeeded = child.needed;
+                CraftingState verification = child.verifyPreliminary(newState);
+                if (!verification.success) {
+                    int maxCraftable = getMaxCraftable(child, state.clone());
+                    int originalChildNeeded = child.needed;
                     child.needed = maxCraftable;
-                    child.verifyPreliminary(state, visited);
-                    child.needed = originalNeeded;
+                    child.verifyPreliminary(state);
+                    child.needed = originalChildNeeded;
                     needed -= maxCraftable;
                 }
                 else {
                     state.set(newState);
-                    return true;
+                    needed = originalNeeded;
+                    return state.success();
                 }
-                if (needed <= 0)
-                    return true;
+                if (needed <= 0) {
+                    needed = originalNeeded;
+                    return state.success();
+                }
             }
-            return false;
+            needed = originalNeeded;
+            return state.failure();
         }
         @Override
         public boolean execute() {
@@ -727,20 +779,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        protected boolean craftInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
-            return false;
+        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
+            return state.failure();
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
         }
         @Override
-        protected boolean verifyInternal(CraftingState state, HashSet<Node> visited, List<Node> children) {
+        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
             if (state.storageAvailability.getOrDefault(target, 0) >= needed) {
                 state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - needed);
-                return true;
+                if (state.collectStorageNodes)
+                    state.storageNodes.add(this);
+                return state.success();
             }
-            return false;
+            return state.failure();
         }
         @Override
         public boolean execute() {
@@ -931,6 +985,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public void storageContainerClosed() {
+        containerManager.currentContainer = null;
         if (!isStorageContainerHandler(MC.player.currentScreenHandler))
             return;
         if (!isCurrentlyCrafting) {
@@ -945,7 +1000,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     // This could (should) be done in O(1) time by modifying verifyNode, but O(log n) time seems to work without lagging
     private int getMaxCraftable(Identifier itemId, CraftingState state) {
         int count = 1;
-        while (makeRootNode(itemId, count).verifyPreliminary(state.clone(), new HashSet<>())) {
+        while (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
             count *= 2;
         }
         count /= 2;
@@ -953,7 +1008,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         if (increment > 0)
             count--;
         while (increment > 0) {
-            if (makeRootNode(itemId, count).verifyPreliminary(state.clone(), new HashSet<>())) {
+            if (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
                 count += increment;
             }
             else {
@@ -961,24 +1016,24 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        if (makeRootNode(itemId, count).verifyPreliminary(state.clone(), new HashSet<>())) {
-            while (makeRootNode(itemId, count).verifyPreliminary(state.clone(), new HashSet<>())) {
+        if (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
+            while (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
                 count++;
             }
             count--;
         }
         else {
-            while (!makeRootNode(itemId, count).verifyPreliminary(state.clone(), new HashSet<>())) {
+            while (!makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
                 count--;
             }
         }
         return count;
     }
 
-    private int getMaxCraftable(Node node, CraftingState state, HashSet<Node> visited) {
+    private int getMaxCraftable(Node node, CraftingState state) {
         int originalNeeded = node.needed;
         int count = 1;
-        while (node.setNeeded(count).verifyPreliminary(state.clone(), (HashSet<Node>)visited.clone())) {
+        while (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
             count *= 2;
         }
         count /= 2;
@@ -986,7 +1041,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         if (increment > 0)
             count--;
         while (increment > 0) {
-            if (node.setNeeded(count).verifyPreliminary(state.clone(), (HashSet<Node>)visited.clone())) {
+            if (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
                 count += increment;
             }
             else {
@@ -994,14 +1049,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             increment /= 2;
         }
-        if (node.setNeeded(count).verifyPreliminary(state.clone(), (HashSet<Node>)visited.clone())) {
-            while (node.setNeeded(count).verifyPreliminary(state.clone(), (HashSet<Node>)visited.clone())) {
+        if (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
+            while (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
                 count++;
             }
             count--;
         }
         else {
-            while (!node.setNeeded(count).verifyPreliminary(state.clone(), (HashSet<Node>)visited.clone())) {
+            while (!node.setNeeded(count).verifyPreliminary(state.clone()).success) {
                 count--;
             }
         }
@@ -1018,10 +1073,20 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
             inventoryAvailabilityMap.put(item, 0);
             if (craftAll) {
-                root = makeRootNode(itemId, getMaxCraftable(itemId, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap)));
+                root = makeRootNode(itemId, getMaxCraftable(itemId, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, new HashSet<>())));
             }
-            if (root.verify()) {
-                if (!root.craft()) {
+            CraftingState verificationState = root.verify();
+            if (verificationState.success) {
+                HashMap<Item, Integer> obtainFromStorage = new HashMap<>();
+                for (StorageNode node : verificationState.storageNodes) {
+                    obtainFromStorage.put(node.target, obtainFromStorage.getOrDefault(node.target, 0) + node.needed);
+                }
+                HashMap<Item, Integer> original = (HashMap<Item, Integer>) obtainFromStorage.clone();
+                containerQuery.acquire(obtainFromStorage);
+                for (Item originalItem : original.keySet()) {
+                    inventoryAvailabilityMap.put(originalItem, inventoryAvailabilityMap.getOrDefault(originalItem, 0) + (original.get(originalItem) - obtainFromStorage.getOrDefault(originalItem, 0)));
+                }
+                if (!root.craft().success) {
                     int finalCount = totalInventoryAvailabilityMap.getOrDefault(item, 0);
                     synchronized (craftingQueue) {
                         craftingQueue.remove(0);
