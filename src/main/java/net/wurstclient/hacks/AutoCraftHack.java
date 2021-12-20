@@ -1,5 +1,7 @@
 package net.wurstclient.hacks;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.OffThreadException;
@@ -17,10 +19,14 @@ import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
 import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
@@ -30,6 +36,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -50,6 +58,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
     private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
+    private WorldStorageQuery worldQuery = new WorldStorageQuery();
 
     private HashMap<Item, Integer> inventoryAvailabilityMap = new HashMap<>();
     private HashMap<Item, Integer> storageAvailabilityMap = new HashMap<>();
@@ -114,12 +123,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private abstract class StorageQuery {
-        public abstract HashMap<Item, Integer> getAvailabilityMap();
-        public abstract void acquire(Item item, int count);
+    private abstract class StorageQuery<T> {
+        public abstract HashMap<T, Integer> getAvailabilityMap();
+        public abstract void acquire(T item, int count);
     }
 
-    private class InventoryStorageQuery extends StorageQuery {
+    private class InventoryStorageQuery extends StorageQuery<Item> {
         public InventoryStorageQuery() { }
         @Override
         public HashMap<Item, Integer> getAvailabilityMap() {
@@ -157,7 +166,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ContainerStorageQuery extends StorageQuery {
+    private class ContainerStorageQuery extends StorageQuery<Item> {
         private HashMap<BlockPos, HashMap<Item, Integer>> containers;
         public ContainerStorageQuery() {
             containers = new HashMap<>();
@@ -223,6 +232,62 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
         }
+    }
+
+    private class WorldStorageQuery extends StorageQuery<Block> {
+        public WorldStorageQuery() { }
+        private List<Chunk> getChunks(int range) {
+            List<Chunk> res = new ArrayList<>();
+            ChunkPos playerPos = MC.player.getChunkPos();
+            for (int x = playerPos.x - range; x <= playerPos.x + range; x++) {
+                for (int z = playerPos.z - range; z <= playerPos.z + range; z++) {
+                    Chunk chunk = MC.world.getChunk(x, z);
+                    if (chunk instanceof EmptyChunk)
+                        continue;
+                    res.add(chunk);
+                }
+            }
+            return res;
+        }
+        private void applyToBlocks(Consumer<Pair<BlockPos, BlockState>> func) {
+            List<Chunk> chunks = getChunks(5);
+            for (Chunk c : chunks) {
+                ChunkPos chunkPos = c.getPos();
+                int minX = chunkPos.getStartX();
+                int minY = MC.world.getBottomY();
+                int minZ = chunkPos.getStartZ();
+                int maxX = chunkPos.getEndX();
+                int maxY = MC.world.getTopY();
+                int maxZ = chunkPos.getEndZ();
+                for (int x = minX; x <= maxX; x++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            BlockState state = c.getBlockState(new BlockPos(x, y, z));
+                            func.accept(new Pair<>(new BlockPos(x, y, z), state));
+                        }
+                    }
+                }
+            }
+        }
+        @Override
+        public HashMap<Block, Integer> getAvailabilityMap() {
+            HashMap<Block, Integer> availability = new HashMap<>();
+            applyToBlocks((b) -> { availability.put(b.getRight().getBlock(), availability.getOrDefault(b.getRight().getBlock(), 0) + 1); });
+            return availability;
+        }
+        public HashMap<Block, HashSet<BlockPos>> getLocations(HashSet<Block> blocks) {
+            HashMap<Block, HashSet<BlockPos>> res = new HashMap<>();
+            applyToBlocks((b) -> {
+                if (!blocks.contains(b.getRight().getBlock()))
+                    return;
+                HashSet<BlockPos> s = res.getOrDefault(b.getRight().getBlock(), new HashSet<>());
+                s.add(b.getLeft());
+                res.put(b.getRight().getBlock(), s);
+            });
+            return res;
+        }
+        @Override
+        public void acquire(Block block, int count) { }
     }
 
     private abstract class CraftingProcess {
@@ -774,9 +839,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public void queueCraft(Identifier itemId, int count, boolean craftAll) {
-        /*new Thread(() -> {
-            containerQuery.acquire(Registry.ITEM.get(new Identifier("minecraft", "iron_ingot")), 1);
-        }).start();*/
         synchronized(craftingQueue) {
             craftingQueue.add(new CraftingQueueEntry(itemId, count, craftAll));
         }
