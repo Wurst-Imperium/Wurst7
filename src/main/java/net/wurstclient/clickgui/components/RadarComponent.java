@@ -61,7 +61,7 @@ public final class RadarComponent extends Component
 			&& mouseY < y2 && mouseY >= -scroll
 			&& mouseY < getParent().getHeight() - 13 - scroll;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -86,7 +86,7 @@ public final class RadarComponent extends Component
 		
 		matrixStack.push();
 		matrixStack.translate(middleX, middleY, 0);
-		matrix = matrixStack.peek().getModel();
+		matrix = matrixStack.peek().getPositionMatrix();
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
@@ -125,7 +125,7 @@ public final class RadarComponent extends Component
 		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.pop();
-		matrix = matrixStack.peek().getModel();
+		matrix = matrixStack.peek().getPositionMatrix();
 		
 		// points
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);

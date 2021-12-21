@@ -105,7 +105,7 @@ public final class ColorComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -129,7 +129,7 @@ public final class ColorComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(color[0], color[1], color[2],

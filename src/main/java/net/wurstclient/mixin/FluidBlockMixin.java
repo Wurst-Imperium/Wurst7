@@ -29,6 +29,7 @@ public abstract class FluidBlockMixin extends Block implements FluidDrainable
 		super(block$Settings_1);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public VoxelShape getCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,

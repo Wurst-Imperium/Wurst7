@@ -114,7 +114,7 @@ public final class CheckboxComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -136,7 +136,7 @@ public final class CheckboxComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -165,7 +165,7 @@ public final class CheckboxComponent extends Component
 	private void drawCheck(MatrixStack matrixStack, int x1, int y1,
 		boolean hovering)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xc1 = x1 + 2.5F;

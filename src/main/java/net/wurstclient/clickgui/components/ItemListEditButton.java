@@ -77,7 +77,7 @@ public final class ItemListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

@@ -243,7 +243,7 @@ public final class MobSpawnEspHack extends Hack
 			matrixStack.push();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, scanner.chunk);
 			
-			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);
@@ -311,7 +311,7 @@ public final class MobSpawnEspHack extends Hack
 				return;
 			
 			red.addAll(blocks.stream()
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
 				.filter(pos -> world.getLightLevel(LightType.SKY, pos) < 8)
 				.collect(Collectors.toList()));
 			
@@ -319,7 +319,7 @@ public final class MobSpawnEspHack extends Hack
 				return;
 			
 			yellow.addAll(blocks.stream().filter(pos -> !red.contains(pos))
-				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 8)
+				.filter(pos -> world.getLightLevel(LightType.BLOCK, pos) < 1)
 				.collect(Collectors.toList()));
 			doneScanning = true;
 		}
