@@ -2,6 +2,7 @@ package net.wurstclient.hacks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.OffThreadException;
@@ -12,10 +13,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
+import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
@@ -32,6 +30,7 @@ import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -62,11 +61,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private HashMap<Item, Integer> inventoryAvailabilityMap = new HashMap<>();
     private HashMap<Item, Integer> storageAvailabilityMap = new HashMap<>();
+    private HashMap<Block, Integer> worldAvailabilityMap = new HashMap<>();
     private HashMap<Item, Integer> totalInventoryAvailabilityMap = new HashMap<>();
 
     private HashSet<Block> containerBlockTypes;
 
-    private Pathfinder pathFinder = new WurstPathfinder();
+    private Pathfinder pathFinder;
+    private BaritoneInterface baritoneInterface;
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
@@ -77,6 +78,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public AutoCraftHack() {
         super("AutoCraft");
         setCategory(Category.ITEMS);
+    }
+
+    private boolean isBaritoneAPIInstalled() {
+        try {
+            Class.forName("baritone.api.BaritoneAPI");
+            return true;
+        }
+        catch (Exception ex) {
+            return false;
+        }
     }
 
     private void initContainerBlockTypes() {
@@ -114,6 +125,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (!processMap.containsKey(id))
                     processMap.put(id, new ArrayList<>());
                 processMap.get(id).add(new RecipeCraftingProcess(recipe));
+            }
+        }
+        for (Identifier id : Registry.BLOCK.getIds()) {
+            List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
+            for (ItemStack stack : droppedStacks) {
+                Identifier stackId = Registry.ITEM.getId(stack.getItem());
+                if (!processMap.containsKey(stackId))
+                    processMap.put(stackId, new ArrayList<>());
+                processMap.get(stackId).add(new WorldCraftingProcess(Registry.BLOCK.get(id)));
             }
         }
     }
@@ -164,15 +184,182 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private abstract class Pathfinder {
+        private boolean supportsMining;
+        public Pathfinder(boolean supportsMining) {
+            this.supportsMining = supportsMining;
+        }
+        public boolean isMiningSupported() {
+            return supportsMining;
+        }
         public abstract void path(BlockPos pos);
+        public abstract void mine(Block block, int count);
     }
 
     private class WurstPathfinder extends Pathfinder {
+        public WurstPathfinder() {
+            super(false);
+        }
         public void path(BlockPos pos) {
             GoToCmd path = new GoToCmd();
             path.setGoal(pos);
             path.enable();
             path.waitUntilDone();
+        }
+        public void mine(Block block, int count) {
+            throw new NotImplementedException("Wurst pathfinder does not support mining");
+        }
+    }
+
+    private abstract class NotifyingRunnable implements Runnable {
+        protected boolean done = false;
+        public boolean isDone() {
+            return done;
+        }
+    }
+
+    private class BaritoneInterface {
+        private Class BaritoneAPI;
+        private Class GoalBlock;
+        private Class Goal;
+        public BaritoneInterface() {
+            try {
+                this.BaritoneAPI = Class.forName("baritone.api.BaritoneAPI");
+                this.GoalBlock = Class.forName("baritone.api.pathing.goals.GoalBlock");
+                this.Goal = Class.forName("baritone.api.pathing.goals.Goal");
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        private Object getPrimaryBaritone() {
+            try {
+                Object provider = BaritoneAPI.getMethod("getProvider").invoke(BaritoneAPI);
+                Object baritone = provider.getClass().getMethod("getPrimaryBaritone").invoke(provider);
+                return baritone;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
+        public Object getCustomGoalProcess() {
+            try {
+                Object baritone = getPrimaryBaritone();
+                Object customGoalProcess = baritone.getClass().getMethod("getCustomGoalProcess").invoke(baritone);
+                return customGoalProcess;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
+        public Object getMineProcess() {
+            try {
+                Object baritone = getPrimaryBaritone();
+                Object mineProcess = baritone.getClass().getMethod("getMineProcess").invoke(baritone);
+                return mineProcess;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
+        public void setGoalAndPath(Object process, BlockPos pos) {
+            try {
+                Object goalBlock = GoalBlock.getConstructor(BlockPos.class).newInstance(pos);
+                process.getClass().getMethod("setGoalAndPath", Goal).invoke(process, goalBlock);
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        public void mine(Object process, int count, Block block) {
+            try {
+                process.getClass().getMethod("mine", int.class, Block[].class).invoke(process, new Object[] { count, new Block[] { block } });
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        public boolean isActive(Object process) {
+            try {
+                Object value = process.getClass().getMethod("isActive").invoke(process);
+                return (Boolean) value;
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    private class BaritonePathfinder extends Pathfinder {
+        public BaritonePathfinder() {
+            super(true);
+        }
+        public void path(BlockPos pos) {
+            Object pathProcess = baritoneInterface.getCustomGoalProcess();
+            NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
+                public void run() {
+                    baritoneInterface.setGoalAndPath(pathProcess, pos);
+                    synchronized (this) {
+                        done = true;
+                        notifyAll();
+                    }
+                }
+            };
+            MC.execute(baritoneRunnable);
+            synchronized(baritoneRunnable) {
+                if (!baritoneRunnable.isDone()) {
+                    try {
+                        baritoneRunnable.wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            while (baritoneInterface.isActive(pathProcess)) {
+                try {
+                    Thread.sleep(10);
+                }
+                catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        public void mine(Block block, int count) {
+            Object mineProcess = baritoneInterface.getMineProcess();
+            final int alreadyPossessed;
+            if (isCurrentlyCrafting) {
+                alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(block.asItem(), 0);
+            }
+            else {
+                alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(block.asItem(), 0);
+            }
+            NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
+                public void run() {
+                    baritoneInterface.mine(mineProcess, count + alreadyPossessed, block);
+                    synchronized (this) {
+                        done = true;
+                        notifyAll();
+                    }
+                }
+            };
+            MC.execute(baritoneRunnable);
+            synchronized(baritoneRunnable) {
+                if (!baritoneRunnable.isDone()) {
+                    try {
+                        baritoneRunnable.wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            while (baritoneInterface.isActive(mineProcess)) {
+                try {
+                    Thread.sleep(10);
+                }
+                catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
@@ -313,7 +500,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        public void acquire(Block block, int count) { }
+        public void acquire(Block block, int count) {
+            pathFinder.mine(block, count);
+        }
     }
 
     private abstract class CraftingProcess {
@@ -339,6 +528,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private Item item;
         public StorageCraftingProcess(Item item) {
             this.item = item;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+    }
+
+    private class WorldCraftingProcess extends CraftingProcess {
+        private Block block;
+        public WorldCraftingProcess(Block block) {
+            this.block = block;
         }
         @Override
         public int getMultiplicity() {
@@ -374,6 +574,37 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             return closestBlockPos;
+        }
+        public void openInventory() {
+            if (MC.currentScreen instanceof InventoryScreen)
+                return;
+            if (MC.currentScreen != null)
+                closeScreen();
+            NotifyingRunnable inventoryRunnable = new NotifyingRunnable() {
+                @Override
+                public void run() {
+                    MC.getTutorialManager().onInventoryOpened();
+                    InventoryScreen screen = new InventoryScreen(MC.player);
+                    screen.refreshRecipeBook();
+                    MC.setScreen(screen);
+                    synchronized(this) {
+                        done = true;
+                        notifyAll();
+                    }
+                }
+            };
+            MC.execute(inventoryRunnable);
+            synchronized(inventoryRunnable) {
+                if (!inventoryRunnable.isDone()) {
+                    try {
+                        inventoryRunnable.wait();
+                    }
+                    catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
         }
         public void goToContainer(BlockPos container) {
             if (container.equals(currentContainer))
@@ -434,13 +665,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class CraftingState {
         private HashMap<Item, Integer> inventoryAvailability;
         private HashMap<Item, Integer> storageAvailability;
+        private HashMap<Block, Integer> worldAvailability;
         private HashSet<Node> visited;
         private boolean collectStorageNodes = false;
         private List<StorageNode> storageNodes = new ArrayList<>();
         private boolean success = false;
-        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashSet<Node> visited) {
+        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashMap<Block, Integer> worldAvailability, HashSet<Node> visited) {
             this.inventoryAvailability = inventoryAvailability;
             this.storageAvailability = storageAvailability;
+            this.worldAvailability = worldAvailability;
             this.visited = visited;
         }
         public CraftingState setSuccess(boolean value) {
@@ -460,7 +693,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return this;
         }
         public CraftingState clone() {
-            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashSet<Node>) visited.clone());
+            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashMap<Block, Integer>) worldAvailability.clone(), (HashSet<Node>) visited.clone());
             state.success = success;
             state.collectStorageNodes = collectStorageNodes;
             state.storageNodes = new ArrayList<>(storageNodes);
@@ -471,6 +704,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             inventoryAvailability.putAll(other.inventoryAvailability);
             storageAvailability.clear();
             storageAvailability.putAll(other.storageAvailability);
+            worldAvailability.clear();
+            worldAvailability.putAll(other.worldAvailability);
             visited.clear();
             visited.addAll(other.visited);
             success = other.success;
@@ -524,14 +759,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public CraftingState craft() {
             HashMap<Item, Integer> inventoryAvailability = inventoryAvailabilityMap;
             HashMap<Item, Integer> storageAvailability = storageAvailabilityMap;
+            HashMap<Block, Integer> worldAvailability = worldAvailabilityMap;
             HashSet<Node> visited = new HashSet<>();
-            return craftPreliminary(new CraftingState(inventoryAvailability, storageAvailability, visited));
+            return craftPreliminary(new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, visited));
         }
         public CraftingState verify() {
             HashMap<Item, Integer> inventoryAvailability = (HashMap<Item, Integer>) inventoryAvailabilityMap.clone();
             HashMap<Item, Integer> storageAvailability = (HashMap<Item, Integer>) storageAvailabilityMap.clone();
+            HashMap<Block, Integer> worldAvailability = (HashMap<Block, Integer>) worldAvailabilityMap.clone();
             HashSet<Node> visited = new HashSet<>();
-            return verifyPreliminary(new CraftingState(inventoryAvailability, storageAvailability, visited).setCollectStorageNodes(true));
+            return verifyPreliminary(new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, visited).setCollectStorageNodes(true));
         }
         private CraftingState craftPreliminary(CraftingState state) {
             boolean rememberVisit = shouldRememberVisit();
@@ -694,31 +931,39 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
             }
         }
+        private void arrangeRecipe(Recipe<?> recipe, boolean craftAll) {
+            MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, craftAll);
+        }
         @Override
         public boolean execute() {
             if (!usingCraftingTable()) {
-                Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
-                BlockPos nearestCraftingTable = containerManager.getClosestToPlayer(craftingTable);
-                if (nearestCraftingTable != null)
-                    containerManager.goToContainer(nearestCraftingTable);
+                if (((RecipeCraftingProcess) processes.get(0)).recipe.fits(2, 2)) {
+                    containerManager.openInventory();
+                }
+                else {
+                    Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
+                    BlockPos nearestCraftingTable = containerManager.getClosestToPlayer(craftingTable);
+                    if (nearestCraftingTable != null)
+                        containerManager.goToContainer(nearestCraftingTable);
+                }
             }
             int neededToCraft = getNeededToCraft(0);
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
-                if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, true);
+                if (!usingCraftingTable() && !usingInventory()) return false;
+                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, true);
                 awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
-                if (!usingCraftingTable()) return false;
+                if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
-                if (!usingCraftingTable()) return false;
-                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, false);
+                if (!usingCraftingTable() && !usingInventory()) return false;
+                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, true);
                 awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
-                if (!usingCraftingTable()) return false;
+                if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
@@ -836,6 +1081,44 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private class WorldNode extends Node {
+        public WorldNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return true;
+        }
+        @Override
+        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
+            return state.failure();
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
+            if (!pathFinder.isMiningSupported())
+                return state.failure();
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            if (state.worldAvailability.getOrDefault(targetBlock, 0) >= needed) {
+                state.worldAvailability.put(targetBlock, state.worldAvailability.getOrDefault(targetBlock, 0) - needed);
+                return state.success();
+            }
+            return state.failure();
+        }
+        @Override
+        public boolean execute() {
+            worldQuery.acquire(((WorldCraftingProcess) processes.get(0)).block, needed);
+            return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
+    }
+
     private int gcd(int a, int b) {
         if (b == 0)
             return a;
@@ -893,6 +1176,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
     }
 
+    private boolean usingInventory() {
+        return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof PlayerScreenHandler;
+    }
+
     private Node makeRootNode(Identifier identifier, int numNeeded) {
         Item item = Registry.ITEM.get(identifier);
         List<CraftingProcess> processes = getProcesses(identifier);
@@ -914,6 +1201,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         else if (itemProcesses.get(0) instanceof StorageCraftingProcess) {
             node = new StorageNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
+        }
+        else if (itemProcesses.get(0) instanceof WorldCraftingProcess) {
+            node = new WorldNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
         }
         return node;
     }
@@ -1102,7 +1392,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
             inventoryAvailabilityMap.put(item, 0);
             if (craftAll) {
-                root = makeRootNode(itemId, getMaxCraftable(itemId, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, new HashSet<>())));
+                root = makeRootNode(itemId, getMaxCraftable(itemId, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, worldAvailabilityMap, new HashSet<>())));
             }
             CraftingState verificationState = root.verify();
             if (verificationState.success) {
@@ -1138,6 +1428,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     @Override
     public void onEnable() {
+        if (isBaritoneAPIInstalled()) {
+            baritoneInterface = new BaritoneInterface();
+            pathFinder = new BaritonePathfinder();
+        }
+        else {
+            pathFinder = new WurstPathfinder();
+        }
         if (processMap == null)
             initProcessMap();
         if (containerBlockTypes == null)
@@ -1155,6 +1452,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
                         inventoryAvailabilityMap = (HashMap<Item, Integer>) totalInventoryAvailabilityMap.clone();
                         storageAvailabilityMap = containerQuery.getAvailabilityMap();
+                        worldAvailabilityMap = worldQuery.getAvailabilityMap();
                         doneCrafting = false;
                     }
                     craft(entry.itemId, entry.count, entry.craftAll);
