@@ -9,10 +9,7 @@ import net.minecraft.network.OffThreadException;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -931,14 +928,55 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
             }
         }
-        private void arrangeRecipe(Recipe<?> recipe, boolean craftAll) {
-            MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, craftAll);
+        private void arrangeRecipe(Recipe<?> recipe, int craftAmount, boolean useInventory) {
+            if (MC.player.getRecipeBook().contains(recipe)) {
+                MC.interactionManager.clickRecipe(MC.player.currentScreenHandler.syncId, ((RecipeCraftingProcess)processes.get(0)).recipe, craftAmount <= 1 ? false : true);
+            }
+            else {
+                int craftingGridSize = useInventory ? 2 : 3;
+                int width = 3;
+                if (recipe instanceof ShapedRecipe) {
+                    ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
+                    width = shapedRecipe.getWidth();
+                }
+                int slotNumber = 0;
+                for (Ingredient ing : recipe.getIngredients()) {
+                    int currentCraftAmount = craftAmount;
+                    if (ing.getMatchingStacks().length > 0) {
+                        int slotX = slotNumber % width;
+                        int slotY = slotNumber / width;
+                        int slot = slotY * craftingGridSize + slotX + 1;
+                        List<Slot> slots = MC.player.currentScreenHandler.slots;
+                        for (int i = slots.size() - 37; i < slots.size(); i++) {
+                            if (currentCraftAmount <= 0)
+                                break;
+                            if (slots.get(i).getStack().getItem().equals(ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length].getItem())) {
+                                int slotAmount = slots.get(i).getStack().getCount();
+                                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                                if (slotAmount <= currentCraftAmount) {
+                                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 0, SlotActionType.PICKUP, MC.player);
+                                    currentCraftAmount -= slotAmount;
+                                } else {
+                                    for (int j = 0; j < currentCraftAmount; j++) {
+                                        MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 1, SlotActionType.PICKUP, MC.player);
+                                    }
+                                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                                    currentCraftAmount = 0;
+                                }
+                            }
+                        }
+                    }
+                    slotNumber++;
+                }
+            }
         }
         @Override
         public boolean execute() {
+            boolean useInventory = false;
             if (!usingCraftingTable()) {
                 if (((RecipeCraftingProcess) processes.get(0)).recipe.fits(2, 2)) {
                     containerManager.openInventory();
+                    useInventory = true;
                 }
                 else {
                     Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
@@ -951,7 +989,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
-                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, true);
+                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, craftingOutput / ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount(), useInventory);
                 awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
@@ -961,7 +999,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
-                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, true);
+                arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, 1, useInventory);
                 awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
