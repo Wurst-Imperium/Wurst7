@@ -16,6 +16,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
@@ -52,6 +53,8 @@ import net.wurstclient.util.json.WsonObject;
 
 public final class AltManagerScreen extends Screen
 {
+	private static final HashSet<Alt> failedLogins = new HashSet<>();
+	
 	private final Screen prevScreen;
 	private final AltManager altManager;
 	
@@ -193,8 +196,11 @@ public final class AltManagerScreen extends Screen
 		if(!error.isEmpty())
 		{
 			errorTimer = 8;
+			failedLogins.add(alt);
 			return;
 		}
+		
+		failedLogins.remove(alt);
 		
 		altManager.setChecked(listGui.selected,
 			client.getSession().getUsername());
@@ -575,10 +581,15 @@ public final class AltManagerScreen extends Screen
 			
 			// tags
 			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
+			
 			if(alt.isStarred())
 				tags += "\u00a7r, \u00a7efavorite";
-			if(alt.isUnchecked())
+			
+			if(failedLogins.contains(alt))
+				tags += "\u00a7r, \u00a7cwrong password?";
+			else if(alt.isUnchecked())
 				tags += "\u00a7r, \u00a7cunchecked";
+			
 			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
 				10526880);
 		}
