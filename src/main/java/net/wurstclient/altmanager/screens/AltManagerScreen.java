@@ -418,6 +418,7 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
