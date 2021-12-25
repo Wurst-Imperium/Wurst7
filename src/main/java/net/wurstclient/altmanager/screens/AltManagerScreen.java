@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -39,6 +40,8 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
@@ -474,41 +477,43 @@ public final class AltManagerScreen extends Screen
 		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
 			return;
 		
-		if(!alt.isCracked())
+		if(alt.isCracked())
+			addTooltip(tooltip, "cracked");
+		else
 		{
-			tooltip.add(new LiteralText("This alt has a password and can"));
-			tooltip.add(new LiteralText("join all servers."));
+			addTooltip(tooltip, "premium");
 			
 			if(failedLogins.contains(alt))
-			{
-				tooltip.add(new LiteralText("Last time you tried to log in"));
-				tooltip.add(new LiteralText("with this alt, it didn't work."));
-			}
+				addTooltip(tooltip, "failed");
 			
 			if(alt.isUnchecked())
-			{
-				tooltip.add(new LiteralText("You have never successfully"));
-				tooltip.add(new LiteralText("logged in with this alt."));
-				
-			}else
-			{
-				tooltip.add(new LiteralText("The password has worked in the"));
-				tooltip.add(new LiteralText("past."));
-			}
-			
-		}else
-		{
-			tooltip.add(new LiteralText("This alt has no password and will"));
-			tooltip.add(new LiteralText("only work on cracked servers."));
+				addTooltip(tooltip, "unchecked");
+			else
+				addTooltip(tooltip, "checked");
 		}
 		
 		if(alt.isStarred())
-		{
-			tooltip.add(new LiteralText("You have marked this alt as"));
-			tooltip.add(new LiteralText("one of your favorites."));
-		}
+			addTooltip(tooltip, "favorite");
 		
 		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
+	}
+	
+	private void addTooltip(ArrayList<Text> tooltip, String trKey)
+	{
+		// translate
+		String translated = WurstClient.INSTANCE
+			.translate("description.wurst.altmanager." + trKey);
+		
+		// line-wrap
+		StringJoiner joiner = new StringJoiner("\n");
+		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
+			.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		String wrapped = joiner.toString();
+		
+		// add to tooltip
+		for(String line : wrapped.split("\n"))
+			tooltip.add(new LiteralText(line));
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,

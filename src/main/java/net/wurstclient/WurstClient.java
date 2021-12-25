@@ -205,6 +205,7 @@ public enum WurstClient
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
 			return IMC.getLanguageManager().getEnglish().get(key);
+		
 		return I18n.translate(key);
 	}
 	
