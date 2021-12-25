@@ -448,4 +448,9 @@ public abstract class ListWidget extends AbstractParentElement
 			.color(64, 64, 64, topAlpha).next();
 		tessellator.draw();
 	}
+	
+	public double getScrollAmount()
+	{
+		return scrollAmount;
+	}
 }

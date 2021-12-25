@@ -446,6 +446,69 @@ public final class AltManagerScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		renderAltTooltip(matrixStack, mouseX, mouseY);
+	}
+	
+	public void renderAltTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
+	{
+		if(!listGui.isMouseInList(mouseX, mouseY))
+			return;
+		
+		List<Alt> altList = altManager.getList();
+		int hoveredIndex = listGui.getItemAtPosition(mouseX, mouseY);
+		
+		if(hoveredIndex < 0 || hoveredIndex >= altList.size())
+			return;
+		
+		int itemX = mouseX - (width - listGui.getRowWidth()) / 2;
+		int itemY = mouseY - 36 + (int)listGui.getScrollAmount() - 4
+			- hoveredIndex * 30;
+		
+		if(itemX < 31 || itemY < 15 || itemY >= 25)
+			return;
+		
+		Alt alt = altList.get(hoveredIndex);
+		ArrayList<Text> tooltip = new ArrayList<>();
+		
+		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
+			return;
+		
+		if(!alt.isCracked())
+		{
+			tooltip.add(new LiteralText("This alt has a password and can"));
+			tooltip.add(new LiteralText("join all servers."));
+			
+			if(failedLogins.contains(alt))
+			{
+				tooltip.add(new LiteralText("Last time you tried to log in"));
+				tooltip.add(new LiteralText("with this alt, it didn't work."));
+			}
+			
+			if(alt.isUnchecked())
+			{
+				tooltip.add(new LiteralText("You have never successfully"));
+				tooltip.add(new LiteralText("logged in with this alt."));
+				
+			}else
+			{
+				tooltip.add(new LiteralText("The password has worked in the"));
+				tooltip.add(new LiteralText("past."));
+			}
+			
+		}else
+		{
+			tooltip.add(new LiteralText("This alt has no password and will"));
+			tooltip.add(new LiteralText("only work on cracked servers."));
+		}
+		
+		if(alt.isStarred())
+		{
+			tooltip.add(new LiteralText("You have marked this alt as"));
+			tooltip.add(new LiteralText("one of your favorites."));
+		}
+		
+		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
@@ -579,19 +642,24 @@ public final class AltManagerScreen extends Screen
 			client.textRenderer.draw(matrixStack,
 				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
 			
-			// tags
-			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
+			String bottomText = getBottomText(alt);
+			client.textRenderer.draw(matrixStack, bottomText, x + 31, y + 15,
+				10526880);
+		}
+		
+		public String getBottomText(Alt alt)
+		{
+			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			
 			if(alt.isStarred())
-				tags += "\u00a7r, \u00a7efavorite";
+				text += "\u00a7r, \u00a7efavorite";
 			
 			if(failedLogins.contains(alt))
-				tags += "\u00a7r, \u00a7cwrong password?";
+				text += "\u00a7r, \u00a7cwrong password?";
 			else if(alt.isUnchecked())
-				tags += "\u00a7r, \u00a7cunchecked";
+				text += "\u00a7r, \u00a7cunchecked";
 			
-			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
-				10526880);
+			return text;
 		}
 	}
 }
