@@ -16,5 +16,5 @@ jobs:
               - There is not enough demand
               - They are no longer relevant
               - There are not enough details
-          days-before-stale: 30
+          days-before-stale: 60
           days-before-close: 30
