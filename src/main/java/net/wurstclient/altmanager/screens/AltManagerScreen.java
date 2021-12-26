@@ -452,7 +452,7 @@ public final class AltManagerScreen extends Screen
 		renderAltTooltip(matrixStack, mouseX, mouseY);
 	}
 	
-	public void renderAltTooltip(MatrixStack matrixStack, int mouseX,
+	private void renderAltTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
 		if(!listGui.isMouseInList(mouseX, mouseY))
@@ -498,24 +498,6 @@ public final class AltManagerScreen extends Screen
 		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 	}
 	
-	private void addTooltip(ArrayList<Text> tooltip, String trKey)
-	{
-		// translate
-		String translated = WurstClient.INSTANCE
-			.translate("description.wurst.altmanager." + trKey);
-		
-		// line-wrap
-		StringJoiner joiner = new StringJoiner("\n");
-		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
-			.stream().map(StringVisitable::getString)
-			.forEach(s -> joiner.add(s));
-		String wrapped = joiner.toString();
-		
-		// add to tooltip
-		for(String line : wrapped.split("\n"))
-			tooltip.add(new LiteralText(line));
-	}
-	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
@@ -533,20 +515,34 @@ public final class AltManagerScreen extends Screen
 				continue;
 			
 			ArrayList<Text> tooltip = new ArrayList<>();
-			tooltip.add(new LiteralText("This button opens another window."));
+			addTooltip(tooltip, "window");
+			
 			if(client.options.fullscreen)
-				tooltip
-					.add(new LiteralText("\u00a7cTurn off fullscreen mode!"));
+				addTooltip(tooltip, "fullscreen");
 			else
-			{
-				tooltip
-					.add(new LiteralText("It might look like the game is not"));
-				tooltip.add(
-					new LiteralText("responding while that window is open."));
-			}
+				addTooltip(tooltip, "window_freeze");
+			
 			renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 			break;
 		}
+	}
+	
+	private void addTooltip(ArrayList<Text> tooltip, String trKey)
+	{
+		// translate
+		String translated = WurstClient.INSTANCE
+			.translate("description.wurst.altmanager." + trKey);
+		
+		// line-wrap
+		StringJoiner joiner = new StringJoiner("\n");
+		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
+			.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		String wrapped = joiner.toString();
+		
+		// add to tooltip
+		for(String line : wrapped.split("\n"))
+			tooltip.add(new LiteralText(line));
 	}
 	
 	public static final class ListGui extends ListWidget

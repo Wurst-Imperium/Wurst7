@@ -41,5 +41,8 @@
   "description.wurst.altmanager.failed": "Als du das letzte Mal versucht hast, dich mit diesem Alt einzuloggen, hat es nicht funktioniert.",
   "description.wurst.altmanager.checked": "Das Password für diesen Alt hat früher schonmal funktioniert.",
   "description.wurst.altmanager.unchecked": "Du hast dich noch nie erfolgreich mit diesem Alt eingeloggt.",
-  "description.wurst.altmanager.favorite": "Du hast diesen Alt als Favoriten markiert."
+  "description.wurst.altmanager.favorite": "Du hast diesen Alt als Favoriten markiert.",
+  "description.wurst.altmanager.window": "Dieser Button öffnet ein zweites Fenster.",
+  "description.wurst.altmanager.window_freeze": "Während dieses Fenster offen ist kann es so aussehen als ob das Spiel nicht reagiert.",
+  "description.wurst.altmanager.fullscreen": "§cSchalte den Vollbildmodus ab!"
 }

@@ -141,5 +141,8 @@
   "description.wurst.altmanager.failed": "Last time you tried to log in with this alt, it didn't work.",
   "description.wurst.altmanager.checked": "The password has worked in the past.",
   "description.wurst.altmanager.unchecked": "You have never successfully logged in with this alt.",
-  "description.wurst.altmanager.favorite": "You have marked this alt as one of your favorites."
+  "description.wurst.altmanager.favorite": "You have marked this alt as one of your favorites.",
+  "description.wurst.altmanager.window": "This button opens another window.",
+  "description.wurst.altmanager.window_freeze": "It might look like the game is not responding while that window is open.",
+  "description.wurst.altmanager.fullscreen": "§cTurn off fullscreen mode!"
 }
