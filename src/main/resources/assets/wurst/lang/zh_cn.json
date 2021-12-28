@@ -142,7 +142,7 @@
   "description.wurst.altmanager.checked": "这个密码在过去是有效的。",
   "description.wurst.altmanager.unchecked": "你从未成功登录过这一个账户。",
   "description.wurst.altmanager.favorite": "你标记了这其中一个账户为你的喜爱。",
-  "description.wurst.altmanager.window": "这个按钮是打开另一个窗口的.",
+  "description.wurst.altmanager.window": "这个按钮是打开另一个窗口的。",
   "description.wurst.altmanager.window_freeze": "当打开另一个窗口时，这会导致游戏看起来未响应。",
-  "description.wurst.altmanager.fullscreen": "§c请关闭全屏模式!"
+  "description.wurst.altmanager.fullscreen": "§c请关闭全屏模式！"
 }
