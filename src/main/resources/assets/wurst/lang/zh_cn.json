@@ -136,4 +136,13 @@
   "description.wurst.hack.truesight": "允许你看到隐身的实体。",
   "description.wurst.hack.tunneller": "自动挖一个隧道。\n\n§c§l警告：§r 尽管这个 AI 会自动避开岩浆和其他危险的地下，这里没有守卫确保你不会死亡，除非你不介意你的东西全部有一定概率会失去。",
   "description.wurst.hack.x-ray": "允许你透视矿物所在的位置（请自行确保服务器内无假矿插件）。"
+  "description.wurst.altmanager.premium": "这个账户拥有密码，且可以加入所有服务器。",
+  "description.wurst.altmanager.cracked": "这个账户没有密码，只能加入盗版服务器。",
+  "description.wurst.altmanager.failed": "上次你尝试登录这个，但是它不起作用。",
+  "description.wurst.altmanager.checked": "这个密码在过去是有效的。",
+  "description.wurst.altmanager.unchecked": "你从未成功登录过这一个账户。",
+  "description.wurst.altmanager.favorite": "你标记了这其中一个账户为你的喜爱。",
+  "description.wurst.altmanager.window": "这个按钮是打开另一个窗口的.",
+  "description.wurst.altmanager.window_freeze": "当打开另一个窗口时，这会导致游戏看起来未响应。",
+  "description.wurst.altmanager.fullscreen": "§c请关闭全屏模式!"
 }
