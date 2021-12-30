@@ -37,5 +37,6 @@ public class TradeFillHack extends Hack implements UpdateListener {
 	@Override
 	public void onUpdate() {
 		if (nextTick != null) nextTick.run();
+		nextTick = null;
 	}
 }
