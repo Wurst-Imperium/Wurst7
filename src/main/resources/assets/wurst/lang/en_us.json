@@ -129,6 +129,7 @@
   "description.wurst.hack.tired": "Makes you look like Alexander back in April 2015.\nOnly visible to other players.",
   "description.wurst.hack.toomanyhax": "Blocks any features that you don't want.\nAllows you to make sure that you don't accidentally enable the wrong hack and get banned for it.\nFor those who want to \"only hack a little bit\".\n\nUse the §6.toomanyhax§r command to choose which features to block.\nType §6.help toomanyhax§r for more info.",
   "description.wurst.hack.tp-aura": "Automatically attacks the closest valid entity while teleporting around it.",
+  "description.wurst.hack.tradefill": "Automatically fill merchant items\nNeed click the desired recipe in the trade list at first.",
   "description.wurst.hack.trajectories": "Predicts the flight path of arrows and throwable items.",
   "description.wurst.hack.treebot": "An experimental bot that automatically walks around and chops down trees.\nLimited to small trees for now.",
   "description.wurst.hack.triggerbot": "Automatically attacks the entity you're looking at.",

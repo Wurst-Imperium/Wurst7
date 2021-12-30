@@ -39,6 +39,7 @@
     "KeyboardMixin",
     "LanguageManagerMixin",
     "LivingEntityRendererMixin",
+	"MerchantScreenMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
     "MouseMixin",

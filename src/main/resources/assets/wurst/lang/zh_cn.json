@@ -129,6 +129,7 @@
   "description.wurst.hack.tired": "让你看起来很像 Alexander 回到 4月 2015年。\n仅限其他玩家可视。",
   "description.wurst.hack.toomanyhax": "屏蔽那些你并不想要有的功能。\n让你确保你不会不小心开启错误的作弊功能导致被服务器封禁。\n这个是给那些 “只想作弊一点点的用户”。\n\n使用指令 §6.toomanyhax§r 来选择哪些功能需要被屏蔽。\n输入 §6.help toomanyhax§r 寻求更多。",
   "description.wurst.hack.tp-aura": "自动传送到实体附近并自动攻击他。",
+  "description.wurst.hack.tradefill": "自动填充村民交易界面的原材料。\n需要先点击左侧交易列表中所需的配方。",
   "description.wurst.hack.trajectories": "预测箭和投掷物品的飞行路径。",
   "description.wurst.hack.treebot": "一个实验性的机器人将会在树木附近砍树。\n目前仅限于砍小树。",
   "description.wurst.hack.triggerbot": "自动攻击你所看的实体。",
