@@ -7,13 +7,13 @@
  */
 package net.wurstclient.command;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.TreeMap;
-
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.commands.*;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.TreeMap;
 
 public final class CmdList
 {
@@ -64,6 +64,7 @@ public final class CmdList
 	public final UnbindCmd unbindCmd = new UnbindCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
+	public final NameCmd nameCmd = new NameCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>(String::compareToIgnoreCase);
