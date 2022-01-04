@@ -41,7 +41,9 @@ public abstract class SignEditScreenMixin extends Screen
 		if(autoSignText == null)
 			return;
 		
-		text = autoSignText;
+		for(int i = 0; i < 4; i++)
+			text[i] = autoSignText[i];
+		
 		finishEditing();
 	}
 	
