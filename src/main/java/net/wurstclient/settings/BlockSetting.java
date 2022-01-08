@@ -127,6 +127,18 @@ public final class BlockSetting extends Setting
 	@Override
 	public Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
-		return new LinkedHashSet<>();
+		String fullName = featureName + " " + getName();
+		
+		String command = ".setblock " + featureName.toLowerCase() + " ";
+		command += getName().toLowerCase().replace(" ", "_") + " ";
+		
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
+		// Can't just list all the blocks here. Would need to change UI to allow
+		// user to choose a block after selecting this option.
+		// pkb.add(new PossibleKeybind(command + "dirt", "Set " + fullName + "
+		// to dirt"));
+		pkb.add(new PossibleKeybind(command + "reset", "Reset " + fullName));
+		
+		return pkb;
 	}
 }
