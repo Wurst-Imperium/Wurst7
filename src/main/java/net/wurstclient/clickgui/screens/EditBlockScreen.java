@@ -25,7 +25,6 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.MathUtils;
 
 public final class EditBlockScreen extends Screen
 {
@@ -69,14 +68,8 @@ public final class EditBlockScreen extends Screen
 	
 	private void done()
 	{
-		Block block;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			block =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			block = BlockUtils.getBlockFromName(nameOrId);
+		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -147,14 +140,8 @@ public final class EditBlockScreen extends Screen
 		
 		matrixStack.pop();
 		
-		Block blockToAdd;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			blockToAdd =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
+		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;

@@ -35,7 +35,7 @@ public final class BlockSetting extends Setting
 	{
 		super(name, description);
 		
-		Block block = BlockUtils.getBlockFromName(blockName);
+		Block block = BlockUtils.getBlockFromNameOrID(blockName);
 		Objects.requireNonNull(block);
 		this.blockName = BlockUtils.getName(block);
 		
@@ -48,6 +48,9 @@ public final class BlockSetting extends Setting
 		this(name, "", blockName, allowAir);
 	}
 	
+	/**
+	 * @return this setting's {@link Block}. Cannot be null.
+	 */
 	public Block getBlock()
 	{
 		return BlockUtils.getBlockFromName(blockName);
@@ -77,7 +80,7 @@ public final class BlockSetting extends Setting
 	
 	public void setBlockName(String blockName)
 	{
-		Block block = BlockUtils.getBlockFromName(blockName);
+		Block block = BlockUtils.getBlockFromNameOrID(blockName);
 		Objects.requireNonNull(block);
 		
 		setBlock(block);
@@ -102,7 +105,7 @@ public final class BlockSetting extends Setting
 		{
 			String newName = JsonUtils.getAsString(json);
 			
-			Block newBlock = BlockUtils.getBlockFromName(newName);
+			Block newBlock = BlockUtils.getBlockFromNameOrID(newName);
 			if(newBlock == null)
 				throw new JsonException();
 			
