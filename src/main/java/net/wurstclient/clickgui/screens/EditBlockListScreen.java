@@ -135,11 +135,13 @@ public final class EditBlockListScreen extends Screen
 		switch(keyCode)
 		{
 			case GLFW.GLFW_KEY_ENTER:
-			addButton.onPress();
+			if(addButton.active)
+				addButton.onPress();
 			break;
 			
 			case GLFW.GLFW_KEY_DELETE:
-			removeButton.onPress();
+			if(!blockNameField.isFocused())
+				removeButton.onPress();
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
