@@ -803,6 +803,9 @@ public final class ClickGui
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
@@ -832,7 +835,6 @@ public final class ClickGui
 		int y4 = y1 + 2;
 		int y5 = y3 - 2;
 		boolean hoveringY = mouseY >= y4 && mouseY < y5;
-		
 		if(window.isClosable())
 		{
 			x3 -= 11;
