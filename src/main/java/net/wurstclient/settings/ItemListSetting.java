@@ -116,6 +116,20 @@ public final class ItemListSetting extends Setting
 	@Override
 	public Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
-		return new LinkedHashSet<>();
+		String fullName = featureName + " " + getName();
+		
+		String command = ".itemlist " + featureName.toLowerCase() + " ";
+		command += getName().toLowerCase().replace(" ", "_") + " ";
+		
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
+		// Can't just list all the items here. Would need to change UI to allow
+		// user to choose an item after selecting this option.
+		// pkb.add(new PossibleKeybind(command + "add dirt",
+		// "Add dirt to " + fullName));
+		// pkb.add(new PossibleKeybind(command + "remove dirt",
+		// "Remove dirt from " + fullName));
+		pkb.add(new PossibleKeybind(command + "reset", "Reset " + fullName));
+		
+		return pkb;
 	}
 }

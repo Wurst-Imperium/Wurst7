@@ -42,6 +42,7 @@ public final class CmdList
 	public final HelpCmd helpCmd = new HelpCmd();
 	public final InvseeCmd invseeCmd = new InvseeCmd();
 	public final IpCmd ipCmd = new IpCmd();
+	public final ItemListCmd itemListCmd = new ItemListCmd();
 	public final JumpCmd jumpCmd = new JumpCmd();
 	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
