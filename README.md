@@ -6,7 +6,7 @@ If you speak both English and some other language, please help us by translating
 
 At the moment, only hack descriptions can be translated. Other descriptions and tooltips will become translatable in the future.
 
-Names of featues (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
 
 See [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) for discussion about translations.
 

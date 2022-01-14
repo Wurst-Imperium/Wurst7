@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,6 +54,12 @@ public enum BlockUtils
 		return Registry.BLOCK.getId(block).toString();
 	}
 	
+	/**
+	 * @param name
+	 *            a String containing the block's name ({@link Identifier})
+	 * @return the requested block, or <code>minecraft:air</code> if the block
+	 *         doesn't exist.
+	 */
 	public static Block getBlockFromName(String name)
 	{
 		try
@@ -63,6 +69,34 @@ public enum BlockUtils
 		}catch(InvalidIdentifierException e)
 		{
 			return Blocks.AIR;
+		}
+	}
+	
+	/**
+	 * @param nameOrId
+	 *            a String containing the block's name ({@link Identifier}) or
+	 *            numeric ID.
+	 * @return the requested block, or null if the block doesn't exist.
+	 */
+	public static Block getBlockFromNameOrID(String nameOrId)
+	{
+		if(MathUtils.isInteger(nameOrId))
+		{
+			BlockState state = Block.STATE_IDS.get(Integer.parseInt(nameOrId));
+			if(state == null)
+				return null;
+			
+			return state.getBlock();
+		}
+		
+		try
+		{
+			return Registry.BLOCK.getOrEmpty(new Identifier(nameOrId))
+				.orElse(null);
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
 		}
 	}
 	
