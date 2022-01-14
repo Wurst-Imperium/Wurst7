@@ -19,4 +19,6 @@ public final class TrueSightHack extends Hack
 		super("TrueSight");
 		setCategory(Category.RENDER);
 	}
+	
+	// See LivingEntityRendererMixin
 }

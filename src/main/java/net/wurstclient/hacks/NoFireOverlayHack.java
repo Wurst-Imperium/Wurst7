@@ -17,7 +17,8 @@ public final class NoFireOverlayHack extends Hack
 	public NoFireOverlayHack()
 	{
 		super("NoFireOverlay");
-		
 		setCategory(Category.RENDER);
 	}
+	
+	// See InGameOverlayRendererMixin.onRenderFireOverlay()
 }

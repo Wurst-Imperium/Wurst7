@@ -20,4 +20,6 @@ public final class SnowShoeHack extends Hack
 		super("SnowShoe");
 		setCategory(Category.MOVEMENT);
 	}
+	
+	// See PowderSnowBlockMixin
 }

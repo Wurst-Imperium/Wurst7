@@ -17,7 +17,8 @@ public final class NameTagsHack extends Hack
 	public NameTagsHack()
 	{
 		super("NameTags");
-		
 		setCategory(Category.RENDER);
 	}
+	
+	// See EntityRendererMixin.wurstRenderLabelIfPresent()
 }

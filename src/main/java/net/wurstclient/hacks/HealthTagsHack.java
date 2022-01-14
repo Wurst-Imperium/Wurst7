@@ -50,4 +50,6 @@ public final class HealthTagsHack extends Hack
 		
 		return Formatting.GREEN;
 	}
+	
+	// See EntityRendererMixin.onRenderLabelIfPresent()
 }

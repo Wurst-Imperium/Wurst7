@@ -30,4 +30,7 @@ public final class ReachHack extends Hack
 	{
 		return range.getValueF();
 	}
+	
+	// See ClientPlayerInteractionManagerMixin.onGetReachDistance() and
+	// ClientPlayerInteractionManagerMixin.hasExtendedReach()
 }
