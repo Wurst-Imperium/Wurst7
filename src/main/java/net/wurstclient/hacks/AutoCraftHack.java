@@ -1,5 +1,6 @@
 package net.wurstclient.hacks;
 
+import baritone.api.BaritoneAPI;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -29,11 +31,13 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
+import javax.tools.Tool;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -72,6 +76,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private boolean doneCrafting = true;
 
     private ContainerManager containerManager = new ContainerManager();
+    private ToolManager toolManager = new ToolManager();
 
     public AutoCraftHack() {
         super("AutoCraft");
@@ -79,14 +84,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private boolean isBaritoneAPIInstalled() {
-        /*try {
+        try {
             Class.forName("baritone.api.BaritoneAPI");
             return true;
         }
         catch (Exception ex) {
             return false;
-        }*/
-        return false;
+        }
     }
 
     private void initContainerBlockTypes() {
@@ -132,15 +136,54 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Identifier stackId = Registry.ITEM.getId(stack.getItem());
                 if (!processMap.containsKey(stackId))
                     processMap.put(stackId, new ArrayList<>());
-                processMap.get(stackId).add(new WorldCraftingProcess(Registry.BLOCK.get(id)));
+                processMap.get(stackId).add(new WorldCraftingProcess(stack.getItem(), Registry.BLOCK.get(id)));
             }
         }
     }
 
-    private List<CraftingProcess> getProcesses(Identifier id) {
+    private class ToolManager {
+        private List<Item> tools;
+        public ToolManager() {
+            tools = new ArrayList<>();
+            String[] prefixes = new String[] {"wooden", "stone", "iron", "golden", "diamond"};
+            String[] suffixes = new String[] {"sword", "axe", "pickaxe", "shovel", "hoe"};
+            for (String prefix : prefixes) {
+                for (String suffix : suffixes) {
+                    tools.add(Registry.ITEM.get(new Identifier("minecraft", prefix + "_" + suffix)));
+                }
+            }
+            tools.add(Registry.ITEM.get(new Identifier("minecraft", "shears")));
+        }
+        public Set<Item> getMatchingTools(Block block) {
+            Set<Item> res = new HashSet<>();
+            BlockState state = block.getDefaultState();
+            if (!state.isToolRequired())
+                return res;
+            for (Item tool : tools) {
+                ItemStack toolStack = new ItemStack(tool, 1);
+                if (toolStack.isSuitableFor(state)) {
+                    res.add(tool);
+                }
+            }
+            return res;
+        }
+        public boolean canMine(Block block) {
+            Set<Item> effectiveTools = getMatchingTools(block);
+            synchronized (totalInventoryAvailabilityMap) {
+                for (Item item : totalInventoryAvailabilityMap.keySet()) {
+                    if (effectiveTools.contains(item))
+                        return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private CraftingPlan getCraftingPlan(Identifier id) {
         List<CraftingProcess> processes = new ArrayList<>(processMap.getOrDefault(id, new ArrayList<>()));
+        processes.add(new InventoryCraftingProcess(Registry.ITEM.get(id)));
         processes.add(new StorageCraftingProcess(Registry.ITEM.get(id)));
-        return processes;
+        return new CraftingPlan(Registry.ITEM.get(id), processes);
     }
 
     private class SlotUpdateInfo {
@@ -154,7 +197,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private abstract class StorageQuery<T> {
         public abstract HashMap<T, Integer> getAvailabilityMap();
-        public abstract void acquire(T item, int count);
+        public abstract boolean acquire(T item, int count);
     }
 
     private class InventoryStorageQuery extends StorageQuery<Item> {
@@ -179,7 +222,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        public void acquire(Item item, int count) { }
+        public boolean acquire(Item item, int count) { return true; }
     }
 
     private abstract class Pathfinder {
@@ -190,30 +233,62 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean isMiningSupported() {
             return supportsMining;
         }
-        public abstract void path(BlockPos pos);
-        public abstract void mine(Block block, int count);
+        public abstract boolean path(BlockPos pos);
+        public abstract boolean mine(Block block, int count);
     }
 
     private class WurstPathfinder extends Pathfinder {
         public WurstPathfinder() {
             super(false);
         }
-        public void path(BlockPos pos) {
+        public boolean path(BlockPos pos) {
             GoToCmd path = new GoToCmd();
             path.setGoal(pos);
             path.enable();
             path.waitUntilDone();
+            return true;
         }
-        public void mine(Block block, int count) {
+        public boolean mine(Block block, int count) {
             throw new NotImplementedException("Wurst pathfinder does not support mining");
         }
     }
 
     private abstract class NotifyingRunnable implements Runnable {
         protected boolean done = false;
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
         public boolean isDone() {
             return done;
         }
+        @Override
+        public void run() {
+            runInternal();
+            lock.lock();
+            try {
+                done = true;
+                condition.signalAll();
+            }
+            finally {
+                lock.unlock();
+            }
+        }
+        public void runUntilDone() {
+            MC.execute(this);
+            lock.lock();
+            try {
+                if (!isDone()) {
+                    condition.await();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+        }
+        public void runWithoutWaiting() {
+            MC.execute(this);
+        }
+        protected abstract void runInternal();
     }
 
     private class BaritoneInterface {
@@ -229,6 +304,36 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+        private void resetSetting(String setting) {
+            try {
+                Object res = getSetting(setting);
+                res.getClass().getMethod("reset").invoke(res);
+            }
+            catch (Exception ex) { }
+        }
+        private Object getSetting(String setting) {
+            try {
+                Object settings = BaritoneAPI.getMethod("getSettings").invoke(BaritoneAPI);
+                Object res = settings.getClass().getField(setting).get(settings);
+                return res;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
+        private void setSetting(String setting, Object value) {
+            try {
+                Object res = getSetting(setting);
+                res.getClass().getField("value").set(res, value);
+            }
+            catch (Exception ex) { }
+        }
+        private void setAllowInventory(boolean value) {
+            setSetting("allowInventory", value);
+        }
+        private void setAcceptableThrowawayItems(List<Item> items) {
+            setSetting("acceptableThrowawayItems", items);
         }
         private Object getPrimaryBaritone() {
             try {
@@ -293,27 +398,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public BaritonePathfinder() {
             super(true);
         }
-        public void path(BlockPos pos) {
+        public boolean path(BlockPos pos) {
             Object pathProcess = baritoneInterface.getCustomGoalProcess();
+            baritoneInterface.setAllowInventory(true);
+            baritoneInterface.setAcceptableThrowawayItems(new ArrayList<>());
             NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
-                public void run() {
+                protected void runInternal() {
                     baritoneInterface.setGoalAndPath(pathProcess, pos);
-                    synchronized (this) {
-                        done = true;
-                        notifyAll();
-                    }
                 }
             };
-            MC.execute(baritoneRunnable);
-            synchronized(baritoneRunnable) {
-                if (!baritoneRunnable.isDone()) {
-                    try {
-                        baritoneRunnable.wait();
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
+            baritoneRunnable.runUntilDone();
             while (baritoneInterface.isActive(pathProcess)) {
                 try {
                     Thread.sleep(10);
@@ -322,35 +416,29 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     ex.printStackTrace();
                 }
             }
+            baritoneInterface.setAllowInventory(false);
+            return true;
         }
-        public void mine(Block block, int count) {
+        public boolean mine(Block block, int count) {
+            updateTotalInventoryAvailability();
             Object mineProcess = baritoneInterface.getMineProcess();
             final int alreadyPossessed;
             if (isCurrentlyCrafting) {
-                alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(block.asItem(), 0);
+                synchronized (totalInventoryAvailabilityMap) {
+                    alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(block.asItem(), 0);
+                }
             }
             else {
                 alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(block.asItem(), 0);
             }
+            baritoneInterface.setAllowInventory(true);
+            baritoneInterface.setAcceptableThrowawayItems(new ArrayList<>());
             NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
-                public void run() {
+                protected void runInternal() {
                     baritoneInterface.mine(mineProcess, count + alreadyPossessed, block);
-                    synchronized (this) {
-                        done = true;
-                        notifyAll();
-                    }
                 }
             };
-            MC.execute(baritoneRunnable);
-            synchronized(baritoneRunnable) {
-                if (!baritoneRunnable.isDone()) {
-                    try {
-                        baritoneRunnable.wait();
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
+            baritoneRunnable.runUntilDone();
             while (baritoneInterface.isActive(mineProcess)) {
                 try {
                     Thread.sleep(10);
@@ -359,6 +447,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     ex.printStackTrace();
                 }
             }
+            baritoneInterface.setAllowInventory(false);
+            return true;
         }
     }
 
@@ -409,7 +499,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                     else {
                         count -= handler.getSlot(i).getStack().getCount();
-                        totalInventoryAvailabilityMap.put(item, totalInventoryAvailabilityMap.getOrDefault(item, 0) + handler.getSlot(i).getStack().getCount());
+                        synchronized (totalInventoryAvailabilityMap) {
+                            totalInventoryAvailabilityMap.put(item, totalInventoryAvailabilityMap.getOrDefault(item, 0) + handler.getSlot(i).getStack().getCount());
+                        }
                         MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.QUICK_MOVE, MC.player);
                     }
                 }
@@ -418,7 +510,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return count;
         }
         @Override
-        public void acquire(Item item, int count) {
+        public boolean acquire(Item item, int count) {
             for (BlockPos pos : containers.keySet()) {
                 if (count <= 0)
                     break;
@@ -427,6 +519,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     count = takeItem(pos, item, count);
                 }
             }
+            return count <= 0;
         }
         public List<BlockPos> getAcquireRoute(Item item, int count) {
             List<BlockPos> res = new ArrayList<>();
@@ -528,13 +621,30 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        public void acquire(Block block, int count) {
-            pathFinder.mine(block, count);
+        public boolean acquire(Block block, int count) {
+            return pathFinder.mine(block, count);
+        }
+    }
+
+    private class CraftingPlan {
+        private List<CraftingProcess> processes;
+        private Item target;
+        public CraftingPlan(Item target, List<CraftingProcess> processes) {
+            this.processes = processes;
+            this.target = target;
+        }
+        public Node getNode() {
+            if (processes.size() == 0)
+                return null;
+            if (processes.size() > 1)
+                return new ChoiceNode(target, 0, processes);
+            return processes.get(0).getNode();
         }
     }
 
     private abstract class CraftingProcess {
         public abstract int getMultiplicity();
+        public abstract Node getNode();
     }
 
     private class RecipeCraftingProcess extends CraftingProcess {
@@ -550,6 +660,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
+        @Override
+        public Node getNode() {
+            return new RecipeNode(recipe.getOutput().getItem(), 0, List.of(this));
+        }
+    }
+
+    private class InventoryCraftingProcess extends CraftingProcess {
+        private Item item;
+        public InventoryCraftingProcess(Item item) {
+            this.item = item;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new InventoryNode(item, 0, List.of(this));
+        }
     }
 
     private class StorageCraftingProcess extends CraftingProcess {
@@ -561,16 +690,41 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getMultiplicity() {
             return 1;
         }
+        @Override
+        public Node getNode() {
+            return new StorageNode(item, 0, List.of(this));
+        }
     }
 
     private class WorldCraftingProcess extends CraftingProcess {
         private Block block;
-        public WorldCraftingProcess(Block block) {
+        private Item dropped;
+        public WorldCraftingProcess(Item dropped, Block block) {
+            this.block = block;
+            this.dropped = dropped;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new WorldNode(dropped, block, 0, List.of(this));
+        }
+    }
+
+    private class ToolCraftingProcess extends CraftingProcess {
+        private Block block;
+        public ToolCraftingProcess(Block block) {
             this.block = block;
         }
         @Override
         public int getMultiplicity() {
             return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new AuxiliaryNode(block.asItem(), 0, List.of(this));
         }
     }
 
@@ -610,29 +764,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 closeScreen();
             NotifyingRunnable inventoryRunnable = new NotifyingRunnable() {
                 @Override
-                public void run() {
+                protected void runInternal() {
                     MC.getTutorialManager().onInventoryOpened();
                     InventoryScreen screen = new InventoryScreen(MC.player);
                     screen.refreshRecipeBook();
                     MC.setScreen(screen);
-                    synchronized(this) {
-                        done = true;
-                        notifyAll();
-                    }
                 }
             };
-            MC.execute(inventoryRunnable);
-            synchronized(inventoryRunnable) {
-                if (!inventoryRunnable.isDone()) {
-                    try {
-                        inventoryRunnable.wait();
-                    }
-                    catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-
+            inventoryRunnable.runUntilDone();
         }
         public void goToContainer(BlockPos container) {
             if (container.equals(currentContainer))
@@ -694,14 +833,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private HashMap<Item, Integer> inventoryAvailability;
         private HashMap<Item, Integer> storageAvailability;
         private HashMap<Block, Integer> worldAvailability;
+        private HashMap<Integer, Item> toolAvailability;
         private HashSet<Node> visited;
-        private boolean collectStorageNodes = false;
         private List<StorageNode> storageNodes = new ArrayList<>();
+        private HashMap<Item, Integer> craftingItemFrequency = new HashMap<>();
         private boolean success = false;
-        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashMap<Block, Integer> worldAvailability, HashSet<Node> visited) {
+        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashMap<Block, Integer> worldAvailability, HashSet<Node> visited, HashMap<Integer, Item> toolAvailability) {
             this.inventoryAvailability = inventoryAvailability;
             this.storageAvailability = storageAvailability;
             this.worldAvailability = worldAvailability;
+            this.toolAvailability = toolAvailability;
             this.visited = visited;
         }
         public CraftingState setSuccess(boolean value) {
@@ -716,15 +857,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             success = false;
             return this;
         }
-        public CraftingState setCollectStorageNodes(boolean value) {
-            collectStorageNodes = value;
-            return this;
-        }
         public CraftingState clone() {
-            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashMap<Block, Integer>) worldAvailability.clone(), (HashSet<Node>) visited.clone());
+            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashMap<Block, Integer>) worldAvailability.clone(), (HashSet<Node>) visited.clone(), (HashMap<Integer, Item>) toolAvailability.clone());
             state.success = success;
-            state.collectStorageNodes = collectStorageNodes;
             state.storageNodes = new ArrayList<>(storageNodes);
+            state.craftingItemFrequency = (HashMap<Item, Integer>) craftingItemFrequency.clone();
             return state;
         }
         public void set(CraftingState other) {
@@ -734,26 +871,30 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             storageAvailability.putAll(other.storageAvailability);
             worldAvailability.clear();
             worldAvailability.putAll(other.worldAvailability);
+            toolAvailability.clear();
+            toolAvailability.putAll(other.toolAvailability);
             visited.clear();
             visited.addAll(other.visited);
             success = other.success;
-            collectStorageNodes = other.collectStorageNodes;
             storageNodes.clear();
             storageNodes.addAll(other.storageNodes);
+            craftingItemFrequency.clear();
+            craftingItemFrequency.putAll(other.craftingItemFrequency);
         }
     }
 
-    private void awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem, boolean succeedAfterTimeout) {
+    private boolean awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem, boolean succeedAfterTimeout) {
         slotUpdateLock.lock();
         try {
             while (latestSlotUpdate == null || !latestSlotUpdate.itemStack.getItem().equals(item) || (!onlyConsiderItem && (latestSlotUpdate.itemStack.getCount() != amount || latestSlotUpdate.slot != slot))) {
                 boolean gotSignal = slotUpdateCondition.await(1000, TimeUnit.MILLISECONDS);
                 if (succeedAfterTimeout)
-                    break;
+                    return true;
                 if (!gotSignal) {
                     ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(0).getStack();
                     if (craftingItem.getItem().equals(item) && (onlyConsiderItem || (craftingItem.getCount() == amount && slot == 0)))
-                        break;
+                        return true;
+                    return false;
                 }
             }
         }
@@ -763,6 +904,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         finally {
             slotUpdateLock.unlock();
         }
+        return true;
     }
 
     private class VerificationInfo {
@@ -781,6 +923,37 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private static class CraftingParams {
+        public boolean generateTree;
+        public boolean useTree;
+        public boolean collectStorageNodes;
+        public boolean execute;
+        public boolean createVerificationInfo;
+        public static final CraftingParams VERIFY_AND_GENERATE = new CraftingParams().setGenerateTree(true).setCollectStorageNodes(true).setCreateVerificationInfo(true);
+        public static final CraftingParams CRAFT = new CraftingParams().setExecute(true).setUseTree(true);
+        public CraftingParams() { }
+        public CraftingParams setGenerateTree(boolean generateTree) {
+            this.generateTree = generateTree;
+            return this;
+        }
+        public CraftingParams setCollectStorageNodes(boolean collectStorageNodes) {
+            this.collectStorageNodes = collectStorageNodes;
+            return this;
+        }
+        public CraftingParams setExecute(boolean execute) {
+            this.execute = execute;
+            return this;
+        }
+        public CraftingParams setCreateVerificationInfo(boolean createVerificationInfo) {
+            this.createVerificationInfo = createVerificationInfo;
+            return this;
+        }
+        public CraftingParams setUseTree(boolean useTree) {
+            this.useTree = useTree;
+            return this;
+        }
+    }
+
     private abstract class Node {
         protected Item target;
         protected int needed;
@@ -788,12 +961,29 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected int stackShift;
         protected List<Node> children;
         protected VerificationInfo verificationInfo;
+        protected String lpVarName = null;
+        protected int naiveMaxCraftable;
+        protected int maxCraftable;
+        protected int nodeId;
+        private static int maxNodeId = 0;
+        protected double efficiencyHeuristic;
         public Node(Item target, int needed, List<CraftingProcess> processes) {
+            nodeId = maxNodeId++;
             children = new ArrayList<>();
             this.processes = processes;
             this.target = target;
             this.needed = needed;
             stackShift = 0;
+        }
+        public List<Pair<ItemStack, ResourceDomain>> toItemStack(Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> res) {
+            List<Pair<ItemStack, ResourceDomain>> result = new ArrayList<>();
+            if (res.getRight().containsKey(nodeId)) {
+                result.add(new Pair<>(new ItemStack(target, res.getRight().get(nodeId).getLeft()), res.getRight().get(nodeId).getRight()));
+            }
+            for (Node child : children) {
+                result.addAll(child.toItemStack(res));
+            }
+            return result;
         }
         public Node setNeeded(int needed) {
             this.needed = needed;
@@ -803,93 +993,164 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.stackShift = stackShift;
             return this;
         }
-        public CraftingState craft() {
-            HashMap<Item, Integer> inventoryAvailability = inventoryAvailabilityMap;
-            HashMap<Item, Integer> storageAvailability = storageAvailabilityMap;
-            HashMap<Block, Integer> worldAvailability = worldAvailabilityMap;
-            HashSet<Node> visited = new HashSet<>();
-            return craftPreliminary(new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, visited));
+        private void generateTree(HashSet<Node> visited, CraftingState state) {
+            if (shouldRememberVisit())
+                visited.add(this);
+            children = getChildren(visited, state);
+            for (Node child : children) {
+                child.generateTree(visited, state);
+            }
+            if (shouldRememberVisit())
+                visited.remove(this);
         }
-        public CraftingState verify() {
+        private int reorderNodeIds(int id) {
+            nodeId = id;
+            int next = id + 1;
+            for (Node child : children) {
+                next = child.reorderNodeIds(next);
+            }
+            return next;
+        }
+        public boolean doCraft() {
+            if (needed == 0)
+                return true;
+            for (Node child : children) {
+                if (!child.doCraft()) {
+                    return false;
+                }
+            }
+            return execute();
+        }
+        public void craft(int amount) {
+            calculateMaxCraftable(amount);
+            doCraft();
+            /*while (!doCraft())
+                calculateMaxCraftable(amount);*/
+        }
+        protected abstract List<Node> getChildrenInternal(HashSet<Node> nodes);
+        private List<Node> getChildren(HashSet<Node> nodes, CraftingState state) {
+            List<Node> res = new ArrayList<>();
+            if (processes == null)
+                return res;
+            for (Node child : getChildrenInternal(nodes)) {
+                if ((child.shouldRememberVisit() && nodes.contains(child)) || !child.canPossiblyCraft(state))
+                    continue;
+                res.add(child);
+            }
+            return res;
+        }
+        protected boolean canPossiblyCraft(CraftingState state) {
+            return true;
+        }
+        protected abstract void calculateEfficiencyHeuristic(int amount);
+        private CraftingState createFreshState() {
             HashMap<Item, Integer> inventoryAvailability = (HashMap<Item, Integer>) inventoryAvailabilityMap.clone();
             HashMap<Item, Integer> storageAvailability = (HashMap<Item, Integer>) storageAvailabilityMap.clone();
             HashMap<Block, Integer> worldAvailability = (HashMap<Block, Integer>) worldAvailabilityMap.clone();
-            HashSet<Node> visited = new HashSet<>();
-            return verifyPreliminary(new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, visited).setCollectStorageNodes(true));
+            CraftingState state = new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, new HashSet<>(), new HashMap<>());
+            return state;
         }
-        private CraftingState craftPreliminary(CraftingState state) {
-            boolean rememberVisit = shouldRememberVisit();
-            if (rememberVisit)
-                state.visited.add(this);
-            int numAvailable = state.inventoryAvailability.getOrDefault(target, 0);
-            if (numAvailable >= needed) {
-                state.inventoryAvailability.put(target, numAvailable - needed);
-                if (rememberVisit)
-                    state.visited.remove(this);
-                return state.success();
+        private int calculateMaxCraftableInternal(int upperBound, boolean useHeuristic, boolean setMaxCraftable, boolean populateNaiveMaxCraftable) {
+            CraftingState state = createFreshState();
+            if (populateNaiveMaxCraftable)
+                genNaiveMaxCraftable(state.clone());
+            HashMap<Integer, Integer> neededMap = new HashMap<>();
+            HashMap<Integer, Integer> newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
+            CraftingState newState = state.clone();
+            HashMap<Item, HashMap<Integer, Integer>> excess = new HashMap<>();
+            Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> resources = getBaseResources(1, excess, newNeededMap, newState, useHeuristic);
+            int amount = 0;
+            while (amount < upperBound && resources.getLeft()) {
+                amount++;
+                neededMap = newNeededMap;
+                newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
+                state = newState;
+                newState = state.clone();
+                resources = getBaseResources(1, excess, newNeededMap, newState, useHeuristic);
             }
-            if (numAvailable > 0) {
-                state.inventoryAvailability.put(target, 0);
-                needed -= numAvailable;
-            }
-            if (craftInternal(state, children).success) {
-                if (rememberVisit)
-                    state.visited.remove(this);
-                return state.success();
-            }
-            if (rememberVisit)
-                state.visited.remove(this);
-            return state.setSuccess(execute());
+            applyNeededMap(neededMap);
+            if (setMaxCraftable)
+                applyMaxCraftableMap(neededMap);
+            return amount;
         }
-        private CraftingState verifyPreliminary(CraftingState state) {
-            verificationInfo = new VerificationInfo();
-            boolean rememberVisit = shouldRememberVisit();
-            if (rememberVisit)
-                state.visited.add(this);
-            if (needed <= 0) {
-                if (rememberVisit)
-                    state.visited.remove(this);
-                return state.success();
+        private void print(int indent, boolean ignoreNeeded) {
+            if ((ignoreNeeded && naiveMaxCraftable > 0) || needed > 0) {
+                String indentation = "";
+                for (int i = 0; i < indent; i++) {
+                    indentation += " ";
+                }
+                System.out.println(indentation + target + ": " + needed + ", " + efficiencyHeuristic + ", " + this.getClass());
+                for (Node child : children) {
+                    child.print(indent + 4, ignoreNeeded);
+                }
             }
-            int numAvailable = state.inventoryAvailability.getOrDefault(target, 0);
-            int neededOffset = 0;
-            if (numAvailable >= needed) {
-                state.inventoryAvailability.put(target, state.inventoryAvailability.get(target) - needed);
-                if (rememberVisit)
-                    state.visited.remove(this);
-                return state.success();
+        }
+        private int calculateMaxCraftable(int upperBound) {
+            generateTree(new HashSet<>(), createFreshState());
+            reorderNodeIds(0);
+            int amount = calculateMaxCraftableInternal(upperBound, false, true, true);
+            calculateEfficiencyHeuristic(Math.min(amount, upperBound));
+            calculateMaxCraftableInternal(upperBound, true, false, false);
+            print(0, false);
+            System.out.println("Craftable: " + amount);
+            return amount;
+        }
+        private void applyNeededMap(HashMap<Integer, Integer> neededMap) {
+            needed = neededMap.getOrDefault(nodeId, 0);
+            for (Node child : children) {
+                child.applyNeededMap(neededMap);
             }
-            if (numAvailable > 0) {
-                state.inventoryAvailability.put(target, 0);
-                needed -= numAvailable;
-                neededOffset += numAvailable;
+        }
+        private void applyMaxCraftableMap(HashMap<Integer, Integer> maxCraftableMap) {
+            maxCraftable = maxCraftableMap.getOrDefault(nodeId, 0);
+            for (Node child : children) {
+                child.applyMaxCraftableMap(maxCraftableMap);
             }
-            List<Node> children = getChildren(this, state.visited);
-            this.children = children;
-            CraftingState res = verifyInternal(state, children);
-            verificationInfo = new VerificationInfo(needed, res.success, verificationInfo.timeHeuristic);
-            needed += neededOffset;
-            if (rememberVisit)
-                state.visited.remove(this);
-            return res;
+        }
+        private Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResources(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            if (excess.containsKey(target)) {
+                HashMap<Integer, Integer> itemMap = excess.get(target);
+                for (int id : itemMap.keySet()) {
+                    if (id <= nodeId) {
+                        int reductionFactor = Math.min(numNeeded, itemMap.get(id));
+                        numNeeded -= reductionFactor;
+                        itemMap.put(id, itemMap.get(id) - reductionFactor);
+                    }
+                    if (numNeeded <= 0)
+                        break;
+                }
+            }
+            int originalNeeded = neededMap.getOrDefault(nodeId, 0);
+            int outputCount = getOutputCount();
+            if (outputCount > 1) {
+                int neededToCraft = getNeededToCraft(originalNeeded + numNeeded);
+                int oldNeededToCraft = getNeededToCraft(originalNeeded);
+                int leftover = neededToCraft - (originalNeeded + numNeeded);
+                int oldLeftover = oldNeededToCraft - originalNeeded;
+                int leftoverDifference = leftover - oldLeftover;
+                excess.put(target, excess.getOrDefault(target, new HashMap<>()));
+                int excessAmount = excess.get(target).getOrDefault(nodeId, 0) + leftoverDifference;
+                int shift = (int) Math.floor((double) excessAmount / outputCount) * outputCount;
+                excess.get(target).put(nodeId, excessAmount - shift);
+                numNeeded -= shift;
+            }
+            neededMap.put(nodeId, originalNeeded + numNeeded);
+            if (numNeeded > 0)
+                return getBaseResourcesInternal(numNeeded, excess, neededMap, state, useHeuristic);
+            return new Pair<>(true, new HashMap<>());
+        }
+        protected abstract Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic);
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            for (Node child : children) {
+                child.genNaiveMaxCraftable(state);
+            }
         }
         protected abstract boolean shouldRememberVisit();
-        protected abstract CraftingState craftInternal(CraftingState state, List<Node> children);
-        protected abstract CraftingState verifyInternal(CraftingState state, List<Node> children);
         public abstract HashMap<Item, ItemStack> collectIngredients();
         public abstract boolean execute();
         public abstract int getOutputCount();
-        public int getNeededToCraft(int index) {
-            if (index < processes.size() && processes.get(index) instanceof RecipeCraftingProcess) {
-                RecipeCraftingProcess process = (RecipeCraftingProcess)processes.get(index);
-                if (needed < process.recipe.getOutput().getCount()) {
-                    return process.recipe.getOutput().getCount();
-                }
-                else {
-                    return (int)Math.ceil((double)needed / process.recipe.getOutput().getCount()) * process.recipe.getOutput().getCount();
-                }
-            }
-            return needed;
+        public int getNeededToCraft(int amount) {
+            return (int)Math.ceil((double)amount / getOutputCount()) * getOutputCount();
         }
         @Override
         public int hashCode() {
@@ -910,18 +1171,61 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
-        protected boolean shouldRememberVisit() {
-            return true;
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            List<Node> res = new ArrayList<>();
+            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            for (ItemStack stack : ingredients.values()) {
+                Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
+                CraftingPlan plan = getCraftingPlan(itemIdentifier);
+                Node child = plan.getNode();
+                res.add(child);
+            }
+            return res;
         }
         @Override
-        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
-            if (children.size() == 0)
-                return state.success();
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.05;
+            RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
+            HashMap<Item, ItemStack> ingredients = collectIngredients();
             for (Node child : children) {
-                child.craftPreliminary(state);
+                child.calculateEfficiencyHeuristic((int)Math.ceil((double)(amount * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount()));
+                efficiencyHeuristic += child.efficiencyHeuristic;
             }
-            state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
-            return state.failure();
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
+            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            int neededToCraft = getNeededToCraft(numNeeded);
+            for (Node child : children) {
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount(), excess, neededMap, state, useHeuristic);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, res);
+                res.putAll(childRes.getRight());
+            }
+            return new Pair<>(true, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            if (children.size() == 0) {
+                naiveMaxCraftable = 0;
+                return;
+            }
+            int outputFactor = Integer.MAX_VALUE;
+            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            for (Node child : children) {
+                int inputAmount = ingredients.get(child.target).getCount();
+                int outputAmount = ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount();
+                int maxCraftable = child.naiveMaxCraftable;
+                outputFactor = Math.min(outputFactor, outputAmount * (maxCraftable / inputAmount));
+            }
+            naiveMaxCraftable = outputFactor;
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return true;
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients() {
@@ -941,20 +1245,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return stackTypes;
         }
         @Override
-        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
-            if (children.size() == 0)
-                return state.failure();
-            verificationInfo.timeHeuristic = 0.05;
-            for (Node child : children) {
-                if (!child.verifyPreliminary(state).success) {
-                    return state.failure();
-                }
-                verificationInfo.timeHeuristic += child.verificationInfo.timeHeuristic;
-            }
-            state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) + getNeededToCraft(0) - needed);
-            return state.success();
-        }
-        @Override
         public int getOutputCount() {
             return ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
         }
@@ -966,19 +1256,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                int outputFactor = Math.min(totalInventoryAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), itemStack.getItem().getMaxCount()) * ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
-                output = Math.min(output, outputFactor);
+                synchronized (totalInventoryAvailabilityMap) {
+                    int outputFactor = Math.min(totalInventoryAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), itemStack.getItem().getMaxCount()) * ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount();
+                    output = Math.min(output, outputFactor);
+                }
             }
             return output;
         }
         private void adjustTotalAvailability(Recipe<?> recipe, int craftingOutput) {
             Item outputItem = recipe.getOutput().getItem();
-            totalInventoryAvailabilityMap.put(outputItem, totalInventoryAvailabilityMap.getOrDefault(outputItem, 0) + craftingOutput);
+            synchronized (totalInventoryAvailabilityMap) {
+                totalInventoryAvailabilityMap.put(outputItem, totalInventoryAvailabilityMap.getOrDefault(outputItem, 0) + craftingOutput);
+            }
             for (Ingredient ing : recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
-                totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
+                synchronized (totalInventoryAvailabilityMap) {
+                    totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
+                }
             }
         }
         private void arrangeRecipe(Recipe<?> recipe, int craftAmount, boolean useInventory) {
@@ -1038,12 +1334,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         containerManager.goToContainer(nearestCraftingTable);
                 }
             }
-            int neededToCraft = getNeededToCraft(0);
+            int neededToCraft = getNeededToCraft(needed);
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, craftingOutput / ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount(), useInventory);
-                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
+                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                    return false;
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
@@ -1053,7 +1350,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, 1, useInventory);
-                awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false);
+                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                    return false;
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
@@ -1068,82 +1366,91 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, needed, processes);
         }
         @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            List<Node> res = new ArrayList<>();
+            for (CraftingProcess process : processes) {
+                int m = process.getMultiplicity();
+                for (int i = 0; i < m; i++) {
+                    Node child = process.getNode().setStackShift(i);
+                    res.add(child);
+                }
+            }
+            return res;
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.0;
+            List<Pair<Node, Double>> timePerItem = new ArrayList<>();
+            int smallestNaiveMaxCraftable = Integer.MAX_VALUE;
+            for (Node child : children) {
+                if (child.naiveMaxCraftable == 0)
+                    continue;
+                if (child.naiveMaxCraftable < smallestNaiveMaxCraftable)
+                    smallestNaiveMaxCraftable = child.naiveMaxCraftable;
+            }
+            for (Node child : children) {
+                if (child.naiveMaxCraftable == 0)
+                    continue;
+                int amt = Math.min(amount, child.naiveMaxCraftable);
+                child.calculateEfficiencyHeuristic(amt);
+                timePerItem.add(new Pair<>(child, child.efficiencyHeuristic / amt));
+            }
+            Collections.sort(timePerItem, Comparator.comparing(o -> o.getRight()));
+            for (Pair<Node, Double> p : timePerItem) {
+                if (amount == 0)
+                    break;
+                Node n = p.getLeft();
+                int m = Math.min(amount, n.naiveMaxCraftable);
+                amount -= m;
+                efficiencyHeuristic += m * p.getRight();
+            }
+        }
+        private HashMap<Item, HashMap<Integer, Integer>> deepcopyExcess(HashMap<Item, HashMap<Integer, Integer>> excess) {
+            HashMap<Item, HashMap<Integer, Integer>> res = new HashMap<>();
+            for (Item item : excess.keySet()) {
+                res.put(item, (HashMap<Integer, Integer>) excess.get(item).clone());
+            }
+            return res;
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            List<Node> orderedItems = new ArrayList<>(children);
+            if (useHeuristic)
+                Collections.sort(orderedItems, Comparator.comparing(o -> o.efficiencyHeuristic));
+            for (Node child : orderedItems) {
+                if (numNeeded == 0)
+                    break;
+                if (child.naiveMaxCraftable == 0)
+                    continue;
+                CraftingState newState = state.clone();
+                HashMap<Integer, Integer> newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
+                HashMap<Item, HashMap<Integer, Integer>> newExcess = deepcopyExcess(excess);
+                int amount = 0;
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
+                while (numNeeded > 0 && childRes.getLeft()) {
+                    amount++;
+                    numNeeded--;
+                    childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
+                }
+                res.putAll(child.getBaseResources(amount, excess, neededMap, state, useHeuristic).getRight());
+            }
+            return new Pair<>(numNeeded == 0, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            for (Node child : children) {
+                naiveMaxCraftable += child.naiveMaxCraftable;
+            }
+        }
+        @Override
         protected boolean shouldRememberVisit() {
             return false;
         }
         @Override
-        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
-            for (Node child : children) {
-                int original = child.needed;
-                child.needed = needed;
-                if (child.verificationInfo == null || !child.verificationInfo.success) {
-                    child.needed = original;
-                    continue;
-                }
-                if (child.verificationInfo.amountToCraft < needed) {
-                    int maxCraftable = verificationInfo.amountToCraft;
-                    if (maxCraftable > 0) {
-                        child.needed = maxCraftable;
-                        child.craftPreliminary(state);
-                        needed -= maxCraftable;
-                    }
-                }
-                else {
-                    child.craftPreliminary(state);
-                    child.needed = original;
-                    return state.success();
-                }
-                child.needed = original;
-            }
-            return state.failure();
-        }
-        @Override
         public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
-        }
-        @Override
-        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
-            int originalNeeded = needed;
-            List<Pair<Node, Pair<CraftingState, Double>>> timePerItem = new ArrayList<>();
-            for (Node child : children) {
-                CraftingState newState = state.clone();
-                CraftingState verification = child.verifyPreliminary(newState);
-                if (!verification.success) {
-                    CraftingState maxCraftableState = state.clone();
-                    int maxCraftable = getMaxCraftable(child, maxCraftableState);
-                    if (maxCraftable == 0)
-                        continue;
-                    int originalChildNeeded = child.needed;
-                    child.needed = maxCraftable;
-                    child.verifyPreliminary(state.clone());
-                    child.needed = originalChildNeeded;
-                    timePerItem.add(new Pair<>(child, new Pair<>(maxCraftableState, child.verificationInfo.timeHeuristic / maxCraftable)));
-                }
-                else {
-                    timePerItem.add(new Pair<>(child, new Pair<>(newState, child.verificationInfo.timeHeuristic / needed)));
-                }
-            }
-            Collections.sort(timePerItem, Comparator.comparing(o -> -o.getRight().getRight()));
-            for (Pair<Node, Pair<CraftingState, Double>> entry : timePerItem) {
-                Node child = entry.getLeft();
-                if (needed <= 0) {
-                    child.verificationInfo.amountToCraft = 0;
-                    continue;
-                }
-                child.verificationInfo.amountToCraft = Math.min(child.verificationInfo.amountToCraft, needed);
-                int originalChildNeeded = child.needed;
-                child.needed = child.verificationInfo.amountToCraft;
-                child.verifyPreliminary(state);
-                child.needed = originalChildNeeded;
-                verificationInfo.timeHeuristic += child.verificationInfo.timeHeuristic;
-                needed -= child.verificationInfo.amountToCraft;
-            }
-            if (needed <= 0) {
-                needed = originalNeeded;
-                return state.success();
-            }
-            needed = originalNeeded;
-            return state.failure();
         }
         @Override
         public boolean execute() {
@@ -1155,46 +1462,99 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class StorageNode extends Node {
-        public StorageNode(Item target, int needed, List<CraftingProcess> processes) {
+    private class InventoryNode extends Node {
+        public InventoryNode(Item target, int needed, List<CraftingProcess> processes) {
             super(target, needed, processes);
+        }
+        @Override
+        protected boolean canPossiblyCraft(CraftingState state) {
+            return state.inventoryAvailability.getOrDefault(target, 0) > 0;
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            return new ArrayList<>();
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.0;
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            res.put(nodeId, new Pair<>(numNeeded, ResourceDomain.INVENTORY));
+            state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - numNeeded);
+            return new Pair<>(state.inventoryAvailability.get(target) >= 0, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = state.inventoryAvailability.getOrDefault(target, 0);
         }
         @Override
         protected boolean shouldRememberVisit() {
             return true;
         }
         @Override
-        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
-            state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - needed);
-            return state.failure();
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            return inventoryQuery.acquire(target, needed);
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
+    }
+
+    private class StorageNode extends Node {
+        public StorageNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected boolean canPossiblyCraft(CraftingState state) {
+            return state.storageAvailability.getOrDefault(target, 0) > 0;
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            return new ArrayList<>();
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            List<BlockPos> route = containerQuery.getAcquireRoute(target, amount);
+            Vec3d prevPos = MC.player.getPos();
+            double totalDistance = 0;
+            for (BlockPos pos : route) {
+                Vec3d curPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+                totalDistance += curPos.subtract(prevPos).length();
+                prevPos = curPos;
+            }
+            efficiencyHeuristic = totalDistance / MC.player.getMovementSpeed();
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            res.put(nodeId, new Pair<>(numNeeded, ResourceDomain.STORAGE));
+            state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - numNeeded);
+            return new Pair<>(state.storageAvailability.get(target) >= 0, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = state.storageAvailability.getOrDefault(target, 0);
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return true;
         }
         @Override
         public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
         }
         @Override
-        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
-            if (state.storageAvailability.getOrDefault(target, 0) >= needed) {
-                List<BlockPos> route = containerQuery.getAcquireRoute(target, needed);
-                Vec3d prevPos = MC.player.getPos();
-                double totalDistance = 0;
-                for (BlockPos pos : route) {
-                    Vec3d curPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
-                    totalDistance += curPos.subtract(prevPos).length();
-                    prevPos = curPos;
-                }
-                verificationInfo.timeHeuristic = totalDistance / MC.player.getMovementSpeed();
-                state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - needed);
-                if (state.collectStorageNodes)
-                    state.storageNodes.add(this);
-                return state.success();
-            }
-            return state.failure();
-        }
-        @Override
         public boolean execute() {
-            containerQuery.acquire(target, needed);
-            return true;
+            return containerQuery.acquire(target, needed);
         }
         @Override
         public int getOutputCount() {
@@ -1203,40 +1563,74 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private class WorldNode extends Node {
-        public WorldNode(Item target, int needed, List<CraftingProcess> processes) {
-            super(target, needed, processes);
+        private Item dropped;
+        private Block block;
+        public WorldNode(Item dropped, Block block, int needed, List<CraftingProcess> processes) {
+            super(dropped, needed, processes);
+            this.dropped = dropped;
+            this.block = block;
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            return List.of(new ToolCraftingProcess(((WorldCraftingProcess) processes.get(0)).block).getNode());
+        }
+        @Override
+        protected boolean canPossiblyCraft(CraftingState state) {
+            return state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) > 0;
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            Vec3d playerPos = MC.player.getPos();
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            BlockPos nearestPos = nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN);
+            efficiencyHeuristic = new Vec3d(nearestPos.getX(), nearestPos.getY(), nearestPos.getZ()).subtract(playerPos).length() / MC.player.getMovementSpeed();
+            efficiencyHeuristic += amount;
+            if (block.getDefaultState().isToolRequired()) {
+                for (Node child : children) {
+                    child.calculateEfficiencyHeuristic(amount);
+                    efficiencyHeuristic += child.efficiencyHeuristic;
+                }
+            }
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            res.put(nodeId, new Pair<>(numNeeded, ResourceDomain.WORLD));
+            state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - numNeeded);
+            if (block.getDefaultState().isToolRequired()) {
+                for (Node child : children) {
+                    Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(1, excess, neededMap, state, useHeuristic);
+                    if (!childRes.getLeft())
+                        return new Pair<>(false, res);
+                    res.putAll(childRes.getRight());
+                }
+            }
+            return new Pair<>(state.worldAvailability.get(block) >= 0, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = state.worldAvailability.getOrDefault(block, 0);
         }
         @Override
         protected boolean shouldRememberVisit() {
             return true;
         }
         @Override
-        protected CraftingState craftInternal(CraftingState state, List<Node> children) {
-            return state.failure();
-        }
-        @Override
         public HashMap<Item, ItemStack> collectIngredients() {
             return new HashMap<>();
         }
         @Override
-        protected CraftingState verifyInternal(CraftingState state, List<Node> children) {
-            if (!pathFinder.isMiningSupported())
-                return state.failure();
-            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
-            BlockPos nearestPos = nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN);
-            Vec3d playerPos = MC.player.getPos();
-            if (state.worldAvailability.getOrDefault(targetBlock, 0) >= needed) {
-                verificationInfo.timeHeuristic = new Vec3d(nearestPos.getX(), nearestPos.getY(), nearestPos.getZ()).subtract(playerPos).length() / MC.player.getMovementSpeed();
-                verificationInfo.timeHeuristic += needed;
-                state.worldAvailability.put(targetBlock, state.worldAvailability.getOrDefault(targetBlock, 0) - needed);
-                return state.success();
-            }
-            return state.failure();
-        }
-        @Override
         public boolean execute() {
-            worldQuery.acquire(((WorldCraftingProcess) processes.get(0)).block, needed);
-            return true;
+            if (!block.getDefaultState().isToolRequired())
+                return worldQuery.acquire(block, needed);
+            for (Node child : children) {
+                if (!child.execute())
+                    return false;
+            }
+            if (!toolManager.canMine(block))
+                return false;
+            return worldQuery.acquire(block, needed);
         }
         @Override
         public int getOutputCount() {
@@ -1244,57 +1638,93 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private int gcd(int a, int b) {
-        if (b == 0)
-            return a;
-        return gcd(b, a % b);
-    }
-
-    private class Fraction {
-        private int numerator;
-        private int denominator;
-        public Fraction(int numerator, int denominator) {
-            this.numerator = numerator;
-            this.denominator = denominator;
-            simplify();
-        }
-        public Fraction(int numerator) {
-            this(numerator, 1);
-        }
-        private void simplify() {
-            int d = gcd(numerator, denominator);
-            numerator /= d;
-            denominator /= d;
-        }
-        public Fraction add(Fraction other) {
-            return new Fraction(numerator * other.denominator + other.numerator * denominator, other.denominator * denominator);
-        }
-        public Fraction mult(Fraction other) {
-            return new Fraction(numerator * other.numerator, denominator * other.denominator);
-        }
-        public Fraction div(Fraction other) {
-            return mult(other.reciprocal());
-        }
-        public Fraction reciprocal() {
-            return new Fraction(denominator, numerator);
-        }
-        public int ceil() {
-            if (denominator == 1)
-                return numerator;
-            return (int)Math.ceil((double)numerator / denominator);
+    private class AuxiliaryNode extends Node {
+        public AuxiliaryNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
         }
         @Override
-        public String toString() {
-            return denominator > 1 ? numerator + "/" + denominator : numerator + "";
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            Set<Item> matchingTools = toolManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
+            List<CraftingProcess> toolProcesses = new ArrayList<>();
+            for (Item tool : matchingTools) {
+                CraftingPlan plan = getCraftingPlan(Registry.ITEM.getId(tool));
+                for (CraftingProcess process : plan.processes) {
+                    if (nodes.contains(process.getNode()))
+                        continue;
+                    toolProcesses.add(process);
+                }
+            }
+            return List.of(new ChoiceNode(target, 0, toolProcesses));
         }
-    }
-
-    private int getMultiplicity(List<CraftingProcess> processes) {
-        int res = 0;
-        for (CraftingProcess process : processes) {
-            res += process.getMultiplicity();
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.0;
+            for (Node child : children) {
+                child.calculateEfficiencyHeuristic(1);
+                efficiencyHeuristic += child.efficiencyHeuristic;
+            }
         }
-        return res;
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            if (children.size() == 0)
+                return new Pair<>(true, res);
+            Set<Item> possibleTools = toolManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
+            for (Integer id : state.toolAvailability.keySet()) {
+                if (id <= nodeId && possibleTools.contains(state.toolAvailability.get(id))) {
+                    return new Pair<>(true, res);
+                }
+            }
+            for (Item item : state.inventoryAvailability.keySet()) {
+                if (possibleTools.contains(item) && state.inventoryAvailability.get(item) > 0) {
+                    state.inventoryAvailability.put(item, state.inventoryAvailability.get(item) - 1);
+                    state.toolAvailability.put(nodeId, item);
+                }
+            }
+            for (Node child : children) {
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, new HashMap<>());
+                res.putAll(childRes.getRight());
+            }
+            for (Node n : children.get(0).children) {
+                if (neededMap.getOrDefault(n.nodeId, 0) > 0) {
+                    state.toolAvailability.put(nodeId, n.target);
+                    break;
+                }
+            }
+            return new Pair<>(true, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = 0;
+            for (Node child : children) {
+                child.genNaiveMaxCraftable(state);
+                naiveMaxCraftable += child.naiveMaxCraftable;
+            }
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            for (Node child : children) {
+                if (!child.execute()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
     }
 
     private boolean usingCraftingTable() {
@@ -1305,63 +1735,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof PlayerScreenHandler;
     }
 
-    private Node makeRootNode(Identifier identifier, int numNeeded) {
-        Item item = Registry.ITEM.get(identifier);
-        List<CraftingProcess> processes = getProcesses(identifier);
-        return makeNode(null, new ItemStack(item, numNeeded), processes).setNeeded(numNeeded);
-    }
-
-    private Node makeNode(Node root, ItemStack stack, List<CraftingProcess> itemProcesses) {
-        int newNeeded = 0;
-        if (root != null && !(root instanceof ChoiceNode)) {
-            newNeeded = new Fraction(root.getNeededToCraft(0) * stack.getCount(), root.getOutputCount()).ceil();
-        }
-        int multiplicity = getMultiplicity(itemProcesses);
-        Node node = null;
-        if (multiplicity > 1 && !(root instanceof ChoiceNode)) {
-            node = new ChoiceNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-        }
-        else if (multiplicity == 0 || itemProcesses.get(0) instanceof RecipeCraftingProcess) {
-            node = new RecipeNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-        }
-        else if (itemProcesses.get(0) instanceof StorageCraftingProcess) {
-            node = new StorageNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-        }
-        else if (itemProcesses.get(0) instanceof WorldCraftingProcess) {
-            node = new WorldNode(stack.getItem(), newNeeded, itemProcesses.size() > 0 ? itemProcesses : null);
-        }
-        return node;
-    }
-
-    private List<Node> getChildren(Node root, HashSet<Node> nodes) {
-        List<Node> children = new ArrayList<>();
-        List<CraftingProcess> processes = root.processes;
-        if (processes == null)
-            return children;
-        if (root instanceof ChoiceNode) {
-            for (CraftingProcess process : processes) {
-                int m = process.getMultiplicity();
-                ArrayList<CraftingProcess> processList = new ArrayList<>();
-                processList.add(process);
-                for (int i = 0; i < m; i++) {
-                    Node child = makeNode(root, new ItemStack(root.target, root.needed), processList).setStackShift(i).setNeeded(root.needed);
-                    children.add(child);
-                }
-            }
-            return children;
-        }
-        else {
-            HashMap<Item, ItemStack> ingredients = root.collectIngredients();
-            for (ItemStack stack : ingredients.values()) {
-                Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
-                List<CraftingProcess> itemProcesses = getProcesses(itemIdentifier);
-                Node child = makeNode(root, stack, itemProcesses);
-                if (!nodes.contains(child)) {
-                    children.add(child);
-                }
-            }
-            return children;
-        }
+    private Node makeRootNode(Identifier identifier) {
+        return getCraftingPlan(identifier).getNode();
     }
 
     private class CraftingQueueEntry {
@@ -1375,13 +1750,38 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private enum ResourceDomain {
+        INVENTORY, STORAGE, WORLD
+    }
+
     public void queueCraft(Identifier itemId, int count, boolean craftAll) {
         synchronized(craftingQueue) {
             craftingQueue.add(new CraftingQueueEntry(itemId, count, craftAll));
         }
     }
 
+    private void updateTotalInventoryAvailability() {
+        NotifyingRunnable updateRunnable = new NotifyingRunnable() {
+            @Override
+            protected void runInternal() {
+                synchronized (totalInventoryAvailabilityMap) {
+                    totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
+                }
+            }
+        };
+        updateRunnable.runUntilDone();
+    }
+
     public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
+        NotifyingRunnable updateRunnable = new NotifyingRunnable() {
+            @Override
+            protected void runInternal() {
+                synchronized (totalInventoryAvailabilityMap) {
+                    totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
+                }
+            }
+        };
+        updateRunnable.runWithoutWaiting();
         slotUpdateLock.lock();
         try {
             latestSlotUpdate = new SlotUpdateInfo(packet.getSlot(), packet.getItemStack());
@@ -1441,83 +1841,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         latestBlockPos = pos;
     }
 
-    // This could (should) be done in O(1) time by modifying verifyNode, but O(log n) time seems to work without lagging
-    private int getMaxCraftable(Identifier itemId, CraftingState state) {
-        int count = 1;
-        while (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
-            count *= 2;
-        }
-        count /= 2;
-        int increment = count / 2;
-        if (increment > 0)
-            count--;
-        while (increment > 0) {
-            if (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
-                count += increment;
-            }
-            else {
-                count -= increment;
-            }
-            increment /= 2;
-        }
-        if (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
-            while (makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
-                count++;
-            }
-            count--;
-        }
-        else {
-            while (!makeRootNode(itemId, count).verifyPreliminary(state.clone()).success) {
-                count--;
-            }
-        }
-        return count;
-    }
-
-    private int getMaxCraftable(Node node, CraftingState state) {
-        int originalNeeded = node.needed;
-        int count = 1;
-        while (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
-            count *= 2;
-        }
-        count /= 2;
-        int increment = count / 2;
-        if (increment > 0)
-            count--;
-        while (increment > 0) {
-            if (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
-                count += increment;
-            }
-            else {
-                count -= increment;
-            }
-            increment /= 2;
-        }
-        if (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
-            while (node.setNeeded(count).verifyPreliminary(state.clone()).success) {
-                count++;
-            }
-            count--;
-        }
-        else {
-            while (!node.setNeeded(count).verifyPreliminary(state.clone()).success) {
-                count--;
-            }
-        }
-        node.needed = originalNeeded;
-        return count;
-    }
-
     private void craft(Identifier itemId, int count, boolean craftAll) {
         isCurrentlyCrafting = true;
         new Thread(() -> {
             containerManager.updateContainers(worldQuery.getLocations(containerBlockTypes));
-            Node root = makeRootNode(itemId, craftAll ? 1 : count);
+            Node root = makeRootNode(itemId);
             Item item = Registry.ITEM.get(itemId);
             int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
             inventoryAvailabilityMap.put(item, 0);
+            root.craft(craftAll ? Integer.MAX_VALUE : count);
+            inventoryAvailabilityMap.put(item, inventoryAvailabilityMap.getOrDefault(item, 0) + initialCount);
+            /*Item item = Registry.ITEM.get(itemId);
+            int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
+            inventoryAvailabilityMap.put(item, 0);
             if (craftAll) {
-                root = makeRootNode(itemId, getMaxCraftable(itemId, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, worldAvailabilityMap, new HashSet<>())));
+                root = makeRootNode(itemId, getMaxCraftable(itemId, CraftingParams.VERIFY_AND_GENERATE, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, worldAvailabilityMap, new HashSet<>())));
             }
             CraftingState verificationState = root.verify();
             if (verificationState.success) {
@@ -1535,16 +1873,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     int finalCount = totalInventoryAvailabilityMap.getOrDefault(item, 0);
                     synchronized (craftingQueue) {
                         craftingQueue.remove(0);
-                        /*craftingQueue.get(0).count -= finalCount - initialCount;
-                        if (craftingQueue.get(0).count <= 0)
-                            craftingQueue.remove(0);*/
+                        //craftingQueue.get(0).count -= finalCount - initialCount;
+                        //if (craftingQueue.get(0).count <= 0)
+                        //    craftingQueue.remove(0);
                     }
                     inventoryAvailabilityMap.put(item, inventoryAvailabilityMap.getOrDefault(item, 0) + initialCount);
                     isCurrentlyCrafting = false;
                     return;
                 }
             }
-            inventoryAvailabilityMap.put(item, inventoryAvailabilityMap.getOrDefault(item, 0) + initialCount);
+            inventoryAvailabilityMap.put(item, inventoryAvailabilityMap.getOrDefault(item, 0) + initialCount);*/
             synchronized(craftingQueue) {
                 craftingQueue.remove(0);
             }
@@ -1575,8 +1913,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (craftingQueue.size() > 0) {
                     CraftingQueueEntry entry = craftingQueue.get(0);
                     if (doneCrafting) {
-                        totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
-                        inventoryAvailabilityMap = (HashMap<Item, Integer>) totalInventoryAvailabilityMap.clone();
+                        synchronized (totalInventoryAvailabilityMap) {
+                            totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
+                            inventoryAvailabilityMap = (HashMap<Item, Integer>) totalInventoryAvailabilityMap.clone();
+                        }
                         storageAvailabilityMap = containerQuery.getAvailabilityMap();
                         worldAvailabilityMap = worldQuery.getAvailabilityMap();
                         nearestBlockPosMap = worldQuery.getNearestPositions();
