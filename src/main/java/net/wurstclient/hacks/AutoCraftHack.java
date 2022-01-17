@@ -1,6 +1,5 @@
 package net.wurstclient.hacks;
 
-import baritone.api.BaritoneAPI;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -14,14 +13,15 @@ import net.minecraft.recipe.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -31,13 +31,11 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
-import javax.tools.Tool;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -77,6 +75,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private ContainerManager containerManager = new ContainerManager();
     private ToolManager toolManager = new ToolManager();
+    private BlockManager blockManager = new BlockManager();
+    private InventoryManager inventoryManager = new InventoryManager();
 
     public AutoCraftHack() {
         super("AutoCraft");
@@ -176,6 +176,48 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             return false;
+        }
+    }
+
+    private class BlockManager {
+        public BlockManager() { }
+        public BlockPos getNearestPlaceablePosition() {
+            int range = 5;
+            double closestLength = Double.POSITIVE_INFINITY;
+            BlockPos closestBlockPos = null;
+            Vec3d playerPos = MC.player.getPos();
+            BlockState state = Registry.BLOCK.get(new Identifier("minecraft", "stone")).getDefaultState();
+            for (int x = (int)playerPos.x - range; x <= (int)playerPos.x + range; x++) {
+                for (int y = (int)playerPos.y - range; y <= (int)playerPos.y + range; y++) {
+                    for (int z = (int)playerPos.z - range; z <= (int)playerPos.z + range; z++) {
+                        if (playerPos.subtract(new Vec3d(x, y, z)).length() > range)
+                            continue;
+                        BlockPos currentPos = new BlockPos(x, y, z);
+                        if (MC.player.getBoundingBox().intersects(state.getOutlineShape(MC.world, currentPos).getBoundingBox().offset(currentPos)))
+                            continue;
+                        BlockHitResult hitResult = new BlockHitResult(Vec3d.ZERO, Direction.UP, currentPos.down(), false);
+                        if (MC.world.getBlockState(currentPos.down()).onUse(MC.world, MC.player, Hand.MAIN_HAND, hitResult).isAccepted())
+                            continue;
+                        if (MC.world.getBlockState(currentPos).isAir() &&
+                                !MC.world.getBlockState(currentPos.down()).isAir() &&
+                                BlockUtils.canBeClicked(currentPos.down())) {
+                            double distance = new Vec3d(x, y, z).subtract(playerPos).lengthSquared();
+                            if (distance < closestLength) {
+                                closestLength = distance;
+                                closestBlockPos = currentPos;
+                            }
+                        }
+                    }
+                }
+            }
+            return closestBlockPos;
+        }
+        public void placeBlock(Item block, BlockPos pos) {
+            containerManager.openInventory();
+            inventoryManager.equipItem(block, 0);
+            inventoryManager.selectHotbarSlot(0);
+            containerManager.closeScreen();
+            IMC.getInteractionManager().rightClickBlock(pos.down(), Direction.UP, Vec3d.ZERO);
         }
     }
 
@@ -713,6 +755,51 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private class PathingCraftingProcess extends CraftingProcess {
+        private Block block;
+        public PathingCraftingProcess(Block block) {
+            this.block = block;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new PathingNode(block.asItem(), 0, List.of(this));
+        }
+    }
+
+    private class PlacementCraftingProcess extends CraftingProcess {
+        private Block block;
+        public PlacementCraftingProcess(Block block) {
+            this.block = block;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new PlacementNode(block.asItem(), 0, List.of(this));
+        }
+    }
+
+    private class WorkbenchCraftingProcess extends CraftingProcess {
+        private Block block;
+        public WorkbenchCraftingProcess(Block block) {
+            this.block = block;
+        }
+        @Override
+        public int getMultiplicity() {
+            return 1;
+        }
+        @Override
+        public Node getNode() {
+            return new WorkbenchNode(block.asItem(), 0, List.of(this));
+        }
+    }
+
     private class ToolCraftingProcess extends CraftingProcess {
         private Block block;
         public ToolCraftingProcess(Block block) {
@@ -724,7 +811,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public Node getNode() {
-            return new AuxiliaryNode(block.asItem(), 0, List.of(this));
+            return new ToolNode(block.asItem(), 0, List.of(this));
         }
     }
 
@@ -826,6 +913,37 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         public HashMap<Block, HashSet<BlockPos>> getContainers() {
             return containers;
+        }
+    }
+
+    private class InventoryManager {
+        public InventoryManager() { }
+        public int getHotbarSlot(int i) {
+            return getStartingSlot() + 27 + i;
+        }
+        public int getStartingSlot() {
+            return MC.player.currentScreenHandler.slots.size() - 37;
+        }
+        public void leftClickSlot(int slot) {
+            MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 0, SlotActionType.PICKUP, MC.player);
+        }
+        public void swapSlots(int slot1, int slot2) {
+            leftClickSlot(slot1);
+            leftClickSlot(slot2);
+            leftClickSlot(slot1);
+        }
+        public void equipItem(Item item, int hotbarSlot) {
+            for (int i = getStartingSlot(); i < getStartingSlot() + 36; i++) {
+                if (!MC.player.currentScreenHandler.slots.get(i).hasStack())
+                    continue;
+                if (MC.player.currentScreenHandler.slots.get(i).getStack().getItem().equals(item)) {
+                    swapSlots(i, getHotbarSlot(hotbarSlot));
+                    break;
+                }
+            }
+        }
+        public void selectHotbarSlot(int slot) {
+            MC.player.getInventory().selectedSlot = slot;
         }
     }
 
@@ -1180,6 +1298,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Node child = plan.getNode();
                 res.add(child);
             }
+            if (!((RecipeCraftingProcess) processes.get(0)).recipe.fits(2, 2)) {
+                Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
+                res.add(new WorkbenchCraftingProcess(craftingTable).getNode());
+            }
             return res;
         }
         @Override
@@ -1188,7 +1310,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             HashMap<Item, ItemStack> ingredients = collectIngredients();
             for (Node child : children) {
-                child.calculateEfficiencyHeuristic((int)Math.ceil((double)(amount * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount()));
+                if (child instanceof WorkbenchNode)
+                    child.calculateEfficiencyHeuristic(1);
+                else
+                    child.calculateEfficiencyHeuristic((int)Math.ceil((double)(amount * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount()));
                 efficiencyHeuristic += child.efficiencyHeuristic;
             }
         }
@@ -1199,7 +1324,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             HashMap<Item, ItemStack> ingredients = collectIngredients();
             int neededToCraft = getNeededToCraft(numNeeded);
             for (Node child : children) {
-                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount(), excess, neededMap, state, useHeuristic);
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(child instanceof WorkbenchNode ? 1 : ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount()), excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, res);
                 res.putAll(childRes.getRight());
@@ -1216,6 +1341,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int outputFactor = Integer.MAX_VALUE;
             HashMap<Item, ItemStack> ingredients = collectIngredients();
             for (Node child : children) {
+                if (child instanceof WorkbenchNode)
+                    continue;
                 int inputAmount = ingredients.get(child.target).getCount();
                 int outputAmount = ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount();
                 int maxCraftable = child.naiveMaxCraftable;
@@ -1391,7 +1518,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             for (Node child : children) {
                 if (child.naiveMaxCraftable == 0)
                     continue;
-                int amt = Math.min(amount, child.naiveMaxCraftable);
+                int amt = Math.min(amount, smallestNaiveMaxCraftable);
                 child.calculateEfficiencyHeuristic(amt);
                 timePerItem.add(new Pair<>(child, child.efficiencyHeuristic / amt));
             }
@@ -1399,8 +1526,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             for (Pair<Node, Double> p : timePerItem) {
                 if (amount == 0)
                     break;
-                Node n = p.getLeft();
-                int m = Math.min(amount, n.naiveMaxCraftable);
+                int m = Math.min(amount, smallestNaiveMaxCraftable);
                 amount -= m;
                 efficiencyHeuristic += m * p.getRight();
             }
@@ -1624,10 +1750,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean execute() {
             if (!block.getDefaultState().isToolRequired())
                 return worldQuery.acquire(block, needed);
-            for (Node child : children) {
-                if (!child.execute())
-                    return false;
-            }
             if (!toolManager.canMine(block))
                 return false;
             return worldQuery.acquire(block, needed);
@@ -1638,8 +1760,173 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class AuxiliaryNode extends Node {
-        public AuxiliaryNode(Item target, int needed, List<CraftingProcess> processes) {
+    private class PathingNode extends Node {
+        public PathingNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            return new ArrayList<>();
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            Vec3d playerPos = MC.player.getPos();
+            Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
+            BlockPos nearestPos = nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN);
+            efficiencyHeuristic = new Vec3d(nearestPos.getX(), nearestPos.getY(), nearestPos.getZ()).subtract(playerPos).length() / MC.player.getMovementSpeed();
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            return new Pair<>(true, new HashMap<>());
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
+            naiveMaxCraftable = state.worldAvailability.getOrDefault(targetBlock, 0);
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
+            return pathFinder.path(nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN));
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
+    }
+
+    private class PlacementNode extends Node {
+        public PlacementNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            CraftingPlan plan = getCraftingPlan(Registry.ITEM.getId(target));
+            List<CraftingProcess> processes = new ArrayList<>();
+            for (CraftingProcess process : plan.processes) {
+                if (!(process instanceof WorldCraftingProcess)) {
+                    processes.add(process);
+                }
+            }
+            return List.of(new ChoiceNode(target, 0, processes));
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.1;
+            for (Node child : children) {
+                child.calculateEfficiencyHeuristic(amount);
+                efficiencyHeuristic += child.efficiencyHeuristic;
+            }
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            for (Node child : children) {
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, new HashMap<>());
+                res.putAll(childRes.getRight());
+            }
+            return new Pair<>(true, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = 0;
+            for (Node child : children) {
+                child.genNaiveMaxCraftable(state);
+                naiveMaxCraftable += child.naiveMaxCraftable;
+            }
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            BlockPos pos =  blockManager.getNearestPlaceablePosition();
+            blockManager.placeBlock(target, pos);
+            containerManager.addContainer(((PlacementCraftingProcess) processes.get(0)).block, pos);
+            return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
+    }
+
+    private class WorkbenchNode extends Node {
+        public WorkbenchNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            List<CraftingProcess> processes = new ArrayList<>();
+            processes.add(new PathingCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
+            processes.add(new PlacementCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
+            return List.of(new ChoiceNode(target, 0, processes));
+        }
+        @Override
+        protected void calculateEfficiencyHeuristic(int amount) {
+            efficiencyHeuristic = 0.0;
+            for (Node child : children) {
+                child.calculateEfficiencyHeuristic(amount);
+                efficiencyHeuristic += child.efficiencyHeuristic;
+            }
+        }
+        @Override
+        protected Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            HashMap<Integer, Pair<Integer, ResourceDomain>> res = new HashMap<>();
+            for (Node child : children) {
+                Pair<Boolean, HashMap<Integer, Pair<Integer, ResourceDomain>>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, new HashMap<>());
+                res.putAll(childRes.getRight());
+            }
+            return new Pair<>(true, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            naiveMaxCraftable = 0;
+            for (Node child : children) {
+                child.genNaiveMaxCraftable(state);
+                naiveMaxCraftable += child.naiveMaxCraftable;
+            }
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return false;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            return new HashMap<>();
+        }
+        @Override
+        public boolean execute() {
+            return true;
+        }
+        @Override
+        public int getOutputCount() {
+            return 1;
+        }
+    }
+
+    private class ToolNode extends Node {
+        public ToolNode(Item target, int needed, List<CraftingProcess> processes) {
             super(target, needed, processes);
         }
         @Override
@@ -1714,11 +2001,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public boolean execute() {
-            for (Node child : children) {
-                if (!child.execute()) {
-                    return false;
-                }
-            }
             return true;
         }
         @Override
