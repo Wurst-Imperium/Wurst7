@@ -53,7 +53,7 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

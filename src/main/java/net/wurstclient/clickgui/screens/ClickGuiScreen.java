@@ -23,7 +23,7 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

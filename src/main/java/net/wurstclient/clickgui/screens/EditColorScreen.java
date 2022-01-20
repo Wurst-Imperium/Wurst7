@@ -294,7 +294,7 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}
