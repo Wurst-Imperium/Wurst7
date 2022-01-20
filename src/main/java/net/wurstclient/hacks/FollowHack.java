@@ -351,20 +351,20 @@ public final class FollowHack extends Hack
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.jumpKey.setPressed(false);
 			}
 			
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			MC.options.keyForward
+			MC.options.forwardKey
 				.setPressed(MC.player.squaredDistanceTo(entity.getX(),
 					MC.player.getY(), entity.getZ()) > distanceSq);
 		}

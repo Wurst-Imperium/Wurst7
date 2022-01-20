@@ -44,7 +44,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
-		KeyBinding sneak = MC.options.keySneak;
+		KeyBinding sneak = MC.options.sneakKey;
 		sneak.setPressed(((IKeyBinding)sneak).isActallyPressed());
 	}
 	
@@ -55,7 +55,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 		if(timer < 10 - twerkSpeed.getValueI())
 			return;
 		
-		MC.options.keySneak.setPressed(!MC.options.keySneak.isPressed());
+		MC.options.sneakKey.setPressed(!MC.options.sneakKey.isPressed());
 		timer = -1;
 	}
 }
