@@ -127,7 +127,7 @@
   "description.wurst.hack.tillaura": "自動將泥土、草塊、諸如此類。轉化為耕地。\n不要和Killaura搞混。",
   "description.wurst.hack.timer": "改變大部分東西的速度。",
   "description.wurst.hack.tired": "讓你看起來很像2015年的Alexander。\n僅限其他玩家可視。",
-  "description.wurst.hack.toomanyhax": "關閉那些你並不想要使用的功能。\n讓你確保你不會不小心開啟錯誤的作弊功能導致被服務器封禁。\n這個是給那些“只想作弊一點點的用戶”。 \n\n使用指令§6. toomanyhax§r來選擇哪些功能需要被遮罩。 \n輸入§6. help toomanyhax§r尋求更多。 ",
+  "description.wurst.hack.toomanyhax": "關閉那些你並不想要使用的功能。\n讓你確保你不會不小心開啟錯誤的作弊功能導致被服務器封禁。\n這個是給那些“只想作弊一點點的用戶”。\n\n使用指令§6. toomanyhax§r來選擇哪些功能需要被遮罩。\n輸入§6. help toomanyhax§r尋求更多。",
   "description.wurst.hack.tp-aura": "自動傳送到實體附近並自動攻擊他。",
   "description.wurst.hack.trajectories": "預測箭和投擲物品的飛行路徑。",
   "description.wurst.hack.treebot": "一個實驗性的機器人將會在樹木附近砍樹。\n現時僅限於砍小樹。",
