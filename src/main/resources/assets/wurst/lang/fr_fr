@@ -81,7 +81,7 @@
   "description.wurst.hack.masstpa": "Envoie une requête TPA à tous les joueurs.\nS'arrête si quelqu'un accepte.",
   "description.wurst.hack.mileycyrus": "Vous fait twerker.",
   "description.wurst.hack.mobesp": "Met en évidence les monstres à proximité.",
-  "description.wurst.hack.mobspawnesp": "Met en évidence les zones où les monstres peuvent apparaître.\n§eyellow§r - les monstres peuvent apparaître la nuit\n§cred§r - les monstres peuvent toujours apparaître",
+  "description.wurst.hack.mobspawnesp": "Met en évidence les zones où les monstres peuvent apparaître.\n§ejaune§r - les monstres peuvent apparaître la nuit\n§crouge§r - les monstres peuvent toujours apparaître",
   "description.wurst.hack.multiaura": "Killaura plus rapide qui attaque plusieurs entités à la fois.",
   "description.wurst.hack.nameprotect": "Masque tous les noms de joueurs.",
   "description.wurst.hack.nametags": "Modifie l'échelle des nametags de nom afin que vous puissiez toujours les lire. Vous permet également de voir les nametags des joueurs accroupis.",
