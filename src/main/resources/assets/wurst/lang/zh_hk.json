@@ -1,6 +1,6 @@
 {
-  "description.wurst.hack.anchoraura": "自动放置（可选），充能，引爆重生锚并击杀你附近的实体。",
-  "description.wurst.hack.antiafk": "随机走动，用于避免服务器挂机检测。\n需要至少有 3x3 的区域可以走动。",
+  "description.wurst.hack.anchoraura": "自動放置（可選），充能，引爆重生錨並且擊殺你附近嘅實體。",
+  "description.wurst.hack.antiafk": "隨便行，避免被伺服器掛機檢查。\n需 3x3 嘅區域。",
   "description.wurst.hack.antiblind": "防止失明。\n与 OptiFine（即高清修复）不兼容。",
   "description.wurst.hack.anticactus": "保护你免受仙人掌伤害。",
   "description.wurst.hack.antiknockback": "保护你不会被其他生物或玩家推动和用剑击退。",
