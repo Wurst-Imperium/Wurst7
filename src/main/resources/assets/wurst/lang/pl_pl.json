@@ -15,7 +15,7 @@
   "description.wurst.hack.autofarm": "Automatycznie zbiera i przesadza plony.\nDziała z pszenicą, marchewką, ziemniakami, burakami, dyniami, arbuzami, kaktusami, trzciną cukrową, wodorostami, bambusem, netherowymi brodawkami i ziarnami kakao.",
   "description.wurst.hack.autofish": "Automatycznie łowi ryby, korzystając z twojej najlepszej wędki. Jeśli podczas łowienia znajdzie lepszą wędkę, automatycznie się na nią przełączy.",
   "description.wurst.hack.automine": "Automatycznie wykopuje każdy blok, na który patrzysz.",
-  "description.wurst.hack.autopotion": "Automatycznie rzuca miotane mikstury leczenia, gdy masz mało życia",
+  "description.wurst.hack.autopotion": "Automatycznie rzuca miotane mikstury leczenia, gdy masz mało życia.",
   "description.wurst.hack.autoreconnect": "Automatycznie łączy się ponownie, gdy zostaniesz wyrzucony z serwera.",
   "description.wurst.hack.autorespawn": "Automatycznie odradza się, kiedy umrzesz.",
   "description.wurst.hack.autosign": "Natychmiast zapisuje dowolny tekst na każdym znaku, który postawisz. Po aktywacji, możesz pisać normalnie na pierwszym znaku, w celu określenia tekstu dla wszystkich innych znaków.",
