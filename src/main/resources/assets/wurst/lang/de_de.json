@@ -35,6 +35,13 @@
   "description.wurst.hack.bowaimbot": "Zielt automatisch mit deinem Bogen oder deiner Armbrust.",
   "description.wurst.hack.buildrandom": "Platziert zufällig Blöcke um dich herum.",
   "description.wurst.hack.bunnyhop": "Lässt dich automatisch hüpfen.",
+  "description.wurst.hack.cameranoclip": "Ermöglicht der Kamera in der Dritte-Person-Perspektive, durch Wände zu gehen.",
+  "description.wurst.hack.cavefinder": "Hilft dir, Höhlen zu finden, indem sie in der ausgewählten Farbe hervorgehoben werden.",
+  "description.wurst.hack.chattranslator": "Übersetzt eingehende Chat-Nachrichten mit Google Translate.",
+  "description.wurst.hack.chestesp": "Gibt Truhen in der Nähe hervor.",
+  "description.wurst.hack.clickaura": "Greift automatisch die nächstgelegene gültige Entität an, wenn du klickst.\n\n§c§lWARNUNG:§r ClickAuras sehen im Allgemeinen verdächtiger aus als Killauras und sind für Plugins leichter zu erkennen. Es wird empfohlen, stattdessen Killaura oder TriggerBot zu verwenden."
+  "description.wurst.hack.clickgui": "Fensterbasierte ClickGUI.",
+  "description.wurst.hack.crashchest": "Erstellt eine Truhe, die Leute im Wesentlichen vom Server bannt, wenn sie zu viele Kopien davon in derem Inventar haben. §c§lWARNUNG:§r §cDas kann nicht rückgängig gemacht werden. Mit Vorsicht verwenden!§r\n\nWenn Kopien stattdessen in eine Truhe gelegt werden, wird jeder, der die Truhe öffnet, vom Server geworfen (nur einmal).",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen.",
   "description.wurst.altmanager.premium": "Dieser Alt hat ein Passwort und kann allen Servern beitreten.",
   "description.wurst.altmanager.cracked": "Dieser Alt hat kein Passwort und funktioniert nur auf cracked Servern.",
