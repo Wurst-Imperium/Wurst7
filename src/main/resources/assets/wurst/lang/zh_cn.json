@@ -150,6 +150,7 @@
   "description.wurst.hack.tired": "让你看起来很像 2015 年 4 月的 Alexander。\n仅限其他玩家可见。",
   "description.wurst.hack.toomanyhax": "屏蔽那些你并不想要有的功能。\n确保你不会不小心开启错误的作弊功能导致被服务器封禁。\n这个是给那些 “只想轻度作弊的用户”。\n\n使用指令 §6.toomanyhax§r 来选择哪些功能需要被屏蔽。\n输入 §6.help toomanyhax§r 查看详细信息。",
   "description.wurst.hack.tp-aura": "自动传送到实体附近并自动攻击。",
+  "description.wurst.hack.tps-display": "推测并且显示服务器游戏刻(TPS)。",
   "description.wurst.hack.trajectories": "预测箭和投掷物品的飞行路径。",
   "description.wurst.hack.treebot": "实验性的自动砍树机器人。\n目前仅限于砍小树。",
   "description.wurst.hack.triggerbot": "自动攻击准星所指的实体。",

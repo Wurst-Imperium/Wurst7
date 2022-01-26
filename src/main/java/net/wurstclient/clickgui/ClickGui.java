@@ -103,6 +103,7 @@ public final class ClickGui
 			window.setMinimized(true);
 		
 		windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
+		windows.add(WurstClient.INSTANCE.getHax().tpsDisplayHack.getWindow());
 		
 		int x = 5;
 		int y = 5;
