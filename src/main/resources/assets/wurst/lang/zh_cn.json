@@ -128,6 +128,7 @@
   "description.wurst.hack.rainbowui": "§c让§a每§9一§c样§a都§9充§c满§a五§9彩§c斑§a斓§9的§c样§a子§9，§c包§a括§9你§c当§a前§9所§c在 §aU§9I",
   "description.wurst.hack.reach": "允许你碰到更远的距离。",
   "description.wurst.hack.remoteview": "允许你以另一个视角观看世界。\n使用 .rv 指令来指定一个特定的实体。",
+  "description.wurst.hack.restock": "自动从背包中取出指定物品来补充手中的消耗，建议与 FastPlace 一起使用。",
   "description.wurst.hack.safewalk": "防止你从方块边缘摔落。",
   "description.wurst.hack.scaffoldwalk": "自动在你的脚下搭方块。",
   "description.wurst.hack.search": "帮助你找到所需要的方块并以彩虹色的方式高亮。",
