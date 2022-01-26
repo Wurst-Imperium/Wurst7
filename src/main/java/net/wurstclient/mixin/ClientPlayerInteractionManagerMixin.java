@@ -101,7 +101,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
 	}
-	
+
 	@Override
 	public void windowClick_THROW(int slot)
 	{
