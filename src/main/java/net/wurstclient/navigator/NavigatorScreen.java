@@ -189,7 +189,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean isPauseScreen()
+	public final boolean shouldPause()
 	{
 		return false;
 	}
