@@ -135,5 +135,14 @@
     "description.wurst.hack.trollpotion": "Gera uma poção com efeitos insuportáveis.",
     "description.wurst.hack.truesight": "Te permite ver entidades invisíveis.",
     "description.wurst.hack.tunneller": "Automaticamente cava túneis.\n\n§c§lAVISO:§r Mesmo que o robô evite lava e outros perigos, não há garantia de sobrevivência durante longos períodos de tempo. Use apenas com itens que você não se importa em perder.",
-    "description.wurst.hack.x-ray": "Te permite ver minérios através de blocos e paredes."
+    "description.wurst.hack.x-ray": "Te permite ver minérios através de blocos e paredes.",
+    "description.wurst.altmanager.premium": "Esta conta alternativa contém senha, e pode entrar em todos servidores",
+    "description.wurst.altmanager.cracked": "Esta conta alternativa não contém senha, e funcionará apenas em servidores pirata.",
+    "description.wurst.altmanager.failed": "A última vez que você tentou ultilizar esta conta alternativa, não funcionou.",
+    "description.wurst.altmanager.checked": "Esta senha funcionou no passado.",
+    "description.wurst.altmanager.unchecked": "Você nunca conseguiu entrar nesta conta alternativa com êxito.",
+    "description.wurst.altmanager.favorite": "Você marcou esta conta como uma de suas favoritas.",
+    "description.wurst.altmanager.window": "Este botão abre outra janela.",
+    "description.wurst.altmanager.window_freeze": "O jogo talvez pareça não responder enquanto a janela estiver aberta.",
+    "description.wurst.altmanager.fullscreen": "§cSaia do modo tela cheia!"
   }
