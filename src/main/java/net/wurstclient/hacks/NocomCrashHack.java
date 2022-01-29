@@ -28,7 +28,7 @@ import net.wurstclient.util.ChatUtils;
 public final class NocomCrashHack extends Hack {
 	Random rand = new Random();
 
-	private final SliderSetting packets = new SliderSetting("Number of packets", 500, 1, 5000, 1, ValueDisplay.INTEGER);
+	private final SliderSetting packets = new SliderSetting("Number of packets", 500, 1, 1000, 1, ValueDisplay.INTEGER);
 
 	public NocomCrashHack() {
 		super("NocomCrash");
