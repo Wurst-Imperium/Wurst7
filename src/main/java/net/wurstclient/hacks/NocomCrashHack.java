@@ -24,8 +24,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
 
-@SearchTags({ "server crasher", "nocom crash",
-		"1.18.1" })
+@SearchTags({ "server crasher", "nocom crash", "lag" })
 public final class NocomCrashHack extends Hack {
 	Random rand = new Random();
 
