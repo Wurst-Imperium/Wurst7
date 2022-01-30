@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,8 +35,10 @@ public class PathPos extends BlockPos
 		if(this == obj)
 			return true;
 		
-		if(!(obj instanceof PathPos node))
+		if(!(obj instanceof PathPos))
 			return false;
+		
+		PathPos node = (PathPos)obj;
 		
 		return getX() == node.getX() && getY() == node.getY()
 			&& getZ() == node.getZ() && isJumping() == node.isJumping();

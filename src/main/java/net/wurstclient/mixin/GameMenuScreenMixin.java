@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -74,9 +74,10 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private boolean isFeedbackOrBugReportButton(Object element)
 	{
-		if(element == null || !(element instanceof ClickableWidget button))
+		if(element == null || !(element instanceof ClickableWidget))
 			return false;
 		
+		ClickableWidget button = (ClickableWidget)element;
 		String message = button.getMessage().getString();
 		
 		return message != null

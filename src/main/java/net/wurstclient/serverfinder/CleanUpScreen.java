@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -221,12 +221,15 @@ public class CleanUpScreen extends Screen
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
 			
-			if(!button.isHovered()
-				|| !(button instanceof CleanUpButton cuButton))
+			ClickableWidget button = (ClickableWidget)d;
+			
+			if(!button.isHovered() || !(button instanceof CleanUpButton))
 				continue;
+			
+			CleanUpButton cuButton = (CleanUpButton)button;
 			
 			if(cuButton.tooltip.isEmpty())
 				continue;

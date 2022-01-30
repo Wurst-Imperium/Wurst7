@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -221,7 +221,7 @@ public final class TunnellerHack extends Hack
 				case 4 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			}
 			
-			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			buffer.setShader(viewMatrix, projMatrix, shader);
@@ -711,6 +711,7 @@ public final class TunnellerHack extends Hack
 	
 	private class PlaceTorchTask extends Task
 	{
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean canRun()
 		{
@@ -751,7 +752,9 @@ public final class TunnellerHack extends Hack
 			BlockState state = BlockUtils.getState(nextTorch);
 			if(!state.getMaterial().isReplaceable())
 				return false;
-			
+				
+			// Can't see why canPlaceAt() is deprecated. Still seems to be
+			// widely used with no replacement.
 			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
 		}
 		

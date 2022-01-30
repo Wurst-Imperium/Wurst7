@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -90,9 +90,10 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		double stepHeight = -1;
 		
-		ArrayList<Box> blockCollisions = MC.world
-			.getBlockCollisions(player, box).map(VoxelShape::getBoundingBox)
-			.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Box> blockCollisions =
+			IMC.getWorld().getBlockCollisionsStream(player, box)
+				.map(VoxelShape::getBoundingBox)
+				.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(Box bb : blockCollisions)
 			if(bb.maxY > stepHeight)

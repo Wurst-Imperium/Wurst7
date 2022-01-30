@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -98,10 +98,8 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		Box bb = new Box(-2, -1, -2, 3, 2, 3);
 		
 		if(isInOpenWater(bobber))
-		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-			
-		}else
+		else
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			RenderUtils.drawCrossBox(bb, matrixStack);

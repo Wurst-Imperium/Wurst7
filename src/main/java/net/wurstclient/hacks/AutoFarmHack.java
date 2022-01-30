@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -201,7 +201,7 @@ public final class AutoFarmHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		Matrix4f viewMatrix = matrixStack.peek().getModel();
+		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		Shader shader = RenderSystem.getShader();
 		
@@ -280,19 +280,19 @@ public final class AutoFarmHack extends Hack
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
-		else if(block instanceof CactusBlock)
+		if(block instanceof CactusBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
-		else if(block instanceof KelpPlantBlock)
+		if(block instanceof KelpPlantBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
-		else if(block instanceof NetherWartBlock)
+		if(block instanceof NetherWartBlock)
 			return state.get(NetherWartBlock.AGE) >= 3;
-		else if(block instanceof BambooBlock)
+		if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
-		else if(block instanceof CocoaBlock)
+		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;

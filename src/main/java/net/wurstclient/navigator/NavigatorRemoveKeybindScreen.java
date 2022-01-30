@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -22,6 +23,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
@@ -93,13 +95,21 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == 1)
+		if(keyCode == GLFW.GLFW_KEY_ESCAPE
+			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
 			client.setScreen(parent);
 	}
 	
 	@Override
 	protected void onMouseClick(double x, double y, int button)
 	{
+		// back button
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			WurstClient.MC.setScreen(parent);
+			return;
+		}
+		
 		// commands
 		if(!hoveredKey.isEmpty())
 		{
@@ -119,9 +129,12 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		// title bar
 		drawCenteredText(matrixStack, client.textRenderer, "Remove Keybind",
-			middleX, 32, 0xffffff);
+			middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -170,10 +183,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				key.replace("key.keyboard.", "") + ": "
 					+ keybind.getDescription(),
-				x1 + 1, y1 + 1, 0xffffff);
+				x1 + 1, y1 + 1, txtColor);
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				keybind.getCommand(), x1 + 1,
-				y1 + 1 + client.textRenderer.fontHeight, 0xffffff);
+				y1 + 1 + client.textRenderer.fontHeight, txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -182,7 +195,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		for(String line : text.split("\n"))
 		{
 			drawStringWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, 0xffffff);
+				bgx1 + 2, textY, txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -193,8 +206,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		// buttons below scissor box
 		for(Drawable d : ((IScreen)this).getButtons())
 		{
-			if(!(d instanceof ClickableWidget button))
+			if(!(d instanceof ClickableWidget))
 				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
 			int x1 = button.x;
@@ -216,8 +231,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// text
 			drawCenteredText(matrixStack, client.textRenderer,
-				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
-				0xffffff);
+				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
+				txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}
@@ -233,5 +248,11 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	protected void onMouseRelease(double x, double y, int button)
 	{
 		
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 }

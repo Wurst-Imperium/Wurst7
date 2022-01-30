@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -57,10 +57,12 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:lapis_block", "minecraft:lapis_ore", "minecraft:lava",
 		"minecraft:lodestone", "minecraft:mossy_cobblestone",
 		"minecraft:nether_gold_ore", "minecraft:nether_portal",
-		"minecraft:nether_quartz_ore", "minecraft:redstone_block",
-		"minecraft:redstone_ore", "minecraft:repeating_command_block",
-		"minecraft:spawner", "minecraft:tnt", "minecraft:torch",
-		"minecraft:trapped_chest", "minecraft:water");
+		"minecraft:nether_quartz_ore", "minecraft:raw_copper_block",
+		"minecraft:raw_gold_block", "minecraft:raw_iron_block",
+		"minecraft:redstone_block", "minecraft:redstone_ore",
+		"minecraft:repeating_command_block", "minecraft:spawner",
+		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
+		"minecraft:water");
 	
 	private ArrayList<String> oreNames;
 	private final String warning;

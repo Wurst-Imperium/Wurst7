@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -53,7 +53,7 @@ public final class HackListHUD implements UpdateListener
 				| (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
 			
 		}else
-			textColor = 0x04ffffff;
+			textColor = 0x04000000 | otf.getColor();
 		
 		int height = posY + activeHax.size() * 9;
 		Window sr = WurstClient.MC.getWindow();

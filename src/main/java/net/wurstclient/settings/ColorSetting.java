@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -51,6 +51,11 @@ public final class ColorSetting extends Setting
 		float green = color.getGreen() / 255F;
 		float blue = color.getBlue() / 255F;
 		return new float[]{red, green, blue};
+	}
+	
+	public int getColorI()
+	{
+		return color.getRGB();
 	}
 	
 	public int getRed()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
+import net.wurstclient.other_features.WurstLogoOtf;
 
 public final class WurstLogo
 {
@@ -31,7 +32,8 @@ public final class WurstLogo
 	
 	public void render(MatrixStack matrixStack)
 	{
-		if(!WurstClient.INSTANCE.getOtfs().wurstLogoOtf.isVisible())
+		WurstLogoOtf otf = WurstClient.INSTANCE.getOtfs().wurstLogoOtf;
+		if(!otf.isVisible())
 			return;
 		
 		String version = getVersionString();
@@ -45,7 +47,7 @@ public final class WurstLogo
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 			color = WurstClient.INSTANCE.getGui().getAcColor();
 		else
-			color = new float[]{1, 1, 1};
+			color = otf.getBackgroundColor();
 		
 		drawQuads(matrixStack, 0, 6, tr.getWidth(version) + 76, 17, color[0],
 			color[1], color[2], 0.5F);
@@ -53,7 +55,7 @@ public final class WurstLogo
 		// draw version string
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		tr.draw(matrixStack, version, 74, 8, 0xFF000000);
+		tr.draw(matrixStack, version, 74, 8, otf.getTextColor());
 		
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -76,7 +78,7 @@ public final class WurstLogo
 	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2,
 		float r, float g, float b, float a)
 	{
-		Matrix4f matrix = matrices.peek().getModel();
+		Matrix4f matrix = matrices.peek().getPositionMatrix();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

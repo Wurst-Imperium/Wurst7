@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -54,7 +55,9 @@ public final class ClickGui
 	
 	private float[] bgColor = new float[3];
 	private float[] acColor = new float[3];
+	private int txtColor;
 	private float opacity;
+	private float ttOpacity;
 	
 	private String tooltip = "";
 	
@@ -118,7 +121,7 @@ public final class ClickGui
 		JsonObject json;
 		try(BufferedReader reader = Files.newBufferedReader(windowsFile))
 		{
-			json = JsonUtils.JSON_PARSER.parse(reader).getAsJsonObject();
+			json = JsonParser.parseReader(reader).getAsJsonObject();
 			
 		}catch(NoSuchFileException e)
 		{
@@ -490,19 +493,15 @@ public final class ClickGui
 			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
 		}
 		
-		renderPopupsAndTooltip(matrixStack, mouseX, mouseY);
+		renderPopups(matrixStack, mouseX, mouseY);
+		renderTooltip(matrixStack, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopupsAndTooltip(MatrixStack matrixStack, int mouseX,
-		int mouseY)
+	public void renderPopups(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		
-		// popups
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -521,67 +520,71 @@ public final class ClickGui
 			
 			matrixStack.pop();
 		}
+	}
+	
+	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+	{
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		// tooltip
-		if(!tooltip.isEmpty())
+		if(tooltip.isEmpty())
+			return;
+		
+		String[] lines = tooltip.split("\n");
+		TextRenderer fr = MC.textRenderer;
+		
+		int tw = 0;
+		int th = lines.length * fr.fontHeight;
+		for(String line : lines)
 		{
-			String[] lines = tooltip.split("\n");
-			TextRenderer fr = MC.textRenderer;
-			
-			int tw = 0;
-			int th = lines.length * fr.fontHeight;
-			for(String line : lines)
-			{
-				int lw = fr.getWidth(line);
-				if(lw > tw)
-					tw = lw;
-			}
-			int sw = MC.currentScreen.width;
-			int sh = MC.currentScreen.height;
-			
-			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
-			int xt2 = xt1 + tw + 3;
-			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
-			int yt2 = yt1 + th + 2;
-			
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
-			
-			RenderSystem.setShader(GameRenderer::getPositionShader);
-			
-			// background
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				0.75F);
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
-			
-			// outline
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
-			
-			// text
-			for(int i = 0; i < lines.length; i++)
-				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 2 + i * fr.fontHeight, 0xffffff);
-			GL11.glEnable(GL11.GL_BLEND);
-			
-			matrixStack.pop();
+			int lw = fr.getWidth(line);
+			if(lw > tw)
+				tw = lw;
 		}
+		int sw = MC.currentScreen.width;
+		int sh = MC.currentScreen.height;
+		
+		int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
+		int xt2 = xt1 + tw + 3;
+		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
+		int yt2 = yt1 + th + 2;
+		
+		matrixStack.push();
+		matrixStack.translate(0, 0, 300);
+		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		// background
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			ttOpacity);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
+		// outline
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
+		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
+		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
+		// text
+		for(int i = 0; i < lines.length; i++)
+			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				txtColor);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		matrixStack.pop();
 	}
 	
 	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
@@ -605,7 +608,9 @@ public final class ClickGui
 		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
 		
 		opacity = clickGui.getOpacity();
-		bgColor = clickGui.getBgColor();
+		ttOpacity = clickGui.getTooltipOpacity();
+		bgColor = clickGui.getBackgroundColor();
+		txtColor = clickGui.getTextColor();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
@@ -615,7 +620,7 @@ public final class ClickGui
 			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
 			
 		}else
-			acColor = clickGui.getAcColor();
+			acColor = clickGui.getAccentColor();
 	}
 	
 	private void renderWindow(MatrixStack matrixStack, Window window,
@@ -627,7 +632,7 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -745,7 +750,7 @@ public final class ClickGui
 			
 			matrixStack.push();
 			matrixStack.translate(x1, y4, 0);
-			matrix = matrixStack.peek().getModel();
+			matrix = matrixStack.peek().getPositionMatrix();
 			
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
@@ -794,9 +799,12 @@ public final class ClickGui
 					partialTicks);
 			
 			matrixStack.pop();
-			matrix = matrixStack.peek().getModel();
+			matrix = matrixStack.peek().getPositionMatrix();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
+		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -827,7 +835,6 @@ public final class ClickGui
 		int y4 = y1 + 2;
 		int y5 = y3 - 2;
 		boolean hoveringY = mouseY >= y4 && mouseY < y5;
-		
 		if(window.isClosable())
 		{
 			x3 -= 11;
@@ -889,7 +896,7 @@ public final class ClickGui
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
 				.getString();
-		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
+		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -898,7 +905,7 @@ public final class ClickGui
 	{
 		int x3 = x2 + 2;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -944,7 +951,7 @@ public final class ClickGui
 	{
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xa1 = x1 + 1;
@@ -993,7 +1000,7 @@ public final class ClickGui
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		float h = hovering ? 1 : 0.85F;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		if(pinned)
@@ -1150,7 +1157,7 @@ public final class ClickGui
 	{
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xc1 = x1 + 2;
@@ -1215,6 +1222,11 @@ public final class ClickGui
 	public float[] getAcColor()
 	{
 		return acColor;
+	}
+	
+	public int getTxtColor()
+	{
+		return txtColor;
 	}
 	
 	public float getOpacity()

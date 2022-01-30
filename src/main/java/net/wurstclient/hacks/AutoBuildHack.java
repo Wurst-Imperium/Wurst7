@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -290,8 +290,10 @@ public final class AutoBuildHack extends Hack
 		HitResult hitResult = MC.crosshairTarget;
 		if(hitResult == null || hitResult.getPos() == null
 			|| hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult blockHitResult))
+			|| !(hitResult instanceof BlockHitResult))
 			return;
+		
+		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
 		
 		BlockPos hitResultPos = blockHitResult.getBlockPos();
 		if(!BlockUtils.canBeClicked(hitResultPos))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -218,14 +218,13 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		if(block instanceof CropBlock
 			&& ((CropBlock)block).isFertilizable(world, pos, state, true))
 			return crops.isChecked();
-		else if(block instanceof StemBlock
+		if(block instanceof StemBlock
 			&& ((StemBlock)block).isFertilizable(world, pos, state, true))
 			return stems.isChecked();
-		else if(block instanceof CocoaBlock
+		if(block instanceof CocoaBlock
 			&& ((CocoaBlock)block).isFertilizable(world, pos, state, true))
 			return cocoa.isChecked();
-		else
-			return other.isChecked();
+		return other.isChecked();
 	}
 	
 	private boolean rightClickBlockLegit(BlockPos pos)

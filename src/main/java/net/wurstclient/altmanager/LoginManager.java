@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.altmanager;
 
 import java.net.Proxy;
+import java.util.Optional;
 
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
@@ -35,7 +36,8 @@ public final class LoginManager
 			WurstClient.IMC
 				.setSession(new Session(auth.getSelectedProfile().getName(),
 					auth.getSelectedProfile().getId().toString(),
-					auth.getAuthenticatedToken(), "mojang"));
+					auth.getAuthenticatedToken(), Optional.empty(),
+					Optional.empty(), Session.AccountType.MOJANG));
 			return "";
 			
 		}catch(AuthenticationUnavailableException e)
@@ -60,6 +62,7 @@ public final class LoginManager
 	
 	public static void changeCrackedName(String newName)
 	{
-		WurstClient.IMC.setSession(new Session(newName, "", "", "mojang"));
+		WurstClient.IMC.setSession(new Session(newName, "", "",
+			Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -189,7 +189,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean isPauseScreen()
+	public final boolean shouldPause()
 	{
 		return false;
 	}
@@ -236,7 +236,7 @@ public abstract class NavigatorScreen extends Screen
 	protected final void drawQuads(MatrixStack matrixStack, int x1, int y1,
 		int x2, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -262,7 +262,7 @@ public abstract class NavigatorScreen extends Screen
 		float yi1 = y1 - 0.1F;
 		float yi2 = y2 + 0.1F;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -332,7 +332,7 @@ public abstract class NavigatorScreen extends Screen
 		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

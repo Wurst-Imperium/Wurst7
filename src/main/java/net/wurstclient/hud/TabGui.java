@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -127,6 +127,9 @@ public final class TabGui implements KeyPressListener
 		if(tabGuiOtf.isHidden())
 			return;
 		
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -155,7 +158,7 @@ public final class TabGui implements KeyPressListener
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
 			WurstClient.MC.textRenderer.draw(matrixStack, tabName, 2, textY,
-				0xffffffff);
+				txtColor);
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -190,7 +193,7 @@ public final class TabGui implements KeyPressListener
 					fName = ">" + fName;
 				
 				WurstClient.MC.textRenderer.draw(matrixStack, fName, 2,
-					tabTextY, 0xffffffff);
+					tabTextY, txtColor);
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
@@ -211,7 +214,7 @@ public final class TabGui implements KeyPressListener
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

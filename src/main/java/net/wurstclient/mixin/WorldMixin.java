@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,10 @@
 package net.wurstclient.mixin;
 
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +19,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.BlockEntityTickInvoker;
@@ -68,5 +74,13 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	public List<BlockEntityTickInvoker> getBlockEntityTickers()
 	{
 		return blockEntityTickers;
+	}
+	
+	@Override
+	public Stream<VoxelShape> getBlockCollisionsStream(@Nullable Entity entity,
+		Box box)
+	{
+		return StreamSupport
+			.stream(getBlockCollisions(entity, box).spliterator(), false);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -121,7 +121,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		
 		drawBackground(matrixStack, x1, x4, y1, y2);
 		drawBox(matrixStack, x2, x4, y1, y2, hBox);
@@ -149,7 +149,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		float[] bgColor = gui.getBgColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -172,7 +172,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		// background
@@ -203,7 +203,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
@@ -217,7 +217,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawArrow(MatrixStack matrixStack, int x2, int x3, int y1,
 		int y2, boolean hBox)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xa1 = x3 + 1;
@@ -263,14 +263,16 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
 		int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
-		int color = 0xF0F0F0;
 		
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x4 + 2, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x4 + 2, y1 + 2, txtColor);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

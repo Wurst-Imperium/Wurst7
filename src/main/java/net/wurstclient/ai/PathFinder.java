@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -288,9 +288,12 @@ public class PathFinder
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
+		// Can't see why isChunkLoaded() is deprecated. Still seems to be widely
+		// used with no replacement.
 		if(!WurstClient.MC.world.isChunkLoaded(pos))
 			return false;
 		
