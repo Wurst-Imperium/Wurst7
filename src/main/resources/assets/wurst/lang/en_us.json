@@ -88,7 +88,7 @@
   "description.wurst.hack.navigator": "A searchable GUI that learns your preferences over time.",
   "description.wurst.hack.nobackground": "Removes the dark background behind inventories.",
   "description.wurst.hack.noclip": "Allows you to freely move through blocks.\nA block (e.g. sand) must fall on your head to activate it.\n\n§c§lWARNING:§r You will take damage while moving through blocks!",
-  "description.wurst.hack.nocomcrash": "Lags servers using the nocom exploit.\nDoes not work on Paper servers. Tested working on vanilla, spigot, and fabric. Can be disabled by some anticheats.",
+  "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
