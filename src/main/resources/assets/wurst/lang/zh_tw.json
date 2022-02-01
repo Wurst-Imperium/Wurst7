@@ -109,7 +109,7 @@
   "description.wurst.hack.prophuntesp": "在躲猫猫小遊戲中知道哪些是人扮的方塊。\n用於Mineplex服務器的Prophunt（躲猫猫），其他服務器未必凑效。",
   "description.wurst.hack.protect": "使用AI模式保護最近的實體，並保護它免受其他實體的傷害。\n使用指令.protect來保護指定的實體，而不是最近的一個。",
   "description.wurst.hack.radar": "生成一個雷達UI並顯示附近的實體。\n§c紅色§r - 玩家\n§6橘色§r - 怪物\n§a綠色§r - 動物\n§7灰色§r - 其他",
-  "description.wurst.hack.rainbowui": "§c讓§a每§9一§c樣§a都§9充§c滿§a五§9彩§c斑§a斕§9的§c樣§a子§9，§c包§a括§9你§c當§a前§9所§c在§aU§9I",
+  "description.wurst.hack.rainbowui": "§c讓§a每§9一§c樣§a都§9充§c滿§a五§9彩§c斑§a斕§9的§c樣§a子§9，\n§c包§a括§9你§c當§a前§9所§c在§aU§9I",
   "description.wurst.hack.reach": "允許你碰到更遠的距離。",
   "description.wurst.hack.remoteview": "允許你以另一個視角觀看世界。\n使用.rv指令來指定一個特殊的實體。",
   "description.wurst.hack.safewalk": "防止你從方塊邊緣掉出。",
