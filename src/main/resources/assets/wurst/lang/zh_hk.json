@@ -88,6 +88,7 @@
   "description.wurst.hack.navigator": "一個可供你搜索嘅 GUI，可以隨着時間嘅推移了解你嘅偏好。",
   "description.wurst.hack.nobackground": "移除GUI後邊嘅暗色背景。",
   "description.wurst.hack.noclip": "允許你自由穿透過方塊。\n一個（例如：沙子）可以掉落嘅方塊掉喺你嘅頭頂才能激活。\n\n§c§l警告：§r 你將會受到傷害當你穿透牆果陣！",
+  "description.wurst.hack.nocomcrash": "利用 Nocom 漏洞使服務器卡頓或崩潰。\n經測試可喺 Vanilla、Spigot 和 Fabric 上工作，Paper 和一些擁有特定反作弊嘅服務器無法使用。",
   "description.wurst.hack.nofall": "從高處仆落嚟免受傷害。",
   "description.wurst.hack.nofireoverlay": "防止火焰阻擋視野。\n\n§c§l警告：§r呢可能會導致你，因唔知身上有火而燒傷致死。",
   "description.wurst.hack.nohurtcam": "關閉因受傷而產生視野搖晃效果。",
