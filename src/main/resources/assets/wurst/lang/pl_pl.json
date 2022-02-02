@@ -88,6 +88,7 @@
   "description.wurst.hack.navigator": "Przeszukiwalny interfejs, który z czasem uczy się twoich preferencji.",
   "description.wurst.hack.nobackground": "Usuwa ciemne tło zza ekwipunków.",
   "description.wurst.hack.noclip": "Pozwala swobodnie poruszać się przez bloki.\nBlok (np. piasek) musi spaść na twoją głowę, aby to aktywować.\n\n§c§lOSTRZERZENIE:§r Odniesiesz obrażenia podczas poruszania się przez bloki!",
+  "description.wurst.hack.nocomcrash": "Laguje i crashuje serwery przy pomocy exploita Nocom.\nNie działa na serwerach Paper. Działanie potwierdzone na serwerach Vanilla, Spigot i Fabric. Może zostać wyłączone przez niektóre AntyCheaty.",
   "description.wurst.hack.nofall": "Chroni przed obrażeniami od upadku.",
   "description.wurst.hack.nofireoverlay": "Blokuje nakładkę, gdy się palisz.\n\n§c§lOSTRZERZENIE:§r Może to spowodować spalenie się na śmierć bez zauważenia.",
   "description.wurst.hack.nohurtcam": "Wyłącza efekt trzęsienia, gdy ponosisz obrażenia.",
