@@ -13,7 +13,7 @@
 |German (Germany)|46/147 done. I'll probably do the rest myself since I can speak it natively.|
 |Italian (Italy)|146/147 done|
 |Japanese (Japan)|137/147 done|
-|Polish (Poland)|146/147 done|
+|Polish (Poland)|147/147 done|
 |Portugese (Brazil)|Pending, needs reviews, check [#528](https://github.com/Wurst-Imperium/Wurst7/pull/528).|
 |Russian (Russia)|137/147 done|
 |Turkish (Turkey)|There are 2 pending submissions ([#511](https://github.com/Wurst-Imperium/Wurst7/pull/511), [#512](https://github.com/Wurst-Imperium/Wurst7/pull/512)) with different translations and I don't know which one to merge. If you speak Turkish, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker. |
