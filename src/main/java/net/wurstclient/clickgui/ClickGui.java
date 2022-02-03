@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -40,6 +41,7 @@ import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.components.FeatureButton;
+import net.wurstclient.command.Command;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.json.JsonUtils;
@@ -88,12 +90,19 @@ public final class ClickGui
 		windows.addAll(windowMap.values());
 		
 		Window uiSettings = new Window("UI Settings");
-		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().tabGuiOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
 		windows.add(uiSettings);
+		
+		Window commands = new Window("Commands");
+		Collection<Command> cmds = WURST.getCmds().getAllCmds();
+		for(Command c : cmds)
+			commands.add(new FeatureButton(c));
+		windows.add(commands);
 		
 		for(Window window : windows)
 			window.setMinimized(true);
