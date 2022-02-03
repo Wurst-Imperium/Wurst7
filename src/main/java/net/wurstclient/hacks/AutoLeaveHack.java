@@ -87,28 +87,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// leave server
-		switch(mode.getSelected())
-		{
-			case QUIT:
-			MC.world.disconnect();
-			break;
-			
-			case CHARS:
-			MC.player.networkHandler
-				.sendPacket(new ChatMessageC2SPacket("\u00a7"));
-			break;
-			
-			case TELEPORT:
-			MC.player.networkHandler
-				.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(3.1e7,
-					100, 3.1e7, false));
-			break;
-			
-			case SELFHURT:
-			MC.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket
-				.attack(MC.player, MC.player.isSneaking()));
-			break;
-		}
+		WURST.getCmds().leaveCmd.disconnectWithMode(mode.getSelected());
 		
 		// disable
 		setEnabled(false);
