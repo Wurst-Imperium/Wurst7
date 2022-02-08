@@ -201,8 +201,9 @@ public class PathFinder
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
-		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down) && canGoAbove(down.down())
-			&& (flying || canFallBelow(pos)) && (divingAllowed
+		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down)
+			&& canGoAbove(down.down()) && (flying || canFallBelow(pos))
+			&& (divingAllowed
 				|| BlockUtils.getState(pos).getMaterial() != Material.WATER))
 			neighbors.add(new PathPos(down));
 		
