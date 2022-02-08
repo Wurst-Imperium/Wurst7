@@ -191,7 +191,7 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < 256 && canGoThrough(up.up())
+		if(pos.getY() < WurstClient.MC.world.getTopY() && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
@@ -201,7 +201,7 @@ public class PathFinder
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
-		if(pos.getY() > 0 && canGoThrough(down) && canGoAbove(down.down())
+		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down) && canGoAbove(down.down())
 			&& (flying || canFallBelow(pos)) && (divingAllowed
 				|| BlockUtils.getState(pos).getMaterial() != Material.WATER))
 			neighbors.add(new PathPos(down));
