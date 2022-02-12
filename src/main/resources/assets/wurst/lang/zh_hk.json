@@ -78,7 +78,7 @@
   "description.wurst.hack.killpotion": "生成一個能殺死絕大多數生物嘅葯水，包括創造模式嘅玩家，但對唔死嘅生物抑或已死生物無效。\n\n需要喺創造模式下。",
   "description.wurst.hack.liquids": "解除限制，允許你喺水中直接放置方塊。",
   "description.wurst.hack.lsd": "產生食咗雲南蘑菇一樣嘅效果。",
-  "description.wurst.hack.masstpa": "畀每個人發送 TPA 請求。\n直到有人接受就會停止\n\n§c§l警告：§r中文服務器使用會因為 Wurst 判斷嘅系英文而導致 TPA 仍喺繼續。",
+  "description.wurst.hack.masstpa": "畀每個人發送 傳送申請。\n直到有人接受就會停止\n\n§c§l警告：§r中文服務器使用會因為 Wurst 判斷嘅系英文而導致 傳送申請 仍喺繼續。",
   "description.wurst.hack.mileycyrus": "類似瘋狂按 Shift 潛行。",
   "description.wurst.hack.mobesp": "高亮附近嘅生物。",
   "description.wurst.hack.mobspawnesp": "高亮啲生物可以生成嘅區域。\n§e黃色§r 可以喺夜間生成\n§c紅色§r - 可以喺任意時候生成",
