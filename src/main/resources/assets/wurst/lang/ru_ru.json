@@ -51,6 +51,7 @@
   "description.wurst.hack.extraelytra": "Облегчает использование Элитры.",
   "description.wurst.hack.fancychat": "Заменяет обычные буквы на сломанные. Можно использовать для обхода мат-фильтра на некоторых серверах.\nНе работает на серверах на которых заблокированы символы Юникода.",
   "description.wurst.hack.fastbreak": "Позволяет ломать блоки быстрее.\nСовет: Хорошо сочетается с Nuker.",
+  "description.wurst.hack.packetmine": "Позволяет ломать блоки быстрее,\nиспользуя сетевые пакеты.\nСкорее всего небезопасен при anti-cheat.",
   "description.wurst.hack.fastladder": "Позволяет забираться по лестницам быстрее.",
   "description.wurst.hack.fastplace": "Позволяет ставить блоки в 5 раз быстрее.\nСовет: Может ускорять работу AutoBuild.",
   "description.wurst.hack.feedaura": "Автоматически кормит животных вокруг.",

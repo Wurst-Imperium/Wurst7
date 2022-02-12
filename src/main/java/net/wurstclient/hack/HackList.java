@@ -82,6 +82,7 @@ public final class HackList implements UpdateListener
 	public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
 	public final FancyChatHack fancyChatHack = new FancyChatHack();
 	public final FastBreakHack fastBreakHack = new FastBreakHack();
+	public final PacketMineHack packetMineHack = new PacketMineHack();
 	public final FastLadderHack fastLadderHack = new FastLadderHack();
 	public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
 	public final FeedAuraHack feedAuraHack = new FeedAuraHack();
