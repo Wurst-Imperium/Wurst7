@@ -88,6 +88,7 @@
   "description.wurst.hack.navigator": "A searchable GUI that learns your preferences over time.",
   "description.wurst.hack.nobackground": "Removes the dark background behind inventories.",
   "description.wurst.hack.noclip": "Allows you to freely move through blocks.\nA block (e.g. sand) must fall on your head to activate it.\n\n§c§lWARNING:§r You will take damage while moving through blocks!",
+  "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
@@ -135,5 +136,14 @@
   "description.wurst.hack.trollpotion": "Generates a potion with many annoying effects on it.",
   "description.wurst.hack.truesight": "Allows you to see invisible entities.",
   "description.wurst.hack.tunneller": "Automatically digs a tunnel.\n\n§c§lWARNING:§r Although this bot will try to avoid lava and other dangers, there is no guarantee that it won't die. Only send it out with gear that you don't mind losing.",
-  "description.wurst.hack.x-ray": "Allows you to see ores through walls."
+  "description.wurst.hack.x-ray": "Allows you to see ores through walls.",
+  "description.wurst.altmanager.premium": "This alt has a password and can join all servers.",
+  "description.wurst.altmanager.cracked": "This alt has no password and will only work on cracked servers.",
+  "description.wurst.altmanager.failed": "Last time you tried to log in with this alt, it didn't work.",
+  "description.wurst.altmanager.checked": "The password has worked in the past.",
+  "description.wurst.altmanager.unchecked": "You have never successfully logged in with this alt.",
+  "description.wurst.altmanager.favorite": "You have marked this alt as one of your favorites.",
+  "description.wurst.altmanager.window": "This button opens another window.",
+  "description.wurst.altmanager.window_freeze": "It might look like the game is not responding while that window is open.",
+  "description.wurst.altmanager.fullscreen": "§cTurn off fullscreen mode!"
 }

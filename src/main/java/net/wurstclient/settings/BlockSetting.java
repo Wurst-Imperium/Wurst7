@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,7 +35,7 @@ public final class BlockSetting extends Setting
 	{
 		super(name, description);
 		
-		Block block = BlockUtils.getBlockFromName(blockName);
+		Block block = BlockUtils.getBlockFromNameOrID(blockName);
 		Objects.requireNonNull(block);
 		this.blockName = BlockUtils.getName(block);
 		
@@ -48,6 +48,9 @@ public final class BlockSetting extends Setting
 		this(name, "", blockName, allowAir);
 	}
 	
+	/**
+	 * @return this setting's {@link Block}. Cannot be null.
+	 */
 	public Block getBlock()
 	{
 		return BlockUtils.getBlockFromName(blockName);
@@ -77,7 +80,7 @@ public final class BlockSetting extends Setting
 	
 	public void setBlockName(String blockName)
 	{
-		Block block = BlockUtils.getBlockFromName(blockName);
+		Block block = BlockUtils.getBlockFromNameOrID(blockName);
 		Objects.requireNonNull(block);
 		
 		setBlock(block);
@@ -102,7 +105,7 @@ public final class BlockSetting extends Setting
 		{
 			String newName = JsonUtils.getAsString(json);
 			
-			Block newBlock = BlockUtils.getBlockFromName(newName);
+			Block newBlock = BlockUtils.getBlockFromNameOrID(newName);
 			if(newBlock == null)
 				throw new JsonException();
 			
@@ -127,6 +130,18 @@ public final class BlockSetting extends Setting
 	@Override
 	public Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
-		return new LinkedHashSet<>();
+		String fullName = featureName + " " + getName();
+		
+		String command = ".setblock " + featureName.toLowerCase() + " ";
+		command += getName().toLowerCase().replace(" ", "_") + " ";
+		
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
+		// Can't just list all the blocks here. Would need to change UI to allow
+		// user to choose a block after selecting this option.
+		// pkb.add(new PossibleKeybind(command + "dirt", "Set " + fullName + "
+		// to dirt"));
+		pkb.add(new PossibleKeybind(command + "reset", "Reset " + fullName));
+		
+		return pkb;
 	}
 }
