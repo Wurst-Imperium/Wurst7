@@ -115,6 +115,7 @@
   "description.wurst.hack.remoteview": "Allows you to see the world as someone else.\nUse the .rv command to make it target a specific entity.",
   "description.wurst.hack.safewalk": "Prevents you from falling off edges.",
   "description.wurst.hack.scaffoldwalk": "Automatically places blocks below your feet.",
+  "description.wurst.hack.scarycreeper": "Automatically leaves server when exploding creeper nearby.",
   "description.wurst.hack.search": "Helps you to find specific blocks by highlighting them in rainbow color.",
   "description.wurst.hack.servercrasher": "Generates an item that can crash 1.15.x servers.\n§oCreative mode only.§r",
   "description.wurst.hack.skinderp": "Randomly toggles parts of your skin.",
