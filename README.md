@@ -6,7 +6,7 @@
 
 |Language|Status|
 |--------|--------|
-|Chinese (Simplified/Mainland)|147/147 done|
+|Chinese (Simplified/Mainland)|Pending changes: [#574](https://github.com/Wurst-Imperium/Wurst7/pull/574)|
 |Chinese (Traditional/Taiwan)|147/147 done|
 |Chinese (Cantonese/Hong Kong)|Pending, needs reviews, check [#555](https://github.com/Wurst-Imperium/Wurst7/pull/555).|
 |French (France)|There are 3 pending submissions ([#515](https://github.com/Wurst-Imperium/Wurst7/pull/515), [#531](https://github.com/Wurst-Imperium/Wurst7/pull/531), [#552](https://github.com/Wurst-Imperium/Wurst7/pull/552)) with different translations and I don't know which one to merge. If you speak French, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker.|
@@ -15,7 +15,7 @@
 |Japanese (Japan)|137/147 done|
 |Polish (Poland)|147/147 done|
 |Portugese (Brazil)|Pending, needs reviews, check [#528](https://github.com/Wurst-Imperium/Wurst7/pull/528).|
-|Russian (Russia)|137/147 done|
+|Russian (Russia)|Pending changes: [#572](https://github.com/Wurst-Imperium/Wurst7/pull/572), [#580](https://github.com/Wurst-Imperium/Wurst7/pull/580)|
 |Turkish (Turkey)|There are 2 pending submissions ([#511](https://github.com/Wurst-Imperium/Wurst7/pull/511), [#512](https://github.com/Wurst-Imperium/Wurst7/pull/512)) with different translations and I don't know which one to merge. If you speak Turkish, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker. |
 |Ukrainian (Ukraine)|137/147 done|
 
