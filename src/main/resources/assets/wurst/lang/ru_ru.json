@@ -140,7 +140,7 @@
   "description.wurst.altmanager.premium": "Этот аккаунт имеет пароль и может присоединяться к любым серверам.",
   "description.wurst.altmanager.cracked": "Этот аккаунт не имеет пароля и он сможет присоединяться только к серверам без авторизации.",
   "description.wurst.altmanager.failed": "Последняя попытка зайти в этот аккаунт была неудачной.",
-  "description.wurst.altmanager.checked": "Пароль работал в предыдущий раз.",
+  "description.wurst.altmanager.checked": "Пароль работал раньше.",
   "description.wurst.altmanager.unchecked": "Вы ни разу не зашли в этот аккаунт удачно.",
   "description.wurst.altmanager.favorite": "Вы пометили этот аккаунт как особый.",
   "description.wurst.altmanager.window": "Эта кнопка открывает другое окно.",
