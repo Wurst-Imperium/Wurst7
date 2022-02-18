@@ -26,9 +26,11 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -85,10 +87,35 @@ public final class AltManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, this, altManager.getList());
 		
-		if(altManager.getList().isEmpty() && shouldAsk)
-			client.setScreen(new ConfirmScreen(this::confirmGenerate,
-				new LiteralText("Your alt list is empty."), new LiteralText(
-					"Would you like some random alts to get started?")));
+		Exception loadingException = altManager.getLoadingException();
+		if(loadingException != null && shouldAsk)
+		{
+			LiteralText title = new LiteralText(
+				"Couldn't create the '.Wurst encryption' folder!");
+			LiteralText message = new LiteralText(
+				"You may have accidentally blocked Wurst from accessing this folder.\n"
+					+ "AltManager cannot encrypt or decrypt your alt list without it.\n"
+					+ "You can still use AltManager, but any alts you create now won't be saved.\n\n"
+					+ "The full error is as follows:\n" + loadingException);
+			LiteralText buttonText = new LiteralText("OK");
+			
+			// This just sets shouldAsk to false and closes the message.
+			Runnable action = () -> confirmGenerate(false);
+			
+			NoticeScreen screen =
+				new NoticeScreen(action, title, message, buttonText);
+			client.setScreen(screen);
+			
+		}else if(altManager.getList().isEmpty() && shouldAsk)
+		{
+			LiteralText title = new LiteralText("Your alt list is empty.");
+			LiteralText message = new LiteralText(
+				"Would you like some random alts to get started?");
+			BooleanConsumer callback = this::confirmGenerate;
+			
+			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
+			client.setScreen(screen);
+		}
 		
 		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
 			height - 52, 100, 20, new LiteralText("Login"), b -> pressLogin()));
