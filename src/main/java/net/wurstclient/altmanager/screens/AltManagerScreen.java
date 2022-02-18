@@ -45,6 +45,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
@@ -90,14 +91,11 @@ public final class AltManagerScreen extends Screen
 		Exception loadingException = altManager.getLoadingException();
 		if(loadingException != null && shouldAsk)
 		{
-			LiteralText title = new LiteralText(
-				"Couldn't create the '.Wurst encryption' folder!");
-			LiteralText message = new LiteralText(
-				"You may have accidentally blocked Wurst from accessing this folder.\n"
-					+ "AltManager cannot encrypt or decrypt your alt list without it.\n"
-					+ "You can still use AltManager, but any alts you create now won't be saved.\n\n"
-					+ "The full error is as follows:\n" + loadingException);
-			LiteralText buttonText = new LiteralText("OK");
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.folder_error.title");
+			TranslatableText message = new TranslatableText(
+				"gui.wurst.altmanager.folder_error.message", loadingException);
+			TranslatableText buttonText = new TranslatableText("gui.done");
 			
 			// This just sets shouldAsk to false and closes the message.
 			Runnable action = () -> confirmGenerate(false);
@@ -108,9 +106,10 @@ public final class AltManagerScreen extends Screen
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
 		{
-			LiteralText title = new LiteralText("Your alt list is empty.");
-			LiteralText message = new LiteralText(
-				"Would you like some random alts to get started?");
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.empty.title");
+			TranslatableText message =
+				new TranslatableText("gui.wurst.altmanager.empty.message");
 			BooleanConsumer callback = this::confirmGenerate;
 			
 			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
