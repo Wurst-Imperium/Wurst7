@@ -26,9 +26,11 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -43,6 +45,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
@@ -85,10 +88,33 @@ public final class AltManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, this, altManager.getList());
 		
-		if(altManager.getList().isEmpty() && shouldAsk)
-			client.setScreen(new ConfirmScreen(this::confirmGenerate,
-				new LiteralText("Your alt list is empty."), new LiteralText(
-					"Would you like some random alts to get started?")));
+		Exception loadingException = altManager.getLoadingException();
+		if(loadingException != null && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.folder_error.title");
+			TranslatableText message = new TranslatableText(
+				"gui.wurst.altmanager.folder_error.message", loadingException);
+			TranslatableText buttonText = new TranslatableText("gui.done");
+			
+			// This just sets shouldAsk to false and closes the message.
+			Runnable action = () -> confirmGenerate(false);
+			
+			NoticeScreen screen =
+				new NoticeScreen(action, title, message, buttonText);
+			client.setScreen(screen);
+			
+		}else if(altManager.getList().isEmpty() && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.empty.title");
+			TranslatableText message =
+				new TranslatableText("gui.wurst.altmanager.empty.message");
+			BooleanConsumer callback = this::confirmGenerate;
+			
+			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
+			client.setScreen(screen);
+		}
 		
 		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
 			height - 52, 100, 20, new LiteralText("Login"), b -> pressLogin()));

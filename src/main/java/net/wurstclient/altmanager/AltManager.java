@@ -129,4 +129,9 @@ public final class AltManager
 	{
 		return numCracked;
 	}
+	
+	public Exception getLoadingException()
+	{
+		return altsFile.getLoadingException();
+	}
 }

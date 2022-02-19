@@ -24,17 +24,32 @@ import net.wurstclient.util.json.WsonObject;
 public final class AltsFile
 {
 	private final Path path;
+	private final Path encFolder;
 	private boolean disableSaving;
-	private final Encryption encryption;
+	private Encryption encryption;
+	private IOException loadingException;
 	
 	public AltsFile(Path path, Path encFolder)
 	{
 		this.path = path;
-		encryption = new Encryption(encFolder);
+		this.encFolder = encFolder;
 	}
 	
 	public void load(AltManager altManager)
 	{
+		try
+		{
+			if(encryption == null)
+				encryption = new Encryption(encFolder);
+			
+		}catch(IOException e)
+		{
+			System.out.println("Couldn't create '.Wurst encryption' folder.");
+			e.printStackTrace();
+			loadingException = e;
+			return;
+		}
+		
 		try
 		{
 			WsonObject wson = encryption.parseFileToObject(path);
@@ -116,6 +131,19 @@ public final class AltsFile
 		if(disableSaving)
 			return;
 		
+		try
+		{
+			if(encryption == null)
+				encryption = new Encryption(encFolder);
+			
+		}catch(IOException e)
+		{
+			System.out.println("Couldn't create '.Wurst encryption' folder.");
+			e.printStackTrace();
+			loadingException = e;
+			return;
+		}
+		
 		JsonObject json = createJson(alts);
 		
 		try
@@ -145,5 +173,10 @@ public final class AltsFile
 		}
 		
 		return json;
+	}
+	
+	public IOException getLoadingException()
+	{
+		return loadingException;
 	}
 }
