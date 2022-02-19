@@ -7,10 +7,30 @@
  */
 package net.wurstclient.serverfinder;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
+import net.minecraft.client.MinecraftClient;
+import net.wurstclient.WurstClient;
+import net.wurstclient.altmanager.ImportAltsFileChooser;
+import net.wurstclient.util.MultiProcessingUtils;
+import net.wurstclient.util.json.JsonException;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -55,8 +75,11 @@ public class ServerFinderScreen extends Screen
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
+			new LiteralText("Import"), b -> importServers()));
+		
 		addDrawableChild(
-			new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
+			new ButtonWidget(width / 2 - 100, height / 4 + 168 + 12, 200, 20,
 				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
@@ -73,6 +96,59 @@ public class ServerFinderScreen extends Screen
 		
 		setInitialFocus(ipBox);
 		state = ServerFinderState.NOT_RUNNING;
+	}
+	
+	private void importServers()
+	{
+		try
+		{
+			Process process = MultiProcessingUtils.startProcessWithIO(
+					ImportServersFileChooser.class,
+					WurstClient.INSTANCE.getWurstFolder().toString());
+			
+			Path path = getFileChooserPath(process);
+			process.waitFor();
+			
+			List<String> strings = Files.readAllLines(path);
+			for (int i = 0 ; i < strings.size() ; i++) {
+				Calendar instant = Calendar.getInstance();
+				prevScreen.getServerList().add(
+						new ServerInfo("Imported " +
+									   instant.get(Calendar.YEAR) + "-" + instant.get(Calendar.MONTH) + "-" + instant.get(Calendar.DAY_OF_MONTH) + " " +
+									   instant.get(Calendar.HOUR_OF_DAY) + ";" + instant.get(Calendar.MINUTE) +
+									   " #" + i, strings.get(i), false
+						)
+				);
+			}
+			prevScreen.getServerList().saveFile();
+		}catch(IOException | InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Path getFileChooserPath(Process process) throws IOException
+	{
+		try(
+				BufferedReader bf =
+						new BufferedReader(new InputStreamReader(process.getInputStream(),
+																 StandardCharsets.UTF_8)))
+		{
+			String response = bf.readLine();
+			
+			if(response == null)
+				throw new IOException("No reponse from FileChooser");
+			
+			try
+			{
+				return Paths.get(response);
+				
+			}catch(InvalidPathException e)
+			{
+				throw new IOException(
+						"Reponse from FileChooser is not a valid path");
+			}
+		}
 	}
 	
 	private void searchOrCancel()
