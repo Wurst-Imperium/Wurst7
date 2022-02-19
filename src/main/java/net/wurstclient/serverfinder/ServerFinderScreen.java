@@ -7,8 +7,21 @@
  */
 package net.wurstclient.serverfinder;
 
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
+import net.wurstclient.WurstClient;
+import net.wurstclient.mixinterface.IMultiplayerScreen;
+import net.wurstclient.util.MathUtils;
+import net.wurstclient.util.MultiProcessingUtils;
+import org.lwjgl.glfw.GLFW;
+
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -18,31 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-
-import net.minecraft.client.MinecraftClient;
-import net.wurstclient.WurstClient;
-import net.wurstclient.altmanager.ImportAltsFileChooser;
-import net.wurstclient.util.MultiProcessingUtils;
-import net.wurstclient.util.json.JsonException;
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Util;
-import net.wurstclient.mixinterface.IMultiplayerScreen;
-import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
 {
