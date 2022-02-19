@@ -115,7 +115,7 @@ public class ServerFinderScreen extends Screen
 				prevScreen.getServerList().add(
 						new ServerInfo("Imported " +
 									   instant.get(Calendar.YEAR) + "-" + instant.get(Calendar.MONTH) + "-" + instant.get(Calendar.DAY_OF_MONTH) + " " +
-									   instant.get(Calendar.HOUR_OF_DAY) + ";" + instant.get(Calendar.MINUTE) +
+									   instant.get(Calendar.HOUR_OF_DAY) + ":" + instant.get(Calendar.MINUTE) +
 									   " #" + i, strings.get(i), false
 						)
 				);
