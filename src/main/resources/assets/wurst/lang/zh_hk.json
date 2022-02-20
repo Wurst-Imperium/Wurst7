@@ -110,7 +110,7 @@
   "description.wurst.hack.prophuntesp": "喺捉依因小游戲中知都邊滴人扮嘅方塊。\n用於 Mineplex 服務器嘅 Prophunt（捉依因），其他服務器未必湊效。",
   "description.wurst.hack.protect": "使用 AI 模式保護最近嘅實體，並保護佢免受其他實體嘅傷害。\n使用指令 .protect 嚟保護指定嘅實體，而唔系最近嘅一個。",
   "description.wurst.hack.radar": "生成一個雷達 UI 並顯示附近嘅實體。\n§c紅色§r - 玩家\n§6橘色§r - 怪物\n§a綠色§r - 動物\n§7灰色§r - 其他",
-  "description.wurst.hack.rainbowui": "§c讓§a每§9一§c樣§a嘢§9充§c滿§a五§9彩§c斑§a斕§9嘅§c樣§a子§9，§c包§a括§9你§c當§a前§9所§c喺§aU§9I",
+  "description.wurst.hack.rainbowui": "§c讓§a每§9一§c樣§a嘢§9充§c滿§a五§9彩§c斑§a斕§9嘅§c樣§a子§9，\n§c包§a括§9你§c當§a前§9所§c喺 §aU§9I§c。",
   "description.wurst.hack.reach": "允許你碰到更遠嘅距離。",
   "description.wurst.hack.remoteview": "允許你以另一個視角睇世界。\n使用 .rv 指令嚟指定一個特殊嘅實體。",
   "description.wurst.hack.safewalk": "防止你從方塊邊緣掉出。",
@@ -145,7 +145,7 @@
   "description.wurst.altmanager.favorite": "你標記咗呢其中一個賬戶為你嘅喜愛。",
   "description.wurst.altmanager.window": "呢個按鈕系打開另一個窗口嘅。",
   "description.wurst.altmanager.window_freeze": "當打開另一個窗口時，呢會導致游戲睇起身冇反應。",
-  "description.wurst.altmanager.fullscreen": "§c請關閉全屏模式！"
+  "description.wurst.altmanager.fullscreen": "§c請關閉全屏模式！",
   "gui.wurst.altmanager.folder_error.title": "無法創建 「.Wurst encryption」 文件夾！",
   "gui.wurst.altmanager.folder_error.message": "你可能唔小心阻止 Wurst 訪問呢個文件夾。\n如果Wurst無法訪問， AltManager 將無法加密或解密你嘅帳戶列表。\n你依然可以使用 AltManager，但你依家創建嘅任何賬戶將冇辦法被保存。\n\n全部錯誤如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你嘅賬戶列表系空嘅。",
