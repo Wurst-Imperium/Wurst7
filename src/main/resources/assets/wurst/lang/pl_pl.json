@@ -149,5 +149,5 @@
   "gui.wurst.altmanager.folder_error.title": "Nie udało się utworzyć folderu '.Wurst encryption'!",
   "gui.wurst.altmanager.folder_error.message": "Mogłeś przypadkowo zablokować dostęp Wurst do tego folderu.\nAltManager nie może zaszyfrować, ani odszyfrować twojej listy altów bez niego.\nMożesz nadal korzystać z AltManagera, ale żaden z altów, które teraz stworzysz, nie zostanie zapisany.\n\nPełny błąd wygląda następująco:\n%s",
   "gui.wurst.altmanager.empty.title": "Twoja lista altów jest pusta.",
-  "gui.wurst.altmanager.empty.message": "Czy na początku chciałbyś dodać kilka losowych altów?"
+  "gui.wurst.altmanager.empty.message": "Czy chciałbyś zacząć od dodania kilku losowych altów?"
 }
