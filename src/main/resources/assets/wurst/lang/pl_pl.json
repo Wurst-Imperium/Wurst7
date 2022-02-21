@@ -145,5 +145,9 @@
   "description.wurst.altmanager.favorite": "Oznaczyłeś ten alt jako jeden z ulubionych.",
   "description.wurst.altmanager.window": "Ten przycisk otwiera inne okno.",
   "description.wurst.altmanager.window_freeze": "Może wydawać się, że gra nie odpowiada, gdy to okno jest otwarte.",
-  "description.wurst.altmanager.fullscreen": "§cWyłącz tryb pełnoekranowy!"
+  "description.wurst.altmanager.fullscreen": "§cWyłącz tryb pełnoekranowy!",
+  "gui.wurst.altmanager.folder_error.title": "Nie udało się utworzyć folderu '.Wurst encryption'!",
+  "gui.wurst.altmanager.folder_error.message": "Mogłeś przypadkowo zablokować dostęp Wurst do tego folderu.\nAltManager nie może zaszyfrować, ani odszyfrować twojej listy altów bez niego.\nMożesz nadal korzystać z AltManagera, ale żaden z altów, które teraz stworzysz, nie zostanie zapisany.\n\nPełny błąd wygląda następująco:\n%s",
+  "gui.wurst.altmanager.empty.title": "Twoja lista altów jest pusta.",
+  "gui.wurst.altmanager.empty.message": "Czy na początku chciałbyś dodać kilka losowych altów?"
 }
