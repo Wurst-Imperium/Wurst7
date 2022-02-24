@@ -21,7 +21,8 @@ import net.wurstclient.WurstClient;
 
 public final class LoginManager
 {
-	public static String login(String email, String password)
+	public static void login(String email, String password)
+		throws LoginException
 	{
 		YggdrasilUserAuthentication auth =
 			(YggdrasilUserAuthentication)new YggdrasilAuthenticationService(
@@ -38,25 +39,37 @@ public final class LoginManager
 					auth.getSelectedProfile().getId().toString(),
 					auth.getAuthenticatedToken(), Optional.empty(),
 					Optional.empty(), Session.AccountType.MOJANG));
-			return "";
 			
 		}catch(AuthenticationUnavailableException e)
 		{
-			return "\u00a74\u00a7lCannot contact authentication server!";
+			throw new LoginException(
+				"\u00a74\u00a7lCannot contact authentication server!", e);
 			
 		}catch(AuthenticationException e)
 		{
 			e.printStackTrace();
 			
-			if(e.getMessage().contains("Invalid username or password.")
-				|| e.getMessage().toLowerCase().contains("account migrated"))
-				return "\u00a74\u00a7lWrong password! (or shadowbanned)";
-			return "\u00a74\u00a7lCannot contact authentication server!";
+			if(e.getMessage().contains("Invalid username or password."))
+				throw new LoginException(
+					"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
+			
+			if(e.getMessage().toLowerCase().contains("account migrated"))
+				throw new LoginException(
+					"\u00a74\u00a7lAccount migrated to Mojang account.", e);
+			
+			if(e.getMessage().toLowerCase().contains("migrated"))
+				throw new LoginException(
+					"\u00a74\u00a7lAccount migrated to Microsoft account.", e);
+			
+			throw new LoginException(
+				"\u00a74\u00a7lCannot contact authentication server!", e);
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lWrong password! (or shadowbanned)";
+			
+			throw new LoginException(
+				"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
 		}
 	}
 	
