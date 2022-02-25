@@ -91,7 +91,7 @@
   "description.wurst.hack.nocomcrash": "利用 Nocom 漏洞使服务器卡顿或崩溃。\n经测试可在 Vanilla、Spigot 和 Fabric 上工作，Paper 和一些拥有特定反作弊的服务器无法使用。",
   "description.wurst.hack.nofall": "使你从免受摔落伤害。",
   "description.wurst.hack.nofireoverlay": "防止火焰阻挡视野。\n\n§c§l警告：§r这可能会导致你因不知道身上有火而被烧死。",
-  "description.wurst.hack.nohurtcam": "关闭因受伤而产生地视野摇晃效果。",
+  "description.wurst.hack.nohurtcam": "关闭因受伤而产生的视野摇晃效果。",
   "description.wurst.hack.nooverlay": "防止因在水中或岩浆中产生的视野阻挡。",
   "description.wurst.hack.nopumpkin": "防止因带南瓜头而导致视野阻挡。",
   "description.wurst.hack.noslowdown": "取消减速的效果。像蜂蜜、灵魂沙或者使用物品时。",
