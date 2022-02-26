@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,6 +10,7 @@ package net.wurstclient.altmanager.screens;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.LiteralText;
+import net.wurstclient.altmanager.LoginException;
 import net.wurstclient.altmanager.LoginManager;
 
 public final class DirectLoginScreen extends AltEditorScreen
@@ -28,17 +29,24 @@ public final class DirectLoginScreen extends AltEditorScreen
 	@Override
 	protected void pressDoneButton()
 	{
-		if(getPassword().isEmpty())
-		{
-			message = "";
-			LoginManager.changeCrackedName(getEmail());
-			
-		}else
-			message = LoginManager.login(getEmail(), getPassword());
+		String nameOrEmail = getNameOrEmail();
+		String password = getPassword();
 		
-		if(message.isEmpty())
-			client.setScreen(new TitleScreen());
+		if(password.isEmpty())
+			LoginManager.changeCrackedName(nameOrEmail);
 		else
-			doErrorEffect();
+			try
+			{
+				LoginManager.login(nameOrEmail, password);
+				
+			}catch(LoginException e)
+			{
+				message = e.getMessage();
+				doErrorEffect();
+				return;
+			}
+		
+		message = "";
+		client.setScreen(new TitleScreen());
 	}
 }

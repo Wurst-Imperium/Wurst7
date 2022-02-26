@@ -35,5 +35,18 @@
   "description.wurst.hack.bowaimbot": "Zielt automatisch mit deinem Bogen oder deiner Armbrust.",
   "description.wurst.hack.buildrandom": "Platziert zufällig Blöcke um dich herum.",
   "description.wurst.hack.bunnyhop": "Lässt dich automatisch hüpfen.",
-  "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen."
+  "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen.",
+  "description.wurst.altmanager.premium": "Dieser Alt hat ein Passwort und kann allen Servern beitreten.",
+  "description.wurst.altmanager.cracked": "Dieser Alt hat kein Passwort und funktioniert nur auf cracked Servern.",
+  "description.wurst.altmanager.failed": "Als du das letzte Mal versucht hast, dich mit diesem Alt einzuloggen, hat es nicht funktioniert.",
+  "description.wurst.altmanager.checked": "Das Password für diesen Alt hat früher schonmal funktioniert.",
+  "description.wurst.altmanager.unchecked": "Du hast dich noch nie erfolgreich mit diesem Alt eingeloggt.",
+  "description.wurst.altmanager.favorite": "Du hast diesen Alt als Favoriten markiert.",
+  "description.wurst.altmanager.window": "Dieser Button öffnet ein zweites Fenster.",
+  "description.wurst.altmanager.window_freeze": "Während dieses Fenster offen ist kann es so aussehen als ob das Spiel nicht reagiert.",
+  "description.wurst.altmanager.fullscreen": "§cSchalte den Vollbildmodus ab!",
+  "gui.wurst.altmanager.folder_error.title": "Konnte den '.Wurst encryption'-Ordner nicht erstellen!",
+  "gui.wurst.altmanager.folder_error.message": "Eventuell hast du Wurst aus Versehen den Zugriff auf diesen Ordner verweigert.\nAltManager kann deine Alt-Liste ohne diesen Ordner nicht ver- order entschlüsseln.\nDu kannst AltManager trotzdem noch benutzen, aber alle Alts die du jetzt erstellst werden nicht gespeichert.\n\nDie komplette Fehlermeldung lautet wie folgt:\n%s",
+  "gui.wurst.altmanager.empty.title": "Deine Alt-Liste ist noch leer.",
+  "gui.wurst.altmanager.empty.message": "Möchtest du mit ein paar zufällig generierten Alts anfangen?"
 }

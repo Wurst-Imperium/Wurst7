@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -78,7 +78,7 @@ public final class WurstLogo
 	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2,
 		float r, float g, float b, float a)
 	{
-		Matrix4f matrix = matrices.peek().getModel();
+		Matrix4f matrix = matrices.peek().getPositionMatrix();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -191,7 +191,7 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < 256 && canGoThrough(up.up())
+		if(pos.getY() < WurstClient.MC.world.getTopY() && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
@@ -201,8 +201,9 @@ public class PathFinder
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
-		if(pos.getY() > 0 && canGoThrough(down) && canGoAbove(down.down())
-			&& (flying || canFallBelow(pos)) && (divingAllowed
+		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down)
+			&& canGoAbove(down.down()) && (flying || canFallBelow(pos))
+			&& (divingAllowed
 				|| BlockUtils.getState(pos).getMaterial() != Material.WATER))
 			neighbors.add(new PathPos(down));
 		
@@ -288,9 +289,12 @@ public class PathFinder
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
+		// Can't see why isChunkLoaded() is deprecated. Still seems to be widely
+		// used with no replacement.
 		if(!WurstClient.MC.world.isChunkLoaded(pos))
 			return false;
 		

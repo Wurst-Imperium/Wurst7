@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -447,5 +447,10 @@ public abstract class ListWidget extends AbstractParentElement
 		bufferBuilder.vertex(left, top, 0.0D).texture(0.0F, top / 32.0F)
 			.color(64, 64, 64, topAlpha).next();
 		tessellator.draw();
+	}
+	
+	public double getScrollAmount()
+	{
+		return scrollAmount;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,7 +35,7 @@ public final class PathRenderer
 		int endZ = end.getZ();
 		
 		matrixStack.push();
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		// main line
 		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
@@ -101,7 +101,7 @@ public final class PathRenderer
 		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

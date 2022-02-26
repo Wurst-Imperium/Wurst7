@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,7 +15,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.MushroomStewItem;
+import net.minecraft.item.StewItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -127,7 +127,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		{
 			ItemStack stack = MC.player.getInventory().getStack(i);
 			
-			if(stack != null && stack.getItem() instanceof MushroomStewItem)
+			if(stack != null && stack.getItem() instanceof StewItem)
 				return i;
 		}
 		

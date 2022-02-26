@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -296,7 +296,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 			int yt2 = yt1 + th + 2;
 			
-			Matrix4f matrix = matrixStack.peek().getModel();
+			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
@@ -417,7 +417,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		drawBox(matrixStack, area.x, area.y, area.x + area.width,
 			area.y + area.height);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

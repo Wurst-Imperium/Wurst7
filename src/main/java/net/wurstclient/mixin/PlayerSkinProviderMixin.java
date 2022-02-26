@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -34,7 +35,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import net.wurstclient.util.json.JsonUtils;
 
 @Mixin(PlayerSkinProvider.class)
 public class PlayerSkinProviderMixin
@@ -147,9 +147,9 @@ public class PlayerSkinProviderMixin
 			// TODO: download capes to file
 			URL url = new URL("https://www.wurstclient.net/api/v1/capes.json");
 			
-			capes = JsonUtils.JSON_PARSER
-				.parse(new InputStreamReader(url.openStream()))
-				.getAsJsonObject();
+			capes =
+				JsonParser.parseReader(new InputStreamReader(url.openStream()))
+					.getAsJsonObject();
 			
 		}catch(Exception e)
 		{

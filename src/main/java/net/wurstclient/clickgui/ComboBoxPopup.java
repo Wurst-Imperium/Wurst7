@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -111,7 +111,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
 		int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float[] acColor = gui.getAcColor();
@@ -134,7 +134,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		float[] bgColor = gui.getBgColor();
 		float alpha = gui.getOpacity() * (hValue ? 1.5F : 1);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], alpha);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -120,7 +121,7 @@ public final class ClickGui
 		JsonObject json;
 		try(BufferedReader reader = Files.newBufferedReader(windowsFile))
 		{
-			json = JsonUtils.JSON_PARSER.parse(reader).getAsJsonObject();
+			json = JsonParser.parseReader(reader).getAsJsonObject();
 			
 		}catch(NoSuchFileException e)
 		{
@@ -523,7 +524,7 @@ public final class ClickGui
 	
 	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		if(tooltip.isEmpty())
@@ -631,7 +632,7 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -749,7 +750,7 @@ public final class ClickGui
 			
 			matrixStack.push();
 			matrixStack.translate(x1, y4, 0);
-			matrix = matrixStack.peek().getModel();
+			matrix = matrixStack.peek().getPositionMatrix();
 			
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
@@ -798,9 +799,12 @@ public final class ClickGui
 					partialTicks);
 			
 			matrixStack.pop();
-			matrix = matrixStack.peek().getModel();
+			matrix = matrixStack.peek().getPositionMatrix();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
+		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -831,7 +835,6 @@ public final class ClickGui
 		int y4 = y1 + 2;
 		int y5 = y3 - 2;
 		boolean hoveringY = mouseY >= y4 && mouseY < y5;
-		
 		if(window.isClosable())
 		{
 			x3 -= 11;
@@ -902,7 +905,7 @@ public final class ClickGui
 	{
 		int x3 = x2 + 2;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -948,7 +951,7 @@ public final class ClickGui
 	{
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xa1 = x1 + 1;
@@ -997,7 +1000,7 @@ public final class ClickGui
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		float h = hovering ? 1 : 0.85F;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		if(pinned)
@@ -1154,7 +1157,7 @@ public final class ClickGui
 	{
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xc1 = x1 + 2;

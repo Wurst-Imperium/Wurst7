@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -172,7 +172,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			
 			Shader shader = RenderSystem.getShader();
 			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
-			mobBox.setShader(matrixStack.peek().getModel(), matrix4f, shader);
+			mobBox.setShader(matrixStack.peek().getPositionMatrix(), matrix4f,
+				shader);
 			
 			matrixStack.pop();
 		}
@@ -184,7 +185,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -84,7 +84,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		matrixStack.scale(-scale, -scale, scale);
 		
-		Matrix4f matrix4f = matrixStack.peek().getModel();
+		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
 		int k = (int)(g * 255.0F) << 24;
 		

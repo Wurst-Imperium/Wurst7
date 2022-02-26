@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,7 +25,6 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.MathUtils;
 
 public final class EditBlockScreen extends Screen
 {
@@ -69,14 +68,8 @@ public final class EditBlockScreen extends Screen
 	
 	private void done()
 	{
-		Block block;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			block =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			block = BlockUtils.getBlockFromName(nameOrId);
+		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -147,14 +140,8 @@ public final class EditBlockScreen extends Screen
 		
 		matrixStack.pop();
 		
-		Block blockToAdd;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			blockToAdd =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
+		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
@@ -164,7 +151,7 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}
