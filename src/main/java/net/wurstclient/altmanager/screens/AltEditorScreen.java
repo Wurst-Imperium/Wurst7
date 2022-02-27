@@ -54,7 +54,7 @@ public abstract class AltEditorScreen extends Screen
 	
 	protected final Screen prevScreen;
 	
-	private TextFieldWidget emailBox;
+	private TextFieldWidget nameOrEmailBox;
 	private TextFieldWidget passwordBox;
 	
 	private ButtonWidget doneButton;
@@ -82,23 +82,23 @@ public abstract class AltEditorScreen extends Screen
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
 			200, 20, new LiteralText("Random Name"),
-			b -> emailBox.setText(NameGenerator.generateName())));
+			b -> nameOrEmailBox.setText(NameGenerator.generateName())));
 		
 		addDrawableChild(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
 				128, 20, new LiteralText("Steal Skin"),
-				b -> message = stealSkin(getEmail())));
+				b -> message = stealSkin(getNameOrEmail())));
 		
 		addDrawableChild(
 			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
 				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
 		
-		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
-			20, new LiteralText(""));
-		emailBox.setMaxLength(48);
-		emailBox.setTextFieldFocused(true);
-		emailBox.setText(getDefaultEmail());
-		addSelectableChild(emailBox);
+		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
+			200, 20, new LiteralText(""));
+		nameOrEmailBox.setMaxLength(48);
+		nameOrEmailBox.setTextFieldFocused(true);
+		nameOrEmailBox.setText(getDefaultNameOrEmail());
+		addSelectableChild(nameOrEmailBox);
 		
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
@@ -112,7 +112,7 @@ public abstract class AltEditorScreen extends Screen
 		passwordBox.setMaxLength(256);
 		addSelectableChild(passwordBox);
 		
-		setInitialFocus(emailBox);
+		setInitialFocus(nameOrEmailBox);
 	}
 	
 	private void openSkinFolder()
@@ -137,29 +137,36 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void tick()
 	{
-		emailBox.tick();
+		nameOrEmailBox.tick();
 		passwordBox.tick();
 		
-		String email = emailBox.getText().trim();
-		boolean alex = email.equalsIgnoreCase("Alexander01998");
+		String nameOrEmail = nameOrEmailBox.getText().trim();
+		boolean alex = nameOrEmail.equalsIgnoreCase("Alexander01998");
 		
-		doneButton.active =
-			!email.isEmpty() && !(alex && passwordBox.getText().isEmpty());
+		doneButton.active = !nameOrEmail.isEmpty()
+			&& !(alex && passwordBox.getText().isEmpty());
 		
 		stealSkinButton.active = !alex;
 	}
 	
-	protected final String getEmail()
+	/**
+	 * @return the user-entered name or email. Cannot be empty when pressing the
+	 *         done button. Cannot be null.
+	 */
+	protected final String getNameOrEmail()
 	{
-		return emailBox.getText();
+		return nameOrEmailBox.getText();
 	}
 	
+	/**
+	 * @return the user-entered password. Can be empty. Cannot be null.
+	 */
 	protected final String getPassword()
 	{
 		return passwordBox.getText();
 	}
 	
-	protected String getDefaultEmail()
+	protected String getDefaultNameOrEmail()
 	{
 		return client.getSession().getUsername();
 	}
@@ -320,10 +327,10 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public boolean mouseClicked(double x, double y, int button)
 	{
-		emailBox.mouseClicked(x, y, button);
+		nameOrEmailBox.mouseClicked(x, y, button);
 		passwordBox.mouseClicked(x, y, button);
 		
-		if(emailBox.isFocused() || passwordBox.isFocused())
+		if(nameOrEmailBox.isFocused() || passwordBox.isFocused())
 			message = "";
 		
 		return super.mouseClicked(x, y, button);
@@ -340,9 +347,9 @@ public abstract class AltEditorScreen extends Screen
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// skin preview
-		AltRenderer.drawAltBack(matrixStack, emailBox.getText(),
+		AltRenderer.drawAltBack(matrixStack, nameOrEmailBox.getText(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(matrixStack, emailBox.getText(),
+		AltRenderer.drawAltBody(matrixStack, nameOrEmailBox.getText(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
@@ -357,7 +364,7 @@ public abstract class AltEditorScreen extends Screen
 			16777215);
 		
 		// text boxes
-		emailBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		nameOrEmailBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		passwordBox.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// red flash for errors
