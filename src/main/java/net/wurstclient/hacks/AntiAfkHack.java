@@ -71,10 +71,10 @@ public final class AntiAfkHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		MC.options.keyForward.setPressed(
-			((IKeyBinding)MC.options.keyForward).isActallyPressed());
-		MC.options.keyJump
-			.setPressed(((IKeyBinding)MC.options.keyJump).isActallyPressed());
+		MC.options.forwardKey.setPressed(
+			((IKeyBinding)MC.options.forwardKey).isActallyPressed());
+		MC.options.jumpKey
+			.setPressed(((IKeyBinding)MC.options.jumpKey).isActallyPressed());
 		
 		pathFinder = null;
 		processor = null;
@@ -100,7 +100,7 @@ public final class AntiAfkHack extends Hack
 			{
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
-					MC.options.keyJump.setPressed(MC.player.isTouchingWater());
+					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
@@ -156,12 +156,12 @@ public final class AntiAfkHack extends Hack
 			
 			// walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
-				MC.options.keyForward.setPressed(true);
+				MC.options.forwardKey.setPressed(true);
 			else
-				MC.options.keyForward.setPressed(false);
+				MC.options.forwardKey.setPressed(false);
 			
 			// swim up
-			MC.options.keyJump.setPressed(MC.player.isTouchingWater());
+			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 			
 			// update timer
 			if(timer > 0)
