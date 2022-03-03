@@ -45,7 +45,7 @@ public final class BoatFlyHack extends Hack implements UpdateListener
 		// fly
 		Entity vehicle = MC.player.getVehicle();
 		Vec3d velocity = vehicle.getVelocity();
-		double motionY = MC.options.keyJump.isPressed() ? 0.3 : 0;
+		double motionY = MC.options.jumpKey.isPressed() ? 0.3 : 0;
 		vehicle.setVelocity(new Vec3d(velocity.x, motionY, velocity.z));
 	}
 }

@@ -22,8 +22,8 @@ public abstract class PathProcessor
 	protected static final MinecraftClient MC = WurstClient.MC;
 	
 	private static final KeyBinding[] CONTROLS =
-		{MC.options.keyForward, MC.options.keyBack, MC.options.keyRight,
-			MC.options.keyLeft, MC.options.keyJump, MC.options.keySneak};
+		{MC.options.forwardKey, MC.options.backKey, MC.options.rightKey,
+			MC.options.leftKey, MC.options.jumpKey, MC.options.sneakKey};
 	
 	protected final ArrayList<PathPos> path;
 	protected int index;

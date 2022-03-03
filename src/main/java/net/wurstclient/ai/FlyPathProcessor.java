@@ -120,13 +120,13 @@ public class FlyPathProcessor extends PathProcessor
 				return;
 			}
 			
-			MC.options.keyForward.setPressed(true);
+			MC.options.forwardKey.setPressed(true);
 			
 			if(MC.player.horizontalCollision)
 				if(posVec.y > nextBox.maxY)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(posVec.y < nextBox.minY)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 				
 			// vertical movement
 		}else if(y)
@@ -139,14 +139,14 @@ public class FlyPathProcessor extends PathProcessor
 			}
 			
 			if(posVec.y < nextBox.minY)
-				MC.options.keyJump.setPressed(true);
+				MC.options.jumpKey.setPressed(true);
 			else
-				MC.options.keySneak.setPressed(true);
+				MC.options.sneakKey.setPressed(true);
 			
 			if(MC.player.verticalCollision)
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyForward.setPressed(true);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.forwardKey.setPressed(true);
 			}
 		}
 	}
