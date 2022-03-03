@@ -23,8 +23,9 @@ public final class ImportServersFileChooser extends JFileChooser
 		
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(
-			new FileNameExtensionFilter("TXT file", "txt"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("TXT file", "txt"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("LIST file", "list"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SERVERS file", "servers"));
 		
 		if(fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
 			return;
