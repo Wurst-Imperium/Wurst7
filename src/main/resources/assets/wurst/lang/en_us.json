@@ -7,6 +7,7 @@
   "description.wurst.hack.antispam": "Blocks chat spam by adding a counter to repeated messages.",
   "description.wurst.hack.antiwaterpush": "Prevents you from getting pushed by water.",
   "description.wurst.hack.antiwobble": "Disables the wobble effect caused by nausea and portals.",
+  "description.wurst.hack.arrowdmg": "Massively increases arrow damage, but also consumes a lot of hunger and reduces accuracy.\n\nDoes not work with crossbows and seems to be patched on Paper servers.",
   "description.wurst.hack.autoarmor": "Manages your armor automatically.",
   "description.wurst.hack.autobuild": "Builds things automatically.\nPlace a single block to start building.",
   "description.wurst.hack.autodrop": "Automatically drops unwanted items.",
