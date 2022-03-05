@@ -25,14 +25,12 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ArrowDmgHack extends Hack
 {
 	private final SliderSetting packets = new SliderSetting("Packets",
-		"Amount of packets to send.\n" + "More packets = higher damage.", 200,
-		2, 2000, 2, ValueDisplay.INTEGER);
+		"description.wurst.setting.arrowdmg.packets", 200, 2, 2000, 2,
+		ValueDisplay.INTEGER);
 	
-	private final CheckboxSetting yeetTridents = new CheckboxSetting(
-		"Trident yeet mode",
-		"When enabled, tridents fly much further. Doesn't seem to affect damage or Riptide.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You can easily lose your trident by enabling this option!",
-		false);
+	private final CheckboxSetting yeetTridents =
+		new CheckboxSetting("Trident yeet mode",
+			"description.wurst.setting.arrowdmg.trident_yeet_mode", false);
 	
 	public ArrowDmgHack()
 	{
