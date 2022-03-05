@@ -56,9 +56,6 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 	@Override
 	public void onStopUsingItem()
 	{
-		if(!isEnabled())
-			return;
-		
 		ClientPlayerEntity player = MC.player;
 		ClientPlayNetworkHandler netHandler = player.networkHandler;
 		
