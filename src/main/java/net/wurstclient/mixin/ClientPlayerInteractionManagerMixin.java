@@ -32,6 +32,7 @@ import net.minecraft.world.World;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -93,8 +94,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
-		// TODO: Make this a proper event
-		WurstClient.INSTANCE.getHax().arrowDmgHack.onStopUsingItem();
+		EventManager.fire(StopUsingItemEvent.INSTANCE);
 	}
 	
 	@Override

@@ -16,13 +16,14 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.StopUsingItemListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"arrow dmg", "ArrowDamage", "arrow damage"})
-public final class ArrowDmgHack extends Hack
+public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 {
 	private final SliderSetting packets = new SliderSetting("Packets",
 		"description.wurst.setting.arrowdmg.packets", 200, 2, 2000, 2,
@@ -40,7 +41,19 @@ public final class ArrowDmgHack extends Hack
 		addSetting(yeetTridents);
 	}
 	
-	// TODO: Make this a proper event
+	@Override
+	protected void onEnable()
+	{
+		EVENTS.add(StopUsingItemListener.class, this);
+	}
+	
+	@Override
+	protected void onDisable()
+	{
+		EVENTS.remove(StopUsingItemListener.class, this);
+	}
+	
+	@Override
 	public void onStopUsingItem()
 	{
 		if(!isEnabled())
