@@ -52,7 +52,7 @@ public final class ThrowHack extends Hack implements RightClickListener
 		if(IMC.getItemUseCooldown() > 0)
 			return;
 		
-		if(!MC.options.keyUse.isPressed())
+		if(!MC.options.useKey.isPressed())
 			return;
 		
 		for(int i = 0; i < amount.getValueI(); i++)

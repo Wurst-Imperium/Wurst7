@@ -11,6 +11,7 @@ import java.net.Proxy;
 import java.util.Optional;
 
 import com.mojang.authlib.Agent;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -21,7 +22,8 @@ import net.wurstclient.WurstClient;
 
 public final class LoginManager
 {
-	public static String login(String email, String password)
+	public static void login(String email, String password)
+		throws LoginException
 	{
 		YggdrasilUserAuthentication auth =
 			(YggdrasilUserAuthentication)new YggdrasilAuthenticationService(
@@ -33,36 +35,56 @@ public final class LoginManager
 		try
 		{
 			auth.logIn();
-			WurstClient.IMC
-				.setSession(new Session(auth.getSelectedProfile().getName(),
-					auth.getSelectedProfile().getId().toString(),
-					auth.getAuthenticatedToken(), Optional.empty(),
-					Optional.empty(), Session.AccountType.MOJANG));
-			return "";
+			
+			GameProfile profile = auth.getSelectedProfile();
+			String username = profile.getName();
+			String uuid = profile.getId().toString();
+			String accessToken = auth.getAuthenticatedToken();
+			
+			Session session = new Session(username, uuid, accessToken,
+				Optional.empty(), Optional.empty(), Session.AccountType.MOJANG);
+			
+			WurstClient.IMC.setSession(session);
 			
 		}catch(AuthenticationUnavailableException e)
 		{
-			return "\u00a74\u00a7lCannot contact authentication server!";
+			throw new LoginException(
+				"\u00a74\u00a7lCannot contact authentication server!", e);
 			
 		}catch(AuthenticationException e)
 		{
 			e.printStackTrace();
+			String msg = e.getMessage().toLowerCase();
 			
-			if(e.getMessage().contains("Invalid username or password.")
-				|| e.getMessage().toLowerCase().contains("account migrated"))
-				return "\u00a74\u00a7lWrong password! (or shadowbanned)";
-			return "\u00a74\u00a7lCannot contact authentication server!";
+			if(msg.contains("invalid username or password."))
+				throw new LoginException(
+					"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
+			
+			if(msg.contains("account migrated"))
+				throw new LoginException(
+					"\u00a74\u00a7lAccount migrated to Mojang account.", e);
+			
+			if(msg.contains("migrated"))
+				throw new LoginException(
+					"\u00a74\u00a7lAccount migrated to Microsoft account.", e);
+			
+			throw new LoginException(
+				"\u00a74\u00a7lCannot contact authentication server!", e);
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lWrong password! (or shadowbanned)";
+			
+			throw new LoginException(
+				"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
 		}
 	}
 	
 	public static void changeCrackedName(String newName)
 	{
-		WurstClient.IMC.setSession(new Session(newName, "", "",
-			Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
+		Session session = new Session(newName, "", "", Optional.empty(),
+			Optional.empty(), Session.AccountType.MOJANG);
+		
+		WurstClient.IMC.setSession(session);
 	}
 }

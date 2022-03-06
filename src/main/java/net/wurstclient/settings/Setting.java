@@ -38,7 +38,7 @@ public abstract class Setting
 	
 	public final String getDescription()
 	{
-		return description;
+		return WurstClient.INSTANCE.translate(description);
 	}
 	
 	public String getWrappedDescription(int width)

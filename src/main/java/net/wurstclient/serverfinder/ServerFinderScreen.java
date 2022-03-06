@@ -245,10 +245,10 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void onClose()
+	public void close()
 	{
 		state = ServerFinderState.CANCELLED;
-		super.onClose();
+		super.close();
 	}
 	
 	enum ServerFinderState
