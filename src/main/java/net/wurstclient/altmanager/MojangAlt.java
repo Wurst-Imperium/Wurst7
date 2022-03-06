@@ -13,10 +13,10 @@ import com.google.gson.JsonObject;
 
 import net.wurstclient.WurstClient;
 
-public final class MojangAlt extends Alt
+public class MojangAlt extends Alt
 {
-	private final String email;
-	private final String password;
+	public String email;
+	public String password;
 	
 	private String name = "";
 	
@@ -59,9 +59,12 @@ public final class MojangAlt extends Alt
 	}
 	
 	@Override
-	public void login() throws LoginException
-	{
-		LoginManager.login(email, password);
+	public void login() throws LoginException, AuthenticationException {
+		try {
+			MicrosoftLoginManager.login(email, password);
+		}catch(Exception e) {
+			LoginManager.login(email, password);
+		}
 		name = getNameFromSession();
 	}
 	

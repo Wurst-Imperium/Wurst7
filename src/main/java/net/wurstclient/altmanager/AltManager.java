@@ -73,7 +73,7 @@ public final class AltManager
 	 *             be explained in the Exception's message, which should be
 	 *             displayed to the user.
 	 */
-	public void login(Alt alt) throws LoginException
+	public void login(Alt alt) throws LoginException, AuthenticationException
 	{
 		boolean wasUnchecked = alt.isUncheckedPremium();
 		
