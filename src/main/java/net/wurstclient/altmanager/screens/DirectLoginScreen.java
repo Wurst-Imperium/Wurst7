@@ -39,11 +39,13 @@ public final class DirectLoginScreen extends AltEditorScreen
 			try
 			{
 				MicrosoftLoginManager.login(nameOrEmail, password);
-			}catch (LoginException e)
+			}catch(LoginException e)
 			{
-				try {
+				try
+				{
 					LoginManager.login(nameOrEmail, password);
-				} catch (LoginException ex) {
+				}catch(LoginException ex)
+				{
 					message = e.getMessage();
 					doErrorEffect();
 				}
