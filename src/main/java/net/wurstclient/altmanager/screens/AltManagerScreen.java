@@ -219,7 +219,7 @@ public final class AltManagerScreen extends Screen
 			failedLogins.remove(alt);
 			client.setScreen(prevScreen);
 			
-		}catch(LoginException | AuthenticationException e)
+		}catch(LoginException e)
 		{
 			errorTimer = 8;
 			failedLogins.add(alt);

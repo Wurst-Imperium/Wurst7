@@ -28,7 +28,7 @@ public abstract class Alt
 	 *             be explained in the Exception's message, which should be
 	 *             displayed to the user.
 	 */
-	public abstract void login() throws LoginException, AuthenticationException;
+	public abstract void login() throws LoginException;
 	
 	/**
 	 * Adds this Alt to the given {@link JsonObject}. Used for saving and
