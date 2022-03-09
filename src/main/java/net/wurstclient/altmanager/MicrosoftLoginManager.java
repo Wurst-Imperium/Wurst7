@@ -26,7 +26,7 @@ public class MicrosoftLoginManager {
     private static String loginURL = "https://login.live.com/oauth20_authorize.srf?client_id=" + clientID + "&response_type=code&scope=" + scope + "&redirect_uri=" + redirectURL;
 
     public static void login(String email, String password)
-            throws AuthenticationException, LoginException {
+            throws LoginException {
         MinecraftProfile minecraftProfile = getAccount(email, password);
 
         if(minecraftProfile == null)
@@ -43,7 +43,7 @@ public class MicrosoftLoginManager {
         try {
             XBLToken xblToken = getXBLToken(getAuthorizationToken(getAuthorizationCode(email, password)));
             return getMinecraftProfile(getMinecraftAccessToken(xblToken.uhs, getXSTSToken(xblToken.token)));
-        }catch(AuthenticationException | NullPointerException e) {
+        }catch(NullPointerException | LoginException e) {
             return null;
         }
     }
@@ -91,7 +91,7 @@ public class MicrosoftLoginManager {
         return xstsToken;
     }
 
-    private static MinecraftProfile getMinecraftProfile(String token) throws AuthenticationException {
+    private static MinecraftProfile getMinecraftProfile(String token) throws LoginException {
         MinecraftProfile minecraftProfile = null;
         try {
             URL url = new URL("https://api.minecraftservices.com/minecraft/profile");
@@ -106,7 +106,7 @@ public class MicrosoftLoginManager {
             JsonObject object = jsonElement.getAsJsonObject();
 
             if(object.has("error"))
-                throw new AuthenticationException("Username / Password was incorrect.");
+                throw new LoginException("Username / Password was incorrect.");
 
             minecraftProfile = new MinecraftProfile(UUID.fromString(object.get("id").getAsString().replaceFirst(
                     "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
@@ -252,16 +252,16 @@ public class MicrosoftLoginManager {
             if(matcher.find()) {
                 ppft = matcher.group(1);
             }else{
-                throw new AuthenticationException("sFTTag not found in response.");
+                throw new LoginException("sFTTag not found in response.");
             }
 
             matcher = Pattern.compile("urlPost:[ ]?'(.+?(?='))").matcher(data);
             if(matcher.find()) {
                 login = matcher.group(1);
             }else{
-                throw new AuthenticationException("urlPost not found in response.");
+                throw new LoginException("urlPost not found in response.");
             }
-        } catch (IOException | AuthenticationException e) {
+        } catch (IOException | LoginException e) {
             e.printStackTrace();
         }
         return microsoftLogin(email, password, cookie, ppft, login);
@@ -298,7 +298,7 @@ public class MicrosoftLoginManager {
             System.out.println("Getting authorization code...");
             System.out.println(httpURLConnection.getResponseCode());
             if(httpURLConnection.getResponseCode() != 200) {
-                throw new AuthenticationException("Username / Password was incorrect.");
+                throw new LoginException("Username / Password was incorrect.");
             }
 
             Pattern pattern = Pattern.compile("[?|&]code=([\\w.-]+)");
@@ -307,10 +307,10 @@ public class MicrosoftLoginManager {
                 System.out.println("Authorization code: " + matcher.group(1));
                 authCode = matcher.group(1);
             }else{
-                throw new AuthenticationException("code not found in response.");
+                throw new LoginException("code not found in response.");
             }
 
-        } catch (IOException | AuthenticationException e) {
+        } catch (IOException | LoginException e) {
             e.printStackTrace();
         }
 

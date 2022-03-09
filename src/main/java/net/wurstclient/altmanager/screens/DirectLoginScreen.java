@@ -10,7 +10,6 @@ package net.wurstclient.altmanager.screens;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.LiteralText;
-import net.wurstclient.altmanager.AuthenticationException;
 import net.wurstclient.altmanager.LoginException;
 import net.wurstclient.altmanager.LoginManager;
 import net.wurstclient.altmanager.MicrosoftLoginManager;
@@ -40,7 +39,7 @@ public final class DirectLoginScreen extends AltEditorScreen
 			try
 			{
 				MicrosoftLoginManager.login(nameOrEmail, password);
-			}catch(AuthenticationException | LoginException e)
+			}catch (LoginException e)
 			{
 				try {
 					LoginManager.login(nameOrEmail, password);
