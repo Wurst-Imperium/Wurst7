@@ -28,14 +28,20 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.util.Session;
 import net.wurstclient.WurstClient;
 
-public class MicrosoftLoginManager
+public enum MicrosoftLoginManager
 {
+	;
+	
 	private static String clientID = "00000000402b5328";
+	
 	private static String scope =
 		"service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL";
+	
 	private static String scopeURL = "service::user.auth.xboxlive.com::MBI_SSL";
+	
 	private static String redirectURL =
 		"https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf";
+	
 	private static String loginURL =
 		"https://login.live.com/oauth20_authorize.srf?client_id=" + clientID
 			+ "&response_type=code&scope=" + scope + "&redirect_uri="
