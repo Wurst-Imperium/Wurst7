@@ -20,7 +20,7 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import net.minecraft.client.util.Session;
 import net.wurstclient.WurstClient;
 
-public class LoginManager
+public final class LoginManager
 {
 	public static void login(String email, String password)
 		throws LoginException
