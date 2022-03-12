@@ -50,8 +50,8 @@ public enum LoginManager
 			
 		}catch(AuthenticationUnavailableException e)
 		{
-			throw new LoginException(
-				"\u00a74\u00a7lCannot contact authentication server!", e);
+			throw new LoginException("Cannot contact authentication server!",
+				e);
 			
 		}catch(AuthenticationException e)
 		{
@@ -59,26 +59,25 @@ public enum LoginManager
 			String msg = e.getMessage().toLowerCase();
 			
 			if(msg.contains("invalid username or password."))
-				throw new LoginException(
-					"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
+				throw new LoginException("Wrong password! (or shadowbanned)",
+					e);
 			
 			if(msg.contains("account migrated"))
-				throw new LoginException(
-					"\u00a74\u00a7lAccount migrated to Mojang account.", e);
+				throw new LoginException("Account migrated to Mojang account.",
+					e);
 			
 			if(msg.contains("migrated"))
 				throw new LoginException(
-					"\u00a74\u00a7lAccount migrated to Microsoft account.", e);
+					"Account migrated to Microsoft account.", e);
 			
-			throw new LoginException(
-				"\u00a74\u00a7lCannot contact authentication server!", e);
+			throw new LoginException("Cannot contact authentication server!",
+				e);
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
 			
-			throw new LoginException(
-				"\u00a74\u00a7lWrong password! (or shadowbanned)", e);
+			throw new LoginException("Wrong password! (or shadowbanned)", e);
 		}
 	}
 	

@@ -39,14 +39,19 @@ public final class DirectLoginScreen extends AltEditorScreen
 			try
 			{
 				MicrosoftLoginManager.login(nameOrEmail, password);
+				
 			}catch(LoginException e)
 			{
 				try
 				{
 					LoginManager.login(nameOrEmail, password);
-				}catch(LoginException ex)
+					
+				}catch(LoginException e2)
 				{
-					message = e.getMessage();
+					message = "\u00a7c\u00a7lMicrosoft:\u00a7c "
+						+ e.getMessage() + "\n\u00a7c\u00a7lMojang:\u00a7c "
+						+ e2.getMessage();
+					
 					doErrorEffect();
 				}
 				return;
