@@ -133,215 +133,6 @@ public enum MicrosoftLoginManager
 		}
 	}
 	
-	private static String getXSTSToken(String xblToken) throws LoginException
-	{
-		JsonArray tokens = new JsonArray();
-		tokens.add(xblToken);
-		
-		JsonObject properties = new JsonObject();
-		properties.addProperty("SandboxId", "RETAIL");
-		properties.add("UserTokens", tokens);
-		
-		JsonObject postData = new JsonObject();
-		postData.addProperty("RelyingParty", "rp://api.minecraftservices.com/");
-		postData.addProperty("TokenType", "JWT");
-		postData.add("Properties", properties);
-		
-		String request = postData.toString();
-		
-		try
-		{
-			URLConnection connection = XSTS_TOKEN_URL.openConnection();
-			
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept", "application/json");
-			
-			connection.setDoOutput(true);
-			
-			System.out.println("Getting XSTS token...");
-			
-			try(OutputStream out = connection.getOutputStream())
-			{
-				out.write(request.getBytes(StandardCharsets.US_ASCII));
-			}
-			
-			WsonObject json = JsonUtils.parseConnectionToObject(connection);
-			return json.getString("Token");
-			
-		}catch(IOException e)
-		{
-			throw new LoginException("Connection failed: " + e, e);
-			
-		}catch(JsonException e)
-		{
-			throw new LoginException("Server sent invalid JSON.", e);
-		}
-	}
-	
-	private static MinecraftProfile getMinecraftProfile(String mcAccessToken)
-		throws LoginException
-	{
-		try
-		{
-			URLConnection connection = PROFILE_URL.openConnection();
-			connection.setRequestProperty("Authorization",
-				"Bearer " + mcAccessToken);
-			
-			System.out.println("Getting UUID and name...");
-			WsonObject json = JsonUtils.parseConnectionToObject(connection);
-			
-			if(json.has("error"))
-				throw new LoginException(
-					"Error message from api.minecraftservices.com:\n"
-						+ json.getElement("error"));
-			
-			UUID uuid = uuidFromJson(json.getString("id"));
-			String name = json.getString("name");
-			
-			return new MinecraftProfile(uuid, name, mcAccessToken);
-			
-		}catch(IOException e)
-		{
-			throw new LoginException("Connection failed: " + e, e);
-			
-		}catch(JsonException e)
-		{
-			throw new LoginException("Server sent invalid JSON.", e);
-		}
-	}
-	
-	private static String getMinecraftAccessToken(String uhs, String xstsToken)
-		throws LoginException
-	{
-		JsonObject postData = new JsonObject();
-		postData.addProperty("identityToken",
-			"XBL3.0 x=" + uhs + ";" + xstsToken);
-		
-		String request = postData.toString();
-		
-		try
-		{
-			URLConnection connection = MC_TOKEN_URL.openConnection();
-			
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept", "application/json");
-			
-			connection.setDoOutput(true);
-			
-			System.out.println("Getting Minecraft access token...");
-			
-			try(OutputStream out = connection.getOutputStream())
-			{
-				out.write(request.getBytes(StandardCharsets.US_ASCII));
-			}
-			
-			WsonObject json = JsonUtils.parseConnectionToObject(connection);
-			return json.getString("access_token");
-			
-		}catch(IOException e)
-		{
-			throw new LoginException("Connection failed: " + e, e);
-			
-		}catch(JsonException e)
-		{
-			throw new LoginException("Server sent invalid JSON.", e);
-		}
-	}
-	
-	private static XBoxLiveToken getXBLToken(String msftAccessToken)
-		throws LoginException
-	{
-		JsonObject properties = new JsonObject();
-		properties.addProperty("AuthMethod", "RPS");
-		properties.addProperty("SiteName", "user.auth.xboxlive.com");
-		properties.addProperty("RpsTicket", msftAccessToken);
-		
-		JsonObject postData = new JsonObject();
-		postData.addProperty("RelyingParty", "http://auth.xboxlive.com");
-		postData.addProperty("TokenType", "JWT");
-		postData.add("Properties", properties);
-		
-		String request = postData.toString();
-		
-		try
-		{
-			URLConnection connection = XBL_TOKEN_URL.openConnection();
-			
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept", "application/json");
-			
-			connection.setDoOutput(true);
-			
-			System.out.println("Getting X-Box Live token...");
-			
-			try(OutputStream out = connection.getOutputStream())
-			{
-				out.write(request.getBytes(StandardCharsets.US_ASCII));
-			}
-			
-			WsonObject json = JsonUtils.parseConnectionToObject(connection);
-			
-			String token = json.getString("Token");
-			String uhs = json.getObject("DisplayClaims").getArray("xui")
-				.getObject(0).getString("uhs");
-			
-			return new XBoxLiveToken(token, uhs);
-			
-		}catch(IOException e)
-		{
-			throw new LoginException("Connection failed: " + e, e);
-			
-		}catch(JsonException e)
-		{
-			throw new LoginException("Server sent invalid JSON.", e);
-		}
-	}
-	
-	private static String getMicrosoftAccessToken(String authCode)
-		throws LoginException
-	{
-		Map<String, String> postData = new HashMap<>();
-		postData.put("client_id", CLIENT_ID);
-		postData.put("code", authCode);
-		postData.put("grant_type", "authorization_code");
-		postData.put("redirect_uri",
-			"https://login.live.com/oauth20_desktop.srf");
-		postData.put("scope", SCOPE_UNENCODED);
-		
-		byte[] encodedDataBytes =
-			urlEncodeMap(postData).getBytes(StandardCharsets.UTF_8);
-		
-		try
-		{
-			HttpURLConnection connection =
-				(HttpURLConnection)AUTH_TOKEN_URL.openConnection();
-			
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded; charset=UTF-8");
-			
-			connection.setDoOutput(true);
-			
-			System.out.println("Getting Microsoft access token...");
-			
-			try(OutputStream out = connection.getOutputStream())
-			{
-				out.write(encodedDataBytes);
-			}
-			
-			WsonObject json = JsonUtils.parseConnectionToObject(connection);
-			return json.getString("access_token");
-			
-		}catch(IOException e)
-		{
-			throw new LoginException("Connection failed: " + e, e);
-			
-		}catch(JsonException e)
-		{
-			throw new LoginException("Server sent invalid JSON.", e);
-		}
-	}
-	
 	private static String getAuthorizationCode(String email, String password)
 		throws LoginException
 	{
@@ -437,6 +228,215 @@ public enum MicrosoftLoginManager
 		}catch(IOException e)
 		{
 			throw new LoginException("Connection failed: " + e, e);
+		}
+	}
+	
+	private static String getMicrosoftAccessToken(String authCode)
+		throws LoginException
+	{
+		Map<String, String> postData = new HashMap<>();
+		postData.put("client_id", CLIENT_ID);
+		postData.put("code", authCode);
+		postData.put("grant_type", "authorization_code");
+		postData.put("redirect_uri",
+			"https://login.live.com/oauth20_desktop.srf");
+		postData.put("scope", SCOPE_UNENCODED);
+		
+		byte[] encodedDataBytes =
+			urlEncodeMap(postData).getBytes(StandardCharsets.UTF_8);
+		
+		try
+		{
+			HttpURLConnection connection =
+				(HttpURLConnection)AUTH_TOKEN_URL.openConnection();
+			
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type",
+				"application/x-www-form-urlencoded; charset=UTF-8");
+			
+			connection.setDoOutput(true);
+			
+			System.out.println("Getting Microsoft access token...");
+			
+			try(OutputStream out = connection.getOutputStream())
+			{
+				out.write(encodedDataBytes);
+			}
+			
+			WsonObject json = JsonUtils.parseConnectionToObject(connection);
+			return json.getString("access_token");
+			
+		}catch(IOException e)
+		{
+			throw new LoginException("Connection failed: " + e, e);
+			
+		}catch(JsonException e)
+		{
+			throw new LoginException("Server sent invalid JSON.", e);
+		}
+	}
+	
+	private static XBoxLiveToken getXBLToken(String msftAccessToken)
+		throws LoginException
+	{
+		JsonObject properties = new JsonObject();
+		properties.addProperty("AuthMethod", "RPS");
+		properties.addProperty("SiteName", "user.auth.xboxlive.com");
+		properties.addProperty("RpsTicket", msftAccessToken);
+		
+		JsonObject postData = new JsonObject();
+		postData.addProperty("RelyingParty", "http://auth.xboxlive.com");
+		postData.addProperty("TokenType", "JWT");
+		postData.add("Properties", properties);
+		
+		String request = postData.toString();
+		
+		try
+		{
+			URLConnection connection = XBL_TOKEN_URL.openConnection();
+			
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept", "application/json");
+			
+			connection.setDoOutput(true);
+			
+			System.out.println("Getting X-Box Live token...");
+			
+			try(OutputStream out = connection.getOutputStream())
+			{
+				out.write(request.getBytes(StandardCharsets.US_ASCII));
+			}
+			
+			WsonObject json = JsonUtils.parseConnectionToObject(connection);
+			
+			String token = json.getString("Token");
+			String uhs = json.getObject("DisplayClaims").getArray("xui")
+				.getObject(0).getString("uhs");
+			
+			return new XBoxLiveToken(token, uhs);
+			
+		}catch(IOException e)
+		{
+			throw new LoginException("Connection failed: " + e, e);
+			
+		}catch(JsonException e)
+		{
+			throw new LoginException("Server sent invalid JSON.", e);
+		}
+	}
+	
+	private static String getXSTSToken(String xblToken) throws LoginException
+	{
+		JsonArray tokens = new JsonArray();
+		tokens.add(xblToken);
+		
+		JsonObject properties = new JsonObject();
+		properties.addProperty("SandboxId", "RETAIL");
+		properties.add("UserTokens", tokens);
+		
+		JsonObject postData = new JsonObject();
+		postData.addProperty("RelyingParty", "rp://api.minecraftservices.com/");
+		postData.addProperty("TokenType", "JWT");
+		postData.add("Properties", properties);
+		
+		String request = postData.toString();
+		
+		try
+		{
+			URLConnection connection = XSTS_TOKEN_URL.openConnection();
+			
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept", "application/json");
+			
+			connection.setDoOutput(true);
+			
+			System.out.println("Getting XSTS token...");
+			
+			try(OutputStream out = connection.getOutputStream())
+			{
+				out.write(request.getBytes(StandardCharsets.US_ASCII));
+			}
+			
+			WsonObject json = JsonUtils.parseConnectionToObject(connection);
+			return json.getString("Token");
+			
+		}catch(IOException e)
+		{
+			throw new LoginException("Connection failed: " + e, e);
+			
+		}catch(JsonException e)
+		{
+			throw new LoginException("Server sent invalid JSON.", e);
+		}
+	}
+	
+	private static String getMinecraftAccessToken(String uhs, String xstsToken)
+		throws LoginException
+	{
+		JsonObject postData = new JsonObject();
+		postData.addProperty("identityToken",
+			"XBL3.0 x=" + uhs + ";" + xstsToken);
+		
+		String request = postData.toString();
+		
+		try
+		{
+			URLConnection connection = MC_TOKEN_URL.openConnection();
+			
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept", "application/json");
+			
+			connection.setDoOutput(true);
+			
+			System.out.println("Getting Minecraft access token...");
+			
+			try(OutputStream out = connection.getOutputStream())
+			{
+				out.write(request.getBytes(StandardCharsets.US_ASCII));
+			}
+			
+			WsonObject json = JsonUtils.parseConnectionToObject(connection);
+			return json.getString("access_token");
+			
+		}catch(IOException e)
+		{
+			throw new LoginException("Connection failed: " + e, e);
+			
+		}catch(JsonException e)
+		{
+			throw new LoginException("Server sent invalid JSON.", e);
+		}
+	}
+	
+	private static MinecraftProfile getMinecraftProfile(String mcAccessToken)
+		throws LoginException
+	{
+		try
+		{
+			URLConnection connection = PROFILE_URL.openConnection();
+			connection.setRequestProperty("Authorization",
+				"Bearer " + mcAccessToken);
+			
+			System.out.println("Getting UUID and name...");
+			WsonObject json = JsonUtils.parseConnectionToObject(connection);
+			
+			if(json.has("error"))
+				throw new LoginException(
+					"Error message from api.minecraftservices.com:\n"
+						+ json.getElement("error"));
+			
+			UUID uuid = uuidFromJson(json.getString("id"));
+			String name = json.getString("name");
+			
+			return new MinecraftProfile(uuid, name, mcAccessToken);
+			
+		}catch(IOException e)
+		{
+			throw new LoginException("Connection failed: " + e, e);
+			
+		}catch(JsonException e)
+		{
+			throw new LoginException("Server sent invalid JSON.", e);
 		}
 	}
 	
