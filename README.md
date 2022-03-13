@@ -1,5 +1,30 @@
 # Wurst Client v7
 
+## ⚠ We Are Looking For Translators ⚠
+
+### Current Status of Translations
+
+|Language|Status|
+|--------|--------|
+|Chinese (Simplified/Mainland)|Pending changes: [#574](https://github.com/Wurst-Imperium/Wurst7/pull/574)|
+|Chinese (Traditional/Taiwan)|147/151 done|
+|Chinese (Cantonese/Hong Kong)|151/151 done.|
+|French (France)|There are 3 pending submissions ([#515](https://github.com/Wurst-Imperium/Wurst7/pull/515), [#531](https://github.com/Wurst-Imperium/Wurst7/pull/531), [#552](https://github.com/Wurst-Imperium/Wurst7/pull/552)) with different translations and I don't know which one to merge. If you speak French, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker.|
+|German (Germany)|50/151 done. I'll probably do the rest myself since I can speak it natively.|
+|Italian (Italy)|146/151 done|
+|Japanese (Japan)|137/151 done|
+|Polish (Poland)|147/151 done|
+|Portugese (Brazil)|Pending, needs reviews, check [#528](https://github.com/Wurst-Imperium/Wurst7/pull/528).|
+|Russian (Russia)|Pending changes: [#572](https://github.com/Wurst-Imperium/Wurst7/pull/572), [#580](https://github.com/Wurst-Imperium/Wurst7/pull/580)|
+|Turkish (Turkey)|There are 2 pending submissions ([#511](https://github.com/Wurst-Imperium/Wurst7/pull/511), [#512](https://github.com/Wurst-Imperium/Wurst7/pull/512)) with different translations and I don't know which one to merge. If you speak Turkish, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker. |
+|Ukrainian (Ukraine)|137/151 done|
+
+If you speak both English and some other language, please help us by translating Wurst or reviewing existing translations. The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
+
+Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+
+For discussion about translations, see [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) here or [#wurst-translations](https://chat.wurstimperium.net/channel/wurst-translations) on our RocketChat server.
+
 ## Downloads (for users)
 
 https://www.wurstclient.net/download/

@@ -42,7 +42,7 @@
   "description.wurst.hack.clickaura": "Automatically attacks the closest valid entity whenever you click.\n\n§c§lWARNING:§r ClickAuras generally look more suspicious than Killauras and are easier for plugins to detect. It is recommended to use Killaura or TriggerBot instead.",
   "description.wurst.hack.clickgui": "Window-based ClickGUI.",
   "description.wurst.hack.crashchest": "Generates a chest that essentially bans people from the server if they have too many copies of it in their inventory. §c§lWARNING:§r §cThis cannot be undone. Use with caution!§r\n\nIf copies are instead placed in a chest, anyone who opens the chest will be kicked from the server (just once).",
-  "description.wurst.hack.creativeflight": "Allows you to you fly like in Creative Mode.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
+  "description.wurst.hack.creativeflight": "Allows you to fly like in Creative Mode.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.criticals": "Changes all your hits to critical hits.",
   "description.wurst.hack.crystalaura": "Automatically places (optional) and detonates end crystals to kill entities around you.",
   "description.wurst.hack.derp": "Randomly moves your head around.\nOnly visible to other players.",
@@ -56,7 +56,7 @@
   "description.wurst.hack.feedaura": "Automatically feeds animals around you.",
   "description.wurst.hack.fightbot": "A bot that automatically walks around and kills everything.\nGood for MobArena.",
   "description.wurst.hack.fish": "Disables underwater gravity so you can swim like a fish.",
-  "description.wurst.hack.flight": "Allows you to you fly.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
+  "description.wurst.hack.flight": "Allows you to fly.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.follow": "A bot that follows the closest entity.\nVery annoying.\n\nUse .follow to follow a specific entity.",
   "description.wurst.hack.forceop": "Cracks AuthMe passwords.\nCan be used to get OP.",
   "description.wurst.hack.freecam": "Allows you to move the camera without moving your character.",
@@ -145,5 +145,9 @@
   "description.wurst.altmanager.favorite": "You have marked this alt as one of your favorites.",
   "description.wurst.altmanager.window": "This button opens another window.",
   "description.wurst.altmanager.window_freeze": "It might look like the game is not responding while that window is open.",
-  "description.wurst.altmanager.fullscreen": "§cTurn off fullscreen mode!"
+  "description.wurst.altmanager.fullscreen": "§cTurn off fullscreen mode!",
+  "gui.wurst.altmanager.folder_error.title": "Couldn't create the '.Wurst encryption' folder!",
+  "gui.wurst.altmanager.folder_error.message": "You may have accidentally blocked Wurst from accessing this folder.\nAltManager cannot encrypt or decrypt your alt list without it.\nYou can still use AltManager, but any alts you create now won't be saved.\n\nThe full error is as follows:\n%s",
+  "gui.wurst.altmanager.empty.title": "Your alt list is empty.",
+  "gui.wurst.altmanager.empty.message": "Would you like some random alts to get started?"
 }

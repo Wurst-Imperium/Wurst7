@@ -9,8 +9,8 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.ChatUtil;
-import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
+import net.wurstclient.altmanager.CrackedAlt;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -49,7 +49,7 @@ public final class AddAltCmd extends Command
 		if(name.equalsIgnoreCase("Alexander01998"))
 			return;
 		
-		WURST.getAltManager().add(new Alt(name, null, null));
+		WURST.getAltManager().add(new CrackedAlt(name));
 		ChatUtils.message("Added 1 alt.");
 	}
 	
@@ -71,7 +71,7 @@ public final class AddAltCmd extends Command
 				|| name.equalsIgnoreCase("Alexander01998"))
 				continue;
 			
-			altManager.add(new Alt(name, null, null));
+			altManager.add(new CrackedAlt(name));
 			alts++;
 		}
 		
