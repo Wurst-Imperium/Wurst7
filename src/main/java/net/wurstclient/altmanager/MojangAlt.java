@@ -61,7 +61,13 @@ public final class MojangAlt extends Alt
 	@Override
 	public void login() throws LoginException
 	{
-		LoginManager.login(email, password);
+		try
+		{
+			MicrosoftLoginManager.login(email, password);
+		}catch(Exception e)
+		{
+			LoginManager.login(email, password);
+		}
 		name = getNameFromSession();
 	}
 	
