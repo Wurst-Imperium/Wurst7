@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -45,37 +46,10 @@ public enum JsonUtils
 		}
 	}
 	
-	public static JsonElement parseURL(String url)
-		throws IOException, JsonException
-	{
-		URI uri = URI.create(url);
-		try(InputStream input = uri.toURL().openStream())
-		{
-			InputStreamReader reader = new InputStreamReader(input);
-			BufferedReader bufferedReader = new BufferedReader(reader);
-			return JsonParser.parseReader(bufferedReader);
-			
-		}catch(JsonParseException e)
-		{
-			throw new JsonException(e);
-		}
-	}
-	
 	public static WsonArray parseFileToArray(Path path)
 		throws IOException, JsonException
 	{
 		JsonElement json = parseFile(path);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
-	}
-	
-	public static WsonArray parseURLToArray(String url)
-		throws IOException, JsonException
-	{
-		JsonElement json = parseURL(url);
 		
 		if(!json.isJsonArray())
 			throw new JsonException();
@@ -94,10 +68,85 @@ public enum JsonUtils
 		return new WsonObject(json.getAsJsonObject());
 	}
 	
+	public static JsonElement parseURL(String url)
+		throws IOException, JsonException
+	{
+		URI uri = URI.create(url);
+		try(InputStream input = uri.toURL().openStream())
+		{
+			InputStreamReader reader = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			return JsonParser.parseReader(bufferedReader);
+			
+		}catch(JsonParseException e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	public static WsonArray parseURLToArray(String url)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseURL(url);
+		
+		if(!json.isJsonArray())
+			throw new JsonException();
+		
+		return new WsonArray(json.getAsJsonArray());
+	}
+	
 	public static WsonObject parseURLToObject(String url)
 		throws IOException, JsonException
 	{
 		JsonElement json = parseURL(url);
+		
+		if(!json.isJsonObject())
+			throw new JsonException();
+		
+		return new WsonObject(json.getAsJsonObject());
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURL(String)} won't do.
+	 */
+	public static JsonElement parseConnection(URLConnection connection)
+		throws IOException, JsonException
+	{
+		try(InputStream input = connection.getInputStream())
+		{
+			InputStreamReader reader = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			return JsonParser.parseReader(bufferedReader);
+			
+		}catch(JsonParseException e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURLToArray(String)} won't
+	 * do.
+	 */
+	public static WsonArray parseConnectionToArray(URLConnection connection)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseConnection(connection);
+		
+		if(!json.isJsonArray())
+			throw new JsonException();
+		
+		return new WsonArray(json.getAsJsonArray());
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURLToObject(String)}
+	 * won't do.
+	 */
+	public static WsonObject parseConnectionToObject(URLConnection connection)
+		throws IOException, JsonException
+	{
+		JsonElement json = parseConnection(connection);
 		
 		if(!json.isJsonObject())
 			throw new JsonException();
@@ -215,5 +264,13 @@ public enum JsonUtils
 			throw new JsonException();
 		
 		return new WsonArray(json.getAsJsonArray());
+	}
+	
+	public static WsonObject getAsObject(JsonElement json) throws JsonException
+	{
+		if(!json.isJsonObject())
+			throw new JsonException();
+		
+		return new WsonObject(json.getAsJsonObject());
 	}
 }

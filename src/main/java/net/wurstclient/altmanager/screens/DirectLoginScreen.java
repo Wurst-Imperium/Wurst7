@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.altmanager.LoginException;
 import net.wurstclient.altmanager.LoginManager;
+import net.wurstclient.altmanager.MicrosoftLoginManager;
 
 public final class DirectLoginScreen extends AltEditorScreen
 {
@@ -37,12 +38,22 @@ public final class DirectLoginScreen extends AltEditorScreen
 		else
 			try
 			{
-				LoginManager.login(nameOrEmail, password);
+				MicrosoftLoginManager.login(nameOrEmail, password);
 				
 			}catch(LoginException e)
 			{
-				message = e.getMessage();
-				doErrorEffect();
+				try
+				{
+					LoginManager.login(nameOrEmail, password);
+					
+				}catch(LoginException e2)
+				{
+					message = "\u00a7c\u00a7lMicrosoft:\u00a7c "
+						+ e.getMessage() + "\n\u00a7c\u00a7lMojang:\u00a7c "
+						+ e2.getMessage();
+					
+					doErrorEffect();
+				}
 				return;
 			}
 		
