@@ -32,6 +32,9 @@ public final class AltRenderer
 	
 	private static void bindSkinTexture(String name)
 	{
+		if(name.isEmpty())
+			name = "Steve";
+		
 		if(loadedSkins.get(name) == null)
 		{
 			UUID uuid = PlayerEntity

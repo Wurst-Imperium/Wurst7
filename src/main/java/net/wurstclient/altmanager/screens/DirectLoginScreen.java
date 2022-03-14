@@ -10,7 +10,9 @@ package net.wurstclient.altmanager.screens;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.LiteralText;
+import net.wurstclient.altmanager.LoginException;
 import net.wurstclient.altmanager.LoginManager;
+import net.wurstclient.altmanager.MicrosoftLoginManager;
 
 public final class DirectLoginScreen extends AltEditorScreen
 {
@@ -28,17 +30,34 @@ public final class DirectLoginScreen extends AltEditorScreen
 	@Override
 	protected void pressDoneButton()
 	{
-		if(getPassword().isEmpty())
-		{
-			message = "";
-			LoginManager.changeCrackedName(getEmail());
-			
-		}else
-			message = LoginManager.login(getEmail(), getPassword());
+		String nameOrEmail = getNameOrEmail();
+		String password = getPassword();
 		
-		if(message.isEmpty())
-			client.setScreen(new TitleScreen());
+		if(password.isEmpty())
+			LoginManager.changeCrackedName(nameOrEmail);
 		else
-			doErrorEffect();
+			try
+			{
+				MicrosoftLoginManager.login(nameOrEmail, password);
+				
+			}catch(LoginException e)
+			{
+				try
+				{
+					LoginManager.login(nameOrEmail, password);
+					
+				}catch(LoginException e2)
+				{
+					message = "\u00a7c\u00a7lMicrosoft:\u00a7c "
+						+ e.getMessage() + "\n\u00a7c\u00a7lMojang:\u00a7c "
+						+ e2.getMessage();
+					
+					doErrorEffect();
+				}
+				return;
+			}
+		
+		message = "";
+		client.setScreen(new TitleScreen());
 	}
 }

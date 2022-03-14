@@ -25,13 +25,13 @@ public class FluidRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
+			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z"},
 		cancellable = true)
-	private static void onIsSideCovered(BlockView blockView_1,
-		BlockPos blockPos_1, Direction direction_1, float float_1,
+	private static void onIsSideCovered(BlockView blockView, BlockPos blockPos,
+		Direction direction, float maxDeviation, BlockState blockState,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		BlockState state = blockView_1.getBlockState(blockPos_1);
+		BlockState state = blockView.getBlockState(blockPos);
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
 		EventManager.fire(event);
 		

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
@@ -31,6 +32,7 @@ import net.minecraft.world.World;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -86,6 +88,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 			return;
 		
 		cir.setReturnValue(true);
+	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
+	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
+	{
+		EventManager.fire(StopUsingItemEvent.INSTANCE);
 	}
 	
 	@Override

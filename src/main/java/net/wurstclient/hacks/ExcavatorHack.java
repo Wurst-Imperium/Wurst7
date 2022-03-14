@@ -402,7 +402,7 @@ public final class ExcavatorHack extends Hack
 			posLookingAt = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
 			
 			// offset if sneaking
-			if(MC.options.keySneak.isPressed())
+			if(MC.options.sneakKey.isPressed())
 				posLookingAt = posLookingAt
 					.offset(((BlockHitResult)MC.crosshairTarget).getSide());
 			
@@ -410,7 +410,7 @@ public final class ExcavatorHack extends Hack
 			posLookingAt = null;
 		
 		// set selected position
-		if(posLookingAt != null && MC.options.keyUse.isPressed())
+		if(posLookingAt != null && MC.options.useKey.isPressed())
 			step.pos = posLookingAt;
 	}
 	
