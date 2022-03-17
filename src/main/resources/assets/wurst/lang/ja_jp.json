@@ -91,7 +91,7 @@
   "description.wurst.hack.navigator": "時間の経過とともに好みを学習する検索可能なGUI。",
   "description.wurst.hack.nobackground": "インベントリーの背後にある暗い背景を削除します。",
   "description.wurst.hack.noclip": "ブロック内を自由に移動できます。\nブロック（砂など）をアクティブにするには、頭に落とす必要があります。\n\n§c§l警告:§r ブロックを移動中にダメージを受けます！",
-  "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
+  "description.wurst.hack.nocomcrash": "Nocomエクスプロイトを使用してサーバーをラグくしたりクラッシュさせます。\nPaperサーバーでは機能しません。 Vanilla、Spigot、Fabricで動作確認済み。 一部のAntiCheatにより無効化される可能性があります。",
   "description.wurst.hack.nofall": "落下によるダメージからあなたを守ります。",
   "description.wurst.hack.nofireoverlay": "火がついているときにオーバーレイを表示しません。\n\n§c§l警告:§r これにより、気付かずに燃え尽きる可能性があります。",
   "description.wurst.hack.nohurtcam": "ダメージをくらったときの揺れ効果を無効にします。",
