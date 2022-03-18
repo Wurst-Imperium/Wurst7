@@ -67,10 +67,10 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			defaultMouseSensitivity = gameOptions.mouseSensitivity;
 			
 		// Adjust mouse sensitivity in relation to zoom level.
-		// (fov / currentLevel) / fov is a value between 0.02 (50x zoom)
+		// 1.0 / currentLevel is a value between 0.02 (50x zoom)
 		// and 1 (no zoom).
 		gameOptions.mouseSensitivity =
-			defaultMouseSensitivity * (fov / currentLevel / fov);
+			defaultMouseSensitivity * (1.0 / currentLevel);
 		
 		return fov / currentLevel;
 	}
