@@ -64,6 +64,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private HashMap<Item, Integer> storageAvailabilityMap = new HashMap<>();
     private HashMap<Block, Integer> worldAvailabilityMap = new HashMap<>();
     private HashMap<Block, BlockPos> nearestBlockPosMap = new HashMap<>();
+    private HashMap<Block, Double> nearestBlockDistanceMap = new HashMap<>();
     private HashMap<Item, Integer> totalInventoryAvailabilityMap = new HashMap<>();
 
     private HashSet<Block> containerBlockTypes;
@@ -500,8 +501,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private class ContainerStorageQuery extends StorageQuery<Item> {
         private HashMap<BlockPos, HashMap<Item, Integer>> containers;
+        public BlockPos nearestContainer = BlockPos.ORIGIN;
+        public double nearestContainerDistance = 0.0;
         public ContainerStorageQuery() {
             containers = new HashMap<>();
+        }
+        public void calculateNearestContainer(Vec3d pos) {
+            double minDistance = Double.POSITIVE_INFINITY;
+            for (BlockPos container : containers.keySet()) {
+                Vec3d containerPos = new Vec3d(container.getX(), container.getY(), container.getZ());
+                double distance = pos.subtract(containerPos).length();
+                if (distance < minDistance) {
+                    nearestContainer = container;
+                    minDistance = distance;
+                }
+            }
+            nearestContainerDistance = minDistance;
         }
         public void updateContainer(HashMap<Item, Integer> content, BlockPos pos) {
             containers.put(pos, content);
@@ -653,6 +668,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (new Vec3d(pos.getX(), pos.getY(), pos.getZ()).subtract(playerPos).lengthSquared() < oldDistance)
                     res.put(block, pos);
             });
+            return res;
+        }
+        public HashMap<Block, Double> getNearestBlockDistances(HashMap<Block, BlockPos> nearestPositions) {
+            HashMap<Block, Double> res = new HashMap<>();
+            Vec3d playerPos = MC.player.getPos();
+            for (Block block : nearestPositions.keySet()) {
+                BlockPos pos = nearestPositions.get(block);
+                Vec3d blockPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+                res.put(block, playerPos.subtract(blockPos).length());
+            }
             return res;
         }
         public HashMap<Block, HashSet<BlockPos>> getLocations(HashSet<Block> blocks) {
@@ -964,6 +989,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private HashMap<Block, Integer> worldAvailability;
         private HashMap<Integer, Item> toolAvailability;
         private HashMap<Integer, Double> efficiencyMap = new HashMap<>();
+        private HashMap<Integer, Double> naiveEfficiencyMap = new HashMap<>();
         private HashSet<Node> visited;
         private List<StorageNode> storageNodes = new ArrayList<>();
         private HashMap<Item, Integer> craftingItemFrequency = new HashMap<>();
@@ -994,6 +1020,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.storageNodes = new ArrayList<>(storageNodes);
             state.craftingItemFrequency = (HashMap<Item, Integer>) craftingItemFrequency.clone();
             state.efficiencyMap = (HashMap<Integer, Double>) efficiencyMap.clone();
+            state.naiveEfficiencyMap = (HashMap<Integer, Double>) naiveEfficiencyMap.clone();
             state.deadNodes = (HashSet<Integer>) deadNodes.clone();
             return state;
         }
@@ -1015,6 +1042,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             craftingItemFrequency.putAll(other.craftingItemFrequency);
             efficiencyMap.clear();
             efficiencyMap.putAll(other.efficiencyMap);
+            naiveEfficiencyMap.clear();
+            naiveEfficiencyMap.putAll(other.efficiencyMap);
             deadNodes.clear();
             deadNodes.addAll(other.deadNodes);
         }
@@ -1206,10 +1235,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
-        private int calculateMaxCraftableInternal(int upperBound, boolean useHeuristic, boolean setMaxCraftable, boolean populateNaiveMaxCraftable) {
+        protected abstract void calculateLowerEfficiencyBound(CraftingState state);
+        protected void genNaiveEfficiencyMap(CraftingState state) {
+            if (naiveMaxCraftable == 0)
+                return;
+            for (Node child : children) {
+                child.genNaiveEfficiencyMap(state);
+            }
+            calculateLowerEfficiencyBound(state);
+        }
+        private int calculateMaxCraftableInternal(int upperBound, boolean useHeuristic, boolean setMaxCraftable, boolean populateNaiveMetrics) {
             CraftingState state = createFreshState();
-            if (populateNaiveMaxCraftable)
+            if (populateNaiveMetrics) {
+                containerQuery.calculateNearestContainer(MC.player.getPos());
                 genNaiveMaxCraftable(state.clone());
+                genNaiveEfficiencyMap(state);
+            }
             HashMap<Integer, Integer> neededMap = new HashMap<>();
             CraftingState newState = state.clone();
             HashMap<Item, HashMap<Integer, Integer>> excess = new HashMap<>();
@@ -1415,6 +1456,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.efficiencyMap.put(nodeId, executionTime);
         }
         @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.05;
+            for (Node child : children) {
+                executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
         protected boolean consumeResourcesInternal(Resources<OperableInteger> resources, CraftingState state, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, int excessOverflow) {
             HashMap<Item, ItemStack> ingredients = collectIngredients();
             int toConsume = 0;
@@ -1444,6 +1493,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            if (Registry.ITEM.getId(target).getPath().contains("crossbow")) {
+                System.out.println("reached");
+            }
             Resources<OperableInteger> res = new Resources<>();
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             HashMap<Item, ItemStack> ingredients = collectIngredients();
@@ -1641,6 +1693,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.efficiencyMap.put(nodeId, executionTime);
         }
         @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.0;
+            double minChild = Double.POSITIVE_INFINITY;
+            for (Node child : children) {
+                if (state.naiveEfficiencyMap.containsKey(child.nodeId))
+                    minChild = Math.min(minChild, state.naiveEfficiencyMap.get(child.nodeId));
+            }
+            executionTime += minChild;
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
         protected boolean consumeResourcesInternal(Resources<OperableInteger> resources, CraftingState state, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, int excessOverflow) {
             int toConsume = 0;
             if (resources.containsKey(nodeId))
@@ -1681,10 +1744,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             CraftingState newState = state.clone();
             HashMap<Integer, Integer> newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
             HashMap<Item, HashMap<Integer, Integer>> newExcess = deepcopyExcess(excess);
-            for (Node child : children) {
+            List<Node> prioritizedChildren = new ArrayList<>(children);
+            Collections.sort(prioritizedChildren, Comparator.comparing(c -> state.naiveEfficiencyMap.getOrDefault(c.nodeId, 0.0)));
+            double bestEfficiency = Double.POSITIVE_INFINITY;
+            for (Node child : prioritizedChildren) {
+                if (bestEfficiency < state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0))
+                    break;
                 if (child.naiveMaxCraftable == 0)
                     continue;
                 Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
+                bestEfficiency = Math.min(bestEfficiency, newState.efficiencyMap.getOrDefault(child.nodeId, Double.POSITIVE_INFINITY));
                 if (childRes.getLeft()) {
                     options.add(new Pair<>(child, childRes));
                     state.efficiencyMap = (HashMap<Integer, Double>) newState.efficiencyMap.clone();
@@ -1692,6 +1761,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 newState = state.clone();
                 newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
                 newExcess = deepcopyExcess(excess);
+
             }
             if (options.size() == 0)
                 return new Pair<>(numNeeded == 0, res);
@@ -1953,6 +2023,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.efficiencyMap.put(nodeId, executionTime);
         }
         @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.0;
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.INVENTORY));
@@ -2016,6 +2091,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.efficiencyMap.put(nodeId, executionTime);
         }
         @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = containerQuery.nearestContainerDistance / MC.player.getMovementSpeed();
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.STORAGE));
@@ -2075,11 +2155,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected void calculateExecutionTime(Resources<OperableInteger> result, CraftingState state) {
-            Vec3d playerPos = MC.player.getPos();
-            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
             int count = result.getOrDefault(nodeId, new Pair<>(new OperableInteger(), ResourceDomain.COMPOSITE)).getLeft().getValue();
-            BlockPos nearestPos = nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN);
-            double executionTime = new Vec3d(nearestPos.getX(), nearestPos.getY(), nearestPos.getZ()).subtract(playerPos).length() / MC.player.getMovementSpeed();
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            double executionTime = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
             executionTime += count * 100;
             if (block.getDefaultState().isToolRequired()) {
                 for (Node child : children) {
@@ -2087,6 +2165,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            double executionTime = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            if (block.getDefaultState().isToolRequired()) {
+                for (Node child : children) {
+                    executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+                }
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
@@ -2147,11 +2236,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected void calculateExecutionTime(Resources<OperableInteger> result, CraftingState state) {
-            Vec3d playerPos = MC.player.getPos();
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
-            BlockPos nearestPos = nearestBlockPosMap.getOrDefault(targetBlock, BlockPos.ORIGIN);
-            double executionTime = new Vec3d(nearestPos.getX(), nearestPos.getY(), nearestPos.getZ()).subtract(playerPos).length() / MC.player.getMovementSpeed();
+            double executionTime = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
             state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
+            double executionTime = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
@@ -2226,6 +2319,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 executionTime += state.efficiencyMap.getOrDefault(child.nodeId, 0.0);
             }
             state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.1;
+            for (Node child : children) {
+                executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
@@ -2311,6 +2412,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 executionTime += state.efficiencyMap.getOrDefault(child.nodeId, 0.0);
             }
             state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.0;
+            for (Node child : children) {
+                executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
@@ -2400,6 +2509,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 executionTime += state.efficiencyMap.getOrDefault(child.nodeId, 0.0);
             }
             state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.0;
+            for (Node child : children) {
+                executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
@@ -2653,6 +2770,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         storageAvailabilityMap = containerQuery.getAvailabilityMap();
                         worldAvailabilityMap = worldQuery.getAvailabilityMap();
                         nearestBlockPosMap = worldQuery.getNearestPositions();
+                        nearestBlockDistanceMap = worldQuery.getNearestBlockDistances(nearestBlockPosMap);
                         doneCrafting = false;
                     }
                     craft(entry.itemId, entry.count, entry.craftAll);
