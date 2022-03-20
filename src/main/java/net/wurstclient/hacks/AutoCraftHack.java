@@ -106,6 +106,26 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private CraftingProcess getCraftingProcessByType(Recipe<?> recipe, RecipeType type) {
+        if (type == RecipeType.CRAFTING) {
+            return new RecipeCraftingProcess(recipe);
+        }
+        else if (type == RecipeType.SMELTING) {
+            return new SmeltingCraftingProcess(recipe);
+        }
+        return null;
+    }
+
+    private String getRecipeNameSeparator(RecipeType type) {
+        if (type == RecipeType.CRAFTING) {
+            return "_from_";
+        }
+        else if (type == RecipeType.SMELTING) {
+            return "_from_smelting_";
+        }
+        return null;
+    }
+
     private void initProcessMap() {
         processMap = new HashMap<>();
         RecipeManager recipeManager = MC.world.getRecipeManager();
@@ -118,21 +138,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 continue;
             Recipe recipe = optionalRecipe.get();
             RecipeType<?> recipeType = recipe.getType();
-            if (recipeType != RecipeType.CRAFTING)
+            if (!(recipeType == RecipeType.CRAFTING || recipeType == RecipeType.SMELTING))
                 continue;
             String path = id.getPath();
-            if (path.contains("_from_")) {
-                String[] components = path.split("_from_");
+            String separator = getRecipeNameSeparator(recipeType);
+            if (path.contains(separator)) {
+                String[] components = path.split(separator);
                 String sourceId = components[0];
                 Identifier baseId = new Identifier(id.getNamespace(), sourceId);
                 if (!processMap.containsKey(baseId))
                     processMap.put(baseId, new ArrayList<>());
-                processMap.get(baseId).add(new RecipeCraftingProcess(recipe));
+                processMap.get(baseId).add(getCraftingProcessByType(recipe, recipeType));
             }
             else {
                 if (!processMap.containsKey(id))
                     processMap.put(id, new ArrayList<>());
-                processMap.get(id).add(new RecipeCraftingProcess(recipe));
+                processMap.get(id).add(getCraftingProcessByType(recipe, recipeType));
             }
         }
         for (Identifier id : Registry.BLOCK.getIds()) {
@@ -737,6 +758,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private class SmeltingCraftingProcess extends CraftingProcess {
+        private Recipe<?> recipe;
+        public SmeltingCraftingProcess(Recipe<?> recipe) {
+            this.recipe = recipe;
+        }
+        @Override
+        public int getMultiplicity() {
+            int res = 1;
+            for (Ingredient ing : recipe.getIngredients()) {
+                res = Math.max(res, ing.getMatchingStacks().length);
+            }
+            return res;
+        }
+        @Override
+        public Node getNode() {
+            return new SmeltingNode(recipe.getOutput().getItem(), 0, List.of(this));
+        }
+    }
+
     private class InventoryCraftingProcess extends CraftingProcess {
         private Item item;
         public InventoryCraftingProcess(Item item) {
@@ -1270,24 +1310,29 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 applyMaxCraftableMap(neededMap);
             return amount;
         }
-        private void print(int indent, boolean ignoreNeeded) {
-            if ((ignoreNeeded && naiveMaxCraftable > 0 && timeTaken >= 10) || needed > 0) {
+        private int print(int indent, boolean ignoreNeeded) {
+            if ((ignoreNeeded && naiveMaxCraftable > 0) || needed > 0) {
                 String indentation = "";
                 for (int i = 0; i < indent; i++) {
                     indentation += " ";
                 }
                 System.out.println(indentation + target + ": " + needed + ", time " + timeTaken + ", calls " + callCounter + ", " + this.getClass());
+                int calls = 1;
                 for (Node child : children) {
-                    child.print(indent + 4, ignoreNeeded);
+                    calls += child.print(indent + 4, ignoreNeeded);
                 }
+                return calls;
             }
+            return 0;
         }
         private int calculateMaxCraftable(int upperBound) {
             globalTimeTaken = BigInteger.ZERO;
             generateTree(new HashSet<>(), createFreshState());
             reorderNodeIds(0);
             int amount = calculateMaxCraftableInternal(upperBound, true, true, true);
-            print(0, true);
+            int numPrinted = print(0, true);
+            System.out.println("Total number of nodes: " + maxNodeId);
+            System.out.println("Number of nodes printed: " + numPrinted);
             System.out.println("Craftable: " + amount);
             BigInteger[] arr = globalTimeTaken.divideAndRemainder(new BigInteger("1000000000"));
             System.out.println("Time taken: " + arr[0] + ", " + arr[1]);
@@ -1404,6 +1449,248 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return target.equals(o.target);
             }
             return false;
+        }
+    }
+
+    private class SmeltingNode extends Node {
+        private Node fuel;
+        private Node furnace;
+        public SmeltingNode(Item target, int needed, List<CraftingProcess> processes) {
+            super(target, needed, processes);
+        }
+        @Override
+        protected void stackResourcesInternal(int num, Resources<OperableInteger> dest, Resources<OperableInteger> src) {
+            if (!src.containsKey(nodeId))
+                return;
+            Pair<OperableInteger, ResourceDomain> item = src.get(nodeId);
+            dest.put(nodeId, new Pair<>(new OperableInteger(num), item.getRight()));
+            for (Node child : children) {
+                if (src.containsKey(child.nodeId)) {
+                    if (child == furnace) {
+                        child.stackResourcesInternal(1, dest, src);
+                    }
+                    else if (child == fuel) {
+                        child.stackResourcesInternal((num / 8) + (num % 8 > 0 ? 1 : 0), dest, src);
+                    }
+                    else {
+                        child.stackResourcesInternal(num, dest, src);
+                    }
+                }
+            }
+        }
+        @Override
+        protected List<Node> getChildrenInternal(HashSet<Node> nodes) {
+            List<Node> res = new ArrayList<>();
+            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            for (ItemStack stack : ingredients.values()) {
+                Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
+                CraftingPlan plan = getCraftingPlan(itemIdentifier);
+                Node child = plan.getNode();
+                res.add(child);
+            }
+            Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
+            furnace = new WorkbenchCraftingProcess(furnaceBlock).getNode();
+            res.add(furnace);
+            Identifier coalIdentifier = new Identifier("minecraft", "coal");
+            fuel = getCraftingPlan(coalIdentifier).getNode();
+            res.add(fuel);
+            return res;
+        }
+        @Override
+        protected void calculateExecutionTime(Resources<OperableInteger> result, CraftingState state) {
+            double executionTime = 0.0;
+            for (Node child : children) {
+                executionTime += state.efficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            if (result.containsKey(nodeId))
+                executionTime += result.get(nodeId).getLeft().getValue() * 1000;
+            state.efficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected void calculateLowerEfficiencyBound(CraftingState state) {
+            double executionTime = 0.05;
+            for (Node child : children) {
+                executionTime += state.naiveEfficiencyMap.getOrDefault(child.nodeId, 0.0);
+            }
+            state.naiveEfficiencyMap.put(nodeId, executionTime);
+        }
+        @Override
+        protected boolean consumeResourcesInternal(Resources<OperableInteger> resources, CraftingState state, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, int excessOverflow) {
+            for (Node child : children) {
+                if (!child.consumeResources(resources, state, excess, neededMap, 0))
+                    return false;
+            }
+            return true;
+        }
+        @Override
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+            Resources<OperableInteger> res = new Resources<>();
+            for (Node child : children) {
+                int realNumNeeded = numNeeded;
+                if (child == fuel)
+                    realNumNeeded = (numNeeded / 8) + (numNeeded % 8 > 0 ? 1 : 0);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(realNumNeeded, excess, neededMap, state, useHeuristic);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, res);
+                mergeResources(res, childRes.getRight());
+            }
+            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
+            return new Pair<>(true, res);
+        }
+        @Override
+        protected void genNaiveMaxCraftable(CraftingState state) {
+            super.genNaiveMaxCraftable(state);
+            if (children.size() == 0) {
+                naiveMaxCraftable = 0;
+                return;
+            }
+            int outputFactor = Integer.MAX_VALUE;
+            for (Node child : children) {
+                outputFactor = Math.min(outputFactor, child.naiveMaxCraftable * (child == fuel ? 8 : 1));
+            }
+            naiveMaxCraftable = outputFactor;
+        }
+        @Override
+        protected boolean shouldRememberVisit() {
+            return true;
+        }
+        @Override
+        public HashMap<Item, ItemStack> collectIngredients() {
+            HashMap<Item, ItemStack> stackTypes = new HashMap<>();
+            for (Ingredient ing : ((SmeltingCraftingProcess)processes.get(0)).recipe.getIngredients()) {
+                if (ing.getMatchingStacks().length == 0)
+                    continue;
+                ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
+                if (stackTypes.containsKey(stack.getItem())) {
+                    ItemStack value = stackTypes.get(stack.getItem());
+                    value.setCount(value.getCount() + stack.getCount());
+                }
+                else {
+                    stackTypes.put(stack.getItem(), stack.copy());
+                }
+            }
+            return stackTypes;
+        }
+        @Override
+        public int getOutputCount() {
+            return ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount();
+        }
+        private int calculateCraftingOutput() {
+            List<Ingredient> ingredients = ((SmeltingCraftingProcess)processes.get(0)).recipe.getIngredients();
+            HashMap<Item, ItemStack> collected = collectIngredients();
+            int output = Integer.MAX_VALUE;
+            for (Ingredient ing : ingredients) {
+                if (ing.getMatchingStacks().length == 0)
+                    continue;
+                ItemStack itemStack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
+                synchronized (totalInventoryAvailabilityMap) {
+                    int outputFactor = Math.min(totalInventoryAvailabilityMap.getOrDefault(itemStack.getItem(), 0) / collected.get(itemStack.getItem()).getCount(), itemStack.getItem().getMaxCount()) * ((SmeltingCraftingProcess) processes.get(0)).recipe.getOutput().getCount();
+                    output = Math.min(output, outputFactor);
+                }
+            }
+            return output;
+        }
+        private void adjustTotalAvailability(Recipe<?> recipe, int craftingOutput) {
+            Item outputItem = recipe.getOutput().getItem();
+            synchronized (totalInventoryAvailabilityMap) {
+                totalInventoryAvailabilityMap.put(outputItem, totalInventoryAvailabilityMap.getOrDefault(outputItem, 0) + craftingOutput);
+            }
+            for (Ingredient ing : recipe.getIngredients()) {
+                if (ing.getMatchingStacks().length == 0)
+                    continue;
+                ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
+                synchronized (totalInventoryAvailabilityMap) {
+                    totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
+                }
+            }
+        }
+        private void arrangeRecipe(Recipe<?> recipe, int craftAmount) {
+            int craftingGridSize = 1;
+            int width = 1;
+            int slotNumber = 0;
+            for (Ingredient ing : recipe.getIngredients()) {
+                int currentCraftAmount = craftAmount;
+                if (ing.getMatchingStacks().length > 0) {
+                    int slotX = slotNumber % width;
+                    int slotY = slotNumber / width;
+                    int slot = slotY * craftingGridSize + slotX + 1;
+                    List<Slot> slots = MC.player.currentScreenHandler.slots;
+                    for (int i = slots.size() - 37; i < slots.size(); i++) {
+                        if (currentCraftAmount <= 0)
+                            break;
+                        if (slots.get(i).getStack().getItem().equals(ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length].getItem())) {
+                            int slotAmount = slots.get(i).getStack().getCount();
+                            MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                            if (slotAmount <= currentCraftAmount) {
+                                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 0, SlotActionType.PICKUP, MC.player);
+                                currentCraftAmount -= slotAmount;
+                            } else {
+                                for (int j = 0; j < currentCraftAmount; j++) {
+                                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 1, SlotActionType.PICKUP, MC.player);
+                                }
+                                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                                currentCraftAmount = 0;
+                            }
+                        }
+                    }
+                }
+                slotNumber++;
+            }
+            int coalCraftAmount = craftAmount / 8 + (craftAmount % 8 > 0 ? 1 : 0);
+            Item coalItem = Registry.ITEM.get(new Identifier("minecraft", "coal"));
+            int fuelSlot = 2;
+            List<Slot> slots = MC.player.currentScreenHandler.slots;
+            for (int i = slots.size() - 37; i < slots.size(); i++) {
+                if (coalCraftAmount <= 0)
+                    break;
+                if (slots.get(i).getStack().getItem().equals(coalItem)) {
+                    int slotAmount = slots.get(i).getStack().getCount();
+                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                    if (slotAmount <= coalCraftAmount) {
+                        MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, fuelSlot, 0, SlotActionType.PICKUP, MC.player);
+                        coalCraftAmount -= slotAmount;
+                    } else {
+                        for (int j = 0; j < coalCraftAmount; j++) {
+                            MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, fuelSlot, 1, SlotActionType.PICKUP, MC.player);
+                        }
+                        MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                        coalCraftAmount = 0;
+                    }
+                }
+            }
+        }
+        @Override
+        public boolean execute() {
+            if (!usingFurnace()) {
+                Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
+                BlockPos nearestFurnace = containerManager.getClosestToPlayer(furnaceBlock);
+                if (nearestFurnace != null)
+                    containerManager.navigateAndOpenContainer(nearestFurnace);
+            }
+            int neededToCraft = needed;
+            int craftingOutput = 0;
+            while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
+                if (!usingFurnace()) return false;
+                arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, craftingOutput / ((SmeltingCraftingProcess) processes.get(0)).recipe.getOutput().getCount());
+                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                    return false;
+                if (!usingFurnace()) return false;
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, craftingOutput);
+                neededToCraft -= craftingOutput;
+            }
+            for (int i = 0; i < neededToCraft / ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
+                if (!usingFurnace()) return false;
+                arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, 1);
+                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                    return false;
+                if (!usingFurnace()) return false;
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
+            }
+            return true;
         }
     }
 
@@ -2579,6 +2866,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private boolean usingCraftingTable() {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
+    }
+
+    private boolean usingFurnace() {
+        return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof FurnaceScreenHandler;
     }
 
     private boolean usingInventory() {
