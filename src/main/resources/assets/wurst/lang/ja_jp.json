@@ -59,7 +59,7 @@
   "description.wurst.hack.feedaura": "周囲の動物に自動で餌を与える。",
   "description.wurst.hack.fightbot": "自動で移動し、周囲のエンティティを倒し続ける。\nMobArenaというミニゲームに最適。",
   "description.wurst.hack.fish": "水中の重力を無効化し、魚のように泳ぐことができる。",
-  "description.wurst.hack.flight": "飛行が可能になる。\n\n§c§l注意: §rNoFallと併用しない場合、落下ダメージが発生する。\n",
+  "description.wurst.hack.flight": "飛行が可能になる。\n\n§c§l注意: §rNoFallと併用しない場合、落下ダメージが発生する。",
   "description.wurst.hack.follow": "自動で最も近いエンティティを追跡し続ける。\n非常に迷惑。\n\n.follow で特定のエンティティを追跡する。",
   "description.wurst.hack.forceop": "AuthMeと呼ばれるPluginにおいて、パスワードの総当たりを行うことができる。\nOP権限を取得するために使用できる。",
   "description.wurst.hack.freecam": "キャラクターを動かすことなくカメラを動かすことができる。",
