@@ -31,6 +31,9 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.*;
@@ -1060,7 +1063,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.storageNodes = new ArrayList<>(storageNodes);
             state.craftingItemFrequency = (HashMap<Item, Integer>) craftingItemFrequency.clone();
             state.efficiencyMap = (HashMap<Integer, Double>) efficiencyMap.clone();
-            state.naiveEfficiencyMap = (HashMap<Integer, Double>) naiveEfficiencyMap.clone();
+            state.naiveEfficiencyMap = naiveEfficiencyMap;
             state.deadNodes = (HashSet<Integer>) deadNodes.clone();
             return state;
         }
@@ -1167,10 +1170,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected int stackShift;
         protected List<Node> children;
         protected int naiveMaxCraftable;
+        protected boolean generatedNaiveMaxCraftable = false;
         protected int maxCraftable;
         protected int nodeId;
         protected int timeTaken;
         protected int callCounter;
+        private static int totalNumCalls = 0;
         private static int maxNodeId = 0;
         public Node(Item target, int needed, List<CraftingProcess> processes) {
             nodeId = maxNodeId++;
@@ -1181,6 +1186,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             stackShift = 0;
             timeTaken = 0;
             callCounter = 0;
+        }
+        protected boolean requiresAllChildren() {
+            return true;
         }
         protected void mergeResources(Resources<OperableInteger> base, Resources<OperableInteger> res) {
             for (Integer item : res.keySet()) {
@@ -1211,15 +1219,33 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.stackShift = stackShift;
             return this;
         }
-        private void generateTree(HashSet<Node> visited, CraftingState state) {
+        private boolean generateTree(HashSet<Node> visited, CraftingState state) {
+            if (!canPossiblyCraft(state))
+                return false;
             if (shouldRememberVisit())
                 visited.add(this);
             children = getChildren(visited, state);
-            for (Node child : children) {
+            int initialChildren = children.size();
+            for (int i = children.size() - 1; i >= 0; i--) {
+                Node child = children.get(i);
                 child.generateTree(visited, state);
+                child.genNaiveMaxCraftable(state);
+                if (child.naiveMaxCraftable == 0) {
+                    if (requiresAllChildren()) {
+                        if (shouldRememberVisit())
+                            visited.remove(this);
+                        return false;
+                    }
+                    else {
+                        children.remove(i);
+                    }
+                }
             }
             if (shouldRememberVisit())
                 visited.remove(this);
+            if (initialChildren > 0 && children.size() == 0)
+                return false;
+            return true;
         }
         private int reorderNodeIds(int id) {
             nodeId = id;
@@ -1251,7 +1277,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (processes == null)
                 return res;
             for (Node child : getChildrenInternal(nodes)) {
-                if ((child.shouldRememberVisit() && nodes.contains(child)) || !child.canPossiblyCraft(state))
+                if (child.shouldRememberVisit() && nodes.contains(child))
                     continue;
                 res.add(child);
             }
@@ -1288,13 +1314,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             CraftingState state = createFreshState();
             if (populateNaiveMetrics) {
                 containerQuery.calculateNearestContainer(MC.player.getPos());
+                clearNaiveMaxCraftable();
                 genNaiveMaxCraftable(state.clone());
                 genNaiveEfficiencyMap(state);
             }
             HashMap<Integer, Integer> neededMap = new HashMap<>();
             CraftingState newState = state.clone();
             HashMap<Item, HashMap<Integer, Integer>> excess = new HashMap<>();
-            Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(1, deepcopyExcess(excess), (HashMap<Integer, Integer>) neededMap.clone(), newState.clone(), useHeuristic);
+            Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(1, 1, deepcopyExcess(excess), (HashMap<Integer, Integer>) neededMap.clone(), newState.clone(), useHeuristic);
             int amount = 0;
             while (amount < upperBound && resources.getLeft()) {
                 amount++;
@@ -1302,7 +1329,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 newState = state.clone();
                 if (!consumeResources(resources.getRight(), newState, excess, neededMap, 0)) {
                     newState = state.clone();
-                    resources = getBaseResources(1, deepcopyExcess(excess), (HashMap<Integer, Integer>) neededMap.clone(), newState.clone(), useHeuristic);
+                    resources = getBaseResources(1, 1, deepcopyExcess(excess), (HashMap<Integer, Integer>) neededMap.clone(), newState.clone(), useHeuristic);
                 }
             }
             applyNeededMap(neededMap);
@@ -1310,16 +1337,33 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 applyMaxCraftableMap(neededMap);
             return amount;
         }
-        private int print(int indent, boolean ignoreNeeded) {
-            if ((ignoreNeeded && naiveMaxCraftable > 0) || needed > 0) {
+        private int getNumNodes() {
+            int res = 1;
+            for (Node child : children) {
+                res += child.getNumNodes();
+            }
+            return res;
+        }
+        private void exportFile() {
+            try {
+                FileOutputStream fos = new FileOutputStream("C:\\Users\\laaks\\Desktop\\crafting.txt");
+                PrintStream stream = new PrintStream(fos);
+                print(0, true, stream);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        private int print(int indent, boolean ignoreNeeded, PrintStream stream) {
+            if (ignoreNeeded || needed > 0) {
                 String indentation = "";
                 for (int i = 0; i < indent; i++) {
                     indentation += " ";
                 }
-                System.out.println(indentation + target + ": " + needed + ", time " + timeTaken + ", calls " + callCounter + ", " + this.getClass());
+                stream.println(indentation + target + ": " + needed + ", time " + timeTaken + ", calls " + callCounter + ", " + this.getClass());
                 int calls = 1;
                 for (Node child : children) {
-                    calls += child.print(indent + 4, ignoreNeeded);
+                    calls += child.print(indent + 1, ignoreNeeded, stream);
                 }
                 return calls;
             }
@@ -1330,10 +1374,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             generateTree(new HashSet<>(), createFreshState());
             reorderNodeIds(0);
             int amount = calculateMaxCraftableInternal(upperBound, true, true, true);
-            int numPrinted = print(0, true);
+            int numPrinted = print(0, false, System.out);
+            //exportFile();
             System.out.println("Total number of nodes: " + maxNodeId);
             System.out.println("Number of nodes printed: " + numPrinted);
             System.out.println("Craftable: " + amount);
+            System.out.println("Nodes in tree: " + getNumNodes());
+            System.out.println("Total number of calls: " + totalNumCalls);
             BigInteger[] arr = globalTimeTaken.divideAndRemainder(new BigInteger("1000000000"));
             System.out.println("Time taken: " + arr[0] + ", " + arr[1]);
             return amount;
@@ -1414,22 +1461,48 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         protected abstract void stackResourcesInternal(int num, Resources<OperableInteger> dest, Resources<OperableInteger> src);
-        private Pair<Boolean, Resources<OperableInteger>> getBaseResources(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        private Pair<Boolean, Resources<OperableInteger>> getBaseResources(int numNeeded, int actualNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
             long startTime = System.currentTimeMillis();
             Pair<Boolean, Resources<OperableInteger>> result = new Pair<>(true, new Resources<>());
+            if (excess.containsKey(target)) {
+                HashMap<Integer, Integer> targetExcess = excess.get(target);
+                for (int node : targetExcess.keySet()) {
+                    if (actualNeeded == 0)
+                        break;
+                    if (node <= nodeId) {
+                        int nodeValue = targetExcess.get(node);
+                        int reductionFactor = Math.min(actualNeeded, nodeValue);
+                        actualNeeded -= reductionFactor;
+                        targetExcess.put(node, nodeValue - reductionFactor);
+                    }
+                }
+            }
             if (numNeeded > 0)
-                result = getBaseResourcesInternal(numNeeded, excess, neededMap, state, useHeuristic);
+                result = getBaseResourcesInternal(numNeeded, actualNeeded, neededMap, state, useHeuristic, excess);
             calculateExecutionTime(result.getRight(), state);
             long endTime = System.currentTimeMillis();
             timeTaken += (int)(endTime - startTime);
             callCounter++;
+            totalNumCalls++;
             return result;
         }
-        protected abstract Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic);
+        protected abstract Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess);
+        protected abstract void genNaiveMaxCraftableInternal(CraftingState state);
+        private void clearNaiveMaxCraftable() {
+            for (Node child : children) {
+                child.clearNaiveMaxCraftable();
+            }
+            naiveMaxCraftable = 0;
+            generatedNaiveMaxCraftable = false;
+        }
         protected void genNaiveMaxCraftable(CraftingState state) {
+            if (generatedNaiveMaxCraftable)
+                return;
             for (Node child : children) {
                 child.genNaiveMaxCraftable(state);
             }
+            genNaiveMaxCraftableInternal(state);
+            generatedNaiveMaxCraftable = true;
         }
         protected abstract boolean shouldRememberVisit();
         public abstract HashMap<Item, ItemStack> collectIngredients();
@@ -1522,14 +1595,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return true;
         }
+        private int getChildNeededFactor(Node child, int num) {
+            if (child == fuel)
+                return (num / 8) + (num % 8 > 0 ? 1 : 0);
+            return num;
+        }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             for (Node child : children) {
-                int realNumNeeded = numNeeded;
-                if (child == fuel)
-                    realNumNeeded = (numNeeded / 8) + (numNeeded % 8 > 0 ? 1 : 0);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(realNumNeeded, excess, neededMap, state, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(getChildNeededFactor(child, numNeeded), getChildNeededFactor(child, actualNeeded), excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, res);
                 mergeResources(res, childRes.getRight());
@@ -1538,8 +1613,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             if (children.size() == 0) {
                 naiveMaxCraftable = 0;
                 return;
@@ -1778,17 +1852,19 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return true;
         }
+        private int getChildNeededFactor(Node child, int num, int neededToCraft, HashMap<Item, ItemStack> ingredients, RecipeCraftingProcess process) {
+            if (child instanceof WorkbenchNode || child instanceof ToolNode)
+                return Math.min(1, num);
+            return ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount());
+        }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
-            if (Registry.ITEM.getId(target).getPath().contains("crossbow")) {
-                System.out.println("reached");
-            }
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             HashMap<Item, ItemStack> ingredients = collectIngredients();
             int neededToCraft = getNeededToCraft(numNeeded);
             for (Node child : children) {
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources((child instanceof WorkbenchNode || child instanceof ToolNode) ? 1 : ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount()), excess, neededMap, state, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(getChildNeededFactor(child, numNeeded, neededToCraft, ingredients, process), getChildNeededFactor(child, actualNeeded, neededToCraft, ingredients, process), excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, res);
                 mergeResources(res, childRes.getRight());
@@ -1797,8 +1873,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             if (children.size() == 0) {
                 naiveMaxCraftable = 0;
                 return;
@@ -1913,6 +1988,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public boolean execute() {
+            if (Registry.ITEM.getId(target).getPath().contains("crossbow")) {
+                System.out.println("reached");
+            }
             boolean useInventory = false;
             if (!usingCraftingTable()) {
                 if (((RecipeCraftingProcess) processes.get(0)).recipe.fits(2, 2)) {
@@ -2023,7 +2101,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             int originalNumNeeded = numNeeded;
             Instant startTime = Instant.now();
@@ -2039,7 +2117,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     break;
                 if (child.naiveMaxCraftable == 0)
                     continue;
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, Math.min(1, actualNeeded), newExcess, newNeededMap, newState, useHeuristic);
                 bestEfficiency = Math.min(bestEfficiency, newState.efficiencyMap.getOrDefault(child.nodeId, Double.POSITIVE_INFINITY));
                 if (childRes.getLeft()) {
                     options.add(new Pair<>(child, childRes));
@@ -2051,7 +2129,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
             }
             if (options.size() == 0)
-                return new Pair<>(numNeeded == 0, res);
+                return new Pair<>(actualNeeded == 0, res);
             Collections.sort(options, Comparator.comparing(c -> state.efficiencyMap.getOrDefault(c.getLeft().nodeId, 0.0)));
             newState = state.clone();
             newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
@@ -2062,11 +2140,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             while (numNeeded > 0 && options.size() > 0) {
                 if (!childRes.getLeft()) {
                     options.remove(0);
+                    if (options.size() == 0)
+                        break;
                     childRes = options.get(0).getRight();
                     continue;
                 }
                 if (options.get(0).getLeft().consumeResources(childRes.getRight(), newState, newExcess, newNeededMap, 0)) {
                     numNeeded--;
+                    actualNeeded = Math.max(0, actualNeeded - 1);
                     amount++;
                     if (amount > 0 && numNeeded == 0) {
                         //Resources<OperableInteger> toConsume = options.get(0).getLeft().getBaseResources(amount, excess, neededMap, state, useHeuristic).getRight();
@@ -2086,11 +2167,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     newState = state.clone();
                     newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
                     newExcess = deepcopyExcess(excess);
-                    childRes = options.get(0).getLeft().getBaseResources(1, excess, neededMap, state, useHeuristic);
+                    childRes = options.get(0).getLeft().getBaseResources(1, Math.min(1, actualNeeded), excess, neededMap, state, useHeuristic);
                 }
             }
             res.put(nodeId, new Pair<>(new OperableInteger(originalNumNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(numNeeded == 0, res);
+            return new Pair<>(actualNeeded == 0, res);
             /*if (useHeuristic)
                 Collections.sort(orderedItems, Comparator.comparing(o -> o.efficiencyHeuristic));
             for (Node child : orderedItems) {
@@ -2113,11 +2194,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(numNeeded == 0, res);*/
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             for (Node child : children) {
                 naiveMaxCraftable += child.naiveMaxCraftable;
             }
+        }
+        @Override
+        protected boolean requiresAllChildren() {
+            return false;
         }
         @Override
         protected boolean shouldRememberVisit() {
@@ -2315,15 +2399,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.INVENTORY));
-            state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - numNeeded);
+            state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - actualNeeded);
             return new Pair<>(state.inventoryAvailability.get(target) >= 0, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = state.inventoryAvailability.getOrDefault(target, 0);
         }
         @Override
@@ -2383,15 +2466,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.STORAGE));
-            state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - numNeeded);
+            state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - actualNeeded);
             return new Pair<>(state.storageAvailability.get(target) >= 0, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = state.storageAvailability.getOrDefault(target, 0);
         }
         @Override
@@ -2465,13 +2547,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.WORLD));
-            state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - numNeeded);
+            state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - actualNeeded);
             if (block.getDefaultState().isToolRequired()) {
                 for (Node child : children) {
-                    Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, excess, neededMap, state, useHeuristic);
+                    Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, Math.min(1, actualNeeded), excess, neededMap, state, useHeuristic);
                     if (!childRes.getLeft())
                         return new Pair<>(false, res);
                     mergeResources(res, childRes.getRight());
@@ -2480,8 +2562,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(state.worldAvailability.get(block) >= 0, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = state.worldAvailability.getOrDefault(block, 0);
         }
         @Override
@@ -2534,14 +2615,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
             naiveMaxCraftable = state.worldAvailability.getOrDefault(targetBlock, 0);
         }
@@ -2616,10 +2696,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             for (Node child : children) {
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, actualNeeded, excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, new Resources<>());
                 mergeResources(res, childRes.getRight());
@@ -2628,11 +2708,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = 0;
             for (Node child : children) {
-                child.genNaiveMaxCraftable(state);
                 naiveMaxCraftable += child.naiveMaxCraftable;
             }
         }
@@ -2709,10 +2787,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             for (Node child : children) {
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, actualNeeded, excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, new Resources<>());
                 mergeResources(res, childRes.getRight());
@@ -2721,11 +2799,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = 0;
             for (Node child : children) {
-                child.genNaiveMaxCraftable(state);
                 naiveMaxCraftable += child.naiveMaxCraftable;
             }
         }
@@ -2806,7 +2882,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.naiveEfficiencyMap.put(nodeId, executionTime);
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, HashMap<Item, HashMap<Integer, Integer>> excess, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic) {
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int numNeeded, int actualNeeded, HashMap<Integer, Integer> neededMap, CraftingState state, boolean useHeuristic, HashMap<Item, HashMap<Integer, Integer>> excess) {
             Resources<OperableInteger> res = new Resources<>();
             if (children.size() == 0)
                 return new Pair<>(true, res);
@@ -2823,7 +2899,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             for (Node child : children) {
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, excess, neededMap, state, useHeuristic);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(numNeeded, actualNeeded, excess, neededMap, state, useHeuristic);
                 if (!childRes.getLeft())
                     return new Pair<>(false, new Resources<>());
                 mergeResources(res, childRes.getRight());
@@ -2838,11 +2914,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new Pair<>(true, res);
         }
         @Override
-        protected void genNaiveMaxCraftable(CraftingState state) {
-            super.genNaiveMaxCraftable(state);
+        protected void genNaiveMaxCraftableInternal(CraftingState state) {
             naiveMaxCraftable = 0;
             for (Node child : children) {
-                child.genNaiveMaxCraftable(state);
                 naiveMaxCraftable += child.naiveMaxCraftable;
             }
         }
