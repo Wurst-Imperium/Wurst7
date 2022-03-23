@@ -91,7 +91,7 @@
   "description.wurst.hack.navigator": "あなたの好みを学習する検索機能付きGUI。",
   "description.wurst.hack.nobackground": "インベントリの暗い背景を削除する。",
   "description.wurst.hack.noclip": "ブロックを貫通し自由に移動できるようになる。\n起動には、砂などのブロックを頭上に落とす必要がある。\n\n§§l注意: §rブロック内を移動している間はダメージを受ける。",
-  "description.wurst.hack.nocomcrash": "Nocomのバグを利用しサーバーにラグを発生させ、クラッシュさせる。\nPaperサーバーでは使用不可。バニラ、Spigot、Fabricサーバーでは動作確認済み。一部のAntiCheatでは対策されている可能性あり。",
+  "description.wurst.hack.nocomcrash": "「Nocom」と呼ばれる脆弱性を利用しサーバーにラグを発生させ、クラッシュさせる。\nPaperサーバーでは使用不可。バニラ、Spigot、Fabricサーバーでは動作確認済み。一部のAntiCheatでは対策されている可能性あり。",
   "description.wurst.hack.nofall": "落下ダメージを無効化する。",
   "description.wurst.hack.nofireoverlay": "燃えている時の画面上のエフェクトを無効化する。\n\n§c§l注意: §r燃えていることに気づかずに焼死する可能性あり。",
   "description.wurst.hack.nohurtcam": "ダメージを受けた時の画面の揺れを無効化する。",
