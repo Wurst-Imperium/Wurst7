@@ -202,7 +202,7 @@ public final class AltManagerScreen extends Screen
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
 		
-		boolean windowMode = !client.options.fullscreen;
+		boolean windowMode = !client.options.method_42447().getValue();
 		importButton.active = windowMode;
 		exportButton.active = windowMode;
 	}
@@ -533,7 +533,7 @@ public final class AltManagerScreen extends Screen
 			ArrayList<Text> tooltip = new ArrayList<>();
 			addTooltip(tooltip, "window");
 			
-			if(client.options.fullscreen)
+			if(client.options.method_42447().getValue())
 				addTooltip(tooltip, "fullscreen");
 			else
 				addTooltip(tooltip, "window_freeze");

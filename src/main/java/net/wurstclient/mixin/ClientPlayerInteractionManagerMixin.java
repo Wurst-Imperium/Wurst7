@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.class_7204;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -165,7 +165,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Shadow
-	private void method_41931(ClientWorld clientWorld, class_7204 arg)
+	private void method_41931(ClientWorld clientWorld,
+		SequencedPacketCreator arg)
 	{
 		
 	}
