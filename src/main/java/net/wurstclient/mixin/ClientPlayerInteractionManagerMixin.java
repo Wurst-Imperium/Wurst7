@@ -146,7 +146,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
 		Direction direction)
 	{
-		method_41931(client.world,
+		sendSequencedPacket(client.world,
 			i -> new PlayerActionC2SPacket(action, blockPos, direction, i));
 	}
 	
@@ -154,7 +154,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	public void sendPlayerInteractBlockPacket(Hand hand,
 		BlockHitResult blockHitResult)
 	{
-		method_41931(client.world,
+		sendSequencedPacket(client.world,
 			i -> new PlayerInteractBlockC2SPacket(hand, blockHitResult, i));
 	}
 	
@@ -165,8 +165,8 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Shadow
-	private void method_41931(ClientWorld clientWorld,
-		SequencedPacketCreator arg)
+	private void sendSequencedPacket(ClientWorld world,
+		SequencedPacketCreator packetCreator)
 	{
 		
 	}
