@@ -15,10 +15,6 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.container.Container;
-import net.minecraft.container.GenericContainer;
-import net.minecraft.container.Slot;
-import net.minecraft.container.SlotActionType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -105,7 +101,7 @@ public abstract class ContainerScreen54Mixin
 			boolean can = false;
 			for (int e = (mode == 1 ? rows * 9 : 0); e < (mode == 1 ? rows * 9 + 36 : rows * 9); e++)
 			{
-				if (Container.canInsertItemIntoSlot(container.slots.get(e), slot.getStack(), true)) 
+				if (handler.canInsertItemIntoSlot(handler.slots.get(e), slot.getStack(), true))
 				{ 
 					can = true;
 					break;
