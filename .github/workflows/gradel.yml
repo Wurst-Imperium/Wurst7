@@ -13,7 +13,6 @@ on:
       - master
       - 'releases/**'
       - 'dev/**'
-      - 'TheGrandCurator-**'
   pull_request:
     branches:
       - master
