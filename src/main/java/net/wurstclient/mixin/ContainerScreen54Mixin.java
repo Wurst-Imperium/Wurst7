@@ -98,7 +98,19 @@ public abstract class ContainerScreen54Mixin
 			Slot slot = handler.slots.get(i);
 			if(slot.getStack().isEmpty())
 				continue;
+			boolean can = false;
+			for (int e = (mode == 1 ? rows * 9 : 0); e < (mode == 1 ? rows * 9 + 36 : rows * 9); e++)
+			{
+				if (handler.canInsertItemIntoSlot(handler.slots.get(e), slot.getStack(), true))
+				{ 
+					can = true;
+					break;
+				}
+			}
 			
+			if (!can) {
+				continue;
+			}
 			waitForDelay();
 			if(this.mode != mode || client.currentScreen == null)
 				break;
