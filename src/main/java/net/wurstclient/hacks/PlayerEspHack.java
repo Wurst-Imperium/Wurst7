@@ -46,12 +46,6 @@ import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 
-class LineColors{
-	Color color_start;
-	Color color_end;
-}
-
-
 
 @SearchTags({"player esp", "PlayerTracers", "player tracers"})
 public final class PlayerEspHack extends Hack implements UpdateListener,
@@ -73,6 +67,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible players.", false);
 
+	private final CheckboxSetting filterNonFriends = new CheckboxSetting(
+			"Filter non-friends", "Won't show players that are not in your friends list", false);
+
 	private final CheckboxSetting armorColorTrace = new CheckboxSetting(
 			"Tracer is Armor Color", "Line color will attempt to be set to what a player's armor color is.", false);
 
@@ -90,6 +87,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		addSetting(boxSize);
 		addSetting(filterSleeping);
 		addSetting(filterInvisible);
+		addSetting(filterNonFriends);
 		addSetting(armorColorTrace);
 		addSetting(armorColorBox);
 	}
@@ -128,6 +126,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
+
+		if (filterNonFriends.isChecked())
+			stream = stream.filter(e -> WURST.getFriends().contains(e.getName().getString()));
 
 		players.addAll(stream.collect(Collectors.toList()));
 	}
