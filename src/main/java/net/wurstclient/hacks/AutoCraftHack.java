@@ -55,7 +55,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private ReentrantLock containerOpenLock = new ReentrantLock();
     private Condition containerOpenCondition = containerOpenLock.newCondition();
 
-    private SlotUpdateInfo latestSlotUpdate;
+    private HashMap<Integer, SlotUpdateInfo> latestSlotUpdates;
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
     private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
@@ -158,6 +158,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         for (Identifier id : Registry.BLOCK.getIds()) {
+            if (id.getPath().equals("granite"))
+                System.out.println("reached");
             List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
             for (ItemStack stack : droppedStacks) {
                 Identifier stackId = Registry.ITEM.getId(stack.getItem());
@@ -179,7 +181,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     tools.add(Registry.ITEM.get(new Identifier("minecraft", prefix + "_" + suffix)));
                 }
             }
-            tools.add(Registry.ITEM.get(new Identifier("minecraft", "shears")));
+            //tools.add(Registry.ITEM.get(new Identifier("minecraft", "shears")));
         }
         public Set<Item> getMatchingTools(Block block) {
             Set<Item> res = new HashSet<>();
@@ -1024,17 +1026,20 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private boolean awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem, boolean succeedAfterTimeout) {
+    private boolean awaitSlotUpdate(Item item, int amount, int slot, boolean onlyConsiderItem, boolean succeedAfterTimeout, boolean pollContinuously) {
         slotUpdateLock.lock();
+        initSlotUpdates();
         try {
-            while (latestSlotUpdate == null || !latestSlotUpdate.itemStack.getItem().equals(item) || (!onlyConsiderItem && (latestSlotUpdate.itemStack.getCount() != amount || latestSlotUpdate.slot != slot))) {
+            while (!latestSlotUpdates.containsKey(slot) || !latestSlotUpdates.get(slot).itemStack.getItem().equals(item) || (!onlyConsiderItem && latestSlotUpdates.get(slot).itemStack.getCount() != amount)) {
                 boolean gotSignal = slotUpdateCondition.await(1000, TimeUnit.MILLISECONDS);
                 if (succeedAfterTimeout)
                     return true;
                 if (!gotSignal) {
-                    ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(0).getStack();
+                    ItemStack craftingItem = MC.player.currentScreenHandler.getSlot(slot).getStack();
                     if (craftingItem.getItem().equals(item) && (onlyConsiderItem || (craftingItem.getCount() == amount && slot == 0)))
                         return true;
+                    if (pollContinuously)
+                        continue;
                     return false;
                 }
             }
@@ -1064,7 +1069,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private HashMap<Integer, Integer> naiveMaxCraftable = new HashMap<>();
         private HashMap<Integer, Boolean> naiveMaxCraftableGenerated = new HashMap<>();
         private HashMap<Integer, Integer> timeTaken = new HashMap<>();
-        private HashMap<Item, HashMap<Integer, Integer>> excess = new HashMap<>();
+        private HashMap<Item, List<Pair<Integer, Integer>>> excess = new HashMap<>();
         private HashMap<Node, Node> nodeInstances = new HashMap<>();
         private int rootNodeId = 0;
         private boolean success = false;
@@ -1088,10 +1093,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             success = false;
             return this;
         }
-        private HashMap<Item, HashMap<Integer, Integer>> deepcopyExcess(HashMap<Item, HashMap<Integer, Integer>> excess) {
-            HashMap<Item, HashMap<Integer, Integer>> res = new HashMap<>();
+        private HashMap<Item, List<Pair<Integer, Integer>>> deepcopyExcess(HashMap<Item, List<Pair<Integer, Integer>>> excess) {
+            HashMap<Item, List<Pair<Integer, Integer>>> res = new HashMap<>();
             for (Item item : excess.keySet()) {
-                res.put(item, (HashMap<Integer, Integer>) excess.get(item).clone());
+                List<Pair<Integer, Integer>> value = excess.get(item);
+                List<Pair<Integer, Integer>> copy = new ArrayList<>();
+                for (Pair<Integer, Integer> instance : value) {
+                    copy.add(new Pair<>(instance.getLeft(), instance.getRight()));
+                }
+                res.put(item, copy);
             }
             return res;
         }
@@ -1155,7 +1165,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             node.genNaiveMaxCraftable(id, this);
         }
         private int generateTreeInternal(int id, Node node) {
-            if (visited.contains(node.target) || !node.canPossiblyCraft(this))
+            if ((node.shouldPruneTarget && visited.contains(node.target)) || !node.canPossiblyCraft(this))
                 return -1;
             if (node.shouldRememberVisit())
                 visited.add(node.target);
@@ -1217,6 +1227,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         //protected int nodeId;
         //protected int timeTaken;
         //protected int callCounter;
+        private boolean shouldPruneTarget = true;
         private Class distinction = Node.class;
         private static int totalNumCalls = 0;
         private static int maxNodeId = 0;
@@ -1227,6 +1238,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         public Node setDistinction(Class distinction) {
             this.distinction = distinction;
+            return this;
+        }
+        public Node setShouldPruneTarget(boolean shouldPruneTarget) {
+            this.shouldPruneTarget = shouldPruneTarget;
             return this;
         }
         protected boolean requiresAllChildren() {
@@ -1369,19 +1384,45 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             System.out.println("Time taken: " + arr[0] + ", " + arr[1]);
             return amount;
         }
+        private int excessGetOrDefault(int nodeId, int defaultValue, List<Pair<Integer, Integer>> excessItem) {
+            for (int i = 0; i < excessItem.size(); i++) {
+                Pair<Integer, Integer> pair = excessItem.get(i);
+                if (pair.getLeft() == nodeId)
+                    return pair.getRight();
+            }
+            return defaultValue;
+        }
+        private void excessPut(int nodeId, int value, List<Pair<Integer, Integer>> excessItem) {
+            int index = 0;
+            for (int i = 0; i < excessItem.size(); i++) {
+                Pair<Integer, Integer> pair = excessItem.get(i);
+                if (pair.getLeft() == nodeId) {
+                    pair.setRight(value);
+                    return;
+                }
+                else if (pair.getLeft() < nodeId) {
+                    index = i;
+                    break;
+                }
+            }
+            excessItem.add(index, new Pair<>(nodeId, value));
+        }
         protected boolean consumeResources(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow) {
             if (!state.deadNodes.contains(nodeId) && resources.containsKey(nodeId) && resources.get(nodeId).getLeft().getValue() > 0) {
                 Pair<OperableInteger, ResourceDomain> resource = resources.get(nodeId);
                 ResourceDomain domain = resource.getRight();
                 int numNeeded = resource.getLeft().getValue();
                 if (state.excess.containsKey(target)) {
-                    HashMap<Integer, Integer> itemMap = state.excess.get(target);
-                    for (int id : itemMap.keySet()) {
-                        if (id >= nodeId) {
-                            int reductionFactor = Math.min(numNeeded, itemMap.get(id));
+                    List<Pair<Integer, Integer>> itemList = state.excess.get(target);
+                    for (int i = itemList.size() - 1; i >= 0; i--) {
+                        Pair<Integer, Integer> pair = itemList.get(i);
+                        if (pair.getLeft() >= nodeId) {
+                            int reductionFactor = Math.min(numNeeded, pair.getRight());
                             numNeeded -= reductionFactor;
                             excessOverflow += reductionFactor;
-                            itemMap.put(id, itemMap.get(id) - reductionFactor);
+                            pair.setRight(pair.getRight() - reductionFactor);
+                            if (pair.getRight() == 0)
+                                itemList.remove(i);
                         }
                         if (numNeeded <= 0)
                             break;
@@ -1395,10 +1436,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     int leftover = neededToCraft - (originalNeeded + numNeeded);
                     int oldLeftover = oldNeededToCraft - originalNeeded;
                     int leftoverDifference = leftover - oldLeftover;
-                    state.excess.put(target, state.excess.getOrDefault(target, new HashMap<>()));
-                    int excessAmount = state.excess.get(target).getOrDefault(nodeId, 0) + leftoverDifference;
+                    state.excess.put(target, state.excess.getOrDefault(target, new ArrayList<>()));
+                    int excessAmount = excessGetOrDefault(nodeId, 0, state.excess.get(target)) + leftoverDifference;
                     int shift = (int) Math.floor((double) excessAmount / outputCount) * outputCount;
-                    state.excess.get(target).put(nodeId, excessAmount - shift);
+                    excessPut(nodeId, excessAmount - shift, state.excess.get(target));
                     numNeeded -= shift;
                 }
                 state.neededMap.put(nodeId, originalNeeded + numNeeded);
@@ -1440,15 +1481,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             long startTime = System.currentTimeMillis();
             Pair<Boolean, Resources<OperableInteger>> result = new Pair<>(true, new Resources<>());
             if (state.excess.containsKey(target)) {
-                HashMap<Integer, Integer> targetExcess = state.excess.get(target);
-                for (int node : targetExcess.keySet()) {
+                List<Pair<Integer, Integer>> targetExcess = state.excess.get(target);
+                for (int i = targetExcess.size() - 1; i >= 0; i--) {
+                    Pair<Integer, Integer> pair = targetExcess.get(i);
                     if (actualNeeded == 0)
                         break;
-                    if (node >= nodeId) {
-                        int nodeValue = targetExcess.get(node);
+                    if (pair.getLeft() >= nodeId) {
+                        int nodeValue = pair.getRight();
                         int reductionFactor = Math.min(actualNeeded, nodeValue);
                         actualNeeded -= reductionFactor;
-                        targetExcess.put(node, nodeValue - reductionFactor);
+                        pair.setRight(nodeValue - reductionFactor);
+                        if (pair.getRight() == 0)
+                            targetExcess.remove(i);
                     }
                 }
             }
@@ -1562,12 +1606,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Node child = plan.getNode();
                 res.add(child);
             }
-            Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
-            furnace = new WorkbenchCraftingProcess(furnaceBlock).getNode();
-            res.add(furnace);
             Identifier coalIdentifier = new Identifier("minecraft", "coal");
             fuel = getCraftingPlan(coalIdentifier).getNode();
             res.add(fuel);
+            Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
+            furnace = new WorkbenchCraftingProcess(furnaceBlock).getNode();
+            res.add(furnace);
             return res;
         }
         @Override
@@ -1701,7 +1745,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (ing.getMatchingStacks().length > 0) {
                     int slotX = slotNumber % width;
                     int slotY = slotNumber / width;
-                    int slot = slotY * craftingGridSize + slotX + 1;
+                    int slot = slotY * craftingGridSize + slotX;
                     List<Slot> slots = MC.player.currentScreenHandler.slots;
                     for (int i = slots.size() - 37; i < slots.size(); i++) {
                         if (currentCraftAmount <= 0)
@@ -1726,7 +1770,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             int coalCraftAmount = craftAmount / 8 + (craftAmount % 8 > 0 ? 1 : 0);
             Item coalItem = Registry.ITEM.get(new Identifier("minecraft", "coal"));
-            int fuelSlot = 2;
+            int fuelSlot = 1;
             List<Slot> slots = MC.player.currentScreenHandler.slots;
             for (int i = slots.size() - 37; i < slots.size(); i++) {
                 if (coalCraftAmount <= 0)
@@ -1764,22 +1808,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingFurnace()) return false;
                 arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, craftingOutput / ((SmeltingCraftingProcess) processes.get(0)).recipe.getOutput().getCount());
-                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), craftingOutput, 2, false, false, true))
                     return false;
                 if (!usingFurnace()) return false;
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 2, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
                 adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
             for (int i = 0; i < neededToCraft / ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingFurnace()) return false;
                 arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, 1);
-                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), neededToCraft, 2, false, false, true))
                     return false;
                 if (!usingFurnace()) return false;
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 2, 0, SlotActionType.QUICK_MOVE, MC.player);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
                 adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
             }
             return true;
@@ -2044,22 +2088,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, craftingOutput / ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount(), useInventory);
-                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false, false))
                     return false;
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, 1, useInventory);
-                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false))
+                if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false, false))
                     return false;
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false);
+                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
                 adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
             }
             //containerManager.closeScreen();
@@ -2168,8 +2212,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic) {
-            if (Registry.ITEM.getId(target).getPath().equals("iron_ingot"))
-                System.out.println("reached");
             Resources<OperableInteger> res = new Resources<>();
             int originalNumNeeded = numNeeded;
             Instant startTime = Instant.now();
@@ -2938,6 +2980,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private class ToolNode extends Node {
         public ToolNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
+            setShouldPruneTarget(false);
         }
         @Override
         protected void stackResourcesInternal(int nodeId, CraftingState state, int num, Resources<OperableInteger> dest, Resources<OperableInteger> src) {
@@ -2966,7 +3009,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     toolProcesses.add(process);
                 }
             }
-            return List.of(new ChoiceNode(target, toolProcesses).setDistinction(getClass()));
+            return List.of(new ChoiceNode(target, toolProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
         }
         @Override
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow) {
@@ -2980,6 +3023,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Node child = children.get(i);
                 if (!child.consumeResources(childId, resources, state, excessOverflow))
                     return false;
+            }
+            List<Integer> childChildIds = state.children.get(childIds.get(0));
+            for (int i = 0; i < children.get(0).children.size(); i++) {
+                int childId = childChildIds.get(i);
+                Node child = children.get(0).children.get(i);
+                if (resources.getOrDefault(childId, new Pair<>(new OperableInteger(), ResourceDomain.COMPOSITE)).getLeft().getValue() > 0) {
+                    state.toolAvailability.put(nodeId, child.target);
+                    break;
+                }
             }
             return true;
         }
@@ -3117,6 +3169,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         updateRunnable.runUntilDone();
     }
 
+    private void initSlotUpdates() {
+        latestSlotUpdates = new HashMap<>();
+    }
+
     public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
         NotifyingRunnable updateRunnable = new NotifyingRunnable() {
             @Override
@@ -3129,7 +3185,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         updateRunnable.runWithoutWaiting();
         slotUpdateLock.lock();
         try {
-            latestSlotUpdate = new SlotUpdateInfo(packet.getSlot(), packet.getItemStack());
+            latestSlotUpdates.put(packet.getSlot(), new SlotUpdateInfo(packet.getSlot(), packet.getItemStack()));
             slotUpdateCondition.signalAll();
         } finally {
             slotUpdateLock.unlock();
