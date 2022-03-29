@@ -51,6 +51,7 @@
   "description.wurst.hack.crystalaura": "Automatically places (optional) and detonates end crystals to kill entities around you.",
   "description.wurst.hack.derp": "Randomly moves your head around.\nOnly visible to other players.",
   "description.wurst.hack.dolphin": "Makes you bob up in water automatically.\n(just like a dolphin)",
+  "description.wurst.hack.emptyslotkeeper": "Keeps one slot of your inventory always empty.\n Useful in combination with the pick-command.",
   "description.wurst.hack.excavator": "Automatically breaks all blocks in the selected area.",
   "description.wurst.hack.extraelytra": "Makes the Elytra easier to use.",
   "description.wurst.hack.fancychat": "Replaces ASCII characters in sent chat messages with fancier unicode characters. Can be used to bypass curse word filters on some servers.\nDoes not work on servers that block unicode characters.",
