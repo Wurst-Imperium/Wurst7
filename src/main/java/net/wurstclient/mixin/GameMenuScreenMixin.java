@@ -7,12 +7,17 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
+import net.minecraft.text.TranslatableText;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import net.minecraft.client.gui.screen.ConnectScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -35,6 +40,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		new Identifier("wurst", "wurst_128.png");
 	
 	private ButtonWidget wurstOptionsButton;
+
+	private final ServerInfo serverEntry = new ServerInfo("", "", false);
 	
 	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
 	{
@@ -48,16 +55,24 @@ public abstract class GameMenuScreenMixin extends Screen
 			return;
 		
 		addWurstOptionsButton();
+		addWurstConnectButton();
 		removeFeedbackAndBugReportButtons();
 	}
 	
 	private void addWurstOptionsButton()
 	{
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
-			204, 20, new LiteralText("            Options"),
+			98, 20, new LiteralText("          Options"),
 			b -> openWurstOptions());
-		
 		addDrawableChild(wurstOptionsButton);
+	}
+
+	private void addWurstConnectButton()
+	{
+		ButtonWidget wurstConnectButton = new ButtonWidget(width / 2 + 4, height / 4 + 56,
+				98, 20, new LiteralText("Direct Connect"),
+				b -> WurstClient.MC.setScreen(new DirectConnectScreen(this, this::directConnect, serverEntry)));
+		addDrawableChild(wurstConnectButton);
 	}
 	
 	private void openWurstOptions()
@@ -102,14 +117,33 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		RenderSystem.setShaderTexture(0, wurstTexture);
 		
-		int x = wurstOptionsButton.x + 34;
-		int y = wurstOptionsButton.y + 2;
-		int w = 63;
-		int h = 16;
-		int fw = 63;
-		int fh = 16;
+		int x = wurstOptionsButton.x + 2;
+		int y = wurstOptionsButton.y + 3;
+		int w = 46;
+		int h = 14;
+		int fw = 46;
+		int fh = 14;
 		float u = 0;
 		float v = 0;
 		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+	}
+
+	private void directConnect(boolean confirmedAction)
+	{
+		if(confirmedAction)
+			connect(serverEntry);
+		else
+			WurstClient.MC.setScreen(this);
+	}
+
+	private void connect(ServerInfo entry)
+	{
+		if(WurstClient.MC.world != null)
+			WurstClient.MC.world.disconnect();
+		if(WurstClient.MC.isInSingleplayer())
+			WurstClient.MC.disconnect(new SaveLevelScreen(new TranslatableText("menu.savingLevel")));
+		else
+			WurstClient.MC.disconnect();
+		ConnectScreen.connect(this, WurstClient.MC, ServerAddress.parse(entry.address), entry);
 	}
 }
