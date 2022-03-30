@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.screens;
 
 import java.util.List;
 
+import net.minecraft.util.InvalidIdentifierException;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -29,55 +30,56 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
-import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
 
-public final class EditItemListScreen extends Screen
-{
+public final class EditItemListScreen extends Screen {
 	private final Screen prevScreen;
 	private final ItemListSetting itemList;
-	
+
 	private ListGui listGui;
 	private TextFieldWidget itemNameField;
 	private ButtonWidget addButton;
 	private ButtonWidget removeButton;
 	private ButtonWidget doneButton;
-	
+	private ButtonWidget searchTypeButton;
+
 	private Item itemToAdd;
-	
-	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList)
-	{
+
+	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList) {
 		super(new LiteralText(""));
 		this.prevScreen = prevScreen;
 		this.itemList = itemList;
 	}
-	
+
 	@Override
 	public boolean shouldPause()
 	{
 		return false;
 	}
-	
+
 	@Override
-	public void init()
-	{
+	public void init() {
 		listGui = new ListGui(client, this, itemList.getItemNames());
-		
+
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		addSelectableChild(itemNameField);
 		itemNameField.setMaxLength(256);
 		
-		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, new LiteralText("Add"), b -> {
+		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30, 20, new LiteralText("Add"), b -> {
+			if (itemList.getSearchType() == null) {
 				itemList.add(itemToAdd);
-				itemNameField.setText("");
-			}));
-		
-		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, new LiteralText("Remove Selected"),
-			b -> itemList.remove(listGui.selected)));
-		
+			} else {
+				itemList.add(itemNameField.getText());
+			}
+			itemNameField.setText("");
+		}));
+
+
+		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52, height - 56, 100, 20,
+				new LiteralText("Remove Selected"), b -> itemList.remove(listGui.selected)));
+
+
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
@@ -86,51 +88,52 @@ public final class EditItemListScreen extends Screen
 				client.setScreen(EditItemListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
-		
+
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
 				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+
+		if (itemList.getSearchType() != null) {
+			addDrawableChild(searchTypeButton = new ButtonWidget(8, 8, 130, 20,
+					new LiteralText("Search Type: " + itemList.getSearchType().getCurrent()), b -> {
+						searchTypeButton
+								.setMessage(new LiteralText("Search Type: " + itemList.getSearchType().getNext()));
+					}));
+		}
 	}
-	
+
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
-	{
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
-		
+
 		itemNameField.mouseClicked(mouseX, mouseY, mouseButton);
 		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(!childClicked && (mouseX < (width - 220) / 2
-			|| mouseX > width / 2 + 129 || mouseY < 32 || mouseY > height - 64))
+
+		if (!childClicked
+				&& (mouseX < (width - 220) / 2 || mouseX > width / 2 + 129 || mouseY < 32 || mouseY > height - 64))
 			listGui.selected = -1;
-		
+
 		return childClicked;
 	}
-	
+
 	@Override
-	public boolean mouseDragged(double double_1, double double_2, int int_1,
-		double double_3, double double_4)
-	{
+	public boolean mouseDragged(double double_1, double double_2, int int_1, double double_3, double double_4) {
 		listGui.mouseDragged(double_1, double_2, int_1, double_3, double_4);
-		return super.mouseDragged(double_1, double_2, int_1, double_3,
-			double_4);
+		return super.mouseDragged(double_1, double_2, int_1, double_3, double_4);
 	}
-	
+
 	@Override
-	public boolean mouseReleased(double double_1, double double_2, int int_1)
-	{
+	public boolean mouseReleased(double double_1, double double_2, int int_1) {
 		listGui.mouseReleased(double_1, double_2, int_1);
 		return super.mouseReleased(double_1, double_2, int_1);
 	}
-	
+
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
-	{
+	public boolean mouseScrolled(double double_1, double double_2, double double_3) {
 		listGui.mouseScrolled(double_1, double_2, double_3);
 		return super.mouseScrolled(double_1, double_2, double_3);
 	}
-	
+
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
@@ -153,23 +156,30 @@ public final class EditItemListScreen extends Screen
 			default:
 			break;
 		}
-		
+
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
-	
+
 	@Override
-	public void tick()
-	{
+	public void tick() {
 		itemNameField.tick();
-		
-		itemToAdd = ItemUtils
-			.getItemFromNameOrID(itemNameField.getText().toLowerCase());
-		addButton.active = itemToAdd != null;
-		
-		removeButton.active =
-			listGui.selected >= 0 && listGui.selected < listGui.list.size();
+		itemToAdd = Registry.ITEM.get(getItemIDFromField());
+		if (itemList.getSearchType() == null) {
+			addButton.active = itemToAdd != null;
+		}
+
+		removeButton.active = listGui.selected >= 0 && listGui.selected < listGui.list.size();
 	}
-	
+
+	private Identifier getItemIDFromField() {
+		try {
+			return new Identifier(itemNameField.getText().toLowerCase());
+
+		} catch (InvalidIdentifierException e) {
+			return null;
+		}
+	}
+
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
@@ -214,61 +224,55 @@ public final class EditItemListScreen extends Screen
 		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
-	}
-	
-	private static class ListGui extends ListWidget
-	{
+}
+
+	private static class ListGui extends ListWidget {
 		private final MinecraftClient mc;
 		private final List<String> list;
 		private int selected = -1;
-		
-		public ListGui(MinecraftClient mc, EditItemListScreen screen,
-			List<String> list)
-		{
+
+		public ListGui(MinecraftClient mc, EditItemListScreen screen, List<String> list) {
 			super(mc, screen.width, screen.height, 32, screen.height - 64, 30);
 			this.mc = mc;
 			this.list = list;
 		}
-		
+
 		@Override
-		protected int getItemCount()
-		{
+		protected int getItemCount() {
 			return list.size();
 		}
-		
+
 		@Override
-		protected boolean selectItem(int index, int int_2, double var3,
-			double var4)
-		{
-			if(index >= 0 && index < list.size())
+		protected boolean selectItem(int index, int int_2, double var3, double var4) {
+			if (index >= 0 && index < list.size())
 				selected = index;
-			
+
 			return true;
 		}
-		
+
 		@Override
-		protected boolean isSelectedItem(int index)
-		{
+		protected boolean isSelectedItem(int index) {
 			return index == selected;
 		}
-		
+
 		@Override
-		protected void renderBackground()
-		{
-			
+		protected void renderBackground() {
+
 		}
-		
+
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
-		{
+		protected void renderItem(MatrixStack matrixStack, int index, int x, int y, int var4, int var5, int var6,
+				float partialTicks) {
 			String name = list.get(index);
-			Item item = Registry.ITEM.get(new Identifier(name));
+			Item item;
+			try {
+				item = Registry.ITEM.get(new Identifier(name));
+			} catch (Exception e) {
+				item = Registry.ITEM.get(new Identifier("air"));
+			}
 			ItemStack stack = new ItemStack(item);
 			TextRenderer fr = mc.textRenderer;
-			
-			String displayName =
-				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
+			String displayName = renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
 			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
@@ -305,7 +309,6 @@ public final class EditItemListScreen extends Screen
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				matrixStack.pop();
-				
 				return "\u00a7ounknown item\u00a7r";
 			}
 			

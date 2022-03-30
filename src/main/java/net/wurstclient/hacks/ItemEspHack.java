@@ -34,9 +34,13 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.SearchType;
+
 
 @SearchTags({"item esp", "ItemTracers", "item tracers"})
 public final class ItemEspHack extends Hack implements UpdateListener,
@@ -51,12 +55,18 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows larger boxes\n"
 			+ "that look better.",
 		BoxSize.values(), BoxSize.FANCY);
-	
+
+	private final ItemListSetting itemSearch = new ItemListSetting(new SearchType(), "Search List",
+			"Use this to search for specific items!\n" + SearchType._DISABLED + ": Will disable the setting\n"
+					+ SearchType._ITEMID + ": Each input name is actually an item id\n" + SearchType._NAME
+					+ ": Each input name is the name of an item\n",
+			"");
+
 	private final ColorSetting color = new ColorSetting("Color",
 		"Items will be highlighted in this color.", Color.YELLOW);
 	
 	private final ArrayList<ItemEntity> items = new ArrayList<>();
-	
+
 	public ItemEspHack()
 	{
 		super("ItemESP");
@@ -65,45 +75,63 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(color);
+		addSetting(itemSearch);
 	}
-	
+
 	@Override
-	public void onEnable()
-	{
+	public void onEnable() {
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
-	
+
 	@Override
-	public void onDisable()
-	{
+	public void onDisable() {
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 	}
-	
+
 	@Override
-	public void onUpdate()
-	{
+	public void onUpdate() {
 		items.clear();
-		for(Entity entity : MC.world.getEntities())
-			if(entity instanceof ItemEntity)
-				items.add((ItemEntity)entity);
+		switch (itemSearch.getSearchType().getCurrent()) {
+			case SearchType._ITEMID:
+				for (Entity entity : MC.world.getEntities()) {
+					if (entity instanceof ItemEntity) {
+						if (itemSearch.containsItemId(((ItemEntity) entity).getStack().getItem())) {
+							items.add((ItemEntity) entity);
+						}
+					}
+				}
+				break;
+			case SearchType._NAME:
+				for (Entity entity : MC.world.getEntities()) {
+					if (entity instanceof ItemEntity) {
+						if (itemSearch.containsItemName(((ItemEntity) entity).getStack())) {
+							items.add((ItemEntity) entity);
+						}
+					}
+				}
+				break;
+			default:
+				for (Entity entity : MC.world.getEntities()) {
+					if (entity instanceof ItemEntity) {
+						items.add((ItemEntity) entity);
+					}
+				}
+		}
 	}
-	
+
 	@Override
-	public void onCameraTransformViewBobbing(
-		CameraTransformViewBobbingEvent event)
-	{
-		if(style.getSelected().lines)
+	public void onCameraTransformViewBobbing(CameraTransformViewBobbingEvent event) {
+		if (style.getSelected().lines)
 			event.cancel();
 	}
-	
+
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		
@@ -120,14 +148,14 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			renderTracers(matrixStack, partialTicks, regionX, regionZ);
 		
 		matrixStack.pop();
-		
+
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
-	
+
 	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
 		int regionX, int regionZ)
 	{
@@ -194,31 +222,27 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
 	}
-	
-	private enum Style
-	{
-		BOXES("Boxes only", true, false),
-		LINES("Lines only", false, true),
+
+	private enum Style {
+		BOXES("Boxes only", true, false), LINES("Lines only", false, true),
 		LINES_AND_BOXES("Lines and boxes", true, true);
-		
+
 		private final String name;
 		private final boolean boxes;
 		private final boolean lines;
-		
-		private Style(String name, boolean boxes, boolean lines)
-		{
+
+		private Style(String name, boolean boxes, boolean lines) {
 			this.name = name;
 			this.boxes = boxes;
 			this.lines = lines;
 		}
-		
+
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return name;
 		}
 	}
-	
+
 	private enum BoxSize
 	{
 		ACCURATE("Accurate", 0),
@@ -232,10 +256,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			this.name = name;
 			this.extraSize = extraSize;
 		}
-		
+
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return name;
 		}
 	}
