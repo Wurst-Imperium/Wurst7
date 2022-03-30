@@ -39,6 +39,7 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
+    "LivingEntityMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",

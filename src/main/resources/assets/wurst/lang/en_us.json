@@ -100,6 +100,7 @@
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.hack.nofireoverlay": "Lowers or blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
+  "description.wurst.hack.nolevitation": "Disables levitation status effect\n §c§lWARNING:§r Elytra will not work while levitation effect is applied!",
   "description.wurst.hack.nooverlay": "Blocks the overlays of water and lava.",
   "description.wurst.hack.nopumpkin": "Blocks the overlay when wearing a pumpkin on your head.",
   "description.wurst.hack.noslowdown": "Cancels slowness effects caused by honey, soul sand and using items.",
