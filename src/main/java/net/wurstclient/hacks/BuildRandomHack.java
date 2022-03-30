@@ -19,6 +19,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -218,6 +219,11 @@ public final class BuildRandomHack extends Hack
 			if(distanceSqPosVec > eyesPos.squaredDistanceTo(posVec.add(dirVec)))
 				continue;
 			
+			// check if block can be interacted with (chest, crafting table, ...)
+			BlockHitResult hitResult = new BlockHitResult(hitVec, side.getOpposite(), neighbor, false);
+			if (MC.world.getBlockState(neighbor).onUse(MC.world, MC.player, Hand.MAIN_HAND, hitResult).isAccepted())
+				continue;
+			
 			// check line of sight
 			if(MC.world
 				.raycast(new RaycastContext(eyesPos, hitVec,
@@ -262,6 +268,11 @@ public final class BuildRandomHack extends Hack
 			
 			// check if hitVec is within range (6 blocks)
 			if(eyesPos.squaredDistanceTo(hitVec) > 36)
+				continue;
+			
+			// check if block can be interacted with (chest, crafting table, ...)
+			BlockHitResult hitResult = new BlockHitResult(hitVec, side.getOpposite(), neighbor, false);
+			if (MC.world.getBlockState(neighbor).onUse(MC.world, MC.player, Hand.MAIN_HAND, hitResult).isAccepted())
 				continue;
 			
 			// place block
