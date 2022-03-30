@@ -104,6 +104,7 @@ public final class HackList implements UpdateListener
 	public final HUDHack hudHack = new HUDHack();
 	public final InfiniChatHack infiniChatHack = new InfiniChatHack();
 	public final InstantBunkerHack instantBunkerHack = new InstantBunkerHack();
+	public final InvWalkHack invWalkHack = new InvWalkHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
 	public final ItemGeneratorHack itemGeneratorHack = new ItemGeneratorHack();
 	public final JesusHack jesusHack = new JesusHack();
