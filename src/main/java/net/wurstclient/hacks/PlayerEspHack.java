@@ -76,6 +76,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting armorColorBox = new CheckboxSetting(
 			"Box is Armor Color", "Box color will attempt to be set to what a player's armor color is.", false);
 
+	private int playerBox;
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 
 	public PlayerEspHack()
@@ -129,7 +130,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 
 		if (filterNonFriends.isChecked())
 			stream = stream.filter(e -> WURST.getFriends().contains(e.getName().getString()));
-
 		players.addAll(stream.collect(Collectors.toList()));
 	}
 
