@@ -17,7 +17,7 @@ public class BetterChatHack extends Hack implements ChatInputListener {
 	private CheckboxSetting militaryTimeSetting = new CheckboxSetting("24-hour clock", false);
 	
 	public BetterChatHack() {
-		super("Better Chat");
+		super("BetterChat");
 		setCategory(Category.CHAT);
 		addSetting(timestampsSetting);
 		addSetting(militaryTimeSetting);
