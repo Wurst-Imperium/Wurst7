@@ -5,18 +5,15 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Latest Client Build
 
 on:
   push:
     branches:
       - master
-      - 'releases/**'
-      - 'dev/**'
   pull_request:
     branches:
       - master
-      - 'releases/**'
 jobs:
   build:
 
@@ -37,5 +34,9 @@ jobs:
           arguments: build
       - uses: actions/upload-artifact@v3
         with:
-          name: Package
-          path: build/libs
+          name: WurstClient
+          path: |
+            build/libs
+            !build/libs/*-sources.jar
+            !build/libs/*-dev.jar
+
