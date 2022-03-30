@@ -15,13 +15,20 @@ import net.minecraft.util.Formatting;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"health tags"})
 public final class HealthTagsHack extends Hack
 {
+	CheckboxSetting showMaxHealth = new CheckboxSetting("Show max health", "Shows players' max health.", false);
+	CheckboxSetting colorByPercentage = new CheckboxSetting("Color by percentage", "Color health display based on percentage of max health instead of fixed values.", false);
+
 	public HealthTagsHack()
 	{
 		super("HealthTags");
+
+		addSetting(showMaxHealth);
+		addSetting(colorByPercentage);
 		setCategory(Category.RENDER);
 	}
 	
@@ -29,27 +36,53 @@ public final class HealthTagsHack extends Hack
 	{
 		if(!isEnabled())
 			return nametag;
-		
-		int health = (int)entity.getHealth();
-		
-		MutableText formattedHealth = new LiteralText(" ")
-			.append(Integer.toString(health)).formatted(getColor(health));
+		// Keep as float for more precise health color calculations.
+		float health = entity.getHealth();
+		float maxHealth = entity.getMaxHealth();
+
+
+		MutableText formattedHealth;
+		if (showMaxHealth.isChecked())
+		{
+			formattedHealth = new LiteralText(" ").append(String.format("%.0f", health)).append("/").append(String.format("%.0f", maxHealth)).formatted(getColor(health, maxHealth));
+		}
+		else
+		{
+			formattedHealth = new LiteralText(" ").append(String.format("%.0f", health)).formatted(getColor(health, maxHealth));
+		}
 		return ((MutableText)nametag).append(formattedHealth);
 	}
 	
-	private Formatting getColor(int health)
+	private Formatting getColor(float health, float maxHealth)
 	{
-		if(health <= 5)
-			return Formatting.DARK_RED;
-		
-		if(health <= 10)
-			return Formatting.GOLD;
-		
-		if(health <= 15)
-			return Formatting.YELLOW;
-		
+		if (colorByPercentage.isChecked())
+		{
+			float percentage = health / maxHealth;
+
+			if (percentage <= 0.25)
+				return Formatting.DARK_RED;
+
+			if (percentage <= 0.5)
+				return Formatting.GOLD;
+
+			if (percentage <= 0.75)
+				return Formatting.YELLOW;
+
+		}
+		else
+		{
+			if(health <= 5)
+				return Formatting.DARK_RED;
+
+			if(health <= 10)
+				return Formatting.GOLD;
+
+			if(health <= 15)
+				return Formatting.YELLOW;
+
+		}
 		return Formatting.GREEN;
+
 	}
-	
 	// See EntityRendererMixin.onRenderLabelIfPresent()
 }

@@ -25,7 +25,8 @@ public class GoogleTranslate
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
 		
-		if(text.equalsIgnoreCase(translated))
+		if(text.replaceAll("\\s", "").equalsIgnoreCase(
+			translated.replaceAll("\\s", "")))
 			return null;
 		
 		return translated;

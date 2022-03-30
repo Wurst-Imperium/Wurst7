@@ -34,7 +34,7 @@ public abstract class BlockMixin implements ItemConvertible
 		BlockPos pos, Direction direction, BlockPos blockPos,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, blockPos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -106,14 +107,21 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		return player.isUsingItem();
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
-	private void onSendMovementPacketsHEAD(CallbackInfo ci)
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+		ordinal = 0,
+		shift = Shift.AFTER), method = "tick()V")
+	private void onSendMovementPacketsBefore(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
-	private void onSendMovementPacketsTAIL(CallbackInfo ci)
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V",
+		ordinal = 0,
+		shift = Shift.BY,
+		by = 2), method = "tick()V")
+	private void onSendMovementPacketsAfter(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}

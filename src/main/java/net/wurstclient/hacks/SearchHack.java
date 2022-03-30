@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import net.minecraft.client.render.*;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -29,12 +31,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
@@ -45,6 +41,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -55,6 +52,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
@@ -66,7 +64,7 @@ public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
-		"The type of block to search for.", "minecraft:diamond_ore", false);
+		"The type of block to search for.", "minecraft:nether_portal", false);
 	
 	private final EnumSetting<Area> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
@@ -78,6 +76,10 @@ public final class SearchHack extends Hack
 			+ "Higher values require a faster computer.",
 		4, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+
+	private final CheckboxSetting tracers = new CheckboxSetting(
+			"Tracers", "Draws tracers to selected blocks.", false);
+
 	private int prevLimit;
 	private boolean notify;
 	
@@ -89,10 +91,15 @@ public final class SearchHack extends Hack
 	private ForkJoinPool pool2;
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
+	private ArrayList<int[]> blockTracerVertices;
+	HashSet<BlockPos> matchingBlocks;
+
 	
 	private VertexBuffer vertexBuffer;
 	private boolean bufferUpToDate;
-	
+	private int displayList;
+	private boolean displayListUpToDate;
+
 	public SearchHack()
 	{
 		super("Search");
@@ -100,6 +107,7 @@ public final class SearchHack extends Hack
 		addSetting(block);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(tracers);
 	}
 	
 	@Override
@@ -242,14 +250,46 @@ public final class SearchHack extends Hack
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
 		}
-		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+
+		if(tracers.isChecked())
+			renderTracers(matrixStack, new Color(red, green, blue), regionX, regionZ);
+
 		matrixStack.pop();
-		
+
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+
+	private void renderTracers(MatrixStack matrixStack, Color color, int regionX, int regionZ)
+	{
+		if(matchingBlocks == null)
+			return;
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
+		Vec3d start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos().subtract(regionX, 0, regionZ));
+		for(BlockPos bp : matchingBlocks)
+		{
+			Vec3d end = new Vec3d(bp.getX() + .5, bp.getY() + .5, bp.getZ() + .5)
+				.subtract(regionX, 0, regionZ);
+			bufferBuilder
+					.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+					.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+
+			bufferBuilder
+					.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+					.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+		}
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
@@ -438,7 +478,7 @@ public final class SearchHack extends Hack
 	
 	private void startCompileVerticesTask()
 	{
-		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
+		matchingBlocks = getMatchingBlocksFromTask();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -468,7 +508,6 @@ public final class SearchHack extends Hack
 		
 		bufferBuilder.end();
 		vertexBuffer.upload(bufferBuilder);
-		
 		bufferUpToDate = true;
 	}
 	
@@ -477,11 +516,21 @@ public final class SearchHack extends Hack
 		try
 		{
 			return compileVerticesTask.get();
-			
+		//try
+		//{
+		//	blockTracerVertices = compileVerticesTask.get();
 		}catch(InterruptedException | ExecutionException e)
 		{
 			throw new RuntimeException(e);
 		}
+
+		//GL11.glNewList(displayList, GL11.GL_COMPILE);
+		//for(int[] vertex : blockTracerVertices)
+		//	GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
+		//GL11.glEndList();
+		//
+		//displayListUpToDate = true;
+
 	}
 	
 	private enum Area
