@@ -8,6 +8,7 @@
   	"AbstractBlockStateMixin",
     "ArmorItemMixin",
     "BackgroundRendererMixin",
+    "BarrelBlockMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
