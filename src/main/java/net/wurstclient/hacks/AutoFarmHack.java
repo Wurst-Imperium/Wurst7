@@ -76,7 +76,7 @@ public final class AutoFarmHack extends Hack
 	public AutoFarmHack()
 	{
 		super("AutoFarm");
-		
+
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(replant);
@@ -294,7 +294,10 @@ public final class AutoFarmHack extends Hack
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
 		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
-		
+		else if(block instanceof SweetBerryBushBlock)
+			return state.get(SweetBerryBushBlock.AGE) >=3;
+
+
 		return false;
 	}
 	
@@ -309,6 +312,7 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
 		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
+		seeds.put(Blocks.SWEET_BERRY_BUSH, Items.SWEET_BERRIES);
 		
 		plants.putAll(blocks.parallelStream()
 			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
@@ -333,10 +337,16 @@ public final class AutoFarmHack extends Hack
 				|| BlockUtils.getState(pos.east()).isIn(BlockTags.JUNGLE_LOGS)
 				|| BlockUtils.getState(pos.south()).isIn(BlockTags.JUNGLE_LOGS)
 				|| BlockUtils.getState(pos.west()).isIn(BlockTags.JUNGLE_LOGS);
-		
+
+		if(item == Items.SWEET_BERRIES)
+			return BlockUtils.getBlock(pos.down()) == Blocks.GRASS_BLOCK ||
+					BlockUtils.getBlock(pos.down()) == Blocks.DIRT ||
+					BlockUtils.getBlock(pos.down()) == Blocks.PODZOL ||
+					BlockUtils.getBlock(pos.down()) == Blocks.COARSE_DIRT ||
+					BlockUtils.getBlock(pos.down()) == Blocks.FARMLAND;
 		return false;
 	}
-	
+
 	private boolean tryToReplant(BlockPos pos, Item neededItem)
 	{
 		ClientPlayerEntity player = MC.player;
@@ -471,11 +481,15 @@ public final class AutoFarmHack extends Hack
 			
 			if(!blocksToHarvest2.isEmpty())
 				currentBlock = blocksToHarvest2.get(0);
-			
+
+
+
 			MC.interactionManager.cancelBlockBreaking();
 			progress = 1;
 			prevProgress = 1;
 			BlockBreaker.breakBlocksWithPacketSpam(blocksToHarvest2);
+
+
 			return;
 		}
 		

@@ -15,7 +15,7 @@
   "description.wurst.hack.autodrop": "Automatically drops unwanted items.",
   "description.wurst.hack.autoleave": "Automatically leaves the server when your health is low.",
   "description.wurst.hack.autoeat": "Automatically eats food when necessary.",
-  "description.wurst.hack.autofarm": "Harvests and replants crops automatically.\nWorks with wheat, carrots, potatoes, beetroots, pumpkins, melons, cacti, sugar canes, kelp, bamboo, nether warts, and cocoa beans.",
+  "description.wurst.hack.autofarm": "Harvests and replants crops automatically.\nWorks with wheat, carrots, potatoes, beetroots, pumpkins, melons, sweet berries, cacti, sugar canes, kelp, bamboo, nether warts, and cocoa beans.",
   "description.wurst.hack.autofish": "Automatically catches fish using your best fishing rod. If it finds a better rod while fishing, it will automatically switch to it.",
   "description.wurst.hack.autogg": "Sends gg after a game.\n\n§c§lATTENTION:§r Made for Hypixel minigames.\nMight not work on other servers.",
   "description.wurst.hack.automine": "Automatically mines any block that you look at.",
