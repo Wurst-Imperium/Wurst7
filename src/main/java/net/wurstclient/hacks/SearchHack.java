@@ -250,9 +250,12 @@ public final class SearchHack extends Hack
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
 		}
-		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+
 		if(tracers.isChecked())
-			renderTracers(matrixStack, red, green, blue);
+			renderTracers(matrixStack, new Color(red, green, blue), regionX, regionZ);
 
 		matrixStack.pop();
 
@@ -263,7 +266,7 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 
-	private void renderTracers(MatrixStack matrixStack, float red, float green, float blue)
+	private void renderTracers(MatrixStack matrixStack, Color color, int regionX, int regionZ)
 	{
 		if(matchingBlocks == null)
 			return;
@@ -272,11 +275,11 @@ public final class SearchHack extends Hack
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-		Vec3d start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		Vec3d start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos().subtract(regionX, 0, regionZ));
 		for(BlockPos bp : matchingBlocks)
 		{
-			Vec3d end = new Vec3d(bp.getX() + .5, bp.getY() + .5, bp.getZ() + .5);
-			Color color = new Color(red, green, blue, 0.4F);
+			Vec3d end = new Vec3d(bp.getX() + .5, bp.getY() + .5, bp.getZ() + .5)
+				.subtract(regionX, 0, regionZ);
 			bufferBuilder
 					.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
 					.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
