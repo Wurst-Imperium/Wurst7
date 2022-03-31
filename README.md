@@ -18,10 +18,10 @@ Scared? Lactose intolerant? Go get the official [Wurst client](http://wurstclien
 
 ## Downloads
 Try it out!
-["Cheddar" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
+[Latest "Cheddar" Client](https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest)
 
 Thar be dragons!
-["Dev" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
+[Latest "Dev" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
 
 
 ## License
