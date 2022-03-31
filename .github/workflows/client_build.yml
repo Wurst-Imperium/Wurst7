@@ -34,21 +34,14 @@ jobs:
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: CheddarBratWurst-Client
-          path: |
-            build/libs
-            !build/libs/*-sources.jar
-            !build/libs/*-dev.jar
 
-      - name: Read Wurst Version from Properties-file
+      - name: Read Wurst Version from gradle.properties
         id: read_property_wurst
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: './gradle.properties'
           property: 'wurst_version'
-      - name: Read Wurst Version from Properties-file
+      - name: Read Minecraft Version from gradle.properties
         id: read_property_mc
         uses: christian-draeger/read-properties@1.0.1
         with:
@@ -72,7 +65,7 @@ jobs:
 
       - name: Make Release Zip
         run: |
-          zip --junk-paths build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}
+          zip --junk-paths CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.jar
 
       - name: Upload Release Asset
         id: upload-release-asset
