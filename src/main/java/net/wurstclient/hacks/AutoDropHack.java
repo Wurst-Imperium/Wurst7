@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -37,7 +37,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	
 	public AutoDropHack()
 	{
-		super("AutoDrop", "Automatically drops unwanted items.");
+		super("AutoDrop");
 		setCategory(Category.ITEMS);
 		addSetting(items);
 	}
@@ -73,7 +73,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
-			ItemStack stack = MC.player.inventory.getStack(adjustedSlot);
+			ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
 			
 			if(stack.isEmpty())
 				continue;

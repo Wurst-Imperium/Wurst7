@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,7 +30,7 @@ public enum BlockVertexCompiler
 	{
 		return () -> blocks.parallelStream()
 			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	public static Callable<ArrayList<int[]>> createTask(

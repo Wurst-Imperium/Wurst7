@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,11 +10,15 @@ package net.wurstclient.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
@@ -26,15 +30,15 @@ public class PathFinder
 	private final WurstClient wurst = WurstClient.INSTANCE;
 	
 	private final boolean invulnerable =
-		WurstClient.MC.player.abilities.creativeMode;
+		WurstClient.MC.player.getAbilities().creativeMode;
 	private final boolean creativeFlying =
-		WurstClient.MC.player.abilities.flying;
+		WurstClient.MC.player.getAbilities().flying;
 	protected final boolean flying =
 		creativeFlying || wurst.getHax().flightHack.isEnabled();
 	private final boolean immuneToFallDamage =
 		invulnerable || wurst.getHax().noFallHack.isEnabled();
-	private final boolean noWaterSlowdown = false;
-	// TODO: wurst.getHax().noSlowdownHack.blockWaterSlowness();
+	private final boolean noWaterSlowdown =
+		wurst.getHax().antiWaterPushHack.isPreventingSlowdown();
 	private final boolean jesus = wurst.getHax().jesusHack.isEnabled();
 	private final boolean spider = wurst.getHax().spiderHack.isEnabled();
 	protected boolean fallingAllowed = true;
@@ -187,7 +191,7 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < 256 && canGoThrough(up.up())
+		if(pos.getY() < WurstClient.MC.world.getTopY() && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
@@ -197,8 +201,9 @@ public class PathFinder
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
-		if(pos.getY() > 0 && canGoThrough(down) && canGoAbove(down.down())
-			&& (flying || canFallBelow(pos)) && (divingAllowed
+		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down)
+			&& canGoAbove(down.down()) && (flying || canFallBelow(pos))
+			&& (divingAllowed
 				|| BlockUtils.getState(pos).getMaterial() != Material.WATER))
 			neighbors.add(new PathPos(down));
 		
@@ -221,7 +226,8 @@ public class PathFinder
 		BlockPos horizontal2 = current.offset(direction2);
 		BlockPos next = horizontal1.offset(direction2);
 		
-		if(isPassable(horizontal1) && isPassable(horizontal2)
+		if(isPassableWithoutMining(horizontal1)
+			&& isPassableWithoutMining(horizontal2)
 			&& checkHorizontalMovement(current, next))
 			return true;
 		
@@ -230,24 +236,65 @@ public class PathFinder
 	
 	protected boolean isPassable(BlockPos pos)
 	{
-		return canGoThrough(pos) && canGoThrough(pos.up())
-			&& canGoAbove(pos.down()) && (divingAllowed || BlockUtils
-				.getState(pos.up()).getMaterial() != Material.WATER);
+		if(!canGoThrough(pos) && !isMineable(pos))
+			return false;
+		
+		BlockPos up = pos.up();
+		if(!canGoThrough(up) && !isMineable(up))
+			return false;
+		
+		if(!canGoAbove(pos.down()))
+			return false;
+		
+		if(!divingAllowed
+			&& BlockUtils.getState(up).getMaterial() == Material.WATER)
+			return false;
+		
+		return true;
+	}
+	
+	protected boolean isPassableWithoutMining(BlockPos pos)
+	{
+		if(!canGoThrough(pos))
+			return false;
+		
+		BlockPos up = pos.up();
+		if(!canGoThrough(up))
+			return false;
+		
+		if(!canGoAbove(pos.down()))
+			return false;
+		
+		if(!divingAllowed
+			&& BlockUtils.getState(up).getMaterial() == Material.WATER)
+			return false;
+		
+		return true;
+	}
+	
+	protected boolean isMineable(BlockPos pos)
+	{
+		return false;
 	}
 	
 	protected boolean canBeSolid(BlockPos pos)
 	{
-		Material material = BlockUtils.getState(pos).getMaterial();
-		Block block = BlockUtils.getBlock(pos);
+		BlockState state = BlockUtils.getState(pos);
+		Material material = state.getMaterial();
+		Block block = state.getBlock();
+		
 		return material.blocksMovement()
 			&& !(block instanceof AbstractSignBlock)
 			|| block instanceof LadderBlock || jesus
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
+		// Can't see why isChunkLoaded() is deprecated. Still seems to be widely
+		// used with no replacement.
 		if(!WurstClient.MC.world.isChunkLoaded(pos))
 			return false;
 		
@@ -392,11 +439,12 @@ public class PathFinder
 	private float getCost(BlockPos current, BlockPos next)
 	{
 		float[] costs = {0.5F, 0.5F};
-		BlockPos[] positions = new BlockPos[]{current, next};
+		BlockPos[] positions = {current, next};
 		
 		for(int i = 0; i < positions.length; i++)
 		{
-			Material material = BlockUtils.getState(positions[i]).getMaterial();
+			BlockPos pos = positions[i];
+			Material material = BlockUtils.getState(pos).getMaterial();
 			
 			// liquids
 			if(material == Material.WATER && !noWaterSlowdown)
@@ -405,9 +453,15 @@ public class PathFinder
 				costs[i] *= 4.539515393656079F;
 			
 			// soul sand
-			if(!canFlyAt(positions[i]) && BlockUtils
-				.getBlock(positions[i].down()) instanceof SoulSandBlock)
+			if(!canFlyAt(pos)
+				&& BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock)
 				costs[i] *= 2.5F;
+			
+			// mining
+			if(isMineable(pos))
+				costs[i] *= 2F;
+			if(isMineable(pos.up()))
+				costs[i] *= 2F;
 		}
 		
 		float cost = costs[0] + costs[1];
@@ -439,7 +493,7 @@ public class PathFinder
 	
 	public int countProcessedBlocks()
 	{
-		return prevPosMap.keySet().size();
+		return prevPosMap.size();
 	}
 	
 	public int getQueueSize()
@@ -495,74 +549,66 @@ public class PathFinder
 		return path;
 	}
 	
-	public void renderPath(boolean debugMode, boolean depthTest)
+	public void renderPath(MatrixStack matrixStack, boolean debugMode,
+		boolean depthTest)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
-		GL11.glTranslated(0.5, 0.5, 0.5);
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
+		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
 		{
 			int renderedThings = 0;
 			
 			// queue (yellow)
-			GL11.glLineWidth(2);
-			GL11.glColor4f(1, 1, 0, 0.75F);
+			RenderSystem.setShaderColor(1, 1, 0, 0.75F);
 			for(PathPos element : queue.toArray())
 			{
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(element);
+				PathRenderer.renderNode(matrixStack, element);
 				renderedThings++;
 			}
 			
 			// processed (red)
-			GL11.glLineWidth(2);
 			for(Entry<PathPos, PathPos> entry : prevPosMap.entrySet())
 			{
 				if(renderedThings >= 5000)
 					break;
 				
 				if(entry.getKey().isJumping())
-					GL11.glColor4f(1, 0, 1, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 1, 0.75F);
 				else
-					GL11.glColor4f(1, 0, 0, 0.75F);
+					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
-				PathRenderer.renderArrow(entry.getValue(), entry.getKey());
+				PathRenderer.renderArrow(matrixStack, entry.getValue(),
+					entry.getKey());
 				renderedThings++;
 			}
 		}
 		
 		// path (blue)
 		if(debugMode)
-		{
-			GL11.glLineWidth(4);
-			GL11.glColor4f(0, 0, 1, 0.75F);
-		}else
-		{
-			GL11.glLineWidth(2);
-			GL11.glColor4f(0, 1, 0, 0.75F);
-		}
+			RenderSystem.setShaderColor(0, 0, 1, 0.75F);
+		else
+			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);
@@ -574,14 +620,13 @@ public class PathFinder
 			throw new IllegalStateException("Path is not formatted!");
 		
 		// check player abilities
-		if(invulnerable != WurstClient.MC.player.abilities.creativeMode
+		if(invulnerable != WurstClient.MC.player.getAbilities().creativeMode
 			|| flying != (creativeFlying
 				|| wurst.getHax().flightHack.isEnabled())
 			|| immuneToFallDamage != (invulnerable
 				|| wurst.getHax().noFallHack.isEnabled())
-			// TODO:
-			// || noWaterSlowdown !=
-			// wurst.getHax().noSlowdownHack.blockWaterSlowness()
+			|| noWaterSlowdown != wurst.getHax().antiWaterPushHack
+				.isPreventingSlowdown()
 			|| jesus != wurst.getHax().jesusHack.isEnabled()
 			|| spider != wurst.getHax().spiderHack.isEnabled())
 			return false;
@@ -629,5 +674,10 @@ public class PathFinder
 	public void setDivingAllowed(boolean divingAllowed)
 	{
 		this.divingAllowed = divingAllowed;
+	}
+	
+	public List<PathPos> getPath()
+	{
+		return Collections.unmodifiableList(path);
 	}
 }

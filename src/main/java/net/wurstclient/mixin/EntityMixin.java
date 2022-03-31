@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,7 +26,7 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
 		opcode = Opcodes.INVOKEVIRTUAL,
 		ordinal = 0),
-		method = {"updateMovementInFluid(Lnet/minecraft/tag/Tag;D)Z"})
+		method = {"updateMovementInFluid(Lnet/minecraft/tag/TagKey;D)Z"})
 	private void setVelocityFromFluid(Entity entity, Vec3d velocity)
 	{
 		VelocityFromFluidEvent event = new VelocityFromFluidEvent();

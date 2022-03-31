@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,8 +9,17 @@ package net.wurstclient.clickgui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
@@ -73,7 +82,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		if(hovering)
 			gui.setTooltip("");
 		
-		drawOutline(x1, x2, y1, y2);
+		drawOutline(matrixStack, x1, x2, y1, y2);
 		
 		int yi1 = y1 - 11;
 		for(T value : setting.getValues())
@@ -81,11 +90,13 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			if(value == setting.getSelected())
 				continue;
 			
+			RenderSystem.setShader(GameRenderer::getPositionShader);
+			
 			yi1 += 11;
 			int yi2 = yi1 + 11;
 			
 			boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
-			drawValueBackground(x1, x2, yi1, yi2, hValue);
+			drawValueBackground(matrixStack, x1, x2, yi1, yi2, hValue);
 			
 			drawValueName(matrixStack, x1, yi1, value);
 		}
@@ -97,41 +108,55 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2;
 	}
 	
-	private void drawOutline(int x1, int x2, int y1, int y2)
+	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
+		int y2)
 	{
-		float[] acColor = gui.getAcColor();
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		float[] acColor = gui.getAcColor();
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	private void drawValueBackground(int x1, int x2, int yi1, int yi2,
-		boolean hValue)
+	private void drawValueBackground(MatrixStack matrixStack, int x1, int x2,
+		int yi1, int yi2, boolean hValue)
 	{
 		float[] bgColor = gui.getBgColor();
 		float alpha = gui.getOpacity() * (hValue ? 1.5F : 1);
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], alpha);
 		
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glVertex2i(x1, yi1);
-		GL11.glVertex2i(x1, yi2);
-		GL11.glVertex2i(x2, yi2);
-		GL11.glVertex2i(x2, yi1);
-		GL11.glEnd();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], alpha);
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, yi1, 0).next();
+		bufferBuilder.vertex(matrix, x1, yi2, 0).next();
+		bufferBuilder.vertex(matrix, x2, yi2, 0).next();
+		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private void drawValueName(MatrixStack matrixStack, int x1, int yi1,
 		Enum<?> value)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

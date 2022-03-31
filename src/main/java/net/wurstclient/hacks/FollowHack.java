@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,10 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -113,9 +117,7 @@ public final class FollowHack extends Hack
 	
 	public FollowHack()
 	{
-		super("Follow",
-			"A bot that follows the closest entity.\n" + "Very annoying.\n\n"
-				+ "Use .follow to follow a specific entity.");
+		super("Follow");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(distance);
@@ -142,8 +144,7 @@ public final class FollowHack extends Hack
 	{
 		if(entity != null)
 			return "Following " + entity.getName().getString();
-		else
-			return "Follow";
+		return "Follow";
 	}
 	
 	@Override
@@ -157,7 +158,7 @@ public final class FollowHack extends Hack
 		{
 			Stream<Entity> stream =
 				StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-					.filter(e -> !e.removed)
+					.filter(e -> !e.isRemoved())
 					.filter(e -> e instanceof LivingEntity
 						&& ((LivingEntity)e).getHealth() > 0
 						|| e instanceof AbstractMinecartEntity)
@@ -274,13 +275,14 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity.removed || entity instanceof LivingEntity
+		if(entity.isRemoved() || entity instanceof LivingEntity
 			&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> entity.getName().getString()
@@ -342,37 +344,39 @@ public final class FollowHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.jumpKey.setPressed(false);
 			}
 			
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			MC.options.keyForward
+			MC.options.forwardKey
 				.setPressed(MC.player.squaredDistanceTo(entity.getX(),
 					MC.player.getY(), entity.getZ()) > distanceSq);
 		}
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	public void setEntity(Entity entity)

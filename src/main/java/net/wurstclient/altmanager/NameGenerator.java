@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -152,12 +152,20 @@ public final class NameGenerator
 		}
 		
 		int special = (int)Math.round(Math.random() * 8);
-		if(special == 3)
+		switch(special)
+		{
+			case 3:
 			name = "xX".concat(name).concat("Xx");
-		else if(special == 4)
+			break;
+			case 4:
 			name = name.concat("LP");
-		else if(special == 5)
+			break;
+			case 5:
 			name = name.concat("HD");
+			break;
+			default:
+			break;
+		}
 		
 		return name;
 	}

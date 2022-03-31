@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.resource.SynchronousResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -33,7 +33,7 @@ import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloadListener, IGameRenderer
+	implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
 {
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
@@ -63,13 +63,13 @@ public abstract class GameRendererMixin
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
 		MatrixStack matrixStack, CallbackInfo ci)
 	{
-		RenderEvent event = new RenderEvent(partialTicks);
+		RenderEvent event = new RenderEvent(matrixStack, partialTicks);
 		EventManager.fire(event);
 	}
 	
 	@Redirect(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
 		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,11 @@ import java.util.LinkedHashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -51,7 +55,7 @@ public final class AutoBuildHack extends Hack
 			+ "add your own or to edit / delete the\n"
 			+ "default templates.\n\n" + "If you mess up, simply press the\n"
 			+ "'Reset to Defaults' button or\n" + "delete the folder.",
-		"autobuild", folder -> DefaultAutoBuildTemplates.createFiles(folder));
+		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
@@ -80,8 +84,7 @@ public final class AutoBuildHack extends Hack
 	
 	public AutoBuildHack()
 	{
-		super("AutoBuild", "Builds things automatically.\n"
-			+ "Place a single block to start building.");
+		super("AutoBuild");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
@@ -262,8 +265,8 @@ public final class AutoBuildHack extends Hack
 			
 			// face block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			
@@ -291,6 +294,7 @@ public final class AutoBuildHack extends Hack
 			return;
 		
 		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
+		
 		BlockPos hitResultPos = blockHitResult.getBlockPos();
 		if(!BlockUtils.canBeClicked(hitResultPos))
 			return;
@@ -344,12 +348,12 @@ public final class AutoBuildHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(status != Status.BUILDING)
 			return;
 		
-		double scale = 1D * 7D / 8D;
+		float scale = 1F * 7F / 8F;
 		double offset = (1D - scale) / 2D;
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = Math.pow(range.getValue(), 2);
@@ -358,20 +362,18 @@ public final class AutoBuildHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2F);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glColor4f(0F, 0F, 0F, 0.5F);
+		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		int blocksDrawn = 0;
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
 			&& blocksDrawn < 1024;)
 		{
@@ -379,41 +381,40 @@ public final class AutoBuildHack extends Hack
 			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
 				continue;
 			
-			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+			matrixStack.push();
+			matrixStack.translate(pos.getX() - regionX, pos.getY(),
 				pos.getZ() - regionZ);
-			GL11.glTranslated(offset, offset, offset);
-			GL11.glScaled(scale, scale, scale);
+			matrixStack.translate(offset, offset, offset);
+			matrixStack.scale(scale, scale, scale);
 			
 			Vec3d posVec = Vec3d.ofCenter(pos);
 			
 			if(eyesPos.squaredDistanceTo(posVec) <= rangeSq)
-				drawGreenBox();
+				drawGreenBox(matrixStack);
 			else
-				RenderUtils.drawOutlinedBox();
+				RenderUtils.drawOutlinedBox(matrixStack);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 			blocksDrawn++;
 		}
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
-	private void drawGreenBox()
+	private void drawGreenBox(MatrixStack matrixStack)
 	{
 		GL11.glDepthMask(false);
-		GL11.glColor4f(0F, 1F, 0F, 0.15F);
-		RenderUtils.drawSolidBox();
+		RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
+		RenderUtils.drawSolidBox(matrixStack);
 		GL11.glDepthMask(true);
 		
-		GL11.glColor4f(0F, 0F, 0F, 0.5F);
-		RenderUtils.drawOutlinedBox();
+		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
+		RenderUtils.drawOutlinedBox(matrixStack);
 	}
 	
 	private enum Status

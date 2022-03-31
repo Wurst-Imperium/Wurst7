@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
+import net.wurstclient.altmanager.MojangAlt;
 
 public final class EditAltScreen extends AltEditorScreen
 {
@@ -26,15 +27,17 @@ public final class EditAltScreen extends AltEditorScreen
 	}
 	
 	@Override
-	protected String getDefaultEmail()
+	protected String getDefaultNameOrEmail()
 	{
-		return editedAlt.getEmail();
+		return editedAlt instanceof MojangAlt
+			? ((MojangAlt)editedAlt).getEmail() : editedAlt.getName();
 	}
 	
 	@Override
 	protected String getDefaultPassword()
 	{
-		return editedAlt.getPassword();
+		return editedAlt instanceof MojangAlt
+			? ((MojangAlt)editedAlt).getPassword() : "";
 	}
 	
 	@Override
@@ -46,7 +49,7 @@ public final class EditAltScreen extends AltEditorScreen
 	@Override
 	protected void pressDoneButton()
 	{
-		altManager.edit(editedAlt, getEmail(), getPassword());
-		client.openScreen(prevScreen);
+		altManager.edit(editedAlt, getNameOrEmail(), getPassword());
+		client.setScreen(prevScreen);
 	}
 }

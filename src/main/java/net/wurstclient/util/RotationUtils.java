@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,10 +33,10 @@ public enum RotationUtils
 		float f = 0.017453292F;
 		float pi = (float)Math.PI;
 		
-		float f1 = MathHelper.cos(-player.yaw * f - pi);
-		float f2 = MathHelper.sin(-player.yaw * f - pi);
-		float f3 = -MathHelper.cos(-player.pitch * f);
-		float f4 = MathHelper.sin(-player.pitch * f);
+		float f1 = MathHelper.cos(-player.getYaw() * f - pi);
+		float f2 = MathHelper.sin(-player.getYaw() * f - pi);
+		float f3 = -MathHelper.cos(-player.getPitch() * f);
+		float f4 = MathHelper.sin(-player.getPitch() * f);
 		
 		return new Vec3d(f2 * f3, f4, f1 * f3);
 	}
@@ -75,8 +75,8 @@ public enum RotationUtils
 		Rotation needed = getNeededRotations(vec);
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
-		float currentYaw = MathHelper.wrapDegrees(player.yaw);
-		float currentPitch = MathHelper.wrapDegrees(player.pitch);
+		float currentYaw = MathHelper.wrapDegrees(player.getYaw());
+		float currentPitch = MathHelper.wrapDegrees(player.getPitch());
 		
 		float diffYaw = currentYaw - needed.yaw;
 		float diffPitch = currentPitch - needed.pitch;
@@ -101,7 +101,8 @@ public enum RotationUtils
 	public static float getHorizontalAngleToLookVec(Vec3d vec)
 	{
 		Rotation needed = getNeededRotations(vec);
-		return MathHelper.wrapDegrees(WurstClient.MC.player.yaw) - needed.yaw;
+		return MathHelper.wrapDegrees(WurstClient.MC.player.getYaw())
+			- needed.yaw;
 	}
 	
 	public static final class Rotation

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,14 +7,25 @@
  */
 package net.wurstclient.ai;
 
-import static org.lwjgl.opengl.GL11.*;
-
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 
 public final class PathRenderer
 {
-	public static void renderArrow(BlockPos start, BlockPos end)
+	public static void renderArrow(MatrixStack matrixStack, BlockPos start,
+		BlockPos end)
 	{
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
 		int startX = start.getX();
 		int startY = start.getY();
 		int startZ = start.getZ();
@@ -23,114 +34,121 @@ public final class PathRenderer
 		int endY = end.getY();
 		int endZ = end.getZ();
 		
-		glPushMatrix();
+		matrixStack.push();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		glBegin(GL_LINES);
-		{
-			glVertex3d(startX, startY, startZ);
-			glVertex3d(endX, endY, endZ);
-		}
-		glEnd();
+		// main line
+		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
+		bufferBuilder.vertex(matrix, endX, endY, endZ).next();
 		
-		glTranslated(endX, endY, endZ);
-		double scale = 1 / 16D;
-		glScaled(scale, scale, scale);
+		matrixStack.translate(endX, endY, endZ);
 		
-		glRotated(Math.toDegrees(Math.atan2(endY - startY, startZ - endZ)) + 90,
-			1, 0, 0);
-		glRotated(
-			Math.toDegrees(Math.atan2(endX - startX,
-				Math.sqrt(
-					Math.pow(endY - startY, 2) + Math.pow(endZ - startZ, 2)))),
-			0, 0, 1);
+		float scale = 1 / 16F;
+		matrixStack.scale(scale, scale, scale);
 		
-		glBegin(GL_LINES);
-		{
-			glVertex3d(0, 2, 1);
-			glVertex3d(-1, 2, 0);
-			
-			glVertex3d(-1, 2, 0);
-			glVertex3d(0, 2, -1);
-			
-			glVertex3d(0, 2, -1);
-			glVertex3d(1, 2, 0);
-			
-			glVertex3d(1, 2, 0);
-			glVertex3d(0, 2, 1);
-			
-			glVertex3d(1, 2, 0);
-			glVertex3d(-1, 2, 0);
-			
-			glVertex3d(0, 2, 1);
-			glVertex3d(0, 2, -1);
-			
-			glVertex3d(0, 0, 0);
-			glVertex3d(1, 2, 0);
-			
-			glVertex3d(0, 0, 0);
-			glVertex3d(-1, 2, 0);
-			
-			glVertex3d(0, 0, 0);
-			glVertex3d(0, 2, -1);
-			
-			glVertex3d(0, 0, 0);
-			glVertex3d(0, 2, 1);
-		}
-		glEnd();
+		int xDiff = endX - startX;
+		int yDiff = endY - startY;
+		int zDiff = endZ - startZ;
 		
-		glPopMatrix();
+		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
+		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		
+		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
+		float zAngle = (float)Math.atan2(xDiff, yzDiff);
+		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		
+		// arrow head
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		
+		matrixStack.pop();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
-	public static void renderNode(BlockPos pos)
+	public static void renderNode(MatrixStack matrixStack, BlockPos pos)
 	{
-		glPushMatrix();
+		matrixStack.push();
 		
-		glTranslated(pos.getX(), pos.getY(), pos.getZ());
-		glScaled(0.1, 0.1, 0.1);
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
-		glBegin(GL_LINES);
-		{
-			// middle part
-			glVertex3d(0, 0, 1);
-			glVertex3d(-1, 0, 0);
-			
-			glVertex3d(-1, 0, 0);
-			glVertex3d(0, 0, -1);
-			
-			glVertex3d(0, 0, -1);
-			glVertex3d(1, 0, 0);
-			
-			glVertex3d(1, 0, 0);
-			glVertex3d(0, 0, 1);
-			
-			// top part
-			glVertex3d(0, 1, 0);
-			glVertex3d(1, 0, 0);
-			
-			glVertex3d(0, 1, 0);
-			glVertex3d(-1, 0, 0);
-			
-			glVertex3d(0, 1, 0);
-			glVertex3d(0, 0, -1);
-			
-			glVertex3d(0, 1, 0);
-			glVertex3d(0, 0, 1);
-			
-			// bottom part
-			glVertex3d(0, -1, 0);
-			glVertex3d(1, 0, 0);
-			
-			glVertex3d(0, -1, 0);
-			glVertex3d(-1, 0, 0);
-			
-			glVertex3d(0, -1, 0);
-			glVertex3d(0, 0, -1);
-			
-			glVertex3d(0, -1, 0);
-			glVertex3d(0, 0, 1);
-		}
-		glEnd();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		glPopMatrix();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		
+		// middle part
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
+		// top part
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, 1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
+		// bottom part
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		
+		bufferBuilder.vertex(matrix, 0, -1, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
+		matrixStack.pop();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -33,7 +34,7 @@ public final class InvseeCmd extends Command implements RenderListener
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Survival mode only.");
 			return;
@@ -44,7 +45,7 @@ public final class InvseeCmd extends Command implements RenderListener
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		boolean found = false;
 		
@@ -54,12 +55,13 @@ public final class InvseeCmd extends Command implements RenderListener
 				continue;
 			
 			OtherClientPlayerEntity player = (OtherClientPlayerEntity)entity;
+			
 			String otherPlayerName = player.getName().getString();
 			if(!otherPlayerName.equalsIgnoreCase(targetName))
 				continue;
 			
 			ChatUtils.message("Showing inventory of " + otherPlayerName + ".");
-			MC.openScreen(new InventoryScreen(player));
+			MC.setScreen(new InventoryScreen(player));
 			found = true;
 			break;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -160,10 +160,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	public AnchorAuraHack()
 	{
-		super("AnchorAura",
-			"Automatically places (optional), charges,\n"
-				+ "and detonates respawn anchors to kill\n"
-				+ "entities around you.");
+		super("AnchorAura");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
@@ -206,8 +203,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		ArrayList<BlockPos> anchors = getNearbyAnchors();
 		
 		Map<Boolean, ArrayList<BlockPos>> anchorsByCharge = anchors.stream()
-			.collect(Collectors.partitioningBy(pos -> isChargedAnchor(pos),
-				Collectors.toCollection(() -> new ArrayList<>())));
+			.collect(Collectors.partitioningBy(this::isChargedAnchor,
+				Collectors.toCollection(ArrayList::new)));
 		
 		ArrayList<BlockPos> chargedAnchors = anchorsByCharge.get(true);
 		ArrayList<BlockPos> unchargedAnchors = anchorsByCharge.get(false);
@@ -306,7 +303,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean selectItem(Predicate<Item> item)
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
 		
@@ -339,7 +336,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean hasItem(Predicate<Item> item)
 	{
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
 		
 		for(int slot = 0; slot < maxInvSlot; slot++)
@@ -458,7 +455,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.RESPAWN_ANCHOR)
 			.sorted(furthestFromPlayer)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private ArrayList<Entity> getNearbyTargets()
@@ -471,7 +468,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
@@ -506,7 +503,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
 		
 		return stream.sorted(furthestFromPlayer)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
@@ -533,7 +530,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			.filter(this::isReplaceable).filter(this::hasClickableNeighbor)
 			.filter(pos -> !targetBB.intersects(new Box(pos)))
 			.sorted(closestToTarget)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isReplaceable(BlockPos pos)
@@ -585,8 +582,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		
 		SPAM("Packet spam", v -> {
 			Rotation rotation = RotationUtils.getNeededRotations(v);
-			PlayerMoveC2SPacket.LookOnly packet =
-				new PlayerMoveC2SPacket.LookOnly(rotation.getYaw(),
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
 					rotation.getPitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 		});

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,7 +30,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	
 	public CriticalsHack()
 	{
-		super("Criticals", "Changes all your hits to critical hits.");
+		super("Criticals");
 		setCategory(Category.COMBAT);
 		addSetting(mode);
 	}
@@ -107,7 +107,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	private void sendPos(double x, double y, double z, boolean onGround)
 	{
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
+			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
 	}
 	
 	private void doMiniJump()

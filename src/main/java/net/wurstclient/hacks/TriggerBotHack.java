@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -92,8 +92,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	public TriggerBotHack()
 	{
-		super("TriggerBot",
-			"Automatically attacks the entity you're looking at.");
+		super("TriggerBot");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(filterPlayers);
@@ -118,6 +117,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
@@ -162,7 +162,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		ClientWorld world = MC.world;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.removed)
+		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)

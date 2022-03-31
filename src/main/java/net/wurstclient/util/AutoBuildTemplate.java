@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,13 +11,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 
-import com.google.gson.JsonObject;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 public final class AutoBuildTemplate
 {
@@ -36,9 +35,9 @@ public final class AutoBuildTemplate
 	public static AutoBuildTemplate load(Path path)
 		throws IOException, JsonException
 	{
-		JsonObject json = JsonUtils.parseFileToObject(path).toJsonObject();
+		WsonObject json = JsonUtils.parseFileToObject(path);
 		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.get("blocks"), int[][].class);
+			JsonUtils.GSON.fromJson(json.getElement("blocks"), int[][].class);
 		
 		if(blocks == null)
 			throw new JsonException("Template has no blocks!");

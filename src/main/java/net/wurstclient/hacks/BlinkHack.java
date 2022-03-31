@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,7 +34,7 @@ public final class BlinkHack extends Hack
 	
 	public BlinkHack()
 	{
-		super("Blink", "Suspends all motion updates while enabled.");
+		super("Blink");
 		setCategory(Category.MOVEMENT);
 		addSetting(limit);
 	}
@@ -44,9 +44,8 @@ public final class BlinkHack extends Hack
 	{
 		if(limit.getValueI() == 0)
 			return getName() + " [" + packets.size() + "]";
-		else
-			return getName() + " [" + packets.size() + "/" + limit.getValueI()
-				+ "]";
+		return getName() + " [" + packets.size() + "/" + limit.getValueI()
+			+ "]";
 	}
 	
 	@Override

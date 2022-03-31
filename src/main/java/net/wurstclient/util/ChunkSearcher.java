@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,9 +13,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import net.wurstclient.WurstClient;
 
 /**
  * Searches a {@link Chunk} for a particular type of {@link Block}.
@@ -42,7 +44,7 @@ public final class ChunkSearcher
 			throw new IllegalStateException();
 		
 		status = Status.SEARCHING;
-		future = pool.submit(() -> searchNow());
+		future = pool.submit(this::searchNow);
 	}
 	
 	private void searchNow()
@@ -52,11 +54,13 @@ public final class ChunkSearcher
 			throw new IllegalStateException();
 		
 		ChunkPos chunkPos = chunk.getPos();
+		ClientWorld world = WurstClient.MC.world;
+		
 		int minX = chunkPos.getStartX();
-		int minY = 0;
+		int minY = world.getBottomY();
 		int minZ = chunkPos.getStartZ();
 		int maxX = chunkPos.getEndX();
-		int maxY = 255;
+		int maxY = world.getTopY();
 		int maxZ = chunkPos.getEndZ();
 		
 		for(int x = minX; x <= maxX; x++)
@@ -79,7 +83,7 @@ public final class ChunkSearcher
 	
 	public void cancelSearching()
 	{
-		new Thread(() -> cancelNow(), "ChunkSearcher-canceller").start();
+		new Thread(this::cancelNow, "ChunkSearcher-canceller").start();
 	}
 	
 	private void cancelNow()

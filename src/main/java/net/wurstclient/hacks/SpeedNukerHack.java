@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -74,8 +74,7 @@ public final class SpeedNukerHack extends Hack
 	
 	public SpeedNukerHack()
 	{
-		super("SpeedNuker",
-			"Faster version of Nuker that cannot bypass NoCheat+.");
+		super("SpeedNuker");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -153,7 +152,7 @@ public final class SpeedNukerHack extends Hack
 			.filter(BlockUtils::canBeClicked).filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	@Override

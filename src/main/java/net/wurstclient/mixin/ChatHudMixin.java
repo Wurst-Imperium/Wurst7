@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,7 @@ package net.wurstclient.mixin;
 
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -53,8 +53,8 @@ public class ChatHudMixin extends DrawableHelper
 		shadow$addMessage(chatText, chatLineId, client.inGameHud.getTicks(),
 			false);
 		
-		LOGGER.info("[CHAT] {}", chatText.getString().replaceAll("\r", "\\\\r")
-			.replaceAll("\n", "\\\\n"));
+		LOGGER.info("[CHAT] {}",
+			chatText.getString().replace("\r", "\\r").replace("\n", "\\n"));
 		ci.cancel();
 	}
 	

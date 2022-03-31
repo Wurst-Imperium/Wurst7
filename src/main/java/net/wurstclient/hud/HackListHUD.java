@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,9 +9,8 @@ package net.wurstclient.hud;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
-
-import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.Window;
@@ -54,14 +53,7 @@ public final class HackListHUD implements UpdateListener
 				| (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
 			
 		}else
-			textColor = 0x04ffffff;
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
-		// YesCheat+ mode indicator
-		// YesCheatSpf yesCheatSpf = WurstClient.INSTANCE.special.yesCheatSpf;
-		// if(yesCheatSpf.modeIndicator.isChecked())
-		// drawString("YesCheat+: " + yesCheatSpf.getProfile().getName());
+			textColor = 0x04000000 | otf.getColor();
 		
 		int height = posY + activeHax.size() * 9;
 		Window sr = WurstClient.MC.getWindow();
@@ -100,15 +92,25 @@ public final class HackListHUD implements UpdateListener
 				return;
 			
 			activeHax.add(entry);
-			Collections.sort(activeHax);
+			sort();
 			
 		}else if(!otf.isAnimations())
 			activeHax.remove(entry);
 	}
 	
+	private void sort()
+	{
+		Comparator<HackListEntry> comparator =
+			Comparator.comparing(hle -> hle.hack, otf.getComparator());
+		Collections.sort(activeHax, comparator);
+	}
+	
 	@Override
 	public void onUpdate()
 	{
+		if(otf.shouldSort())
+			sort();
+		
 		if(!otf.isAnimations())
 			return;
 		
@@ -176,7 +178,6 @@ public final class HackListHUD implements UpdateListener
 	}
 	
 	private static final class HackListEntry
-		implements Comparable<HackListEntry>
 	{
 		private final Hack hack;
 		private int offset;
@@ -190,15 +191,10 @@ public final class HackListHUD implements UpdateListener
 		}
 		
 		@Override
-		public int compareTo(HackListEntry o)
-		{
-			return hack.getRenderName()
-				.compareToIgnoreCase(o.hack.getRenderName());
-		}
-		
-		@Override
 		public boolean equals(Object obj)
 		{
+			// do not use Java 16 syntax here,
+			// it breaks Eclipse's Clean Up feature
 			if(!(obj instanceof HackListEntry))
 				return false;
 			

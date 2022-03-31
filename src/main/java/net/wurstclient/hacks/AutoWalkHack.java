@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -19,7 +19,7 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 {
 	public AutoWalkHack()
 	{
-		super("AutoWalk", "Makes you walk automatically.");
+		super("AutoWalk");
 		setCategory(Category.MOVEMENT);
 	}
 	
@@ -34,13 +34,13 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
-		KeyBinding forwardKey = MC.options.keyForward;
+		KeyBinding forwardKey = MC.options.forwardKey;
 		forwardKey.setPressed(((IKeyBinding)forwardKey).isActallyPressed());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		MC.options.keyForward.setPressed(true);
+		MC.options.forwardKey.setPressed(true);
 	}
 }

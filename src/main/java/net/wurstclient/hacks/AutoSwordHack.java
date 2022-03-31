@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -46,9 +46,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	public AutoSwordHack()
 	{
-		super("AutoSword",
-			"Automatically uses the best weapon in your hotbar to attack entities.\n"
-				+ "Tip: This works with Killaura.");
+		super("AutoSword");
 		
 		setCategory(Category.COMBAT);
 		
@@ -110,10 +108,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// skip empty slots
-			if(MC.player.inventory.getStack(i).isEmpty())
+			if(MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.inventory.getStack(i).getItem();
+			Item item = MC.player.getInventory().getStack(i).getItem();
 			
 			// get damage
 			float value = getValue(item);
@@ -132,10 +130,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.inventory.selectedSlot;
+			oldSlot = MC.player.getInventory().selectedSlot;
 		
 		// set slot
-		MC.player.inventory.selectedSlot = bestSlot;
+		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// start timer
 		timer = releaseTime.getValueI();
@@ -148,14 +146,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			case SPEED:
 			if(item instanceof SwordItem)
 				return ((ISwordItem)item).fuckMcAfee();
-			else if(item instanceof MiningToolItem)
+			if(item instanceof MiningToolItem)
 				return ((IMiningToolItem)item).fuckMcAfee2();
 			break;
 			
 			case DAMAGE:
 			if(item instanceof SwordItem)
 				return ((SwordItem)item).getAttackDamage();
-			else if(item instanceof MiningToolItem)
+			if(item instanceof MiningToolItem)
 				return ((IMiningToolItem)item).fuckMcAfee1();
 			break;
 		}
@@ -173,7 +171,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		if(oldSlot != -1)
 		{
-			MC.player.inventory.selectedSlot = oldSlot;
+			MC.player.getInventory().selectedSlot = oldSlot;
 			oldSlot = -1;
 		}
 	}

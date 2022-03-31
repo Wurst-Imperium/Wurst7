@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,8 @@ package net.wurstclient.clickgui.screens;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -53,25 +55,26 @@ public final class EditBlockScreen extends Screen
 			new TextFieldWidget(tr, x1, y1, 178, 18, new LiteralText(""));
 		blockField.setText(valueString);
 		blockField.setSelectionStart(0);
+		blockField.setMaxLength(256);
 		
-		children.add(blockField);
+		addSelectableChild(blockField);
 		setInitialFocus(blockField);
-		blockField.setSelected(true);
+		blockField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
-		addButton(doneButton);
+		addDrawableChild(doneButton);
 	}
 	
 	private void done()
 	{
-		String value = blockField.getText();
-		Block block = BlockUtils.getBlockFromName(value);
+		String nameOrId = blockField.getText();
+		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
 		
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -84,7 +87,7 @@ public final class EditBlockScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			break;
 		}
 		
@@ -104,41 +107,51 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, tr, setting.getName(), width / 2, 20,
+		drawCenteredText(matrixStack, tr, setting.getName(), width / 2, 20,
 			0xFFFFFF);
 		
 		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(-64 + width / 2 - 100, 115, 0);
+		matrixStack.push();
+		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
 		
 		boolean lblAbove =
 			!blockField.getText().isEmpty() || blockField.isFocused();
-		String lblText = lblAbove ? "Block name or ID:" : "block name or ID";
+		String lblText =
+			lblAbove ? "Block ID or number:" : "block ID or number";
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
 		drawStringWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
-		fill(matrixStack, 48, -56, 64, -36, 0xffa0a0a0);
-		fill(matrixStack, 49, -55, 64, -37, 0xff000000);
-		fill(matrixStack, 214, -56, 244, -55, 0xffa0a0a0);
-		fill(matrixStack, 214, -37, 244, -36, 0xffa0a0a0);
-		fill(matrixStack, 244, -56, 246, -36, 0xffa0a0a0);
-		fill(matrixStack, 214, -55, 243, -52, 0xff000000);
-		fill(matrixStack, 214, -40, 243, -37, 0xff000000);
-		fill(matrixStack, 215, -55, 216, -37, 0xff000000);
-		fill(matrixStack, 242, -55, 245, -37, 0xff000000);
+		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
 		
-		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
-		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
+		fill(matrixStack, 48, -56, 64, -36, border);
+		fill(matrixStack, 49, -55, 64, -37, black);
+		fill(matrixStack, 214, -56, 244, -55, border);
+		fill(matrixStack, 214, -37, 244, -36, border);
+		fill(matrixStack, 244, -56, 246, -36, border);
+		fill(matrixStack, 214, -55, 243, -52, black);
+		fill(matrixStack, 214, -40, 243, -37, black);
+		fill(matrixStack, 215, -55, 216, -37, black);
+		fill(matrixStack, 242, -55, 245, -37, black);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
+		
+		String nameOrId = blockField.getText();
+		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
+		
+		if(blockToAdd == null)
+			blockToAdd = Blocks.AIR;
+		
+		renderIcon(matrixStack, new ItemStack(blockToAdd),
+			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}
@@ -152,20 +165,22 @@ public final class EditBlockScreen extends Screen
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		GL11.glPushMatrix();
+		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.push();
 		
-		GL11.glTranslated(x, y, 0);
-		double scale = large ? 1.5 : 0.75;
-		GL11.glScaled(scale, scale, scale);
+		modelViewStack.translate(x, y, 0);
+		float scale = large ? 1.5F : 0.75F;
+		modelViewStack.scale(scale, scale, scale);
 		
-		DiffuseLighting.enable();
+		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
 		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
 			0, 0);
-		DiffuseLighting.disable();
+		DiffuseLighting.disableGuiDepthLighting();
 		
-		GL11.glPopMatrix();
+		modelViewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);
@@ -174,17 +189,17 @@ public final class EditBlockScreen extends Screen
 	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
 		boolean large)
 	{
-		GL11.glPushMatrix();
+		matrixStack.push();
 		
-		GL11.glTranslated(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		if(large)
-			GL11.glScaled(2, 2, 2);
+			matrixStack.scale(2, 2, 2);
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		tr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 	}
 }

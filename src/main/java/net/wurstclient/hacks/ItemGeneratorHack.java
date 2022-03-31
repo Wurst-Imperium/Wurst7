@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,12 +7,14 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Optional;
 import java.util.Random;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -38,9 +40,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	
 	public ItemGeneratorHack()
 	{
-		super("ItemGenerator",
-			"Generates random items and drops them on the ground.\n"
-				+ "\u00a7oCreative mode only.\u00a7r");
+		super("ItemGenerator");
 		
 		setCategory(Category.ITEMS);
 		addSetting(speed);
@@ -52,7 +52,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	{
 		EVENTS.add(UpdateListener.class, this);
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -71,7 +71,13 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		int stacks = speed.getValueI();
 		for(int i = 9; i < 9 + stacks; i++)
 		{
-			Item item = Registry.ITEM.getRandom(random);
+			// Not sure if it's possible to get an empty optional here,
+			// but if so it will just retry.
+			Optional<RegistryEntry<Item>> optional = Optional.empty();
+			while(optional.isEmpty())
+				optional = Registry.ITEM.getRandom(random);
+			
+			Item item = optional.get().value();
 			ItemStack stack = new ItemStack(item, stackSize.getValueI());
 			
 			CreativeInventoryActionC2SPacket packet =

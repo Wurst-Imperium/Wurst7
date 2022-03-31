@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
 import net.wurstclient.Category;
@@ -31,7 +31,7 @@ public final class SneakHack extends Hack
 	
 	public SneakHack()
 	{
-		super("Sneak", "Makes you sneak automatically.");
+		super("Sneak");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 	}
@@ -58,7 +58,7 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
+			IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
 			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
 			break;
 			
@@ -71,7 +71,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		KeyBinding sneakKey = MC.options.keySneak;
+		KeyBinding sneakKey = MC.options.sneakKey;
 		
 		switch(mode.getSelected())
 		{

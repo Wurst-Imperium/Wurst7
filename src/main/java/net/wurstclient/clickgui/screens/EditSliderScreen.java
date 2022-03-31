@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -50,13 +50,13 @@ public final class EditSliderScreen extends Screen
 		valueField.setText(valueString);
 		valueField.setSelectionStart(0);
 		
-		children.add(valueField);
+		addSelectableChild(valueField);
 		setInitialFocus(valueField);
-		valueField.setSelected(true);
+		valueField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
-		addButton(doneButton);
+		addDrawableChild(doneButton);
 	}
 	
 	private void done()
@@ -66,7 +66,7 @@ public final class EditSliderScreen extends Screen
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
 		
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public final class EditSliderScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.openScreen(prevScreen);
+			client.setScreen(prevScreen);
 			break;
 		}
 		
@@ -97,7 +97,7 @@ public final class EditSliderScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, client.textRenderer, slider.getName(),
+		drawCenteredText(matrixStack, client.textRenderer, slider.getName(),
 			width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -105,7 +105,7 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

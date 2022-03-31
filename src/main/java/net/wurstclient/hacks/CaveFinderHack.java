@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,8 +25,18 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -34,6 +45,7 @@ import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
@@ -42,8 +54,10 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
@@ -66,6 +80,15 @@ public final class CaveFinderHack extends Hack
 			+ "Higher values require a faster computer.",
 		5, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	
+	private final ColorSetting color = new ColorSetting("Color",
+		"Caves will be highlighted\n" + "in this color.", Color.RED);
+	
+	private final SliderSetting opacity = new SliderSetting("Opacity",
+		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
+		0, 1, 0.01,
+		v -> v == 0 ? "Breathing" : ValueDisplay.PERCENTAGE.getValueString(v));
+	
 	private int prevLimit;
 	private boolean notify;
 	
@@ -78,16 +101,17 @@ public final class CaveFinderHack extends Hack
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
-	private int displayList;
-	private boolean displayListUpToDate;
+	private VertexBuffer vertexBuffer;
+	private boolean bufferUpToDate;
 	
 	public CaveFinderHack()
 	{
-		super("CaveFinder",
-			"Helps you to find caves by\n" + "highlighting them in red.");
+		super("CaveFinder");
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(color);
+		addSetting(opacity);
 	}
 	
 	@Override
@@ -99,8 +123,7 @@ public final class CaveFinderHack extends Hack
 		pool1 = MinPriorityThreadFactory.newFixedThreadPool();
 		pool2 = new ForkJoinPool();
 		
-		displayList = GL11.glGenLists(1);
-		displayListUpToDate = false;
+		bufferUpToDate = false;
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
@@ -117,7 +140,10 @@ public final class CaveFinderHack extends Hack
 		stopPool2Tasks();
 		pool1.shutdownNow();
 		pool2.shutdownNow();
-		GL11.glDeleteLists(displayList, 1);
+		
+		if(vertexBuffer != null)
+			vertexBuffer.close();
+		
 		chunksToUpdate.clear();
 	}
 	
@@ -132,17 +158,13 @@ public final class CaveFinderHack extends Hack
 		Packet<?> packet = event.getPacket();
 		Chunk chunk;
 		
-		if(packet instanceof BlockUpdateS2CPacket)
+		if(packet instanceof BlockUpdateS2CPacket change)
 		{
-			BlockUpdateS2CPacket change = (BlockUpdateS2CPacket)packet;
 			BlockPos pos = change.getPos();
 			chunk = world.getChunk(pos);
 			
-		}else if(packet instanceof ChunkDeltaUpdateS2CPacket)
+		}else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
 		{
-			ChunkDeltaUpdateS2CPacket change =
-				(ChunkDeltaUpdateS2CPacket)packet;
-			
 			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
 			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
 			if(changedBlocks.isEmpty())
@@ -150,12 +172,9 @@ public final class CaveFinderHack extends Hack
 			
 			chunk = world.getChunk(changedBlocks.get(0));
 			
-		}else if(packet instanceof ChunkDataS2CPacket)
-		{
-			ChunkDataS2CPacket chunkData = (ChunkDataS2CPacket)packet;
+		}else if(packet instanceof ChunkDataS2CPacket chunkData)
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-			
-		}else
+		else
 			return;
 		
 		chunksToUpdate.add(chunk);
@@ -193,41 +212,47 @@ public final class CaveFinderHack extends Hack
 		if(!compileVerticesTask.isDone())
 			return;
 		
-		if(!displayListUpToDate)
-			setDisplayListFromTask();
+		if(!bufferUpToDate)
+			setBufferFromTask();
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		// generate color
+		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
 		
-		GL11.glColor4f(1, 0, 0, alpha);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glCallList(displayList);
-		GL11.glEnd();
+		if(opacity.getValue() > 0)
+			alpha = opacity.getValueF();
 		
-		GL11.glPopMatrix();
+		float[] colorF = color.getColorF();
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
+		if(vertexBuffer != null)
+		{
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+			Shader shader = RenderSystem.getShader();
+			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+		}
+		
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
@@ -352,7 +377,7 @@ public final class CaveFinderHack extends Hack
 			compileVerticesTask = null;
 		}
 		
-		displayListUpToDate = false;
+		bufferUpToDate = false;
 	}
 	
 	private boolean areAllChunkSearchersDone()
@@ -378,13 +403,12 @@ public final class CaveFinderHack extends Hack
 	{
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		Callable<HashSet<BlockPos>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator
-					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-				.limit(maxBlocks)
-				.collect(Collectors.toCollection(() -> new HashSet<>()));
+		Callable<HashSet<BlockPos>> task = () -> searchers.values()
+			.parallelStream()
+			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+			.sorted(Comparator
+				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}
@@ -431,16 +455,26 @@ public final class CaveFinderHack extends Hack
 		compileVerticesTask = pool2.submit(task);
 	}
 	
-	private void setDisplayListFromTask()
+	private void setBufferFromTask()
 	{
 		ArrayList<int[]> vertices = getVerticesFromTask();
 		
-		GL11.glNewList(displayList, GL11.GL_COMPILE);
-		for(int[] vertex : vertices)
-			GL11.glVertex3d(vertex[0], vertex[1], vertex[2]);
-		GL11.glEndList();
+		if(vertexBuffer != null)
+			vertexBuffer.close();
 		
-		displayListUpToDate = true;
+		vertexBuffer = new VertexBuffer();
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		
+		for(int[] vertex : vertices)
+			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
+		
+		bufferBuilder.end();
+		vertexBuffer.upload(bufferBuilder);
+		
+		bufferUpToDate = true;
 	}
 	
 	public ArrayList<int[]> getVerticesFromTask()

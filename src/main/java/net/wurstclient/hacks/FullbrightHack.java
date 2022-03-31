@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -45,7 +45,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	public FullbrightHack()
 	{
-		super("Fullbright", "Allows you to see in the dark.");
+		super("Fullbright");
 		setCategory(Category.RENDER);
 		addSetting(method);
 		addSetting(fade);

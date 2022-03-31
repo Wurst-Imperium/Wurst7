@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -26,7 +26,7 @@ public final class SafeWalkHack extends Hack
 	
 	public SafeWalkHack()
 	{
-		super("SafeWalk", "Prevents you from falling off edges.");
+		super("SafeWalk");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
 	}
@@ -69,7 +69,7 @@ public final class SafeWalkHack extends Hack
 	
 	private void setSneaking(boolean sneaking)
 	{
-		IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
+		IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
 		
 		if(sneaking)
 			((KeyBinding)sneakKey).setPressed(true);

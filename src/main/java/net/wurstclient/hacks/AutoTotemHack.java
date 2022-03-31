@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,8 +30,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	
 	public AutoTotemHack()
 	{
-		super("AutoTotem",
-			"Automatically moves totems of undying to your off-hand.");
+		super("AutoTotem");
 		setCategory(Category.COMBAT);
 		addSetting(showCounter);
 	}
@@ -71,7 +70,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		finishMovingTotem();
 		
-		PlayerInventory inventory = MC.player.inventory;
+		PlayerInventory inventory = MC.player.getInventory();
 		int nextTotemSlot = searchForTotems(inventory);
 		
 		ItemStack offhandStack = inventory.getStack(40);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -33,7 +34,9 @@ import javax.crypto.spec.SecretKeySpec;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
+import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.util.json.JsonException;
@@ -48,8 +51,10 @@ public final class Encryption
 	private final Cipher encryptCipher;
 	private final Cipher decryptCipher;
 	
-	public Encryption(Path encFolder)
+	public Encryption(Path encFolder) throws IOException
 	{
+		createEncryptionFolder(encFolder);
+		
 		KeyPair rsaKeyPair =
 			getRsaKeyPair(encFolder.resolve("wurst_rsa_public.txt"),
 				encFolder.resolve("wurst_rsa_private.txt"));
@@ -72,6 +77,26 @@ public final class Encryption
 			throw new CrashException(
 				CrashReport.create(e, "Creating AES ciphers"));
 		}
+	}
+	
+	private Path createEncryptionFolder(Path encFolder) throws IOException
+	{
+		Files.createDirectories(encFolder);
+		if(Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS)
+			Files.setAttribute(encFolder, "dos:hidden", true);
+		
+		Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");
+		String readmeText = "DO NOT SHARE THESE FILES WITH ANYONE!\r\n"
+			+ "They are encryption keys that protect your alt list file from being read by someone else.\r\n"
+			+ "If someone is asking you to send these files, they are 100% trying to scam you.\r\n"
+			+ "\r\n"
+			+ "DO NOT EDIT, RENAME OR DELETE THESE FILES! (unless you know what you're doing)\r\n"
+			+ "If you do, Wurst's Alt Manager can no longer read your alt list and will replace it with a blank one.\r\n"
+			+ "In other words, YOUR ALT LIST WILL BE DELETED.";
+		Files.write(readme, readmeText.getBytes("UTF-8"),
+			StandardOpenOption.CREATE);
+		
+		return encFolder;
 	}
 	
 	public byte[] decrypt(byte[] bytes)
@@ -102,7 +127,7 @@ public final class Encryption
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
-			return JsonUtils.JSON_PARSER.parse(loadEncryptedFile(path));
+			return JsonParser.parseString(loadEncryptedFile(path));
 			
 		}catch(JsonParseException e)
 		{

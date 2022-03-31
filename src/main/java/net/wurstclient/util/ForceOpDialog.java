@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -73,7 +73,7 @@ public class ForceOpDialog extends JDialog
 		setVisible(true);
 		toFront();
 		
-		new Thread(() -> handleDialogInput(), "ForceOP dialog input").start();
+		new Thread(this::handleDialogInput, "ForceOP dialog input").start();
 	}
 	
 	private void handleDialogInput()
@@ -146,7 +146,7 @@ public class ForceOpDialog extends JDialog
 		JFileChooser fsTXTList = new JFileChooser();
 		fsTXTList.setAcceptAllFileFilterUsed(false);
 		fsTXTList.addChoosableFileFilter(
-			new FileNameExtensionFilter("TXT files", new String[]{"txt"}));
+			new FileNameExtensionFilter("TXT files", "txt"));
 		fsTXTList.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		
 		int action = fsTXTList.showOpenDialog(this);

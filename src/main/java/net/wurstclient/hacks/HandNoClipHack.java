@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,8 +34,7 @@ public final class HandNoClipHack extends Hack
 	
 	public HandNoClipHack()
 	{
-		super("HandNoClip",
-			"Allows you to reach specific blocks through walls.");
+		super("HandNoClip");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(blocks);
@@ -45,4 +44,6 @@ public final class HandNoClipHack extends Hack
 	{
 		return blocks.getBlockNames().contains(BlockUtils.getName(pos));
 	}
+	
+	// See AbstractBlockStateMixin.onGetOutlineShape()
 }

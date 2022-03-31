@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -31,7 +31,7 @@ public final class DamageCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.abilities.creativeMode)
+		if(MC.player.getAbilities().creativeMode)
 			throw new CmdError("Cannot damage in creative mode.");
 		
 		int amount = parseAmount(args[0]);
@@ -70,6 +70,6 @@ public final class DamageCmd extends Command
 	private void sendPosition(double x, double y, double z, boolean onGround)
 	{
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
+			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
 	}
 }

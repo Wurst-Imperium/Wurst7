@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -27,7 +27,7 @@ public final class RenameCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length == 0)
@@ -38,7 +38,7 @@ public final class RenameCmd extends Command
 			message += " " + args[i];
 		
 		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
-		ItemStack item = MC.player.inventory.getMainHandStack();
+		ItemStack item = MC.player.getInventory().getMainHandStack();
 		
 		if(item == null)
 			throw new CmdError("There is no item in your hand.");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,9 +14,22 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -46,12 +59,12 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible mobs.", false);
 	
-	private int mobBox;
 	private final ArrayList<MobEntity> mobs = new ArrayList<>();
+	private VertexBuffer mobBox;
 	
 	public MobEspHack()
 	{
-		super("MobESP", "Highlights nearby mobs.");
+		super("MobESP");
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);
@@ -65,11 +78,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		mobBox = GL11.glGenLists(1);
-		GL11.glNewList(mobBox, GL11.GL_COMPILE);
+		mobBox = new VertexBuffer();
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(bb);
-		GL11.glEndList();
+		RenderUtils.drawOutlinedBox(bb, mobBox);
 	}
 	
 	@Override
@@ -79,8 +90,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		GL11.glDeleteLists(mobBox, 1);
-		mobBox = 0;
+		if(mobBox != null)
+			mobBox.close();
 	}
 	
 	@Override
@@ -91,7 +102,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		Stream<MobEntity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
 				.filter(e -> e instanceof MobEntity).map(e -> (MobEntity)e)
-				.filter(e -> !e.removed && e.getHealth() > 0);
+				.filter(e -> !e.isRemoved() && e.getHealth() > 0);
 		
 		if(filterInvisible.isChecked())
 			stream = stream.filter(e -> !e.isInvisible());
@@ -108,85 +119,105 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		if(style.getSelected().boxes)
-			renderBoxes(partialTicks, regionX, regionZ);
+			renderBoxes(matrixStack, partialTicks, regionX, regionZ);
 		
 		if(style.getSelected().lines)
-			renderTracers(partialTicks, regionX, regionZ);
+			renderTracers(matrixStack, partialTicks, regionX, regionZ);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private void renderBoxes(double partialTicks, int regionX, int regionZ)
+	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
-		double extraSize = boxSize.getSelected().extraSize;
+		float extraSize = boxSize.getSelected().extraSize;
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		for(MobEntity e : mobs)
 		{
-			GL11.glPushMatrix();
+			matrixStack.push();
 			
-			GL11.glTranslated(
+			matrixStack.translate(
 				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
 				e.prevY + (e.getY() - e.prevY) * partialTicks,
 				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
 			
-			GL11.glScaled(e.getWidth() + extraSize, e.getHeight() + extraSize,
-				e.getWidth() + extraSize);
+			matrixStack.scale(e.getWidth() + extraSize,
+				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
 			float f = MC.player.distanceTo(e) / 20F;
-			GL11.glColor4f(2 - f, f, 0, 0.5F);
+			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			
-			GL11.glCallList(mobBox);
+			Shader shader = RenderSystem.getShader();
+			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
+			mobBox.setShader(matrixStack.peek().getPositionMatrix(), matrix4f,
+				shader);
 			
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 	}
 	
-	private void renderTracers(double partialTicks, int regionX, int regionZ)
+	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+		int regionX, int regionZ)
 	{
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		GL11.glBegin(GL11.GL_LINES);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION_COLOR);
+		
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		
 		for(MobEntity e : mobs)
 		{
+			Vec3d interpolationOffset = new Vec3d(e.getX(), e.getY(), e.getZ())
+				.subtract(e.prevX, e.prevY, e.prevZ).multiply(1 - partialTicks);
+			
 			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
-					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks));
+				.subtract(interpolationOffset).subtract(regionX, 0, regionZ);
 			
 			float f = MC.player.distanceTo(e) / 20F;
-			GL11.glColor4f(2 - f, f, 0, 0.5F);
+			float r = MathHelper.clamp(2 - f, 0, 1);
+			float g = MathHelper.clamp(f, 0, 1);
 			
-			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
-			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.color(r, g, 0, 0.5F).next();
+			
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.color(r, g, 0, 0.5F).next();
 		}
-		GL11.glEnd();
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+		
 	}
 	
 	private enum Style
@@ -216,12 +247,12 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private enum BoxSize
 	{
 		ACCURATE("Accurate", 0),
-		FANCY("Fancy", 0.1);
+		FANCY("Fancy", 0.1F);
 		
 		private final String name;
-		private final double extraSize;
+		private final float extraSize;
 		
-		private BoxSize(String name, double extraSize)
+		private BoxSize(String name, float extraSize)
 		{
 			this.name = name;
 			this.extraSize = extraSize;

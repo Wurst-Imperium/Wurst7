@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -56,13 +56,11 @@ public final class TillauraHack extends Hack implements UpdateListener
 		true);
 	
 	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
-		Blocks.GRASS_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
+		Blocks.DIRT_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
 	
 	public TillauraHack()
 	{
-		super("Tillaura",
-			"Automatically turns dirt, grass, etc. into farmland.\n"
-				+ "Not to be confused with Killaura.");
+		super("Tillaura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -90,13 +88,13 @@ public final class TillauraHack extends Hack implements UpdateListener
 			return;
 		
 		// check held item
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		if(stack.isEmpty() || !(stack.getItem() instanceof HoeItem))
 			return;
 		
 		// get valid blocks
 		ArrayList<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), (p) -> isCorrectBlock(p));
+			getValidBlocks(range.getValue(), this::isCorrectBlock);
 		
 		if(multiTill.isChecked())
 		{
@@ -133,7 +131,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			.filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)

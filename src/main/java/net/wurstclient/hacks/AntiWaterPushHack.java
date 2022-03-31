@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,7 +26,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	
 	public AntiWaterPushHack()
 	{
-		super("AntiWaterPush", "Prevents you from getting pushed by water.");
+		super("AntiWaterPush");
 		setCategory(Category.MOVEMENT);
 		addSetting(preventSlowdown);
 	}
@@ -53,7 +53,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 		if(!preventSlowdown.isChecked())
 			return;
 		
-		if(!MC.options.keyJump.isPressed())
+		if(!MC.options.jumpKey.isPressed())
 			return;
 		
 		if(!MC.player.isOnGround())
@@ -76,5 +76,10 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	{
 		if(preventSlowdown.isChecked())
 			event.setInWater(false);
+	}
+	
+	public boolean isPreventingSlowdown()
+	{
+		return preventSlowdown.isChecked();
 	}
 }

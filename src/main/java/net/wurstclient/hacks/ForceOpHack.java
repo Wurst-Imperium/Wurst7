@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -47,8 +47,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	
 	public ForceOpHack()
 	{
-		super("ForceOP",
-			"Cracks AuthMe passwords.\n" + "Can be used to get OP.");
+		super("ForceOP");
 		setCategory(Category.CHAT);
 	}
 	
@@ -64,7 +63,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			process = MultiProcessingUtils.startProcessWithIO(
 				ForceOpDialog.class, MC.getSession().getUsername());
 			
-			new Thread(() -> handleDialogOutput(), "ForceOP dialog output")
+			new Thread(this::handleDialogOutput, "ForceOP dialog output")
 				.start();
 			
 		}catch(IOException e)

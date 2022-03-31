@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -25,9 +27,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
 
 public final class EditItemListScreen extends Screen
@@ -51,7 +53,7 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}
@@ -63,30 +65,31 @@ public final class EditItemListScreen extends Screen
 		
 		itemNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
-		children.add(itemNameField);
+		addSelectableChild(itemNameField);
+		itemNameField.setMaxLength(256);
 		
-		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
-			20, new LiteralText("Add"), b -> {
+		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
+			height - 56, 30, 20, new LiteralText("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
 			}));
 		
-		addButton(removeButton = new ButtonWidget(width / 2 + 52, height - 56,
-			100, 20, new LiteralText("Remove Selected"),
+		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
+			height - 56, 100, 20, new LiteralText("Remove Selected"),
 			b -> itemList.remove(listGui.selected)));
 		
-		addButton(new ButtonWidget(width - 108, 8, 100, 20,
+		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
-			b -> client.openScreen(new ConfirmScreen(b2 -> {
+			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
-				client.openScreen(EditItemListScreen.this);
+				client.setScreen(EditItemListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
-		addButton(
+		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.openScreen(prevScreen)));
+				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override
@@ -131,12 +134,25 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
-			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
+			if(addButton.active)
+				addButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_DELETE:
+			if(!itemNameField.isFocused())
+				removeButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
+			break;
+			
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -146,64 +162,58 @@ public final class EditItemListScreen extends Screen
 	{
 		itemNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(getItemIDFromField());
+		itemToAdd = ItemUtils
+			.getItemFromNameOrID(itemNameField.getText().toLowerCase());
 		addButton.active = itemToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
 	}
 	
-	private Identifier getItemIDFromField()
-	{
-		try
-		{
-			return new Identifier(itemNameField.getText().toLowerCase());
-			
-		}catch(InvalidIdentifierException e)
-		{
-			return null;
-		}
-	}
-	
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
+		
+		matrixStack.push();
+		matrixStack.translate(0, 0, 300);
 		
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
+		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslated(0, 0, 300);
+			matrixStack.push();
+			matrixStack.translate(0, 0, 300);
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"item name or ID", 68, height - 50, 0x808080);
-			GL11.glPopMatrix();
+			matrixStack.pop();
 		}
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
-		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
-		fill(matrixStack, 215, height - 55, 216, height - 37, 0xff000000);
-		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
-		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd), 52,
-			height - 52, false);
+		int border = itemNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
 		
-		GL11.glPopMatrix();
+		fill(matrixStack, 48, height - 56, 64, height - 36, border);
+		fill(matrixStack, 49, height - 55, 64, height - 37, black);
+		fill(matrixStack, 214, height - 56, 244, height - 55, border);
+		fill(matrixStack, 214, height - 37, 244, height - 36, border);
+		fill(matrixStack, 244, height - 56, 246, height - 36, border);
+		fill(matrixStack, 214, height - 55, 243, height - 52, black);
+		fill(matrixStack, 214, height - 40, 243, height - 37, black);
+		fill(matrixStack, 215, height - 55, 216, height - 37, black);
+		fill(matrixStack, 242, height - 55, 245, height - 37, black);
+		
+		matrixStack.pop();
+		
+		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
+			width / 2 - 164, height - 52, false);
 	}
 	
 	private static class ListGui extends ListWidget
@@ -261,8 +271,8 @@ public final class EditItemListScreen extends Screen
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registry.ITEM.getId(item).toString(),
-				x + 28, y + 18, 0xa0a0a0);
+			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
+				y + 18, 0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(MatrixStack matrixStack,
@@ -270,48 +280,52 @@ public final class EditItemListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+				modelViewStack.push();
+				modelViewStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
+					modelViewStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					GL11.glScaled(0.75, 0.75, 0.75);
+					modelViewStack.scale(0.75F, 0.75F, 0.75F);
 				
-				DiffuseLighting.enable();
+				DiffuseLighting.enableGuiDepthLighting();
 				mc.getItemRenderer().renderInGuiWithOverrides(
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				DiffuseLighting.disable();
-				GL11.glPopMatrix();
+				DiffuseLighting.disableGuiDepthLighting();
 				
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
+				modelViewStack.pop();
+				RenderSystem.applyModelViewMatrix();
+				
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					GL11.glScaled(2, 2, 2);
+					matrixStack.scale(2, 2, 2);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				TextRenderer fr = mc.textRenderer;
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				GL11.glPopMatrix();
+				matrixStack.pop();
 				
 				return "\u00a7ounknown item\u00a7r";
-				
-			}else
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
-				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
-				else
-					GL11.glScaled(0.75, 0.75, 0.75);
-				
-				DiffuseLighting.enable();
-				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-				DiffuseLighting.disable();
-				
-				GL11.glPopMatrix();
-				
-				return stack.getName().getString();
 			}
+			
+			MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+			modelViewStack.push();
+			modelViewStack.translate(x, y, 0);
+			
+			if(large)
+				modelViewStack.scale(1.5F, 1.5F, 1.5F);
+			else
+				modelViewStack.scale(0.75F, 0.75F, 0.75F);
+			
+			DiffuseLighting.enableGuiDepthLighting();
+			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
+			DiffuseLighting.disableGuiDepthLighting();
+			
+			modelViewStack.pop();
+			RenderSystem.applyModelViewMatrix();
+			
+			return stack.getName().getString();
 		}
 	}
 }

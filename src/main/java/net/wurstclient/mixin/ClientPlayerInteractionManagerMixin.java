@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +19,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.screen.slot.SlotActionType;
@@ -32,6 +32,7 @@ import net.minecraft.world.World;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -53,7 +54,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private int blockBreakingCooldown;
 	
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityId()I",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
 		ordinal = 0)},
 		method = {
 			"updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
@@ -89,6 +90,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 		cir.setReturnValue(true);
 	}
 	
+	@Inject(at = {@At("HEAD")},
+		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
+	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
+	{
+		EventManager.fire(StopUsingItemEvent.INSTANCE);
+	}
+	
 	@Override
 	public float getCurrentBreakingProgress()
 	{
@@ -102,21 +110,21 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
-	public ItemStack windowClick_PICKUP(int slot)
+	public void windowClick_PICKUP(int slot)
 	{
-		return clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
+		clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
 	}
 	
 	@Override
-	public ItemStack windowClick_QUICK_MOVE(int slot)
+	public void windowClick_QUICK_MOVE(int slot)
 	{
-		return clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
+		clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
 	}
 	
 	@Override
-	public ItemStack windowClick_THROW(int slot)
+	public void windowClick_THROW(int slot)
 	{
-		return clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
+		clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
 	}
 	
 	@Override
@@ -164,6 +172,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 		World world_1, Hand hand_1);
 	
 	@Shadow
-	public abstract ItemStack clickSlot(int int_1, int int_2, int int_3,
-		SlotActionType slotActionType_1, PlayerEntity playerEntity_1);
+	public abstract void clickSlot(int syncId, int slotId, int clickData,
+		SlotActionType actionType, PlayerEntity playerEntity);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -42,18 +42,23 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:bone_block", "minecraft:bookshelf",
 		"minecraft:brewing_stand", "minecraft:chain_command_block",
 		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
-		"minecraft:coal_ore", "minecraft:command_block",
-		"minecraft:crafting_table", "minecraft:diamond_block",
-		"minecraft:diamond_ore", "minecraft:dispenser", "minecraft:dropper",
-		"minecraft:emerald_block", "minecraft:emerald_ore",
-		"minecraft:enchanting_table", "minecraft:end_portal",
-		"minecraft:end_portal_frame", "minecraft:ender_chest",
-		"minecraft:furnace", "minecraft:glowstone", "minecraft:gold_block",
-		"minecraft:gold_ore", "minecraft:hopper", "minecraft:iron_block",
-		"minecraft:iron_ore", "minecraft:ladder", "minecraft:lapis_block",
-		"minecraft:lapis_ore", "minecraft:lava", "minecraft:lodestone",
-		"minecraft:mossy_cobblestone", "minecraft:nether_gold_ore",
-		"minecraft:nether_portal", "minecraft:nether_quartz_ore",
+		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
+		"minecraft:crafting_table", "minecraft:deepslate_coal_ore",
+		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
+		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
+		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
+		"minecraft:diamond_block", "minecraft:diamond_ore",
+		"minecraft:dispenser", "minecraft:dropper", "minecraft:emerald_block",
+		"minecraft:emerald_ore", "minecraft:enchanting_table",
+		"minecraft:end_portal", "minecraft:end_portal_frame",
+		"minecraft:ender_chest", "minecraft:furnace", "minecraft:glowstone",
+		"minecraft:gold_block", "minecraft:gold_ore", "minecraft:hopper",
+		"minecraft:iron_block", "minecraft:iron_ore", "minecraft:ladder",
+		"minecraft:lapis_block", "minecraft:lapis_ore", "minecraft:lava",
+		"minecraft:lodestone", "minecraft:mossy_cobblestone",
+		"minecraft:nether_gold_ore", "minecraft:nether_portal",
+		"minecraft:nether_quartz_ore", "minecraft:raw_copper_block",
+		"minecraft:raw_gold_block", "minecraft:raw_iron_block",
 		"minecraft:redstone_block", "minecraft:redstone_ore",
 		"minecraft:repeating_command_block", "minecraft:spawner",
 		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
@@ -67,7 +72,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	public XRayHack()
 	{
-		super("X-Ray", "Allows you to see ores through walls.");
+		super("X-Ray");
 		setCategory(Category.RENDER);
 		addSetting(ores);
 		
@@ -75,12 +80,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 			.map(ModContainer::getMetadata).map(ModMetadata::getId)
 			.collect(Collectors.toList());
 		
-		Pattern sodium = Pattern.compile("sodium.*");
 		Pattern optifine = Pattern.compile("opti(?:fine|fabric).*");
 		
-		if(mods.stream().anyMatch(sodium.asPredicate()))
-			warning = "Sodium is installed. X-Ray will not work properly!";
-		else if(mods.stream().anyMatch(optifine.asPredicate()))
+		if(mods.stream().anyMatch(optifine.asPredicate()))
 			warning = "OptiFine is installed. X-Ray will not work properly!";
 		else
 			warning = null;
@@ -165,7 +167,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
-		MC.openScreen(new EditBlockListScreen(prevScreen, ores));
+		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
 	private boolean isVisible(Block block)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,11 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -63,6 +67,9 @@ public final class KillauraLegitHack extends Hack
 			+ "the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
+	
+	public final SliderSetting fov =
+		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -113,11 +120,11 @@ public final class KillauraLegitHack extends Hack
 	
 	public KillauraLegitHack()
 	{
-		super("KillauraLegit", "Slower Killaura that is harder to detect.\n"
-			+ "Not required on normal NoCheat+ servers!");
+		super("KillauraLegit");
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(priority);
+		addSetting(fov);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -140,6 +147,7 @@ public final class KillauraLegitHack extends Hack
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
@@ -171,7 +179,7 @@ public final class KillauraLegitHack extends Hack
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed)
+				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
 					|| e instanceof EndCrystalEntity)
@@ -179,6 +187,10 @@ public final class KillauraLegitHack extends Hack
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		
+		if(fov.getValue() < 360.0)
+			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
+				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -281,8 +293,8 @@ public final class KillauraLegitHack extends Hack
 		float oldYaw = MC.player.prevYaw;
 		float oldPitch = MC.player.prevPitch;
 		
-		MC.player.yaw = limitAngleChange(oldYaw, rotation.getYaw(), 30);
-		MC.player.pitch = rotation.getPitch();
+		MC.player.setYaw(limitAngleChange(oldYaw, rotation.getYaw(), 30));
+		MC.player.setPitch(rotation.getPitch());
 		
 		return Math.abs(oldYaw - rotation.getYaw())
 			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;
@@ -297,7 +309,7 @@ public final class KillauraLegitHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -306,14 +318,11 @@ public final class KillauraLegitHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -321,43 +330,42 @@ public final class KillauraLegitHack extends Hack
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
-		if(target instanceof LivingEntity)
-		{
-			LivingEntity le = (LivingEntity)target;
+		if(target instanceof LivingEntity le)
 			p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
-		}
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(
+		matrixStack.translate(
 			target.prevX + (target.getX() - target.prevX) * partialTicks
 				- regionX,
 			target.prevY + (target.getY() - target.prevY) * partialTicks,
 			target.prevZ + (target.getZ() - target.prevZ) * partialTicks
 				- regionZ);
-		GL11.glTranslated(0, 0.05, 0);
-		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
-		GL11.glTranslated(-0.5, 0, -0.5);
+		matrixStack.translate(0, 0.05, 0);
+		matrixStack.scale(target.getWidth(), target.getHeight(),
+			target.getWidth());
+		matrixStack.translate(-0.5, 0, -0.5);
 		
 		if(p < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(p, p, p);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(box, matrixStack);
 		
-		GL11.glPopMatrix();
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(box, matrixStack);
+		
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}

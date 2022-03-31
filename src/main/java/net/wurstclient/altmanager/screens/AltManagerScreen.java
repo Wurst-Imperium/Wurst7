@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,24 +16,41 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
@@ -42,6 +59,8 @@ import net.wurstclient.util.json.WsonObject;
 
 public final class AltManagerScreen extends Screen
 {
+	private static final HashSet<Alt> failedLogins = new HashSet<>();
+	
 	private final Screen prevScreen;
 	private final AltManager altManager;
 	
@@ -69,38 +88,63 @@ public final class AltManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, this, altManager.getList());
 		
-		if(altManager.getList().isEmpty() && shouldAsk)
-			client.openScreen(new ConfirmScreen(this::confirmGenerate,
-				new LiteralText("Your alt list is empty."), new LiteralText(
-					"Would you like some random alts to get started?")));
+		Exception folderException = altManager.getFolderException();
+		if(folderException != null && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.folder_error.title");
+			TranslatableText message = new TranslatableText(
+				"gui.wurst.altmanager.folder_error.message", folderException);
+			TranslatableText buttonText = new TranslatableText("gui.done");
+			
+			// This just sets shouldAsk to false and closes the message.
+			Runnable action = () -> confirmGenerate(false);
+			
+			NoticeScreen screen =
+				new NoticeScreen(action, title, message, buttonText);
+			client.setScreen(screen);
+			
+		}else if(altManager.getList().isEmpty() && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.empty.title");
+			TranslatableText message =
+				new TranslatableText("gui.wurst.altmanager.empty.message");
+			BooleanConsumer callback = this::confirmGenerate;
+			
+			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
+			client.setScreen(screen);
+		}
 		
-		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
-			100, 20, new LiteralText("Login"), b -> pressLogin()));
+		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
+			height - 52, 100, 20, new LiteralText("Login"), b -> pressLogin()));
 		
-		addButton(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
-			b -> client.openScreen(new DirectLoginScreen(this))));
+			b -> client.setScreen(new DirectLoginScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
+		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
-			b -> client.openScreen(new AddAltScreen(this, altManager))));
+			b -> client.setScreen(new AddAltScreen(this, altManager))));
 		
-		addButton(starButton = new ButtonWidget(width / 2 - 154, height - 28,
-			75, 20, new LiteralText("Favorite"), b -> pressFavorite()));
+		addDrawableChild(
+			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
+				new LiteralText("Favorite"), b -> pressFavorite()));
 		
-		addButton(editButton = new ButtonWidget(width / 2 - 76, height - 28, 74,
-			20, new LiteralText("Edit"), b -> pressEdit()));
+		addDrawableChild(editButton = new ButtonWidget(width / 2 - 76,
+			height - 28, 74, 20, new LiteralText("Edit"), b -> pressEdit()));
 		
-		addButton(deleteButton = new ButtonWidget(width / 2 + 2, height - 28,
-			74, 20, new LiteralText("Delete"), b -> pressDelete()));
+		addDrawableChild(
+			deleteButton = new ButtonWidget(width / 2 + 2, height - 28, 74, 20,
+				new LiteralText("Delete"), b -> pressDelete()));
 		
-		addButton(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
+			new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
 		
-		addButton(importButton = new ButtonWidget(8, 8, 50, 20,
+		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
 		
-		addButton(exportButton = new ButtonWidget(58, 8, 50, 20,
+		addDrawableChild(exportButton = new ButtonWidget(58, 8, 50, 20,
 			new LiteralText("Export"), b -> pressExportAlts()));
 	}
 	
@@ -169,24 +213,17 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		if(alt.isCracked())
+		try
 		{
-			LoginManager.changeCrackedName(alt.getEmail());
-			client.openScreen(prevScreen);
-			return;
-		}
-		
-		String error = LoginManager.login(alt.getEmail(), alt.getPassword());
-		
-		if(!error.isEmpty())
+			altManager.login(alt);
+			failedLogins.remove(alt);
+			client.setScreen(prevScreen);
+			
+		}catch(LoginException e)
 		{
 			errorTimer = 8;
-			return;
+			failedLogins.add(alt);
 		}
-		
-		altManager.setChecked(listGui.selected,
-			client.getSession().getUsername());
-		client.openScreen(prevScreen);
 	}
 	
 	private void pressFavorite()
@@ -195,7 +232,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		altManager.setStarred(listGui.selected, !alt.isStarred());
+		altManager.toggleFavorite(alt);
 		listGui.selected = -1;
 	}
 	
@@ -205,7 +242,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		client.openScreen(new EditAltScreen(this, altManager, alt));
+		client.setScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -217,13 +254,13 @@ public final class AltManagerScreen extends Screen
 		LiteralText text =
 			new LiteralText("Are you sure you want to remove this alt?");
 		
-		String altName = alt.getNameOrEmail();
+		String altName = alt.getDisplayName();
 		LiteralText message = new LiteralText(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
 			message, new LiteralText("Delete"), new LiteralText("Cancel"));
-		client.openScreen(screen);
+		client.setScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -267,11 +304,11 @@ public final class AltManagerScreen extends Screen
 			switch(data.length)
 			{
 				case 1:
-				alts.add(new Alt(data[0], null, null));
+				alts.add(new CrackedAlt(data[0]));
 				break;
 				
 				case 2:
-				alts.add(new Alt(data[0], data[1], null));
+				alts.add(new MojangAlt(data[0], data[1]));
 				break;
 			}
 		}
@@ -336,11 +373,8 @@ public final class AltManagerScreen extends Screen
 		List<String> lines = new ArrayList<>();
 		
 		for(Alt alt : altManager.getList())
-			if(alt.isCracked())
-				lines.add(alt.getEmail());
-			else
-				lines.add(alt.getEmail() + ":" + alt.getPassword());
-			
+			lines.add(alt.exportAsTXT());
+		
 		Files.write(path, lines);
 	}
 	
@@ -350,21 +384,24 @@ public final class AltManagerScreen extends Screen
 		{
 			ArrayList<Alt> alts = new ArrayList<>();
 			for(int i = 0; i < 8; i++)
-				alts.add(new Alt(NameGenerator.generateName(), null, null));
+				alts.add(new CrackedAlt(NameGenerator.generateName()));
 			
 			altManager.addAll(alts);
 		}
 		
 		shouldAsk = false;
-		client.openScreen(this);
+		client.setScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
 	{
+		if(listGui.getSelectedAlt() == null)
+			return;
+		
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		client.openScreen(this);
+		client.setScreen(this);
 	}
 	
 	@Override
@@ -374,6 +411,10 @@ public final class AltManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
@@ -382,19 +423,19 @@ public final class AltManagerScreen extends Screen
 			if(alt == null)
 				return;
 			
-			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
+			AltRenderer.drawAltBack(matrixStack, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
+			AltRenderer.drawAltBody(matrixStack, alt.getName(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		drawCenteredString(matrixStack, textRenderer, "Alt Manager", width / 2,
-			4, 16777215);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer, "Alt Manager", width / 2, 4,
+			16777215);
+		drawCenteredText(matrixStack, textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
-		drawCenteredString(
+		drawCenteredText(
 			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);
@@ -402,22 +443,21 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
-			GL11.glColor4f(1, 0, 0, errorTimer / 16F);
+			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				GL11.glVertex2d(0, 0);
-				GL11.glVertex2d(width, 0);
-				GL11.glVertex2d(width, height);
-				GL11.glVertex2d(0, height);
-			}
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, 0, 0).next();
+			bufferBuilder.vertex(matrix, width, height, 0).next();
+			bufferBuilder.vertex(matrix, 0, height, 0).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 			
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
 			errorTimer--;
@@ -425,13 +465,65 @@ public final class AltManagerScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		renderAltTooltip(matrixStack, mouseX, mouseY);
+	}
+	
+	private void renderAltTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
+	{
+		if(!listGui.isMouseInList(mouseX, mouseY))
+			return;
+		
+		List<Alt> altList = altManager.getList();
+		int hoveredIndex = listGui.getItemAtPosition(mouseX, mouseY);
+		
+		if(hoveredIndex < 0 || hoveredIndex >= altList.size())
+			return;
+		
+		int itemX = mouseX - (width - listGui.getRowWidth()) / 2;
+		int itemY = mouseY - 36 + (int)listGui.getScrollAmount() - 4
+			- hoveredIndex * 30;
+		
+		if(itemX < 31 || itemY < 15 || itemY >= 25)
+			return;
+		
+		Alt alt = altList.get(hoveredIndex);
+		ArrayList<Text> tooltip = new ArrayList<>();
+		
+		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
+			return;
+		
+		if(alt.isCracked())
+			addTooltip(tooltip, "cracked");
+		else
+		{
+			addTooltip(tooltip, "premium");
+			
+			if(failedLogins.contains(alt))
+				addTooltip(tooltip, "failed");
+			
+			if(alt.isCheckedPremium())
+				addTooltip(tooltip, "checked");
+			else
+				addTooltip(tooltip, "unchecked");
+		}
+		
+		if(alt.isFavorite())
+			addTooltip(tooltip, "favorite");
+		
+		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.isHovered())
 				continue;
 			
@@ -439,20 +531,34 @@ public final class AltManagerScreen extends Screen
 				continue;
 			
 			ArrayList<Text> tooltip = new ArrayList<>();
-			tooltip.add(new LiteralText("This button opens another window."));
+			addTooltip(tooltip, "window");
+			
 			if(client.options.fullscreen)
-				tooltip
-					.add(new LiteralText("\u00a7cTurn off fullscreen mode!"));
+				addTooltip(tooltip, "fullscreen");
 			else
-			{
-				tooltip
-					.add(new LiteralText("It might look like the game is not"));
-				tooltip.add(
-					new LiteralText("responding while that window is open."));
-			}
+				addTooltip(tooltip, "window_freeze");
+			
 			renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 			break;
 		}
+	}
+	
+	private void addTooltip(ArrayList<Text> tooltip, String trKey)
+	{
+		// translate
+		String translated = WurstClient.INSTANCE
+			.translate("description.wurst.altmanager." + trKey);
+		
+		// line-wrap
+		StringJoiner joiner = new StringJoiner("\n");
+		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
+			.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		String wrapped = joiner.toString();
+		
+		// add to tooltip
+		for(String line : wrapped.split("\n"))
+			tooltip.add(new LiteralText(line));
 	}
 	
 	public static final class ListGui extends ListWidget
@@ -480,6 +586,9 @@ public final class AltManagerScreen extends Screen
 			return selected;
 		}
 		
+		/**
+		 * @return The selected Alt, or null if no Alt is selected.
+		 */
 		protected Alt getSelectedAlt()
 		{
 			if(selected < 0 || selected >= list.size())
@@ -516,10 +625,13 @@ public final class AltManagerScreen extends Screen
 		{
 			Alt alt = list.get(id);
 			
+			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			RenderSystem.setShader(GameRenderer::getPositionShader);
+			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glEnable(GL11.GL_BLEND);
 				
@@ -527,38 +639,47 @@ public final class AltManagerScreen extends Screen
 					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
-				GL11.glColor4f(0, 1, 0, opacity);
+				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				GL11.glBegin(GL11.GL_QUADS);
-				{
-					GL11.glVertex2d(x - 2, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2);
-					GL11.glVertex2d(x - 2 + 220, y - 2 + 30);
-					GL11.glVertex2d(x - 2, y - 2 + 30);
-				}
-				GL11.glEnd();
+				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
+				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
+				bufferBuilder.end();
+				BufferRenderer.draw(bufferBuilder);
 				
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);
 			}
 			
 			// face
-			AltRenderer.drawAltFace(matrixStack, alt.getNameOrEmail(), x + 1,
-				y + 1, 24, 24, isSelectedItem(id));
+			AltRenderer.drawAltFace(matrixStack, alt.getName(), x + 1, y + 1,
+				24, 24, isSelectedItem(id));
 			
 			// name / email
 			client.textRenderer.draw(matrixStack,
-				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
+				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880);
 			
-			// tags
-			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
-			if(alt.isStarred())
-				tags += "\u00a7r, \u00a7efavorite";
-			if(alt.isUnchecked())
-				tags += "\u00a7r, \u00a7cunchecked";
-			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
+			String bottomText = getBottomText(alt);
+			client.textRenderer.draw(matrixStack, bottomText, x + 31, y + 15,
 				10526880);
+		}
+		
+		public String getBottomText(Alt alt)
+		{
+			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
+			
+			if(alt.isFavorite())
+				text += "\u00a7r, \u00a7efavorite";
+			
+			if(failedLogins.contains(alt))
+				text += "\u00a7r, \u00a7cwrong password?";
+			else if(alt.isUncheckedPremium())
+				text += "\u00a7r, \u00a7cunchecked";
+			
+			return text;
 		}
 	}
 }

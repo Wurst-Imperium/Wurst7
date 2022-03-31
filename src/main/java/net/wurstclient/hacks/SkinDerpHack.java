@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.Random;
-import java.util.Set;
 
 import net.minecraft.client.render.entity.PlayerModelPart;
 import net.wurstclient.Category;
@@ -23,7 +22,7 @@ public final class SkinDerpHack extends Hack implements UpdateListener
 	
 	public SkinDerpHack()
 	{
-		super("SkinDerp", "Randomly toggles parts of your skin.");
+		super("SkinDerp");
 		setCategory(Category.FUN);
 	}
 	
@@ -39,7 +38,7 @@ public final class SkinDerpHack extends Hack implements UpdateListener
 		EVENTS.remove(UpdateListener.class, this);
 		
 		for(PlayerModelPart part : PlayerModelPart.values())
-			MC.options.setPlayerModelPart(part, true);
+			MC.options.togglePlayerModelPart(part, true);
 	}
 	
 	@Override
@@ -48,10 +47,8 @@ public final class SkinDerpHack extends Hack implements UpdateListener
 		if(random.nextInt(4) != 0)
 			return;
 		
-		Set<PlayerModelPart> activeParts =
-			MC.options.getEnabledPlayerModelParts();
-		
 		for(PlayerModelPart part : PlayerModelPart.values())
-			MC.options.setPlayerModelPart(part, !activeParts.contains(part));
+			MC.options.togglePlayerModelPart(part,
+				!MC.options.isPlayerModelPartEnabled(part));
 	}
 }

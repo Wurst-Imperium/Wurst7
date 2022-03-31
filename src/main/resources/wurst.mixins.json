@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "net.wurstclient.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
@@ -37,6 +37,7 @@
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
+    "LanguageManagerMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
@@ -44,11 +45,13 @@
     "MultiplayerScreenMixin",
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
+    "PowderSnowBlockMixin",
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",
     "ShulkerBoxScreenMixin",
     "SignEditScreenMixin",
+    "SodiumBlockOcclusionCacheMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",

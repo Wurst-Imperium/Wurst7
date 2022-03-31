@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,8 +22,7 @@ public final class DerpHack extends Hack implements UpdateListener
 	
 	public DerpHack()
 	{
-		super("Derp", "Randomly moves your head around.\n"
-			+ "Only visible to other players.");
+		super("Derp");
 		setCategory(Category.FUN);
 	}
 	
@@ -46,10 +45,11 @@ public final class DerpHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		float yaw = MC.player.yaw + random.nextFloat() * 360F - 180F;
+		float yaw = MC.player.getYaw() + random.nextFloat() * 360F - 180F;
 		float pitch = random.nextFloat() * 180F - 90F;
 		
-		MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookOnly(
-			yaw, pitch, MC.player.isOnGround()));
+		MC.player.networkHandler
+			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
+				MC.player.isOnGround()));
 	}
 }

@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.mixin;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +29,8 @@ import net.wurstclient.events.PacketInputListener.PacketInputEvent;
 public abstract class ClientConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
-	private ConnectionPacketOutputEvent event;
+	private ConcurrentLinkedQueue<ConnectionPacketOutputEvent> events =
+		new ConcurrentLinkedQueue<>();
 	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/network/ClientConnection;handlePacket(Lnet/minecraft/network/Packet;Lnet/minecraft/network/listener/PacketListener;)V",
@@ -50,7 +53,9 @@ public abstract class ClientConnectionMixin
 		at = @At("HEAD"))
 	public Packet<?> onSendPacket(Packet<?> packet)
 	{
-		event = new ConnectionPacketOutputEvent(packet);
+		ConnectionPacketOutputEvent event =
+			new ConnectionPacketOutputEvent(packet);
+		events.add(event);
 		EventManager.fire(event);
 		return event.getPacket();
 	}
@@ -63,9 +68,22 @@ public abstract class ClientConnectionMixin
 		GenericFutureListener<? extends Future<? super Void>> callback,
 		CallbackInfo ci)
 	{
-		if(event != null && event.isCancelled())
+		ConnectionPacketOutputEvent event = getEvent(packet);
+		if(event == null)
+			return;
+		
+		if(event.isCancelled())
 			ci.cancel();
 		
-		event = null;
+		events.remove(event);
+	}
+	
+	private ConnectionPacketOutputEvent getEvent(Packet<?> packet)
+	{
+		for(ConnectionPacketOutputEvent event : events)
+			if(event.getPacket() == packet)
+				return event;
+			
+		return null;
 	}
 }

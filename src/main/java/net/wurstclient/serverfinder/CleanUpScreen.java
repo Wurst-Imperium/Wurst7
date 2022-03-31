@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,16 +14,18 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
+import net.wurstclient.mixinterface.IScreen;
 
 public class CleanUpScreen extends Screen
 {
@@ -46,52 +48,58 @@ public class CleanUpScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-			() -> "Cancel", "", b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
+				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
 		
-		addButton(cleanUpButton = new CleanUpButton(width / 2 - 100,
+		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
 			"Start the Clean Up with the settings\n" + "you specified above.\n"
 				+ "It might look like the game is not\n"
 				+ "responding for a couple of seconds.",
 			b -> cleanUp()));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
-			() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
-			"Servers that clearly don't exist.",
-			b -> cleanupUnknown = !cleanupUnknown));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
+				() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
+				"Servers that clearly don't exist.",
+				b -> cleanupUnknown = !cleanupUnknown));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
+		addDrawableChild(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
 			() -> "Outdated Servers: " + removeOrKeep(cleanupOutdated),
 			"Servers that run a different Minecraft\n" + "version than you.",
 			b -> cleanupOutdated = !cleanupOutdated));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
-			() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
-			"All servers that failed the last ping.\n"
-				+ "Make sure that the last ping is complete\n"
-				+ "before you do this. That means: Go back,\n"
-				+ "press the refresh button and wait until\n"
-				+ "all servers are done refreshing.",
-			b -> cleanupFailed = !cleanupFailed));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
+				() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
+				"All servers that failed the last ping.\n"
+					+ "Make sure that the last ping is complete\n"
+					+ "before you do this. That means: Go back,\n"
+					+ "press the refresh button and wait until\n"
+					+ "all servers are done refreshing.",
+				b -> cleanupFailed = !cleanupFailed));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 48 + 12,
-			() -> "\"Grief me\" Servers: " + removeOrKeep(cleanupGriefMe),
-			"All servers where the name starts with \"Grief me\"\n"
-				+ "Useful for removing servers found by ServerFinder.",
-			b -> cleanupGriefMe = !cleanupGriefMe));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 48 + 12,
+				() -> "\"Grief me\" Servers: " + removeOrKeep(cleanupGriefMe),
+				"All servers where the name starts with \"Grief me\"\n"
+					+ "Useful for removing servers found by ServerFinder.",
+				b -> cleanupGriefMe = !cleanupGriefMe));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
-			() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
-			"This will completely clear your server\n"
-				+ "list. \u00a7cUse with caution!\u00a7r",
-			b -> removeAll = !removeAll));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
+				() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
+				"This will completely clear your server\n"
+					+ "list. \u00a7cUse with caution!\u00a7r",
+				b -> removeAll = !removeAll));
 		
-		addButton(new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
-			() -> "Rename all Servers: " + yesOrNo(cleanupRename),
-			"Renames your servers to \"Grief me #1\",\n"
-				+ "\"Grief me #2\", etc.",
-			b -> cleanupRename = !cleanupRename));
+		addDrawableChild(
+			new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
+				() -> "Rename all Servers: " + yesOrNo(cleanupRename),
+				"Renames your servers to \"Grief me #1\",\n"
+					+ "\"Grief me #2\", etc.",
+				b -> cleanupRename = !cleanupRename));
 	}
 	
 	private String yesOrNo(boolean b)
@@ -122,7 +130,7 @@ public class CleanUpScreen extends Screen
 			}
 		
 		saveServerList();
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	private boolean shouldRemove(ServerInfo server)
@@ -198,9 +206,9 @@ public class CleanUpScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, textRenderer, "Clean Up", width / 2, 20,
+		drawCenteredText(matrixStack, textRenderer, "Clean Up", width / 2, 20,
 			16777215);
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		
@@ -211,12 +219,18 @@ public class CleanUpScreen extends Screen
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.isHovered() || !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;
+			
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
@@ -238,7 +252,7 @@ public class CleanUpScreen extends Screen
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new LiteralText[0]);
+				this.tooltip = Arrays.asList();
 			else
 			{
 				String[] lines = tooltip.split("\n");

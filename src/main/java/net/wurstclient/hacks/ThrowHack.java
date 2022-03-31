@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,11 +22,7 @@ public final class ThrowHack extends Hack implements RightClickListener
 	
 	public ThrowHack()
 	{
-		super("Throw",
-			"Uses an item multiple times. Can be used to throw\n"
-				+ "snowballs and eggs, spawn mobs, place minecarts, etc.\n"
-				+ "in very large quantities.\n\n"
-				+ "This can cause a lot of lag and even crash a server.");
+		super("Throw");
 		
 		setCategory(Category.OTHER);
 		addSetting(amount);
@@ -56,7 +52,7 @@ public final class ThrowHack extends Hack implements RightClickListener
 		if(IMC.getItemUseCooldown() > 0)
 			return;
 		
-		if(!MC.options.keyUse.isPressed())
+		if(!MC.options.useKey.isPressed())
 			return;
 		
 		for(int i = 0; i < amount.getValueI(); i++)

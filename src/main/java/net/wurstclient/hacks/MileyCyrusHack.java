@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -27,7 +27,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	
 	public MileyCyrusHack()
 	{
-		super("MileyCyrus", "Makes you twerk.");
+		super("MileyCyrus");
 		setCategory(Category.FUN);
 		addSetting(twerkSpeed);
 	}
@@ -44,7 +44,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
-		KeyBinding sneak = MC.options.keySneak;
+		KeyBinding sneak = MC.options.sneakKey;
 		sneak.setPressed(((IKeyBinding)sneak).isActallyPressed());
 	}
 	
@@ -55,7 +55,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 		if(timer < 10 - twerkSpeed.getValueI())
 			return;
 		
-		MC.options.keySneak.setPressed(!MC.options.keySneak.isPressed());
+		MC.options.sneakKey.setPressed(!MC.options.sneakKey.isPressed());
 		timer = -1;
 	}
 }

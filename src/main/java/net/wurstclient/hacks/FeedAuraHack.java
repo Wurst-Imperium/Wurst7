@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,8 +14,12 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -67,7 +71,7 @@ public final class FeedAuraHack extends Hack
 	
 	public FeedAuraHack()
 	{
-		super("FeedAura", "Automatically feeds animals around you.");
+		super("FeedAura");
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(priority);
@@ -106,16 +110,16 @@ public final class FeedAuraHack extends Hack
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		ItemStack heldStack = player.inventory.getMainHandStack();
+		ItemStack heldStack = player.getInventory().getMainHandStack();
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<AnimalEntity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.removed).filter(e -> e instanceof AnimalEntity)
-				.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
-				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-				.filter(e -> e.isBreedingItem(heldStack))
-				.filter(AnimalEntity::canEat);
+		Stream<AnimalEntity> stream = StreamSupport
+			.stream(MC.world.getEntities().spliterator(), true)
+			.filter(e -> !e.isRemoved()).filter(e -> e instanceof AnimalEntity)
+			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
+			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+			.filter(e -> e.isBreedingItem(heldStack))
+			.filter(AnimalEntity::canEat);
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(e -> !e.isBaby());
@@ -153,7 +157,7 @@ public final class FeedAuraHack extends Hack
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(renderTarget == null)
 			return;
@@ -162,14 +166,11 @@ public final class FeedAuraHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -178,37 +179,38 @@ public final class FeedAuraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(
+		matrixStack.translate(
 			renderTarget.prevX
 				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
 			renderTarget.prevY
 				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
 			renderTarget.prevZ
 				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
-		GL11.glTranslated(0, 0.05, 0);
-		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
+		matrixStack.translate(0, 0.05, 0);
+		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());
-		GL11.glTranslated(-0.5, 0, -0.5);
+		matrixStack.translate(-0.5, 0, -0.5);
 		
 		if(p < 1)
 		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(p, p, p);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
+			matrixStack.translate(0.5, 0.5, 0.5);
+			matrixStack.scale(p, p, p);
+			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderUtils.drawSolidBox(box, matrixStack);
 		
-		GL11.glPopMatrix();
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(box, matrixStack);
+		
+		matrixStack.pop();
 		
 		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
