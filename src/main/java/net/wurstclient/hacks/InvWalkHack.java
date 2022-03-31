@@ -7,56 +7,39 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
-import net.minecraft.client.gui.screen.ingame.BeaconScreen;
-import net.minecraft.client.gui.screen.ingame.BlastFurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
-import net.minecraft.client.gui.screen.ingame.CartographyTableScreen;
-import net.minecraft.client.gui.screen.ingame.CommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
-import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.GrindstoneScreen;
-import net.minecraft.client.gui.screen.ingame.HopperScreen;
-import net.minecraft.client.gui.screen.ingame.HorseScreen;
-import net.minecraft.client.gui.screen.ingame.MerchantScreen;
-import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-import net.minecraft.client.gui.screen.ingame.SmithingScreen;
-import net.minecraft.client.gui.screen.ingame.SmokerScreen;
-import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
-import net.minecraft.client.gui.screen.ingame.StructureBlockScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.item.ItemGroup;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
-import net.wurstclient.clickgui.screens.EditBlockListScreen;
-import net.wurstclient.clickgui.screens.EditBlockScreen;
-import net.wurstclient.clickgui.screens.EditItemListScreen;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
-import net.wurstclient.navigator.NavigatorScreen;
 import net.wurstclient.settings.CheckboxSetting;
 
-@SearchTags({"inventory walk", "InvMove"})
+@SearchTags({"inv walk", "inventory walk", "InvMove", "inv move",
+	"inventory move", "MenuWalk", "menu walk"})
 public final class InvWalkHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting exception =
-			new CheckboxSetting("Only allow player inventory",
-				"Blocks all other containers or instances of GUIs",
-				false);
+	private final CheckboxSetting allowClickGUI =
+		new CheckboxSetting("Allow ClickGUI",
+			"description.wurst.setting.invwalk.allow_clickgui", true);
 	
+	private final CheckboxSetting allowOther =
+		new CheckboxSetting("Allow other screens",
+			"description.wurst.setting.invwalk.allow_other", true);
+
 	public InvWalkHack()
 	{
 		super("InvWalk");
 		setCategory(Category.MOVEMENT);
-		addSetting(exception);
+		addSetting(allowClickGUI);
+		addSetting(allowOther);
 	}
 	
 	@Override
@@ -74,53 +57,49 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if (avoid() || optional() && exception.isChecked())
+		Screen screen = MC.currentScreen;
+		if(screen == null)
 			return;
 		
-		IKeyBinding forwardKey = (IKeyBinding)MC.options.forwardKey;
-		((KeyBinding)forwardKey).setPressed(forwardKey.isActallyPressed());
+		if(!isAllowedScreen(screen))
+			return;
 		
-		IKeyBinding backKey = (IKeyBinding)MC.options.backKey;
-		((KeyBinding)backKey).setPressed(backKey.isActallyPressed());
+		KeyBinding[] keys = {MC.options.forwardKey, MC.options.backKey,
+			MC.options.leftKey, MC.options.rightKey, MC.options.jumpKey,
+			MC.options.sprintKey, MC.options.sneakKey};
 		
-		IKeyBinding leftKey = (IKeyBinding)MC.options.leftKey;
-		((KeyBinding)leftKey).setPressed(leftKey.isActallyPressed());
-		
-		IKeyBinding rightKey = (IKeyBinding)MC.options.rightKey;
-		((KeyBinding)rightKey).setPressed(rightKey.isActallyPressed());
-		
-		IKeyBinding jumpKey = (IKeyBinding)MC.options.jumpKey;
-		((KeyBinding)jumpKey).setPressed(jumpKey.isActallyPressed());
-		
-		IKeyBinding sprintKey = (IKeyBinding)MC.options.sprintKey;
-		((KeyBinding)sprintKey).setPressed(sprintKey.isActallyPressed());
-		
-		IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
-		((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());	
-			
+		for(KeyBinding key : keys)
+			key.setPressed(((IKeyBinding)key).isActallyPressed());
 	}
-	 private boolean avoid()
-	    {
-	        return MC.currentScreen == null || (MC.currentScreen instanceof CreativeInventoryScreen 
-	        		|| MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof SignEditScreen
-	        		|| MC.currentScreen instanceof CommandBlockScreen || MC.currentScreen instanceof EditBlockListScreen
-	        		|| MC.currentScreen instanceof EditBlockScreen || MC.currentScreen instanceof EditItemListScreen
-	        		|| MC.currentScreen instanceof AnvilScreen || MC.currentScreen instanceof AbstractCommandBlockScreen 
-	        		|| MC.currentScreen instanceof StructureBlockScreen || MC.currentScreen instanceof ClickGuiScreen
-	        		|| MC.currentScreen instanceof NavigatorScreen);
-	    }
-	 
-	 private boolean optional()
-		{
-			return MC.currentScreen == null || (MC.currentScreen instanceof CraftingScreen
-					|| MC.currentScreen instanceof GenericContainerScreen || MC.currentScreen instanceof HopperScreen
-					|| MC.currentScreen instanceof FurnaceScreen || MC.currentScreen instanceof BeaconScreen
-					|| MC.currentScreen instanceof BlastFurnaceScreen || MC.currentScreen instanceof BrewingStandScreen
-					|| MC.currentScreen instanceof GrindstoneScreen || MC.currentScreen instanceof ShulkerBoxScreen
-					|| MC.currentScreen instanceof SmithingScreen || MC.currentScreen instanceof StonecutterScreen
-					|| MC.currentScreen instanceof SmokerScreen || MC.currentScreen instanceof EnchantmentScreen
-					|| MC.currentScreen instanceof MerchantScreen || MC.currentScreen instanceof CartographyTableScreen
-					|| MC.currentScreen instanceof Generic3x3ContainerScreen
-					|| MC.currentScreen instanceof HorseScreen);
-		} 
+	
+	private boolean isAllowedScreen(Screen screen)
+	{
+		if(screen instanceof AbstractInventoryScreen
+			&& !isCreativeSearchBarOpen(screen))
+			return true;
+		
+		if(allowClickGUI.isChecked() && screen instanceof ClickGuiScreen)
+			return true;
+		
+		if(allowOther.isChecked() && screen instanceof HandledScreen
+			&& !hasTextBox(screen))
+			return true;
+		
+		return false;
+	}
+	
+	private boolean isCreativeSearchBarOpen(Screen screen)
+	{
+		if(!(screen instanceof CreativeInventoryScreen))
+			return false;
+		
+		CreativeInventoryScreen crInvScreen = (CreativeInventoryScreen)screen;
+		return crInvScreen.getSelectedTab() == ItemGroup.SEARCH.getIndex();
+	}
+	
+	private boolean hasTextBox(Screen screen)
+	{
+		return screen.children().stream()
+			.anyMatch(e -> e instanceof TextFieldWidget);
+	}
 }
