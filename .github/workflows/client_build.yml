@@ -11,6 +11,7 @@ on:
   push:
     branches:
       - master
+      - dev
   pull_request:
     branches:
       - master
@@ -29,6 +30,7 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
+        id: builder
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
@@ -40,3 +42,45 @@ jobs:
             !build/libs/*-sources.jar
             !build/libs/*-dev.jar
 
+      - name: Read Wurst Version from Properties-file
+        id: read_property_wurst
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'wurst_version'
+      - name: Read Wurst Version from Properties-file
+        id: read_property_mc
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'minecraft_version'
+
+      - name: Define release_tag
+        id: release_tag
+        run: echo ::set-output name=tag::v`date +%y%m%d`-${{ steps.read_property_wurst.outputs.value }}-MC${{ steps.read_property_mc.outputs.value }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          release_name: Release ${{ steps.release_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Make Release Zip
+        run: |
+          zip --junk-paths build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}
+          asset_name: CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip
+          asset_content_type: application/zip

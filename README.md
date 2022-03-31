@@ -1,48 +1,28 @@
-# Wurst Client v7
+# Cheddar BratWurst Client v7
 
 ## ⚠ We Are Looking For Translators & Proofreaders ⚠
 
-Mostly proofreaders. Many translations are currently stuck because we have no one who can proofread them. See table below and the ["reviews wanted" label](https://github.com/Wurst-Imperium/Wurst7/pulls?q=is%3Aopen+label%3A%22reviews+wanted%22+label%3Atranslation).
+Mostly proofreaders. Many translations are currently stuck because we have no one who can proofread them.
+Go to the official [Wurst7](https://github.com/Wurst-Imperium/Wurst7) repo and see if you can help!
 
-### Current Status of Translations
+## What is this?
+The intention of **[Cheddar-BratWurst7](https://github.com/TheGrandCurator/Cheddar-BratWurst7)** is to sacrifice some stability for faster code adoption.
 
-|Language|Status|
-|--------|--------|
-|Chinese (Simplified/Mainland)|Pending changes: [#574](https://github.com/Wurst-Imperium/Wurst7/pull/574), [#588](https://github.com/Wurst-Imperium/Wurst7/pull/588)|
-|Chinese (Traditional/Taiwan)|151/154 done|
-|Chinese (Cantonese/Hong Kong)|154/154 done|
-|French (France)|There are 3 pending submissions ([#515](https://github.com/Wurst-Imperium/Wurst7/pull/515), [#531](https://github.com/Wurst-Imperium/Wurst7/pull/531), [#552](https://github.com/Wurst-Imperium/Wurst7/pull/552)) with different translations and I don't know which one to merge. If you speak French, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker.|
-|German (Germany)|53/154 done. I'll probably do the rest myself since I can speak it natively.|
-|Italian (Italy)|146/154 done|
-|Japanese (Japan)|137/154 done|
-|Polish (Poland)|154/154 done|
-|Portugese (Brazil)|Pending, needs reviews, check [#528](https://github.com/Wurst-Imperium/Wurst7/pull/528).|
-|Russian (Russia)|Pending changes: [#572](https://github.com/Wurst-Imperium/Wurst7/pull/572)|
-|Turkish (Turkey)|There are 2 pending submissions ([#511](https://github.com/Wurst-Imperium/Wurst7/pull/511), [#512](https://github.com/Wurst-Imperium/Wurst7/pull/512)) with different translations and I don't know which one to merge. If you speak Turkish, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker. |
-|Ukrainian (Ukraine)|137/154 done|
+Any Pull Request submitted to **[Wurst7](https://github.com/Wurst-Imperium/Wurst7)** may already be merged here.
 
-If you speak both English and some other language, please help us by translating Wurst or reviewing existing translations. The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
+The dev branch client builds should be treated as "alpha" builds. Probably won't crash on startup.
 
-Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+The master branch client builds should be treated as "beta" builds. Won't crash on startup.
 
-For discussion about translations, see [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) here or [#wurst-translations](https://chat.wurstimperium.net/channel/wurst-translations) on our RocketChat server.
+Scared? Lactose intolerant? Go get the official [Wurst client](http://wurstclient.net/download/).
 
-## Downloads (for users)
+## Downloads
+Try it out!
+["Cheddar" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
 
-https://www.wurstclient.net/download/
+Thar be dragons!
+["Dev" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
 
-## Setup (for developers) (using Windows 10 & Eclipse)
-
-Requirements: [JDK 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot)
-
-1. Run these two commands in PowerShell:
-
-```
-./gradlew.bat genSources
-./gradlew.bat eclipse
-```
-
-2. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
 
 ## License
 
@@ -50,6 +30,42 @@ This code is licensed under the GNU General Public License v3. **You can only us
 
 ## Note about Pull Requests
 
-If you are contributing multiple unrelated features, please create a separate pull request for each feature. Squeezing everything into one giant pull request makes it very difficult for us to add your features, as we have to test, validate and add them one by one.
+This is all intended to flow back into the official Wurst Client, this is just for those who want the "preview" version of current Wurst7 Client Development
 
 Thank you for your understanding - and thanks again for taking the time to contribute!!
+
+# A Special Thank You to the Wurst Contributors!
+
+## [Alexander01998](https://guthub.com/Alexander01998) (The OG)
+### [Mersid](https://github.com/Mersid)
+### [SistineFibelKen](https://github.com/SistineFibelKen)
+### [hiddenalt](https://github.com/hiddenalt)
+### [EliteUn17y](https://github.com/EliteUn17y)
+### [ThisTestUser](https://github.com/ThisTestUser)
+### [andevo](https://github.com/andevo)
+### [gurachan](https://github.com/gurachan)
+### [wosk0x01](https://github.com/wosk0x01)
+### [ZANX3Y](https://github.com/ZANX3Y)
+### [skidderrom](https://github.com/skidderrom)
+#### [rennaarenata](https://github.com/rennaarenata)
+#### [sabaadmin](https://github.com/sabaadmin)
+#### [TheWienerMaster](https://github.com/TheWienerMaster)
+#### [Hexeption](https://github.com/Hexeption)
+#### [KTibow](https://github.com/KTibow)
+#### [faseri](https://github.com/faseri)
+#### [pikami](https://github.com/pikami)
+#### [AidanRB](https://github.com/AidanRB)
+#### [MaxCoding3](https://github.com/MaxCoding3)
+#### [flestr](https://github.com/flestr)
+#### [PanForPancakes](https://github.com/PanForPancakes)
+#### [aleksilassila](https://github.com/aleksilassila)
+#### [octeep](https://github.com/octeep)
+#### [SiongSng](https://github.com/SiongSng)
+#### [js6pak](https://github.com/js6pak)
+#### [allanshepherd](https://github.com/allanshepherd)
+#### [JamesTheAwesomeDude](https://github.com/JamesTheAwesomeDude)
+#### [FlorianMichael](https://github.com/FlorianMichael)
+#### [xuri02](https://github.com/xuri02)
+#### [pcm1k](https://github.com/pcm1k)
+#### [thyraxx](https://github.com/thyraxx)
+#### [Dalethium](https://github.com/Dalethium)
