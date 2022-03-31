@@ -71,6 +71,7 @@
   "description.wurst.hack.highjump": "Allows you to jump higher.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.infinichat": "Removes the 256 character limit from the chat.\nUseful for long commands that modify NBT data.\n\n§6§lNOTICE:§r Not recommended for talking to people. Most servers will cut messages to 256 characters on their end.",
   "description.wurst.hack.instantbunker": "Builds a small bunker around you. Needs 57 blocks.",
+  "description.wurst.hack.invwalk": "Enables movement in the inventory and container screens.",
   "description.wurst.hack.itemesp": "Highlights nearby items.",
   "description.wurst.hack.itemgenerator": "Generates random items and drops them on the ground.\n§oCreative mode only.§r",
   "description.wurst.hack.jesus": "Allows you to walk on water.\nJesus used this hack ~2000 years ago.",

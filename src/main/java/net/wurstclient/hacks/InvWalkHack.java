@@ -8,29 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
-import net.minecraft.client.gui.screen.ingame.BeaconScreen;
-import net.minecraft.client.gui.screen.ingame.BlastFurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
-import net.minecraft.client.gui.screen.ingame.CartographyTableScreen;
-import net.minecraft.client.gui.screen.ingame.CommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.CraftingScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
-import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.GrindstoneScreen;
-import net.minecraft.client.gui.screen.ingame.HopperScreen;
-import net.minecraft.client.gui.screen.ingame.HorseScreen;
-import net.minecraft.client.gui.screen.ingame.MerchantScreen;
-import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-import net.minecraft.client.gui.screen.ingame.SmithingScreen;
-import net.minecraft.client.gui.screen.ingame.SmokerScreen;
-import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
-import net.minecraft.client.gui.screen.ingame.StructureBlockScreen;
+import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -47,16 +25,15 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"inventory walk", "InvMove"})
 public final class InvWalkHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting exception =
-			new CheckboxSetting("Only allow player inventory",
-				"Blocks all other containers or instances of GUIs",
-				false);
+	private final CheckboxSetting invOnly =
+		new CheckboxSetting("Only allow player inventory",
+			"Blocks all other containers or instances of GUIs", false);
 	
 	public InvWalkHack()
 	{
-		super("InvWalk", "Enables movement in inventory and container screens");
+		super("InvWalk");
 		setCategory(Category.MOVEMENT);
-		addSetting(exception);
+		addSetting(invOnly);
 	}
 	
 	@Override
@@ -74,53 +51,67 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if (avoid() || optional() && exception.isChecked())
+		if(avoid() || optional() && invOnly.isChecked())
 			return;
 		
-		IKeyBinding forwardKey = (IKeyBinding)MC.options.keyForward;
+		IKeyBinding forwardKey = (IKeyBinding)MC.options.forwardKey;
 		((KeyBinding)forwardKey).setPressed(forwardKey.isActallyPressed());
 		
-		IKeyBinding backKey = (IKeyBinding)MC.options.keyBack;
+		IKeyBinding backKey = (IKeyBinding)MC.options.backKey;
 		((KeyBinding)backKey).setPressed(backKey.isActallyPressed());
 		
-		IKeyBinding leftKey = (IKeyBinding)MC.options.keyLeft;
+		IKeyBinding leftKey = (IKeyBinding)MC.options.leftKey;
 		((KeyBinding)leftKey).setPressed(leftKey.isActallyPressed());
 		
-		IKeyBinding rightKey = (IKeyBinding)MC.options.keyRight;
+		IKeyBinding rightKey = (IKeyBinding)MC.options.rightKey;
 		((KeyBinding)rightKey).setPressed(rightKey.isActallyPressed());
 		
-		IKeyBinding jumpKey = (IKeyBinding)MC.options.keyJump;
+		IKeyBinding jumpKey = (IKeyBinding)MC.options.jumpKey;
 		((KeyBinding)jumpKey).setPressed(jumpKey.isActallyPressed());
 		
-		IKeyBinding sprintKey = (IKeyBinding)MC.options.keySprint;
+		IKeyBinding sprintKey = (IKeyBinding)MC.options.sprintKey;
 		((KeyBinding)sprintKey).setPressed(sprintKey.isActallyPressed());
 		
-		IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
-		((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());	
-			
+		IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
+		((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
 	}
-	 private boolean avoid()
-	    {
-	        return MC.currentScreen == null || (MC.currentScreen instanceof CreativeInventoryScreen 
-	        		|| MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof SignEditScreen
-	        		|| MC.currentScreen instanceof CommandBlockScreen || MC.currentScreen instanceof EditBlockListScreen
-	        		|| MC.currentScreen instanceof EditBlockScreen || MC.currentScreen instanceof EditItemListScreen
-	        		|| MC.currentScreen instanceof AnvilScreen || MC.currentScreen instanceof AbstractCommandBlockScreen 
-	        		|| MC.currentScreen instanceof StructureBlockScreen || MC.currentScreen instanceof ClickGuiScreen
-	        		|| MC.currentScreen instanceof NavigatorScreen);
-	    }
-	 
-	 private boolean optional()
-		{
-			return MC.currentScreen == null || (MC.currentScreen instanceof CraftingScreen
-					|| MC.currentScreen instanceof GenericContainerScreen || MC.currentScreen instanceof HopperScreen
-					|| MC.currentScreen instanceof FurnaceScreen || MC.currentScreen instanceof BeaconScreen
-					|| MC.currentScreen instanceof BlastFurnaceScreen || MC.currentScreen instanceof BrewingStandScreen
-					|| MC.currentScreen instanceof GrindstoneScreen || MC.currentScreen instanceof ShulkerBoxScreen
-					|| MC.currentScreen instanceof SmithingScreen || MC.currentScreen instanceof StonecutterScreen
-					|| MC.currentScreen instanceof SmokerScreen || MC.currentScreen instanceof EnchantmentScreen
-					|| MC.currentScreen instanceof MerchantScreen || MC.currentScreen instanceof CartographyTableScreen
-					|| MC.currentScreen instanceof Generic3x3ContainerScreen
-					|| MC.currentScreen instanceof HorseScreen);
-		} 
+	
+	private boolean avoid()
+	{
+		return MC.currentScreen == null
+			|| MC.currentScreen instanceof CreativeInventoryScreen
+			|| MC.currentScreen instanceof ChatScreen
+			|| MC.currentScreen instanceof SignEditScreen
+			|| MC.currentScreen instanceof CommandBlockScreen
+			|| MC.currentScreen instanceof EditBlockListScreen
+			|| MC.currentScreen instanceof EditBlockScreen
+			|| MC.currentScreen instanceof EditItemListScreen
+			|| MC.currentScreen instanceof AnvilScreen
+			|| MC.currentScreen instanceof AbstractCommandBlockScreen
+			|| MC.currentScreen instanceof StructureBlockScreen
+			|| MC.currentScreen instanceof ClickGuiScreen
+			|| MC.currentScreen instanceof NavigatorScreen;
+	}
+	
+	private boolean optional()
+	{
+		return MC.currentScreen == null
+			|| MC.currentScreen instanceof CraftingScreen
+			|| MC.currentScreen instanceof GenericContainerScreen
+			|| MC.currentScreen instanceof HopperScreen
+			|| MC.currentScreen instanceof FurnaceScreen
+			|| MC.currentScreen instanceof BeaconScreen
+			|| MC.currentScreen instanceof BlastFurnaceScreen
+			|| MC.currentScreen instanceof BrewingStandScreen
+			|| MC.currentScreen instanceof GrindstoneScreen
+			|| MC.currentScreen instanceof ShulkerBoxScreen
+			|| MC.currentScreen instanceof SmithingScreen
+			|| MC.currentScreen instanceof StonecutterScreen
+			|| MC.currentScreen instanceof SmokerScreen
+			|| MC.currentScreen instanceof EnchantmentScreen
+			|| MC.currentScreen instanceof MerchantScreen
+			|| MC.currentScreen instanceof CartographyTableScreen
+			|| MC.currentScreen instanceof Generic3x3ContainerScreen
+			|| MC.currentScreen instanceof HorseScreen;
+	}
 }
