@@ -10,10 +10,10 @@ name: Latest Client Build
 on:
   push:
     branches:
-      - master
+      - dev
   pull_request:
     branches:
-      - master
+      - dev
 jobs:
   build:
 
@@ -34,9 +34,5 @@ jobs:
           arguments: build
       - uses: actions/upload-artifact@v3
         with:
-          name: WurstClient
-          path: |
-            build/libs
-            !build/libs/*-sources.jar
-            !build/libs/*-dev.jar
-
+          name: Dev-CheddarBratWurst-Client
+          path: build/libs

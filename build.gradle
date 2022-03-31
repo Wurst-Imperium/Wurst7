@@ -7,7 +7,14 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+
+static def getDate() {
+	def date = new Date()
+	def formattedDate = date.format('yyMMdd')
+	return formattedDate
+}
+
+version = "v" + getDate() + "-" + project.wurst_version + "-MC" + project.minecraft_version
 group = project.maven_group
 
 repositories {

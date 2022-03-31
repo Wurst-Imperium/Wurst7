@@ -34,7 +34,7 @@ jobs:
           arguments: build
       - uses: actions/upload-artifact@v3
         with:
-          name: WurstClient
+          name: CheddarBratWurst-Client
           path: |
             build/libs
             !build/libs/*-sources.jar
