@@ -125,7 +125,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		
 		@SuppressWarnings("unchecked")
 		ISimpleOption<Double> gammaOption =
-			(ISimpleOption<Double>)(Object)MC.options.method_42473();
+			(ISimpleOption<Double>)(Object)MC.options.getGamma();
 		
 		// TODO: Why does this use 0.5 instead of
 		// FullBright's defaultGamma setting?
@@ -138,7 +138,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		@SuppressWarnings("unchecked")
 		ISimpleOption<Double> gammaOption =
-			(ISimpleOption<Double>)(Object)MC.options.method_42473();
+			(ISimpleOption<Double>)(Object)MC.options.getGamma();
 		
 		gammaOption.forceSetValue(16.0);
 	}
