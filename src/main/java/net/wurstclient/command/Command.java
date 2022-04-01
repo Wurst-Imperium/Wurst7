@@ -31,7 +31,7 @@ public abstract class Command extends Feature
 		this.syntax = syntax;
 	}
 	
-	public abstract void call(String[] args) throws CmdException;
+	public abstract void call(String[] args) throws CmdException, Exception;
 	
 	@Override
 	public final String getName()

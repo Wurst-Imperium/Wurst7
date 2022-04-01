@@ -62,6 +62,7 @@ public final class CmdList
 	public final SetModeCmd setModeCmd = new SetModeCmd();
 	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
 	public final SettingsCmd settingsCmd = new SettingsCmd();
+	public final SpamCmd spamCmd = new SpamCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
 	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
@@ -70,7 +71,7 @@ public final class CmdList
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
 	public final XrayCmd xrayCmd = new XrayCmd();
-	
+
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>(String::compareToIgnoreCase);
 	
