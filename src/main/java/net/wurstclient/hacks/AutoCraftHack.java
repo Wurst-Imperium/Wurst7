@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
 
-    private HashMap<Identifier, List<CraftingProcess>> processMap = null;
+    private LinkedHashMap<Identifier, List<CraftingProcess>> processMap = null;
 
     private List<CraftingQueueEntry> craftingQueue = new ArrayList<>();
 
@@ -55,20 +55,20 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private ReentrantLock containerOpenLock = new ReentrantLock();
     private Condition containerOpenCondition = containerOpenLock.newCondition();
 
-    private HashMap<Integer, SlotUpdateInfo> latestSlotUpdates;
+    private LinkedHashMap<Integer, SlotUpdateInfo> latestSlotUpdates;
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
     private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
     private WorldStorageQuery worldQuery = new WorldStorageQuery();
 
-    private HashMap<Item, Integer> inventoryAvailabilityMap = new HashMap<>();
-    private HashMap<Item, Integer> storageAvailabilityMap = new HashMap<>();
-    private HashMap<Block, Integer> worldAvailabilityMap = new HashMap<>();
-    private HashMap<Block, BlockPos> nearestBlockPosMap = new HashMap<>();
-    private HashMap<Block, Double> nearestBlockDistanceMap = new HashMap<>();
-    private HashMap<Item, Integer> totalInventoryAvailabilityMap = new HashMap<>();
+    private LinkedHashMap<Item, Integer> inventoryAvailabilityMap = new LinkedHashMap<>();
+    private LinkedHashMap<Item, Integer> storageAvailabilityMap = new LinkedHashMap<>();
+    private LinkedHashMap<Block, Integer> worldAvailabilityMap = new LinkedHashMap<>();
+    private LinkedHashMap<Block, BlockPos> nearestBlockPosMap = new LinkedHashMap<>();
+    private LinkedHashMap<Block, Double> nearestBlockDistanceMap = new LinkedHashMap<>();
+    private LinkedHashMap<Item, Integer> totalInventoryAvailabilityMap = new LinkedHashMap<>();
 
-    private HashSet<Block> containerBlockTypes;
+    private LinkedHashSet<Block> containerBlockTypes;
 
     private Pathfinder pathFinder;
     private BaritoneInterface baritoneInterface;
@@ -100,7 +100,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private void initContainerBlockTypes() {
-        containerBlockTypes = new HashSet<>();
+        containerBlockTypes = new LinkedHashSet<>();
         List<String> blockTypes = List.of("crafting_table", "chest", "furnace");
         for (String type : blockTypes) {
             containerBlockTypes.add(Registry.BLOCK.get(new Identifier("minecraft", type)));
@@ -128,7 +128,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private void initProcessMap() {
-        processMap = new HashMap<>();
+        processMap = new LinkedHashMap<>();
         RecipeManager recipeManager = MC.world.getRecipeManager();
         Stream<Identifier> keys = recipeManager.keys();
         Iterator<Identifier> iter = keys.iterator();
@@ -158,8 +158,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         for (Identifier id : Registry.BLOCK.getIds()) {
-            if (id.getPath().equals("granite"))
-                System.out.println("reached");
             List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
             for (ItemStack stack : droppedStacks) {
                 Identifier stackId = Registry.ITEM.getId(stack.getItem());
@@ -170,7 +168,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ToolManager {
+    public class ToolManager {
         private List<Item> tools;
         public ToolManager() {
             tools = new ArrayList<>();
@@ -184,7 +182,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             //tools.add(Registry.ITEM.get(new Identifier("minecraft", "shears")));
         }
         public Set<Item> getMatchingTools(Block block) {
-            Set<Item> res = new HashSet<>();
+            Set<Item> res = new LinkedHashSet<>();
             BlockState state = block.getDefaultState();
             if (!state.isToolRequired())
                 return res;
@@ -208,7 +206,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class BlockManager {
+    public class BlockManager {
         public BlockManager() { }
         public BlockPos getNearestPlaceablePosition() {
             int range = 5;
@@ -257,7 +255,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return new CraftingPlan(Registry.ITEM.get(id), processes);
     }
 
-    private class SlotUpdateInfo {
+    public class SlotUpdateInfo {
         public int slot;
         public ItemStack itemStack;
         public SlotUpdateInfo(int slot, ItemStack itemStack) {
@@ -266,16 +264,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private abstract class StorageQuery<T> {
-        public abstract HashMap<T, Integer> getAvailabilityMap();
+    public abstract class StorageQuery<T> {
+        public abstract LinkedHashMap<T, Integer> getAvailabilityMap();
         public abstract boolean acquire(T item, int count);
     }
 
-    private class InventoryStorageQuery extends StorageQuery<Item> {
+    public class InventoryStorageQuery extends StorageQuery<Item> {
         public InventoryStorageQuery() { }
         @Override
-        public HashMap<Item, Integer> getAvailabilityMap() {
-            HashMap<Item, Integer> res = new HashMap<>();
+        public LinkedHashMap<Item, Integer> getAvailabilityMap() {
+            LinkedHashMap<Item, Integer> res = new LinkedHashMap<>();
             List<ItemStack> items = MC.player.getInventory().main;
             for (ItemStack cur : items) {
                 if (cur.getCount() > 0)
@@ -283,8 +281,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
-        public HashMap<Item, Integer> getCurrentContainerAvailabilityMap() {
-            HashMap<Item, Integer> res = new HashMap<>();
+        public LinkedHashMap<Item, Integer> getCurrentContainerAvailabilityMap() {
+            LinkedHashMap<Item, Integer> res = new LinkedHashMap<>();
             List<Slot> slots = MC.player.currentScreenHandler.slots;
             for (int i = 0; i < slots.size() - 36; i++) {
                 if (slots.get(i).getStack().getCount() > 0)
@@ -296,7 +294,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean acquire(Item item, int count) { return true; }
     }
 
-    private abstract class Pathfinder {
+    public abstract class Pathfinder {
         private boolean supportsMining;
         public Pathfinder(boolean supportsMining) {
             this.supportsMining = supportsMining;
@@ -308,7 +306,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public abstract boolean mine(Block block, int count);
     }
 
-    private class WurstPathfinder extends Pathfinder {
+    public class WurstPathfinder extends Pathfinder {
         public WurstPathfinder() {
             super(false);
         }
@@ -324,7 +322,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private abstract class NotifyingRunnable implements Runnable {
+    public abstract class NotifyingRunnable implements Runnable {
         protected boolean done = false;
         ReentrantLock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
@@ -362,7 +360,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected abstract void runInternal();
     }
 
-    private class BaritoneInterface {
+    public class BaritoneInterface {
         private Class BaritoneAPI;
         private Class GoalBlock;
         private Class Goal;
@@ -465,7 +463,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class BaritonePathfinder extends Pathfinder {
+    public class BaritonePathfinder extends Pathfinder {
         public BaritonePathfinder() {
             super(true);
         }
@@ -523,12 +521,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ContainerStorageQuery extends StorageQuery<Item> {
-        private HashMap<BlockPos, HashMap<Item, Integer>> containers;
+    public class ContainerStorageQuery extends StorageQuery<Item> {
+        private LinkedHashMap<BlockPos, LinkedHashMap<Item, Integer>> containers;
         public BlockPos nearestContainer = BlockPos.ORIGIN;
         public double nearestContainerDistance = 0.0;
         public ContainerStorageQuery() {
-            containers = new HashMap<>();
+            containers = new LinkedHashMap<>();
         }
         public void calculateNearestContainer(Vec3d pos) {
             double minDistance = Double.POSITIVE_INFINITY;
@@ -542,13 +540,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             nearestContainerDistance = minDistance;
         }
-        public void updateContainer(HashMap<Item, Integer> content, BlockPos pos) {
+        public void updateContainer(LinkedHashMap<Item, Integer> content, BlockPos pos) {
             containers.put(pos, content);
         }
         @Override
-        public HashMap<Item, Integer> getAvailabilityMap() {
-            HashMap<Item, Integer> globalAvailabilityMap = new HashMap<>();
-            for (HashMap<Item, Integer> map : containers.values()) {
+        public LinkedHashMap<Item, Integer> getAvailabilityMap() {
+            LinkedHashMap<Item, Integer> globalAvailabilityMap = new LinkedHashMap<>();
+            for (LinkedHashMap<Item, Integer> map : containers.values()) {
                 for (Item item : map.keySet()) {
                     globalAvailabilityMap.put(item, globalAvailabilityMap.getOrDefault(item, 0) + map.get(item));
                 }
@@ -559,7 +557,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int initialCount = count;
             if (!containers.containsKey(containerPos))
                 return count;
-            HashMap<Item, Integer> container = containers.get(containerPos);
+            LinkedHashMap<Item, Integer> container = containers.get(containerPos);
             ScreenHandler handler = MC.player.currentScreenHandler;
             for (int i = 0; i < handler.slots.size() - 36; i++) {
                 if (count <= 0)
@@ -618,12 +616,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
-        public void acquire(HashMap<Item, Integer> items) {
+        public void acquire(LinkedHashMap<Item, Integer> items) {
             for (BlockPos pos : containers.keySet()) {
                 if (items.size() == 0)
                     break;
-                HashMap<Item, Integer> container = containers.get(pos);
-                Set<Item> itemKeySet = new HashSet<>(items.keySet());
+                LinkedHashMap<Item, Integer> container = containers.get(pos);
+                Set<Item> itemKeySet = new LinkedHashSet<>(items.keySet());
                 for (Item toAcquire : itemKeySet) {
                     if (container.getOrDefault(toAcquire, 0) > 0) {
                         containerManager.navigateAndOpenContainer(pos);
@@ -636,7 +634,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class WorldStorageQuery extends StorageQuery<Block> {
+    public class WorldStorageQuery extends StorageQuery<Block> {
         public WorldStorageQuery() { }
         private List<Chunk> getChunks(int range) {
             List<Chunk> res = new ArrayList<>();
@@ -672,13 +670,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        public HashMap<Block, Integer> getAvailabilityMap() {
-            HashMap<Block, Integer> availability = new HashMap<>();
+        public LinkedHashMap<Block, Integer> getAvailabilityMap() {
+            LinkedHashMap<Block, Integer> availability = new LinkedHashMap<>();
             applyToBlocks((b) -> { availability.put(b.getRight().getBlock(), availability.getOrDefault(b.getRight().getBlock(), 0) + 1); });
             return availability;
         }
-        public HashMap<Block, BlockPos> getNearestPositions() {
-            HashMap<Block, BlockPos> res = new HashMap<>();
+        public LinkedHashMap<Block, BlockPos> getNearestPositions() {
+            LinkedHashMap<Block, BlockPos> res = new LinkedHashMap<>();
             Vec3d playerPos = MC.player.getPos();
             applyToBlocks((b) -> {
                 Block block = b.getRight().getBlock();
@@ -694,8 +692,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             });
             return res;
         }
-        public HashMap<Block, Double> getNearestBlockDistances(HashMap<Block, BlockPos> nearestPositions) {
-            HashMap<Block, Double> res = new HashMap<>();
+        public LinkedHashMap<Block, Double> getNearestBlockDistances(LinkedHashMap<Block, BlockPos> nearestPositions) {
+            LinkedHashMap<Block, Double> res = new LinkedHashMap<>();
             Vec3d playerPos = MC.player.getPos();
             for (Block block : nearestPositions.keySet()) {
                 BlockPos pos = nearestPositions.get(block);
@@ -704,12 +702,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
-        public HashMap<Block, HashSet<BlockPos>> getLocations(HashSet<Block> blocks) {
-            HashMap<Block, HashSet<BlockPos>> res = new HashMap<>();
+        public LinkedHashMap<Block, LinkedHashSet<BlockPos>> getLocations(LinkedHashSet<Block> blocks) {
+            LinkedHashMap<Block, LinkedHashSet<BlockPos>> res = new LinkedHashMap<>();
             applyToBlocks((b) -> {
                 if (!blocks.contains(b.getRight().getBlock()))
                     return;
-                HashSet<BlockPos> s = res.getOrDefault(b.getRight().getBlock(), new HashSet<>());
+                LinkedHashSet<BlockPos> s = res.getOrDefault(b.getRight().getBlock(), new LinkedHashSet<>());
                 s.add(b.getLeft());
                 res.put(b.getRight().getBlock(), s);
             });
@@ -721,7 +719,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class CraftingPlan {
+    public class CraftingPlan {
         private List<CraftingProcess> processes;
         private Item target;
         public CraftingPlan(Item target, List<CraftingProcess> processes) {
@@ -737,12 +735,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private abstract class CraftingProcess {
+    public abstract class CraftingProcess {
         public abstract int getMultiplicity();
         public abstract Node getNode();
     }
 
-    private class RecipeCraftingProcess extends CraftingProcess {
+    public class RecipeCraftingProcess extends CraftingProcess {
         private Recipe<?> recipe;
         public RecipeCraftingProcess(Recipe<?> recipe) {
             this.recipe = recipe;
@@ -761,7 +759,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class SmeltingCraftingProcess extends CraftingProcess {
+    public class SmeltingCraftingProcess extends CraftingProcess {
         private Recipe<?> recipe;
         public SmeltingCraftingProcess(Recipe<?> recipe) {
             this.recipe = recipe;
@@ -780,7 +778,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class InventoryCraftingProcess extends CraftingProcess {
+    public class InventoryCraftingProcess extends CraftingProcess {
         private Item item;
         public InventoryCraftingProcess(Item item) {
             this.item = item;
@@ -795,7 +793,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class StorageCraftingProcess extends CraftingProcess {
+    public class StorageCraftingProcess extends CraftingProcess {
         private Item item;
         public StorageCraftingProcess(Item item) {
             this.item = item;
@@ -810,7 +808,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class WorldCraftingProcess extends CraftingProcess {
+    public class WorldCraftingProcess extends CraftingProcess {
         private Block block;
         private Item dropped;
         public WorldCraftingProcess(Item dropped, Block block) {
@@ -827,7 +825,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class PathingCraftingProcess extends CraftingProcess {
+    public class PathingCraftingProcess extends CraftingProcess {
         private Block block;
         public PathingCraftingProcess(Block block) {
             this.block = block;
@@ -842,7 +840,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class PlacementCraftingProcess extends CraftingProcess {
+    public class PlacementCraftingProcess extends CraftingProcess {
         private Block block;
         public PlacementCraftingProcess(Block block) {
             this.block = block;
@@ -857,7 +855,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class WorkbenchCraftingProcess extends CraftingProcess {
+    public class WorkbenchCraftingProcess extends CraftingProcess {
         private Block block;
         public WorkbenchCraftingProcess(Block block) {
             this.block = block;
@@ -872,7 +870,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ToolCraftingProcess extends CraftingProcess {
+    public class ToolCraftingProcess extends CraftingProcess {
         private Block block;
         public ToolCraftingProcess(Block block) {
             this.block = block;
@@ -887,8 +885,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ContainerManager {
-        private HashMap<Block, HashSet<BlockPos>> containers = new HashMap<>();
+    public class ContainerManager {
+        private LinkedHashMap<Block, LinkedHashSet<BlockPos>> containers = new LinkedHashMap<>();
         private BlockPos currentContainer = null;
         private BlockPos getNearestPathablePosition(BlockPos containerPos) {
             int range = 5;
@@ -961,13 +959,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         public void addContainer(Block block, BlockPos pos) {
-            HashSet<BlockPos> positions = containers.getOrDefault(block, new HashSet<>());
+            LinkedHashSet<BlockPos> positions = containers.getOrDefault(block, new LinkedHashSet<>());
             positions.add(pos);
             containers.put(block, positions);
         }
-        public void updateContainers(HashMap<Block, HashSet<BlockPos>> updated) {
+        public void updateContainers(LinkedHashMap<Block, LinkedHashSet<BlockPos>> updated) {
             for (Block b : updated.keySet()) {
-                HashSet<BlockPos> positions = containers.getOrDefault(b, new HashSet<>());
+                LinkedHashSet<BlockPos> positions = containers.getOrDefault(b, new LinkedHashSet<>());
                 positions.addAll(updated.get(b));
                 containers.put(b, positions);
             }
@@ -988,12 +986,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return nearestPos;
         }
-        public HashMap<Block, HashSet<BlockPos>> getContainers() {
+        public LinkedHashMap<Block, LinkedHashSet<BlockPos>> getContainers() {
             return containers;
         }
     }
 
-    private class InventoryManager {
+    public class InventoryManager {
         public InventoryManager() { }
         public int getHotbarSlot(int i) {
             return getStartingSlot() + 27 + i;
@@ -1053,28 +1051,55 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return true;
     }
 
-    private class CraftingState {
-        private HashMap<Item, Integer> inventoryAvailability;
-        private HashMap<Item, Integer> storageAvailability;
-        private HashMap<Block, Integer> worldAvailability;
-        private HashMap<Integer, Item> toolAvailability;
-        private HashMap<Integer, Double> efficiencyMap = new HashMap<>();
-        private HashMap<Integer, Double> naiveEfficiencyMap = new HashMap<>();
-        private HashSet<Item> visited;
+    public class NodeGraphGenerationInfo {
+        private LinkedHashMap<Node, LinkedHashSet<Node>> backlog;
+        private List<NodeEquivalenceClass> newEquivalenceClasses;
+        private List<NodeEquivalenceClass> newProfiles;
+        public boolean success;
+        public NodeGraphGenerationInfo() {
+            backlog = new LinkedHashMap<>();
+            newEquivalenceClasses = new ArrayList<>();
+            newProfiles = new ArrayList<>();
+        }
+        public NodeGraphGenerationInfo(LinkedHashMap<Node, LinkedHashSet<Node>> backlog, List<NodeEquivalenceClass> newEquivalenceClasses, List<NodeEquivalenceClass> newProfiles) {
+            this.backlog = backlog;
+            this.newEquivalenceClasses = newEquivalenceClasses;
+            this.newProfiles = newProfiles;
+        }
+        public NodeGraphGenerationInfo success() {
+            success = true;
+            return this;
+        }
+        public NodeGraphGenerationInfo failure() {
+            success = false;
+            return this;
+        }
+    }
+
+    public class CraftingState {
+        private LinkedHashMap<Item, Integer> inventoryAvailability;
+        private LinkedHashMap<Item, Integer> storageAvailability;
+        private LinkedHashMap<Block, Integer> worldAvailability;
+        private LinkedHashMap<Integer, Item> toolAvailability;
+        private LinkedHashMap<Integer, Double> efficiencyMap = new LinkedHashMap<>();
+        private LinkedHashMap<Integer, Double> naiveEfficiencyMap = new LinkedHashMap<>();
+        private LinkedHashSet<Item> visited;
         private List<StorageNode> storageNodes = new ArrayList<>();
-        private HashMap<Item, Integer> craftingItemFrequency = new HashMap<>();
-        private HashSet<Integer> deadNodes = new HashSet<>();
-        private HashMap<Integer, List<Integer>> children = new HashMap<>();
-        private HashMap<Integer, Integer> neededMap = new HashMap<>();
-        private HashMap<Integer, Integer> naiveMaxCraftable = new HashMap<>();
-        private HashMap<Integer, Boolean> naiveMaxCraftableGenerated = new HashMap<>();
-        private HashMap<Integer, Integer> timeTaken = new HashMap<>();
-        private HashMap<Item, List<Pair<Integer, Integer>>> excess = new HashMap<>();
-        private HashMap<Node, Node> nodeInstances = new HashMap<>();
+        private LinkedHashMap<Item, Integer> craftingItemFrequency = new LinkedHashMap<>();
+        private LinkedHashSet<Integer> deadNodes = new LinkedHashSet<>();
+        private LinkedHashMap<Integer, List<Integer>> children = new LinkedHashMap<>();
+        private LinkedHashMap<Integer, Integer> neededMap = new LinkedHashMap<>();
+        private LinkedHashMap<Integer, Integer> naiveMaxCraftable = new LinkedHashMap<>();
+        private LinkedHashMap<Integer, Boolean> naiveMaxCraftableGenerated = new LinkedHashMap<>();
+        private LinkedHashMap<Integer, Integer> timeTaken = new LinkedHashMap<>();
+        private LinkedHashMap<Item, List<Pair<Integer, Integer>>> excess = new LinkedHashMap<>();
+        private LinkedHashMap<NodeEquivalenceClass, NodeEquivalenceClass> equivalenceRelation = new LinkedHashMap<>();
+        private LinkedHashMap<Node, Node> nodeInstances = new LinkedHashMap<>();
+        private LinkedHashMap<NodeEquivalenceClass, LinkedHashSet<Item>> instanceProfile = new LinkedHashMap<>();
         private int rootNodeId = 0;
         private boolean success = false;
-        //private HashMap<Integer, Node> idInstanceMap = new HashMap<>();
-        public CraftingState(HashMap<Item, Integer> inventoryAvailability, HashMap<Item, Integer> storageAvailability, HashMap<Block, Integer> worldAvailability, HashSet<Item> visited, HashMap<Integer, Item> toolAvailability) {
+        private LinkedHashMap<Integer, Node> idInstanceMap = new LinkedHashMap<>();
+        public CraftingState(LinkedHashMap<Item, Integer> inventoryAvailability, LinkedHashMap<Item, Integer> storageAvailability, LinkedHashMap<Block, Integer> worldAvailability, LinkedHashSet<Item> visited, LinkedHashMap<Integer, Item> toolAvailability) {
             this.inventoryAvailability = inventoryAvailability;
             this.storageAvailability = storageAvailability;
             this.worldAvailability = worldAvailability;
@@ -1093,8 +1118,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             success = false;
             return this;
         }
-        private HashMap<Item, List<Pair<Integer, Integer>>> deepcopyExcess(HashMap<Item, List<Pair<Integer, Integer>>> excess) {
-            HashMap<Item, List<Pair<Integer, Integer>>> res = new HashMap<>();
+        private LinkedHashMap<Item, List<Pair<Integer, Integer>>> deepcopyExcess(LinkedHashMap<Item, List<Pair<Integer, Integer>>> excess) {
+            LinkedHashMap<Item, List<Pair<Integer, Integer>>> res = new LinkedHashMap<>();
             for (Item item : excess.keySet()) {
                 List<Pair<Integer, Integer>> value = excess.get(item);
                 List<Pair<Integer, Integer>> copy = new ArrayList<>();
@@ -1106,22 +1131,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         public CraftingState clone() {
-            CraftingState state = new CraftingState((HashMap<Item, Integer>) inventoryAvailability.clone(), (HashMap<Item, Integer>) storageAvailability.clone(), (HashMap<Block, Integer>) worldAvailability.clone(), (HashSet<Item>) visited.clone(), (HashMap<Integer, Item>) toolAvailability.clone());
+            CraftingState state = new CraftingState((LinkedHashMap<Item, Integer>) inventoryAvailability.clone(), (LinkedHashMap<Item, Integer>) storageAvailability.clone(), (LinkedHashMap<Block, Integer>) worldAvailability.clone(), (LinkedHashSet<Item>) visited.clone(), (LinkedHashMap<Integer, Item>) toolAvailability.clone());
             state.success = success;
             state.storageNodes = new ArrayList<>(storageNodes);
-            state.craftingItemFrequency = (HashMap<Item, Integer>) craftingItemFrequency.clone();
-            state.efficiencyMap = (HashMap<Integer, Double>) efficiencyMap.clone();
+            state.craftingItemFrequency = (LinkedHashMap<Item, Integer>) craftingItemFrequency.clone();
+            state.efficiencyMap = (LinkedHashMap<Integer, Double>) efficiencyMap.clone();
             state.naiveEfficiencyMap = naiveEfficiencyMap;
-            state.deadNodes = (HashSet<Integer>) deadNodes.clone();
+            state.deadNodes = (LinkedHashSet<Integer>) deadNodes.clone();
             state.children = children;
-            state.neededMap = (HashMap<Integer, Integer>) neededMap.clone();
+            state.neededMap = (LinkedHashMap<Integer, Integer>) neededMap.clone();
             state.naiveMaxCraftable = naiveMaxCraftable;
             state.naiveMaxCraftableGenerated = naiveMaxCraftableGenerated;
             state.timeTaken = timeTaken;
             state.excess = deepcopyExcess(excess);
             state.nodeInstances = nodeInstances;
             state.rootNodeId = rootNodeId;
-            //state.idInstanceMap = idInstanceMap;
+            state.idInstanceMap = idInstanceMap;
             return state;
         }
         public void set(CraftingState other) {
@@ -1144,7 +1169,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             excess = other.excess;
             nodeInstances = other.nodeInstances;
             rootNodeId = other.rootNodeId;
-            //idInstanceMap = other.idInstanceMap;
+            idInstanceMap = other.idInstanceMap;
         }
         private void clearChildren(int id) {
             if (children.containsKey(id)) {
@@ -1157,37 +1182,169 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 naiveMaxCraftable.remove(id);
             if (naiveMaxCraftableGenerated.containsKey(id))
                 naiveMaxCraftableGenerated.remove(id);
-            //if (idInstanceMap.containsKey(id))
-            //    idInstanceMap.remove(id);
+            if (idInstanceMap.containsKey(id))
+                idInstanceMap.remove(id);
         }
         public void generateTree(int id, Node node) {
+            long startTime = System.currentTimeMillis();
+            generateNodeInstanceGraph(node, new LinkedHashMap<>());
+            int diff = (int)(System.currentTimeMillis() - startTime);
             generateTreeInternal(id, node);
             node.genNaiveMaxCraftable(id, this);
         }
+        private void clearInstanceGraph(Node node) {
+            equivalenceRelation.remove(new NodeEquivalenceClass(node));
+            instanceProfile.remove(new NodeEquivalenceClass(node));
+        }
+        private NodeGraphGenerationInfo generateNodeInstanceGraph(Node node, LinkedHashMap<Node, Node> ancestors) {
+            if (!node.canPossiblyCraft(this))
+                return new NodeGraphGenerationInfo().failure();
+            /*if (node.shouldPruneTarget && visited.contains(node.target))
+                return;
+            if (node.shouldRememberVisit())
+                visited.add(node.target);*/
+            assert !equivalenceRelation.containsKey(new NodeEquivalenceClass(node));
+            if (Registry.ITEM.getId(node.target).getPath().equals("furnace") && node instanceof RecipeNode && node.stackShift == 0)
+                System.out.println("reached");
+            ancestors.put(node, node);
+            NodeEquivalenceClass equivalenceClass = new NodeEquivalenceClass(node);
+            List<NodeEquivalenceClass> newEquivalenceClasses = new ArrayList<>();
+            List<NodeEquivalenceClass> newProfiles = new ArrayList<>();
+            equivalenceRelation.put(equivalenceClass, equivalenceClass);
+            newEquivalenceClasses.add(equivalenceClass);
+            List<Node> nodeChildren = node.getChildren(this);
+            node.children = nodeChildren;
+            LinkedHashSet<Item> profile = new LinkedHashSet<>();
+            if (node.shouldPruneTarget)
+                profile.add(node.target);
+            LinkedHashMap<Node, LinkedHashSet<Node>> res = new LinkedHashMap<>();
+            boolean removedChildren = false;
+            for (int i = nodeChildren.size() - 1; i >= 0; i--) {
+                Node child = nodeChildren.get(i);
+                if (ancestors.containsKey(child)) {
+                    addToNodeBacklog(res, child, node);
+                    nodeChildren.set(i, ancestors.get(child));
+                }
+                else if (equivalenceRelation.containsKey(new NodeEquivalenceClass(child))) {
+                    profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
+                    nodeChildren.set(i, equivalenceRelation.get(new NodeEquivalenceClass(child)).node);
+                }
+                else {
+                    NodeGraphGenerationInfo childRes = generateNodeInstanceGraph(child, ancestors);
+                    if (!childRes.success) {
+                        for (NodeEquivalenceClass n : childRes.newEquivalenceClasses) {
+                            equivalenceRelation.remove(n);
+                        }
+                        for (NodeEquivalenceClass n : childRes.newProfiles) {
+                            instanceProfile.remove(n);
+                        }
+                        if (node.requiresAllChildren()) {
+                            ancestors.remove(node);
+                            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, newProfiles).failure();
+                        }
+                        else {
+                            removedChildren = true;
+                            nodeChildren.remove(i);
+                        }
+                    }
+                    else {
+                        newEquivalenceClasses.addAll(childRes.newEquivalenceClasses);
+                        newProfiles.addAll(childRes.newProfiles);
+                        mergeNodeBacklogs(res, childRes.backlog);
+                        profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
+                    }
+                }
+            }
+            if (removedChildren && nodeChildren.size() == 0 && !node.requiresAllChildren()) {
+                clearInstanceGraph(node);
+                ancestors.remove(node);
+                return new NodeGraphGenerationInfo().failure();
+            }
+            if (res.containsKey(node)) {
+                LinkedHashSet<Node> backloggedNodes = res.get(node);
+                for (Node descendant : backloggedNodes) {
+                    for (Node backloggedAncestor : res.keySet()) {
+                        addToNodeBacklog(res, backloggedAncestor, descendant);
+                    }
+                    instanceProfile.get(new NodeEquivalenceClass(descendant)).addAll(profile);
+                }
+                res.remove(node);
+            }
+            for (Node key : res.keySet()) {
+                res.get(key).add(node);
+            }
+            NodeEquivalenceClass profileClass = new NodeEquivalenceClass(node);
+            instanceProfile.put(profileClass, profile);
+            newProfiles.add(profileClass);
+            ancestors.remove(node);
+            if (ancestors.size() == 0 && res.size() != 0)
+                System.out.println("reached");
+            assert ancestors.size() != 0 || (res.size() == 0);
+            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, newProfiles).success();
+        }
+        private void addToNodeBacklog(LinkedHashMap<Node, LinkedHashSet<Node>> backlog, Node dest, Node src) {
+            LinkedHashSet<Node> entry = backlog.getOrDefault(dest, new LinkedHashSet<>());
+            entry.add(src);
+            backlog.put(dest, entry);
+        }
+        private void mergeNodeBacklogs(LinkedHashMap<Node, LinkedHashSet<Node>> dest, LinkedHashMap<Node, LinkedHashSet<Node>> src) {
+            for (Node item : src.keySet()) {
+                if (!dest.containsKey(item)) {
+                    dest.put(item, src.get(item));
+                }
+                else {
+                    LinkedHashSet<Node> entry = dest.get(item);
+                    entry.addAll(src.get(item));
+                }
+            }
+        }
+        private LinkedHashSet<Item> LinkedHashSetOverlap(LinkedHashSet<Item> set1, LinkedHashSet<Item> set2) {
+            LinkedHashSet<Item> result = new LinkedHashSet<>();
+            LinkedHashSet<Item> smallest = set1.size() < set2.size() ? set1 : set2;
+            LinkedHashSet<Item> biggest = smallest == set1 ? set2 : set1;
+            for (Item item : smallest) {
+                if (biggest.contains(item))
+                    result.add(item);
+            }
+            return result;
+        }
         private int generateTreeInternal(int id, Node node) {
-            if ((node.shouldPruneTarget && visited.contains(node.target)) || !node.canPossiblyCraft(this))
+            assert node != null;
+            assert node.canPossiblyCraft(this);
+            assert !nodeInstances.containsKey(node);
+            assert equivalenceRelation.containsKey(new NodeEquivalenceClass(node));
+            assert equivalenceRelation.get(new NodeEquivalenceClass(node)) != null;
+            if (Registry.ITEM.getId(node.target).getPath().equals("deepslate") && node instanceof ChoiceNode && node.distinction.equals(ToolNode.class))
+                System.out.println("reached");
+            if (node.shouldPruneTarget && visited.contains(node.target))
                 return -1;
             if (node.shouldRememberVisit())
                 visited.add(node.target);
             List<Node> nodeChildren;
-            if (!nodeInstances.containsKey(node)) {
-                nodeInstances.put(node, node);
-                nodeChildren = node.getChildren(this);
-                node.children = nodeChildren;
-            }
-            else {
+            if (nodeInstances.containsKey(node)) {
                 node = nodeInstances.get(node);
                 nodeChildren = node.children;
             }
-            //idInstanceMap.put(id, node);
+            else {
+                nodeChildren = equivalenceRelation.get(new NodeEquivalenceClass(node)).cloneChildren();
+                node.children = nodeChildren;
+                nodeInstances.put(node, node);
+            }
+            idInstanceMap.put(id, node);
             int initialChildren = nodeChildren.size();
             List<Integer> nodeChildIds = children.getOrDefault(id, new ArrayList<>());
             children.put(id, nodeChildIds);
             for (int i = nodeChildren.size() - 1; i >= 0; i--) {
                 Node child = nodeChildren.get(i);
+                assert equivalenceRelation.containsKey(new NodeEquivalenceClass(child));
+                assert instanceProfile.containsKey(new NodeEquivalenceClass(child));
+                child.overlap = LinkedHashSetOverlap(visited, instanceProfile.get(new NodeEquivalenceClass(child)));
+                if (instanceProfile.get(new NodeEquivalenceClass(child)).size() > instanceProfile.get(new NodeEquivalenceClass(node)).size())
+                    System.out.println("reached");
                 if (nodeInstances.containsKey(child)) {
-                    child = nodeInstances.get(child);
-                    nodeChildren.set(i, child);
+                    Node match = nodeInstances.get(child);
+                    nodeChildren.set(i, match);
+                    child = match;
                 }
                 nodeChildIds.add(0, id + 1);
                 int retval = generateTreeInternal(id + 1, child);
@@ -1216,7 +1373,32 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private abstract class Node {
+    public class NodeEquivalenceClass {
+        private Node node;
+        public NodeEquivalenceClass(Node node) {
+            this.node = node;
+        }
+        public List<Node> cloneChildren() {
+            List<Node> res = new ArrayList<>();
+            for (Node child : node.children) {
+                res.add(child.clone());
+            }
+            return res;
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof NodeEquivalenceClass) {
+                return node.equivalenceClassEquals(((NodeEquivalenceClass) other).node);
+            }
+            return false;
+        }
+        @Override
+        public int hashCode() {
+            return node.equivalenceClassHashCode();
+        }
+    }
+
+    public abstract class Node {
         protected Item target;
         //protected int needed;
         protected List<CraftingProcess> processes;
@@ -1227,8 +1409,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         //protected int nodeId;
         //protected int timeTaken;
         //protected int callCounter;
+        private LinkedHashSet<Item> overlap = new LinkedHashSet<>();
         private boolean shouldPruneTarget = true;
-        private Class distinction = Node.class;
+        public Class distinction = Node.class;
         private static int totalNumCalls = 0;
         private static int maxNodeId = 0;
         public Node(Item target, List<CraftingProcess> processes) {
@@ -1282,7 +1465,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             /*while (!doCraft())
                 calculateMaxCraftable(amount);*/
         }
-        protected abstract List<Node> getChildrenInternal(HashSet<Item> nodes);
+        protected abstract List<Node> getChildrenInternal(LinkedHashSet<Item> nodes);
         private List<Node> getChildren(CraftingState state) {
             List<Node> res = new ArrayList<>();
             if (processes == null)
@@ -1299,10 +1482,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         protected abstract void calculateExecutionTime(int nodeId, Resources<OperableInteger> result, CraftingState state);
         private CraftingState createFreshState() {
-            HashMap<Item, Integer> inventoryAvailability = (HashMap<Item, Integer>) inventoryAvailabilityMap.clone();
-            HashMap<Item, Integer> storageAvailability = (HashMap<Item, Integer>) storageAvailabilityMap.clone();
-            HashMap<Block, Integer> worldAvailability = (HashMap<Block, Integer>) worldAvailabilityMap.clone();
-            CraftingState state = new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, new HashSet<>(), new HashMap<>());
+            LinkedHashMap<Item, Integer> inventoryAvailability = (LinkedHashMap<Item, Integer>) inventoryAvailabilityMap.clone();
+            LinkedHashMap<Item, Integer> storageAvailability = (LinkedHashMap<Item, Integer>) storageAvailabilityMap.clone();
+            LinkedHashMap<Block, Integer> worldAvailability = (LinkedHashMap<Block, Integer>) worldAvailabilityMap.clone();
+            CraftingState state = new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, new LinkedHashSet<>(), new LinkedHashMap<>());
             return state;
         }
         protected abstract void calculateLowerEfficiencyBound(int nodeId, CraftingState state);
@@ -1310,6 +1493,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (state.naiveMaxCraftable.getOrDefault(id, 0) == 0)
                 return;
             List<Integer> childIds = state.children.getOrDefault(id, new ArrayList<>());
+            if (childIds.size() != children.size())
+                System.out.println("reached");
             for (int i = 0; i < children.size(); i++) {
                 int childId = childIds.get(i);
                 Node child = children.get(i);
@@ -1535,7 +1720,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 state.visited.remove(target);
         }
         protected abstract boolean shouldRememberVisit();
-        public abstract HashMap<Item, ItemStack> collectIngredients();
+        public abstract LinkedHashMap<Item, ItemStack> collectIngredients();
         public abstract boolean execute(int nodeId, CraftingState state);
         public abstract int getOutputCount();
         public int getNeededToCraft(int amount) {
@@ -1551,6 +1736,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             hash = 31 * hash + target.hashCode();
             hash = 31 * hash + getClass().hashCode();
             hash = 31 * hash + distinction.hashCode();
+            hash = 31 * hash + overlap.hashCode();
+            hash = hashCodeInternal(hash);
+            return hash;
+        }
+        public int equivalenceClassHashCode() {
+            int hash = 7;
+            hash = 31 * hash + stackShift;
+            hash = 31 * hash + target.hashCode();
+            hash = 31 * hash + getClass().hashCode();
+            hash = 31 * hash + distinction.hashCode();
             hash = hashCodeInternal(hash);
             return hash;
         }
@@ -1561,13 +1756,32 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean equals(Object other) {
             if (other instanceof Node) {
                 Node o = (Node)other;
+                return overlap.size() == o.overlap.size() && target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equalsInternal(other) && overlap.equals(o.overlap);
+            }
+            return false;
+        }
+        public boolean equivalenceClassEquals(Object other) {
+            if (other instanceof Node) {
+                Node o = (Node)other;
                 return target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equalsInternal(other);
             }
             return false;
         }
+        protected abstract Node cloneInternal();
+        public Node clone() {
+            Node cloned = cloneInternal();
+            cloned.target = target;
+            cloned.stackShift = stackShift;
+            cloned.processes = new ArrayList<>(processes);
+            cloned.children = new ArrayList<>(children);
+            cloned.overlap = (LinkedHashSet<Item>) overlap.clone();
+            cloned.shouldPruneTarget = shouldPruneTarget;
+            cloned.distinction = distinction;
+            return cloned;
+        }
     }
 
-    private class SmeltingNode extends Node {
+    public class SmeltingNode extends Node {
         private Node fuel;
         private Node furnace;
         public SmeltingNode(Item target, List<CraftingProcess> processes) {
@@ -1597,9 +1811,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             List<Node> res = new ArrayList<>();
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             for (ItemStack stack : ingredients.values()) {
                 Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
                 CraftingPlan plan = getCraftingPlan(itemIdentifier);
@@ -1687,8 +1901,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            HashMap<Item, ItemStack> stackTypes = new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            LinkedHashMap<Item, ItemStack> stackTypes = new LinkedHashMap<>();
             for (Ingredient ing : ((SmeltingCraftingProcess)processes.get(0)).recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
@@ -1709,7 +1923,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         private int calculateCraftingOutput() {
             List<Ingredient> ingredients = ((SmeltingCraftingProcess)processes.get(0)).recipe.getIngredients();
-            HashMap<Item, ItemStack> collected = collectIngredients();
+            LinkedHashMap<Item, ItemStack> collected = collectIngredients();
             int output = Integer.MAX_VALUE;
             for (Ingredient ing : ingredients) {
                 if (ing.getMatchingStacks().length == 0)
@@ -1796,6 +2010,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return 31 * hash + ((SmeltingCraftingProcess) processes.get(0)).recipe.hashCode();
         }
         @Override
+        protected Node cloneInternal() {
+            SmeltingNode res = new SmeltingNode(target, processes);
+            res.fuel = fuel;
+            res.furnace = furnace;
+            return res;
+        }
+        @Override
         public boolean execute(int nodeId, CraftingState state) {
             if (!usingFurnace()) {
                 Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
@@ -1830,7 +2051,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class RecipeNode extends Node {
+    public class RecipeNode extends Node {
         public RecipeNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -1841,7 +2062,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             Pair<OperableInteger, ResourceDomain> item = src.get(nodeId);
             dest.put(nodeId, new Pair<>(new OperableInteger(num), item.getRight()));
             int neededToCraft = getNeededToCraft(num);
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             List<Integer> childIds = state.children.get(nodeId);
             for (int i = 0; i < children.size(); i++) {
@@ -1858,9 +2079,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             List<Node> res = new ArrayList<>();
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             for (ItemStack stack : ingredients.values()) {
                 Identifier itemIdentifier = Registry.ITEM.getId(stack.getItem());
                 CraftingPlan plan = getCraftingPlan(itemIdentifier);
@@ -1895,7 +2116,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow) {
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             int toConsume = 0;
             int amount = 0;
             if (resources.containsKey(nodeId))
@@ -1924,7 +2145,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return true;
         }
-        private int getChildNeededFactor(Node child, int num, int neededToCraft, HashMap<Item, ItemStack> ingredients, RecipeCraftingProcess process) {
+        private int getChildNeededFactor(Node child, int num, int neededToCraft, LinkedHashMap<Item, ItemStack> ingredients, RecipeCraftingProcess process) {
             if (child instanceof WorkbenchNode || child instanceof ToolNode)
                 return Math.min(1, num);
             return ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount());
@@ -1933,7 +2154,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic) {
             Resources<OperableInteger> res = new Resources<>();
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             int neededToCraft = getNeededToCraft(numNeeded);
             List<Integer> childIds = state.children.get(nodeId);
             for (int i = 0; i < children.size(); i++) {
@@ -1954,7 +2175,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return;
             }
             int outputFactor = Integer.MAX_VALUE;
-            HashMap<Item, ItemStack> ingredients = collectIngredients();
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             List<Integer> childIds = state.children.get(id);
             for (int i = 0; i < children.size(); i++) {
                 int childId = childIds.get(i);
@@ -1973,8 +2194,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            HashMap<Item, ItemStack> stackTypes = new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            LinkedHashMap<Item, ItemStack> stackTypes = new LinkedHashMap<>();
             for (Ingredient ing : ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
@@ -1995,7 +2216,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         private int calculateCraftingOutput() {
             List<Ingredient> ingredients = ((RecipeCraftingProcess)processes.get(0)).recipe.getIngredients();
-            HashMap<Item, ItemStack> collected = collectIngredients();
+            LinkedHashMap<Item, ItemStack> collected = collectIngredients();
             int output = Integer.MAX_VALUE;
             for (Ingredient ing : ingredients) {
                 if (ing.getMatchingStacks().length == 0)
@@ -2069,6 +2290,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return 31 * hash + ((RecipeCraftingProcess) processes.get(0)).recipe.hashCode();
         }
         @Override
+        protected Node cloneInternal() {
+            return new RecipeNode(target, processes);
+        }
+        @Override
         public boolean execute(int nodeId, CraftingState state) {
             boolean useInventory = false;
             if (!usingCraftingTable()) {
@@ -2111,12 +2336,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class ChoiceNode extends Node {
+    public class ChoiceNode extends Node {
         public ChoiceNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             List<Node> res = new ArrayList<>();
             for (CraftingProcess process : processes) {
                 int m = process.getMultiplicity();
@@ -2205,7 +2430,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (childRes.getLeft()) {
                     bestEfficiency = Math.min(bestEfficiency, newState.efficiencyMap.getOrDefault(childId, Double.POSITIVE_INFINITY));
                     options.add(new Pair<>(prioritizedPair, childRes));
-                    state.efficiencyMap = (HashMap<Integer, Double>) newState.efficiencyMap.clone();
+                    state.efficiencyMap = (LinkedHashMap<Integer, Double>) newState.efficiencyMap.clone();
                 }
                 newState = state.clone();
             }
@@ -2281,8 +2506,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (child.naiveMaxCraftable == 0)
                     continue;
                 CraftingState newState = state.clone();
-                HashMap<Integer, Integer> newNeededMap = (HashMap<Integer, Integer>) neededMap.clone();
-                HashMap<Item, HashMap<Integer, Integer>> newExcess = deepcopyExcess(excess);
+                LinkedHashMap<Integer, Integer> newNeededMap = (LinkedHashMap<Integer, Integer>) neededMap.clone();
+                LinkedHashMap<Item, LinkedHashMap<Integer, Integer>> newExcess = deepcopyExcess(excess);
                 int amount = 0;
                 Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
                 while (numNeeded > 0 && childRes.getLeft()) {
@@ -2311,8 +2536,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2322,12 +2547,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new ChoiceNode(target, processes);
+        }
     }
 
-    private class Resources<T extends ArithmeticOperable> {
-        private HashMap<Integer, Pair<T, ResourceDomain>> resources;
+    public class Resources<T extends ArithmeticOperable> {
+        private LinkedHashMap<Integer, Pair<T, ResourceDomain>> resources;
         public Resources() {
-            resources = new HashMap<>();
+            resources = new LinkedHashMap<>();
         }
         public void put(int nodeId, Pair<T, ResourceDomain> res) {
             resources.put(nodeId, res);
@@ -2384,7 +2613,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         int ceil();
     }
 
-    private class OperableInteger implements ArithmeticOperable<OperableInteger> {
+    public class OperableInteger implements ArithmeticOperable<OperableInteger> {
         private int value;
 
         public OperableInteger(int value) {
@@ -2420,7 +2649,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class Fraction implements ArithmeticOperable<Fraction> {
+    public class Fraction implements ArithmeticOperable<Fraction> {
         private int numerator;
         private int denominator;
 
@@ -2472,7 +2701,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    private class InventoryNode extends Node {
+    public class InventoryNode extends Node {
         public InventoryNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -2488,7 +2717,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return state.inventoryAvailability.getOrDefault(target, 0) > 0;
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             return new ArrayList<>();
         }
         @Override
@@ -2517,8 +2746,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2528,9 +2757,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new InventoryNode(target, processes);
+        }
     }
 
-    private class StorageNode extends Node {
+    public class StorageNode extends Node {
         public StorageNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -2546,7 +2779,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return state.storageAvailability.getOrDefault(target, 0) > 0;
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             return new ArrayList<>();
         }
         @Override
@@ -2584,8 +2817,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2595,9 +2828,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new StorageNode(target, processes);
+        }
     }
 
-    private class WorldNode extends Node {
+    public class WorldNode extends Node {
         private Item dropped;
         private Block block;
         public WorldNode(Item dropped, Block block, List<CraftingProcess> processes) {
@@ -2621,7 +2858,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             Block block = ((WorldCraftingProcess) processes.get(0)).block;
             if (block.getDefaultState().isToolRequired())
                 return List.of(new ToolCraftingProcess(block).getNode());
@@ -2686,8 +2923,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2712,9 +2949,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return false;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new WorldNode(dropped, block, processes);
+        }
     }
 
-    private class PathingNode extends Node {
+    public class PathingNode extends Node {
         public PathingNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -2726,7 +2967,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             dest.put(nodeId, new Pair<>(new OperableInteger(num), item.getRight()));
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             return new ArrayList<>();
         }
         @Override
@@ -2757,8 +2998,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2777,9 +3018,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new PathingNode(target, processes);
+        }
     }
 
-    private class PlacementNode extends Node {
+    public class PlacementNode extends Node {
         public PlacementNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -2799,7 +3044,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             CraftingPlan plan = getCraftingPlan(Registry.ITEM.getId(target));
             List<CraftingProcess> processes = new ArrayList<>();
             for (CraftingProcess process : plan.processes) {
@@ -2858,8 +3103,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2872,9 +3117,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new PlacementNode(target, processes);
+        }
     }
 
-    private class WorkbenchNode extends Node {
+    public class WorkbenchNode extends Node {
         public WorkbenchNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
         }
@@ -2894,7 +3143,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             List<CraftingProcess> processes = new ArrayList<>();
             processes.add(new PathingCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
             processes.add(new PlacementCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
@@ -2964,8 +3213,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -2975,9 +3224,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        @Override
+        protected Node cloneInternal() {
+            return new WorkbenchNode(target, processes);
+        }
     }
 
-    private class ToolNode extends Node {
+    public class ToolNode extends Node {
         public ToolNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
             setShouldPruneTarget(false);
@@ -2998,7 +3251,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected List<Node> getChildrenInternal(HashSet<Item> nodes) {
+        protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             Set<Item> matchingTools = toolManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
             List<CraftingProcess> toolProcesses = new ArrayList<>();
             for (Item tool : matchingTools) {
@@ -3107,8 +3360,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return false;
         }
         @Override
-        public HashMap<Item, ItemStack> collectIngredients() {
-            return new HashMap<>();
+        public LinkedHashMap<Item, ItemStack> collectIngredients() {
+            return new LinkedHashMap<>();
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
@@ -3117,6 +3370,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         public int getOutputCount() {
             return 1;
+        }
+        @Override
+        protected Node cloneInternal() {
+            return new ToolNode(target, processes);
         }
     }
 
@@ -3136,7 +3393,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return getCraftingPlan(identifier).getNode();
     }
 
-    private class CraftingQueueEntry {
+    public class CraftingQueueEntry {
         private Identifier itemId;
         private int count;
         private boolean craftAll;
@@ -3170,7 +3427,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private void initSlotUpdates() {
-        latestSlotUpdates = new HashMap<>();
+        latestSlotUpdates = new LinkedHashMap<>();
     }
 
     public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
@@ -3211,7 +3468,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     public void storageContainerContent(int syncId, List<ItemStack> content) {
         if (isStorageContainerHandler(MC.player.currentScreenHandler)) {
-            HashMap<Item, Integer> contentMap = new HashMap<>();
+            LinkedHashMap<Item, Integer> contentMap = new LinkedHashMap<>();
             for (int i = 0; i < content.size() - 36; i++) {
                 ItemStack stack = content.get(i);
                 if (stack.getCount() > 0)
@@ -3256,16 +3513,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int initialCount = inventoryAvailabilityMap.getOrDefault(item, 0);
             inventoryAvailabilityMap.put(item, 0);
             if (craftAll) {
-                root = makeRootNode(itemId, getMaxCraftable(itemId, CraftingParams.VERIFY_AND_GENERATE, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, worldAvailabilityMap, new HashSet<>())));
+                root = makeRootNode(itemId, getMaxCraftable(itemId, CraftingParams.VERIFY_AND_GENERATE, new CraftingState(inventoryAvailabilityMap, storageAvailabilityMap, worldAvailabilityMap, new LinkedHashSet<>())));
             }
             CraftingState verificationState = root.verify();
             if (verificationState.success) {
-                HashMap<Item, Integer> obtainFromStorage = new HashMap<>();
+                LinkedHashMap<Item, Integer> obtainFromStorage = new LinkedHashMap<>();
                 for (StorageNode node : verificationState.storageNodes) {
                     obtainFromStorage.put(node.target, obtainFromStorage.getOrDefault(node.target, 0) + node.needed);
                     storageAvailabilityMap.put(node.target, storageAvailabilityMap.getOrDefault(node.target, 0) - node.needed);
                 }
-                HashMap<Item, Integer> original = (HashMap<Item, Integer>) obtainFromStorage.clone();
+                LinkedHashMap<Item, Integer> original = (LinkedHashMap<Item, Integer>) obtainFromStorage.clone();
                 containerQuery.acquire(obtainFromStorage);
                 for (Item originalItem : original.keySet()) {
                     inventoryAvailabilityMap.put(originalItem, inventoryAvailabilityMap.getOrDefault(originalItem, 0) + (original.get(originalItem) - obtainFromStorage.getOrDefault(originalItem, 0)));
@@ -3316,7 +3573,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     if (doneCrafting) {
                         synchronized (totalInventoryAvailabilityMap) {
                             totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
-                            inventoryAvailabilityMap = (HashMap<Item, Integer>) totalInventoryAvailabilityMap.clone();
+                            inventoryAvailabilityMap = (LinkedHashMap<Item, Integer>) totalInventoryAvailabilityMap.clone();
                         }
                         storageAvailabilityMap = containerQuery.getAvailabilityMap();
                         worldAvailabilityMap = worldQuery.getAvailabilityMap();
