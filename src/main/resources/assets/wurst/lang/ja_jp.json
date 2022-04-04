@@ -73,7 +73,7 @@
   "description.wurst.hack.instantbunker": "あたりに小さなバンカーを作る。57個のブロックが必要。",
   "description.wurst.hack.invwalk": "インベントリを開いた状態で歩けるようになる。",
   "description.wurst.setting.invwalk.allow_clickgui": "WurstのClickGUIを開いた状態で歩けるようになる。",
-  "description.wurst.setting.invwalk.allow_other": "その他のゲームメニュー（チェストや馬のメニュー、村人との取引画面など）を開いた状態で歩けるようになる。",
+  "description.wurst.setting.invwalk.allow_other": "その他の文字入力の必要のないゲームメニュー（チェストや馬のメニュー、村人との取引画面など）を開いた状態で歩けるようになる。",
   "description.wurst.hack.itemesp": "周囲のアイテムをハイライト表示する。",
   "description.wurst.hack.itemgenerator": "ランダムにアイテムを生成し地面に捨て続ける。\n§oクリエイティブモードのみ。§r",
   "description.wurst.hack.jesus": "水面を歩けるようになる。\n忍者はこのハックを使用していたらしい。",
