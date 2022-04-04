@@ -30,15 +30,18 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.lwjgl.system.CallbackI;
 
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AutoCraftHack extends Hack implements UpdateListener {
@@ -1188,6 +1191,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public void generateTree(int id, Node node) {
             long startTime = System.currentTimeMillis();
             generateNodeInstanceGraph(node, new LinkedHashMap<>());
+            generateInstanceProfiles(new NodeEquivalenceClass(node));
             int diff = (int)(System.currentTimeMillis() - startTime);
             generateTreeInternal(id, node);
             node.genNaiveMaxCraftable(id, this);
@@ -1195,6 +1199,132 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private void clearInstanceGraph(Node node) {
             equivalenceRelation.remove(new NodeEquivalenceClass(node));
             instanceProfile.remove(new NodeEquivalenceClass(node));
+        }
+        private void populateIntegerGraph(NodeEquivalenceClass node, AtomicInteger id, LinkedHashMap<Integer, NodeEquivalenceClass> forwardMapping, LinkedHashMap<NodeEquivalenceClass, Integer> reverseMapping, LinkedHashMap<Integer, List<Integer>> graph) {
+            int nodeId = id.get();
+            forwardMapping.put(nodeId, node);
+            reverseMapping.put(node, nodeId);
+            List<Integer> outboundEdges = new ArrayList<>();
+            graph.put(nodeId, outboundEdges);
+            for (Node child : node.node.children) {
+                NodeEquivalenceClass childEquivalenceClass = new NodeEquivalenceClass(child);
+                if (reverseMapping.containsKey(childEquivalenceClass)) {
+                    outboundEdges.add(reverseMapping.get(childEquivalenceClass));
+                }
+                else {
+                    id.set(id.get() + 1);
+                    outboundEdges.add(id.get());
+                    populateIntegerGraph(childEquivalenceClass, id, forwardMapping, reverseMapping, graph);
+                }
+            }
+        }
+        private Pair<LinkedHashMap<Integer, NodeEquivalenceClass>, LinkedHashMap<Integer, List<Integer>>> convertToIntegerGraph(NodeEquivalenceClass rootNode, int rootId) {
+            LinkedHashMap<Integer, NodeEquivalenceClass> forwardMapping = new LinkedHashMap<>();
+            LinkedHashMap<NodeEquivalenceClass, Integer> reverseMapping = new LinkedHashMap<>();
+            LinkedHashMap<Integer, List<Integer>> integerGraph = new LinkedHashMap<>();
+            populateIntegerGraph(rootNode, new AtomicInteger(rootId), forwardMapping, reverseMapping, integerGraph);
+            return new Pair<>(forwardMapping, integerGraph);
+        }
+        private LinkedHashMap<Integer, List<Integer>> graphTranspose(LinkedHashMap<Integer, List<Integer>> graph) {
+            LinkedHashMap<Integer, List<Integer>> res = new LinkedHashMap<>();
+            for (Integer node : graph.keySet()) {
+                List<Integer> nodeChildren = graph.get(node);
+                for (Integer child : nodeChildren) {
+                    if (!res.containsKey(child))
+                        res.put(child, new ArrayList<>());
+                    res.get(child).add(node);
+                }
+            }
+            return res;
+        }
+        private void graphDFS(Stack<Integer> stack, LinkedHashSet<Integer> visited, LinkedHashMap<Integer, List<Integer>> graph, int id) {
+            visited.add(id);
+            List<Integer> nodeChildren = graph.get(id);
+            for (int child : nodeChildren) {
+                if (!visited.contains(child))
+                    graphDFS(stack, visited, graph, child);
+            }
+            stack.push(id);
+        }
+        private void transposeGraphDFS(LinkedHashSet<Integer> component, LinkedHashSet<Integer> visited, LinkedHashSet<Integer> totalNodes, LinkedHashMap<Integer, List<Integer>> graph, int id) {
+            visited.add(id);
+            List<Integer> nodeChildren = graph.get(id);
+            for (int child : nodeChildren) {
+                if (!visited.contains(child) && !totalNodes.contains(child))
+                    transposeGraphDFS(component, visited, totalNodes, graph, child);
+            }
+            component.add(id);
+        }
+        private List<LinkedHashSet<NodeEquivalenceClass>> findStronglyConnectedComponents(NodeEquivalenceClass rootNode) {
+            int rootId = 0;
+            Pair<LinkedHashMap<Integer, NodeEquivalenceClass>, LinkedHashMap<Integer, List<Integer>>> graphPair = convertToIntegerGraph(rootNode, rootId);
+            LinkedHashMap<Integer, NodeEquivalenceClass> nodeMapping = graphPair.getLeft();
+            LinkedHashMap<Integer, List<Integer>> graph = graphPair.getRight();
+            LinkedHashMap<Integer, List<Integer>> transpose = graphTranspose(graph);
+            Stack<Integer> nodeStack = new Stack<>();
+            graphDFS(nodeStack, new LinkedHashSet<>(), graph, rootId);
+            LinkedHashSet<Integer> totalNodes = new LinkedHashSet<>();
+            List<LinkedHashSet<NodeEquivalenceClass>> res = new ArrayList<>();
+            while (!nodeStack.empty()) {
+                int id = nodeStack.pop();
+                if (!transpose.containsKey(id))
+                    transpose.put(id, new ArrayList<>());
+                if (totalNodes.contains(id))
+                    continue;
+                LinkedHashSet<Integer> component = new LinkedHashSet<>();
+                transposeGraphDFS(component, new LinkedHashSet<>(), totalNodes, transpose, id);
+                totalNodes.addAll(component);
+                res.add(component.stream().map(nodeMapping::get).collect(Collectors.toCollection(LinkedHashSet::new)));
+            }
+            return res;
+        }
+        private void calculateComponentProfile(List<LinkedHashSet<NodeEquivalenceClass>> components, LinkedHashMap<Integer, LinkedHashSet<Item>> componentProfiles, LinkedHashMap<Integer, LinkedHashSet<Integer>> componentGraph, int component) {
+            LinkedHashSet<Item> res = components.get(component).stream().filter(node -> node.node.shouldPruneTarget).map(node -> node.node.target).collect(Collectors.toCollection(LinkedHashSet::new));
+            if (componentGraph.containsKey(component)) {
+                for (int childComponent : componentGraph.get(component)) {
+                    if (!componentProfiles.containsKey(childComponent)) {
+                        calculateComponentProfile(components, componentProfiles, componentGraph, childComponent);
+                    }
+                    res.addAll(componentProfiles.get(childComponent));
+                }
+            }
+            componentProfiles.put(component, res);
+        }
+        private void generateInstanceProfiles(NodeEquivalenceClass rootNode) {
+            List<LinkedHashSet<NodeEquivalenceClass>> components = findStronglyConnectedComponents(rootNode);
+            LinkedHashMap<NodeEquivalenceClass, Integer> nodeComponentMap = new LinkedHashMap<>();
+            for (int i = 0; i < components.size(); i++) {
+                LinkedHashSet<NodeEquivalenceClass> component = components.get(i);
+                for (NodeEquivalenceClass node : component) {
+                    nodeComponentMap.put(node, i);
+                }
+            }
+            LinkedHashMap<Integer, LinkedHashSet<Integer>> componentGraph = new LinkedHashMap<>();
+            for (NodeEquivalenceClass node : nodeComponentMap.keySet()) {
+                int component = nodeComponentMap.get(node);
+                for (Node child : node.node.children) {
+                    NodeEquivalenceClass childClass = new NodeEquivalenceClass(child);
+                    int childComponent = nodeComponentMap.get(childClass);
+                    if (component == childComponent)
+                        continue;
+                    if (!componentGraph.containsKey(component))
+                        componentGraph.put(component, new LinkedHashSet<>());
+                    componentGraph.get(component).add(childComponent);
+                }
+            }
+            LinkedHashMap<Integer, LinkedHashSet<Item>> componentProfiles = new LinkedHashMap<>();
+            for (int i = 0; i < components.size(); i++) {
+                if (componentProfiles.containsKey(i))
+                    continue;
+                calculateComponentProfile(components, componentProfiles, componentGraph, i);
+            }
+            for (int i = 0; i < components.size(); i++) {
+                LinkedHashSet<NodeEquivalenceClass> component = components.get(i);
+                LinkedHashSet<Item> componentProfile = componentProfiles.get(i);
+                for (NodeEquivalenceClass node : component) {
+                    instanceProfile.put(node, componentProfile);
+                }
+            }
         }
         private NodeGraphGenerationInfo generateNodeInstanceGraph(Node node, LinkedHashMap<Node, Node> ancestors) {
             if (!node.canPossiblyCraft(this))
@@ -1204,19 +1334,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (node.shouldRememberVisit())
                 visited.add(node.target);*/
             assert !equivalenceRelation.containsKey(new NodeEquivalenceClass(node));
-            if (Registry.ITEM.getId(node.target).getPath().equals("furnace") && node instanceof RecipeNode && node.stackShift == 0)
-                System.out.println("reached");
             ancestors.put(node, node);
             NodeEquivalenceClass equivalenceClass = new NodeEquivalenceClass(node);
             List<NodeEquivalenceClass> newEquivalenceClasses = new ArrayList<>();
-            List<NodeEquivalenceClass> newProfiles = new ArrayList<>();
+            //List<NodeEquivalenceClass> newProfiles = new ArrayList<>();
             equivalenceRelation.put(equivalenceClass, equivalenceClass);
             newEquivalenceClasses.add(equivalenceClass);
             List<Node> nodeChildren = node.getChildren(this);
             node.children = nodeChildren;
-            LinkedHashSet<Item> profile = new LinkedHashSet<>();
-            if (node.shouldPruneTarget)
-                profile.add(node.target);
+            //LinkedHashSet<Item> profile = new LinkedHashSet<>();
+            //if (node.shouldPruneTarget)
+            //    profile.add(node.target);
             LinkedHashMap<Node, LinkedHashSet<Node>> res = new LinkedHashMap<>();
             boolean removedChildren = false;
             for (int i = nodeChildren.size() - 1; i >= 0; i--) {
@@ -1226,7 +1354,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     nodeChildren.set(i, ancestors.get(child));
                 }
                 else if (equivalenceRelation.containsKey(new NodeEquivalenceClass(child))) {
-                    profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
+                    //profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
                     nodeChildren.set(i, equivalenceRelation.get(new NodeEquivalenceClass(child)).node);
                 }
                 else {
@@ -1235,12 +1363,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         for (NodeEquivalenceClass n : childRes.newEquivalenceClasses) {
                             equivalenceRelation.remove(n);
                         }
-                        for (NodeEquivalenceClass n : childRes.newProfiles) {
-                            instanceProfile.remove(n);
-                        }
+                        //for (NodeEquivalenceClass n : childRes.newProfiles) {
+                        //    instanceProfile.remove(n);
+                        //}
                         if (node.requiresAllChildren()) {
                             ancestors.remove(node);
-                            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, newProfiles).failure();
+                            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, null).failure();
                         }
                         else {
                             removedChildren = true;
@@ -1249,9 +1377,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                     else {
                         newEquivalenceClasses.addAll(childRes.newEquivalenceClasses);
-                        newProfiles.addAll(childRes.newProfiles);
+                        //newProfiles.addAll(childRes.newProfiles);
                         mergeNodeBacklogs(res, childRes.backlog);
-                        profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
+                        //profile.addAll(instanceProfile.get(new NodeEquivalenceClass(child)));
                     }
                 }
             }
@@ -1266,7 +1394,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     for (Node backloggedAncestor : res.keySet()) {
                         addToNodeBacklog(res, backloggedAncestor, descendant);
                     }
-                    instanceProfile.get(new NodeEquivalenceClass(descendant)).addAll(profile);
+                    //instanceProfile.get(new NodeEquivalenceClass(descendant)).addAll(profile);
                 }
                 res.remove(node);
             }
@@ -1274,13 +1402,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 res.get(key).add(node);
             }
             NodeEquivalenceClass profileClass = new NodeEquivalenceClass(node);
-            instanceProfile.put(profileClass, profile);
-            newProfiles.add(profileClass);
+            //instanceProfile.put(profileClass, profile);
+            //newProfiles.add(profileClass);
             ancestors.remove(node);
-            if (ancestors.size() == 0 && res.size() != 0)
-                System.out.println("reached");
             assert ancestors.size() != 0 || (res.size() == 0);
-            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, newProfiles).success();
+            return new NodeGraphGenerationInfo(res, newEquivalenceClasses, null).success();
         }
         private void addToNodeBacklog(LinkedHashMap<Node, LinkedHashSet<Node>> backlog, Node dest, Node src) {
             LinkedHashSet<Node> entry = backlog.getOrDefault(dest, new LinkedHashSet<>());
@@ -1314,8 +1440,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             assert !nodeInstances.containsKey(node);
             assert equivalenceRelation.containsKey(new NodeEquivalenceClass(node));
             assert equivalenceRelation.get(new NodeEquivalenceClass(node)) != null;
-            if (Registry.ITEM.getId(node.target).getPath().equals("deepslate") && node instanceof ChoiceNode && node.distinction.equals(ToolNode.class))
-                System.out.println("reached");
             if (node.shouldPruneTarget && visited.contains(node.target))
                 return -1;
             if (node.shouldRememberVisit())
@@ -1339,8 +1463,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 assert equivalenceRelation.containsKey(new NodeEquivalenceClass(child));
                 assert instanceProfile.containsKey(new NodeEquivalenceClass(child));
                 child.overlap = LinkedHashSetOverlap(visited, instanceProfile.get(new NodeEquivalenceClass(child)));
-                if (instanceProfile.get(new NodeEquivalenceClass(child)).size() > instanceProfile.get(new NodeEquivalenceClass(node)).size())
-                    System.out.println("reached");
                 if (nodeInstances.containsKey(child)) {
                     Node match = nodeInstances.get(child);
                     nodeChildren.set(i, match);
@@ -1493,8 +1615,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (state.naiveMaxCraftable.getOrDefault(id, 0) == 0)
                 return;
             List<Integer> childIds = state.children.getOrDefault(id, new ArrayList<>());
-            if (childIds.size() != children.size())
-                System.out.println("reached");
             for (int i = 0; i < children.size(); i++) {
                 int childId = childIds.get(i);
                 Node child = children.get(i);
