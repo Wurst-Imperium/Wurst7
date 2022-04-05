@@ -18,8 +18,9 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
+import net.wurstclient.core.MCScreen;
 
-public final class EditSliderScreen extends Screen
+public final class EditSliderScreen extends MCScreen
 {
 	private final Screen prevScreen;
 	private final SliderSetting slider;

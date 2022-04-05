@@ -28,8 +28,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
+import net.wurstclient.core.MCScreen;
 
-public final class EditColorScreen extends Screen
+public final class EditColorScreen extends MCScreen
 {
 	private final Screen prevScreen;
 	private final ColorSetting colorSetting;

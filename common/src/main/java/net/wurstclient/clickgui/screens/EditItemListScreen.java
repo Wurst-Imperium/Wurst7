@@ -31,8 +31,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ListWidget;
+import net.wurstclient.core.MCScreen;
 
-public final class EditItemListScreen extends Screen {
+public final class EditItemListScreen extends MCScreen {
 	private final Screen prevScreen;
 	private final ItemListSetting itemList;
 

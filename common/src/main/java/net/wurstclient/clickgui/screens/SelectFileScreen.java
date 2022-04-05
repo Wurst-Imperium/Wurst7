@@ -24,8 +24,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.ListWidget;
+import net.wurstclient.core.MCScreen;
 
-public final class SelectFileScreen extends Screen
+public final class SelectFileScreen extends MCScreen
 {
 	private final Screen prevScreen;
 	private final FileSetting setting;

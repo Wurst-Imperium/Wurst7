@@ -11,8 +11,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.core.MCScreen;
 
-public final class ClickGuiScreen extends Screen
+
+public final class ClickGuiScreen extends MCScreen
 {
 	private final ClickGui gui;
 	

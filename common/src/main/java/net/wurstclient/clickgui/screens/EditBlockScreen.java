@@ -25,8 +25,9 @@ import net.minecraft.text.LiteralText;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.core.MCScreen;
 
-public final class EditBlockScreen extends Screen
+public final class EditBlockScreen extends MCScreen
 {
 	private final Screen prevScreen;
 	private final BlockSetting setting;
