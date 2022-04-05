@@ -14,12 +14,15 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.HungerManager;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.FoodComponents;
 import net.minecraft.item.Item;
@@ -32,18 +35,38 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto eat", "AutoFood", "auto food", "AutoFeeder", "auto feeder",
 	"AutoFeeding", "auto feeding", "AutoSoup", "auto soup"})
 public final class AutoEatHack extends Hack implements UpdateListener
 {
+	private final SliderSetting targetHunger = new SliderSetting(
+		"Target hunger",
+		"Tries to keep the hunger bar at or above this level, but only if it doesn't waste any hunger points.",
+		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting minHunger = new SliderSetting("Min hunger",
+		"Always keeps the hunger bar at or above this level, even if it wastes some hunger points.\n\n"
+			+ "A value of 10 always allows for fast healing, but wastes the most hunger points. Recommended if you have lots of food and/or lots of combat.\n\n"
+			+ "A value of 6.5 cannot cause any waste with vanilla food items, but still gives a good amount of points for sprinting. Recommended if you have if you don't have much food.",
+		6.5, 0, 10, 0.5, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting injuredHunger = new SliderSetting(
+		"Injured hunger",
+		"Fills the hunger bar to at least this level when you are injured, even if it wastes some hunger points.\n"
+			+ "10.0 - fastest healing\n" + "9.0 - slowest healing\n"
+			+ "8.5 or lower - no healing\n" + "3.0 or lower - no sprinting",
+		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting injuryThreshold =
+		new SliderSetting("Injury threshold",
+			"Prevents small injuries from wasting all your food.", 1.5, 0, 10,
+			0.5, ValueDisplay.DECIMAL);
+	
 	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
 		"Eat while walking", "Slows you down, not recommended.", false);
-	
-	private final EnumSetting<FoodPriority> foodPriority =
-		new EnumSetting<>("Prefer food with", FoodPriority.values(),
-			FoodPriority.HIGH_SATURATION);
 	
 	private final CheckboxSetting allowHunger =
 		new CheckboxSetting("Allow hunger effect",
@@ -62,14 +85,21 @@ public final class AutoEatHack extends Hack implements UpdateListener
 				+ "Not recommended.",
 			false);
 	
+	// TODO: "Take items from" setting (like AnchorAura)
+	
 	private int oldSlot = -1;
 	
 	public AutoEatHack()
 	{
 		super("AutoEat");
 		setCategory(Category.ITEMS);
+		
+		addSetting(targetHunger);
+		addSetting(minHunger);
+		addSetting(injuredHunger);
+		addSetting(injuryThreshold);
+		
 		addSetting(eatWhileWalking);
-		addSetting(foodPriority);
 		addSetting(allowHunger);
 		addSetting(allowPoison);
 		addSetting(allowChorus);
@@ -85,43 +115,106 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		stopIfEating();
+		
+		if(isEating())
+			stopEating();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		ClientPlayerEntity player = MC.player;
+		
 		if(!shouldEat())
 		{
-			stopIfEating();
+			if(isEating())
+				stopEating();
+			
 			return;
 		}
 		
-		int bestSlot = getBestSlot();
-		if(bestSlot == -1)
+		HungerManager hungerManager = player.getHungerManager();
+		int foodLevel = hungerManager.getFoodLevel();
+		int targetHungerI = (int)(targetHunger.getValue() * 2);
+		int minHungerI = (int)(minHunger.getValue() * 2);
+		int injuredHungerI = (int)(injuredHunger.getValue() * 2);
+		
+		if(isInjured(player) && foodLevel < injuredHungerI)
 		{
-			stopIfEating();
+			eat(-1);
+			return;
+		}
+		
+		if(foodLevel < minHungerI)
+		{
+			eat(-1);
+			return;
+		}
+		
+		if(foodLevel < targetHungerI)
+		{
+			int maxPoints = targetHungerI - foodLevel;
+			eat(maxPoints);
+		}
+	}
+	
+	private void eat(int maxPoints)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		int foodSlot = findBestFoodSlot(maxPoints);
+		
+		if(foodSlot == -1)
+		{
+			if(isEating())
+				stopEating();
+			
 			return;
 		}
 		
 		// save old slot
 		if(!isEating())
-			oldSlot = MC.player.getInventory().selectedSlot;
+			oldSlot = inventory.selectedSlot;
 		
-		// set slot
-		MC.player.getInventory().selectedSlot = bestSlot;
+		// select food
+		inventory.selectedSlot = foodSlot;
 		
 		// eat food
 		MC.options.useKey.setPressed(true);
 		IMC.getInteractionManager().rightClickItem();
 	}
 	
-	private int getBestSlot()
+	private boolean shouldEat()
+	{
+		if(MC.player.getAbilities().creativeMode)
+			return false;
+		
+		if(!MC.player.canConsume(false))
+			return false;
+		
+		if(!eatWhileWalking.isChecked()
+			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
+			return false;
+		
+		if(isClickable(MC.crosshairTarget))
+			return false;
+		
+		return true;
+	}
+	
+	private void stopEating()
+	{
+		MC.options.useKey.setPressed(false);
+		MC.player.getInventory().selectedSlot = oldSlot;
+		oldSlot = -1;
+	}
+	
+	private int findBestFoodSlot(int maxPoints)
 	{
 		int bestSlot = -1;
 		FoodComponent bestFood = null;
 		Comparator<FoodComponent> comparator =
-			foodPriority.getSelected().comparator;
+			Comparator.<FoodComponent> comparingDouble(
+				FoodComponent::getSaturationModifier);
 		
 		for(int i = 0; i < 9; i++)
 		{
@@ -132,6 +225,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			
 			FoodComponent food = item.getFoodComponent();
 			if(!isAllowedFood(food))
+				continue;
+			
+			if(maxPoints >= 0 && food.getHunger() > maxPoints)
 				continue;
 			
 			// compare to previously found food
@@ -164,22 +260,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		return true;
 	}
 	
-	private boolean shouldEat()
+	public boolean isEating()
 	{
-		if(MC.player.getAbilities().creativeMode)
-			return false;
-		
-		if(!MC.player.canConsume(false))
-			return false;
-		
-		if(!eatWhileWalking.isChecked()
-			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
-			return false;
-		
-		if(isClickable(MC.crosshairTarget))
-			return false;
-		
-		return true;
+		return oldSlot != -1;
 	}
 	
 	private boolean isClickable(HitResult hitResult)
@@ -208,52 +291,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		return false;
 	}
 	
-	public boolean isEating()
+	private boolean isInjured(ClientPlayerEntity player)
 	{
-		return oldSlot != -1;
-	}
-	
-	private void stopIfEating()
-	{
-		if(!isEating())
-			return;
-		
-		MC.options.useKey.setPressed(false);
-		
-		MC.player.getInventory().selectedSlot = oldSlot;
-		oldSlot = -1;
-	}
-	
-	public static enum FoodPriority
-	{
-		HIGH_HUNGER("High Food Points",
-			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)),
-		
-		HIGH_SATURATION("High Saturation",
-			Comparator.<FoodComponent> comparingDouble(
-				FoodComponent::getSaturationModifier)),
-		
-		LOW_HUNGER("Low Food Points",
-			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)
-				.reversed()),
-		
-		LOW_SATURATION("Low Saturation",
-			Comparator.<FoodComponent> comparingDouble(
-				FoodComponent::getSaturationModifier).reversed());
-		
-		private final String name;
-		private final Comparator<FoodComponent> comparator;
-		
-		private FoodPriority(String name, Comparator<FoodComponent> comparator)
-		{
-			this.name = name;
-			this.comparator = comparator;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
+		int injuryThresholdI = (int)(injuryThreshold.getValue() * 2);
+		return player.getHealth() < player.getMaxHealth() - injuryThresholdI;
 	}
 }
