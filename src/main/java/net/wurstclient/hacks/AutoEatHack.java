@@ -7,7 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
@@ -34,7 +36,9 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
@@ -60,10 +64,17 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			+ "8.5 or lower - no healing\n" + "3.0 or lower - no sprinting",
 		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
 	
-	private final SliderSetting injuryThreshold =
-		new SliderSetting("Injury threshold",
-			"Prevents small injuries from wasting all your food.", 1.5, 0, 10,
-			0.5, ValueDisplay.DECIMAL);
+	private final SliderSetting injuryThreshold = new SliderSetting(
+		"Injury threshold",
+		"Prevents small injuries from wasting all your food. AutoEat will only consider you injured if you have lost at least this number of hearts.",
+		1.5, 0.5, 10, 0.5, ValueDisplay.DECIMAL);
+	
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
+		new EnumSetting<>("Take items from", "Where to look for food.",
+			TakeItemsFrom.values(), TakeItemsFrom.HOTBAR);
+	
+	private final CheckboxSetting allowOffhand =
+		new CheckboxSetting("Allow offhand", true);
 	
 	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
 		"Eat while walking", "Slows you down, not recommended.", false);
@@ -85,8 +96,6 @@ public final class AutoEatHack extends Hack implements UpdateListener
 				+ "Not recommended.",
 			false);
 	
-	// TODO: "Take items from" setting (like AnchorAura)
-	
 	private int oldSlot = -1;
 	
 	public AutoEatHack()
@@ -98,6 +107,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		addSetting(minHunger);
 		addSetting(injuredHunger);
 		addSetting(injuryThreshold);
+		
+		addSetting(takeItemsFrom);
+		addSetting(allowOffhand);
 		
 		addSetting(eatWhileWalking);
 		addSetting(allowHunger);
@@ -171,16 +183,95 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		// save old slot
-		if(!isEating())
-			oldSlot = inventory.selectedSlot;
-		
 		// select food
-		inventory.selectedSlot = foodSlot;
+		if(foodSlot < 9)
+		{
+			if(!isEating())
+				oldSlot = inventory.selectedSlot;
+			
+			inventory.selectedSlot = foodSlot;
+			
+		}else if(foodSlot == 40)
+		{
+			if(!isEating())
+				oldSlot = inventory.selectedSlot;
+			
+			// off-hand slot, no need to select anything
+			
+		}else
+		{
+			moveFoodToHotbar(foodSlot);
+			return;
+		}
 		
 		// eat food
 		MC.options.useKey.setPressed(true);
 		IMC.getInteractionManager().rightClickItem();
+	}
+	
+	private int findBestFoodSlot(int maxPoints)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		FoodComponent bestFood = null;
+		int bestSlot = -1;
+		
+		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
+		
+		ArrayList<Integer> slots = new ArrayList<>();
+		if(maxInvSlot == 0)
+			slots.add(inventory.selectedSlot);
+		if(allowOffhand.isChecked())
+			slots.add(40);
+		Stream.iterate(0, i -> i < maxInvSlot, i -> i + 1)
+			.forEach(i -> slots.add(i));
+		
+		Comparator<FoodComponent> comparator =
+			Comparator.comparingDouble(FoodComponent::getSaturationModifier);
+		
+		for(int slot : slots)
+		{
+			Item item = inventory.getStack(slot).getItem();
+			
+			// filter out non-food items
+			if(!item.isFood())
+				continue;
+			
+			FoodComponent food = item.getFoodComponent();
+			if(!isAllowedFood(food))
+				continue;
+			
+			if(maxPoints >= 0 && food.getHunger() > maxPoints)
+				continue;
+			
+			// compare to previously found food
+			if(bestFood == null || comparator.compare(food, bestFood) > 0)
+			{
+				bestFood = food;
+				bestSlot = slot;
+			}
+		}
+		
+		return bestSlot;
+	}
+	
+	private void moveFoodToHotbar(int foodSlot)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		if(inventory.getEmptySlot() < 9)
+			im.windowClick_QUICK_MOVE(foodSlot);
+		else if(inventory.getEmptySlot() != -1)
+		{
+			im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
+			im.windowClick_QUICK_MOVE(foodSlot);
+			
+		}else
+		{
+			im.windowClick_PICKUP(inventory.selectedSlot + 36);
+			im.windowClick_PICKUP(foodSlot);
+			im.windowClick_PICKUP(inventory.selectedSlot + 36);
+		}
 	}
 	
 	private boolean shouldEat()
@@ -206,39 +297,6 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		MC.options.useKey.setPressed(false);
 		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;
-	}
-	
-	private int findBestFoodSlot(int maxPoints)
-	{
-		int bestSlot = -1;
-		FoodComponent bestFood = null;
-		Comparator<FoodComponent> comparator =
-			Comparator.<FoodComponent> comparingDouble(
-				FoodComponent::getSaturationModifier);
-		
-		for(int i = 0; i < 9; i++)
-		{
-			// filter out non-food items
-			Item item = MC.player.getInventory().getStack(i).getItem();
-			if(!item.isFood())
-				continue;
-			
-			FoodComponent food = item.getFoodComponent();
-			if(!isAllowedFood(food))
-				continue;
-			
-			if(maxPoints >= 0 && food.getHunger() > maxPoints)
-				continue;
-			
-			// compare to previously found food
-			if(bestFood == null || comparator.compare(food, bestFood) > 0)
-			{
-				bestFood = food;
-				bestSlot = i;
-			}
-		}
-		
-		return bestSlot;
 	}
 	
 	private boolean isAllowedFood(FoodComponent food)
@@ -295,5 +353,29 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	{
 		int injuryThresholdI = (int)(injuryThreshold.getValue() * 2);
 		return player.getHealth() < player.getMaxHealth() - injuryThresholdI;
+	}
+	
+	private enum TakeItemsFrom
+	{
+		HANDS("Hands", 0),
+		
+		HOTBAR("Hotbar", 9),
+		
+		INVENTORY("Inventory", 36);
+		
+		private final String name;
+		private final int maxInvSlot;
+		
+		private TakeItemsFrom(String name, int maxInvSlot)
+		{
+			this.name = name;
+			this.maxInvSlot = maxInvSlot;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }
