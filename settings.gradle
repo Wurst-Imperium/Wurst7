@@ -8,3 +8,13 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+rootProject.name = 'CheddarBratWurst-' + rootProject.projectDir.name
+
+include '1.18.1'
+
+project(":1.18.1").dir = new File('versions/1.18.1')
+
+include '1.18.2'
+
+project(":1.18.2").dir = new File('versions/1.18.2')
