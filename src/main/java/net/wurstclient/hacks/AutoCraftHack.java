@@ -28,6 +28,7 @@ import net.wurstclient.Category;
 import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -76,7 +77,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private Pathfinder baritoneChatPathfinder;
     private BaritoneAPIInterface baritoneAPIInterface;
     private BaritoneChatInterface baritoneChatInterface;
-    private boolean baritoneChatInterfaceEnabled = true;
+    private CheckboxSetting baritoneChatInterfaceEnabled = new CheckboxSetting("Baritone Chat Interface", "Use Baritone to pathfind and mine stuff (requires Baritone to be installed as a fabric mod).", false);
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
@@ -92,6 +93,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public AutoCraftHack() {
         super("AutoCraft");
         setCategory(Category.ITEMS);
+        addSetting(baritoneChatInterfaceEnabled);
     }
 
     private boolean isBaritoneAPIInstalled() {
@@ -162,15 +164,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 processMap.get(id).add(getCraftingProcessByType(recipe, recipeType));
             }
         }
-        if (getActivePathfinder().isMiningSupported()) {
-            for (Identifier id : Registry.BLOCK.getIds()) {
-                List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
-                for (ItemStack stack : droppedStacks) {
-                    Identifier stackId = Registry.ITEM.getId(stack.getItem());
-                    if (!processMap.containsKey(stackId))
-                        processMap.put(stackId, new ArrayList<>());
-                    processMap.get(stackId).add(new WorldCraftingProcess(stack.getItem(), Registry.BLOCK.get(id)));
-                }
+        for (Identifier id : Registry.BLOCK.getIds()) {
+            List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
+            for (ItemStack stack : droppedStacks) {
+                Identifier stackId = Registry.ITEM.getId(stack.getItem());
+                if (!processMap.containsKey(stackId))
+                    processMap.put(stackId, new ArrayList<>());
+                processMap.get(stackId).add(new WorldCraftingProcess(stack.getItem(), Registry.BLOCK.get(id)));
             }
         }
     }
@@ -1728,7 +1728,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             calculateMaxCraftable(amount, state);
             long endTime = System.currentTimeMillis();
             System.out.println("TOTAL CALCULATION TIME: " + (int)(endTime - startTime));
-            if (baritoneChatInterfaceEnabled)
+            if (baritoneChatInterfaceEnabled.isChecked())
                 baritoneChatInterface.setAcceptableThrowawayItems(state.throwawayItems.stream().toList());
             doCraft(state.rootNodeId, state);
             /*while (!doCraft())
@@ -3202,6 +3202,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
             Resources<OperableInteger> res = new Resources<>();
+            if (!getActivePathfinder().isMiningSupported())
+                return new Pair<>(false, res);
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.WORLD));
             state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - actualNeeded);
             if (block.getDefaultState().isToolRequired()) {
@@ -3799,7 +3801,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private Pathfinder getActivePathfinder() {
-        if (baritoneChatInterfaceEnabled)
+        if (baritoneChatInterfaceEnabled.isChecked())
             return baritoneChatPathfinder;
         return regularPathfinder;
     }
