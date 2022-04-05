@@ -57,7 +57,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private ReentrantLock containerOpenLock = new ReentrantLock();
     private Condition containerOpenCondition = containerOpenLock.newCondition();
 
-    private LinkedHashMap<Integer, SlotUpdateInfo> latestSlotUpdates;
+    private LinkedHashMap<Integer, SlotUpdateInfo> latestSlotUpdates = new LinkedHashMap<>();
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
     private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
@@ -72,8 +72,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private LinkedHashSet<Block> containerBlockTypes;
 
-    private Pathfinder pathFinder;
-    private BaritoneInterface baritoneInterface;
+    private Pathfinder regularPathfinder;
+    private Pathfinder baritoneChatPathfinder;
+    private BaritoneAPIInterface baritoneAPIInterface;
+    private BaritoneChatInterface baritoneChatInterface;
+    private boolean baritoneChatInterfaceEnabled = true;
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
@@ -159,7 +162,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 processMap.get(id).add(getCraftingProcessByType(recipe, recipeType));
             }
         }
-        if (pathFinder.isMiningSupported()) {
+        if (getActivePathfinder().isMiningSupported()) {
             for (Identifier id : Registry.BLOCK.getIds()) {
                 List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
                 for (ItemStack stack : droppedStacks) {
@@ -270,7 +273,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     public abstract class StorageQuery<T> {
         public abstract LinkedHashMap<T, Integer> getAvailabilityMap();
-        public abstract boolean acquire(T item, int count);
+        public abstract boolean acquire(T item, Item dropped, int count);
     }
 
     public class InventoryStorageQuery extends StorageQuery<Item> {
@@ -295,7 +298,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        public boolean acquire(Item item, int count) { return true; }
+        public boolean acquire(Item item, Item dropped, int count) { return true; }
     }
 
     public abstract class Pathfinder {
@@ -307,7 +310,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return supportsMining;
         }
         public abstract boolean path(BlockPos pos);
-        public abstract boolean mine(Block block, int count);
+        public abstract boolean mine(Block block, Item dropped, int count);
     }
 
     public class WurstPathfinder extends Pathfinder {
@@ -321,7 +324,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             path.waitUntilDone();
             return true;
         }
-        public boolean mine(Block block, int count) {
+        public boolean mine(Block block, Item dropped, int count) {
             throw new NotImplementedException("Wurst pathfinder does not support mining");
         }
     }
@@ -364,11 +367,93 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected abstract void runInternal();
     }
 
-    public class BaritoneInterface {
+    public abstract class BaritoneChatProcess {
+        protected abstract void waitUntilDone();
+    }
+
+    public class BaritoneChatPathProcess extends BaritoneChatProcess {
+        private BlockPos pos;
+        public BaritoneChatPathProcess(BlockPos pos) {
+            this.pos = pos;
+        }
+        @Override
+        protected void waitUntilDone() {
+            Vec3d blockPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+            try {
+                while (blockPos.subtract(MC.player.getPos()).length() > 1) {
+                    Thread.sleep(100);
+                }
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class BaritoneChatMineProcess extends BaritoneChatProcess {
+        private int count;
+        private Item dropped;
+        public BaritoneChatMineProcess(int count, Item dropped) {
+            this.count = count;
+            this.dropped = dropped;
+        }
+        @Override
+        protected void waitUntilDone() {
+            LinkedHashMap<Item, Integer> currentItems = inventoryQuery.getAvailabilityMap();
+            try {
+                while (currentItems.getOrDefault(dropped, 0) < count) {
+                    Thread.sleep(100);
+                    currentItems = inventoryQuery.getAvailabilityMap();
+                }
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class BaritoneChatInterface {
+        public BaritoneChatInterface() { }
+        private void sendCommand(String cmd) {
+            new NotifyingRunnable() {
+                @Override
+                protected void runInternal() {
+                    MC.player.sendChatMessage("#" + cmd);
+                }
+            }.runUntilDone();
+        }
+        private void setSetting(String setting, String value) {
+            sendCommand(setting + " " + value);
+        }
+        private void setAllowInventory(boolean value) {
+            setSetting("allowInventory", value + "");
+        }
+        private void setAcceptableThrowawayItems(List<Item> items) {
+            String settingValue;
+            if (items.isEmpty()) {
+                settingValue = ",";
+            }
+            else {
+                settingValue = items.stream().map(item -> Registry.ITEM.getId(item).getPath()).collect(Collectors.joining(","));
+            }
+            setSetting("acceptableThrowawayItems", settingValue);
+        }
+        public BaritoneChatProcess path(BlockPos pos) {
+            sendCommand("goto " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+            return new BaritoneChatPathProcess(pos);
+        }
+        public BaritoneChatProcess mine(int count, Block block, Item dropped) {
+            sendCommand("mine " + count + " " + Registry.ITEM.getId(block.asItem()).getPath());
+            return new BaritoneChatMineProcess(count, dropped);
+        }
+    }
+
+    public class BaritoneAPIInterface {
         private Class BaritoneAPI;
         private Class GoalBlock;
         private Class Goal;
-        public BaritoneInterface() {
+        public BaritoneAPIInterface() {
             try {
                 this.BaritoneAPI = Class.forName("baritone.api.BaritoneAPI");
                 this.GoalBlock = Class.forName("baritone.api.pathing.goals.GoalBlock");
@@ -467,21 +552,46 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    public class BaritonePathfinder extends Pathfinder {
-        public BaritonePathfinder() {
+    public class BaritoneChatPathfinder extends Pathfinder {
+        private boolean updatedSettings = false;
+        public BaritoneChatPathfinder() {
+            super(true);
+        }
+        private void updateSettings() {
+            if (!updatedSettings) {
+                baritoneChatInterface.setAllowInventory(true);
+                updatedSettings = true;
+            }
+        }
+        public boolean path(BlockPos pos) {
+            updateSettings();
+            BaritoneChatProcess process = baritoneChatInterface.path(pos);
+            process.waitUntilDone();
+            return true;
+        }
+        public boolean mine(Block block, Item dropped, int count) {
+            updateSettings();
+            BaritoneChatProcess process = baritoneChatInterface.mine(count, block, dropped);
+            process.waitUntilDone();
+            return true;
+        }
+    }
+
+    public class BaritoneAPIPathfinder extends Pathfinder {
+        public BaritoneAPIPathfinder() {
             super(true);
         }
         public boolean path(BlockPos pos) {
-            Object pathProcess = baritoneInterface.getCustomGoalProcess();
-            baritoneInterface.setAllowInventory(true);
-            baritoneInterface.setAcceptableThrowawayItems(new ArrayList<>());
+            Object pathProcess = baritoneAPIInterface.getCustomGoalProcess();
+            baritoneAPIInterface.setAllowInventory(true);
+            baritoneAPIInterface.setAcceptableThrowawayItems(new ArrayList<>());
             NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
                 protected void runInternal() {
-                    baritoneInterface.setGoalAndPath(pathProcess, pos);
+                    baritoneAPIInterface.setGoalAndPath(pathProcess, pos);
                 }
             };
             baritoneRunnable.runUntilDone();
-            while (baritoneInterface.isActive(pathProcess)) {
+            while (baritoneAPIInterface.isActive(pathProcess)) {
                 try {
                     Thread.sleep(10);
                 }
@@ -489,12 +599,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     ex.printStackTrace();
                 }
             }
-            baritoneInterface.setAllowInventory(false);
+            baritoneAPIInterface.setAllowInventory(false);
             return true;
         }
-        public boolean mine(Block block, int count) {
+        public boolean mine(Block block, Item dropped, int count) {
             updateTotalInventoryAvailability();
-            Object mineProcess = baritoneInterface.getMineProcess();
+            Object mineProcess = baritoneAPIInterface.getMineProcess();
             final int alreadyPossessed;
             if (isCurrentlyCrafting) {
                 synchronized (totalInventoryAvailabilityMap) {
@@ -504,15 +614,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             else {
                 alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(block.asItem(), 0);
             }
-            baritoneInterface.setAllowInventory(true);
-            baritoneInterface.setAcceptableThrowawayItems(new ArrayList<>());
+            baritoneAPIInterface.setAllowInventory(true);
+            baritoneAPIInterface.setAcceptableThrowawayItems(new ArrayList<>());
             NotifyingRunnable baritoneRunnable = new NotifyingRunnable() {
                 protected void runInternal() {
-                    baritoneInterface.mine(mineProcess, count + alreadyPossessed, block);
+                    baritoneAPIInterface.mine(mineProcess, count + alreadyPossessed, block);
                 }
             };
             baritoneRunnable.runUntilDone();
-            while (baritoneInterface.isActive(mineProcess)) {
+            while (baritoneAPIInterface.isActive(mineProcess)) {
                 try {
                     Thread.sleep(10);
                 }
@@ -520,7 +630,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     ex.printStackTrace();
                 }
             }
-            baritoneInterface.setAllowInventory(false);
+            baritoneAPIInterface.setAllowInventory(false);
             return true;
         }
     }
@@ -597,7 +707,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return count;
         }
         @Override
-        public boolean acquire(Item item, int count) {
+        public boolean acquire(Item item, Item dropped, int count) {
             for (BlockPos pos : containers.keySet()) {
                 if (count <= 0)
                     break;
@@ -718,8 +828,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        public boolean acquire(Block block, int count) {
-            return pathFinder.mine(block, count);
+        public boolean acquire(Block block, Item dropped, int count) {
+            return getActivePathfinder().mine(block, dropped, count);
         }
     }
 
@@ -957,7 +1067,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             BlockPos nearestPathablePosition = getNearestPathablePosition(container);
             if (nearestPathablePosition == null)
                 nearestPathablePosition = container.up();
-            return pathFinder.path(nearestPathablePosition);
+            return getActivePathfinder().path(nearestPathablePosition);
         }
         public boolean navigateAndOpenContainer(BlockPos container) {
             if (!navigateToContainer(container))
@@ -1118,6 +1228,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private LinkedHashMap<NodeEquivalenceClass, LinkedHashSet<Item>> instanceProfile = new LinkedHashMap<>();
         private LinkedHashMap<Integer, Node> idInstanceMap = new LinkedHashMap<>();
         private LinkedHashMap<Node, Integer> childScope = new LinkedHashMap<>();
+        private LinkedHashSet<Item> throwawayItems = new LinkedHashSet<>();
         private int rootNodeId = 0;
         private boolean success = false;
         public CraftingState(LinkedHashMap<Item, Integer> inventoryAvailability, LinkedHashMap<Item, Integer> storageAvailability, LinkedHashMap<Block, Integer> worldAvailability, LinkedHashSet<Item> visited, LinkedHashMap<Integer, Item> toolAvailability) {
@@ -1204,14 +1315,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             naiveMaxCraftable.remove(node);
             naiveMaxCraftableGenerated.remove(node);
         }
-        private void traverseChildren(int id, Node node) {
-
+        private void generateThrowawayItems(NodeEquivalenceClass node) {
+            List<String> itemNames = List.of("dirt", "cobblestone", "stone", "netherrack", "granite", "diorite");
+            LinkedHashSet<Item> profile = instanceProfile.get(node);
+            throwawayItems = itemNames.stream().map(name ->  Registry.ITEM.get(new Identifier("minecraft", name))).filter(item -> !profile.contains(item)).collect(Collectors.toCollection(LinkedHashSet::new));
         }
         public boolean generateTree(int id, Node node) {
             generateNodeInstanceGraph(node, new LinkedHashMap<>());
             if (!equivalenceRelation.containsKey(new NodeEquivalenceClass(node)))
                 return false;
             generateInstanceProfiles(new NodeEquivalenceClass(node));
+            generateThrowawayItems(new NodeEquivalenceClass(node));
             generateTreeInternal(id, node);
             node.genNaiveMaxCraftable(this);
             return true;
@@ -1614,6 +1728,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             calculateMaxCraftable(amount, state);
             long endTime = System.currentTimeMillis();
             System.out.println("TOTAL CALCULATION TIME: " + (int)(endTime - startTime));
+            if (baritoneChatInterfaceEnabled)
+                baritoneChatInterface.setAcceptableThrowawayItems(state.throwawayItems.stream().toList());
             doCraft(state.rootNodeId, state);
             /*while (!doCraft())
                 calculateMaxCraftable(amount);*/
@@ -2929,7 +3045,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
-            return inventoryQuery.acquire(target, state.neededMap.getOrDefault(nodeId, 0));
+            return inventoryQuery.acquire(target, target, state.neededMap.getOrDefault(nodeId, 0));
         }
         @Override
         public int getOutputCount() {
@@ -3005,7 +3121,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         public boolean execute(int nodeId, CraftingState state) {
-            return containerQuery.acquire(target, state.neededMap.getOrDefault(nodeId, 0));
+            return containerQuery.acquire(target, target, state.neededMap.getOrDefault(nodeId, 0));
         }
         @Override
         public int getOutputCount() {
@@ -3116,10 +3232,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         public boolean execute(int nodeId, CraftingState state) {
             if (!block.getDefaultState().isToolRequired())
-                return worldQuery.acquire(block, state.neededMap.getOrDefault(nodeId, 0));
+                return worldQuery.acquire(block, dropped, state.neededMap.getOrDefault(nodeId, 0));
             if (!toolManager.canMine(block))
                 return false;
-            return worldQuery.acquire(block, state.neededMap.getOrDefault(nodeId, 0));
+            return worldQuery.acquire(block, dropped, state.neededMap.getOrDefault(nodeId, 0));
         }
         @Override
         public int getOutputCount() {
@@ -3204,7 +3320,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (!nearestBlockPosMap.containsKey(targetBlock))
                 return false;
             nearestTarget = nearestBlockPosMap.get(targetBlock).up();
-            return pathFinder.path(nearestTarget);
+            return getActivePathfinder().path(nearestTarget);
         }
         @Override
         public int getOutputCount() {
@@ -3682,6 +3798,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private Pathfinder getActivePathfinder() {
+        if (baritoneChatInterfaceEnabled)
+            return baritoneChatPathfinder;
+        return regularPathfinder;
+    }
+
     private boolean usingCraftingTable() {
         return MC.player.currentScreenHandler != null && MC.player.currentScreenHandler instanceof CraftingScreenHandler;
     }
@@ -3855,12 +3977,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     @Override
     public void onEnable() {
+        baritoneChatInterface = new BaritoneChatInterface();
+        baritoneChatPathfinder = new BaritoneChatPathfinder();
         if (isBaritoneAPIInstalled()) {
-            baritoneInterface = new BaritoneInterface();
-            pathFinder = new BaritonePathfinder();
+            baritoneAPIInterface = new BaritoneAPIInterface();
+            regularPathfinder = new BaritoneAPIPathfinder();
         }
         else {
-            pathFinder = new WurstPathfinder();
+            regularPathfinder = new WurstPathfinder();
         }
         if (processMap == null)
             initProcessMap();
