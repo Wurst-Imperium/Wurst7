@@ -12,7 +12,7 @@ Mostly proofreaders. Many translations are currently stuck because we have no on
 |Chinese (Traditional/Taiwan)|151/166 done|
 |Chinese (Cantonese/Hong Kong)|154/166 done|
 |French (France)|There are 3 pending submissions ([#515](https://github.com/Wurst-Imperium/Wurst7/pull/515), [#531](https://github.com/Wurst-Imperium/Wurst7/pull/531), [#552](https://github.com/Wurst-Imperium/Wurst7/pull/552)) with different translations and I don't know which one to merge. If you speak French, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker.|
-|German (Germany)|56/166 done. I'll probably do the rest myself since I can speak it natively.|
+|German (Germany)|65/166 done. I'll probably do the rest myself since I can speak it natively.|
 |Hindi (India)|Pending, needs reviews, check [#604](https://github.com/Wurst-Imperium/Wurst7/pull/604).|
 |Italian (Italy)|146/166 done|
 |Japanese (Japan)|157/166 done|
