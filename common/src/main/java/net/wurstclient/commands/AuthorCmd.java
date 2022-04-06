@@ -15,6 +15,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.core.MCNbtUtils;
 
 public final class AuthorCmd extends Command
 {
@@ -42,6 +43,6 @@ public final class AuthorCmd extends Command
 				"You must hold a written book in your main hand.");
 		
 		String author = String.join(" ", args);
-		heldItem.setSubNbt("author", NbtString.of(author));
+		MCNbtUtils.setSubNbt(heldItem, "author", NbtString.of(author));
 	}
 }

@@ -172,7 +172,7 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
 				b -> saveToFile()));
 
 		addDrawableChild(new ButtonWidget(width / 2 - 100, 250, 200, 20, new LiteralText("Back"),
-				b -> client.setScreen(prevScreen)));
+				b -> WurstClient.setScreen(prevScreen)));
 
 	}
 

@@ -44,7 +44,7 @@ public class WurstOptionsScreen extends Screen
 	{
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
-				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
+				new LiteralText("Back"), b -> WurstClient.setScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -103,7 +103,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "Keybinds",
 			"Keybinds allow you to toggle any hack\n"
 				+ "or command by simply pressing a\n" + "button.",
-			b -> client.setScreen(new KeybindManagerScreen(this)));
+			b -> WurstClient.setScreen(new KeybindManagerScreen(this)));
 		
 		new WurstOptionsButton(-50, 48, () -> "X-Ray Blocks",
 			"Manager for the blocks\n" + "that X-Ray will show.",
@@ -113,7 +113,7 @@ public class WurstOptionsScreen extends Screen
 			"The Zoom Manager allows you to\n"
 				+ "change the zoom key, how far it\n"
 				+ "will zoom in and more.",
-			b -> client.setScreen(new ZoomManagerScreen(this)));
+			b -> WurstClient.setScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()

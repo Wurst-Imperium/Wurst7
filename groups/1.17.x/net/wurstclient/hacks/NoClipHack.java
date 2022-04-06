@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PlayerMoveListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
@@ -61,11 +60,11 @@ public final class NoClipHack extends Hack implements UpdateListener,
 		player.setVelocity(0, 0, 0);
 		
 		float speed = 0.2F;
-		player.airStrafingSpeed = speed;
+		player.flyingSpeed = speed;
 		
-		if(WurstClient.MCKeys.jumpKey().isPressed())
+		if(MC.options.keyJump.isPressed())
 			player.addVelocity(0, speed, 0);
-		if(WurstClient.MCKeys.sneakKey().isPressed())
+		if(MC.options.keySneak.isPressed())
 			player.addVelocity(0, -speed, 0);
 	}
 	

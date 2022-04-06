@@ -9,6 +9,7 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -237,7 +238,7 @@ public abstract class NavigatorScreen extends MCScreen
 	protected final void drawQuads(MatrixStack matrixStack, int x1, int y1,
 		int x2, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -263,7 +264,7 @@ public abstract class NavigatorScreen extends MCScreen
 		float yi1 = y1 - 0.1F;
 		float yi2 = y2 + 0.1F;
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -333,7 +334,7 @@ public abstract class NavigatorScreen extends MCScreen
 		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

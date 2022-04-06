@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
 import net.wurstclient.WurstClient;
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -221,7 +222,7 @@ public final class TunnellerHack extends Hack
 				case 4 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			}
 			
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			buffer.setShader(viewMatrix, projMatrix, shader);

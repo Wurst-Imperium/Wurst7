@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -172,7 +173,7 @@ public final class BaseFinderHack extends Hack
 		
 		if(vertexBuffer != null)
 		{
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);

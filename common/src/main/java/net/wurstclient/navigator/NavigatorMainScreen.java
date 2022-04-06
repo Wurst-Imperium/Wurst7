@@ -10,6 +10,7 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -119,7 +120,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.setScreen((Screen)null);
+			WurstClient.setScreen((Screen)null);
 			return;
 		}
 		
@@ -214,7 +215,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(clickTimer < 4)
 				clickTimer++;
 			else
-				WurstClient.MC.setScreen(
+				WurstClient.setScreen(
 					new NavigatorFeatureScreen(expandingFeature, this));
 		else if(!expanding && clickTimer > -1)
 			clickTimer--;
@@ -296,7 +297,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 			int yt2 = yt1 + th + 2;
 			
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
@@ -417,7 +418,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		drawBox(matrixStack, area.x, area.y, area.x + area.width,
 			area.y + area.height);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

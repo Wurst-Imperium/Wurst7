@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hud;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -78,7 +79,7 @@ public final class WurstLogo
 	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2,
 		float r, float g, float b, float a)
 	{
-		Matrix4f matrix = matrices.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrices);
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

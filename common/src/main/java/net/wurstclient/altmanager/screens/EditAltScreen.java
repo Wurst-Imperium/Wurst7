@@ -9,6 +9,7 @@ package net.wurstclient.altmanager.screens;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
+import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.Alt;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.MojangAlt;
@@ -50,6 +51,6 @@ public final class EditAltScreen extends AltEditorScreen
 	protected void pressDoneButton()
 	{
 		altManager.edit(editedAlt, getNameOrEmail(), getPassword());
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 }

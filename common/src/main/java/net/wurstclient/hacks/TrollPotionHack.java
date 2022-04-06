@@ -16,6 +16,7 @@ import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChatUtils;
@@ -115,7 +116,7 @@ public final class TrollPotionHack extends Hack
 			
 			NbtCompound nbt = new NbtCompound();
 			nbt.put("CustomPotionEffects", effects);
-			stack.setNbt(nbt);
+			MCNbtUtils.setNbt(stack, nbt);
 			
 			String name = "\u00a7f" + itemName + " of Trolling";
 			stack.setCustomName(new LiteralText(name));

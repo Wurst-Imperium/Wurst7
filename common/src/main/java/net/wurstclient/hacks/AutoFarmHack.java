@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -201,7 +202,7 @@ public final class AutoFarmHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		Shader shader = RenderSystem.getShader();
 		

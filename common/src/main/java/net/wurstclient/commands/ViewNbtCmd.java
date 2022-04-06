@@ -16,6 +16,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.core.MCNbtUtils;
 
 @SearchTags({"view nbt", "NBTViewer", "nbt viewer"})
 public final class ViewNbtCmd extends Command
@@ -34,7 +35,7 @@ public final class ViewNbtCmd extends Command
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		NbtCompound tag = stack.getNbt();
+		NbtCompound tag = MCNbtUtils.getNbt(stack);
 		String nbt = tag == null ? "" : tag.asString();
 		
 		switch(String.join(" ", args).toLowerCase())

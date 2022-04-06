@@ -10,6 +10,7 @@ package net.wurstclient.hud;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -214,7 +215,7 @@ public final class TabGui implements KeyPressListener
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

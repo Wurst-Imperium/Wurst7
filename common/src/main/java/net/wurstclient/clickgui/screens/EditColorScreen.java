@@ -14,6 +14,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -155,7 +156,7 @@ public final class EditColorScreen extends MCScreen
 	private void done()
 	{
 		colorSetting.setColor(color);
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -250,7 +251,7 @@ public final class EditColorScreen extends MCScreen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+				WurstClient.setScreen(prevScreen);
 			break;
 		}
 		

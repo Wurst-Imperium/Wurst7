@@ -74,8 +74,8 @@ public final class EditBlockScreen extends MCScreen
 		
 		if(block != null)
 			setting.setBlock(block);
-		
-		client.setScreen(prevScreen);
+
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -88,7 +88,7 @@ public final class EditBlockScreen extends MCScreen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+				WurstClient.setScreen(prevScreen);
 			break;
 		}
 		

@@ -64,7 +64,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(parent.getFeature().getName());
-					WurstClient.MC.setScreen(parent);
+					WurstClient.setScreen(parent);
 				}else
 				{
 					choosingKey = true;
@@ -84,7 +84,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> WurstClient.MC.setScreen(parent)));
+			new LiteralText("Cancel"), b -> WurstClient.setScreen(parent)));
 	}
 	
 	@Override
@@ -98,7 +98,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 		}else if(keyCode == GLFW.GLFW_KEY_ESCAPE
 			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
-			client.setScreen(parent);
+			WurstClient.setScreen(parent);
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.setScreen(parent);
+			WurstClient.setScreen(parent);
 			return;
 		}
 		

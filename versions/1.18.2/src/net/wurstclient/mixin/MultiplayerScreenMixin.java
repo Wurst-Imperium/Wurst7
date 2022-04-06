@@ -63,11 +63,11 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 					.joinLastServer((MultiplayerScreen)(Object)this)));
 		
 		addDrawableChild(new ButtonWidget((width / 5) * 3, 10, width / 5,
-			20, new LiteralText("Server Finder"), b -> client.setScreen(
+			20, new LiteralText("Server Finder"), b -> WurstClient.setScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
 		
 		addDrawableChild(new ButtonWidget((width / 5) * 4, 10, width / 5,
-			20, new LiteralText("Clean Up"), b -> client.setScreen(
+			20, new LiteralText("Clean Up"), b -> WurstClient.setScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 	

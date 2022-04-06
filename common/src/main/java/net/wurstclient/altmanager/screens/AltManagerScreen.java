@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringJoiner;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -102,7 +103,7 @@ public final class AltManagerScreen extends Screen
 			
 			NoticeScreen screen =
 				new NoticeScreen(action, title, message, buttonText);
-			client.setScreen(screen);
+			WurstClient.setScreen(screen);
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
 		{
@@ -113,7 +114,7 @@ public final class AltManagerScreen extends Screen
 			BooleanConsumer callback = this::confirmGenerate;
 			
 			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
-			client.setScreen(screen);
+			WurstClient.setScreen(screen);
 		}
 		
 		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
@@ -121,11 +122,11 @@ public final class AltManagerScreen extends Screen
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
 			new LiteralText("Direct Login"),
-			b -> client.setScreen(new DirectLoginScreen(this))));
+			b -> WurstClient.setScreen(new DirectLoginScreen(this))));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
 			new LiteralText("Add"),
-			b -> client.setScreen(new AddAltScreen(this, altManager))));
+			b -> WurstClient.setScreen(new AddAltScreen(this, altManager))));
 		
 		addDrawableChild(
 			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
@@ -139,7 +140,7 @@ public final class AltManagerScreen extends Screen
 				new LiteralText("Delete"), b -> pressDelete()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+			new LiteralText("Cancel"), b -> WurstClient.setScreen(prevScreen)));
 		
 		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
 			new LiteralText("Import"), b -> pressImportAlts()));
@@ -217,7 +218,7 @@ public final class AltManagerScreen extends Screen
 		{
 			altManager.login(alt);
 			failedLogins.remove(alt);
-			client.setScreen(prevScreen);
+			WurstClient.setScreen(prevScreen);
 			
 		}catch(LoginException e)
 		{
@@ -242,7 +243,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		client.setScreen(new EditAltScreen(this, altManager, alt));
+		WurstClient.setScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -260,7 +261,7 @@ public final class AltManagerScreen extends Screen
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
 			message, new LiteralText("Delete"), new LiteralText("Cancel"));
-		client.setScreen(screen);
+		WurstClient.setScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -390,7 +391,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		client.setScreen(this);
+		WurstClient.setScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -401,7 +402,7 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
-		client.setScreen(this);
+		WurstClient.setScreen(this);
 	}
 	
 	@Override
@@ -411,7 +412,7 @@ public final class AltManagerScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -625,7 +626,7 @@ public final class AltManagerScreen extends Screen
 		{
 			Alt alt = list.get(id);
 			
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			

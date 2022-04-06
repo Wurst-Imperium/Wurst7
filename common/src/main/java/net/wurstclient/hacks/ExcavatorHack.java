@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.wurstclient.WurstClient;
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -335,7 +336,7 @@ public final class ExcavatorHack extends Hack
 		
 		matrixStack.push();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		String message;

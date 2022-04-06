@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.SharedConstants;
@@ -50,7 +51,7 @@ public class CleanUpScreen extends Screen
 	{
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
+				() -> "Cancel", "", b -> WurstClient.setScreen(prevScreen)));
 		
 		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -130,7 +131,7 @@ public class CleanUpScreen extends Screen
 			}
 		
 		saveServerList();
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	private boolean shouldRemove(ServerInfo server)

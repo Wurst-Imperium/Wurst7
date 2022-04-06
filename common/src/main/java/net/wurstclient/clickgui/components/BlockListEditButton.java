@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.components;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -51,8 +52,7 @@ public final class BlockListEditButton extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		WurstClient.MC.setScreen(
-			new EditBlockListScreen(WurstClient.MC.currentScreen, setting));
+		WurstClient.setScreen(new EditBlockListScreen(WurstClient.MC.currentScreen, setting));
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public final class BlockListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

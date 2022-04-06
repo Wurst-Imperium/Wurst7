@@ -20,6 +20,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.util.ChatUtils;
 
 public final class ModifyCmd extends Command
@@ -80,13 +81,13 @@ public final class ModifyCmd extends Command
 		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
-		if(!stack.hasNbt())
-			stack.setNbt(new NbtCompound());
+		if(!MCNbtUtils.hasNbt(stack))
+			MCNbtUtils.setNbt(stack,new NbtCompound());
 		
 		try
 		{
 			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.getNbt().copyFrom(tag);
+			MCNbtUtils.getNbt(stack).copyFrom(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -103,7 +104,7 @@ public final class ModifyCmd extends Command
 		try
 		{
 			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.setNbt(tag);
+			MCNbtUtils.setNbt(stack,tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -117,7 +118,7 @@ public final class ModifyCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		NbtPath path = parseNbtPath(stack.getNbt(), args[1]);
+		NbtPath path = parseNbtPath(MCNbtUtils.getNbt(stack), args[1]);
 		
 		if(path == null)
 			throw new CmdError("The path does not exist.");

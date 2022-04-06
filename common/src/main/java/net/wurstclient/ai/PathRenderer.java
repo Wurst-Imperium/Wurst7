@@ -16,6 +16,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
+import net.wurstclient.core.MatrixUtils;
 
 public final class PathRenderer
 {
@@ -35,7 +36,7 @@ public final class PathRenderer
 		int endZ = end.getZ();
 		
 		matrixStack.push();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		
 		// main line
 		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
@@ -101,7 +102,7 @@ public final class PathRenderer
 		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

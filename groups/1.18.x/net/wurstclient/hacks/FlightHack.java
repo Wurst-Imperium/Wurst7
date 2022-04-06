@@ -11,7 +11,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -60,10 +59,10 @@ public final class FlightHack extends Hack
 		player.setVelocity(0, 0, 0);
 		Vec3d velocity = player.getVelocity();
 		
-		if(WurstClient.MCKeys.jumpKey().isPressed())
+		if(MC.options.jumpKey.isPressed())
 			player.setVelocity(velocity.add(0, speed.getValue(), 0));
 		
-		if(WurstClient.MCKeys.sneakKey().isPressed())
+		if(MC.options.sneakKey.isPressed())
 			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
 	}
 	

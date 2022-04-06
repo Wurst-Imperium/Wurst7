@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
@@ -66,8 +67,8 @@ public final class EditSliderScreen extends MCScreen
 		
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
-		
-		client.setScreen(prevScreen);
+
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -80,7 +81,7 @@ public final class EditSliderScreen extends MCScreen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+			WurstClient.setScreen(prevScreen);
 			break;
 		}
 		

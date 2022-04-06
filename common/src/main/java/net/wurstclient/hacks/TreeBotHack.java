@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -319,7 +320,7 @@ public final class TreeBotHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack,
 			MC.world.getChunk(tree.getStump()));
 		
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		Shader shader = RenderSystem.getShader();
 		

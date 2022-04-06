@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -95,7 +96,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	private void drawLine(MatrixStack matrixStack, ArrayList<Vec3d> path,
 		Vec3d camPos)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

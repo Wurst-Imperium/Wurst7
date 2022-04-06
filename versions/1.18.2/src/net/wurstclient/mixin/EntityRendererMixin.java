@@ -25,6 +25,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
+import net.wurstclient.core.MatrixUtils;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin<T extends Entity>
@@ -84,7 +85,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		matrixStack.scale(-scale, -scale, scale);
 		
-		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix4f = MatrixUtils.getPositionMatrix(matrixStack);
 		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
 		int k = (int)(g * 255.0F) << 24;
 		

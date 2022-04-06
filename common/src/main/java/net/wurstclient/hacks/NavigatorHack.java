@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.navigator.NavigatorMainScreen;
@@ -28,7 +29,7 @@ public final class NavigatorHack extends Hack
 	public void onEnable()
 	{
 		if(!(MC.currentScreen instanceof NavigatorMainScreen))
-			MC.setScreen(new NavigatorMainScreen());
+			WurstClient.setScreen(new NavigatorMainScreen());
 		
 		setEnabled(false);
 	}

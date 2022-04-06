@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -405,7 +406,7 @@ public final class AutoFishHack extends Hack
 
 	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 

@@ -24,6 +24,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
@@ -83,7 +84,7 @@ public final class GiveCmd extends Command
 			try
 			{
 				NbtCompound tag = StringNbtReader.parse(nbt);
-				stack.setNbt(tag);
+				MCNbtUtils.setNbt(stack,tag);
 				
 			}catch(CommandSyntaxException e)
 			{

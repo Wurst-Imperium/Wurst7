@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.screens;
 
 import java.util.List;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -79,16 +80,16 @@ public final class EditBlockListScreen extends MCScreen
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
-			b -> client.setScreen(new ConfirmScreen(b2 -> {
+			b -> WurstClient.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
-				client.setScreen(EditBlockListScreen.this);
+				WurstClient.setScreen(EditBlockListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+				new LiteralText("Done"), b -> WurstClient.setScreen(prevScreen)));
 	}
 	
 	@Override

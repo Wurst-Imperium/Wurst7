@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -361,7 +362,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			solidBox.setShader(viewMatrix, projMatrix, shader);
@@ -376,7 +377,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private void renderLines(MatrixStack matrixStack, Vec3d start,
 		ArrayList<Box> boxes, int regionX, int regionZ)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		for(Box box : boxes)

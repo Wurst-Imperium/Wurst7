@@ -17,6 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import net.wurstclient.core.MCScreen;
+import net.wurstclient.core.MatrixUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.glfw.GLFW;
@@ -47,7 +49,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
 
-public abstract class AltEditorScreen extends Screen
+public abstract class AltEditorScreen extends MCScreen
 {
 	private final Path skinFolder =
 		WurstClient.INSTANCE.getWurstFolder().resolve("skins");
@@ -78,7 +80,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
-				new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+				new LiteralText("Cancel"), b -> WurstClient.setScreen(prevScreen)));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
 			200, 20, new LiteralText("Random Name"),
@@ -342,7 +344,7 @@ public abstract class AltEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

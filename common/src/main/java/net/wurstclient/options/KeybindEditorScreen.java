@@ -50,13 +50,13 @@ public final class KeybindEditorScreen extends Screen
 	{
 		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
 			new LiteralText("Change Key"),
-			b -> client.setScreen(new PressAKeyScreen(this))));
+			b -> WurstClient.setScreen(new PressAKeyScreen(this))));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
 			20, new LiteralText("Save"), b -> save()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
-			20, new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+			20, new LiteralText("Cancel"), b -> WurstClient.setScreen(prevScreen)));
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, new LiteralText(""));
@@ -75,7 +75,7 @@ public final class KeybindEditorScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
 		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getText());
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	@Override

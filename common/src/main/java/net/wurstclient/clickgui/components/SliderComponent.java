@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.components;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -65,7 +66,7 @@ public final class SliderComponent extends Component
 	private void handleLeftClick()
 	{
 		if(Screen.hasControlDown())
-			MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
+			WurstClient.setScreen(new EditSliderScreen(MC.currentScreen, setting));
 		else
 			dragging = true;
 	}
@@ -170,7 +171,7 @@ public final class SliderComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -209,7 +210,7 @@ public final class SliderComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		float xl1 = x3;
@@ -265,7 +266,7 @@ public final class SliderComponent extends Component
 	private void drawKnob(MatrixStack matrixStack, int x1, int x2, int y2,
 		int y3, boolean hSlider, boolean renderAsDisabled)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		double percentage = (setting.getValue() - setting.getMinimum())

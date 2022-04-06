@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
-
-import net.wurstclient.WurstClient;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -36,7 +33,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -52,12 +48,8 @@ public final class FreecamHack extends Hack
 {
 	private final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
-	
 	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
 		"Draws a line to your character's actual position.", false);
-	
-	private final ColorSetting color =
-		new ColorSetting("Tracer color", Color.WHITE);
 	
 	private FakePlayerEntity fakePlayer;
 	
@@ -67,7 +59,6 @@ public final class FreecamHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
-		addSetting(color);
 	}
 	
 	@Override
@@ -84,8 +75,9 @@ public final class FreecamHack extends Hack
 		
 		fakePlayer = new FakePlayerEntity();
 		
-		KeyBinding[] bindings = {WurstClient.MCKeys.forwardKey(), WurstClient.MCKeys.backKey(), WurstClient.MCKeys.leftKey(),
-				WurstClient.MCKeys.rightKey(), WurstClient.MCKeys.jumpKey(), WurstClient.MCKeys.sneakKey()};
+		GameOptions gs = MC.options;
+		KeyBinding[] bindings = {gs.keyForward, gs.keyBack, gs.keyLeft,
+			gs.keyRight, gs.keyJump, gs.keySneak};
 		
 		for(KeyBinding binding : bindings)
 			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
@@ -119,13 +111,13 @@ public final class FreecamHack extends Hack
 		player.setVelocity(Vec3d.ZERO);
 		
 		player.setOnGround(false);
-		player.airStrafingSpeed = speed.getValueF();
+		player.flyingSpeed = speed.getValueF();
 		Vec3d velocity = player.getVelocity();
 		
-		if(WurstClient.MCKeys.jumpKey().isPressed())
+		if(MC.options.keyJump.isPressed())
 			player.setVelocity(velocity.add(0, speed.getValue(), 0));
 		
-		if(WurstClient.MCKeys.sneakKey().isPressed())
+		if(MC.options.keySneak.isPressed())
 			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
 	}
 	
@@ -183,8 +175,7 @@ public final class FreecamHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		RenderSystem.setShaderColor(1, 1, 1, 0.5F);
 		
 		// box
 		matrixStack.push();
@@ -201,7 +192,7 @@ public final class FreecamHack extends Hack
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
 		Vec3d end = fakePlayer.getBoundingBox().getCenter();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = matrixStack.peek().getModel();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

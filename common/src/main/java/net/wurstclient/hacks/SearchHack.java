@@ -24,6 +24,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
 import net.minecraft.client.render.*;
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -245,7 +246,7 @@ public final class SearchHack extends Hack
 		
 		if(vertexBuffer != null)
 		{
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
@@ -270,7 +271,7 @@ public final class SearchHack extends Hack
 	{
 		if(matchingBlocks == null)
 			return;
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);

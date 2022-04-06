@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
@@ -177,7 +178,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
-		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
+		WurstClient.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 
 	private boolean isOpaque(BlockPos pos)

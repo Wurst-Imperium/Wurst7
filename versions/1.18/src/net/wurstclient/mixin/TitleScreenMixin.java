@@ -64,7 +64,7 @@ public abstract class TitleScreenMixin extends Screen
 		// add AltManager button
 		addDrawableChild(altsButton = new ButtonWidget(width / 2 + 2,
 			realmsButton.y, 98, 20, new LiteralText("Alt Manager"),
-			b -> client.setScreen(new AltManagerScreen(this,
+			b -> WurstClient.setScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 	}
 	

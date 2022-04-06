@@ -28,6 +28,7 @@ import net.minecraft.util.math.Vec3f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.core.MatrixUtils;
 import net.wurstclient.hacks.RadarHack;
 
 public final class RadarComponent extends Component
@@ -61,7 +62,7 @@ public final class RadarComponent extends Component
 			&& mouseY < y2 && mouseY >= -scroll
 			&& mouseY < getParent().getHeight() - 13 - scroll;
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
@@ -86,7 +87,7 @@ public final class RadarComponent extends Component
 		
 		matrixStack.push();
 		matrixStack.translate(middleX, middleY, 0);
-		matrix = matrixStack.peek().getPositionMatrix();
+		matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
@@ -125,7 +126,7 @@ public final class RadarComponent extends Component
 		BufferRenderer.draw(bufferBuilder);
 		
 		matrixStack.pop();
-		matrix = matrixStack.peek().getPositionMatrix();
+		matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		
 		// points
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);

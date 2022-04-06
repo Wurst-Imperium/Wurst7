@@ -9,6 +9,7 @@ package net.wurstclient.options;
 
 import java.util.function.Consumer;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
@@ -63,7 +64,7 @@ public final class EnterProfileNameScreen extends MCScreen
 		if(!value.isEmpty())
 			callback.accept(value);
 		
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -76,7 +77,7 @@ public final class EnterProfileNameScreen extends MCScreen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+				WurstClient.setScreen(prevScreen);
 			break;
 		}
 		

@@ -23,6 +23,7 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
@@ -89,7 +90,7 @@ public final class PotionCmd extends Command
 		
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", effects);
-		stack.setNbt(nbt);
+		MCNbtUtils.setNbt(stack,nbt);
 		ChatUtils.message("Potion modified.");
 	}
 	
@@ -141,7 +142,7 @@ public final class PotionCmd extends Command
 		
 		NbtCompound nbt = new NbtCompound();
 		nbt.put("CustomPotionEffects", newEffects);
-		stack.setNbt(nbt);
+		MCNbtUtils.setNbt(stack,nbt);
 		ChatUtils.message("Effect removed.");
 	}
 	

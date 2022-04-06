@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.components;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -50,7 +51,7 @@ public final class ColorComponent extends Component
 			return;
 		
 		if(mouseButton == 0)
-			MC.setScreen(new EditColorScreen(MC.currentScreen, setting));
+			WurstClient.setScreen(new EditColorScreen(MC.currentScreen, setting));
 		else if(mouseButton == 1)
 			setting.setColor(setting.getDefaultColor());
 	}
@@ -105,7 +106,7 @@ public final class ColorComponent extends Component
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -129,7 +130,7 @@ public final class ColorComponent extends Component
 		float[] acColor = GUI.getAcColor();
 		float opacity = GUI.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		RenderSystem.setShaderColor(color[0], color[1], color[2],

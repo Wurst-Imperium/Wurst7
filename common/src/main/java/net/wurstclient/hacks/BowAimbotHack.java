@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.wurstclient.WurstClient;
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -392,7 +393,7 @@ public final class BowAimbotHack extends Hack
 		
 		matrixStack.push();
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
 		String message;

@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 
 import net.minecraft.util.InvalidIdentifierException;
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -83,16 +84,16 @@ public final class EditItemListScreen extends MCScreen {
 
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
 			new LiteralText("Reset to Defaults"),
-			b -> client.setScreen(new ConfirmScreen(b2 -> {
+			b -> WurstClient.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
-				client.setScreen(EditItemListScreen.this);
+				WurstClient.setScreen(EditItemListScreen.this);
 			}, new LiteralText("Reset to Defaults"),
 				new LiteralText("Are you sure?")))));
 
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+				new LiteralText("Done"), b -> WurstClient.setScreen(prevScreen)));
 
 		if (itemList.getSearchType() != null) {
 			addDrawableChild(searchTypeButton = new ButtonWidget(8, 8, 130, 20,

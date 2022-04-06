@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.DeathListener;
 import net.wurstclient.hack.Hack;
 
@@ -37,6 +38,6 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 	public void onDeath()
 	{
 		MC.player.requestRespawn();
-		MC.setScreen(null);
+		WurstClient.setScreen(null);
 	}
 }

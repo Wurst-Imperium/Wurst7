@@ -22,6 +22,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditItemListScreen;
+import net.wurstclient.core.MatrixUtils;
 import net.wurstclient.settings.ItemListSetting;
 
 public final class ItemListEditButton extends Component
@@ -49,7 +50,7 @@ public final class ItemListEditButton extends Component
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)
 			return;
 		
-		WurstClient.MC.setScreen(
+		WurstClient.setScreen(
 			new EditItemListScreen(WurstClient.MC.currentScreen, setting));
 	}
 	
@@ -77,7 +78,7 @@ public final class ItemListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		

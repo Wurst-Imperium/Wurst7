@@ -183,7 +183,4 @@ public abstract class MinecraftClientMixin
 		
 	}
 
-	public void setScreen(@Nullable Screen screen){
-		this.openScreen(screen);
-	}
 }

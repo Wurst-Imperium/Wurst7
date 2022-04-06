@@ -71,13 +71,13 @@ public abstract class GameMenuScreenMixin extends Screen
 	{
 		ButtonWidget wurstConnectButton = new ButtonWidget(width / 2 + 4, height / 4 + 56,
 				98, 20, new LiteralText("Direct Connect"),
-				b -> WurstClient.MC.setScreen(new DirectConnectScreen(this, this::directConnect, serverEntry)));
+				b -> WurstClient.setScreen(new DirectConnectScreen(this, this::directConnect, serverEntry)));
 		addDrawableChild(wurstConnectButton);
 	}
 	
 	private void openWurstOptions()
 	{
-		client.setScreen(new WurstOptionsScreen(this));
+		WurstClient.setScreen(new WurstOptionsScreen(this));
 	}
 	
 	private void removeFeedbackAndBugReportButtons()
@@ -133,7 +133,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		if(confirmedAction)
 			connect(serverEntry);
 		else
-			WurstClient.MC.setScreen(this);
+			WurstClient.setScreen(this);
 	}
 
 	private void connect(ServerInfo entry)

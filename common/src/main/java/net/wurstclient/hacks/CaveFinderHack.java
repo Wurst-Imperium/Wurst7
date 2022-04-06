@@ -23,6 +23,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -242,7 +243,7 @@ public final class CaveFinderHack extends Hack
 		
 		if(vertexBuffer != null)
 		{
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);

@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -243,7 +244,7 @@ public final class MobSpawnEspHack extends Hack
 			matrixStack.push();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, scanner.chunk);
 			
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f viewMatrix = MatrixUtils.getPositionMatrix(matrixStack);
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);

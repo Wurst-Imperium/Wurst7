@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -173,7 +174,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// add keybind
-						WurstClient.MC.setScreen(new NavigatorNewKeybindScreen(
+						WurstClient.setScreen(new NavigatorNewKeybindScreen(
 							possibleKeybinds, NavigatorFeatureScreen.this));
 					}
 				};
@@ -235,7 +236,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						client.setScreen(new NavigatorRemoveKeybindScreen(
+						WurstClient.setScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
@@ -294,7 +295,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private void goBack()
 	{
 		parent.setExpanding(false);
-		client.setScreen(parent);
+		WurstClient.setScreen(parent);
 	}
 	
 	@Override
@@ -371,7 +372,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			int x3 = x1 + 2;
 			int x5 = x2 - 2;
 			
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			

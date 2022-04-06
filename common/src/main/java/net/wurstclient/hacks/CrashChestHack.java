@@ -14,6 +14,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
 
@@ -51,7 +52,7 @@ public final class CrashChestHack extends Hack
 		for(int i = 0; i < 40000; i++)
 			nbtList.add(new NbtList());
 		nbtCompound.put("www.wurstclient.net", nbtList);
-		stack.setNbt(nbtCompound);
+		MCNbtUtils.setNbt(stack,nbtCompound);
 		stack.setCustomName(new LiteralText("Copy Me"));
 		
 		// give item

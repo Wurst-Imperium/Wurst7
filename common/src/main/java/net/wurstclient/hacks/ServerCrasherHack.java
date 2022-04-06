@@ -18,6 +18,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.core.MCNbtUtils;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
 
@@ -44,8 +45,7 @@ public final class ServerCrasherHack extends Hack
 		
 		Item item = Registry.ITEM.get(new Identifier("creeper_spawn_egg"));
 		ItemStack stack = new ItemStack(item, 1);
-		stack.setNbt(createNBT());
-		
+		MCNbtUtils.setNbt(stack,createNBT());
 		placeStackInHotbar(stack);
 		setEnabled(false);
 	}

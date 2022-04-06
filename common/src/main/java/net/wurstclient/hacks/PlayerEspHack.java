@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.wurstclient.core.MCNbtUtils;
+import net.wurstclient.core.MatrixUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -154,7 +156,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private Color getColorByArmor(PlayerEntity e) {
 		float r = 0, g = 0, b = 0;
 		for (ItemStack items : e.getInventory().armor) {
-			NbtCompound compoundTag = items.getSubNbt("display");
+			NbtCompound compoundTag = MCNbtUtils.getSubNbt(items, "display");
 			// Returns a decimal color code
 			int color = compoundTag != null && compoundTag.contains("color", 99) ? compoundTag.getInt("color") : -1;
 			// no color found
@@ -244,7 +246,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = MatrixUtils.getPositionMatrix(matrixStack);
 
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

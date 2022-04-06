@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.wurstclient.WurstClient;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -70,7 +71,7 @@ public final class SelectFileScreen extends MCScreen
 	
 	private void openPrevScreen()
 	{
-		client.setScreen(prevScreen);
+		WurstClient.setScreen(prevScreen);
 	}
 	
 	private void done()
@@ -93,16 +94,16 @@ public final class SelectFileScreen extends MCScreen
 			"This will empty the '" + setting.getFolder().getFileName()
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
-		
-		client.setScreen(new ConfirmScreen(this::confirmReset, title, message));
+
+		WurstClient.setScreen(new ConfirmScreen(this::confirmReset, title, message));
 	}
 	
 	private void confirmReset(boolean confirmed)
 	{
 		if(confirmed)
 			setting.resetFolder();
-		
-		client.setScreen(SelectFileScreen.this);
+
+		WurstClient.setScreen(SelectFileScreen.this);
 	}
 	
 	@Override

@@ -49,7 +49,6 @@ import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
-import net.wurstclient.core.MCKeys;
 
 public enum WurstClient
 {
@@ -57,7 +56,7 @@ public enum WurstClient
 	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
-	public static final net.wurstclient.core.MCKeys MCKeys = new MCKeys(MC);
+	public static final MCKeys MCKeys = new MCKeys(MC);
 	public static final String VERSION = "7.22";
 	public static final String MC_VERSION = "1.18.2";
 	
