@@ -47,54 +47,44 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoEatHack extends Hack implements UpdateListener
 {
 	private final SliderSetting targetHunger = new SliderSetting(
-		"Target hunger",
-		"Tries to keep the hunger bar at or above this level, but only if it doesn't waste any hunger points.",
-		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
+		"Target hunger", "description.wurst.setting.autoeat.target_hunger", 10,
+		0, 10, 0.5, ValueDisplay.DECIMAL);
 	
 	private final SliderSetting minHunger = new SliderSetting("Min hunger",
-		"Always keeps the hunger bar at or above this level, even if it wastes some hunger points.\n\n"
-			+ "A value of 10 always allows for fast healing, but wastes the most hunger points. Recommended if you have lots of food and/or lots of combat.\n\n"
-			+ "A value of 6.5 cannot cause any waste with vanilla food items, but still gives a good amount of points for sprinting. Recommended if you have if you don't have much food.",
-		6.5, 0, 10, 0.5, ValueDisplay.DECIMAL);
+		"description.wurst.setting.autoeat.min_hunger", 6.5, 0, 10, 0.5,
+		ValueDisplay.DECIMAL);
 	
 	private final SliderSetting injuredHunger = new SliderSetting(
-		"Injured hunger",
-		"Fills the hunger bar to at least this level when you are injured, even if it wastes some hunger points.\n"
-			+ "10.0 - fastest healing\n" + "9.0 - slowest healing\n"
-			+ "8.5 or lower - no healing\n" + "3.0 or lower - no sprinting",
+		"Injured hunger", "description.wurst.setting.autoeat.injured_hunger",
 		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
 	
-	private final SliderSetting injuryThreshold = new SliderSetting(
-		"Injury threshold",
-		"Prevents small injuries from wasting all your food. AutoEat will only consider you injured if you have lost at least this number of hearts.",
-		1.5, 0.5, 10, 0.5, ValueDisplay.DECIMAL);
+	private final SliderSetting injuryThreshold =
+		new SliderSetting("Injury threshold",
+			"description.wurst.setting.autoeat.injury_threshold", 1.5, 0.5, 10,
+			0.5, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
-		new EnumSetting<>("Take items from", "Where to look for food.",
-			TakeItemsFrom.values(), TakeItemsFrom.HOTBAR);
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
+		"Take items from", "description.wurst.setting.autoeat.take_items_from",
+		TakeItemsFrom.values(), TakeItemsFrom.HOTBAR);
 	
 	private final CheckboxSetting allowOffhand =
 		new CheckboxSetting("Allow offhand", true);
 	
-	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
-		"Eat while walking", "Slows you down, not recommended.", false);
+	private final CheckboxSetting eatWhileWalking =
+		new CheckboxSetting("Eat while walking",
+			"description.wurst.setting.autoeat.eat_while_walking", false);
 	
 	private final CheckboxSetting allowHunger =
 		new CheckboxSetting("Allow hunger effect",
-			"Rotten flesh applies a harmless 'hunger' effect.\n"
-				+ "It is safe to eat and useful as emergency food.",
-			true);
+			"description.wurst.setting.autoeat.allow_hunger", true);
 	
 	private final CheckboxSetting allowPoison =
 		new CheckboxSetting("Allow poison effect",
-			"Poisoned food applies damage over time.\n" + "Not recommended.",
-			false);
+			"description.wurst.setting.autoeat.allow_poison", false);
 	
 	private final CheckboxSetting allowChorus =
 		new CheckboxSetting("Allow chorus fruit",
-			"Eating chorus fruit teleports you to a random location.\n"
-				+ "Not recommended.",
-			false);
+			"description.wurst.setting.autoeat.allow_chorus", false);
 	
 	private int oldSlot = -1;
 	

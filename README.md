@@ -9,18 +9,18 @@ Mostly proofreaders. Many translations are currently stuck because we have no on
 |Language|Status|
 |--------|--------|
 |Chinese (Simplified/Mainland)|Pending changes: [#574](https://github.com/Wurst-Imperium/Wurst7/pull/574), [#588](https://github.com/Wurst-Imperium/Wurst7/pull/588)|
-|Chinese (Traditional/Taiwan)|151/157 done|
-|Chinese (Cantonese/Hong Kong)|154/157 done|
+|Chinese (Traditional/Taiwan)|151/166 done|
+|Chinese (Cantonese/Hong Kong)|154/166 done|
 |French (France)|There are 3 pending submissions ([#515](https://github.com/Wurst-Imperium/Wurst7/pull/515), [#531](https://github.com/Wurst-Imperium/Wurst7/pull/531), [#552](https://github.com/Wurst-Imperium/Wurst7/pull/552)) with different translations and I don't know which one to merge. If you speak French, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker.|
-|German (Germany)|56/157 done. I'll probably do the rest myself since I can speak it natively.|
+|German (Germany)|56/166 done. I'll probably do the rest myself since I can speak it natively.|
 |Hindi (India)|Pending, needs reviews, check [#604](https://github.com/Wurst-Imperium/Wurst7/pull/604).|
-|Italian (Italy)|146/157 done|
-|Japanese (Japan)|157/157 done|
-|Polish (Poland)|157/157 done|
+|Italian (Italy)|146/166 done|
+|Japanese (Japan)|157/166 done|
+|Polish (Poland)|157/166 done|
 |Portugese (Brazil)|Pending, needs reviews, check [#528](https://github.com/Wurst-Imperium/Wurst7/pull/528).|
-|Russian (Russia)|147/157 done|
+|Russian (Russia)|147/166 done|
 |Turkish (Turkey)|There are 2 pending submissions ([#511](https://github.com/Wurst-Imperium/Wurst7/pull/511), [#512](https://github.com/Wurst-Imperium/Wurst7/pull/512)) with different translations and I don't know which one to merge. If you speak Turkish, please check these submissions for any grammatical errors and let me know which one sounds best to a native speaker. |
-|Ukrainian (Ukraine)|137/157 done|
+|Ukrainian (Ukraine)|137/166 done|
 
 If you speak both English and some other language, please help us by translating Wurst or reviewing existing translations. The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
 
