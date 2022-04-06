@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.util.StringHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -20,6 +19,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.StringHelper;
 
 @SearchTags({"mass tpa"})
 @DontSaveState

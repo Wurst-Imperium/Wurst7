@@ -13,9 +13,9 @@ import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.StewItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -27,6 +27,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+
+import java.util.ArrayList;
 
 @SearchTags({"auto soup", "AutoStew", "auto stew"})
 public final class AutoSoupHack extends Hack implements UpdateListener
@@ -121,14 +123,22 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		if(soupInInventory != -1)
 			IMC.getInteractionManager().windowClick_QUICK_MOVE(soupInInventory);
 	}
-	
+
+
+
 	private int findSoup(int startSlot, int endSlot)
 	{
+		ArrayList<Item> StewList = new ArrayList<Item>(4);
+		StewList.add(Items.MUSHROOM_STEW);
+		StewList.add(Items.SUSPICIOUS_STEW);
+		StewList.add(Items.RABBIT_STEW);
+		StewList.add(Items.BEETROOT_SOUP);
+
 		for(int i = startSlot; i < endSlot; i++)
 		{
 			ItemStack stack = MC.player.getInventory().getStack(i);
 			
-			if(stack != null && stack.getItem() instanceof StewItem)
+			if(stack != null && StewList.contains(stack.getItem()))
 				return i;
 		}
 		

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -325,5 +326,9 @@ public enum WurstClient
 	public AltManager getAltManager()
 	{
 		return altManager;
+	}
+
+	public static void setScreen(Screen screen){
+		MC.setScreen(screen);
 	}
 }

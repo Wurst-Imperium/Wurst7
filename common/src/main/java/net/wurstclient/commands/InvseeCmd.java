@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.wurstclient.WurstClient;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -61,7 +62,7 @@ public final class InvseeCmd extends Command implements RenderListener
 				continue;
 			
 			ChatUtils.message("Showing inventory of " + otherPlayerName + ".");
-			MC.setScreen(new InventoryScreen(player));
+			WurstClient.setScreen(new InventoryScreen(player));
 			found = true;
 			break;
 		}

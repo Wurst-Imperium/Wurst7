@@ -92,6 +92,7 @@ sourceSets {
 		java {
 			srcDirs "src"
 			srcDirs "../../common/src/main/java"
+			srcDirs "../../groups/1.18.x"
 		}
 		//noinspection GroovyAssignabilityCheck
 		resources{

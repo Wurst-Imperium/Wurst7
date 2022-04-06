@@ -56,7 +56,7 @@ public final class BlockComponent extends Component
 			Screen currentScreen = WurstClient.MC.currentScreen;
 			EditBlockScreen editScreen =
 				new EditBlockScreen(currentScreen, setting);
-			WurstClient.MC.setScreen(editScreen);
+			WurstClient.setScreen(editScreen);
 			
 		}else if(mouseButton == 1)
 			setting.resetToDefault();
