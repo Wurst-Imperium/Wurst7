@@ -145,5 +145,9 @@
   "description.wurst.altmanager.favorite": "Вы пометили этот аккаунт как особый.",
   "description.wurst.altmanager.window": "Эта кнопка открывает другое окно.",
   "description.wurst.altmanager.window_freeze": "Может показаться, что игра не отвечает пока открыто это окно.",
-  "description.wurst.altmanager.fullscreen": "§cВыйдите из полноэкранного режима!"
+  "description.wurst.altmanager.fullscreen": "§cВыйдите из полноэкранного режима!",
+  "gui.wurst.altmanager.folder_error.title": "Не удалось создать папку '.Wurst encryption'!",
+  "gui.wurst.altmanager.folder_error.message": "Возможно, вы случайно заблокировали доступ Wurst к этой папке.\nAltManager не может зашифровать или расшифровать ваш список твинков без него.\nВы все еще можете использовать AltManager, но любые твинки, которые вы создадите сейчас, не будут сохранены.\n\nПолная ошибка выглядит следующим образом:\n%s",
+  "gui.wurst.altmanager.empty.title": "Список ваших альтов пустой",
+  "gui.wurst.altmanager.empty.message": "Хотите чтобы я сгенерировал несколько случайных альтов, чтобы начать?"
 }
