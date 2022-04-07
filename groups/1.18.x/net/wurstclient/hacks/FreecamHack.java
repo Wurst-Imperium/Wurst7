@@ -41,6 +41,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.WurstClient;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
@@ -82,10 +83,8 @@ public final class FreecamHack extends Hack
 		EVENTS.add(RenderListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
-		
-		GameOptions gs = MC.options;
-		KeyBinding[] bindings = {gs.forwardKey, gs.backKey, gs.leftKey,
-			gs.rightKey, gs.jumpKey, gs.sneakKey};
+		KeyBinding[] bindings = {WurstClient.MCKeys.forwardKey(), WurstClient.MCKeys.backKey(), WurstClient.MCKeys.leftKey(),
+				WurstClient.MCKeys.rightKey(), WurstClient.MCKeys.jumpKey(), WurstClient.MCKeys.sneakKey()};
 		
 		for(KeyBinding binding : bindings)
 			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
@@ -122,10 +121,10 @@ public final class FreecamHack extends Hack
 		player.airStrafingSpeed = speed.getValueF();
 		Vec3d velocity = player.getVelocity();
 		
-		if(MC.options.jumpKey.isPressed())
+		if(WurstClient.MCKeys.jumpKey().isPressed())
 			player.setVelocity(velocity.add(0, speed.getValue(), 0));
-		
-		if(MC.options.sneakKey.isPressed())
+
+		if(WurstClient.MCKeys.sneakKey().isPressed())
 			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
 	}
 	

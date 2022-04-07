@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "wurst",
+  "id": "cheddarbrat-wurst",
   "version": "${version}",
 
-  "name": "Wurst Client",
-  "description": "Wurst Wurst Wurst!",
+  "name": "CheddarBratWurst Client",
+  "description": "Cheesy Wurst Wurst Wurst!",
   "authors": [
-    "Alexander01998"
+    "Alexander01998",
+    "TheGrandCurator"
   ],
   "contact": {
     "homepage": "https://www.wurstclient.net/",

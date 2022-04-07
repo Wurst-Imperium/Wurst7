@@ -16,6 +16,7 @@ import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
+import net.wurstclient.WurstClient;
 
 @SearchTags({"no clip"})
 public final class NoClipHack extends Hack implements UpdateListener,
