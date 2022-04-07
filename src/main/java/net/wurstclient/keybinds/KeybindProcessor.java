@@ -39,6 +39,8 @@ public final class KeybindProcessor implements KeyPressListener
 		if(event.getAction() != GLFW.GLFW_PRESS)
 			return;
 		
+		if (InputUtil.isKeyPressed(WurstClient.MC.getWindow().getHandle(), GLFW.GLFW_KEY_F3)) return;
+
 		Screen screen = WurstClient.MC.currentScreen;
 		if(screen != null && !(screen instanceof ClickGuiScreen))
 			return;
