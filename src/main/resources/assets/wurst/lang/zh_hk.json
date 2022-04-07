@@ -15,7 +15,7 @@
   "description.wurst.hack.autodrop": "自動丢咗你唔想要嘅嘢（有預設）。",
   "description.wurst.hack.autoleave": "如果你嘅血量低於規定值，將會自動離開服務器。",
   "description.wurst.hack.autoeat": "當必要陣會自動進食。",
-    "description.wurst.setting.autoeat.target_hunger": "嘗試保持飢餓條喺此水平或以上，前提系佢唔會溢出飢餓度。",
+  "description.wurst.setting.autoeat.target_hunger": "嘗試保持飢餓條喺此水平或以上，前提系佢唔會溢出飢餓度。",
   "description.wurst.setting.autoeat.min_hunger": "永遠保持飢餓條喺呢個水平或以上，就算佢溢出。\n6.5 -唔會導致浪費任何原版食品。\n10.0 -完全忽略浪費，只為保持飢餓條滿。",
   "description.wurst.setting.autoeat.injured_hunger": "當你受傷時，飢餓條至少恢復到呢個等級，就算會溢出。\n10.0 - 能夠快速生命恢復\n9.0 - 最慢生命恢復\n<9.0 - 不会生命恢复\n<3.5 - 无法疾跑",
   "description.wurst.setting.autoeat.injury_threshold": "防止輕傷就進食，浪費你嘅食物。AutoEat 功能只會喺你失去至少呢個數嘅血量才會認為你受傷。",
