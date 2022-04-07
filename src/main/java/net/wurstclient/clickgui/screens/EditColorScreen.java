@@ -70,7 +70,7 @@ public final class EditColorScreen extends Screen
 	{
 		// Cache color palette
 		try(InputStream stream = client.getResourceManager()
-			.getResource(paletteIdentifier).getInputStream())
+			.getResourceOrThrow(paletteIdentifier).getInputStream())
 		{
 			paletteAsBufferedImage = ImageIO.read(stream);
 			
