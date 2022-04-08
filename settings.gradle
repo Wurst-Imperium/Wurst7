@@ -11,13 +11,13 @@ pluginManagement {
 
 rootProject.name = 'CheddarBratWurst-' + rootProject.projectDir.name
 
-include '1.18.2'
-
-project(":1.18.2").dir = new File('versions/1.18.2')
-
 include '1.17'
 
 project(":1.17").dir = new File('versions/1.17')
+
+include '1.17.1'
+
+project(":1.17.1").dir = new File('versions/1.17.1')
 
 
 include '1.18'
@@ -28,3 +28,7 @@ project(":1.18").dir = new File('versions/1.18')
 include '1.18.1'
 
 project(":1.18.1").dir = new File('versions/1.18.1')
+
+include '1.18.2'
+
+project(":1.18.2").dir = new File('versions/1.18.2')

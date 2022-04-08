@@ -38,7 +38,6 @@ dependencies {
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-	implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 processResources {

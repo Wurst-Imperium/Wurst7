@@ -101,7 +101,6 @@ public abstract class EntityRendererMixin<T extends Entity>
 		matrixStack.pop();
 	}
 
-	@Shadow
 	public TextRenderer getFontRenderer()
 	{
 		return null;

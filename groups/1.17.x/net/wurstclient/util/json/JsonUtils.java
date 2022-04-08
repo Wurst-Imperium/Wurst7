@@ -7,22 +7,13 @@
  */
 package net.wurstclient.util.json;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.google.gson.*;
+
+import java.io.*;
 import java.net.URI;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 public enum JsonUtils
 {
@@ -32,14 +23,21 @@ public enum JsonUtils
 	
 	public static final Gson PRETTY_GSON =
 		new GsonBuilder().setPrettyPrinting().create();
-	
+
+	public static JsonElement parseString(String string)
+	{
+		JsonParser parser = new JsonParser();
+		return parser.parse(string);
+	}
+
 	public static JsonElement parseFile(Path path)
 		throws IOException, JsonException
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
-			return JsonParser.parseReader(reader);
-			
+			JsonParser parser = new JsonParser();
+			return parser.parse(reader.toString());
+
 		}catch(JsonParseException e)
 		{
 			throw new JsonException(e);
@@ -76,7 +74,8 @@ public enum JsonUtils
 		{
 			InputStreamReader reader = new InputStreamReader(input);
 			BufferedReader bufferedReader = new BufferedReader(reader);
-			return JsonParser.parseReader(bufferedReader);
+			JsonParser parser = new JsonParser();
+			return parser.parse(bufferedReader.toString());
 			
 		}catch(JsonParseException e)
 		{
@@ -116,8 +115,9 @@ public enum JsonUtils
 		{
 			InputStreamReader reader = new InputStreamReader(input);
 			BufferedReader bufferedReader = new BufferedReader(reader);
-			return JsonParser.parseReader(bufferedReader);
-			
+			JsonParser parser = new JsonParser();
+			return parser.parse(bufferedReader.toString());
+
 		}catch(JsonParseException e)
 		{
 			throw new JsonException(e);

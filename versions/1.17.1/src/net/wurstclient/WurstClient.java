@@ -58,7 +58,7 @@ public enum WurstClient
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	public static final MCKeys MCKeys = new MCKeys(MC);
 	public static final String VERSION = "7.22";
-	public static final String MC_VERSION = "1.17";
+	public static final String MC_VERSION = "1.17.1";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -329,6 +329,6 @@ public enum WurstClient
 	}
 
 	public static void setScreen(Screen screen){
-		MC.openScreen(screen);
+		WurstClient.setScreen(screen);
 	}
 }

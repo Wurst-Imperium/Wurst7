@@ -23,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -35,6 +34,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.wurstclient.util.json.JsonUtils;
 
 @Mixin(PlayerSkinProvider.class)
 public class PlayerSkinProviderMixin
@@ -147,9 +147,7 @@ public class PlayerSkinProviderMixin
 			// TODO: download capes to file
 			URL url = new URL("https://www.wurstclient.net/api/v1/capes.json");
 			
-			capes =
-				JsonParser.parseReader(new InputStreamReader(url.openStream()))
-					.getAsJsonObject();
+			capes = JsonUtils.parseConnection(url.openConnection()).getAsJsonObject();
 			
 		}catch(Exception e)
 		{
