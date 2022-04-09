@@ -89,7 +89,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(ElytraItem.isUsable(chest) && WurstClient.MCKeys.jumpKey().isPressed())
+		if(ElytraItem.isUsable(chest) && WurstClient.MC_GAME_OPTIONS.getJumpKey().isPressed())
 			doInstantFly();
 	}
 	
@@ -107,9 +107,9 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		Vec3d v = MC.player.getVelocity();
 		
-		if(WurstClient.MCKeys.jumpKey().isPressed())
+		if(WurstClient.MC_GAME_OPTIONS.getJumpKey().isPressed())
 			MC.player.setVelocity(v.x, v.y + 0.08, v.z);
-		else if(WurstClient.MCKeys.sneakKey().isPressed())
+		else if(WurstClient.MC_GAME_OPTIONS.getSneakKey().isPressed())
 			MC.player.setVelocity(v.x, v.y - 0.04, v.z);
 	}
 	
@@ -124,9 +124,9 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		Vec3d v = MC.player.getVelocity();
 		
-		if(WurstClient.MCKeys.forwardKey().isPressed())
+		if(WurstClient.MC_GAME_OPTIONS.getForwardKey().isPressed())
 			MC.player.setVelocity(v.add(forward));
-		else if(WurstClient.MCKeys.backKey().isPressed())
+		else if(WurstClient.MC_GAME_OPTIONS.getBackKey().isPressed())
 			MC.player.setVelocity(v.subtract(forward));
 	}
 	

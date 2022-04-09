@@ -203,7 +203,7 @@ public final class AltManagerScreen extends Screen
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
 		
-		boolean windowMode = !client.options.fullscreen;
+		boolean windowMode = !WurstClient.MC_GAME_OPTIONS.getIsFullscreen();
 		importButton.active = windowMode;
 		exportButton.active = windowMode;
 	}
@@ -534,7 +534,7 @@ public final class AltManagerScreen extends Screen
 			ArrayList<Text> tooltip = new ArrayList<>();
 			addTooltip(tooltip, "window");
 			
-			if(client.options.fullscreen)
+			if(WurstClient.MC_GAME_OPTIONS.getIsFullscreen())
 				addTooltip(tooltip, "fullscreen");
 			else
 				addTooltip(tooltip, "window_freeze");

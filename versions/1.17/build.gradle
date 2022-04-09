@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -84,6 +84,7 @@ sourceSets {
 		java {
 			srcDirs "src"
 			srcDirs "../../groups/${project.group_version}"
+			srcDirs "../../groups/${project.java_version}/src"
 			srcDirs "../../common/src/main/java"
 		}
 		//noinspection GroovyAssignabilityCheck
@@ -97,7 +98,7 @@ sourceSets {
 
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.17 (21w19a) upwards uses Java 16.
+	// Minecraft 21w19a to 1.18 Pre-release 1 uses Java 16.
 	it.options.release = 16
 }
 

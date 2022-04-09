@@ -59,7 +59,7 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding sneakKey = (IKeyBinding)WurstClient.MCKeys.sneakKey();
+			IKeyBinding sneakKey = (IKeyBinding)WurstClient.MC_GAME_OPTIONS.getSneakKey();
 			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
 			break;
 			
@@ -72,7 +72,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		KeyBinding sneakKey = WurstClient.MCKeys.sneakKey();
+		KeyBinding sneakKey = WurstClient.MC_GAME_OPTIONS.getSneakKey();
 		
 		switch(mode.getSelected())
 		{

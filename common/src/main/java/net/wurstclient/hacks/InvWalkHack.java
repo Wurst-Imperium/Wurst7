@@ -65,9 +65,9 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		if(!isAllowedScreen(screen))
 			return;
 		
-		KeyBinding[] keys = {WurstClient.MCKeys.forwardKey(), WurstClient.MCKeys.backKey(),
-				WurstClient.MCKeys.leftKey(), WurstClient.MCKeys.rightKey(), WurstClient.MCKeys.jumpKey(),
-				WurstClient.MCKeys.sprintKey(), WurstClient.MCKeys.sneakKey()};
+		KeyBinding[] keys = {WurstClient.MC_GAME_OPTIONS.getForwardKey(), WurstClient.MC_GAME_OPTIONS.getBackKey(),
+				WurstClient.MC_GAME_OPTIONS.getLeftKey(), WurstClient.MC_GAME_OPTIONS.getRightKey(), WurstClient.MC_GAME_OPTIONS.getJumpKey(),
+				WurstClient.MC_GAME_OPTIONS.getSprintKey(), WurstClient.MC_GAME_OPTIONS.getSneakKey()};
 		
 		for(KeyBinding key : keys)
 			key.setPressed(((IKeyBinding)key).isActallyPressed());

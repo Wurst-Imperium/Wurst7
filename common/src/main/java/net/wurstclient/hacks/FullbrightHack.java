@@ -11,12 +11,14 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.core.MCGameOptions;
 
 @SearchTags({"Fullbrightness", "full brightness", "Fulbrightness",
 	"ful brightness", "NightVision", "night vision", "FullLightness",
@@ -62,7 +64,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			@Override
 			public void onUpdate()
 			{
-				double gamma = MC.options.gamma;
+				double gamma = WurstClient.MC_GAME_OPTIONS.getGamma();
 				System.out.println("Brightness started at " + gamma);
 				
 				if(gamma > 1)
@@ -100,35 +102,35 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	private void setGamma(double target)
 	{
 		wasGammaChanged = true;
-		GameOptions options = MC.options;
+		MCGameOptions options = WurstClient.MC_GAME_OPTIONS;
 		
-		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
+		if(!fade.isChecked() || Math.abs(options.getGamma() - target) <= 0.5)
 		{
-			options.gamma = target;
+			options.setGamma(target);
 			return;
 		}
 		
-		if(options.gamma < target)
-			options.gamma += 0.5;
+		if(options.getGamma() < target)
+			options.setGamma(options.getGamma() + 0.5);
 		else
-			options.gamma -= 0.5;
+			options.setGamma(options.getGamma() - 0.5);
 	}
 	
 	private void resetGamma(double target)
 	{
-		GameOptions options = MC.options;
+		MCGameOptions options = WurstClient.MC_GAME_OPTIONS;
 		
-		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
+		if(!fade.isChecked() || Math.abs(options.getGamma() - target) <= 0.5)
 		{
-			options.gamma = target;
+			options.setGamma(target);
 			wasGammaChanged = false;
 			return;
 		}
 		
-		if(options.gamma < target)
-			options.gamma += 0.5;
+		if(options.getGamma() < target)
+			options.setGamma(options.getGamma() + 0.5);
 		else
-			options.gamma -= 0.5;
+			options.setGamma(options.getGamma() - 0.5);
 	}
 	
 	private void updateNightVision()

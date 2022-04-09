@@ -161,7 +161,7 @@ public final class ClickAuraHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		if(!WURST.MCKeys.attackKey().isPressed())
+		if(!WURST.MC_GAME_OPTIONS.getAttackKey().isPressed())
 			return;
 		
 		if(MC.player.getAttackCooldownProgress(0) < 1)

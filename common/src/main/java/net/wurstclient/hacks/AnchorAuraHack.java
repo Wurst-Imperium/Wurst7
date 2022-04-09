@@ -42,6 +42,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
@@ -194,7 +195,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.world.getDimension().isRespawnAnchorWorking())
+		if(WurstClient.MC_WORLD.respawnAnchorWorksCurrentDimension())
 		{
 			ChatUtils.error("Respawn anchors don't explode in this dimension.");
 			setEnabled(false);

@@ -134,13 +134,13 @@ public final class XRayHack extends Hack implements UpdateListener,
 		MC.worldRenderer.reload();
 		
 		if(!WURST.getHax().fullbrightHack.isEnabled())
-			MC.options.gamma = 0.5F;
+			WurstClient.MC_GAME_OPTIONS.setGamma(0.5F);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		MC.options.gamma = 16;
+		WurstClient.MC_GAME_OPTIONS.setGamma(16F);
 	}
 	
 	@Override

@@ -177,8 +177,8 @@ public final class TunnellerHack extends Hack
 		if(hax.freecamHack.isEnabled() || hax.remoteViewHack.isEnabled())
 			return;
 		
-		KeyBinding[] bindings = {WurstClient.MCKeys.forwardKey(), WurstClient.MCKeys.backKey(), WurstClient.MCKeys.leftKey(),
-				WurstClient.MCKeys.rightKey(), WurstClient.MCKeys.jumpKey(), WurstClient.MCKeys.sneakKey()};
+		KeyBinding[] bindings = {WurstClient.MC_GAME_OPTIONS.getForwardKey(), WurstClient.MC_GAME_OPTIONS.getBackKey(), WurstClient.MC_GAME_OPTIONS.getLeftKey(),
+				WurstClient.MC_GAME_OPTIONS.getRightKey(), WurstClient.MC_GAME_OPTIONS.getJumpKey(), WurstClient.MC_GAME_OPTIONS.getSneakKey()};
 		for(KeyBinding binding : bindings)
 			binding.setPressed(false);
 		
@@ -474,7 +474,7 @@ public final class TunnellerHack extends Hack
 			Vec3d vec = Vec3d.ofCenter(base);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 
-			WURST.MCKeys.forwardKey().setPressed(true);
+			WURST.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 		}
 	}
 	
@@ -528,7 +528,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			WurstClient.MCKeys.sneakKey().setPressed(true);
+			WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 			Vec3d velocity = MC.player.getVelocity();
 			MC.player.setVelocity(0, velocity.y, 0);
 			
@@ -665,7 +665,7 @@ public final class TunnellerHack extends Hack
 		public void run()
 		{
 			BlockPos player = new BlockPos(MC.player.getPos());
-			KeyBinding forward = WURST.MCKeys.forwardKey();
+			KeyBinding forward = WURST.MC_GAME_OPTIONS.getForwardKey();
 			
 			Vec3d diffVec = Vec3d.of(player.subtract(start));
 			Vec3d dirVec = Vec3d.of(direction.getVector());
@@ -769,7 +769,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 
-			WurstClient.MCKeys.sneakKey().setPressed(true);
+			WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 			placeBlockSimple(nextTorch);
 		}
 		

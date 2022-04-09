@@ -71,8 +71,8 @@ public final class EditColorScreen extends MCScreen
 	public void init()
 	{
 		// Cache color palette
-		try(InputStream stream = client.getResourceManager()
-			.getResource(paletteIdentifier).getInputStream())
+		try(InputStream stream = WurstClient.MC_RESOURCE_MANAGER
+				.getResourceOrThrow(paletteIdentifier).getInputStream())
 		{
 			paletteAsBufferedImage = ImageIO.read(stream);
 			

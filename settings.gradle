@@ -32,3 +32,14 @@ project(":1.18.1").dir = new File('versions/1.18.1')
 include '1.18.2'
 
 project(":1.18.2").dir = new File('versions/1.18.2')
+
+include '22w11a'
+project(":22w11a").dir = new File('versions/22w11a')
+include '22w12a'
+project(":22w12a").dir = new File('versions/22w12a')
+include '22w13a'
+project(":22w13a").dir = new File('versions/22w13a')
+//include '22w13oneblockatatime'
+//project(":22w13oneblockatatime").dir = new File('versions/22w13oneblockatatime')
+include '22w14a'
+project(":22w14a").dir = new File('versions/22w14a')

@@ -41,7 +41,7 @@ public final class JetpackHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(WurstClient.MCKeys.jumpKey().isPressed())
+		if(WurstClient.MC_GAME_OPTIONS.getJumpKey().isPressed())
 			MC.player.jump();
 	}
 }

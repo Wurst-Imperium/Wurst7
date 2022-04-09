@@ -113,7 +113,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// eat food
-		WurstClient.MCKeys.useKey().setPressed(true);
+		WurstClient.MC_GAME_OPTIONS.getUseKey().setPressed(true);
 		IMC.getInteractionManager().rightClickItem();
 	}
 	
@@ -219,7 +219,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(!isEating())
 			return;
 
-		WurstClient.MCKeys.useKey().setPressed(false);
+		WurstClient.MC_GAME_OPTIONS.getUseKey().setPressed(false);
 		
 		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;

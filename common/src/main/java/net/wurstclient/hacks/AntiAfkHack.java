@@ -72,10 +72,10 @@ public final class AntiAfkHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 
-		WurstClient.MCKeys.forwardKey().setPressed(
-			((IKeyBinding) WurstClient.MCKeys.forwardKey()).isActallyPressed());
-		WurstClient.MCKeys.jumpKey()
-			.setPressed(((IKeyBinding) WurstClient.MCKeys.jumpKey()).isActallyPressed());
+		WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(
+			((IKeyBinding) WurstClient.MC_GAME_OPTIONS.getForwardKey()).isActallyPressed());
+		WurstClient.MC_GAME_OPTIONS.getJumpKey()
+			.setPressed(((IKeyBinding) WurstClient.MC_GAME_OPTIONS.getJumpKey()).isActallyPressed());
 		
 		pathFinder = null;
 		processor = null;
@@ -101,7 +101,7 @@ public final class AntiAfkHack extends Hack
 			{
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
-					WurstClient.MCKeys.jumpKey().setPressed(MC.player.isTouchingWater());
+					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
@@ -157,12 +157,12 @@ public final class AntiAfkHack extends Hack
 			
 			// walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
-				WurstClient.MCKeys.forwardKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 			else
-				WurstClient.MCKeys.forwardKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(false);
 			
 			// swim up
-			WurstClient.MCKeys.jumpKey().setPressed(MC.player.isTouchingWater());
+			WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(MC.player.isTouchingWater());
 			
 			// update timer
 			if(timer > 0)

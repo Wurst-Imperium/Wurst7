@@ -201,7 +201,7 @@ public final class ProtectHack extends Hack
 		
 		if(friend != null)
 		{
-			WURST.MCKeys.forwardKey().setPressed(false);
+			WURST.MC_GAME_OPTIONS.getForwardKey().setPressed(false);
 			friend = null;
 		}
 	}
@@ -352,19 +352,19 @@ public final class ProtectHack extends Hack
 						MC.player.getX(), target.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > target.getY() + 1D)
-					WurstClient.MCKeys.sneakKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 				else if(MC.player.getY() < target.getY() - 1D)
-					WurstClient.MCKeys.jumpKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 			}else
 			{
-				WurstClient.MCKeys.sneakKey().setPressed(false);
-				WurstClient.MCKeys.jumpKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(false);
 			}
 			
 			// follow target
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
-			WurstClient.MCKeys.forwardKey().setPressed(MC.player.distanceTo(
+			WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(MC.player.distanceTo(
 				target) > (target == friend ? distanceF : distanceE));
 		}
 		

@@ -87,17 +87,17 @@ public class WalkPathProcessor extends PathProcessor
 				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()
 					|| WURST.getHax().jesusHack.isOverLiquid()))
-				WurstClient.MCKeys.sneakKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 		}
 		
 		// horizontal movement
 		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
 		{
-			WurstClient.MCKeys.forwardKey().setPressed(true);
+			WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 			
 			if(index > 0 && path.get(index - 1).isJumping()
 				|| pos.getY() < nextPos.getY())
-				WurstClient.MCKeys.jumpKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 			
 			// vertical movement
 		}else if(pos.getY() != nextPos.getY())
@@ -112,7 +112,7 @@ public class WalkPathProcessor extends PathProcessor
 					WURST.getRotationFaker().faceVectorClientIgnorePitch(
 						BlockUtils.getBoundingBox(pos).getCenter());
 					
-					WurstClient.MCKeys.forwardKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 					
 				}else
 				{
@@ -122,7 +122,7 @@ public class WalkPathProcessor extends PathProcessor
 						index++;
 					
 					// jump up
-					WurstClient.MCKeys.jumpKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 				}
 				
 				// go down
@@ -135,7 +135,7 @@ public class WalkPathProcessor extends PathProcessor
 				
 				// walk off the edge
 				if(WurstClient.MC.player.isOnGround())
-					WurstClient.MCKeys.forwardKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 			}
 	}
 }

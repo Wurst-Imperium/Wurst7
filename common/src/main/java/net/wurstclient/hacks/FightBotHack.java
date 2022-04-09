@@ -313,17 +313,17 @@ public final class FightBotHack extends Hack
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					WurstClient.MCKeys.sneakKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					WurstClient.MCKeys.jumpKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 			}else
 			{
-				WurstClient.MCKeys.sneakKey().setPressed(false);
-				WurstClient.MCKeys.jumpKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(false);
 			}
 			
 			// follow entity
-			WurstClient.MCKeys.forwardKey().setPressed(
+			WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(
 				MC.player.distanceTo(entity) > distance.getValueF());
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());

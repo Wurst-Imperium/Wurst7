@@ -121,13 +121,13 @@ public class FlyPathProcessor extends PathProcessor
 				return;
 			}
 			
-			WurstClient.MCKeys.forwardKey().setPressed(true);
+			WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 			
 			if(MC.player.horizontalCollision)
 				if(posVec.y > nextBox.maxY)
-					WurstClient.MCKeys.sneakKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 				else if(posVec.y < nextBox.minY)
-					WurstClient.MCKeys.jumpKey().setPressed(true);
+					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 				
 			// vertical movement
 		}else if(y)
@@ -140,14 +140,14 @@ public class FlyPathProcessor extends PathProcessor
 			}
 			
 			if(posVec.y < nextBox.minY)
-				WurstClient.MCKeys.jumpKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(true);
 			else
-				WurstClient.MCKeys.sneakKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(true);
 			
 			if(MC.player.verticalCollision)
 			{
-				WurstClient.MCKeys.sneakKey().setPressed(false);
-				WurstClient.MCKeys.forwardKey().setPressed(true);
+				WurstClient.MC_GAME_OPTIONS.getSneakKey().setPressed(false);
+				WurstClient.MC_GAME_OPTIONS.getForwardKey().setPressed(true);
 			}
 		}
 	}
