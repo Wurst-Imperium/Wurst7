@@ -44,6 +44,7 @@ public final class FishHack extends Hack implements UpdateListener
 			return;
 		
 		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, velocity.y + 0.005, velocity.z);
+		velocity.add(0,0.005, 0);
+		player.setVelocity(velocity);
 	}
 }

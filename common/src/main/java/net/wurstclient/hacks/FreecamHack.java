@@ -9,13 +9,11 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import net.wurstclient.core.MCPlayer;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -116,7 +114,7 @@ public final class FreecamHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		MCPlayer player = (MCPlayer)MC.player;
+		IClientPlayerEntity player = (IClientPlayerEntity)MC.player;
 		player.setVelocity(Vec3d.ZERO);
 		
 		player.setOnGround(false);

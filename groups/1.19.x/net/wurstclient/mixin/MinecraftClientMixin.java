@@ -40,8 +40,8 @@ import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
-	extends ReentrantThreadExecutor<Runnable>
-	implements WindowEventHandler, IMinecraftClient
+		extends ReentrantThreadExecutor<Runnable>
+		implements WindowEventHandler, IMinecraftClient
 {
 	@Shadow
 	private int itemUseCooldown;
@@ -57,127 +57,127 @@ public abstract class MinecraftClientMixin
 	@Shadow
 	@Final
 	private Session session;
-	
+
 	private Session wurstSession;
-	
+
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
 		super(string_1);
 	}
-	
+
 	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+			target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
+			ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
 	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 			cir.setReturnValue(false);
 	}
-	
+
 	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
-		ordinal = 0)}, method = {"doItemUse()V"}, cancellable = true)
+			target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
+			ordinal = 0)}, method = {"doItemUse()V"}, cancellable = true)
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 			ci.cancel();
 	}
-	
+
 	@Inject(at = {@At("HEAD")}, method = {"doItemPick()V"})
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
-		
+
 		HitResult hitResult = WurstClient.MC.crosshairTarget;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.ENTITY)
 			return;
-		
+
 		Entity entity = ((EntityHitResult)hitResult).getEntity();
 		WurstClient.INSTANCE.getFriends().middleClick(entity);
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
-		method = {"getSession()Lnet/minecraft/client/util/Session;"},
-		cancellable = true)
+			method = {"getSession()Lnet/minecraft/client/util/Session;"},
+			cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
 	{
 		if(wurstSession == null)
 			return;
-		
+
 		cir.setReturnValue(wurstSession);
 	}
-	
+
 	@Redirect(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0),
-		method = {
-			"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
+			target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0),
+			method = {
+					"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
 	private Session getSessionForSessionProperties(MinecraftClient mc)
 	{
 		if(wurstSession != null)
 			return wurstSession;
 		return session;
 	}
-	
+
 	@Override
 	public void rightClick()
 	{
 		doItemUse();
 	}
-	
+
 	@Override
 	public int getItemUseCooldown()
 	{
 		return itemUseCooldown;
 	}
-	
+
 	@Override
 	public void setItemUseCooldown(int itemUseCooldown)
 	{
 		this.itemUseCooldown = itemUseCooldown;
 	}
-	
+
 	@Override
 	public IClientPlayerEntity getPlayer()
 	{
 		return (IClientPlayerEntity)player;
 	}
-	
+
 	@Override
 	public IWorld getWorld()
 	{
 		return (IWorld)world;
 	}
-	
+
 	@Override
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
 	}
-	
+
 	@Override
 	public ILanguageManager getLanguageManager()
 	{
 		return (ILanguageManager)languageManager;
 	}
-	
+
 	@Override
 	public void setSession(Session session)
 	{
 		wurstSession = session;
 	}
-	
+
 	@Shadow
 	private void doItemUse()
 	{
-		
+
 	}
 }

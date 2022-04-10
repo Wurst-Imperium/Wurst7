@@ -9,6 +9,7 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
 
@@ -91,6 +92,10 @@ public interface KnockbackListener extends Listener
 		public double getDefaultZ()
 		{
 			return defaultZ;
+		}
+
+		public Vec3d getVec3d(){
+			return new Vec3d(this.x, this.y, this.z);
 		}
 	}
 }

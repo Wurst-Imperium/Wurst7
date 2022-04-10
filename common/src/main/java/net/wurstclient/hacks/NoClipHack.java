@@ -7,10 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.core.MCPlayer;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PlayerMoveListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
@@ -52,14 +51,14 @@ public final class NoClipHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		MCPlayer player = (MCPlayer)MC.player;
+		IClientPlayerEntity player = (IClientPlayerEntity)MC.player;
 		
-		player.noClip = true;
-		player.fallDistance = 0;
+		player.setNoClip(true);
+		player.setFallDistance(0);
 		player.setOnGround(false);
 		
 		player.getAbilities().flying = false;
-		player.setVelocity(0, 0, 0);
+		player.setVelocity(Vec3d.ZERO);
 		
 		float speed = 0.2F;
 		player.setAirSpeed(speed);

@@ -44,6 +44,6 @@ public final class DolphinHack extends Hack implements UpdateListener
 			return;
 		
 		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, velocity.y + 0.04, velocity.z);
+		player.setVelocity(velocity.add(0,0.04,0));
 	}
 }

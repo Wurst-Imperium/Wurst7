@@ -7,14 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.core.MCPlayer;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.WurstClient;
@@ -53,12 +52,12 @@ public final class FlightHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		MCPlayer player = (MCPlayer)MC.player;
+		IClientPlayerEntity player = (IClientPlayerEntity)MC.player;
 		
 		player.getAbilities().flying = false;
 		player.setAirSpeed(speed.getValueF());
 		
-		player.setVelocity(0, 0, 0);
+		player.setVelocity(Vec3d.ZERO);
 		Vec3d velocity = player.getVelocity();
 		
 		if(WurstClient.MC_GAME_OPTIONS.getJumpKey().isPressed())

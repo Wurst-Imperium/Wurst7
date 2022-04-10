@@ -48,6 +48,6 @@ public final class FastLadderHack extends Hack implements UpdateListener
 			return;
 		
 		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, 0.2872, velocity.z);
+		player.setVelocity(new Vec3d(velocity.x, 0.2872, velocity.z));
 	}
 }

@@ -59,10 +59,10 @@ public class FlyPathProcessor extends PathProcessor
 			if(creativeFlying)
 			{
 				Vec3d v = MC.player.getVelocity();
-				
-				MC.player.setVelocity(v.x / Math.max(Math.abs(v.x) * 50, 1),
+
+				MC.player.setVelocity(new Vec3d(v.x / Math.max(Math.abs(v.x) * 50, 1),
 					v.y / Math.max(Math.abs(v.y) * 50, 1),
-					v.z / Math.max(Math.abs(v.z) * 50, 1));
+					v.z / Math.max(Math.abs(v.z) * 50, 1)));
 			}
 			
 			if(index >= path.size())
@@ -98,14 +98,11 @@ public class FlyPathProcessor extends PathProcessor
 			Vec3d v = MC.player.getVelocity();
 			
 			if(!x)
-				MC.player.setVelocity(v.x / Math.max(Math.abs(v.x) * 50, 1),
-					v.y, v.z);
+				MC.player.setVelocity(new Vec3d(v.x / Math.max(Math.abs(v.x) * 50, 1), v.y, v.z));
 			if(!y)
-				MC.player.setVelocity(v.x,
-					v.y / Math.max(Math.abs(v.y) * 50, 1), v.z);
+				MC.player.setVelocity(new Vec3d(v.x,v.y / Math.max(Math.abs(v.y) * 50, 1), v.z));
 			if(!z)
-				MC.player.setVelocity(v.x, v.y,
-					v.z / Math.max(Math.abs(v.z) * 50, 1));
+				MC.player.setVelocity(new Vec3d(v.x, v.y,v.z / Math.max(Math.abs(v.z) * 50, 1)));
 		}
 		
 		Vec3d vecInPos = new Vec3d(nextPos.getX() + 0.5, nextPos.getY() + 0.1,

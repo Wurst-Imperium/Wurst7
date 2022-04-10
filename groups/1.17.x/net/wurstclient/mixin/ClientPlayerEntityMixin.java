@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.entity.player.PlayerAbilities;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -167,9 +168,26 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		KnockbackEvent event = new KnockbackEvent(x, y, z);
 		EventManager.fire(event);
-		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
+		super.setVelocity(event.getVec3d());
 	}
-	
+
+	@Override
+	public void setVelocity(double x, double y, double z)
+	{
+		super.setVelocity(x,y,z);
+	}
+
+	@Override
+	public void setVelocity(Vec3d value)
+	{
+		super.setVelocity(value);
+	}
+
+	@Override
+	public Vec3d getVelocity(){
+		return super.getVelocity();
+	}
+
 	@Override
 	public boolean isTouchingWater()
 	{
@@ -231,7 +249,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		this.noClip = noClip;
 	}
-	
+
+	public void setFallDistance(float value)
+	{
+		this.fallDistance = value;
+	}
+
 	@Override
 	public float getLastYaw()
 	{
@@ -248,5 +271,19 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier)
 	{
 		this.movementMultiplier = movementMultiplier;
+	}
+
+	public float getAirSpeed(){
+		return this.flyingSpeed;
+	}
+
+	public void setAirSpeed(float value){
+		this.flyingSpeed = value;
+	}
+
+	@Override
+	public PlayerAbilities getAbilities()
+	{
+		return super.getAbilities();
 	}
 }

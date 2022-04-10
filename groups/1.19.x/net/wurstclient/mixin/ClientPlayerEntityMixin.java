@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.entity.player.PlayerAbilities;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,15 +56,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Shadow
 	@Final
 	protected MinecraftClient client;
-	
+
 	private Screen tempCurrentScreen;
-	
+
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
 		GameProfile gameProfile_1)
 	{
 		super(clientWorld_1, gameProfile_1);
 	}
-	
+
 	@Inject(at = @At("HEAD"),
 		method = "sendChatMessage(Ljava/lang/String;)V",
 		cancellable = true)
@@ -71,22 +72,22 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 		{
 			ci.cancel();
 			return;
 		}
-		
+
 		if(!event.isModified())
 			return;
-		
+
 		ChatMessageC2SPacket packet =
 			new ChatMessageC2SPacket(event.getMessage());
 		networkHandler.sendPacket(packet);
 		ci.cancel();
 	}
-	
+
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
 		ordinal = 0), method = "tick()V")
@@ -94,7 +95,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
-	
+
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
 		ordinal = 0), method = "tickMovement()V")
@@ -102,22 +103,22 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
 			return false;
-		
+
 		return player.isUsingItem();
 	}
-	
+
 	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
-	
+
 	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
 		method = {
 			"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
@@ -126,7 +127,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
 		EventManager.fire(event);
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
 		method = {"isAutoJumpEnabled()Z"},
 		cancellable = true)
@@ -135,7 +136,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
 			cir.setReturnValue(false);
 	}
-	
+
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
 		opcode = Opcodes.GETFIELD,
@@ -144,11 +145,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
-		
+
 		tempCurrentScreen = client.currentScreen;
 		client.currentScreen = null;
 	}
-	
+
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
 		opcode = Opcodes.GETFIELD,
@@ -157,35 +158,52 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		if(tempCurrentScreen == null)
 			return;
-		
+
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
 	}
-	
+
 	@Override
 	public void setVelocityClient(double x, double y, double z)
 	{
 		KnockbackEvent event = new KnockbackEvent(x, y, z);
 		EventManager.fire(event);
-		super.setVelocityClient(event.getX(), event.getY(), event.getZ());
+		super.setVelocity(event.getVec3d());
 	}
-	
+
+	@Override
+	public void setVelocity(double x, double y, double z)
+	{
+		super.setVelocity(x,y,z);
+	}
+
+	@Override
+	public void setVelocity(Vec3d value)
+	{
+		super.setVelocity(value);
+	}
+
+	@Override
+	public Vec3d getVelocity(){
+		return super.getVelocity();
+	}
+
 	@Override
 	public boolean isTouchingWater()
 	{
 		boolean inWater = super.isTouchingWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
 		EventManager.fire(event);
-		
+
 		return event.isInWater();
 	}
-	
+
 	@Override
 	public boolean isTouchingWaterBypass()
 	{
 		return super.isTouchingWater();
 	}
-	
+
 	@Override
 	protected float getJumpVelocity()
 	{
@@ -193,60 +211,96 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			+ WurstClient.INSTANCE.getHax().highJumpHack
 				.getAdditionalJumpMotion();
 	}
-	
+
 	@Override
 	protected boolean clipAtLedge()
 	{
 		return super.clipAtLedge()
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
-	
+
 	@Override
 	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
 	{
 		Vec3d result = super.adjustMovementForSneaking(movement, type);
-		
+
 		if(movement != null)
 			WurstClient.INSTANCE.getHax().safeWalkHack
 				.onClipAtLedge(!movement.equals(result));
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean hasStatusEffect(StatusEffect effect)
 	{
 		FullbrightHack fullbright =
 			WurstClient.INSTANCE.getHax().fullbrightHack;
-		
+
 		if(effect == StatusEffects.NIGHT_VISION
 			&& fullbright.isNightVisionActive())
 			return true;
-		
+
 		return super.hasStatusEffect(effect);
 	}
-	
+
 	@Override
 	public void setNoClip(boolean noClip)
 	{
 		this.noClip = noClip;
 	}
-	
+
 	@Override
 	public float getLastYaw()
 	{
 		return lastYaw;
 	}
-	
+
 	@Override
 	public float getLastPitch()
 	{
 		return lastPitch;
 	}
-	
+
 	@Override
 	public void setMovementMultiplier(Vec3d movementMultiplier)
 	{
 		this.movementMultiplier = movementMultiplier;
+	}
+
+	public void setFallDistance(float value){
+		this.fallDistance = value;
+	}
+
+	public float getAirSpeed(){
+		return this.airStrafingSpeed;
+	}
+
+	public void setAirSpeed(float value){
+		this.airStrafingSpeed = value;
+	}
+
+	public boolean isOnGround(){
+		return super.onGround;
+	}
+
+	public void setOnGround(boolean value){
+		this.onGround = value;
+	}
+
+	@Override
+	public boolean isInLava(){
+		return super.isInLava();
+	}
+
+	@Override
+	public boolean isClimbing(){
+		return super.isClimbing();
+	}
+
+	@Override
+	public PlayerAbilities getAbilities()
+	{
+		return super.getAbilities();
 	}
 }

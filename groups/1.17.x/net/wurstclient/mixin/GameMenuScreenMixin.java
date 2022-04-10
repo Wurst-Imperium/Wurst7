@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,76 +32,76 @@ import net.wurstclient.options.WurstOptionsScreen;
 public abstract class GameMenuScreenMixin extends Screen
 {
 	private static final Identifier wurstTexture =
-		new Identifier("wurst", "wurst_128.png");
-	
+			new Identifier("wurst", "wurst_128.png");
+
 	private ButtonWidget wurstOptionsButton;
-	
+
 	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
 	}
-	
+
 	@Inject(at = {@At("TAIL")}, method = {"initWidgets()V"})
 	private void onInitWidgets(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
-		
+
 		addWurstOptionsButton();
 		removeFeedbackAndBugReportButtons();
 	}
-	
+
 	private void addWurstOptionsButton()
 	{
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, height / 4 + 56,
-			204, 20, new LiteralText("            Options"),
-			b -> openWurstOptions());
-		
+				204, 20, new LiteralText("            Options"),
+				b -> openWurstOptions());
+
 		addDrawableChild(wurstOptionsButton);
 	}
-	
+
 	private void openWurstOptions()
 	{
 		WurstClient.setScreen(new WurstOptionsScreen(this));
 	}
-	
+
 	private void removeFeedbackAndBugReportButtons()
 	{
 		((IScreen)this).getButtons()
-			.removeIf(this::isFeedbackOrBugReportButton);
+				.removeIf(this::isFeedbackOrBugReportButton);
 		children().removeIf(this::isFeedbackOrBugReportButton);
 	}
-	
+
 	private boolean isFeedbackOrBugReportButton(Object element)
 	{
 		if(element == null || !(element instanceof ClickableWidget))
 			return false;
-		
+
 		ClickableWidget button = (ClickableWidget)element;
 		String message = button.getMessage().getString();
-		
+
 		return message != null
-			&& (message.equals(I18n.translate("menu.sendFeedback"))
+				&& (message.equals(I18n.translate("menu.sendFeedback"))
 				|| message.equals(I18n.translate("menu.reportBugs")));
 	}
-	
+
 	@Inject(at = {@At("TAIL")},
-		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"})
+			method = {"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"})
 	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
-		float partialTicks, CallbackInfo ci)
+						  float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
-		
+
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
+
 		RenderSystem.setShaderTexture(0, wurstTexture);
-		
+
 		int x = wurstOptionsButton.x + 34;
 		int y = wurstOptionsButton.y + 2;
 		int w = 63;

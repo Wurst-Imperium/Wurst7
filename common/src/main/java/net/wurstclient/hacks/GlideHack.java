@@ -12,14 +12,13 @@ import java.util.stream.StreamSupport;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.core.MCPlayer;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
@@ -63,7 +62,7 @@ public final class GlideHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		MCPlayer player = (MCPlayer)MC.player;
+		IClientPlayerEntity player = (IClientPlayerEntity)MC.player;
 		Vec3d v = player.getVelocity();
 		
 		if(player.isOnGround() || player.isTouchingWater() || player.isInLava()
@@ -89,8 +88,7 @@ public final class GlideHack extends Hack implements UpdateListener
 				.anyMatch(Material::isLiquid))
 				return;
 		}
-		
-		player.setVelocity(v.x, Math.max(v.y, -fallSpeed.getValue()), v.z);
+		player.setVelocity(new Vec3d(v.x, Math.max(v.y, -fallSpeed.getValue()), v.z));
 		player.setAirSpeed(player.getAirSpeed() * moveSpeed.getValueF());;
 	}
 }

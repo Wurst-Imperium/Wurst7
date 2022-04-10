@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -33,116 +33,114 @@ import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
+		implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
 {
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
-		ordinal = 0),
-		method = {
-			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+			target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
+			ordinal = 0),
+			method = {
+					"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
-		MatrixStack matrixStack, float partalTicks)
+										  MatrixStack matrixStack, float partalTicks)
 	{
 		CameraTransformViewBobbingEvent event =
-			new CameraTransformViewBobbingEvent();
+				new CameraTransformViewBobbingEvent();
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 			return;
-		
+
 		bobView(matrixStack, partalTicks);
 	}
-	
+
 	@Inject(
-		at = {@At(value = "FIELD",
-			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0)},
-		method = {
-			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+			at = {@At(value = "FIELD",
+					target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
+					opcode = Opcodes.GETFIELD,
+					ordinal = 0)},
+			method = {
+					"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private void onRenderWorld(float partialTicks, long finishTimeNano,
-		MatrixStack matrixStack, CallbackInfo ci)
+							   MatrixStack matrixStack, CallbackInfo ci)
 	{
 		RenderEvent event = new RenderEvent(matrixStack, partialTicks);
 		EventManager.fire(event);
 	}
-	
-	@Redirect(
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0),
-		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
-	private double getFov(GameOptions options)
+
+	@Inject(at = @At(value = "RETURN", ordinal = 1),
+			method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"},
+			cancellable = true)
+	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
+						  CallbackInfoReturnable<Double> cir)
 	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(options.fov);
+		cir.setReturnValue(WurstClient.INSTANCE.getOtfs().zoomOtf
+				.changeFovBasedOnZoom(cir.getReturnValueD()));
 	}
-	
+
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/Entity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;",
-		opcode = Opcodes.INVOKEVIRTUAL,
-		ordinal = 0)}, method = {"updateTargetedEntity(F)V"})
+			target = "Lnet/minecraft/entity/Entity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;",
+			opcode = Opcodes.INVOKEVIRTUAL,
+			ordinal = 0)}, method = {"updateTargetedEntity(F)V"})
 	private void onHitResultRayTrace(float float_1, CallbackInfo ci)
 	{
 		HitResultRayTraceEvent event = new HitResultRayTraceEvent(float_1);
 		EventManager.fire(event);
 	}
-	
+
 	@Redirect(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F",
-			ordinal = 0),
-		method = {
-			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F",
+					ordinal = 0),
+			method = {
+					"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private float wurstNauseaLerp(float delta, float first, float second)
 	{
 		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
 			return MathHelper.lerp(delta, first, second);
-		
+
 		return 0;
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
-		method = {
-			"getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F"},
-		cancellable = true)
+			method = {
+					"getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F"},
+			cancellable = true)
 	private static void onGetNightVisionStrength(LivingEntity livingEntity,
-		float f, CallbackInfoReturnable<Float> cir)
+												 float f, CallbackInfoReturnable<Float> cir)
 	{
 		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
-		
+				WurstClient.INSTANCE.getHax().fullbrightHack;
+
 		if(fullbright.isNightVisionActive())
 			cir.setReturnValue(fullbright.getNightVisionStrength());
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
-		method = {
-			"bobViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V"},
-		cancellable = true)
+			method = {
+					"bobViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V"},
+			cancellable = true)
 	private void onBobViewWhenHurt(MatrixStack matrixStack, float f,
-		CallbackInfo ci)
+								   CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();
 	}
-	
+
 	@Shadow
 	private void bobView(MatrixStack matrixStack, float partalTicks)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void loadWurstShader(Identifier identifier)
 	{
 		loadShader(identifier);
 	}
-	
+
 	@Shadow
 	private void loadShader(Identifier identifier)
 	{
-		
+
 	}
 }
