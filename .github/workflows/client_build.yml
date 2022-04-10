@@ -11,12 +11,15 @@ on:
   push:
     branches:
       - master
+      - add_versions
   pull_request:
     branches:
       - master
 jobs:
   build:
-
+    strategy:
+      matrix:
+        value: ["1.17", "1.17.1", "1.18", "1.18.1", "1.18.2", "22w11a", "22w12a", "22w13a", "22w14a"]
     runs-on: ubuntu-latest
 
     steps:
@@ -38,13 +41,13 @@ jobs:
         id: read_property_wurst
         uses: christian-draeger/read-properties@1.0.1
         with:
-          path: './gradle.properties'
+          path: './versions/${{ matrix.value }}/gradle.properties'
           property: 'wurst_version'
       - name: Read Minecraft Version from gradle.properties
         id: read_property_mc
         uses: christian-draeger/read-properties@1.0.1
         with:
-          path: './gradle.properties'
+          path: './versions/${{ matrix.value }}/gradle.properties'
           property: 'minecraft_version'
 
       - name: Define release_tag
@@ -53,7 +56,7 @@ jobs:
 
       - name: Make Release Zip
         run: |
-          zip --junk-paths CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.jar
+          zip --junk-paths CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip versions/${{ matrix.value }}/build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.jar
 
       - name: Create Release
         id: create_release
