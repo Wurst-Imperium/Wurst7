@@ -30,8 +30,9 @@ public class ChatHudMixin extends DrawableHelper
 {
 	@Shadow
 	private List<ChatHudLine<OrderedText>> visibleMessages;
-	@Shadow
+
 	private static Logger LOGGER;
+
 	@Shadow
 	private MinecraftClient client;
 	

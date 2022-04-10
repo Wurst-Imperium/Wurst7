@@ -36,8 +36,8 @@ project(":22w12a").dir = new File('versions/22w12a')
 include '22w13a'
 project(":22w13a").dir = new File('versions/22w13a')
 
-//include '22w13oneblockatatime'
-//project(":22w13oneblockatatime").dir = new File('versions/22w13oneblockatatime')
+include '22w13oneblockatatime'
+project(":22w13oneblockatatime").dir = new File('versions/22w13oneblockatatime')
 
 include '22w14a'
 project(":22w14a").dir = new File('versions/22w14a')
