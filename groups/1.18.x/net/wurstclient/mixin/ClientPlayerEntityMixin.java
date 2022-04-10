@@ -192,6 +192,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Override
+	public void addVelocity(double x, double y, double z)
+	{
+		super.addVelocity(x,y,z);
+	}
+
+	@Override
 	public Vec3d getVelocity(){
 		return super.getVelocity();
 	}

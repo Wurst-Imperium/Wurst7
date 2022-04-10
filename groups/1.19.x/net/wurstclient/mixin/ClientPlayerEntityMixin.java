@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -45,7 +46,7 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
-	implements IClientPlayerEntity
+		implements IClientPlayerEntity
 {
 	@Shadow
 	private float lastYaw;
@@ -60,14 +61,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private Screen tempCurrentScreen;
 
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
-		GameProfile gameProfile_1)
+								   GameProfile gameProfile_1)
 	{
 		super(clientWorld_1, gameProfile_1);
 	}
 
 	@Inject(at = @At("HEAD"),
-		method = "sendChatMessage(Ljava/lang/String;)V",
-		cancellable = true)
+			method = "sendChatMessage(Ljava/lang/String;)V",
+			cancellable = true)
 	private void onSendChatMessage(String message, CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
@@ -83,22 +84,22 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return;
 
 		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(event.getMessage());
+				new ChatMessageC2SPacket(event.getMessage());
 		networkHandler.sendPacket(packet);
 		ci.cancel();
 	}
 
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
-		ordinal = 0), method = "tick()V")
+			target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+			ordinal = 0), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 
 	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
-		ordinal = 0), method = "tickMovement()V")
+			target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
+			ordinal = 0), method = "tickMovement()V")
 	private boolean wurstIsUsingItem(ClientPlayerEntity player)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
@@ -120,8 +121,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Inject(at = {@At("HEAD")},
-		method = {
-			"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
+			method = {
+					"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
@@ -129,8 +130,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Inject(at = {@At("HEAD")},
-		method = {"isAutoJumpEnabled()Z"},
-		cancellable = true)
+			method = {"isAutoJumpEnabled()Z"},
+			cancellable = true)
 	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
@@ -138,9 +139,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = {"updateNausea()V"})
+			target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0), method = {"updateNausea()V"})
 	private void beforeUpdateNausea(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
@@ -151,9 +152,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = {"updateNausea()V"})
+			target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 1), method = {"updateNausea()V"})
 	private void afterUpdateNausea(CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
@@ -184,6 +185,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 
 	@Override
+	public void addVelocity(double x, double y, double z)
+	{
+		super.addVelocity(x,y,z);
+	}
+
+	@Override
 	public Vec3d getVelocity(){
 		return super.getVelocity();
 	}
@@ -208,7 +215,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected float getJumpVelocity()
 	{
 		return super.getJumpVelocity()
-			+ WurstClient.INSTANCE.getHax().highJumpHack
+				+ WurstClient.INSTANCE.getHax().highJumpHack
 				.getAdditionalJumpMotion();
 	}
 
@@ -216,7 +223,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected boolean clipAtLedge()
 	{
 		return super.clipAtLedge()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+				|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 
 	@Override
@@ -226,7 +233,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
 		if(movement != null)
 			WurstClient.INSTANCE.getHax().safeWalkHack
-				.onClipAtLedge(!movement.equals(result));
+					.onClipAtLedge(!movement.equals(result));
 
 		return result;
 	}
@@ -235,10 +242,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public boolean hasStatusEffect(StatusEffect effect)
 	{
 		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
+				WurstClient.INSTANCE.getHax().fullbrightHack;
 
 		if(effect == StatusEffects.NIGHT_VISION
-			&& fullbright.isNightVisionActive())
+				&& fullbright.isNightVisionActive())
 			return true;
 
 		return super.hasStatusEffect(effect);
