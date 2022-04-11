@@ -9,7 +9,8 @@ package net.wurstclient.mixin;
 
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,8 +32,7 @@ public class ChatHudMixin extends DrawableHelper
 	@Shadow
 	private List<ChatHudLine<OrderedText>> visibleMessages;
 
-	@Shadow
-	private static Logger LOGGER;
+	private static Logger LOGGER = LogManager.getLogger();
 
 	@Shadow
 	private MinecraftClient client;

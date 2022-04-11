@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
+	id 'de.undercouch.download' version '5.0.4'
 }
 
 static def getDate() {
@@ -10,7 +11,7 @@ static def getDate() {
 }
 
 archivesBaseName = project.archives_base_name
-version = "v" + getDate() + "-" + project.wurst_version + "-MC" + project.minecraft_version
+version = project.minecraft_version + "-" + project.wurst_version + "-" + getDate()
 group = project.maven_group
 description = 'builds version ' + version
 
@@ -44,7 +45,12 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": project.version,
+				"fabric_loader": project.loader_version,
+				"fabric_api": project.fabric_version,
+				"fabric_minecraft_version": project.minecraft_version,
+				"java_version": project.java_version
+
 	}
 }
 
@@ -84,23 +90,37 @@ sourceSets {
 		java {
 			srcDirs "src"
 			srcDirs "../../groups/${project.group_version}"
-			srcDirs "../../groups/${project.java_version}/src"
 			srcDirs "../../common/src/main/java"
+			srcDirs "../../groups/JAVA_${project.java_version}/src"
 		}
 		//noinspection GroovyAssignabilityCheck
 		resources{
-			srcDirs "resources"
-			srcDirs "../../groups/${project.java_version}/resources"
 			srcDirs "../../common/src/main/resources"
+			srcDirs "../../groups/JAVA_${{project.java_version}}/resources"
 		}
 	}
 }
 
+task getFabricAPI(type: Download) {
+	dest "build/libs/"
+	src "https://github.com/FabricMC/fabric/releases/download/${{project.fabric_version}}/fabric-api-${{project.fabric_version}}.jar"
+	overwrite false
+}
+
+
+task makeReleaseZip(type: Zip) {
+	dependsOn("build")
+	dependsOn("getFabricAPI")
+	from "build/libs/${{project.archives_base_name}}-${{ project.version }}.jar",
+			"build/libs/fabric-api-${{project.fabric_version}}.jar",
+			"../../common/install_cheddar.bat"
+	archiveFileName	= "${{project.archives_base_name}}-${{ project.version }}.zip"
+	destinationDirectory = new File("../../build/")}
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 21w19a to 1.18 Pre-release 1 uses Java 16.
-	it.options.release = 16
+	it.options.release = Integer.parseInt(project.java_version)
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
+

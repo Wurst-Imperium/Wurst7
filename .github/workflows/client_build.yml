@@ -17,9 +17,6 @@ on:
       - master
 jobs:
   build:
-    strategy:
-      matrix:
-        value: ["1.17", "1.17.1", "1.18", "1.18.1", "1.18.2", "22w11a", "22w12a", "22w13a", "22w14a"]
     runs-on: ubuntu-latest
 
     steps:
@@ -35,28 +32,18 @@ jobs:
         id: builder
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
-          arguments: :${{ matrix.value }}:build
+          arguments: build
 
       - name: Read Wurst Version from gradle.properties
         id: read_property_wurst
         uses: christian-draeger/read-properties@1.0.1
         with:
-          path: './versions/${{ matrix.value }}/gradle.properties'
+          path: './gradle.properties'
           property: 'wurst_version'
-      - name: Read Minecraft Version from gradle.properties
-        id: read_property_mc
-        uses: christian-draeger/read-properties@1.0.1
-        with:
-          path: './versions/${{ matrix.value }}/gradle.properties'
-          property: 'minecraft_version'
 
       - name: Define release_tag
         id: release_tag
-        run: echo ::set-output name=tag::v`date +%y%m%d`-${{ steps.read_property_wurst.outputs.value }}-MC${{ steps.read_property_mc.outputs.value }}
-
-      - name: Make Release Zip
-        run: |
-          zip --junk-paths CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip versions/${{ matrix.value }}/build/libs/CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.jar
+        run: echo ::set-output name=tag::v`date +%y%m%d`-${{ steps.read_property_wurst.outputs.value }}
 
       - name: Create Release
         id: create_release
@@ -71,11 +58,8 @@ jobs:
 
       - name: Upload Release Asset
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip
-          asset_name: CheddarBratWurst-Client-${{ steps.release_tag.outputs.tag }}.zip
-          asset_content_type: application/zip
+          files: |
+            build/CheddarBratWurst-Client-*
+            LICENSE.txt
