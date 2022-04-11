@@ -11,7 +11,6 @@ on:
   push:
     branches:
       - dev
-      - add_versions
   pull_request:
     branches:
       - dev
