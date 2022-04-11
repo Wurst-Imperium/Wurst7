@@ -115,6 +115,14 @@ task makeReleaseZip(type: Zip) {
 	archiveFileName	 = "${{project.archives_base_name}}-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
 
+task makeDevZip(type: Zip) {
+	dependsOn("build")
+	dependsOn("getFabricAPI")
+	from "build/libs/", "../../common/install_cheddar.bat"
+	archiveFileName	 = "${{project.archives_base_name}}-DEV-${{ project.version }}.zip"
+	destinationDirectory = new File("../../build/")}
+
+
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 

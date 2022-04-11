@@ -101,15 +101,6 @@ sourceSets {
 	}
 }
 
-
-tasks.withType(JavaCompile).configureEach {
-	// Minecraft 21w19a to 1.18 Pre-release 1 uses Java 16.
-	it.options.release = Integer.parseInt(project.java_version)
-}
-
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
-
 task getFabricAPI(type: Download) {
 	dest "build/libs/"
 	src "https://github.com/FabricMC/fabric/releases/download/${{project.fabric_version}}/fabric-api-${{project.fabric_version}}.jar"
@@ -124,3 +115,19 @@ task makeReleaseZip(type: Zip) {
 			"../../common/install_cheddar.bat"
 	archiveFileName	 = "${{project.archives_base_name}}-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
+
+
+task makeDevZip(type: Zip) {
+	dependsOn("build")
+	dependsOn("getFabricAPI")
+	from "build/libs/", "../../common/install_cheddar.bat"
+	archiveFileName	 = "${{project.archives_base_name}}-DEV-${{ project.version }}.zip"
+	destinationDirectory = new File("../../build/")}
+
+tasks.withType(JavaCompile).configureEach {
+	// Minecraft 21w19a to 1.18 Pre-release 1 uses Java 16.
+	it.options.release = Integer.parseInt(project.java_version)
+}
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16

@@ -11,7 +11,6 @@ on:
   push:
     branches:
       - master
-      - add_versions
   pull_request:
     branches:
       - master
@@ -64,4 +63,4 @@ jobs:
             build/CheddarBratWurst-Client-*
             LICENSE.txt
           tag_name: ${{ steps.release_tag.outputs.tag }}
-          release_name: Release ${{ steps.release_tag.outputs.tag }}
+          name: Release ${{ steps.release_tag.outputs.tag }}
