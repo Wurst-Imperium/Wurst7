@@ -59,6 +59,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private Condition containerOpenCondition = containerOpenLock.newCondition();
 
     private LinkedHashMap<Integer, SlotUpdateInfo> latestSlotUpdates = new LinkedHashMap<>();
+    private int lastSlotUpdatePacketRevision = -1;
 
     private InventoryStorageQuery inventoryQuery = new InventoryStorageQuery();
     private ContainerStorageQuery containerQuery = new ContainerStorageQuery();
@@ -288,6 +289,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
+        public LinkedHashMap<Item, Integer> getScreenAvailabilityMap() {
+            LinkedHashMap<Item, Integer> res = new LinkedHashMap<>();
+            for (int i = 0; i < 36; i++) {
+                Slot currentSlot = MC.player.playerScreenHandler.slots.get(i + 9);
+                ItemStack stack = currentSlot.getStack();
+                if (stack.getCount() > 0)
+                    res.put(stack.getItem(), res.getOrDefault(stack.getItem(), 0) + stack.getCount());
+            }
+            return res;
+        }
         public LinkedHashMap<Item, Integer> getCurrentContainerAvailabilityMap() {
             LinkedHashMap<Item, Integer> res = new LinkedHashMap<>();
             List<Slot> slots = MC.player.currentScreenHandler.slots;
@@ -378,12 +389,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected void waitUntilDone() {
+            double epsilon = 1E-6;
             Vec3d blockPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+            Vec3d lastPos = null;
+            Vec3d currentPos = MC.player.getPos();
+            double distance;
             try {
-                while (blockPos.subtract(MC.player.getPos()).length() > 1) {
+                while ((distance = blockPos.subtract(MC.player.getPos()).length()) > 1 && (lastPos == null || distance > 2.5 || currentPos.subtract(lastPos).length() > epsilon)) {
                     Thread.sleep(100);
+                    lastPos = currentPos;
+                    currentPos = MC.player.getPos();
                 }
-                Thread.sleep(500);
+                Thread.sleep(200);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -400,15 +417,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected void waitUntilDone() {
-            LinkedHashMap<Item, Integer> currentItems = inventoryQuery.getAvailabilityMap();
+            slotUpdateLock.lock();
             try {
-                while (currentItems.getOrDefault(dropped, 0) < count) {
-                    Thread.sleep(100);
-                    currentItems = inventoryQuery.getAvailabilityMap();
+                while (totalInventoryAvailabilityMap.getOrDefault(dropped, 0) < count) {
+                    slotUpdateCondition.await(100, TimeUnit.MILLISECONDS);
                 }
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+            finally {
+                slotUpdateLock.unlock();
             }
         }
     }
@@ -444,7 +463,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new BaritoneChatPathProcess(pos);
         }
         public BaritoneChatProcess mine(int count, Block block, Item dropped) {
-            sendCommand("mine " + count + " " + Registry.ITEM.getId(block.asItem()).getPath());
+            sendCommand("mine " + count + " " + Registry.BLOCK.getId(block).getPath());
             return new BaritoneChatMineProcess(count, dropped);
         }
     }
@@ -570,8 +589,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         public boolean mine(Block block, Item dropped, int count) {
+            final int alreadyPossessed;
+            if (isCurrentlyCrafting) {
+                synchronized (totalInventoryAvailabilityMap) {
+                    alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(block.asItem(), 0);
+                }
+            }
+            else {
+                alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(block.asItem(), 0);
+            }
             updateSettings();
-            BaritoneChatProcess process = baritoneChatInterface.mine(count, block, dropped);
+            BaritoneChatProcess process = baritoneChatInterface.mine(count + alreadyPossessed, block, dropped);
             process.waitUntilDone();
             return true;
         }
@@ -717,6 +745,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             return count <= 0;
+        }
+        public double getDistanceToContainer(Item item) {
+            Vec3d playerPos = MC.player.getPos();
+            double closestDistance = Double.POSITIVE_INFINITY;
+            for (BlockPos pos : containers.keySet()) {
+                Vec3d containerPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+                LinkedHashMap<Item, Integer> container = containers.get(pos);
+                if (container.containsKey(item))
+                    closestDistance = Math.min(closestDistance, containerPos.subtract(playerPos).length());
+            }
+            return closestDistance;
         }
         public List<BlockPos> getAcquireRoute(Item item, int count) {
             List<BlockPos> res = new ArrayList<>();
@@ -1229,7 +1268,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private LinkedHashMap<Integer, Node> idInstanceMap = new LinkedHashMap<>();
         private LinkedHashMap<Node, Integer> childScope = new LinkedHashMap<>();
         private LinkedHashSet<Item> throwawayItems = new LinkedHashSet<>();
+        private LinkedHashMap<Node, Resources<OperableInteger>> cachedResources = new LinkedHashMap<>();
+        private LinkedHashMap<Node, Double> cachedEfficiency = new LinkedHashMap<>();
+        private LinkedHashMap<Node, EfficiencyEquation> efficiencyEquations = new LinkedHashMap<>();
+        private LinkedHashMap<Node, Boolean> efficiencyEquationsGenerated = new LinkedHashMap<>();
         private int rootNodeId = 0;
+        private static int maxVisitedSize = 0;
         private boolean success = false;
         public CraftingState(LinkedHashMap<Item, Integer> inventoryAvailability, LinkedHashMap<Item, Integer> storageAvailability, LinkedHashMap<Block, Integer> worldAvailability, LinkedHashSet<Item> visited, LinkedHashMap<Integer, Item> toolAvailability) {
             this.inventoryAvailability = inventoryAvailability;
@@ -1280,6 +1324,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.nodeInstances = nodeInstances;
             state.rootNodeId = rootNodeId;
             state.idInstanceMap = idInstanceMap;
+            state.childScope = childScope;
+            state.throwawayItems = throwawayItems;
+            state.cachedResources = cachedResources;
+            state.cachedEfficiency = cachedEfficiency;
+            state.efficiencyEquations = efficiencyEquations;
+            state.efficiencyEquationsGenerated = efficiencyEquationsGenerated;
             return state;
         }
         public void set(CraftingState other) {
@@ -1304,6 +1354,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             nodeInstances = other.nodeInstances;
             rootNodeId = other.rootNodeId;
             idInstanceMap = other.idInstanceMap;
+            childScope = other.childScope;
+            throwawayItems = other.throwawayItems;
+            cachedResources = other.cachedResources;
+            cachedEfficiency = other.cachedEfficiency;
+            efficiencyEquations = other.efficiencyEquations;
+            efficiencyEquationsGenerated = other.efficiencyEquationsGenerated;
         }
         private void clearChildren(Node node) {
             if (children.containsKey(node)) {
@@ -1316,7 +1372,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             naiveMaxCraftableGenerated.remove(node);
         }
         private void generateThrowawayItems(NodeEquivalenceClass node) {
-            List<String> itemNames = List.of("dirt", "cobblestone", "stone", "netherrack", "granite", "diorite");
+            List<String> itemNames = List.of("dirt", "cobblestone", "stone", "netherrack", "granite", "diorite", "gravel", "sand", "end_stone");
             LinkedHashSet<Item> profile = instanceProfile.get(node);
             throwawayItems = itemNames.stream().map(name ->  Registry.ITEM.get(new Identifier("minecraft", name))).filter(item -> !profile.contains(item)).collect(Collectors.toCollection(LinkedHashSet::new));
         }
@@ -1662,6 +1718,83 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    public class EfficiencyEquationComponent {
+        private double base;
+        private double coefficient;
+        public EfficiencyEquationComponent(double base, double coefficient) {
+            this.base = base;
+            this.coefficient = coefficient;
+        }
+        public double evaluate(int num) {
+            return base + coefficient * num;
+        }
+        public EfficiencyEquationComponent mult(double factor) {
+            return new EfficiencyEquationComponent(base, coefficient * factor);
+        }
+        public EfficiencyEquationComponent add(EfficiencyEquationComponent other) {
+            return new EfficiencyEquationComponent(base + other.base, coefficient + other.coefficient);
+        }
+        public EfficiencyEquationComponent clone() {
+            return new EfficiencyEquationComponent(base, coefficient);
+        }
+    }
+
+    public class EfficiencyEquation {
+        private List<EfficiencyEquationComponent> components;
+        public EfficiencyEquation(List<EfficiencyEquationComponent> components) {
+            this.components = components;
+        }
+        public EfficiencyEquation() {
+            components = new ArrayList<>();
+        }
+        public double evaluate(int num) {
+            return Collections.min(components.stream().map(component -> component.evaluate(num)).collect(Collectors.toList()));
+        }
+        public EfficiencyEquation mult(double factor) {
+            return new EfficiencyEquation(components.stream().map(component -> component.mult(factor)).collect(Collectors.toList()));
+        }
+        public EfficiencyEquation simplify() {
+            if (components.size() == 0)
+                return this;
+            components.sort(Comparator.comparingDouble(c -> c.base));
+            double smallestCoefficient = components.get(0).coefficient;
+            for (int i = 1; i < components.size(); i++) {
+                if (components.get(i).coefficient < smallestCoefficient) {
+                    smallestCoefficient = components.get(i).coefficient;
+                }
+                else {
+                    components.remove(i);
+                    i--;
+                }
+            }
+            return this;
+        }
+        public EfficiencyEquation add(EfficiencyEquation other) {
+            if (components.size() == 0) {
+                return other.clone();
+            }
+            else if (other.components.size() == 0) {
+                return clone();
+            }
+            List<EfficiencyEquationComponent> res = new ArrayList<>();
+            for (EfficiencyEquationComponent c1 : components) {
+                for (EfficiencyEquationComponent c2 : other.components) {
+                    res.add(c1.add(c2));
+                }
+            }
+            return new EfficiencyEquation(res).simplify();
+        }
+        public EfficiencyEquation min(EfficiencyEquation other) {
+            List<EfficiencyEquationComponent> res = new ArrayList<>();
+            res.addAll(components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
+            res.addAll(other.components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
+            return new EfficiencyEquation(res).simplify();
+        }
+        public EfficiencyEquation clone() {
+            return new EfficiencyEquation(components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
+        }
+    }
+
     public abstract class Node {
         protected Item target;
         //protected int needed;
@@ -1758,6 +1891,29 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return state;
         }
         protected abstract double calculateLowerEfficiencyBound(int nodeId, CraftingState state);
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation(new ArrayList<>());
+            for (Node child : children) {
+                res = res.add(state.efficiencyEquations.get(child));
+            }
+            return res;
+        }
+        protected void genEfficiencyEquations(CraftingState state, LinkedHashSet<Item> visited) {
+            if (state.efficiencyEquationsGenerated.getOrDefault(this, false) || state.naiveMaxCraftable.getOrDefault(this, 0) == 0)
+                return;
+            if (shouldPruneTarget && visited.contains(target))
+                return;
+            if (shouldRememberVisit())
+                visited.add(target);
+            for (Node child : children) {
+                child.genEfficiencyEquations(state, visited);
+            }
+            EfficiencyEquation equation = genEfficiencyEquationsInternal(state);
+            if (shouldRememberVisit())
+                visited.remove(target);
+            state.efficiencyEquations.put(this, equation);
+            state.efficiencyEquationsGenerated.put(this, true);
+        }
         protected void genNaiveEfficiencyMap(int id, CraftingState state, LinkedHashSet<Item> visited) {
             if (state.naiveEfficiencyMapGenerated.getOrDefault(this, false) || state.naiveMaxCraftable.getOrDefault(this, 0) == 0)
                 return;
@@ -1787,10 +1943,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 containerQuery.calculateNearestContainer(MC.player.getPos());
                 //clearNaiveMaxCraftable(state.rootNodeId, state);
                 //genNaiveMaxCraftable(state.rootNodeId, state);
+                genEfficiencyEquations(state, new LinkedHashSet<>());
                 genNaiveEfficiencyMap(state.rootNodeId, state, new LinkedHashSet<>());
             }
             CraftingState newState = state.clone();
-            Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(state.rootNodeId, 1, 1, newState.clone(), useHeuristic, new LinkedHashSet<>());
+            CraftingState clonedState = newState.clone();
+            Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(state.rootNodeId, 1, 1, clonedState, useHeuristic, new LinkedHashSet<>());
             int amount = 0;
             while (amount < upperBound && resources.getLeft()) {
                 amount++;
@@ -1798,7 +1956,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 newState = state.clone();
                 if (!consumeResources(state.rootNodeId, resources.getRight(), newState, 0, new LinkedHashSet<>())) {
                     newState = state.clone();
-                    resources = getBaseResources(state.rootNodeId, 1, 1, newState.clone(), useHeuristic, new LinkedHashSet<>());
+                    clonedState = newState.clone();
+                    resources = getBaseResources(state.rootNodeId, 1, 1, clonedState, useHeuristic, new LinkedHashSet<>());
                 }
             }
             originalState.set(newState);
@@ -1814,12 +1973,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private int print(int indent, boolean ignoreNeeded, PrintStream stream, int id, CraftingState state) {
             int needed = state.neededMap.getOrDefault(id, 0);
             int timeTaken = state.timeTaken.getOrDefault(id, 0);
+            double efficiencyEquationMetric = state.efficiencyEquations.containsKey(this) ? state.efficiencyEquations.get(this).evaluate(needed) : 0;
+            double regularEfficiencyMetric = state.naiveEfficiencyMap.getOrDefault(this, 0.0);
             if (ignoreNeeded || state.neededMap.getOrDefault(id, 0) > 0) {
                 String indentation = "";
                 for (int i = 0; i < indent; i++) {
                     indentation += " ";
                 }
-                stream.println(indentation + target + ": " + needed + ", time " + timeTaken + ", " + this.getClass());
+                stream.println(indentation + target + ": " + needed + ", time " + timeTaken + ", " + this.getClass() + ", equation " + efficiencyEquationMetric + ", regular " + regularEfficiencyMetric);
                 int calls = 1;
                 List<Integer> childIds = state.children.getOrDefault(this, new ArrayList<>());
                 for (int i = 0; i < children.size(); i++) {
@@ -1954,11 +2115,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         protected abstract void stackResourcesInternal(int nodeId, CraftingState state, int num, Resources<OperableInteger> dest, Resources<OperableInteger> src, LinkedHashSet<Item> visited);
+        private Resources<OperableInteger> shiftResources(Resources<OperableInteger> res, int shift) {
+            Resources<OperableInteger> result = new Resources<>();
+            for (int key : res.keySet()) {
+                result.put(key + shift, res.get(key));
+            }
+            return result;
+        }
         private Pair<Boolean, Resources<OperableInteger>> getBaseResources(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
+            System.out.println(getClass() + ", " + target);
+            state.maxVisitedSize = Math.max(visited.size(), state.maxVisitedSize);
             long startTime = System.currentTimeMillis();
             Pair<Boolean, Resources<OperableInteger>> result = new Pair<>(true, new Resources<>());
             if (shouldPruneTarget && visited.contains(target))
-                return result;
+                return new Pair<>(false, new Resources<>());
+            //if (visited.size() >= 20)
+            //    return new Pair<>(false, new Resources<>());
             if (shouldRememberVisit())
                 visited.add(target);
             if (state.excess.containsKey(target)) {
@@ -1977,9 +2149,28 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                 }
             }
+            /*if (numNeeded == 1 && state.cachedResources.containsKey(this)) {
+                Resources<OperableInteger> cachedRes = shiftResources(state.cachedResources.get(this), nodeId);
+                if (actualNeeded == 1 && consumeResources(nodeId, cachedRes, state.clone(), 0, visited)) {
+                    if (shouldRememberVisit())
+                        visited.remove(target);
+                    state.efficiencyMap.put(nodeId, state.cachedEfficiency.get(this));
+                    return new Pair<>(true, cachedRes);
+                }
+            }*/
             if (numNeeded > 0)
                 result = getBaseResourcesInternal(nodeId, numNeeded, actualNeeded, state, useHeuristic, visited);
-            calculateExecutionTime(nodeId, result.getRight(), state);
+            //calculateExecutionTime(nodeId, result.getRight(), state);
+            /*if (numNeeded == 1 && result.getLeft()) {
+                if (state.deadNodes.contains(nodeId)) {
+                    state.cachedResources.put(this, new Resources<>());
+                    state.cachedEfficiency.put(this, 0.0);
+                }
+                else {
+                    state.cachedResources.put(this, shiftResources(result.getRight(), -nodeId));
+                    state.cachedEfficiency.put(this, state.efficiencyMap.get(nodeId));
+                }
+            }*/
             long endTime = System.currentTimeMillis();
             state.timeTaken.put(nodeId, (int)(endTime - startTime));
             totalNumCalls++;
@@ -2066,6 +2257,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private boolean areNodesEquivalent(Node n1, Node n2) {
+        return new NodeEquivalenceClass(n1).equals(new NodeEquivalenceClass(n2));
+    }
+
     public class SmeltingNode extends Node {
         private Node fuel;
         private Node furnace;
@@ -2087,10 +2282,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 int childId = nodeId + childIds.get(i);
                 Node child = children.get(i);
                 if (src.containsKey(childId)) {
-                    if (child == furnace) {
+                    if (areNodesEquivalent(child, furnace)) {
                         child.stackResourcesInternal(childId, state, 1, dest, src, visited);
                     }
-                    else if (child == fuel) {
+                    else if (areNodesEquivalent(child, fuel)) {
                         child.stackResourcesInternal(childId, state, (num / 8) + (num % 8 > 0 ? 1 : 0), dest, src, visited);
                     }
                     else {
@@ -2117,6 +2312,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             Block furnaceBlock = Registry.BLOCK.get(new Identifier("minecraft", "furnace"));
             furnace = new WorkbenchCraftingProcess(furnaceBlock).getNode();
             res.add(furnace);
+            return res;
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation(new ArrayList<>());
+            for (Node child : children) {
+                if (areNodesEquivalent(child, fuel)) {
+                    res = res.add(state.efficiencyEquations.get(child).mult(1.0 / 8.0));
+                }
+                else if (areNodesEquivalent(child, furnace)) {
+                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationComponent(state.efficiencyEquations.get(child).evaluate(1), 0))));
+                }
+                else {
+                    res = res.add(state.efficiencyEquations.get(child));
+                }
+            }
             return res;
         }
         @Override
@@ -2151,7 +2362,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         private int getChildNeededFactor(Node child, int num) {
-            if (child == fuel)
+            if (areNodesEquivalent(child, fuel))
                 return (num / 8) + (num % 8 > 0 ? 1 : 0);
             return num;
         }
@@ -2178,7 +2389,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             int outputFactor = Integer.MAX_VALUE;
             for (Node child : children) {
-                outputFactor = Math.min(outputFactor, state.naiveMaxCraftable.get(child) * (child == fuel ? 8 : 1));
+                outputFactor = Math.min(outputFactor, state.naiveMaxCraftable.get(child) * (areNodesEquivalent(child, fuel) ? 8 : 1));
             }
             state.naiveMaxCraftable.put(this, outputFactor);
         }
@@ -2227,14 +2438,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             synchronized (totalInventoryAvailabilityMap) {
                 totalInventoryAvailabilityMap.put(outputItem, totalInventoryAvailabilityMap.getOrDefault(outputItem, 0) + craftingOutput);
             }
-            for (Ingredient ing : recipe.getIngredients()) {
+            /*for (Ingredient ing : recipe.getIngredients()) {
                 if (ing.getMatchingStacks().length == 0)
                     continue;
                 ItemStack stack = ing.getMatchingStacks()[stackShift % ing.getMatchingStacks().length];
                 synchronized (totalInventoryAvailabilityMap) {
                     totalInventoryAvailabilityMap.put(stack.getItem(), totalInventoryAvailabilityMap.getOrDefault(stack.getItem(), 0) - (stack.getCount() * craftingOutput) / recipe.getOutput().getCount());
                 }
-            }
+            }*/
         }
         private void arrangeRecipe(Recipe<?> recipe, int craftAmount) {
             int craftingGridSize = 1;
@@ -2311,27 +2522,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     containerManager.navigateAndOpenContainer(nearestFurnace);
             }
             int neededToCraft = state.neededMap.getOrDefault(nodeId, 0);
-            int craftingOutput = 0;
-            while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
+            int craftingOutput;
+            while (neededToCraft > 0 && (craftingOutput = calculateCraftingOutput()) > 0) {
+                int amount = Math.min(craftingOutput, neededToCraft);
+                adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, amount);
                 if (!usingFurnace()) return false;
-                arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, craftingOutput / ((SmeltingCraftingProcess) processes.get(0)).recipe.getOutput().getCount());
-                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), craftingOutput, 2, false, false, true))
+                arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, amount / ((SmeltingCraftingProcess) processes.get(0)).recipe.getOutput().getCount());
+                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), amount, 2, false, false, true))
                     return false;
                 if (!usingFurnace()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 2, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
-                adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, craftingOutput);
-                neededToCraft -= craftingOutput;
-            }
-            for (int i = 0; i < neededToCraft / ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
-                if (!usingFurnace()) return false;
-                arrangeRecipe(((SmeltingCraftingProcess) processes.get(0)).recipe, 1);
-                if (!awaitSlotUpdate(((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), neededToCraft, 2, false, false, true))
-                    return false;
-                if (!usingFurnace()) return false;
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 2, 0, SlotActionType.QUICK_MOVE, MC.player);
-                awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
-                adjustTotalAvailability(((SmeltingCraftingProcess)processes.get(0)).recipe, ((SmeltingCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
+                neededToCraft -= amount;
             }
             return true;
         }
@@ -2383,6 +2585,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (!((RecipeCraftingProcess) processes.get(0)).recipe.fits(2, 2)) {
                 Block craftingTable = Registry.BLOCK.get(new Identifier("minecraft", "crafting_table"));
                 res.add(new WorkbenchCraftingProcess(craftingTable).getNode());
+            }
+            return res;
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0.05, 0)));
+            LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
+            RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
+            for (Node child : children) {
+                if (ingredients.containsKey(child.target)) {
+                    res = res.add(state.efficiencyEquations.get(child).mult((double)ingredients.get(child.target).getCount() / process.recipe.getOutput().getCount()));
+                }
+                else {
+                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationComponent(state.efficiencyEquations.get(child).evaluate(1), 0))));
+                }
             }
             return res;
         }
@@ -2598,6 +2815,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int neededToCraft = getNeededToCraft(state.neededMap.getOrDefault(nodeId, 0));
             int craftingOutput = 0;
             while ((craftingOutput = calculateCraftingOutput()) <= neededToCraft && craftingOutput > 0) {
+                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, craftingOutput / ((RecipeCraftingProcess) processes.get(0)).recipe.getOutput().getCount(), useInventory);
                 if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false, false))
@@ -2605,10 +2823,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
-                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, craftingOutput);
                 neededToCraft -= craftingOutput;
             }
             for (int i = 0; i < neededToCraft / ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(); i++) {
+                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 arrangeRecipe(((RecipeCraftingProcess) processes.get(0)).recipe, 1, useInventory);
                 if (!awaitSlotUpdate(((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getItem(), ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount(), 0, false, false, false))
@@ -2616,7 +2834,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (!usingCraftingTable() && !usingInventory()) return false;
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, MC.player);
                 awaitSlotUpdate(Registry.ITEM.get(new Identifier("minecraft", "air")), 0, 0, true, false, false);
-                adjustTotalAvailability(((RecipeCraftingProcess)processes.get(0)).recipe, ((RecipeCraftingProcess)processes.get(0)).recipe.getOutput().getCount());
             }
             //containerManager.closeScreen();
             return true;
@@ -2636,6 +2853,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     Node child = process.getNode().setStackShift(i);
                     res.add(child);
                 }
+            }
+            return res;
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation(new ArrayList<>());
+            for (Node child : children) {
+                res = res.min(state.efficiencyEquations.get(child));
             }
             return res;
         }
@@ -2730,85 +2955,51 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
             Resources<OperableInteger> res = new Resources<>();
             int originalNumNeeded = numNeeded;
-            Instant startTime = Instant.now();
-            List<Pair<Pair<Node, Integer>, Pair<Boolean, Resources<OperableInteger>>>> options = new ArrayList<>();
-            List<Pair<Node, Integer>> prioritizedChildren = new ArrayList<>();
+            List<Pair<Node, Integer>> options = new ArrayList<>();
             List<Integer> childIds = state.children.get(this);
             for (int i = 0; i < children.size(); i++) {
                 int childId = nodeId + childIds.get(i);
                 Node child = children.get(i);
-                prioritizedChildren.add(new Pair<>(child, childId));
+                options.add(new Pair<>(child, childId));
             }
-            Collections.sort(prioritizedChildren, Comparator.comparing(c -> state.naiveEfficiencyMap.getOrDefault(c.getLeft(), 0.0)));
-            extractOptions(prioritizedChildren, options, state, actualNeeded, useHeuristic, visited);
+            Collections.sort(options, Comparator.comparing(option -> state.efficiencyEquations.get(option.getLeft()).evaluate(originalNumNeeded)));
             if (options.size() == 0)
                 return new Pair<>(actualNeeded == 0, res);
-            Collections.sort(options, Comparator.comparing(c -> state.efficiencyMap.getOrDefault(c.getLeft().getRight(), 0.0)));
             CraftingState newState = state.clone();
-            globalTimeTaken = globalTimeTaken.add(new BigInteger((Instant.now().getNano() - startTime.getNano()) + ""));
-            Pair<Boolean, Resources<OperableInteger>> childRes = options.get(0).getRight();
+            Pair<Boolean, Resources<OperableInteger>> childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState, useHeuristic, visited);
             int amount = 0;
             while (numNeeded > 0 && options.size() > 0) {
                 if (!childRes.getLeft()) {
                     options.remove(0);
                     if (options.size() == 0) {
-                        if (prioritizedChildren.size() == 0) {
-                            break;
-                        }
-                        else {
-                            extractOptions(prioritizedChildren, options, state, actualNeeded, useHeuristic, visited);
-                            if (options.size() == 0)
-                                break;
-                        }
+                        break;
                     }
-                    childRes = options.get(0).getRight();
+                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState, useHeuristic, visited);
                     continue;
                 }
-                if (options.get(0).getLeft().getLeft().consumeResources(options.get(0).getLeft().getRight(), childRes.getRight(), newState, 0, visited)) {
+                if (options.get(0).getLeft().consumeResources(options.get(0).getRight(), childRes.getRight(), newState, 0, visited)) {
                     numNeeded--;
                     actualNeeded = Math.max(0, actualNeeded - 1);
                     amount++;
                     if (amount > 0 && numNeeded == 0) {
-                        //Resources<OperableInteger> toConsume = options.get(0).getLeft().getBaseResources(amount, excess, neededMap, state, useHeuristic).getRight();
-                        Resources<OperableInteger> toConsume = options.get(0).getLeft().getLeft().stackResources(options.get(0).getLeft().getRight(), state, amount, childRes.getRight(), visited);
-                        options.get(0).getLeft().getLeft().consumeResources(options.get(0).getLeft().getRight(), toConsume, state, 0, visited);
+                        Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResources(options.get(0).getRight(), state, amount, childRes.getRight(), visited);
+                        options.get(0).getLeft().consumeResources(options.get(0).getRight(), toConsume, state, 0, visited);
                         mergeResources(res, toConsume);
                     }
                 }
                 else {
                     if (amount > 0) {
-                        //Resources<OperableInteger> toConsume = options.get(0).getLeft().getBaseResources(amount, excess, neededMap, state, useHeuristic).getRight();
-                        Resources<OperableInteger> toConsume = options.get(0).getLeft().getLeft().stackResources(options.get(0).getLeft().getRight(), state, amount, childRes.getRight(), visited);
-                        options.get(0).getLeft().getLeft().consumeResources(options.get(0).getLeft().getRight(), toConsume, state, 0, visited);
+                        Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResources(options.get(0).getRight(), state, amount, childRes.getRight(), visited);
+                        options.get(0).getLeft().consumeResources(options.get(0).getRight(), toConsume, state, 0, visited);
                         mergeResources(res, toConsume);
                     }
                     amount = 0;
                     newState = state.clone();
-                    childRes = options.get(0).getLeft().getLeft().getBaseResources(options.get(0).getLeft().getRight(), 1, Math.min(1, actualNeeded), state, useHeuristic, visited);
+                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), state, useHeuristic, visited);
                 }
             }
             res.put(nodeId, new Pair<>(new OperableInteger(originalNumNeeded), ResourceDomain.COMPOSITE));
             return new Pair<>(actualNeeded == 0, res);
-            /*if (useHeuristic)
-                Collections.sort(orderedItems, Comparator.comparing(o -> o.efficiencyHeuristic));
-            for (Node child : orderedItems) {
-                if (numNeeded == 0)
-                    break;
-                if (child.naiveMaxCraftable == 0)
-                    continue;
-                CraftingState newState = state.clone();
-                LinkedHashMap<Integer, Integer> newNeededMap = (LinkedHashMap<Integer, Integer>) neededMap.clone();
-                LinkedHashMap<Item, LinkedHashMap<Integer, Integer>> newExcess = deepcopyExcess(excess);
-                int amount = 0;
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
-                while (numNeeded > 0 && childRes.getLeft()) {
-                    amount++;
-                    numNeeded--;
-                    childRes = child.getBaseResources(1, newExcess, newNeededMap, newState, useHeuristic);
-                }
-                res.putAll(child.getBaseResources(amount, excess, neededMap, state, useHeuristic).getRight());
-            }
-            return new Pair<>(numNeeded == 0, res);*/
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -3016,6 +3207,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0, 0)));
+        }
+        @Override
         protected void calculateExecutionTime(int nodeId, Resources<OperableInteger> result, CraftingState state) {
             double executionTime = 0.0;
             state.efficiencyMap.put(nodeId, executionTime);
@@ -3081,6 +3276,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             return new ArrayList<>();
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            double base = containerQuery.getDistanceToContainer(target) / MC.player.getMovementSpeed();
+            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 0)));
         }
         @Override
         protected void calculateExecutionTime(int nodeId, Resources<OperableInteger> result, CraftingState state) {
@@ -3168,6 +3368,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (block.getDefaultState().isToolRequired())
                 return List.of(new ToolCraftingProcess(block).getNode());
             return new ArrayList<>();
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            if (block.getDefaultState().isToolRequired()) {
+                for (Node child : children) {
+                    base += state.efficiencyEquations.get(child).evaluate(1);
+                }
+            }
+            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 100)));
         }
         @Override
         protected boolean canPossiblyCraft(CraftingState state) {
@@ -3282,6 +3493,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
+            double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 0)));
+        }
+        @Override
         protected void calculateExecutionTime(int nodeId, Resources<OperableInteger> result, CraftingState state) {
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
             double executionTime = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
@@ -3369,6 +3586,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             return List.of(new ChoiceNode(target, processes).setDistinction(getClass()));
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0.1, 0)));
+            for (Node child : children) {
+                res = res.add(state.efficiencyEquations.get(child));
+            }
+            return res;
         }
         @Override
         protected void calculateExecutionTime(int nodeId, Resources<OperableInteger> result, CraftingState state) {
@@ -3466,6 +3691,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             processes.add(new PathingCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
             processes.add(new PlacementCraftingProcess(((WorkbenchCraftingProcess) this.processes.get(0)).block));
             return List.of(new ChoiceNode(target, processes).setDistinction(getClass()));
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation();
+            for (Node child : children) {
+                res = res.add(state.efficiencyEquations.get(child));
+            }
+            return res;
         }
         @Override
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
@@ -3579,6 +3812,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 toolProcesses.addAll(plan.processes);
             }
             return List.of(new ChoiceNode(target, toolProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
+        }
+        @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation();
+            for (Node child : children) {
+                res = res.add(state.efficiencyEquations.get(child));
+            }
+            return res;
         }
         @Override
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
@@ -3726,6 +3967,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return List.of(new ChoiceNode(target, itemProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
         }
         @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+            EfficiencyEquation res = new EfficiencyEquation();
+            for (Node child : children) {
+                res = res.add(state.efficiencyEquations.get(child));
+            }
+            return res;
+        }
+        @Override
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
             List<Integer> childIds = state.children.get(this);
             for (int i = 0; i < children.size(); i++) {
@@ -3860,15 +4109,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public void notifySlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
-        NotifyingRunnable updateRunnable = new NotifyingRunnable() {
-            @Override
-            protected void runInternal() {
-                synchronized (totalInventoryAvailabilityMap) {
-                    totalInventoryAvailabilityMap = inventoryQuery.getAvailabilityMap();
+        if (packet.getSlot() != 0) {
+            if (packet.getRevision() == lastSlotUpdatePacketRevision)
+                return;
+            if (packet.getSyncId() == ScreenHandlerSlotUpdateS2CPacket.UPDATE_CURSOR_SYNC_ID || packet.getSyncId() == ScreenHandlerSlotUpdateS2CPacket.UPDATE_PLAYER_INVENTORY_SYNC_ID)
+                return;
+            lastSlotUpdatePacketRevision = packet.getRevision();
+            NotifyingRunnable updateRunnable = new NotifyingRunnable() {
+                protected void runInternal() {
+                    synchronized (totalInventoryAvailabilityMap) {
+                        totalInventoryAvailabilityMap.clear();
+                        totalInventoryAvailabilityMap.putAll(inventoryQuery.getScreenAvailabilityMap());
+                    }
                 }
-            }
-        };
-        updateRunnable.runWithoutWaiting();
+            };
+            updateRunnable.runWithoutWaiting();
+        }
         slotUpdateLock.lock();
         try {
             latestSlotUpdates.put(packet.getSlot(), new SlotUpdateInfo(packet.getSlot(), packet.getItemStack()));
