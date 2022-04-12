@@ -2841,7 +2841,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
-            EfficiencyEquation res = new EfficiencyEquation();
+            EfficiencyEquation res = new EfficiencyEquation(new ArrayList<>());
             for (Node child : children) {
                 res = res.min(state.efficiencyEquations.get(child));
             }
