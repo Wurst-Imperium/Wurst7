@@ -1,5 +1,6 @@
 package net.wurstclient.hacks;
 
+import io.netty.util.concurrent.ThreadPerTaskExecutor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -7,17 +8,26 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootManager;
+import net.minecraft.loot.LootTables;
+import net.minecraft.loot.condition.LootConditionManager;
+import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.network.OffThreadException;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.*;
+import net.minecraft.resource.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -38,6 +48,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
@@ -158,6 +169,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         groups.put("food", foodGroup);
     }
 
+    public LootManager makeLootManager() {
+        ResourcePackManager rpl = new ResourcePackManager(ResourceType.SERVER_DATA, new VanillaDataPackProvider());
+        rpl.scanPacks();
+        ResourcePack thePack = rpl.getProfiles().iterator().next().createResourcePack();
+        ReloadableResourceManager resourceManager = new ReloadableResourceManagerImpl(ResourceType.SERVER_DATA);
+        LootManager manager = new LootManager(new LootConditionManager());
+        resourceManager.registerReloader(manager);
+        try {
+            resourceManager.reload(new ThreadPerTaskExecutor(Thread::new), new ThreadPerTaskExecutor(Thread::new), Collections.singletonList(thePack), CompletableFuture.completedFuture(Unit.INSTANCE)).get();
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+        return manager;
+    }
+
     private void initProcessMap() {
         processMap = new LinkedHashMap<>();
         RecipeManager recipeManager = MC.world.getRecipeManager();
@@ -188,13 +214,32 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 processMap.get(id).add(getCraftingProcessByType(recipe, recipeType));
             }
         }
+        LootManager manager = makeLootManager();
         for (Identifier id : Registry.BLOCK.getIds()) {
-            List<ItemStack> droppedStacks = Block.getDroppedStacks(Registry.BLOCK.get(id).getDefaultState(), MC.getServer().getOverworld(), BlockPos.ORIGIN, null);
-            for (ItemStack stack : droppedStacks) {
-                Identifier stackId = Registry.ITEM.getId(stack.getItem());
-                if (!processMap.containsKey(stackId))
-                    processMap.put(stackId, new ArrayList<>());
-                processMap.get(stackId).add(new WorldCraftingProcess(stack.getItem(), Registry.BLOCK.get(id)));
+            List<Item> items;
+            Block block = Registry.BLOCK.get(id);
+            Identifier lootTableLocation = block.getLootTableId();
+            if (lootTableLocation == LootTables.EMPTY) {
+                items = Collections.emptyList();
+            }
+            else {
+                items = new ArrayList<>();
+                manager.getTable(lootTableLocation).generateLoot(
+                        new LootContext.Builder((ServerWorld) null)
+                                .random(new Random())
+                                .parameter(LootContextParameters.ORIGIN, Vec3d.of(BlockPos.ORIGIN))
+                                .parameter(LootContextParameters.TOOL, ItemStack.EMPTY)
+                                .optionalParameter(LootContextParameters.BLOCK_ENTITY, null)
+                                .parameter(LootContextParameters.BLOCK_STATE, block.getDefaultState())
+                                .build(LootContextTypes.BLOCK),
+                        stack -> items.add(stack.getItem())
+                );
+            }
+            for (Item dropped : items) {
+                Identifier itemId = Registry.ITEM.getId(dropped);
+                if (!processMap.containsKey(itemId))
+                    processMap.put(itemId, new ArrayList<>());
+                processMap.get(itemId).add(new WorldCraftingProcess(dropped, block));
             }
         }
     }
