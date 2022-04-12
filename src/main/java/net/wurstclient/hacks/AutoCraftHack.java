@@ -25,6 +25,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
+import net.wurstclient.WurstClient;
 import net.wurstclient.commands.GoToCmd;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -34,7 +35,6 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.PrintStream;
 import java.math.BigInteger;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,11 +74,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     private LinkedHashSet<Block> containerBlockTypes;
 
-    private Pathfinder regularPathfinder;
-    private Pathfinder baritoneChatPathfinder;
-    private BaritoneAPIInterface baritoneAPIInterface;
+    private WurstPathfinder wurstPathfinder;
+    private BaritoneChatPathfinder baritoneChatPathfinder;
     private BaritoneChatInterface baritoneChatInterface;
     private CheckboxSetting baritoneChatInterfaceEnabled = new CheckboxSetting("Baritone Chat Interface", "Use Baritone to pathfind and mine stuff (requires Baritone to be installed as a fabric mod).", false);
+    private CheckboxSetting flightPathsEnabled = new CheckboxSetting("Flight Paths", "Navigate using Wurst's flight path processor whenever possible.", false);
 
     private BlockPos latestBlockPos = BlockPos.ORIGIN;
 
@@ -95,6 +95,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         super("AutoCraft");
         setCategory(Category.ITEMS);
         addSetting(baritoneChatInterfaceEnabled);
+        addSetting(flightPathsEnabled);
     }
 
     private boolean isBaritoneAPIInstalled() {
@@ -325,15 +326,19 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public class WurstPathfinder extends Pathfinder {
+        FlightHack flight;
         public WurstPathfinder() {
             super(false);
+            flight = WurstClient.INSTANCE.getHax().flightHack;
+        }
+        public void setFlight(boolean status) {
+            flight.setEnabled(status);
         }
         public boolean path(BlockPos pos) {
             GoToCmd path = new GoToCmd();
             path.setGoal(pos);
             path.enable();
-            path.waitUntilDone();
-            return true;
+            return path.waitUntilDone();
         }
         public boolean mine(Block block, Item dropped, int count) {
             throw new NotImplementedException("Wurst pathfinder does not support mining");
@@ -605,7 +610,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    public class BaritoneAPIPathfinder extends Pathfinder {
+    /*public class BaritoneAPIPathfinder extends Pathfinder {
         public BaritoneAPIPathfinder() {
             super(true);
         }
@@ -661,7 +666,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             baritoneAPIInterface.setAllowInventory(false);
             return true;
         }
-    }
+    }*/
 
     public class ContainerStorageQuery extends StorageQuery<Item> {
         private LinkedHashMap<BlockPos, LinkedHashMap<Item, Integer>> containers;
@@ -1053,6 +1058,17 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    private boolean pathTo(BlockPos pos) {
+        if (flightPathsEnabled.isChecked()) {
+            wurstPathfinder.setFlight(true);
+            boolean success = wurstPathfinder.path(pos);
+            wurstPathfinder.setFlight(false);
+            if (success)
+                return true;
+        }
+        return getActivePathfinder().path(pos);
+    }
+
     public class ContainerManager {
         private LinkedHashMap<Block, LinkedHashSet<BlockPos>> containers = new LinkedHashMap<>();
         private BlockPos currentContainer = null;
@@ -1106,7 +1122,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             BlockPos nearestPathablePosition = getNearestPathablePosition(container);
             if (nearestPathablePosition == null)
                 nearestPathablePosition = container.up();
-            return getActivePathfinder().path(nearestPathablePosition);
+            return pathTo(nearestPathablePosition);
         }
         public boolean navigateAndOpenContainer(BlockPos container) {
             if (!navigateToContainer(container))
@@ -3539,7 +3555,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (!nearestBlockPosMap.containsKey(targetBlock))
                 return false;
             nearestTarget = nearestBlockPosMap.get(targetBlock).up();
-            return getActivePathfinder().path(nearestTarget);
+            return pathTo(nearestTarget);
         }
         @Override
         public int getOutputCount() {
@@ -4052,7 +4068,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private Pathfinder getActivePathfinder() {
         if (baritoneChatInterfaceEnabled.isChecked())
             return baritoneChatPathfinder;
-        return regularPathfinder;
+        return wurstPathfinder;
     }
 
     private boolean usingCraftingTable() {
@@ -4237,13 +4253,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public void onEnable() {
         baritoneChatInterface = new BaritoneChatInterface();
         baritoneChatPathfinder = new BaritoneChatPathfinder();
-        if (isBaritoneAPIInstalled()) {
-            baritoneAPIInterface = new BaritoneAPIInterface();
-            regularPathfinder = new BaritoneAPIPathfinder();
-        }
-        else {
-            regularPathfinder = new WurstPathfinder();
-        }
+        wurstPathfinder = new WurstPathfinder();
         if (processMap == null)
             initProcessMap();
         if (containerBlockTypes == null)

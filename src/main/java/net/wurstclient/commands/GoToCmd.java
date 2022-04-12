@@ -38,6 +38,7 @@ public final class GoToCmd extends Command
 	private Condition doneCondition = doneLock.newCondition();
 
 	private boolean doneProcessing = false;
+	private boolean success = false;
 	
 	public GoToCmd()
 	{
@@ -85,7 +86,7 @@ public final class GoToCmd extends Command
 		pathFinder = new PathFinder(goal);
 	}
 
-	public void waitUntilDone() {
+	public boolean waitUntilDone() {
 		doneLock.lock();
 		try {
 			while (!doneProcessing)
@@ -95,6 +96,7 @@ public final class GoToCmd extends Command
 		} finally {
 			doneLock.unlock();
 		}
+		return success;
 	}
 
 	private void notifyDone() {
@@ -176,6 +178,7 @@ public final class GoToCmd extends Command
 			{
 				if(pathFinder.isFailed())
 				{
+					success = false;
 					ChatUtils.error("Could not find a path.");
 					disable();
 				}
@@ -203,8 +206,10 @@ public final class GoToCmd extends Command
 		// process path
 		processor.process();
 		
-		if(processor.isDone())
+		if(processor.isDone()) {
+			success = true;
 			disable();
+		}
 	}
 	
 	@Override
