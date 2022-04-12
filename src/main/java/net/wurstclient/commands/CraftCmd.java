@@ -9,6 +9,7 @@ package net.wurstclient.commands;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -81,8 +82,11 @@ public final class CraftCmd extends Command
         if (args.length == 0) {
             throw new CmdError("Invalid number of arguments");
         }
+        Set<String> groupNames = autoCraft.getGroupNames();
         for (int i = 0; i < args.length; i++) {
             ParsedArgument parsed = parse(args[i]);
+            if (groupNames.contains(parsed.id))
+                continue;
             Identifier itemId = new Identifier("minecraft", parsed.id);
             if (!Registry.ITEM.containsId(itemId)) {
                 throw new CmdError("Item " + itemId + " either does not exist or has no recipe");
@@ -90,8 +94,7 @@ public final class CraftCmd extends Command
         }
         for (int i = 0; i < args.length; i++) {
             ParsedArgument parsed = parse(args[i]);
-            Identifier itemId = new Identifier("minecraft:" + parsed.id);
-            autoCraft.queueCraft(itemId, parsed.count, parsed.craftAll);
+            autoCraft.queueCraft(parsed.id, parsed.count, parsed.craftAll);
         }
         if (!autoCraft.isEnabled())
             autoCraft.setEnabled(true);
