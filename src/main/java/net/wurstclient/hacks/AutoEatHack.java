@@ -7,19 +7,24 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.HungerManager;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.FoodComponents;
 import net.minecraft.item.Item;
@@ -31,36 +36,55 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto eat", "AutoFood", "auto food", "AutoFeeder", "auto feeder",
 	"AutoFeeding", "auto feeding", "AutoSoup", "auto soup"})
 public final class AutoEatHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting eatWhileWalking = new CheckboxSetting(
-		"Eat while walking", "Slows you down, not recommended.", false);
+	private final SliderSetting targetHunger = new SliderSetting(
+		"Target hunger", "description.wurst.setting.autoeat.target_hunger", 10,
+		0, 10, 0.5, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<FoodPriority> foodPriority =
-		new EnumSetting<>("Prefer food with", FoodPriority.values(),
-			FoodPriority.HIGH_SATURATION);
+	private final SliderSetting minHunger = new SliderSetting("Min hunger",
+		"description.wurst.setting.autoeat.min_hunger", 6.5, 0, 10, 0.5,
+		ValueDisplay.DECIMAL);
+	
+	private final SliderSetting injuredHunger = new SliderSetting(
+		"Injured hunger", "description.wurst.setting.autoeat.injured_hunger",
+		10, 0, 10, 0.5, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting injuryThreshold =
+		new SliderSetting("Injury threshold",
+			"description.wurst.setting.autoeat.injury_threshold", 1.5, 0.5, 10,
+			0.5, ValueDisplay.DECIMAL);
+	
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
+		"Take items from", "description.wurst.setting.autoeat.take_items_from",
+		TakeItemsFrom.values(), TakeItemsFrom.HOTBAR);
+	
+	private final CheckboxSetting allowOffhand =
+		new CheckboxSetting("Allow offhand", true);
+	
+	private final CheckboxSetting eatWhileWalking =
+		new CheckboxSetting("Eat while walking",
+			"description.wurst.setting.autoeat.eat_while_walking", false);
 	
 	private final CheckboxSetting allowHunger =
 		new CheckboxSetting("Allow hunger effect",
-			"Rotten flesh applies a harmless 'hunger' effect.\n"
-				+ "It is safe to eat and useful as emergency food.",
-			true);
+			"description.wurst.setting.autoeat.allow_hunger", true);
 	
 	private final CheckboxSetting allowPoison =
 		new CheckboxSetting("Allow poison effect",
-			"Poisoned food applies damage over time.\n" + "Not recommended.",
-			false);
+			"description.wurst.setting.autoeat.allow_poison", false);
 	
 	private final CheckboxSetting allowChorus =
 		new CheckboxSetting("Allow chorus fruit",
-			"Eating chorus fruit teleports you to a random location.\n"
-				+ "Not recommended.",
-			false);
+			"description.wurst.setting.autoeat.allow_chorus", false);
 	
 	private int oldSlot = -1;
 	
@@ -68,8 +92,16 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	{
 		super("AutoEat");
 		setCategory(Category.ITEMS);
+		
+		addSetting(targetHunger);
+		addSetting(minHunger);
+		addSetting(injuredHunger);
+		addSetting(injuryThreshold);
+		
+		addSetting(takeItemsFrom);
+		addSetting(allowOffhand);
+		
 		addSetting(eatWhileWalking);
-		addSetting(foodPriority);
 		addSetting(allowHunger);
 		addSetting(allowPoison);
 		addSetting(allowChorus);
@@ -85,48 +117,112 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		stopIfEating();
+		
+		if(isEating())
+			stopEating();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		ClientPlayerEntity player = MC.player;
+		
 		if(!shouldEat())
 		{
-			stopIfEating();
+			if(isEating())
+				stopEating();
+			
 			return;
 		}
 		
-		int bestSlot = getBestSlot();
-		if(bestSlot == -1)
+		HungerManager hungerManager = player.getHungerManager();
+		int foodLevel = hungerManager.getFoodLevel();
+		int targetHungerI = (int)(targetHunger.getValue() * 2);
+		int minHungerI = (int)(minHunger.getValue() * 2);
+		int injuredHungerI = (int)(injuredHunger.getValue() * 2);
+		
+		if(isInjured(player) && foodLevel < injuredHungerI)
 		{
-			stopIfEating();
+			eat(-1);
 			return;
 		}
 		
-		// save old slot
-		if(!isEating())
-			oldSlot = MC.player.getInventory().selectedSlot;
+		if(foodLevel < minHungerI)
+		{
+			eat(-1);
+			return;
+		}
 		
-		// set slot
-		MC.player.getInventory().selectedSlot = bestSlot;
+		if(foodLevel < targetHungerI)
+		{
+			int maxPoints = targetHungerI - foodLevel;
+			eat(maxPoints);
+		}
+	}
+	
+	private void eat(int maxPoints)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		int foodSlot = findBestFoodSlot(maxPoints);
+		
+		if(foodSlot == -1)
+		{
+			if(isEating())
+				stopEating();
+			
+			return;
+		}
+		
+		// select food
+		if(foodSlot < 9)
+		{
+			if(!isEating())
+				oldSlot = inventory.selectedSlot;
+			
+			inventory.selectedSlot = foodSlot;
+			
+		}else if(foodSlot == 40)
+		{
+			if(!isEating())
+				oldSlot = inventory.selectedSlot;
+			
+			// off-hand slot, no need to select anything
+			
+		}else
+		{
+			moveFoodToHotbar(foodSlot);
+			return;
+		}
 		
 		// eat food
 		MC.options.useKey.setPressed(true);
 		IMC.getInteractionManager().rightClickItem();
 	}
 	
-	private int getBestSlot()
+	private int findBestFoodSlot(int maxPoints)
 	{
-		int bestSlot = -1;
+		PlayerInventory inventory = MC.player.getInventory();
 		FoodComponent bestFood = null;
-		Comparator<FoodComponent> comparator =
-			foodPriority.getSelected().comparator;
+		int bestSlot = -1;
 		
-		for(int i = 0; i < 9; i++)
+		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
+		
+		ArrayList<Integer> slots = new ArrayList<>();
+		if(maxInvSlot == 0)
+			slots.add(inventory.selectedSlot);
+		if(allowOffhand.isChecked())
+			slots.add(40);
+		Stream.iterate(0, i -> i < maxInvSlot, i -> i + 1)
+			.forEach(i -> slots.add(i));
+		
+		Comparator<FoodComponent> comparator =
+			Comparator.comparingDouble(FoodComponent::getSaturationModifier);
+		
+		for(int slot : slots)
 		{
+			Item item = inventory.getStack(slot).getItem();
+			
 			// filter out non-food items
-			Item item = MC.player.getInventory().getStack(i).getItem();
 			if(!item.isFood())
 				continue;
 			
@@ -134,15 +230,63 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			if(!isAllowedFood(food))
 				continue;
 			
+			if(maxPoints >= 0 && food.getHunger() > maxPoints)
+				continue;
+			
 			// compare to previously found food
 			if(bestFood == null || comparator.compare(food, bestFood) > 0)
 			{
 				bestFood = food;
-				bestSlot = i;
+				bestSlot = slot;
 			}
 		}
 		
 		return bestSlot;
+	}
+	
+	private void moveFoodToHotbar(int foodSlot)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		if(inventory.getEmptySlot() < 9)
+			im.windowClick_QUICK_MOVE(foodSlot);
+		else if(inventory.getEmptySlot() != -1)
+		{
+			im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
+			im.windowClick_QUICK_MOVE(foodSlot);
+			
+		}else
+		{
+			im.windowClick_PICKUP(inventory.selectedSlot + 36);
+			im.windowClick_PICKUP(foodSlot);
+			im.windowClick_PICKUP(inventory.selectedSlot + 36);
+		}
+	}
+	
+	private boolean shouldEat()
+	{
+		if(MC.player.getAbilities().creativeMode)
+			return false;
+		
+		if(!MC.player.canConsume(false))
+			return false;
+		
+		if(!eatWhileWalking.isChecked()
+			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
+			return false;
+		
+		if(isClickable(MC.crosshairTarget))
+			return false;
+		
+		return true;
+	}
+	
+	private void stopEating()
+	{
+		MC.options.useKey.setPressed(false);
+		MC.player.getInventory().selectedSlot = oldSlot;
+		oldSlot = -1;
 	}
 	
 	private boolean isAllowedFood(FoodComponent food)
@@ -164,22 +308,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		return true;
 	}
 	
-	private boolean shouldEat()
+	public boolean isEating()
 	{
-		if(MC.player.getAbilities().creativeMode)
-			return false;
-		
-		if(!MC.player.canConsume(false))
-			return false;
-		
-		if(!eatWhileWalking.isChecked()
-			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
-			return false;
-		
-		if(isClickable(MC.crosshairTarget))
-			return false;
-		
-		return true;
+		return oldSlot != -1;
 	}
 	
 	private boolean isClickable(HitResult hitResult)
@@ -208,46 +339,27 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		return false;
 	}
 	
-	public boolean isEating()
+	private boolean isInjured(ClientPlayerEntity player)
 	{
-		return oldSlot != -1;
+		int injuryThresholdI = (int)(injuryThreshold.getValue() * 2);
+		return player.getHealth() < player.getMaxHealth() - injuryThresholdI;
 	}
 	
-	private void stopIfEating()
+	private enum TakeItemsFrom
 	{
-		if(!isEating())
-			return;
+		HANDS("Hands", 0),
 		
-		MC.options.useKey.setPressed(false);
+		HOTBAR("Hotbar", 9),
 		
-		MC.player.getInventory().selectedSlot = oldSlot;
-		oldSlot = -1;
-	}
-	
-	public static enum FoodPriority
-	{
-		HIGH_HUNGER("High Food Points",
-			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)),
-		
-		HIGH_SATURATION("High Saturation",
-			Comparator.<FoodComponent> comparingDouble(
-				FoodComponent::getSaturationModifier)),
-		
-		LOW_HUNGER("Low Food Points",
-			Comparator.<FoodComponent> comparingInt(FoodComponent::getHunger)
-				.reversed()),
-		
-		LOW_SATURATION("Low Saturation",
-			Comparator.<FoodComponent> comparingDouble(
-				FoodComponent::getSaturationModifier).reversed());
+		INVENTORY("Inventory", 36);
 		
 		private final String name;
-		private final Comparator<FoodComponent> comparator;
+		private final int maxInvSlot;
 		
-		private FoodPriority(String name, Comparator<FoodComponent> comparator)
+		private TakeItemsFrom(String name, int maxInvSlot)
 		{
 			this.name = name;
-			this.comparator = comparator;
+			this.maxInvSlot = maxInvSlot;
 		}
 		
 		@Override
