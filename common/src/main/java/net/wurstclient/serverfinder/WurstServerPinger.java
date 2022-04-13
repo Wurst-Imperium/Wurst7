@@ -7,8 +7,6 @@
  */
 package net.wurstclient.serverfinder;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,11 +23,11 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 	private int pingPort;
 	private WurstServerListPinger pinger;
 	private boolean notifiedDoneListeners = false;
-	private boolean scanPorts;
-	private int searchNumber;
+	private final boolean scanPorts;
+	private final int searchNumber;
 	private int currentIncrement = 1;
 	private boolean startingIncrement = true;
-	private ArrayList<IServerFinderDoneListener> doneListeners = new ArrayList<>();
+	private final ArrayList<IServerFinderDoneListener> doneListeners = new ArrayList<>();
 	private int portPingers = 0;
 	private int successfulPortPingers = 0;
 	private String pingIP;
@@ -128,7 +126,7 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 		if (isOldSearch())
 			return;
 		
-		//System.out.println("Pinging " + ip + ":" + port + "...");
+		System.out.println("Pinging " + ip + ":" + port + "...");
 		
 		try
 		{
@@ -136,12 +134,12 @@ public class WurstServerPinger implements IServerFinderDisconnectListener, IServ
 		}
 		catch(UnknownHostException e)
 		{
-			//System.out.println("Unknown host: " + ip + ":" + port);
+			System.out.println("Unknown host: " + ip + ":" + port);
 			failed = true;
 			
 		}catch(Exception e2)
 		{
-			//System.out.println("Ping failed: " + ip + ":" + port);
+			System.out.println("Ping failed: " + ip + ":" + port);
 			failed = true;
 		}
 		

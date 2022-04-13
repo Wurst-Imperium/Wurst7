@@ -15,147 +15,150 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
+import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.option.*;
+import net.minecraft.util.Util;
+import net.wurstclient.util.CyclingButtonWidget;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.core.MCScreen;
 
 public class ServerFinderScreen extends MCScreen implements IServerFinderDoneListener {
-	private MultiplayerScreen prevScreen;
+    private final MultiplayerScreen prevScreen;
+    private TextFieldWidget ipBox;
+    private TextFieldWidget versionBox;
+    private TextFieldWidget maxThreadsBox;
+    private TextFieldWidget targetCheckedBox;
+    private ButtonWidget searchButton;
+    private CyclingButtonWidget scanPortsButton;
+    private CyclingButtonWidget searchDirectionButton;
 
-	private TextFieldWidget ipBox;
-	private TextFieldWidget versionBox;
-	private TextFieldWidget maxThreadsBox;
-	private TextFieldWidget targetCheckedBox;
-	private ButtonWidget searchButton;
+    private ServerFinderState state;
+    private int maxThreads;
+    private volatile int numActiveThreads;
+    private volatile int checked;
+    private volatile int working;
 
-	private ServerFinderState state;
-	private int maxThreads;
-	private volatile int numActiveThreads;
-	private volatile int checked;
-	private volatile int working;
+    private int targetChecked = 512;
 
-	private int targetChecked = 512;
+    private final Stack<String> ipsToPing = new Stack<>();
 
-	private Stack<String> ipsToPing = new Stack<>();
+    private final Object serverFinderLock = new Object();
 
-	private final Object serverFinderLock = new Object();
-	
-	public static ServerFinderScreen instance = null;
-	private static int searchNumber = 0;
-	
-	private ArrayList<String> versionFilters = new ArrayList<>();
-	private int playerCountFilter = 0;
-	private boolean scanPorts = true;
-	
-	private String saveToFileMessage = null;
+    public static ServerFinderScreen instance = null;
+    private static int searchNumber = 0;
 
-	public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu) {
-		super(new LiteralText(""));
-		newSearch();
-		instance = this;
-		prevScreen = prevMultiplayerMenu;
-	}
-	
-	private void newSearch() {
-		searchNumber = (searchNumber + 1) % 1000;
-	}
-	
-	public void incrementTargetChecked(int amount) {
-		synchronized(serverFinderLock) {
-			if (state != ServerFinderState.CANCELLED)
-				checked += amount;
-		}
-	}
-	
-	public ServerFinderState getState() {
-		return state;
-	}
-	
-	private void saveToFile() {
-		if (WurstClient.INSTANCE == null || prevScreen == null)
-			return;
-		
-		int newIPs = 0;
-		
-		Path wurstFolder = WurstClient.INSTANCE.getWurstFolder();
-		if (wurstFolder == null)
-			return;
-		
-		Path filePath = wurstFolder.resolve("servers.txt");
-		File serverFile = filePath.toFile();
-		HashSet<IPAddress> hashedIPs = new HashSet<>();
-		if (serverFile.exists()) {
-			try {
-				List<String> ips = Files.readAllLines(filePath);
-				for (String ip: ips) {
-					IPAddress parsedIP = IPAddress.fromText(ip);
-					if (parsedIP != null)
-						hashedIPs.add(parsedIP);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		ServerList servers = prevScreen.getServerList();
-		for (int i = 0; i < servers.size(); i++) {
-			ServerInfo info = servers.get(i);
-			IPAddress addr = IPAddress.fromText(info.address);
-			if (addr != null && hashedIPs.add(addr))
-				newIPs++;
-		}
-		
-		String fileOutput = "";
-		for (IPAddress ip : hashedIPs) {
-			String stringIP = ip.toString();
-			if (stringIP != null)
-				fileOutput += stringIP + "\n";
-		}
-		try (PrintWriter pw = new PrintWriter(filePath.toFile())) {
-			pw.print(fileOutput);
-		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		saveToFileMessage = "\u00a76Saved " + newIPs + " new IP" + (newIPs == 1 ? "" : "s");
-	}
+    private ArrayList<String> versionFilters = new ArrayList<>();
+    private boolean scanPorts = true;
 
-	@Override
-	public void init()
-	{
-		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, new LiteralText(""));
-		ipBox.setMaxLength(200);
-		ipBox.setTextFieldFocused(true);
-		addDrawableChild(ipBox);
-		setInitialFocus(ipBox);
-		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 30, 115, 30, 10, new LiteralText(""));
-		maxThreadsBox.setMaxLength(4);
-		maxThreadsBox.setText("128");
-		addDrawableChild(maxThreadsBox);
-		targetCheckedBox = new TextFieldWidget(textRenderer, width / 2 + 100 - 40, 115, 40, 10, new LiteralText(""));
-		targetCheckedBox.setMaxLength(5);
-		targetCheckedBox.setText("1337");
-		addDrawableChild(targetCheckedBox);
-		state = ServerFinderState.NOT_RUNNING;
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 130, 200, 20, new LiteralText("Scan Ports: " + (scanPorts ? "Yes" : "No")),
-				b -> b.setMessage(new LiteralText("Scan Ports: " + ((scanPorts = !scanPorts) ? "Yes" : "No")))));
+    private String saveToFileMessage = null;
+
+    public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu) {
+        super(new LiteralText(""));
+        newSearch();
+        instance = this;
+        prevScreen = prevMultiplayerMenu;
+    }
+
+    private void newSearch() {
+        searchNumber = (searchNumber + 1) % 1000;
+    }
+
+    public void incrementTargetChecked(int amount) {
+        synchronized (serverFinderLock) {
+            if (state != ServerFinderState.CANCELLED)
+                checked += amount;
+        }
+    }
+
+    public ServerFinderState getState() {
+        return state;
+    }
+
+    private void saveToFile() {
+        if (WurstClient.INSTANCE == null || prevScreen == null)
+            return;
+
+        int newIPs = 0;
+
+        Path wurstFolder = WurstClient.INSTANCE.getWurstFolder();
+        if (wurstFolder == null)
+            return;
+
+        Path filePath = wurstFolder.resolve("servers.txt");
+        File serverFile = filePath.toFile();
+        HashSet<IPAddress> hashedIPs = new HashSet<>();
+        if (serverFile.exists()) {
+            try {
+                List<String> ips = Files.readAllLines(filePath);
+                for (String ip : ips) {
+                    IPAddress parsedIP = IPAddress.fromText(ip);
+                    if (parsedIP != null)
+                        hashedIPs.add(parsedIP);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ServerList servers = prevScreen.getServerList();
+        for (int i = 0; i < servers.size(); i++) {
+            ServerInfo info = servers.get(i);
+            IPAddress addr = IPAddress.fromText(info.address);
+            if (addr != null && hashedIPs.add(addr))
+                newIPs++;
+        }
+
+        StringBuilder fileOutput = new StringBuilder();
+        for (IPAddress ip : hashedIPs) {
+            String stringIP = ip.toString();
+            if (stringIP != null)
+                fileOutput.append(stringIP).append("\n");
+        }
+        try (PrintWriter pw = new PrintWriter(filePath.toFile())) {
+            pw.print(fileOutput);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        saveToFileMessage = "\u00a76Saved " + newIPs + " new IP" + (newIPs == 1 ? "" : "s");
+    }
+
+    @Override
+    public void init() {
+        ipBox = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, new LiteralText(""));
+        ipBox.setMaxLength(200);
+        ipBox.setTextFieldFocused(true);
+        addDrawableChild(ipBox);
+        setInitialFocus(ipBox);
+        maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 30, 115, 30, 10, new LiteralText(""));
+        maxThreadsBox.setMaxLength(4);
+        maxThreadsBox.setText("128");
+        addDrawableChild(maxThreadsBox);
+        targetCheckedBox = new TextFieldWidget(textRenderer, width / 2 + 100 - 40, 115, 40, 10, new LiteralText(""));
+        targetCheckedBox.setMaxLength(5);
+        targetCheckedBox.setText("1337");
+        addDrawableChild(targetCheckedBox);
+        state = ServerFinderState.NOT_RUNNING;
+        ArrayList<CyclingButtonWidget.CycleButtonEntry> scanPortsOptions = new ArrayList<CyclingButtonWidget.CycleButtonEntry>();
+        scanPortsOptions.add(new CyclingButtonWidget.CycleButtonEntry("Extra Ports: Yes", "YES"));
+        scanPortsOptions.add(new CyclingButtonWidget.CycleButtonEntry("Extra Ports: No", "NO"));
+        scanPortsButton = new CyclingButtonWidget(width / 2 - 100, 130, 98, 20, scanPortsOptions, Optional.empty());
+        addDrawableChild(scanPortsButton);
+        ArrayList<CyclingButtonWidget.CycleButtonEntry> searchDirectionOptions = new ArrayList<CyclingButtonWidget.CycleButtonEntry>();
+        searchDirectionOptions.add(new CyclingButtonWidget.CycleButtonEntry("Search Forwards", "FORWARD"));
+        searchDirectionOptions.add(new CyclingButtonWidget.CycleButtonEntry("Search Backwards", "BACK"));
+        searchDirectionButton = new CyclingButtonWidget(width / 2, 130, 98, 20, searchDirectionOptions, Optional.empty());
+        addDrawableChild(searchDirectionButton);
 
 		versionBox = new TextFieldWidget(textRenderer, width / 2 - 100, 185, 200, 20, new LiteralText(""));
 		versionBox.setMaxLength(200);
@@ -171,249 +174,285 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
 		addDrawableChild(new ButtonWidget(width / 2 + 2, 230, 98, 20, new LiteralText("Save to File"),
 				b -> saveToFile()));
 
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 250, 200, 20, new LiteralText("Back"),
-				b -> WurstClient.setScreen(prevScreen)));
+        addDrawableChild(new ButtonWidget(width / 2 - 100, 250, 200, 20, new LiteralText("Back"),
+                b -> WurstClient.setScreen(prevScreen)));
 
-	}
+    }
 
-	private void searchOrCancel() {
-		if (state.isRunning()) {
-			state = ServerFinderState.CANCELLED;
-			return;
-		}
+    private void searchOrCancel() {
+        if (state.isRunning()) {
+            state = ServerFinderState.CANCELLED;
+            return;
+        }
 
-		state = ServerFinderState.RESOLVING;
-		maxThreads = Integer.parseInt(maxThreadsBox.getText());
-		targetChecked = Integer.parseInt(targetCheckedBox.getText());
-		saveToFileMessage = null;
-		ipsToPing.clear();
-		numActiveThreads = 0;
-		checked = 0;
-		working = 0;
-		
-		newSearch();
-		parseVersionFilters();
+        state = ServerFinderState.RESOLVING;
+        maxThreads = Integer.parseInt(maxThreadsBox.getText());
+        targetChecked = Integer.parseInt(targetCheckedBox.getText());
+        scanPorts = scanPortsButton.getSelectedValue().equals("YES");
+        saveToFileMessage = null;
+        ipsToPing.clear();
+        numActiveThreads = 0;
+        checked = 0;
+        working = 0;
 
-		findServers();
-	}
-	
-	private void parseVersionFilters() {
-		String filter = versionBox.getText();
-		String[] versions = filter.split(";");
-		if (versionFilters == null) {
-			versionFilters = new ArrayList<>();
-		}
-		versionFilters.clear();
-		for (String version : versions) {
-			String trimmed = version.trim();
-			if (trimmed.length() > 0)
-				versionFilters.add(version.trim());
-		}
-	}
+        newSearch();
+        parseVersionFilters();
 
-	private void findServers() {
-		try {
-			InetAddress addr = InetAddress.getByName(ipBox.getText().split(":")[0].trim());
+        findServers();
+    }
 
-			int[] ipParts = new int[4];
-			for (int i = 0; i < 4; i++)
-				ipParts[i] = addr.getAddress()[i] & 0xff;
+    private void parseVersionFilters() {
+        String filter = versionBox.getText();
+        String[] versions = filter.split(";");
+        if (versionFilters == null) {
+            versionFilters = new ArrayList<>();
+        }
+        versionFilters.clear();
+        for (String version : versions) {
+            String trimmed = version.trim();
+            if (trimmed.length() > 0)
+                versionFilters.add(version.trim());
+        }
+    }
 
-			state = ServerFinderState.SEARCHING;
-			int[] changes = { 0, 1, -1, 2, -2, 3, -3 };
-			for (int change : changes)
-				for (int i2 = 0; i2 <= 255; i2++) {
-					if (state == ServerFinderState.CANCELLED)
-						return;
+    private static int getIntFromInetAddress(InetAddress addr) {
+        byte[] a = addr.getAddress();
+        return ((a[0] & 0xFF) << 24) | ((a[1] & 0xFF) << 16) | ((a[2] & 0xFF) << 8) | (a[3] & 0xFF);
+    }
 
-					int[] ipParts2 = ipParts.clone();
-					ipParts2[2] = ipParts[2] + change & 0xff;
-					ipParts2[3] = i2;
-					String ip = ipParts2[0] + "." + ipParts2[1] + "." + ipParts2[2] + "." + ipParts2[3];
+    private static InetAddress getInetAddressFromInt(int value) throws UnknownHostException {
+        StringBuffer ip_address_string = new StringBuffer();
+        for (int i = 0; i < 4; i++) {
+            ip_address_string.append(0xff & value >> 24);
+            value <<= 8;
+            if (i != 4 - 1)
+                ip_address_string.append('.');
+        }
+        return InetAddress.getByName(ip_address_string.toString());
+    }
 
-					ipsToPing.push(ip);
-				}
-			while (numActiveThreads < maxThreads && pingNewIP()) {
-			}
+    private static InetAddress getPreviousIPV4Address(InetAddress ip) {
+        try {
+            return getInetAddressFromInt(getIntFromInetAddress(ip) - 1);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+    }
 
-		} catch (UnknownHostException e) {
-			state = ServerFinderState.UNKNOWN_HOST;
+    private static InetAddress getNextIPV4Address(InetAddress ip) {
+        try {
+            return getInetAddressFromInt(getIntFromInetAddress(ip) + 1);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			state = ServerFinderState.ERROR;
-		}
-	}
 
-	private boolean pingNewIP() {
-		synchronized (serverFinderLock) {
-			if (ipsToPing.size() > 0) {
-				String ip = ipsToPing.pop();
-				WurstServerPinger pinger = new WurstServerPinger(scanPorts, searchNumber);
-				pinger.addServerFinderDoneListener(this);
-				pinger.ping(ip);
-				numActiveThreads++;
-				return true;
-			}
-		}
-		return false;
-	}
+    private void findServers() {
 
-	@Override
-	public void tick() {
-		ipBox.tick();
-		versionBox.tick();
+        try {
+            InetAddress addr = InetAddress.getByName(ipBox.getText().split(":")[0].trim());
 
-		searchButton.setMessage(new LiteralText(state.isRunning() ? "Cancel" : "Search"));
-		ipBox.active = !state.isRunning();
-		versionBox.active = !state.isRunning();
-		maxThreadsBox.active = !state.isRunning();
+            state = ServerFinderState.SEARCHING;
+            ipsToPing.push(addr.getHostAddress());
+            for (int x = 0; x < targetChecked - 1; x++) {
+                if (searchDirectionButton.getSelectedValue().equals("FORWARD")) {
+                    addr = getNextIPV4Address(addr);
+                } else {
+                    addr = getPreviousIPV4Address(addr);
+                }
+                if (addr != null) {
+                    ipsToPing.push(addr.getHostAddress());
+                }
+            }
+            System.out.println("IPS TO PING: " + ipsToPing.size());
+            for (String ip : ipsToPing) {
+                System.out.println(ip);
+            }
+            while (numActiveThreads < maxThreads && pingNewIP()) {
+            }
 
-		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText()) && !ipBox.getText().isEmpty();
-	}
+        } catch (UnknownHostException e) {
+            state = ServerFinderState.UNKNOWN_HOST;
 
-	private boolean isServerInList(String ip) {
-		for (int i = 0; i < prevScreen.getServerList().size(); i++)
-			if (prevScreen.getServerList().get(i).address.equals(ip))
-				return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            state = ServerFinderState.ERROR;
+        }
+    }
 
-		return false;
-	}
+    private boolean pingNewIP() {
+        synchronized (serverFinderLock) {
+            if (ipsToPing.size() > 0) {
+                String ip = ipsToPing.pop();
+                WurstServerPinger pinger = new WurstServerPinger(scanPorts, searchNumber);
+                checked++;
+                pinger.addServerFinderDoneListener(this);
+                pinger.ping(ip);
+                numActiveThreads++;
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3) {
-		if (keyCode == GLFW.GLFW_KEY_ENTER)
-			searchButton.onPress();
+    @Override
+    public void tick() {
+        ipBox.tick();
+        versionBox.tick();
 
-		return super.keyPressed(keyCode, scanCode, int_3);
-	}
+        searchButton.setMessage(new LiteralText(state.isRunning() ? "Cancel" : "Search"));
+        ipBox.active = !state.isRunning();
+        versionBox.active = !state.isRunning();
+        maxThreadsBox.active = !state.isRunning();
 
-	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-		renderBackground(matrixStack);
+        searchButton.active = MathUtils.isInteger(maxThreadsBox.getText()) && !ipBox.getText().isEmpty();
+    }
 
-		drawCenteredText(matrixStack, textRenderer, "Server Finder",
-				width / 2,20, 16777215);
-		drawCenteredText(matrixStack, textRenderer,
-			"This will search for servers with similar IPs",
-				width / 2, 40, 10526880);
-		drawCenteredText(matrixStack, textRenderer,
-			"to the IP you type into the field below.",
-				width / 2, 50, 10526880);
-		drawCenteredText(matrixStack, textRenderer,
-			"The servers it finds will be added to your server list.",
-			width / 2, 60, 10526880);
+    private boolean isServerInList(String ip) {
+        for (int i = 0; i < prevScreen.getServerList().size(); i++)
+            if (prevScreen.getServerList().get(i).address.equals(ip))
+                return true;
 
-		drawStringWithShadow(matrixStack, textRenderer, "Server address:",
-			width / 2 - 100, 80, 10526880);
-		ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
-		drawCenteredText(matrixStack, textRenderer, saveToFileMessage == null ? state.toString() : saveToFileMessage,
-				width / 2, 30, 10526880);
+        return false;
+    }
 
-		drawStringWithShadow(matrixStack, textRenderer, "Max. Threads:",
-				width / 2 - 100, 115, 10526880);
-		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
-		drawStringWithShadow(matrixStack, textRenderer, "Max. Check:",
-				width / 2 + 3, 115, 10526880);
-		targetCheckedBox.render(matrixStack, mouseX, mouseY, partialTicks);
-		drawStringWithShadow(matrixStack, textRenderer, "Checked: " + checked + " / " + targetCheckedBox.getText(),
-				width / 2 - 100, 155,10526880);
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int int_3) {
+        if (keyCode == GLFW.GLFW_KEY_ENTER)
+            searchButton.onPress();
 
-		drawStringWithShadow(matrixStack, textRenderer, "Found Working: " + working,
-				width / 2 - 100, 165, 10526880);
+        return super.keyPressed(keyCode, scanCode, int_3);
+    }
 
-		drawStringWithShadow(matrixStack, textRenderer, "Filter by version. Example: 1.18.1;1.18.2",
-				width / 2 - 100, 175, 10526880);
-		versionBox.render(matrixStack, mouseX, mouseY, partialTicks);
+    @Override
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        renderBackground(matrixStack);
 
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-	}
+        drawCenteredText(matrixStack, textRenderer, "Server Finder",
+                width / 2, 20, 16777215);
+        drawCenteredText(matrixStack, textRenderer,
+                "This will search for servers with similar IPs",
+                width / 2, 40, 10526880);
+        drawCenteredText(matrixStack, textRenderer,
+                "to the IP you type into the field below.",
+                width / 2, 50, 10526880);
+        drawCenteredText(matrixStack, textRenderer,
+                "The servers it finds will be added to your server list.",
+                width / 2, 60, 10526880);
 
-	@Override
-	public void close()
-	{
-		state = ServerFinderState.CANCELLED;
-		super.close();
-	}
+        drawStringWithShadow(matrixStack, textRenderer, "Server address:",
+                width / 2 - 100, 80, 10526880);
+        ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
+        drawCenteredText(matrixStack, textRenderer, saveToFileMessage == null ? state.toString() : saveToFileMessage,
+                width / 2, 30, 10526880);
 
-	enum ServerFinderState {
-		NOT_RUNNING(""), SEARCHING("\u00a72Searching..."), RESOLVING("\u00a72Resolving..."),
-		UNKNOWN_HOST("\u00a74Unknown Host!"), CANCELLED("\u00a74Cancelled!"), DONE("\u00a72Done!"),
-		ERROR("\u00a74An error occurred!");
+        drawStringWithShadow(matrixStack, textRenderer, "Max. Threads:",
+                width / 2 - 100, 115, 10526880);
+        maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
+        drawStringWithShadow(matrixStack, textRenderer, "Max. IPs:",
+                width / 2 + 3, 115, 10526880);
+        targetCheckedBox.render(matrixStack, mouseX, mouseY, partialTicks);
+        drawStringWithShadow(matrixStack, textRenderer, "Checking: " + checked + " / " + targetCheckedBox.getText(),
+                width / 2 - 100, 155, 10526880);
 
-		private final String name;
+        drawStringWithShadow(matrixStack, textRenderer, "Found Working: " + working,
+                width / 2 - 100, 165, 10526880);
 
-		private ServerFinderState(String name) {
-			this.name = name;
-		}
+        drawStringWithShadow(matrixStack, textRenderer, "Filter by version. Example: 1.18.1;1.18.2",
+                width / 2 - 100, 175, 10526880);
+        versionBox.render(matrixStack, mouseX, mouseY, partialTicks);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
 
-		public boolean isRunning() {
-			return this == SEARCHING || this == RESOLVING;
-		}
+    @Override
+    public void close() {
+        state = ServerFinderState.CANCELLED;
+        super.close();
+    }
 
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-	
-	public static int getSearchNumber() {
-		return searchNumber;
-	}
-	
-	private boolean filterPass(WurstServerInfo info) {
-		if (info == null)
-			return false;
-		if (info.playerCount < playerCountFilter)
-			return false;
-		for (String version : versionFilters) {
-			if (info.version != null && info.version.contains(version)) {
-				return true;
-			}
-		}
-		return versionFilters.isEmpty();
-	}
-	
-	@Override
-	public void onServerDone(WurstServerPinger pinger) {
-		if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
-			return;
-		synchronized (serverFinderLock) {
-			checked++;
-			numActiveThreads--;
-		}
-		if (pinger.isWorking()) {
-			if (!isServerInList(pinger.getServerIP()) && filterPass(pinger.getServerInfo())) {
-				synchronized (serverFinderLock) {
-					working++;
-					prevScreen.getServerList().add(new ServerInfo("Grief me #" + working, pinger.getServerIP(), false));
-					prevScreen.getServerList().saveFile();
-					((IMultiplayerScreen) prevScreen).getServerListSelector().setSelected(null);
-					((IMultiplayerScreen) prevScreen).getServerListSelector().setServers(prevScreen.getServerList());
-				}
-			}
-		}
-		while (numActiveThreads < maxThreads && pingNewIP());
-		synchronized (serverFinderLock) {
-			if (checked >= targetChecked) {
-				state = ServerFinderState.DONE;
-			}
-		}
-	}
+    enum ServerFinderState {
+        NOT_RUNNING(""), SEARCHING("\u00a72Searching..."), RESOLVING("\u00a72Resolving..."),
+        UNKNOWN_HOST("\u00a74Unknown Host!"), CANCELLED("\u00a74Cancelled!"), DONE("\u00a72Done!"),
+        ERROR("\u00a74An error occurred!");
 
-	@Override
-	public void onServerFailed(WurstServerPinger pinger) {
-		if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
-			return;
-		synchronized (serverFinderLock) {
-			checked++;
-			numActiveThreads--;
-		}
-		while (numActiveThreads < maxThreads && pingNewIP());
-		synchronized (serverFinderLock) {
-			if (checked >= targetChecked) {
-				state = ServerFinderState.DONE;
-			}
-		}
-	}
+        private final String name;
+
+        private ServerFinderState(String name) {
+            this.name = name;
+        }
+
+        public boolean isRunning() {
+            return this == SEARCHING || this == RESOLVING;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public static int getSearchNumber() {
+        return searchNumber;
+    }
+
+    private boolean filterPass(WurstServerInfo info) {
+        if (info == null)
+            return false;
+        int playerCountFilter = 0;
+        if (info.playerCount < playerCountFilter)
+            return false;
+        for (String version : versionFilters) {
+            if (info.version != null && info.version.contains(version)) {
+                return true;
+            }
+        }
+        return versionFilters.isEmpty();
+    }
+
+    @Override
+    public void onServerDone(WurstServerPinger pinger) {
+        if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
+            return;
+        if (pinger.isWorking()) {
+            if (!isServerInList(pinger.getServerIP()) && filterPass(pinger.getServerInfo())) {
+                synchronized (serverFinderLock) {
+                    working++;
+                    prevScreen.getServerList().add(new ServerInfo("Grief me #" + working, pinger.getServerIP(), false));
+                    prevScreen.getServerList().saveFile();
+                    ((IMultiplayerScreen) prevScreen).getServerListSelector().setSelected(null);
+                    ((IMultiplayerScreen) prevScreen).getServerListSelector().setServers(prevScreen.getServerList());
+                }
+            }
+        }
+        synchronized (serverFinderLock) {
+            numActiveThreads--;
+        }
+        while (numActiveThreads < maxThreads && pingNewIP()) {
+
+        }
+        synchronized (serverFinderLock) {
+            if (numActiveThreads == 0) {
+                state = ServerFinderState.DONE;
+            }
+        }
+    }
+
+    @Override
+    public void onServerFailed(WurstServerPinger pinger) {
+        if (state == ServerFinderState.CANCELLED || pinger == null || pinger.getSearchNumber() != searchNumber)
+            return;
+        synchronized (serverFinderLock) {
+            numActiveThreads--;
+        }
+        while (numActiveThreads < maxThreads && pingNewIP()) {
+
+        }
+        synchronized (serverFinderLock) {
+            if (numActiveThreads == 0) {
+                state = ServerFinderState.DONE;
+            }
+        }
+    }
 }
+
