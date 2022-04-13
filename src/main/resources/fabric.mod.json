@@ -29,7 +29,7 @@
   "depends": {
     "fabricloader": ">=0.12.12",
     "fabric": ">=0.49.4",
-    "minecraft": "~1.19-alpha.22.14.a",
+    "minecraft": "~1.19-alpha.22.15.a",
     "java": ">=17"
   },
   "suggests": {
