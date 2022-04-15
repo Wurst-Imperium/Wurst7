@@ -61,9 +61,9 @@ public final class KeybindProcessor implements KeyPressListener
 	
 	private void processCmds(String cmds)
 	{
-		cmds = cmds.replace(";", "\u00a7").replace("\u00a7\u00a7", ";");
+		cmds = cmds.replace(";", "§").replace("§§", ";");
 		
-		for(String cmd : cmds.split("\u00a7"))
+		for(String cmd : cmds.split("§"))
 			processCmd(cmd.trim());
 	}
 	

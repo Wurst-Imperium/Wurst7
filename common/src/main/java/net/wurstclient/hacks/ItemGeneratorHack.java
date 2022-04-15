@@ -24,7 +24,7 @@ import net.wurstclient.core.RegistryUtils;
 public final class ItemGeneratorHack extends Hack implements UpdateListener
 {
 	private final SliderSetting speed = new SliderSetting("Speed",
-		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton\n"
+		"§4§lWARNING:§r High speeds will cause a ton\n"
 			+ "of lag and can easily crash the game!",
 		1, 1, 36, 1, ValueDisplay.INTEGER);
 	

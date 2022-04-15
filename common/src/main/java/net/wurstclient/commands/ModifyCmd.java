@@ -32,7 +32,7 @@ public final class ModifyCmd extends Command
 			".modify remove <nbt_path>", "Use $ for colors, use $$ for $.", "",
 			"Example:",
 			".modify add {display:{Name:'{\"text\":\"$cRed Name\"}'}}",
-			"(changes the item's name to \u00a7cRed Name\u00a7r)");
+			"(changes the item's name to §cRed Name§r)");
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public final class ModifyCmd extends Command
 	private void add(ItemStack stack, String[] args) throws CmdError
 	{
 		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
+		nbt = nbt.replace("$", "§").replace("§§", "$");
 		
 		if(!MCNbtUtils.hasNbt(stack))
 			MCNbtUtils.setNbt(stack,new NbtCompound());
@@ -99,7 +99,7 @@ public final class ModifyCmd extends Command
 	private void set(ItemStack stack, String[] args) throws CmdError
 	{
 		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
+		nbt = nbt.replace("$", "§").replace("§§", "$");
 		
 		try
 		{

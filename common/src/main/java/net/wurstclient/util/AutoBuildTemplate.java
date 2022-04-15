@@ -56,9 +56,8 @@ public final class AutoBuildTemplate
 	}
 	
 	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
-		Direction direction)
+		Direction front)
 	{
-		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
 		LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
 		

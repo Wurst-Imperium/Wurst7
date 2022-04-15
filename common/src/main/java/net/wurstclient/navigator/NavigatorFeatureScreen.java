@@ -191,9 +191,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				.getAllKeybinds())
 			{
 				String commands = keybind.getCommands();
-				commands = commands.replace(";", "\u00a7")
-					.replace("\u00a7\u00a7", ";");
-				for(String command : commands.split("\u00a7"))
+				commands = commands.replace(";", "§")
+					.replace("§§", ";");
+				for(String command : commands.split("§"))
 				{
 					command = command.trim();
 					String keybindDescription =

@@ -136,7 +136,19 @@ public enum BlockUtils
 				
 		return blocks;
 	}
-	
+
+	public static Stream<BlockPos> getAllInRangeFromCenter(BlockPos center, int range)
+	{
+		BlockPos min = center.add(-range, -range, -range);
+		BlockPos max = center.add(range, range, range);
+		return getAllInBox(min, max).stream();
+	}
+
+	public static Stream<BlockPos> getAllInRangeFromEyes(int range){
+		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		return getAllInRangeFromCenter(eyesBlock, range);
+	}
+
 	public static Stream<BlockPos> getAllInBoxStream(BlockPos from, BlockPos to)
 	{
 		BlockPos min = new BlockPos(Math.min(from.getX(), to.getX()),

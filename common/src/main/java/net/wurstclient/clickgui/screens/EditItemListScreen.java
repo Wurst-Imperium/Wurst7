@@ -311,7 +311,7 @@ public final class EditItemListScreen extends MCScreen {
 				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				matrixStack.pop();
-				return "\u00a7ounknown item\u00a7r";
+				return "§ounknown item§r";
 			}
 			
 			MatrixStack modelViewStack = RenderSystem.getModelViewStack();

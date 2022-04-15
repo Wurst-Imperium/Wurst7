@@ -302,7 +302,7 @@ public final class EditBlockListScreen extends MCScreen
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				matrixStack.pop();
 				
-				return "\u00a7ounknown block\u00a7r";
+				return "§ounknown block§r";
 				
 			}
 			MatrixStack modelViewStack = RenderSystem.getModelViewStack();

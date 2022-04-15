@@ -22,8 +22,8 @@ public final class NoFireOverlayHack extends Hack
 		addSetting(mode);
 	}
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-			"\u00a7lLower\u00a7r mode lowers the overlay.\n"
-					+ "\u00a7lRemove\u00a7r mode removes the overlay.",
+			"§lLower§r mode lowers the overlay.\n"
+					+ "§lRemove§r mode removes the overlay.",
 			Mode.values(), Mode.LOWER);
 	public boolean shouldCancelOverlay()
 	{

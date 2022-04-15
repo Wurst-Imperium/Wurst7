@@ -46,7 +46,7 @@ public final class AutoArmorHack extends Hack
 		"Swap while moving",
 		"Whether or not to swap armor pieces\n"
 			+ "while the player is moving.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r" + " This would not be possible\n"
+			+ "§c§lWARNING:§r" + " This would not be possible\n"
 			+ "without cheats. It may raise suspicion.",
 		false);
 	

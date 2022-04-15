@@ -433,9 +433,9 @@ public final class CaveFinderHack extends Hack
 			notify = true;
 		else if(notify)
 		{
-			ChatUtils.warning("CaveFinder found \u00a7lA LOT\u00a7r of blocks!"
-				+ " To prevent lag, it will only show the closest \u00a76"
-				+ limit.getValueString() + "\u00a7r results.");
+			ChatUtils.warning("CaveFinder found §lA LOT§r of blocks!"
+				+ " To prevent lag, it will only show the closest §6"
+				+ limit.getValueString() + "§r results.");
 			notify = false;
 		}
 		

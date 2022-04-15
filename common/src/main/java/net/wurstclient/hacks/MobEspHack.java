@@ -51,9 +51,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
 	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
-		"\u00a7lAccurate\u00a7r mode shows the exact\n"
+		"§lAccurate§r mode shows the exact\n"
 			+ "hitbox of each mob.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
+			+ "§lFancy§r mode shows slightly larger\n"
 			+ "boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	

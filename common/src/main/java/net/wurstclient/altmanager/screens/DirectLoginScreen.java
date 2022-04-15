@@ -49,8 +49,8 @@ public final class DirectLoginScreen extends AltEditorScreen
 					
 				}catch(LoginException e2)
 				{
-					message = "\u00a7c\u00a7lMicrosoft:\u00a7c "
-						+ e.getMessage() + "\n\u00a7c\u00a7lMojang:\u00a7c "
+					message = "§c§lMicrosoft:§c "
+						+ e.getMessage() + "\n§c§lMojang:§c "
 						+ e2.getMessage();
 					
 					doErrorEffect();

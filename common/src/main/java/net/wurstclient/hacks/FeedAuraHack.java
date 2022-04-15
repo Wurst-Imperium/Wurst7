@@ -55,10 +55,10 @@ public final class FeedAuraHack extends Hack
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which animal will be fed first.\n"
-			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires\n"
+			+ "§lDistance§r - Feeds the closest animal.\n"
+			+ "§lAngle§r - Feeds the animal that requires\n"
 			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
+			+ "§lHealth§r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	
 	private final CheckboxSetting filterBabies =

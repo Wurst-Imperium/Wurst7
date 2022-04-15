@@ -26,10 +26,10 @@ import net.wurstclient.core.MCGameOptions;
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
+		"§lGamma§r works by setting your brightness slider\n"
 			+ "beyond 100%. Incompatible with shader packs.\n\n"
-			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
-			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
+			+ "§lNight Vision§r works by applying the night\n"
+			+ "vision effect. This §ousually§r works with\n"
 			+ "shader packs.",
 		Method.values(), Method.GAMMA);
 	

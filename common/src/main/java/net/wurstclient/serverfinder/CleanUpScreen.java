@@ -90,9 +90,9 @@ public class CleanUpScreen extends Screen
 		
 		addDrawableChild(
 			new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
-				() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
+				() -> "§cRemove all Servers: " + yesOrNo(removeAll),
 				"This will completely clear your server\n"
-					+ "list. \u00a7cUse with caution!\u00a7r",
+					+ "list. §cUse with caution!§r",
 				b -> removeAll = !removeAll));
 		
 		addDrawableChild(
@@ -163,7 +163,7 @@ public class CleanUpScreen extends Screen
 			return false;
 		
 		return server.label.getString()
-			.equals("\u00a74Can\'t resolve hostname");
+			.equals("§4Can\'t resolve hostname");
 	}
 	
 	private boolean isSameProtocol(ServerInfo server)

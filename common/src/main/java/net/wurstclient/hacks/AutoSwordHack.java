@@ -32,13 +32,13 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
 		"Switch back", "Switches back to the previously selected slot\n"
-			+ "after \u00a7lRelease time\u00a7r has passed.",
+			+ "after §lRelease time§r has passed.",
 		true);
 	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
 		"Time until AutoSword will switch back from\n"
 			+ "the weapon to the previously selected slot.\n\n"
-			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
+			+ "Only works when §lSwitch back§r is checked.",
 		10, 1, 200, 1, v -> (int)v + " ticks");
 	
 	private int oldSlot;

@@ -25,24 +25,24 @@ import net.wurstclient.settings.EnumSetting;
 public final class HackListOtf extends OtherFeature
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lAuto\u00a7r mode renders the whole list if it fits onto the screen.\n"
-			+ "\u00a7lCount\u00a7r mode only renders the number of active hacks.\n"
-			+ "\u00a7lHidden\u00a7r mode renders nothing.",
+		"§lAuto§r mode renders the whole list if it fits onto the screen.\n"
+			+ "§lCount§r mode only renders the number of active hacks.\n"
+			+ "§lHidden§r mode renders nothing.",
 		Mode.values(), Mode.AUTO);
 	
 	private final EnumSetting<Position> position = new EnumSetting<>("Position",
 		"Which side of the screen the HackList should be shown on."
-			+ "\nChange this to \u00a7lRight\u00a7r when using TabGUI.",
+			+ "\nChange this to §lRight§r when using TabGUI.",
 		Position.values(), Position.LEFT);
 	
 	private final ColorSetting color = new ColorSetting("Color",
 		"Color of the HackList text.\n"
-			+ "Only visible when \u00a76RainbowUI\u00a7r is disabled.",
+			+ "Only visible when §6RainbowUI§r is disabled.",
 		Color.WHITE);
 	
 	private final EnumSetting<SortBy> sortBy = new EnumSetting<>("Sort by",
 		"Determines how the HackList entries are sorted.\n"
-			+ "Only visible when \u00a76Mode\u00a7r is set to \u00a76Auto\u00a7r.",
+			+ "Only visible when §6Mode§r is set to §6Auto§r.",
 		SortBy.values(), SortBy.NAME);
 	
 	private final CheckboxSetting revSort =

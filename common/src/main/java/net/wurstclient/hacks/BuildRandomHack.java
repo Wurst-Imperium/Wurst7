@@ -43,8 +43,8 @@ public final class BuildRandomHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lFast\u00a7r mode can place blocks behind other blocks.\n"
-			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
+		"§lFast§r mode can place blocks behind other blocks.\n"
+			+ "§lLegit§r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
 	private final CheckboxSetting checkItem =

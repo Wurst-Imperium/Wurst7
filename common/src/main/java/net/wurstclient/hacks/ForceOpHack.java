@@ -214,7 +214,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			sendIndexToDialog();
 		}
 		
-		ChatUtils.message("\u00a7c[\u00a74\u00a7lFAILURE\u00a7c]\u00a7f All "
+		ChatUtils.message("§c[§4§lFAILURE§c]§f All "
 			+ (lastPW + 1) + " passwords were wrong.");
 	}
 	
@@ -234,7 +234,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 	public void onReceivedMessage(ChatInputEvent event)
 	{
 		String message = event.getComponent().getString();
-		if(message.startsWith("\u00a7c[\u00a76Wurst\u00a7c]\u00a7f "))
+		if(message.startsWith("§c[§6Wurst§c]§f "))
 			return;
 		
 		String msgLowerCase = message.toLowerCase();
@@ -270,7 +270,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 				password = passwords[lastPW - 1];
 			
 			ChatUtils.message(
-				"\u00a7a[\u00a72\u00a7lSUCCESS\u00a7a]\u00a7f The password \""
+				"§a[§2§lSUCCESS§a]§f The password \""
 					+ password + "\" worked.");
 			
 			setEnabled(false);

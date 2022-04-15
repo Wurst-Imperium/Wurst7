@@ -67,8 +67,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			return;
 		
 		ArrayList<String> commandsList =
-			new ArrayList<>(Arrays.asList(oldCommands.replace(";", "\u00a7")
-				.replace("\u00a7\u00a7", ";").split("\u00a7")));
+			new ArrayList<>(Arrays.asList(oldCommands.replace(";", "§")
+				.replace("§§", ";").split("§")));
 		
 		for(int i = 0; i < commandsList.size(); i++)
 			commandsList.set(i, commandsList.get(i).trim());
@@ -81,8 +81,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			WurstClient.INSTANCE.getKeybinds().remove(selectedKey);
 		else
 		{
-			String newCommands = String.join("\u00a7", commandsList)
-				.replace(";", "\u00a7\u00a7").replace("\u00a7", ";");
+			String newCommands = String.join("§", commandsList)
+				.replace(";", "§§").replace("§", ";");
 			WurstClient.INSTANCE.getKeybinds().add(selectedKey, newCommands);
 		}
 		

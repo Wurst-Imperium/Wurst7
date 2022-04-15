@@ -132,7 +132,7 @@ public abstract class AltEditorScreen extends MCScreen
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			message = "\u00a74\u00a7lSkin folder could not be created.";
+			message = "§4§lSkin folder could not be created.";
 		}
 	}
 	
@@ -201,17 +201,17 @@ public abstract class AltEditorScreen extends MCScreen
 				Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			}
 			
-			return "\u00a7a\u00a7lSaved skin as " + name + ".png";
+			return "§a§lSaved skin as " + name + ".png";
 			
 		}catch(IOException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lSkin could not be saved.";
+			return "§4§lSkin could not be saved.";
 			
 		}catch(NullPointerException e)
 		{
 			e.printStackTrace();
-			return "\u00a74\u00a7lPlayer does not exist.";
+			return "§4§lPlayer does not exist.";
 		}
 	}
 	

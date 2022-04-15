@@ -36,7 +36,7 @@ public abstract class Feature
 		new LinkedHashSet<>();
 	
 	private final String searchTags =
-		getClass().isAnnotationPresent(SearchTags.class) ? String.join("\u00a7",
+		getClass().isAnnotationPresent(SearchTags.class) ? String.join("§",
 			getClass().getAnnotation(SearchTags.class).value()) : "";
 	
 	private final boolean safeToBlock =

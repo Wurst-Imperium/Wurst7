@@ -188,7 +188,7 @@ public final class TabGui implements KeyPressListener
 				String fName = feature.getName();
 				
 				if(feature.isEnabled())
-					fName = "\u00a7a" + fName + "\u00a7r";
+					fName = "§a" + fName + "§r";
 				
 				if(i == tab.selected)
 					fName = ">" + fName;

@@ -45,14 +45,14 @@ public final class SpeedNukerHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
-			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
+		"§lNormal§r mode simply breaks everything\n" + "around you.\n"
+			+ "§lID§r mode only breaks the selected block\n"
 			+ "type. Left-click on a block to select it.\n"
-			+ "\u00a7lMultiID\u00a7r mode only breaks the block types\n"
+			+ "§lMultiID§r mode only breaks the block types\n"
 			+ "in your MultiID List.\n"
-			+ "\u00a7lFlat\u00a7r mode flattens the area around you,\n"
+			+ "§lFlat§r mode flattens the area around you,\n"
 			+ "but won't dig down.\n"
-			+ "\u00a7lSmash\u00a7r mode only breaks blocks that\n"
+			+ "§lSmash§r mode only breaks blocks that\n"
 			+ "can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	

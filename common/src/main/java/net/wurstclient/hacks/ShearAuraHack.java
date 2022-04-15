@@ -55,10 +55,10 @@ public final class ShearAuraHack extends Hack
 
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which sheep will be sheared first.\n"
-			+ "\u00a7lDistance\u00a7r - Shears the closest sheep.\n"
-			+ "\u00a7lAngle\u00a7r - Shears the sheep that requires\n"
+			+ "§lDistance§r - Shears the closest sheep.\n"
+			+ "§lAngle§r - Shears the sheep that requires\n"
 			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Shears the weakest sheep.",
+			+ "§lHealth§r - Shears the weakest sheep.",
 		Priority.values(), Priority.ANGLE);
 
 	private AnimalEntity target;

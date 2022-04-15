@@ -84,7 +84,7 @@ public final class WurstUpdater implements UpdateListener
 		if(latestVersion == null || latestVersion.isInvalid())
 		{
 			String text = "An error occurred while checking for updates."
-				+ " Click \u00a7nhere\u00a7r to check manually.";
+				+ " Click §nhere§r to check manually.";
 			String url = "https://www.wurstclient.net/download/";
 			showLink(text, url);
 			return;
@@ -94,7 +94,7 @@ public final class WurstUpdater implements UpdateListener
 			return;
 		
 		String text = "Wurst " + latestVersion + " is now available."
-			+ " Click \u00a7nhere\u00a7r to download the update.";
+			+ " Click §nhere§r to download the update.";
 		String url = "https://www.wurstclient.net/download/";
 		showLink(text, url);
 	}

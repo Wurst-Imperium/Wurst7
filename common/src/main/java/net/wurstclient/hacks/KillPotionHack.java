@@ -120,7 +120,7 @@ public final class KillPotionHack extends Hack
 			MCNbtUtils.setNbt(stack,nbt);
 			
 			String name =
-				"\u00a7f" + itemName + " of \u00a74\u00a7lINSTANT DEATH";
+				"§f" + itemName + " of §4§lINSTANT DEATH";
 			stack.setCustomName(new LiteralText(name));
 			
 			return stack;

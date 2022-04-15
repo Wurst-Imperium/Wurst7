@@ -37,7 +37,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	public ZoomOtf()
 	{
 		super("Zoom", "Allows you to zoom in.\n"
-			+ "By default, the zoom is activated by pressing the \u00a7lV\u00a7r key.\n"
+			+ "By default, the zoom is activated by pressing the §lV§r key.\n"
 			+ "Go to Wurst Options -> Zoom to change this keybind.");
 		addSetting(level);
 		addSetting(scroll);

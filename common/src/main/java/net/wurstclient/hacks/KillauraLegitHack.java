@@ -58,10 +58,10 @@ public final class KillauraLegitHack extends Hack
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
+			+ "§lDistance§r - Attacks the closest entity.\n"
+			+ "§lAngle§r - Attacks the entity that requires\n"
 			+ "the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
+			+ "§lHealth§r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
 	public final SliderSetting fov =

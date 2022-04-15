@@ -22,7 +22,7 @@ public final class WurstLogoOtf extends OtherFeature
 {
 	private final ColorSetting bgColor = new ColorSetting("Background",
 		"Background color.\n"
-			+ "Only visible when \u00a76RainbowUI\u00a7r is disabled.",
+			+ "Only visible when §6RainbowUI§r is disabled.",
 		Color.WHITE);
 	
 	private final ColorSetting txtColor =

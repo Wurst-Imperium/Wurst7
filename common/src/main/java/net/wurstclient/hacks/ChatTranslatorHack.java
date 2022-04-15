@@ -74,7 +74,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 		String incomingMsg = event.getComponent().getString();
 		
 		String translatorPrefix =
-			"\u00a7a[\u00a7b" + langTo.getSelected().name + "\u00a7a]:\u00a7r ";
+			"§a[§b" + langTo.getSelected().name + "§a]:§r ";
 		
 		if(incomingMsg.startsWith(ChatUtils.WURST_PREFIX)
 			|| incomingMsg.startsWith(translatorPrefix))

@@ -357,7 +357,7 @@ public abstract class ListWidget extends AbstractParentElement
 	@Override
 	public boolean charTyped(char chr, int keyCode)
 	{
-		return !isVisible() ? false : super.charTyped(chr, keyCode);
+		return isVisible() && super.charTyped(chr, keyCode);
 	}
 	
 	@Override

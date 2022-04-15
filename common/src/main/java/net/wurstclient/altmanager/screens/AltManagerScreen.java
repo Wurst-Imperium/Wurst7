@@ -670,15 +670,15 @@ public final class AltManagerScreen extends Screen
 		
 		public String getBottomText(Alt alt)
 		{
-			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
+			String text = alt.isCracked() ? "§8cracked" : "§2premium";
 			
 			if(alt.isFavorite())
-				text += "\u00a7r, \u00a7efavorite";
+				text += "§r, §efavorite";
 			
 			if(failedLogins.contains(alt))
-				text += "\u00a7r, \u00a7cwrong password?";
+				text += "§r, §cwrong password?";
 			else if(alt.isUncheckedPremium())
-				text += "\u00a7r, \u00a7cunchecked";
+				text += "§r, §cunchecked";
 			
 			return text;
 		}

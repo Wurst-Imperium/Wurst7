@@ -92,7 +92,7 @@ public final class ClickGui
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
-		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
+		settings.map(Setting::getComponent).forEach(uiSettings::add);
 		windows.add(uiSettings);
 		
 		for(Window window : windows)

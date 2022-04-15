@@ -118,7 +118,7 @@ public final class TrollPotionHack extends Hack
 			nbt.put("CustomPotionEffects", effects);
 			MCNbtUtils.setNbt(stack, nbt);
 			
-			String name = "\u00a7f" + itemName + " of Trolling";
+			String name = "§f" + itemName + " of Trolling";
 			stack.setCustomName(new LiteralText(name));
 			
 			return stack;

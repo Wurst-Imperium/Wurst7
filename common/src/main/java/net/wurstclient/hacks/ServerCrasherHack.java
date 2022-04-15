@@ -55,7 +55,7 @@ public final class ServerCrasherHack extends Hack
 		try
 		{
 			return StringNbtReader.parse(
-				"{display:{Lore:['\"\u00a7r1. Place item in dispenser.\"','\"\u00a7r2. Dispense item.\"','\"\u00a7r3. Ssss... BOOM!\"'],Name:'{\"text\":\"\u00a7rServer Creeper\"}'},EntityTag:{CustomName:\"TEST\",id:\"Creeper\",CustomNameVisible:1}}");
+				"{display:{Lore:['\"§r1. Place item in dispenser.\"','\"§r2. Dispense item.\"','\"§r3. Ssss... BOOM!\"'],Name:'{\"text\":\"§rServer Creeper\"}'},EntityTag:{CustomName:\"TEST\",id:\"Creeper\",CustomNameVisible:1}}");
 			
 		}catch(CommandSyntaxException e)
 		{

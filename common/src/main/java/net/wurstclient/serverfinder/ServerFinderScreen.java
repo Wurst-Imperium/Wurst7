@@ -130,7 +130,7 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
             e.printStackTrace();
         }
 
-        saveToFileMessage = "\u00a76Saved " + newIPs + " new IP" + (newIPs == 1 ? "" : "s");
+        saveToFileMessage = "§6Saved " + newIPs + " new IP" + (newIPs == 1 ? "" : "s");
     }
 
     @Override
@@ -149,30 +149,24 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
         targetCheckedBox.setText("1337");
         addDrawableChild(targetCheckedBox);
         state = ServerFinderState.NOT_RUNNING;
-        ArrayList<CyclingButtonWidget.CycleButtonEntry> scanPortsOptions = new ArrayList<CyclingButtonWidget.CycleButtonEntry>();
-        scanPortsOptions.add(new CyclingButtonWidget.CycleButtonEntry("Extra Ports: Yes", "YES"));
-        scanPortsOptions.add(new CyclingButtonWidget.CycleButtonEntry("Extra Ports: No", "NO"));
-        scanPortsButton = new CyclingButtonWidget(width / 2 - 100, 130, 98, 20, scanPortsOptions, Optional.empty());
+        scanPortsButton = new CyclingButtonWidget<ScanPorts>(width / 2 - 100, 130, 98, 20, ScanPorts.values(), ScanPorts.NO);
         addDrawableChild(scanPortsButton);
-        ArrayList<CyclingButtonWidget.CycleButtonEntry> searchDirectionOptions = new ArrayList<CyclingButtonWidget.CycleButtonEntry>();
-        searchDirectionOptions.add(new CyclingButtonWidget.CycleButtonEntry("Search Forwards", "FORWARD"));
-        searchDirectionOptions.add(new CyclingButtonWidget.CycleButtonEntry("Search Backwards", "BACK"));
-        searchDirectionButton = new CyclingButtonWidget(width / 2, 130, 98, 20, searchDirectionOptions, Optional.empty());
+        searchDirectionButton = new CyclingButtonWidget<SearchDirection>(width / 2, 130, 98, 20, SearchDirection.values(), SearchDirection.FORWARDS);
         addDrawableChild(searchDirectionButton);
 
-		versionBox = new TextFieldWidget(textRenderer, width / 2 - 100, 185, 200, 20, new LiteralText(""));
-		versionBox.setMaxLength(200);
-		addDrawableChild(versionBox);
-		addDrawableChild(searchButton =
-				new ButtonWidget(width / 2 - 100, 210, 200, 20,
-						new LiteralText("Search"), b -> searchOrCancel()));
+        versionBox = new TextFieldWidget(textRenderer, width / 2 - 100, 185, 200, 20, new LiteralText(""));
+        versionBox.setMaxLength(200);
+        addDrawableChild(versionBox);
+        addDrawableChild(searchButton =
+                new ButtonWidget(width / 2 - 100, 210, 200, 20,
+                        new LiteralText("Search"), b -> searchOrCancel()));
 
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 230, 98, 20, new LiteralText("Tutorial"),
-				b -> Util.getOperatingSystem()
-						.open("https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
+        addDrawableChild(new ButtonWidget(width / 2 - 100, 230, 98, 20, new LiteralText("Tutorial"),
+                b -> Util.getOperatingSystem()
+                        .open("https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 
-		addDrawableChild(new ButtonWidget(width / 2 + 2, 230, 98, 20, new LiteralText("Save to File"),
-				b -> saveToFile()));
+        addDrawableChild(new ButtonWidget(width / 2 + 2, 230, 98, 20, new LiteralText("Save to File"),
+                b -> saveToFile()));
 
         addDrawableChild(new ButtonWidget(width / 2 - 100, 250, 200, 20, new LiteralText("Back"),
                 b -> WurstClient.setScreen(prevScreen)));
@@ -188,7 +182,7 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
         state = ServerFinderState.RESOLVING;
         maxThreads = Integer.parseInt(maxThreadsBox.getText());
         targetChecked = Integer.parseInt(targetCheckedBox.getText());
-        scanPorts = scanPortsButton.getSelectedValue().equals("YES");
+        scanPorts = scanPortsButton.getSelected() == ScanPorts.YES;
         saveToFileMessage = null;
         ipsToPing.clear();
         numActiveThreads = 0;
@@ -256,7 +250,7 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
             state = ServerFinderState.SEARCHING;
             ipsToPing.push(addr.getHostAddress());
             for (int x = 0; x < targetChecked - 1; x++) {
-                if (searchDirectionButton.getSelectedValue().equals("FORWARD")) {
+                if (searchDirectionButton.getSelected() == SearchDirection.FORWARDS) {
                     addr = getNextIPV4Address(addr);
                 } else {
                     addr = getPreviousIPV4Address(addr);
@@ -372,9 +366,9 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
     }
 
     enum ServerFinderState {
-        NOT_RUNNING(""), SEARCHING("\u00a72Searching..."), RESOLVING("\u00a72Resolving..."),
-        UNKNOWN_HOST("\u00a74Unknown Host!"), CANCELLED("\u00a74Cancelled!"), DONE("\u00a72Done!"),
-        ERROR("\u00a74An error occurred!");
+        NOT_RUNNING(""), SEARCHING("§2Searching..."), RESOLVING("§2Resolving..."),
+        UNKNOWN_HOST("§4Unknown Host!"), CANCELLED("§4Cancelled!"), DONE("§2Done!"),
+        ERROR("§4An error occurred!");
 
         private final String name;
 
@@ -452,6 +446,40 @@ public class ServerFinderScreen extends MCScreen implements IServerFinderDoneLis
             if (numActiveThreads == 0) {
                 state = ServerFinderState.DONE;
             }
+        }
+    }
+
+    private enum ScanPorts {
+        YES("Extra Ports: Yes"),
+        NO("Extra Ports: No"),
+        ;
+
+        private final String name;
+
+        private ScanPorts(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private enum SearchDirection {
+        FORWARDS("Search Forwards"),
+        BACKWARDS("Search Backwards"),
+        ;
+
+        private final String name;
+
+        private SearchDirection(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

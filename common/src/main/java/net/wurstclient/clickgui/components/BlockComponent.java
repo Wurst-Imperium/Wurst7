@@ -97,12 +97,12 @@ public final class BlockComponent extends Component
 			gui.setTooltip(setting.getWrappedDescription(200));
 		else if(hBlock)
 		{
-			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);
-			tooltip += "\n\u00a76ID:\u00a7r " + setting.getBlockName();
-			tooltip += "\n\u00a76Block #:\u00a7r "
+			String tooltip = "§6Name:§r " + getBlockName(stack);
+			tooltip += "\n§6ID:§r " + setting.getBlockName();
+			tooltip += "\n§6Block #:§r "
 				+ Block.getRawIdFromState(setting.getBlock().getDefaultState());
-			tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
-			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
+			tooltip += "\n\n§e[left-click]§r to edit";
+			tooltip += "\n§e[right-click]§r to reset";
 			gui.setTooltip(tooltip);
 		}
 		
@@ -191,7 +191,7 @@ public final class BlockComponent extends Component
 	private String getBlockName(ItemStack stack)
 	{
 		if(stack.isEmpty())
-			return "\u00a7ounknown block\u00a7r";
+			return "§ounknown block§r";
 		return stack.getName().getString();
 	}
 }

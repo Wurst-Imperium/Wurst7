@@ -101,7 +101,7 @@ public final class MassTpaHack extends Hack
 	public void onReceivedMessage(ChatInputEvent event)
 	{
 		String message = event.getComponent().getString().toLowerCase();
-		if(message.startsWith("\u00a7c[\u00a76wurst\u00a7c]"))
+		if(message.startsWith("§c[§6wurst§c]"))
 			return;
 		
 		if(message.contains("/help") || message.contains("permission"))
