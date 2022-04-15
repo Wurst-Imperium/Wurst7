@@ -111,7 +111,7 @@ task makeReleaseZip(type: Zip) {
 	dependsOn("getFabricAPI")
 	from "build/libs/${{project.archives_base_name}}-${{ project.version }}.jar",
 			"build/libs/fabric-api-${{project.fabric_version}}.jar",
-			"../../common/install_cheddar.bat"
+			"../../common/install_cheddar.sh", "../../common/install_cheddar.bat"
 
 	archiveFileName	 = "${{project.archives_base_name}}-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
@@ -119,7 +119,7 @@ task makeReleaseZip(type: Zip) {
 task makeDevZip(type: Zip) {
 	dependsOn("build")
 	dependsOn("getFabricAPI")
-	from "build/libs/", "../../common/install_cheddar.bat"
+	from "build/libs/", "../../common/install_cheddar.sh", "../../common/install_cheddar.bat"
 	archiveFileName	 = "${{project.archives_base_name}}-DEV-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
 
