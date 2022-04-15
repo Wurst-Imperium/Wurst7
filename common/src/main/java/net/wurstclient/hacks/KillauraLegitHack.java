@@ -67,6 +67,11 @@ public final class KillauraLegitHack extends Hack
 	public final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
+	private final CheckboxSetting damageIndicator = new CheckboxSetting(
+		"Damage indicator",
+		"Renders a colored box within the target, inversely proportional to its remaining health.",
+		true);
+	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
@@ -123,6 +128,7 @@ public final class KillauraLegitHack extends Hack
 		addSetting(range);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(damageIndicator);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -313,7 +319,7 @@ public final class KillauraLegitHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(target == null)
+		if(target == null || !damageIndicator.isChecked())
 			return;
 		
 		// GL settings
