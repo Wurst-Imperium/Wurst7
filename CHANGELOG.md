@@ -1,4 +1,4 @@
-# Release v220331-7.22-MC1.18.2
+# Release v7.23-220415
 ## What's Changed
 ### New Hacks:
 * HUDHack
@@ -7,6 +7,7 @@
 * NoLevitationHack
 * ShearAuraHack
 * GGHack
+* LawnmowerHack
 
 
 ### New Commands:
@@ -59,5 +60,3 @@
 * [Wurst-Imperium#497](https://github.com/Wurst-Imperium/Wurst7/pull/497) Fixes Float Math Error in ItemESPHack
 * [Wurst-Imperium#500](https://github.com/Wurst-Imperium/Wurst7/pull/500) Fixes BuildRandomHack Opening containers and getting stuck
 * [Wurst-Imperium#501](https://github.com/Wurst-Imperium/Wurst7/pull/501) Fixes ChestESPHack not showing barrels. (ISSUE Wurst-Imperium#439)
-
-**Full Changelog**: https://github.com/TheGrandCurator/Cheddar-BratWurst7/commits/v220331-7.22-MC1.18.2

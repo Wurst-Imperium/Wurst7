@@ -62,7 +62,7 @@ public class LawnmowerHack extends Hack
 
     public LawnmowerHack() {
         super("Lawnmower");
-        setCategory(Category.BLOCKS);
+        setCategory(Category.MCMMO);
         addSetting(range);
         addSetting(priority);
         addSetting(instantBreak);

@@ -106,11 +106,13 @@ task getFabricAPI(type: Download) {
 	src "https://github.com/FabricMC/fabric/releases/download/${{project.fabric_version}}/fabric-api-${{project.fabric_version}}.jar"
 	overwrite false
 }
-
 task makeReleaseZip(type: Zip) {
 	dependsOn("build")
+	dependsOn("getFabricAPI")
 	from "build/libs/${{project.archives_base_name}}-${{ project.version }}.jar",
 			"build/libs/fabric-api-${{project.fabric_version}}.jar",
+			"../../common/install_cheddar.bat"
+
 	archiveFileName	 = "${{project.archives_base_name}}-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
 
@@ -120,7 +122,6 @@ task makeDevZip(type: Zip) {
 	from "build/libs/", "../../common/install_cheddar.bat"
 	archiveFileName	 = "${{project.archives_base_name}}-DEV-${{ project.version }}.zip"
 	destinationDirectory = new File("../../build/")}
-
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17

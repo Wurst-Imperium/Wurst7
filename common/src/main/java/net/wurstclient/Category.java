@@ -16,7 +16,9 @@ public enum Category
 	CHAT("Chat"),
 	FUN("Fun"),
 	ITEMS("Items"),
-	OTHER("Other");
+	OTHER("Other"),
+	MCMMO("MCMMO"),
+	;
 	
 	private final String name;
 	

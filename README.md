@@ -20,6 +20,7 @@ Scared? Lactose intolerant? Go get the official [Wurst client](http://wurstclien
 ### New Hacks:
 * HUDHack
 * NoFogHack
+* LawnmowerHack
 * OreMinerHack
 * NoLevitationHack
 * ShearAuraHack
