@@ -48,7 +48,7 @@ processResources {
 		expand "version": project.version,
 				"fabric_loader": project.loader_version,
 				"fabric_api": project.fabric_version,
-				"fabric_minecraft_version": project.minecraft_version,
+				"fabric_minecraft_version": project.fabric_minecraft_version,
 				"java_version": project.java_version
 
 	}
