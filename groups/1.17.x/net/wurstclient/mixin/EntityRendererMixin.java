@@ -103,6 +103,6 @@ public abstract class EntityRendererMixin<T extends Entity>
 
 	public TextRenderer getFontRenderer()
 	{
-		return null;
+		return WurstClient.MC.textRenderer;
 	}
 }

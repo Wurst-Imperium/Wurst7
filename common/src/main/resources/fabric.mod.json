@@ -38,6 +38,7 @@
   },
   "breaks": {
     "wi_zoom": "*",
-    "wi-zoom": "*"
+    "wi-zoom": "*",
+    "wurst": "*"
   }
 }

@@ -128,6 +128,11 @@ public abstract class MinecraftClientMixin
 	}
 
 	@Override
+	public void leftClick() {
+		doAttack();
+	}
+
+	@Override
 	public void rightClick()
 	{
 		doItemUse();
@@ -179,5 +184,11 @@ public abstract class MinecraftClientMixin
 	private void doItemUse()
 	{
 
+	}
+
+	@Shadow
+	private boolean doAttack()
+	{
+		return false;
 	}
 }

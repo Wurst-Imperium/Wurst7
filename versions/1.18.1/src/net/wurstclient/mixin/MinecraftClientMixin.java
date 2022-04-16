@@ -126,7 +126,12 @@ public abstract class MinecraftClientMixin
 			return wurstSession;
 		return session;
 	}
-	
+
+	@Override
+	public void leftClick() {
+		doAttack();
+	}
+
 	@Override
 	public void rightClick()
 	{
@@ -179,5 +184,10 @@ public abstract class MinecraftClientMixin
 	private void doItemUse()
 	{
 		
+	}
+
+	@Shadow
+	private void doAttack()
+	{
 	}
 }

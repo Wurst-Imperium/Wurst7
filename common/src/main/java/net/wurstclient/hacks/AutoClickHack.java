@@ -36,7 +36,7 @@ public class AutoClickHack extends Hack implements UpdateListener{
 		
 			@Override
 			public void run() {
-				if(button.getSelected().name == "Right Mouse Button"){
+				if(button.getSelected() == Button.RMB){
 					IMC.rightClick();
 				}
 				else {

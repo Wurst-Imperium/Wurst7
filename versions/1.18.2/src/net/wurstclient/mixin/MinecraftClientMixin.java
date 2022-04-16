@@ -185,9 +185,10 @@ public abstract class MinecraftClientMixin
 	{
 		
 	}
-	@Shadow
-	private void doAttack() 
-	{
 
+	@Shadow
+	private boolean doAttack()
+	{
+		return false;
 	}
 }
