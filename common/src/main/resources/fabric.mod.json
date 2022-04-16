@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "cheddarbrat-wurst",
+  "version": "${version}",
+
+  "name": "CheddarBratWurst Client",
+  "description": "Cheesy Brat-Wurst is the Best Wurst!",
+  "authors": [
+    "Alexander01998",
+    "TheGrandCurator"
+  ],
+  "contact": {
+    "homepage": "https://github.com/TheGrandCurator/Cheddar-BratWurst7",
+    "sources": "https://github.com/TheGrandCurator/Cheddar-BratWurst7"
+  },
+
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/wurst/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "net.wurstclient.WurstInitializer"
+    ]
+  },
+  "mixins": [
+    "wurst.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=${fabric_loader}",
+    "fabric": ">=${fabric_api}",
+    "minecraft": ">=${fabric_minecraft_version}",
+    "java": ">=${java_version}"
+  },
+  "suggests": {
+    "flamingo": "*"
+  },
+  "breaks": {
+    "wi_zoom": "*",
+    "wi-zoom": "*"
+  }
+}
