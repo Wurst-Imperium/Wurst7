@@ -52,7 +52,7 @@ public final class WurstUpdater implements UpdateListener
 		try
 		{
 			WsonArray wson = JsonUtils.parseURLToArray(
-				"https://api.github.com/repos/Wurst-Imperium/Wurst-MCX2/releases");
+				"https://api.github.com/repos/TheGrandCurator/Cheddar-BratWurst7/releases");
 			
 			for(WsonObject release : wson.getAllObjects())
 			{
@@ -85,7 +85,7 @@ public final class WurstUpdater implements UpdateListener
 		{
 			String text = "An error occurred while checking for updates."
 				+ " Click §nhere§r to check manually.";
-			String url = "https://www.wurstclient.net/download/";
+			String url = "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest/";
 			showLink(text, url);
 			return;
 		}
@@ -93,9 +93,9 @@ public final class WurstUpdater implements UpdateListener
 		if(!outdated)
 			return;
 		
-		String text = "Wurst " + latestVersion + " is now available."
+		String text = "CheddarBrat-Wurst " + latestVersion + " is now available."
 			+ " Click §nhere§r to download the update.";
-		String url = "https://www.wurstclient.net/download/";
+		String url = "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest";
 		showLink(text, url);
 	}
 	
@@ -110,12 +110,12 @@ public final class WurstUpdater implements UpdateListener
 	private boolean containsCompatibleAsset(WsonArray wsonArray)
 		throws JsonException
 	{
-		String compatibleSuffix = "MC" + WurstClient.MC_VERSION + ".jar";
+		String compatiblePrefix = "CheddarBratWurst-Client-" + WurstClient.MC_VERSION + "-";
 		
 		for(WsonObject asset : wsonArray.getAllObjects())
 		{
 			String assetName = asset.getString("name");
-			if(!assetName.endsWith(compatibleSuffix))
+			if(!assetName.startsWith(compatiblePrefix))
 				continue;
 			
 			return true;

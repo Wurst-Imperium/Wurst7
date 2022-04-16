@@ -42,7 +42,7 @@ jobs:
 
       - name: Define release_tag
         id: release_tag
-        run: echo ::set-output name=tag::v`date +%y%m%d`-${{ steps.read_property_wurst.outputs.value }}
+        run: echo ::set-output name=tag::v${{ steps.read_property_wurst.outputs.value }-`date +%y%m%d`}
 
       - name: Create Release
         id: create_release

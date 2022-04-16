@@ -64,7 +64,7 @@ public enum WurstClient
 	public static final MCGameOptions MC_GAME_OPTIONS = new MCGameOptions(MC);
 	public static final MCWorld MC_WORLD = new MCWorld(MC);
 	public static final MCResourceManager MC_RESOURCE_MANAGER = new MCResourceManager(MC);
-	public static final String VERSION = ClientVersion.wurstVersion;
+	public static final String VERSION = ClientVersion.wurstVersion + "-" + ClientVersion.cheddarVersion;
 	public static final String MC_VERSION = ClientVersion.minecraftVersion;
 	
 	private WurstAnalytics analytics;
@@ -92,7 +92,7 @@ public enum WurstClient
 	
 	public void initialize()
 	{
-		System.out.println("Starting Wurst Client...");
+		System.out.println("Starting CheddarBrat-Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
 		
@@ -156,8 +156,6 @@ public enum WurstClient
 			GLFW.GLFW_KEY_V, "Zoom");
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
-		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
-			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
 	
 	private Path createWurstFolder()

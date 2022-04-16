@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public final class Version implements Comparable<Version>
 {
 	private static final Pattern SYNTAX =
-		Pattern.compile("^[0-9]+\\.[0-9]+(?:\\.[0-9]+)?(?:pre[0-9]+)?$");
+		Pattern.compile("^[0-9]+\\.[0-9]+(?:-[0-9]+)?(?:pre[0-9]+)?$");
 	
 	private final int major;
 	private final int minor;
@@ -21,6 +21,7 @@ public final class Version implements Comparable<Version>
 	
 	public Version(String version)
 	{
+		System.out.println("Provided string version is: " + version);
 		if(!SYNTAX.asPredicate().test(version))
 		{
 			major = -1;
@@ -29,7 +30,7 @@ public final class Version implements Comparable<Version>
 			preRelease = Integer.MAX_VALUE;
 			return;
 		}
-		
+		System.out.println("asPredicate test is true ");
 		int indexOfPre = version.indexOf("pre");
 		
 		String[] parts;
@@ -45,13 +46,18 @@ public final class Version implements Comparable<Version>
 		}
 		
 		major = Integer.parseInt(parts[0]);
-		
-		minor = Integer.parseInt(parts[1]);
-		
-		if(parts.length == 3)
-			patch = Integer.parseInt(parts[2]);
-		else
-			patch = 0;
+
+		if (parts[1].contains("-")){
+			minor = Integer.parseInt(parts[1].substring(0, parts[1].indexOf("-")));
+			patch = Integer.parseInt(parts[1].substring(parts[1].indexOf("-")+1));
+		}else{
+			minor = Integer.parseInt(parts[1]);
+			if(parts.length == 3){
+				patch = Integer.parseInt(parts[2]);
+			} else{
+				patch = 0;
+			}
+		}
 	}
 	
 	@Override
@@ -139,11 +145,11 @@ public final class Version implements Comparable<Version>
 	
 	public String getChangelogLink()
 	{
-		String version = major + "-" + minor;
+		String version = major + "." + minor + "-" + patch;
 		
 		if(isPreRelease())
 			version += "pre" + preRelease;
 		
-		return "https://www.wurstclient.net/updates/wurst-" + version + "/";
+		return "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/tag/v" + version + "/";
 	}
 }
