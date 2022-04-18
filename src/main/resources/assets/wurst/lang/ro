@@ -19,7 +19,6 @@
   "description.wurst.setting.autoeat.min_hunger": "Pastreaza hunger bar-ul la nivelul ales sau chiar unul mai ridicat, chiar daca consunsuma puncte de hunger.\n6.5 - Nu poate cauza risipa cu.\n10.0 - Ignora complet risipa si umple hunger bar-ul la maxim.",
   "description.wurst.setting.autoeat.injured_hunger": "Umple hunger bar-ul cel putin pana la nivelul ales, chiar daca consunsuma puncte de hunger.\n10.0 - cel mai rapid healing\n9.0 - cel mai incet healing\n<9.0 - fara alergare\n<3.5 - fara alergare",
   "description.wurst.setting.autoeat.injury_threshold": "Previne micile rani din a-ti risipi toata mancarea. AutoEat te va considera ranit numai si numai daca ai pierdut acest numar de inimi.",
-  "description.wurst.setting.autoeat.injury_threshold": "Previne mici rani din a-ti risipi mancarea. AutoEat te va considera ranit numai si numai daca ai ajuns la acest numar de inimi.",
   "description.wurst.setting.autoeat.take_items_from": "Unde ar trebui sa caute AutoEat-ul mancare.",
   "description.wurst.setting.autoeat.eat_while_walking": "Vei fi incetinit, nu este recomandat.",
   "description.wurst.setting.autoeat.allow_hunger": "Efectul de hunger al rotten flesh-ului nu se aplica.\nEste bun de mancat si poate servi drept mancare de urgenta.",
