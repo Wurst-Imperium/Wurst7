@@ -4,7 +4,6 @@ import io.netty.util.concurrent.ThreadPerTaskExecutor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -320,7 +319,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             inventoryManager.equipItem(block, 0);
             inventoryManager.selectHotbarSlot(0);
             containerManager.closeScreen();
-            IMC.getInteractionManager().rightClickBlock(pos.down(), Direction.UP, Vec3d.ZERO);
+            BlockUtils.rightClickBlockLegit(pos.down(), false, 5);
         }
     }
 
@@ -1146,7 +1145,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private LinkedHashMap<Block, LinkedHashSet<BlockPos>> containers = new LinkedHashMap<>();
         private BlockPos currentContainer = null;
         private BlockPos getNearestPathablePosition(BlockPos containerPos) {
-            int range = 5;
+            int range = 4;
             double closestLength = Double.POSITIVE_INFINITY;
             BlockPos closestBlockPos = null;
             Vec3d playerPos = MC.player.getPos();
@@ -1200,7 +1199,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean navigateAndOpenContainer(BlockPos container) {
             if (!navigateToContainer(container))
                 return false;
-            IMC.getInteractionManager().rightClickBlock(container, Direction.NORTH, Vec3d.ZERO);
+            BlockUtils.rightClickBlockLegit(container, false, 5);
             awaitContainerOpen();
             currentContainer = container;
             return true;
@@ -1807,80 +1806,221 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    public class EfficiencyEquationComponent {
+    public class EfficiencyEquationSegment {
+        private double offset = 0.0;
         private double base;
         private double coefficient;
-        public EfficiencyEquationComponent(double base, double coefficient) {
+        private double start;
+        private double end;
+        public EfficiencyEquationSegment(double base, double coefficient, double start, double end) {
             this.base = base;
             this.coefficient = coefficient;
+            this.start = start;
+            this.end = end;
         }
-        public double evaluate(int num) {
-            return base + coefficient * num;
+        public EfficiencyEquationSegment setOffset(double offset) {
+            this.offset = offset;
+            return this;
         }
-        public EfficiencyEquationComponent mult(double factor) {
-            return new EfficiencyEquationComponent(base, coefficient * factor);
+        public double evaluate(double num) {
+            return offset + evaluateRelative(num);
         }
-        public EfficiencyEquationComponent add(EfficiencyEquationComponent other) {
-            return new EfficiencyEquationComponent(base + other.base, coefficient + other.coefficient);
+        public double evaluateRelative(double num) {
+            return base + coefficient * (num - start);
         }
-        public EfficiencyEquationComponent clone() {
-            return new EfficiencyEquationComponent(base, coefficient);
+        public EfficiencyEquationSegment mult(double factor) {
+            return new EfficiencyEquationSegment(base, coefficient * factor, start, start + (end - start) / factor).setOffset(offset);
+        }
+        public EfficiencyEquationSegment clone() {
+            return new EfficiencyEquationSegment(base, coefficient, start, end).setOffset(offset);
         }
     }
 
     public class EfficiencyEquation {
-        private List<EfficiencyEquationComponent> components;
-        public EfficiencyEquation(List<EfficiencyEquationComponent> components) {
-            this.components = components;
+        private List<EfficiencyEquationSegment> segments;
+        public EfficiencyEquation(List<EfficiencyEquationSegment> components) {
+            this.segments = components;
         }
         public EfficiencyEquation() {
-            components = List.of(new EfficiencyEquationComponent(0, 0));
+            segments = new ArrayList<>();
+        }
+        public double getEfficiencyRatio() {
+            if (segments.size() == 0)
+                return Double.POSITIVE_INFINITY;
+            EfficiencyEquationSegment lastSegment = segments.get(segments.size() - 1);
+            return lastSegment.evaluate(lastSegment.end) / lastSegment.end;
+        }
+        public double singleProductionCost() {
+            if (segments.size() == 0)
+                return Double.POSITIVE_INFINITY;
+            return evaluate(1);
         }
         public double evaluate(int num) {
-            return Collections.min(components.stream().map(component -> component.evaluate(num)).collect(Collectors.toList()));
+            double epsilon = 1E-6;
+            if (segments.size() == 0)
+                return 0;
+            for (EfficiencyEquationSegment segment : segments) {
+                if (num >= segment.start - epsilon && num <= segment.end + epsilon)
+                    return segment.evaluate(num);
+            }
+            return segments.get(segments.size() - 1).evaluate(num);
         }
-        public EfficiencyEquation mult(double factor) {
-            return new EfficiencyEquation(components.stream().map(component -> component.mult(factor)).collect(Collectors.toList()));
-        }
-        public EfficiencyEquation simplify() {
-            if (components.size() == 0)
-                return this;
-            components.sort(Comparator.comparingDouble(c -> c.base));
-            double smallestCoefficient = components.get(0).coefficient;
-            for (int i = 1; i < components.size(); i++) {
-                if (components.get(i).coefficient < smallestCoefficient) {
-                    smallestCoefficient = components.get(i).coefficient;
+        public EfficiencyEquation clamp(double factor) {
+            List<EfficiencyEquationSegment> res = new ArrayList<>();
+            for (EfficiencyEquationSegment segment : segments) {
+                if (factor <= segment.end) {
+                    res.add(new EfficiencyEquationSegment(segment.base, segment.coefficient, segment.start, factor).setOffset(segment.offset));
+                    break;
                 }
                 else {
-                    components.remove(i);
-                    i--;
+                    res.add(segment.clone());
                 }
+            }
+            return new EfficiencyEquation(res).adjustSegmentOffsets().relinkSegments();
+        }
+        public EfficiencyEquation mult(double factor) {
+            return new EfficiencyEquation(segments.stream().map(component -> component.mult(factor)).collect(Collectors.toList())).adjustSegmentOffsets().relinkSegments();
+        }
+        public EfficiencyEquation concat(EfficiencyEquation other) {
+            List<EfficiencyEquationSegment> concatenated = segments.stream().map(EfficiencyEquationSegment::clone).collect(Collectors.toList());
+            concatenated.addAll(other.segments.stream().map(EfficiencyEquationSegment::clone).collect(Collectors.toList()));
+            return new EfficiencyEquation(concatenated).adjustSegmentOffsets().relinkSegments();
+        }
+        public EfficiencyEquation add(EfficiencyEquation other) {
+            double epsilon = 1E-6;
+            if (other.segments.size() == 0)
+                return clone();
+            if (segments.size() == 0)
+                return other.clone();
+            List<EfficiencyEquationSegment> res = new ArrayList<>();
+            int i1 = 0;
+            int i2 = 0;
+            int i1prev = -1;
+            int i2prev = -1;
+            double position = 0;
+            EfficiencyEquation e1 = shallowClone();
+            EfficiencyEquation e2 = other.shallowClone();
+            if (e1.segments.get(e1.segments.size() - 1).end != Double.POSITIVE_INFINITY)
+                e1.segments.add(new EfficiencyEquationSegment(0, 0, e1.segments.get(e1.segments.size() - 1).end, Double.POSITIVE_INFINITY));
+            if (e2.segments.get(e2.segments.size() - 1).end != Double.POSITIVE_INFINITY)
+                e2.segments.add(new EfficiencyEquationSegment(0, 0, e2.segments.get(e2.segments.size() - 1).end, Double.POSITIVE_INFINITY));
+            EfficiencyEquationSegment s1 = e1.segments.get(i1);
+            EfficiencyEquationSegment s2 = e2.segments.get(i2);
+            while (i1prev != i1 || i2prev != i2) {
+                double nextPosition = Math.min(s1.end, s2.end);
+                EfficiencyEquationSegment newSegment = new EfficiencyEquationSegment(s1.evaluateRelative(position) + s2.evaluateRelative(position), s1.coefficient + s2.coefficient, position, nextPosition);
+                if (res.size() > 0 && Math.abs(res.get(res.size() - 1).evaluateRelative(position) - newSegment.evaluateRelative(position)) <= epsilon && Math.abs(res.get(res.size() - 1).coefficient - newSegment.coefficient) <= epsilon) {
+                    res.get(res.size() - 1).end = newSegment.end;
+                }
+                else {
+                    res.add(newSegment);
+                }
+                position = nextPosition;
+                i1prev = i1;
+                i2prev = i2;
+                if (s1.end == s2.end) {
+                    i1 = Math.min(e1.segments.size() - 1, i1 + 1);
+                    i2 = Math.min(e2.segments.size() - 1, i2 + 1);
+                } else if (s1.end < s2.end) {
+                    i1 = Math.min(e1.segments.size() - 1, i1 + 1);
+                } else {
+                    i2 = Math.min(e2.segments.size() - 1, i2 + 1);
+                }
+                s1 = e1.segments.get(i1);
+                s2 = e2.segments.get(i2);
+            }
+            if (!res.isEmpty() && res.get(res.size() - 1).base == 0 && res.get(res.size() - 1).end == Double.POSITIVE_INFINITY)
+                res.remove(res.size() - 1);
+            return new EfficiencyEquation(res).adjustSegmentOffsets().relinkSegments();
+        }
+        private double findIntersectionPoint(EfficiencyEquationSegment s1, EfficiencyEquationSegment s2) {
+            double epsilon = 1E-6;
+            double m = s1.coefficient;
+            double n = s2.coefficient;
+            double b = s1.offset + s1.base;
+            double d = s2.offset + s2.base;
+            if (Math.abs(m - n) <= epsilon)
+                return 0;
+            return (d - b) / (m - n);
+        }
+        public EfficiencyEquation min(EfficiencyEquation other) {
+            double epsilon = 1E-6;
+            if (other.segments.size() == 0)
+                return clone();
+            if (segments.size() == 0)
+                return other.clone();
+            List<EfficiencyEquationSegment> res = new ArrayList<>();
+            int i1 = 0;
+            int i2 = 0;
+            int i1prev = -1;
+            int i2prev = -1;
+            double position = 0;
+            EfficiencyEquation e1 = shallowClone();
+            EfficiencyEquation e2 = other.shallowClone();
+            if (e1.segments.get(e1.segments.size() - 1).end != Double.POSITIVE_INFINITY)
+                e1.segments.add(new EfficiencyEquationSegment(Double.POSITIVE_INFINITY, 0, e1.segments.get(e1.segments.size() - 1).end, Double.POSITIVE_INFINITY));
+            if (e2.segments.get(e2.segments.size() - 1).end != Double.POSITIVE_INFINITY)
+                e2.segments.add(new EfficiencyEquationSegment(Double.POSITIVE_INFINITY, 0, e2.segments.get(e2.segments.size() - 1).end, Double.POSITIVE_INFINITY));
+            EfficiencyEquationSegment s1 = e1.segments.get(i1);
+            EfficiencyEquationSegment s2 = e2.segments.get(i2);
+            while (i1prev != i1 || i2prev != i2) {
+                double nextPosition = Math.min(s1.end, s2.end);
+                double intersectionPoint = findIntersectionPoint(s1, s2);
+                EfficiencyEquationSegment smallest = s1.offset + s1.base < s2.offset + s2.base ? s1 : s2;
+                if (Math.abs(s1.coefficient - s2.coefficient) > epsilon && intersectionPoint >= position && intersectionPoint < nextPosition)
+                    nextPosition = intersectionPoint;
+                EfficiencyEquationSegment newSegment = new EfficiencyEquationSegment(smallest.evaluateRelative(position), smallest.coefficient, position, nextPosition);
+                if (res.size() > 0 && Math.abs(res.get(res.size() - 1).evaluateRelative(position) - newSegment.evaluateRelative(position)) <= epsilon && Math.abs(res.get(res.size() - 1).coefficient - newSegment.coefficient) <= epsilon) {
+                    res.get(res.size() - 1).end = newSegment.end;
+                }
+                else {
+                    res.add(newSegment);
+                }
+                position = nextPosition;
+                i1prev = i1;
+                i2prev = i2;
+                if (s1.end == s2.end) {
+                    i1 = Math.min(e1.segments.size() - 1, i1 + 1);
+                    i2 = Math.min(e2.segments.size() - 1, i2 + 1);
+                } else if (s1.end < s2.end) {
+                    i1 = Math.min(e1.segments.size() - 1, i1 + 1);
+                } else {
+                    i2 = Math.min(e2.segments.size() - 1, i2 + 1);
+                }
+                s1 = e1.segments.get(i1);
+                s2 = e2.segments.get(i2);
+            }
+            if (!res.isEmpty() && res.get(res.size() - 1).base == Double.POSITIVE_INFINITY && res.get(res.size() - 1).end == Double.POSITIVE_INFINITY)
+                res.remove(res.size() - 1);
+            return new EfficiencyEquation(res).adjustSegmentOffsets().relinkSegments();
+        }
+        private EfficiencyEquation adjustSegmentOffsets() {
+            if (segments.size() == 0)
+                return this;
+            segments.get(0).setOffset(0);
+            for (int i = 1; i < segments.size(); i++) {
+                EfficiencyEquationSegment prev = segments.get(i - 1);
+                EfficiencyEquationSegment cur = segments.get(i);
+                cur.offset = prev.evaluate(prev.end);
             }
             return this;
         }
-        public EfficiencyEquation add(EfficiencyEquation other) {
-            if (components.size() == 0) {
-                return other.clone();
+        private EfficiencyEquation relinkSegments() {
+            for (int i = 1; i < segments.size(); i++) {
+                EfficiencyEquationSegment prev = segments.get(i - 1);
+                EfficiencyEquationSegment cur = segments.get(i);
+                double diff = cur.start - prev.end;
+                cur.start -= diff;
+                if (cur.end != Double.POSITIVE_INFINITY)
+                    cur.end -= diff;
             }
-            else if (other.components.size() == 0) {
-                return clone();
-            }
-            List<EfficiencyEquationComponent> res = new ArrayList<>();
-            for (EfficiencyEquationComponent c1 : components) {
-                for (EfficiencyEquationComponent c2 : other.components) {
-                    res.add(c1.add(c2));
-                }
-            }
-            return new EfficiencyEquation(res).simplify();
-        }
-        public EfficiencyEquation min(EfficiencyEquation other) {
-            List<EfficiencyEquationComponent> res = new ArrayList<>();
-            res.addAll(components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
-            res.addAll(other.components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
-            return new EfficiencyEquation(res).simplify();
+            return this;
         }
         public EfficiencyEquation clone() {
-            return new EfficiencyEquation(components.stream().map(EfficiencyEquationComponent::clone).collect(Collectors.toList()));
+            return new EfficiencyEquation(segments.stream().map(EfficiencyEquationSegment::clone).collect(Collectors.toList()));
+        }
+        public EfficiencyEquation shallowClone() {
+            return new EfficiencyEquation(new ArrayList<>(segments));
         }
     }
 
@@ -1978,24 +2118,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             CraftingState state = new CraftingState(inventoryAvailability, storageAvailability, worldAvailability, new LinkedHashSet<>(), new LinkedHashMap<>());
             return state;
         }
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, numNeeded);
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;
         }
-        protected void genEfficiencyEquations(CraftingState state, LinkedHashSet<Item> visited) {
+        protected void genEfficiencyEquations(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             if (state.efficiencyEquationsGenerated.getOrDefault(this, false))
                 return;
             if (shouldPruneTarget && visited.contains(target))
                 return;
             if (shouldRememberVisit())
                 visited.add(target);
-            for (Node child : children) {
-                child.genEfficiencyEquations(state, visited);
-            }
-            EfficiencyEquation equation = genEfficiencyEquationsInternal(state);
+            EfficiencyEquation equation = genEfficiencyEquationsInternal(state, visited, numNeeded);
             if (shouldRememberVisit())
                 visited.remove(target);
             state.efficiencyEquations.put(this, equation);
@@ -2010,8 +2148,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             System.out.println("Tree generation time: " + (int)(treeEndTime - treeStartTime));
             if (populateNaiveMetrics) {
                 containerQuery.calculateNearestContainer(MC.player.getPos());
-                genEfficiencyEquations(state, new LinkedHashSet<>());
+                long equationStartTime = System.currentTimeMillis();
+                genEfficiencyEquations(state, new LinkedHashSet<>(), 1);
+                long equationEndTime = System.currentTimeMillis();
+                System.out.println("Efficiency equation generation time: " + (int)(equationEndTime - equationStartTime));
             }
+            System.out.println("Number of segments: " + state.efficiencyEquations.get(this).segments.size());
             CraftingState newState = state.clone();
             CraftingState clonedState = newState.clone();
             Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(state.rootNodeId, 1, 1, clonedState, useHeuristic, new LinkedHashSet<>());
@@ -2189,7 +2331,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return result;
         }
         private Pair<Boolean, Resources<OperableInteger>> getBaseResources(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            System.out.println(getClass() + ", " + target);
+            //System.out.println(getClass() + ", " + target);
             state.maxVisitedSize = Math.max(visited.size(), state.maxVisitedSize);
             long startTime = System.currentTimeMillis();
             Pair<Boolean, Resources<OperableInteger>> result = new Pair<>(true, new Resources<>());
@@ -2381,14 +2523,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, getChildNeededFactor(child, numNeeded));
                 if (areNodesEquivalent(child, fuel)) {
                     res = res.add(state.efficiencyEquations.get(child).mult(1.0 / 8.0));
                 }
                 else if (areNodesEquivalent(child, furnace)) {
-                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationComponent(state.efficiencyEquations.get(child).evaluate(1), 0))));
+                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationSegment(state.efficiencyEquations.get(child).evaluate(1), 0, 0, Integer.MAX_VALUE))));
                 }
                 else {
                     res = res.add(state.efficiencyEquations.get(child));
@@ -2635,16 +2778,19 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
-            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0.05, 0)));
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
+            int naiveMaxCraftable = state.naiveMaxCraftable.get(this);
+            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0.05, 0, 0, naiveMaxCraftable)));
             LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
+            int neededToCraft = getNeededToCraft(numNeeded);
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, getChildNeededFactor(child, numNeeded, neededToCraft, ingredients, (RecipeCraftingProcess) processes.get(0)));
                 if (ingredients.containsKey(child.target)) {
-                    res = res.add(state.efficiencyEquations.get(child).mult((double)ingredients.get(child.target).getCount() / process.recipe.getOutput().getCount()));
+                    res = res.add(state.efficiencyEquations.get(child).mult((double)ingredients.get(child.target).getCount() / process.recipe.getOutput().getCount()).clamp(naiveMaxCraftable));
                 }
                 else {
-                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationComponent(state.efficiencyEquations.get(child).evaluate(1), 0))));
+                    res = res.add(new EfficiencyEquation(List.of(new EfficiencyEquationSegment(state.efficiencyEquations.get(child).evaluate(1), 0, 0, naiveMaxCraftable))));
                 }
             }
             return res;
@@ -2885,10 +3031,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
-            EfficiencyEquation res = new EfficiencyEquation(new ArrayList<>());
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
+            EfficiencyEquation res = new EfficiencyEquation();
+            List<Node> prioritizedChildren = new ArrayList<>(children);
             for (Node child : children) {
-                res = res.min(state.efficiencyEquations.get(child));
+                child.genEfficiencyEquations(state, visited, numNeeded);
+            }
+            prioritizedChildren.sort(Comparator.comparingDouble(c -> state.efficiencyEquations.get(c).singleProductionCost()));
+            for (Node child : prioritizedChildren) {
+                res = res.concat(state.efficiencyEquations.get(child));
             }
             return res;
         }
@@ -2935,27 +3086,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             if (shouldRememberVisit())
                 visited.remove(target);
-        }
-        private void extractOptions(List<Pair<Node, Integer>> prioritizedChildren, List<Pair<Pair<Node, Integer>, Pair<Boolean, Resources<OperableInteger>>>> options, CraftingState state, int actualNeeded, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            CraftingState newState = state.clone();
-            double bestEfficiency = Double.POSITIVE_INFINITY;
-            while (prioritizedChildren.size() > 0) {
-                Pair<Node, Integer> prioritizedPair = prioritizedChildren.get(0);
-                Node child = prioritizedPair.getLeft();
-                int childId = prioritizedPair.getRight();
-                if (bestEfficiency < state.naiveEfficiencyMap.getOrDefault(child, 0.0))
-                    break;
-                if (state.naiveMaxCraftable.getOrDefault(child, 0) == 0)
-                    continue;
-                prioritizedChildren.remove(0);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, 1, Math.min(1, actualNeeded), newState, useHeuristic, visited);
-                if (childRes.getLeft()) {
-                    bestEfficiency = Math.min(bestEfficiency, newState.efficiencyMap.getOrDefault(childId, Double.POSITIVE_INFINITY));
-                    options.add(new Pair<>(prioritizedPair, childRes));
-                    state.efficiencyMap = (LinkedHashMap<Integer, Double>) newState.efficiencyMap.clone();
-                }
-                newState = state.clone();
-            }
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
@@ -3213,8 +3343,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
-            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0, 0)));
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
+            return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0, 0, 0, state.naiveMaxCraftable.get(this))));
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
@@ -3275,9 +3405,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             double base = containerQuery.getDistanceToContainer(target) / MC.player.getMovementSpeed();
-            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 0)));
+            return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, state.naiveMaxCraftable.get(this))));
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
@@ -3349,15 +3479,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
             double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
             if (block.getDefaultState().isToolRequired()) {
                 for (Node child : children) {
+                    child.genEfficiencyEquations(state, visited, 1);
                     base += state.efficiencyEquations.get(child).evaluate(1);
                 }
             }
-            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 100)));
+            return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 100, 0, state.naiveMaxCraftable.get(this))));
         }
         @Override
         protected boolean canPossiblyCraft(CraftingState state) {
@@ -3446,10 +3577,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new ArrayList<>();
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
             double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
-            return new EfficiencyEquation(List.of(new EfficiencyEquationComponent(base, 0)));
+            return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, 1)));
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
@@ -3530,9 +3661,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return List.of(new ChoiceNode(target, processes).setDistinction(getClass()));
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
-            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationComponent(0.1, 0)));
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
+            EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0.1, 0, 0, state.naiveMaxCraftable.get(this))));
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, numNeeded);
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;
@@ -3617,9 +3749,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return List.of(new ChoiceNode(target, processes).setDistinction(getClass()));
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, numNeeded);
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;
@@ -3720,9 +3853,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return List.of(new ChoiceNode(target, toolProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, numNeeded);
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;
@@ -3855,9 +3989,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return List.of(new ChoiceNode(target, itemProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
         }
         @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state) {
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
             for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, numNeeded);
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;

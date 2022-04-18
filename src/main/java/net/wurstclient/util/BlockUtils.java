@@ -14,14 +14,21 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
+
+import static net.wurstclient.WurstClient.IMC;
 
 public enum BlockUtils
 {
@@ -140,5 +147,82 @@ public enum BlockUtils
 			* (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
 		
 		return stream.limit(limit);
+	}
+
+	private static boolean hasLineOfSight(Vec3d from, Vec3d to)
+	{
+		RaycastContext.ShapeType type = RaycastContext.ShapeType.COLLIDER;
+		RaycastContext.FluidHandling fluid = RaycastContext.FluidHandling.NONE;
+
+		RaycastContext context =
+				new RaycastContext(from, to, type, fluid, MC.player);
+
+		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
+	}
+
+	public static boolean rightClickBlockLegit(BlockPos pos, boolean checkLOS, int range)
+	{
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d posVec = Vec3d.ofCenter(pos);
+		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		double rangeSq = Math.pow(range, 2);
+
+		for(Direction side : Direction.values())
+		{
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
+			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
+
+			// check if hitVec is within range
+			if(distanceSqHitVec > rangeSq)
+				continue;
+
+			// check if side is facing towards player
+			if(distanceSqHitVec >= distanceSqPosVec)
+				continue;
+
+			if(checkLOS && !hasLineOfSight(eyesPos, hitVec))
+				continue;
+
+			// face block
+			WurstClient.INSTANCE.getRotationFaker().faceVectorPacket(hitVec);
+
+			// right click block
+			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			MC.player.swingHand(Hand.MAIN_HAND);
+			IMC.setItemUseCooldown(4);
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean rightClickBlockSimple(BlockPos pos, boolean checkLOS, int range)
+	{
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d posVec = Vec3d.ofCenter(pos);
+		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		double rangeSq = Math.pow(range, 2);
+
+		for(Direction side : Direction.values())
+		{
+			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
+			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
+
+			// check if hitVec is within range
+			if(distanceSqHitVec > rangeSq)
+				continue;
+
+			// check if side is facing towards player
+			if(distanceSqHitVec >= distanceSqPosVec)
+				continue;
+
+			if(checkLOS && !hasLineOfSight(eyesPos, hitVec))
+				continue;
+
+			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			return true;
+		}
+
+		return false;
 	}
 }

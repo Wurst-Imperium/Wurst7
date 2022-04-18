@@ -41,7 +41,6 @@ public class LootPoolMixin {
 
     @Overwrite
     public void addGeneratedLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
-        System.out.println("MIXIN REACHED");
         if (context.getWorld() != null && !this.predicate.test(context)) {
             return;
         }
