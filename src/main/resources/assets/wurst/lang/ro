@@ -52,7 +52,7 @@
   "description.wurst.hack.chattranslator": "Traduce mesajele de pe chat folosind Google Translate.",
   "description.wurst.hack.chestesp": "Contureaza chesturile din apropiere.",
   "description.wurst.hack.clickaura": "Ataca automat cea mai apropiata entitate atunci cand dai click.\n\n§c§lATENTIE:§r ClickAura este mai suspicios decat Killaura si este mai usor de detectat de catre anumite plugin-uri. Este recomandat in schimb sa folosesti Killaura sau TriggerBot.",
-  "description.wurst.hack.clickgui": "ClickGUI bazat pe Windows.",
+  "description.wurst.hack.clickgui": "ClickGUI bazat pe windows.",
   "description.wurst.hack.crashchest": "Genereaza un chest care da ban playerilor daca au prea multe copii in inventar. §c§lATENTIE:§r §cLucrul acesta nu poate fi schimbat. Foloseste cu grija!§r\n\nIf copiile sunt plasate intr-un chest, oricine il deschide isi va lua kick de pe server (doar o data).",
   "description.wurst.hack.creativeflight": "Iti permite sa zbori ca si in Creativ.\n\n§c§lATENTIE:§r Iti vei lua fall damage daca nu folosesti NoFall.",
   "description.wurst.hack.criticals": "Iti schimba toate hit-urile in criticale.",
