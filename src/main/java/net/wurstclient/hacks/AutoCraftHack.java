@@ -2330,8 +2330,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 visited.add(target);
             if (!src.containsKey(nodeId))
                 return;
-            if (num == 0)
-                System.out.println("reached");
             stackResourcesInternal(nodeId, state, num, dest, src, visited);
             if (shouldRememberVisit())
                 visited.remove(target);
@@ -2393,7 +2391,30 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 visited.remove(target);
             return result;
         }
-        protected abstract Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited);
+        protected boolean drawResourcesFromState(CraftingState state, int numNeeded, int actualNeeded) {
+            return true;
+        }
+        protected int getChildNeededFactor(Node child, int numNeeded) {
+            return numNeeded;
+        }
+        protected ResourceDomain getResourceDomain() {
+            return ResourceDomain.COMPOSITE;
+        }
+        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
+            Resources<OperableInteger> res = new Resources<>();
+            List<Integer> childIds = state.children.get(this);
+            for (int i = 0; i < children.size(); i++) {
+                int childId = nodeId + childIds.get(i);
+                Node child =  children.get(i);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, getChildNeededFactor(child, numNeeded), getChildNeededFactor(child, actualNeeded), state, useHeuristic, visited);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, res);
+                mergeResources(res, childRes.getRight());
+            }
+            ResourceDomain domain = getResourceDomain();
+            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), domain));
+            return new Pair<>(drawResourcesFromState(state, numNeeded, actualNeeded), res);
+        }
         protected abstract void genNaiveMaxCraftableInternal(CraftingState state);
         protected void genNaiveMaxCraftable(CraftingState state) {
             if (shouldPruneTarget && state.visited.contains(target))
@@ -2542,21 +2563,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     return false;
             }
             return true;
-        }
-        @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child =  children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, res);
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -2734,25 +2740,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return true;
         }
-        private int getChildNeededFactor(Node child, int num) {
+        @Override
+        protected int getChildNeededFactor(Node child, int num) {
             if (areNodesEquivalent(child, fuel))
                 return (num / 8) + (num % 8 > 0 ? 1 : 0);
             return num;
-        }
-        @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child =  children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, getChildNeededFactor(child, numNeeded), getChildNeededFactor(child, actualNeeded), state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, res);
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -2958,10 +2950,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             int naiveMaxCraftable = state.naiveMaxCraftable.get(this);
             EfficiencyEquation res = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0.05, 0, 0, naiveMaxCraftable)));
             LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
-            int neededToCraft = getNeededToCraft(numNeeded);
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             for (Node child : children) {
-                child.genEfficiencyEquations(state, visited, getChildNeededFactor(child, numNeeded, neededToCraft, ingredients, (RecipeCraftingProcess) processes.get(0)));
+                child.genEfficiencyEquations(state, visited, getChildNeededFactor(child, numNeeded));
                 if (ingredients.containsKey(child.target)) {
                     res = res.add(state.efficiencyEquations.get(child).mult((double)ingredients.get(child.target).getCount() / process.recipe.getOutput().getCount()).clamp(naiveMaxCraftable));
                 }
@@ -3002,28 +2993,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return true;
         }
-        private int getChildNeededFactor(Node child, int num, int neededToCraft, LinkedHashMap<Item, ItemStack> ingredients, RecipeCraftingProcess process) {
-            if (child instanceof WorkbenchNode || child instanceof ToolNode)
-                return Math.min(1, num);
-            return ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount());
-        }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
+        protected int getChildNeededFactor(Node child, int numNeeded) {
             RecipeCraftingProcess process = (RecipeCraftingProcess) processes.get(0);
             LinkedHashMap<Item, ItemStack> ingredients = collectIngredients();
             int neededToCraft = getNeededToCraft(numNeeded);
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child = children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, getChildNeededFactor(child, numNeeded, neededToCraft, ingredients, process), getChildNeededFactor(child, actualNeeded, neededToCraft, ingredients, process), state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, res);
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
+            if (child instanceof WorkbenchNode || child instanceof ToolNode)
+                return Math.min(1, numNeeded);
+            return ((neededToCraft * ingredients.get(child.target).getCount()) / process.recipe.getOutput().getCount());
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -3507,11 +3484,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0, 0, 0, state.naiveMaxCraftable.get(this))));
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.INVENTORY));
+        protected ResourceDomain getResourceDomain() {
+            return ResourceDomain.INVENTORY;
+        }
+        @Override
+        protected boolean drawResourcesFromState(CraftingState state, int numNeeded, int actualNeeded) {
             state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - actualNeeded);
-            return new Pair<>(state.inventoryAvailability.get(target) >= 0, res);
+            return state.inventoryAvailability.get(target) >= 0;
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -3562,11 +3541,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, state.naiveMaxCraftable.get(this))));
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.STORAGE));
+        protected ResourceDomain getResourceDomain() {
+            return ResourceDomain.STORAGE;
+        }
+        @Override
+        protected boolean drawResourcesFromState(CraftingState state, int numNeeded, int actualNeeded) {
             state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - actualNeeded);
-            return new Pair<>(state.storageAvailability.get(target) >= 0, res);
+            return state.storageAvailability.get(target) >= 0;
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -3637,6 +3618,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         protected boolean canPossiblyCraft(CraftingState state) {
             return state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) > 0;
+        }
+        @Override
+        protected ResourceDomain getResourceDomain() {
+            return ResourceDomain.WORLD;
+        }
+        @Override
+        protected boolean drawResourcesFromState(CraftingState state, int numNeeded, int actualNeeded) {
+            state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - actualNeeded);
+            return state.worldAvailability.get(block) >= 0;
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
@@ -3719,12 +3709,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, 1)));
         }
         @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
-        }
-        @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
             state.naiveMaxCraftable.put(this, state.worldAvailability.getOrDefault(targetBlock, 0));
@@ -3796,21 +3780,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 res = res.add(state.efficiencyEquations.get(child));
             }
             return res;
-        }
-        @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child = children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, new Resources<>());
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -3891,21 +3860,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     return false;
             }
             return true;
-        }
-        @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child = children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, new Resources<>());
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
@@ -4111,23 +4065,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     return false;
             }
             return true;
-        }
-        @Override
-        protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
-            Resources<OperableInteger> res = new Resources<>();
-            if (children.size() == 0)
-                return new Pair<>(true, res);
-            List<Integer> childIds = state.children.get(this);
-            for (int i = 0; i < children.size(); i++) {
-                int childId = nodeId + childIds.get(i);
-                Node child = children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, new Resources<>());
-                mergeResources(res, childRes.getRight());
-            }
-            res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
-            return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
