@@ -54,7 +54,6 @@
     "ShulkerBoxScreenMixin",
     "SignEditScreenMixin",
     "SodiumBlockOcclusionCacheMixin",
-    "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",

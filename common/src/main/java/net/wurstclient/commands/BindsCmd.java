@@ -178,7 +178,7 @@ public final class BindsCmd extends Command
 	
 	private void reset()
 	{
-		WURST.getKeybinds().setKeybinds(KeybindList.DEFAULT_KEYBINDS);
+		WURST.getKeybinds().setDefaultKeybinds();
 		ChatUtils.message("All keybinds reset to defaults.");
 	}
 	

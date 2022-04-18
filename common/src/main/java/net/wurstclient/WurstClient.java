@@ -103,9 +103,8 @@ public enum WurstClient
 		
 		eventManager = new EventManager(this);
 		
-		Path enabledHacksFile = wurstFolder.resolve("enabled-hacks.json");
-		hax = new HackList(enabledHacksFile);
-		
+		hax = new HackList("DEFAULT.json");
+
 		cmds = new CmdList();
 		
 		otfs = new OtfList();
@@ -116,9 +115,8 @@ public enum WurstClient
 		this.settingsFile.load();
 		hax.tooManyHaxHack.loadBlockedHacksFile();
 		
-		Path keybindsFile = wurstFolder.resolve("keybinds.json");
-		keybinds = new KeybindList(keybindsFile);
-		
+		keybinds = new KeybindList("DEFAULT.json");
+
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);
 		

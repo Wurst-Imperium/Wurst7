@@ -62,29 +62,9 @@ public final class EnabledHaxCmd extends Command
 	{
 		if(args.length != 2)
 			throw new CmdSyntaxError();
-		
 		String name = parseFileName(args[1]);
-		
-		try
-		{
-			WURST.getHax().loadProfile(name);
-			ChatUtils.message("Hacks loaded: " + name);
-			
-		}catch(NoSuchFileException e)
-		{
-			throw new CmdError("Profile '" + name + "' doesn't exist.");
-			
-		}catch(JsonException e)
-		{
-			e.printStackTrace();
-			throw new CmdError(
-				"Profile '" + name + "' is corrupted: " + e.getMessage());
-			
-		}catch(IOException e)
-		{
-			e.printStackTrace();
-			throw new CmdError("Couldn't load profile: " + e.getMessage());
-		}
+		WURST.getHax().loadProfile(name);
+		ChatUtils.message("Hacks loaded: " + name);
 	}
 	
 	private void saveProfile(String[] args) throws CmdException
