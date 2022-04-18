@@ -27,7 +27,7 @@
   "description.wurst.hack.autofarm": "Recolteaza si planteaza automat.\nFunctioneaza cu grau, morcovi, cartofi, sfecla, dovleci, pepeni, cactusi, trestie de zahar, varec, bambus, nether wart, si boabe de cacao.",
   "description.wurst.hack.autofish": "Pescuieste automat folosindu-se de cea mai buna undita a ta. Daca pescuind gaseste o undita mai buna, o va folosi pe aceea.",
   "description.wurst.hack.automine": "Strica automat block-ul la care te uiti.",
-  "description.wurst.hack.autopotion": "Arunca instant splash potions of instant health atunci cand esti pe putine inimi.",
+  "description.wurst.hack.autopotion": "Arunca splash potions of instant health atunci cand esti pe putine inimi.",
   "description.wurst.hack.autoreconnect": "Reconecteaza-te automat atunci cand esti deconectat de pe server.",
   "description.wurst.hack.autorespawn": "Respawneaza-te automat atunci cand mori.",
   "description.wurst.hack.autosign": "Scrie instant ce vrei pe fiecare semn pe care il pui. Odata activat, poti scrie normal pe primul semn pentru a specifica ce vrei sa scrii pe toate celelalte.",
