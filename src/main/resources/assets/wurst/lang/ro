@@ -160,7 +160,7 @@
   "description.wurst.altmanager.unchecked": "Nu ai reusit niciodata sa te loghezi in acest cont alternativ.",
   "description.wurst.altmanager.favorite": "Ai marcat acest cont alternativ la favorite.",
   "description.wurst.altmanager.window": "Acest buton deschide o alta fereastra.",
-  "description.wurst.altmanager.window_freeze": "It might look like the game is not responding while that window is open.",
+  "description.wurst.altmanager.window_freeze": "Ar putea sa para de parca jocul nu raspunde atunci cand acea fereastra este deschisa.",
   "description.wurst.altmanager.fullscreen": "§cOpreste modul fullscreen!",
   "gui.wurst.altmanager.folder_error.title": "Folderul'.Wurst encryption' nu a putut fi creeat!",
   "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripa sau decripta conturi alternative fara acesta .\nInca poti folosi AltManager, dar orice cont alternativ creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s",
