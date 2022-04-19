@@ -69,7 +69,7 @@
   "description.wurst.hack.fightbot": "Un bot care se plimba si omoara totul.\nBun pentru MobArena.",
   "description.wurst.hack.fish": "Dezactiveaza gravitatea din apa si poti inota ca un pestisor.",
   "description.wurst.hack.flight": "Iti permite sa zbori.\n\n§c§lATENTIE:§r Iti vei lua fall damage daca nu folosesti NoFall.",
-  "description.wurst.hack.follow": "Un bot care urmareste cea mai apropiata entitate.\nFoarte enervant.\n\nfoloseste .follow pentru a urmari o entitate anume.",
+  "description.wurst.hack.follow": "Un bot care urmareste cea mai apropiata entitate.\nFoarte enervant.\n\nFoloseste .follow pentru a urmari o entitate anume.",
   "description.wurst.hack.forceop": "Sparge parolele de AuthMe.\nPoate fi folosit pentru a face rost de OP.",
   "description.wurst.hack.freecam": "Iti permite sa misti camera fara sa iti misti caracterul.",
   "description.wurst.hack.fullbright": "Iti permite sa vezi in intuneric.",
