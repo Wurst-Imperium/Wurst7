@@ -118,7 +118,7 @@
   "description.wurst.hack.overlay": "Activeaza animatia Nuker atunci cand e pornit.",
   "description.wurst.hack.panic": "Opreste instant orice hack pornit.\nAi grija folosing acesta!",
   "description.wurst.hack.parkour": "Te face sa sari automat cand esti la marginea unui block.\nFolositor pentru parkour.",
-  "description.wurst.hack.playeresp": "Contureaza jucatorii din apropiere.\nhitboxurile prietenilor vor aparea in albastru.",
+  "description.wurst.hack.playeresp": "Contureaza jucatorii din apropiere.\nHitboxurile prietenilor vor aparea in albastru.",
   "description.wurst.hack.playerfinder": "Localizeaza playerii din departare pe timp de furtuna.",
   "description.wurst.hack.portalgui": "Iti permite sa folosesti GUI-uri in portale.",
   "description.wurst.hack.potionsaver": "Ingheata efectele potiunilor in timp ce stai pe loc.",
