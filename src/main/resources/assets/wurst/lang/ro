@@ -113,7 +113,7 @@
   "description.wurst.hack.noweather": "Iti permite sa schimbi timpul, vremea si starea lunii.",
   "description.wurst.hack.noweb": "Te previne din a te intepeni in panze de paianjen.",
   "description.wurst.hack.nuker": "Strica automat blocurile din jurul tau.",
-  "description.wurst.hack.nukerlegit": "Nuker mai incet care trece de NoCheat+.\nNu este necesar pe serverele cu NoCheat+.",
+  "description.wurst.hack.nukerlegit": "Nuker mai incet care trece de pluginurile AntiCheat.\nNu este necesar pe serverele cu NoCheat+.",
   "description.wurst.hack.openwateresp": "Arata daca pescuiesti in 'apa libera' si contureaza o cutie destinata calcularii apei.",
   "description.wurst.hack.overlay": "Activeaza animatia Nuker atunci cand e pornit.",
   "description.wurst.hack.panic": "Opreste instant orice hack pornit.\nAi grija folosing acesta!",
