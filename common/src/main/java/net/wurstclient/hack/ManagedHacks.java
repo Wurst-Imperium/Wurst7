@@ -77,7 +77,6 @@ public final class ManagedHacks extends ManagedProfile implements EnableHackList
     }
 
     private void updateProfileFile(){
-        System.out.println("Saveing hacks to file");
         currentEnabledHacksFile.save(this.createJson());
     }
 

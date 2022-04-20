@@ -38,9 +38,6 @@ public abstract class ProfileFileReader {
     public WsonObject load() {
         try {
             WsonObject obj = JsonUtils.parseFileToObject(path);
-            System.out.println("What is this object?");
-            System.out.println(obj);
-            System.out.println(obj.toJsonObject());
             return obj;
 
         } catch (NoSuchFileException e) {
