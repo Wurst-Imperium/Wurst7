@@ -2,21 +2,61 @@
   "schemaVersion": 1,
   "id": "cheddarbrat-wurst",
   "version": "${version}",
-
   "name": "CheddarBratWurst Client",
   "description": "Cheesy Brat-Wurst is the Best Wurst!",
   "authors": [
-    "Alexander01998",
-    "TheGrandCurator"
+    {
+      "name": "TheGrandCurator",
+      "email": "Th3GrandCurator@gmail.com"
+    },
+    "Alexander01998"
   ],
   "contact": {
-    "homepage": "https://github.com/TheGrandCurator/Cheddar-BratWurst7",
-    "sources": "https://github.com/TheGrandCurator/Cheddar-BratWurst7"
+    "homepage": "https://github.com/TheGrandCurator/Cheddar-BratWurst7/wiki",
+    "sources": "https://github.com/TheGrandCurator/Cheddar-BratWurst7",
+    "issues": "https://github.com/TheGrandCurator/Cheddar-BratWurst7/issues"
   },
-
+  "contributors": [
+    "Mersid",
+    "SistineFibelKen",
+    "hiddenalt-team",
+    "EliteUn17y",
+    "ThisTestUser",
+    "andevo",
+    "sn4k3ch4rm3r",
+    "gurachan",
+    "wosk0x01",
+    "ZANX3Y",
+    "skidderrom",
+    "rennaarenata",
+    "sabaadmin",
+    "TheWienerMaster",
+    "Hexeption",
+    "KTibow",
+    "faseri",
+    "pikami",
+    "AidanRB",
+    "MaxCoding3",
+    "flestr",
+    "PanForPancakes",
+    "aleksilassila",
+    "octeep",
+    "SiongSng",
+    "js6pak",
+    "allanshepherd",
+    "cropbob",
+    "JamesTheAwesomeDude",
+    "FlorianMichael",
+    "xuri02",
+    "pcm1k",
+    "thyraxx",
+    "Dalethium",
+    "ElementW",
+    "KosmX",
+    "sudofox"
+  ],
   "license": "GPL-3.0-or-later",
   "icon": "assets/wurst/icon.png",
-
   "environment": "client",
   "entrypoints": {
     "main": [
@@ -29,7 +69,6 @@
   "mixins": [
     "wurst.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=${fabric_loader}",
     "fabric": ">=${fabric_api}",
@@ -43,5 +82,13 @@
     "wi_zoom": "*",
     "wi-zoom": "*",
     "wurst": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/PBAjnhZvBv",
+        "modmenu.issues": "https://github.com/TheGrandCurator/Cheddar-BratWurst7/issues"
+      }
+    }
   }
 }
