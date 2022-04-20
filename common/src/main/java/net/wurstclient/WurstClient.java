@@ -137,7 +137,7 @@ public enum WurstClient implements GameSessionEventListener
 		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
-		
+		eventManager.add(GameSessionEventListener.class, this);
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder =
 			Paths.get(System.getProperty("user.home"), ".Wurst encryption")

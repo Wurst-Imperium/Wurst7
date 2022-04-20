@@ -7,7 +7,6 @@
  */
 package net.wurstclient.update;
 
-import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -83,28 +82,17 @@ public final class WurstUpdater implements UpdateListener
 		
 		if(latestVersion == null || latestVersion.isInvalid())
 		{
-			String text = "An error occurred while checking for updates."
-				+ " Click §nhere§r to check manually.";
-			String url = "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest/";
-			showLink(text, url);
+			component = new LiteralText("An error occurred while checking for updates."
+					+ " Open Wurst Options for latest update link.");
 			return;
 		}
 		
 		if(!outdated)
 			return;
 		
-		String text = "CheddarBrat-Wurst " + latestVersion + " is now available."
-			+ " Click §nhere§r to download the update.";
-		String url = "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest";
-		showLink(text, url);
-	}
-	
-	private void showLink(String text, String url)
-	{
-		component = new LiteralText(text);
-		
-		ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
-		component.getStyle().withClickEvent(event);
+		component = new LiteralText("CheddarBrat-Wurst " + latestVersion + " is now available."
+				+ " Open Wurst Options for latest update link.");
+
 	}
 	
 	private boolean containsCompatibleAsset(WsonArray wsonArray)

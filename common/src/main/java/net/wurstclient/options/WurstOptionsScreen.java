@@ -7,10 +7,6 @@
  */
 package net.wurstclient.options;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Supplier;
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,10 +24,15 @@ import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
 import static net.wurstclient.util.ModMenuUtils.isModMenuPresent;
 
 public class WurstOptionsScreen extends Screen {
     private final Screen prevScreen;
+    private final int verticalSpacing = 24;
 
     public WurstOptionsScreen(Screen prevScreen) {
         super(new LiteralText(""));
@@ -41,7 +42,7 @@ public class WurstOptionsScreen extends Screen {
     @Override
     public void init() {
         addDrawableChild(
-                new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
+                new ButtonWidget(width / 2 - 100, height / 4 + verticalSpacing * 7 - 16, 200, 20,
                         new LiteralText("Back"), b -> WurstClient.setScreen(prevScreen)));
 
         addSettingButtons();
@@ -57,7 +58,6 @@ public class WurstOptionsScreen extends Screen {
         VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
         CheckboxSetting forceEnglish =
                 wurst.getOtfs().translationsOtf.getForceEnglish();
-        int verticalSpacing = 24;
 
         new WurstOptionsButton(-154, verticalSpacing,
                 () -> "Click Friends: "
@@ -97,20 +97,20 @@ public class WurstOptionsScreen extends Screen {
     }
 
     private void addManagerButtons() {
-        new WurstOptionsButton(-50, 24, () -> "Enabled Hacks",
+        new WurstOptionsButton(-50, verticalSpacing, () -> "Enabled Hacks",
                 "Profiles to Enable or Disable Hacks",
                 b -> WurstClient.setScreen(new EnabledHacksManagerScreen(this)));
-        new WurstOptionsButton(-50, 48, () -> "Keybinds",
+        new WurstOptionsButton(-50, verticalSpacing * 2, () -> "Keybinds",
                 "Keybinds allow you to toggle any hack\n"
                         + "or command by simply pressing a\n" + "button.",
                 b -> WurstClient.setScreen(new KeybindManagerScreen(this) {
                 }));
 
-        new WurstOptionsButton(-50, 72, () -> "X-Ray Blocks",
+        new WurstOptionsButton(-50, verticalSpacing * 3, () -> "X-Ray Blocks",
                 "Manager for the blocks\n" + "that X-Ray will show.",
                 b -> WurstClient.INSTANCE.getHackRegistry().xRayHack.openBlockListEditor(this));
 
-        new WurstOptionsButton(-50, 96, () -> "Zoom",
+        new WurstOptionsButton(-50, verticalSpacing * 4, () -> "Zoom",
                 "The Zoom Manager allows you to\n"
                         + "change the zoom key, how far it\n"
                         + "will zoom in and more.",
@@ -120,22 +120,25 @@ public class WurstOptionsScreen extends Screen {
     private void addLinkButtons() {
         OperatingSystem os = Util.getOperatingSystem();
 
-        new WurstOptionsButton(54, 24, () -> "Official Website",
+        new WurstOptionsButton(54, verticalSpacing, () -> "Official Website",
                 "WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
 
-        new WurstOptionsButton(54, 48, () -> "Wurst Wiki",
-                "Wiki.WurstClient.net",
-                b -> os.open("https://wiki.wurstclient.net/"));
+        new WurstOptionsButton(54, verticalSpacing * 2, () -> "Cheddar Wurst Wiki",
+                "https://github.com/TheGrandCurator/Cheddar-BratWurst7/wiki",
+                b -> os.open("https://github.com/TheGrandCurator/Cheddar-BratWurst7/wiki"));
 
-        new WurstOptionsButton(54, 72, () -> "Twitter", "@Wurst_Imperium",
-                b -> os.open("https://twitter.com/Wurst_Imperium"));
+        new WurstOptionsButton(54, verticalSpacing * 3, () -> "Discord", "https://discord.gg/PBAjnhZvBv",
+                b -> os.open("https://discord.gg/PBAjnhZvBv"));
 
-        new WurstOptionsButton(54, 96, () -> "Reddit", "r/WurstClient",
+        new WurstOptionsButton(54, verticalSpacing * 4, () -> "Reddit", "r/WurstClient",
                 b -> os.open("https://www.reddit.com/r/WurstClient/"));
 
-        new WurstOptionsButton(54, 120, () -> "Source Code",
+        new WurstOptionsButton(54, verticalSpacing * 5, () -> "Source Code",
                 "https://github.com/TheGrandCurator/Cheddar-BratWurst7/",
                 b -> os.open("https://github.com/TheGrandCurator/Cheddar-BratWurst7/"));
+        new WurstOptionsButton(54, verticalSpacing * 6, () -> "Latest Version",
+                "https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest",
+                b -> os.open("https://github.com/TheGrandCurator/Cheddar-BratWurst7/releases/latest"));
     }
 
     @Override
