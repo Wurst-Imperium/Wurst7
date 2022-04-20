@@ -61,6 +61,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
+	public final SliderSetting fov =
+		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
@@ -116,6 +119,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(useCooldown);
 		addSetting(speed);
 		addSetting(range);
+		addSetting(fov);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -183,6 +187,10 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		
+		if(fov.getValue() < 360.0)
+			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
+				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
