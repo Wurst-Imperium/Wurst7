@@ -2,7 +2,7 @@
   "description.wurst.hack.anchoraura": "Plaseaza automat (optional), incarca, si detoneaza respawn anchoruri pentru a ucide entitati din jurul tau.",
   "description.wurst.hack.antiafk": "Umbla anapoda pentru a evita pluginuri anti-afk.\nNeceseita un spatiu liber de cel putin 3x3.",
   "description.wurst.hack.antiblind": "Previne efectul de orbire.\nIncompatibl cu OptiFine.",
-  "description.wurst.hack.anticactus": "Esti protejat de damage-ul dat de cactusi."
+  "description.wurst.hack.anticactus": "Esti protejat de damage-ul dat de cactusi.",
   "description.wurst.hack.antiknockback": "Te previne din a fi impins de catre playeri sau mobi.",
   "description.wurst.hack.antispam": "Opreste chat spam-ul prin adaugarea unui raspuns la mesaje repetate.",
   "description.wurst.hack.antiwaterpush": "Te previne din a fi impins de catre apa.",
@@ -135,7 +135,7 @@
   "description.wurst.hack.skinderp": "Porneste si opreste la intamplare parti diferite din skinul tau.",
   "description.wurst.hack.sneak": "Te pune automat pe sneak.",
   "description.wurst.hack.snowshoe": "Iti permite sa umbli pe powder snow.",
-  "description.wurst.hack.speedhack": Iti permite sa fugi de ~2.5x mai repede decat atunci cand fugi si sari.\n\n§6§lATENTIE:§r Si-a luat patch in NoCheat+ versiunea 3.13.2. Va functiona numai in instante mai vechi de NoCheat+.\nScrie §l/ncp version§r pentru a verifica verisunea de NoCheat+ a unui server.",
+  "description.wurst.hack.speedhack": "Iti permite sa fugi de ~2.5x mai repede decat atunci cand fugi si sari.\n\n§6§lATENTIE:§r Si-a luat patch in NoCheat+ versiunea 3.13.2. Va functiona numai in instante mai vechi de NoCheat+.\nScrie §l/ncp version§r pentru a verifica verisunea de NoCheat+ a unui server.",
   "description.wurst.hack.speednuker": "Versiune mai rapida de Nuker dar care nu poate NoCheat+.",
   "description.wurst.hack.spider": "Iti permite sa te urci pe pereti ca si un paianjen.",
   "description.wurst.hack.step": "Iti permite sa calci peste block-uri intregi./n(ca si cum a-i calca pe stairs).",
@@ -162,5 +162,5 @@
   "description.wurst.altmanager.window_freeze": "Ar putea sa para de parca jocul nu raspunde atunci cand acea fereastra este deschisa.",
   "description.wurst.altmanager.fullscreen": "§cOpreste modul fullscreen!",
   "gui.wurst.altmanager.folder_error.title": "Folderul '.Wurst encryption' nu a putut fi creeat!",
-  "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripta sau decripta conturi alternative fara acesta.\nInca poti folosi AltManager, dar orice cont alternativ pe care il creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s",
+  "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripta sau decripta conturi alternative fara acesta.\nInca poti folosi AltManager, dar orice cont alternativ pe care il creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s"
 }
