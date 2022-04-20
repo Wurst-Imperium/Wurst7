@@ -38,7 +38,7 @@ public final class AltRenderer
 		if(loadedSkins.get(name) == null)
 		{
 			UUID uuid = DynamicSerializableUuid
-				.method_43343(new GameProfile((UUID)null, name));
+				.getUuidFromProfile(new GameProfile((UUID)null, name));
 			
 			PlayerListEntry entry = new PlayerListEntry(
 				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
@@ -93,7 +93,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(DynamicSerializableUuid.method_43344(name))
+				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
@@ -225,7 +225,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(DynamicSerializableUuid.method_43344(name))
+				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
