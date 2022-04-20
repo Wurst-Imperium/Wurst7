@@ -25,6 +25,7 @@ Scared? Lactose intolerant? Go get the official [Wurst client](http://wurstclien
 * NoLevitationHack
 * ShearAuraHack
 * GGHack
+* AutoClicker
 * HackList
 
 ### New Commands:
@@ -47,6 +48,12 @@ Scared? Lactose intolerant? Go get the official [Wurst client](http://wurstclien
 * BuildRandomHack Bug Fix
 * ItemESPHack Bug Fix
 * ChestESPHack Bug Fix
+* Modmenu Integration
+* Enabled Hacks Profiles via Gui (Accessible from Wurst options)
+* Adds Wurst options button to Title Screen
+* Moves DisableWurst button from Statistics to Wurst options
+* Fix for breaking Fabric API Update to 0.51.1 (ISSUE [Wurst-Imperium#625])
+* Fix Nobackground breaking Screens outside of game
 
 ## Downloads
 Try it out!
@@ -56,35 +63,37 @@ Thar be dragons!
 [Latest "Dev" Builds](https://github.com/TheGrandCurator/Cheddar-BratWurst7/actions/workflows/dev_client_build.yml)
 
 ### Wurst7 Pull Requests that have been merged
-|                                Wurst7PR                                 |                                       Decription                                       |
-|:-----------------------------------------------------------------------:|:--------------------------------------------------------------------------------------:|
-| [Wurst-Imperium#42](#https://github.com/Wurst-Imperium/Wurst7/pull/42)  |                    Added Randomize ChestSteal Speed to hide from AC                    |
-| [Wurst-Imperium#51](#https://github.com/Wurst-Imperium/Wurst7/pull/51)  |                  Improved ChestSteal Speed via mixed inventory checks                  |
-| [Wurst-Imperium#69](#https://github.com/Wurst-Imperium/Wurst7/pull/69)  |                       (nice) Added GG at end of HighPixel Games                        |
-| [Wurst-Imperium#80](#https://github.com/Wurst-Imperium/Wurst7/pull/80)  |                    Improved PlayerESP with Color By Armor (Bedwars)                    |
-| [Wurst-Imperium#85](#https://github.com/Wurst-Imperium/Wurst7/pull/85)  |                                   Added OreMinerHack                                   |
-| [Wurst-Imperium#93](#https://github.com/Wurst-Imperium/Wurst7/pull/93)  |                                     Added HUDHack                                      |
-| [Wurst-Imperium#96](#https://github.com/Wurst-Imperium/Wurst7/pull/96)  |           Added .equip command (to equip an inventory item to a hotbar slot)           |
-| [Wurst-Imperium#107](https://github.com/Wurst-Imperium/Wurst7/pull/107) |                      Improved PlayerESP to Filter to ONLY friends                      |
-| [Wurst-Imperium#109](https://github.com/Wurst-Imperium/Wurst7/pull/109) |                           Added DirectConnect Button In-game                           |
-| [Wurst-Imperium#118](https://github.com/Wurst-Imperium/Wurst7/pull/118) |          Improved NoFireOverlay to optionally lower, rather than remove fire           |
-| [Wurst-Imperium#128](https://github.com/Wurst-Imperium/Wurst7/pull/128) |                Improved Healthtags to optionally show numerical values                 |
-| [Wurst-Imperium#140](https://github.com/Wurst-Imperium/Wurst7/pull/140) |                    Added .hacklist command to unclutter the screen                     |
-| [Wurst-Imperium#212](https://github.com/Wurst-Imperium/Wurst7/pull/212) |                                 Added NoLevitationHack                                 |
-| [Wurst-Imperium#226](https://github.com/Wurst-Imperium/Wurst7/pull/226) |                                    Added NoFogHack                                     |
-| [Wurst-Imperium#297](https://github.com/Wurst-Imperium/Wurst7/pull/297) |                             Added "Legit" mode to XRayHack                             |
-| [Wurst-Imperium#318](https://github.com/Wurst-Imperium/Wurst7/pull/318) |                     Improved SearchHack by adding Tracers setting                      |
-| [Wurst-Imperium#395](https://github.com/Wurst-Imperium/Wurst7/pull/395) |                      Improved ItemESP by adding Item List Filter                       |
-| [Wurst-Imperium#396](https://github.com/Wurst-Imperium/Wurst7/pull/396) |                       Improved AutoFarm to include sweet berries                       |
-| [Wurst-Imperium#409](https://github.com/Wurst-Imperium/Wurst7/pull/409) |                     Added BetterChat (Timestamps on chat messages)                     |
-| [Wurst-Imperium#438](https://github.com/Wurst-Imperium/Wurst7/pull/438) |                                  Added ShearAuraHack                                   |
-| [Wurst-Imperium#464](https://github.com/Wurst-Imperium/Wurst7/pull/464) |               Improved the KillAura Hacks. Added Zombie Villager Filter                |
-| [Wurst-Imperium#469](https://github.com/Wurst-Imperium/Wurst7/pull/469) |                         Improved AutoFishHack Some AC settings                         |
-| [Wurst-Imperium#476](https://github.com/Wurst-Imperium/Wurst7/pull/476) | Fixes some Aura Hacks not working while in minecart/mounted (ISSUE Wurst-Imperium#475) |
-| [Wurst-Imperium#477](https://github.com/Wurst-Imperium/Wurst7/pull/477) |                                 Improved AutoTranslate                                 |
-| [Wurst-Imperium#497](https://github.com/Wurst-Imperium/Wurst7/pull/497) |                         Fixes Float Math Error in ItemESPHack                          |
-| [Wurst-Imperium#500](https://github.com/Wurst-Imperium/Wurst7/pull/500) |               Fixes BuildRandomHack Opening containers and getting stuck               |
-| [Wurst-Imperium#501](https://github.com/Wurst-Imperium/Wurst7/pull/501) |           Fixes ChestESPHack not showing barrels. (ISSUE Wurst-Imperium#439)           |
+|                                 Wurst7PR                                 |                                       Decription                                       |
+|:------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------:|
+|  [Wurst-Imperium#42](#https://github.com/Wurst-Imperium/Wurst7/pull/42)  |                    Added Randomize ChestSteal Speed to hide from AC                    |
+|  [Wurst-Imperium#51](#https://github.com/Wurst-Imperium/Wurst7/pull/51)  |                  Improved ChestSteal Speed via mixed inventory checks                  |
+|  [Wurst-Imperium#69](#https://github.com/Wurst-Imperium/Wurst7/pull/69)  |                       (nice) Added GG at end of HighPixel Games                        |
+|  [Wurst-Imperium#80](#https://github.com/Wurst-Imperium/Wurst7/pull/80)  |                    Improved PlayerESP with Color By Armor (Bedwars)                    |
+|  [Wurst-Imperium#85](#https://github.com/Wurst-Imperium/Wurst7/pull/85)  |                                   Added OreMinerHack                                   |
+|  [Wurst-Imperium#93](#https://github.com/Wurst-Imperium/Wurst7/pull/93)  |                                     Added HUDHack                                      |
+|  [Wurst-Imperium#96](#https://github.com/Wurst-Imperium/Wurst7/pull/96)  |           Added .equip command (to equip an inventory item to a hotbar slot)           |
+| [Wurst-Imperium#107](https://github.com/Wurst-Imperium/Wurst7/pull/107)  |                      Improved PlayerESP to Filter to ONLY friends                      |
+| [Wurst-Imperium#109](https://github.com/Wurst-Imperium/Wurst7/pull/109)  |                           Added DirectConnect Button In-game                           |
+| [Wurst-Imperium#118](https://github.com/Wurst-Imperium/Wurst7/pull/118)  |          Improved NoFireOverlay to optionally lower, rather than remove fire           |
+| [Wurst-Imperium#128](https://github.com/Wurst-Imperium/Wurst7/pull/128)  |                Improved Healthtags to optionally show numerical values                 |
+| [Wurst-Imperium#140](https://github.com/Wurst-Imperium/Wurst7/pull/140)  |                    Added .hacklist command to unclutter the screen                     |
+| [Wurst-Imperium#212](https://github.com/Wurst-Imperium/Wurst7/pull/212)  |                                 Added NoLevitationHack                                 |
+| [Wurst-Imperium#226](https://github.com/Wurst-Imperium/Wurst7/pull/226)  |                                    Added NoFogHack                                     |
+| [Wurst-Imperium#297](https://github.com/Wurst-Imperium/Wurst7/pull/297)  |                             Added "Legit" mode to XRayHack                             |
+| [Wurst-Imperium#318](https://github.com/Wurst-Imperium/Wurst7/pull/318)  |                     Improved SearchHack by adding Tracers setting                      |
+| [Wurst-Imperium#395](https://github.com/Wurst-Imperium/Wurst7/pull/395)  |                      Improved ItemESP by adding Item List Filter                       |
+| [Wurst-Imperium#396](https://github.com/Wurst-Imperium/Wurst7/pull/396)  |                       Improved AutoFarm to include sweet berries                       |
+| [Wurst-Imperium#409](https://github.com/Wurst-Imperium/Wurst7/pull/409)  |                     Added BetterChat (Timestamps on chat messages)                     |
+| [Wurst-Imperium#438](https://github.com/Wurst-Imperium/Wurst7/pull/438)  |                                  Added ShearAuraHack                                   |
+| [Wurst-Imperium#464](https://github.com/Wurst-Imperium/Wurst7/pull/464)  |               Improved the KillAura Hacks. Added Zombie Villager Filter                |
+| [Wurst-Imperium#469](https://github.com/Wurst-Imperium/Wurst7/pull/469)  |                         Improved AutoFishHack Some AC settings                         |
+| [Wurst-Imperium#476](https://github.com/Wurst-Imperium/Wurst7/pull/476)  | Fixes some Aura Hacks not working while in minecart/mounted (ISSUE Wurst-Imperium#475) |
+| [Wurst-Imperium#477](https://github.com/Wurst-Imperium/Wurst7/pull/477)  |                                 Improved AutoTranslate                                 |
+| [Wurst-Imperium#497](https://github.com/Wurst-Imperium/Wurst7/pull/497)  |                         Fixes Float Math Error in ItemESPHack                          |
+| [Wurst-Imperium#500](https://github.com/Wurst-Imperium/Wurst7/pull/500)  |               Fixes BuildRandomHack Opening containers and getting stuck               |
+| [Wurst-Imperium#501](https://github.com/Wurst-Imperium/Wurst7/pull/501)  |           Fixes ChestESPHack not showing barrels. (ISSUE Wurst-Imperium#439)           |
+| [Wurst-Imperium#552](#https://github.com/Wurst-Imperium/Wurst7/pull/552) |                                  ModMenu integration                                   |
+| [Wurst-Imperium#621](#https://github.com/Wurst-Imperium/Wurst7/pull/621) |                  Fix NoBackground breaking menus outside of gameplay                   |
 
 ## License
 
@@ -108,5 +117,4 @@ Thank you for your understanding - and thanks again for taking the time to contr
 |         [MaxCoding3](https://github.com/MaxCoding3)          |     [flestr](https://github.com/flestr)     |  [PanForPancakes](https://github.com/PanForPancakes)  |  [aleksilassila](https://github.com/aleksilassila)  |              [octeep](https://github.com/octeep)              |
 |           [SiongSng](https://github.com/SiongSng)            |     [js6pak](https://github.com/js6pak)     |   [allanshepherd](https://github.com/allanshepherd)   |        [cropbob](https://github.com/cropbob)        | [JamesTheAwesomeDude](https://github.com/JamesTheAwesomeDude) |
 |     [FlorianMichael](https://github.com/FlorianMichael)      |     [xuri02](https://github.com/xuri02)     |           [pcm1k](https://github.com/pcm1k)           |        [thyraxx](https://github.com/thyraxx)        |           [Dalethium](https://github.com/Dalethium)           |
-|           [ElementW](https://github.com/ElementW)            |      [KosmX](https://github.com/KosmX)      |                                                       |                                                     |                                                               |
-
+|           [ElementW](https://github.com/ElementW)            |      [KosmX](https://github.com/KosmX)      |         [sudofox](https://github.com/sudofox)         |                                                     |                                                               |
