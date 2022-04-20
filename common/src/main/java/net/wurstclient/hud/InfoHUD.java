@@ -16,7 +16,7 @@ public class InfoHUD {
 	private long prevTime;
 	private Map<String,Setting> settings;
 	public InfoHUD() {
-		settings = WurstClient.INSTANCE.getHax().hudHack.getSettings();
+		settings = WurstClient.INSTANCE.getHackRegistry().hudHack.getSettings();
 		prevTime = System.currentTimeMillis();
 		speed = 0;
 		prevPos = new Position(){

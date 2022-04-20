@@ -95,7 +95,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				hasHelp ? 149 : 302, 18, new LiteralText(primaryAction), b -> {
 					
 					TooManyHaxHack tooManyHax =
-						WurstClient.INSTANCE.getHax().tooManyHaxHack;
+						WurstClient.INSTANCE.getHackRegistry().tooManyHaxHack;
 					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 					{
 						ChatUtils.error(

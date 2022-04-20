@@ -41,7 +41,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 			cancellable = true)
 	private void onGetRainGradient(float f, CallbackInfoReturnable<Float> cir)
 	{
-		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
+		if(WurstClient.INSTANCE.getHackRegistry().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
 	}
 
@@ -49,7 +49,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	public float getSkyAngle(float tickDelta)
 	{
 		NoWeatherHack noWeatherHack =
-				WurstClient.INSTANCE.getHax().noWeatherHack;
+				WurstClient.INSTANCE.getHackRegistry().noWeatherHack;
 
 		long timeOfDay =
 				noWeatherHack.isTimeChanged() ? noWeatherHack.getChangedTime()
@@ -62,7 +62,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	public int getMoonPhase()
 	{
 		NoWeatherHack noWeatherHack =
-				WurstClient.INSTANCE.getHax().noWeatherHack;
+				WurstClient.INSTANCE.getHackRegistry().noWeatherHack;
 
 		if(noWeatherHack.isMoonPhaseChanged())
 			return noWeatherHack.getChangedMoonPhase();

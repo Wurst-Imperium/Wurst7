@@ -102,7 +102,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			ordinal = 0), method = "tickMovement()V")
 	private boolean wurstIsUsingItem(ClientPlayerEntity player)
 	{
-		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().noSlowdownHack.isEnabled())
 			return false;
 
 		return player.isUsingItem();
@@ -134,7 +134,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cancellable = true)
 	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
-		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
+		if(!WurstClient.INSTANCE.getHackRegistry().stepHack.isAutoJumpAllowed())
 			cir.setReturnValue(false);
 	}
 
@@ -144,7 +144,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			ordinal = 0), method = {"updateNausea()V"})
 	private void beforeUpdateNausea(CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHackRegistry().portalGuiHack.isEnabled())
 			return;
 
 		tempCurrentScreen = client.currentScreen;
@@ -215,7 +215,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected float getJumpVelocity()
 	{
 		return super.getJumpVelocity()
-				+ WurstClient.INSTANCE.getHax().highJumpHack
+				+ WurstClient.INSTANCE.getHackRegistry().highJumpHack
 				.getAdditionalJumpMotion();
 	}
 
@@ -223,7 +223,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected boolean clipAtLedge()
 	{
 		return super.clipAtLedge()
-				|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+				|| WurstClient.INSTANCE.getHackRegistry().safeWalkHack.isEnabled();
 	}
 
 	@Override
@@ -232,7 +232,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		Vec3d result = super.adjustMovementForSneaking(movement, type);
 
 		if(movement != null)
-			WurstClient.INSTANCE.getHax().safeWalkHack
+			WurstClient.INSTANCE.getHackRegistry().safeWalkHack
 					.onClipAtLedge(!movement.equals(result));
 
 		return result;
@@ -242,7 +242,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public boolean hasStatusEffect(StatusEffect effect)
 	{
 		FullbrightHack fullbright =
-				WurstClient.INSTANCE.getHax().fullbrightHack;
+				WurstClient.INSTANCE.getHackRegistry().fullbrightHack;
 
 		if(effect == StatusEffects.NIGHT_VISION
 				&& fullbright.isNightVisionActive())

@@ -29,7 +29,7 @@ public class InGameOverlayRendererMixin
 	private static void onRenderFireOverlay(MinecraftClient minecraftClient,
 		MatrixStack matrixStack, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldCancelOverlay())
+		if(WurstClient.INSTANCE.getHackRegistry().noFireOverlayHack.shouldCancelOverlay())
 			ci.cancel();
 	}
 	
@@ -38,7 +38,7 @@ public class InGameOverlayRendererMixin
 		constant = @Constant(doubleValue = -0.30000001192092896D))
 	private static double getFireOffset(double orig)
 	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldLowerOverlay())
+		if(WurstClient.INSTANCE.getHackRegistry().noFireOverlayHack.shouldLowerOverlay())
 			return -0.5;
 		return orig;
 	}
@@ -51,7 +51,7 @@ public class InGameOverlayRendererMixin
 		MinecraftClient minecraftClient, MatrixStack matrixStack,
 		CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().noOverlayHack.isEnabled())
 			ci.cancel();
 	}
 }

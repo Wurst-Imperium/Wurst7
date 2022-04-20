@@ -31,7 +31,7 @@ public abstract class RenderTickCounterMixin
 	public void onBeginRenderTick(long long_1,
 								  CallbackInfoReturnable<Integer> cir)
 	{
-		TimerHack timerHack = WurstClient.INSTANCE.getHax().timerHack;
+		TimerHack timerHack = WurstClient.INSTANCE.getHackRegistry().timerHack;
 		lastFrameDuration *= timerHack.getTimerSpeed();
 	}
 }

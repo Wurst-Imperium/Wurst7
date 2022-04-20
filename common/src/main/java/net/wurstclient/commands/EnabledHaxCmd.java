@@ -63,7 +63,7 @@ public final class EnabledHaxCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		String name = parseFileName(args[1]);
-		WURST.getHax().loadProfile(name);
+		WURST.currentHackProfile.loadProfile(name);
 		ChatUtils.message("Hacks loaded: " + name);
 	}
 	
@@ -76,7 +76,7 @@ public final class EnabledHaxCmd extends Command
 		
 		try
 		{
-			WURST.getHax().saveProfile(name);
+			WURST.currentHackProfile.saveProfile(name);
 			ChatUtils.message("Hacks saved: " + name);
 			
 		}catch(IOException | JsonException e)
@@ -100,7 +100,7 @@ public final class EnabledHaxCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		ArrayList<Path> files = WURST.getHax().listProfiles();
+		ArrayList<Path> files = WURST.currentHackProfile.listProfiles();
 		int page = parsePage(args);
 		int pages = (int)Math.ceil(files.size() / 8.0);
 		pages = Math.max(pages, 1);

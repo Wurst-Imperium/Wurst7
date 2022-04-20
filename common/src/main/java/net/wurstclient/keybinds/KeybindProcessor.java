@@ -7,6 +7,7 @@
  */
 package net.wurstclient.keybinds;
 
+import net.wurstclient.hack.HackRegistry;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -16,17 +17,16 @@ import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.util.ChatUtils;
 
 public final class KeybindProcessor implements KeyPressListener
 {
-	private final HackList hax;
-	private final KeybindList keybinds;
+	private final HackRegistry hax;
+	private final KeybindManaged keybinds;
 	private final CmdProcessor cmdProcessor;
 	
-	public KeybindProcessor(HackList hax, KeybindList keybinds,
-		CmdProcessor cmdProcessor)
+	public KeybindProcessor(HackRegistry hax, KeybindManaged keybinds,
+							CmdProcessor cmdProcessor)
 	{
 		this.hax = hax;
 		this.keybinds = keybinds;

@@ -153,15 +153,15 @@ public final class FightBotHack extends Hack
 	public void onEnable()
 	{
 		// disable other killauras
-		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().crystalAuraHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
-		WURST.getHax().killauraHack.setEnabled(false);
-		WURST.getHax().multiAuraHack.setEnabled(false);
-		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
-		WURST.getHax().tpAuraHack.setEnabled(false);
-		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHackRegistry().clickAuraHack.setEnabled(false);
+		WURST.getHackRegistry().crystalAuraHack.setEnabled(false);
+		WURST.getHackRegistry().killauraLegitHack.setEnabled(false);
+		WURST.getHackRegistry().killauraHack.setEnabled(false);
+		WURST.getHackRegistry().multiAuraHack.setEnabled(false);
+		WURST.getHackRegistry().protectHack.setEnabled(false);
+		WURST.getHackRegistry().triggerBotHack.setEnabled(false);
+		WURST.getHackRegistry().tpAuraHack.setEnabled(false);
+		WURST.getHackRegistry().tunnellerHack.setEnabled(false);
 		
 		pathFinder = new EntityPathFinder(MC.player);
 		
@@ -263,7 +263,7 @@ public final class FightBotHack extends Hack
 		if(entity == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		WURST.getHackRegistry().autoSwordHack.setSlot();
 		
 		if(useAi.isChecked())
 		{
@@ -307,7 +307,7 @@ public final class FightBotHack extends Hack
 			// control height if flying
 			if(!MC.player.isOnGround()
 				&& (MC.player.getAbilities().flying
-					|| WURST.getHax().flightHack.isEnabled())
+					|| WURST.getHackRegistry().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
@@ -338,7 +338,7 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// attack entity
-		WURST.getHax().criticalsHack.doCritical();
+		WURST.getHackRegistry().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, entity);
 		MC.player.swingHand(Hand.MAIN_HAND);
 	}

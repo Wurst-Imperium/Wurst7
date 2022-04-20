@@ -25,7 +25,6 @@ import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -54,7 +53,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackList;
+import net.wurstclient.hack.HackRegistry;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -117,15 +116,15 @@ public final class TunnellerHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().autoMineHack.setEnabled(false);
-		WURST.getHax().excavatorHack.setEnabled(false);
-		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().followHack.setEnabled(false);
-		WURST.getHax().instantBunkerHack.setEnabled(false);
-		WURST.getHax().nukerHack.setEnabled(false);
-		WURST.getHax().nukerLegitHack.setEnabled(false);
-		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHackRegistry().autoMineHack.setEnabled(false);
+		WURST.getHackRegistry().excavatorHack.setEnabled(false);
+		WURST.getHackRegistry().fightBotHack.setEnabled(false);
+		WURST.getHackRegistry().followHack.setEnabled(false);
+		WURST.getHackRegistry().instantBunkerHack.setEnabled(false);
+		WURST.getHackRegistry().nukerHack.setEnabled(false);
+		WURST.getHackRegistry().nukerLegitHack.setEnabled(false);
+		WURST.getHackRegistry().protectHack.setEnabled(false);
+		WURST.getHackRegistry().speedNukerHack.setEnabled(false);
 		
 		// add listeners
 		EVENTS.add(UpdateListener.class, this);
@@ -167,7 +166,7 @@ public final class TunnellerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		HackList hax = WURST.getHax();
+		HackRegistry hax = WURST.getHackRegistry();
 		Hack[] incompatibleHax = {hax.autoSwitchHack, hax.autoToolHack,
 			hax.autoWalkHack, hax.blinkHack, hax.flightHack,
 			hax.scaffoldWalkHack, hax.sneakHack};
@@ -436,7 +435,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			WURST.getHax().autoToolHack.equipBestTool(currentBlock, false, true,
+			WURST.getHackRegistry().autoToolHack.equipBestTool(currentBlock, false, true,
 				false);
 			breakBlock(currentBlock);
 			
@@ -551,7 +550,7 @@ public final class TunnellerHack extends Hack
 				placeBlockSimple(pos);
 			else
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
+				WURST.getHackRegistry().autoToolHack.equipBestTool(pos, false, true,
 					false);
 				breakBlock(pos);
 			}

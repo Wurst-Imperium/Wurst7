@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.wurstclient.util.profiles.ProfileList;
+import net.wurstclient.util.profiles.ManagedProfile;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -28,15 +28,15 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.json.JsonException;
 
-public class ManageProfilesScreen extends Screen
+public class ProfilesScreen extends Screen
 {
     private final Screen prevScreen;
 
     private ListGui listGui;
     private ButtonWidget loadButton;
-    ProfileList profiles;
+    private final ManagedProfile profiles;
 
-    public ManageProfilesScreen(Screen prevScreen, ProfileList profiles)
+    public ProfilesScreen(Screen prevScreen, ManagedProfile profiles)
     {
         super(new LiteralText(""));
         this.prevScreen = prevScreen;

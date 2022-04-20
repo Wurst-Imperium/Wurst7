@@ -27,7 +27,7 @@ public final class BlinkCmd extends Command
 		if(args.length > 1)
 			throw new CmdSyntaxError();
 		
-		BlinkHack blinkHack = WURST.getHax().blinkHack;
+		BlinkHack blinkHack = WURST.getHackRegistry().blinkHack;
 		
 		if(args.length == 0)
 		{

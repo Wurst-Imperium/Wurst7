@@ -47,7 +47,7 @@ public final class CmdProcessor implements ChatOutputListener
 			Command cmd = parseCmd(input);
 			
 			TooManyHaxHack tooManyHax =
-				WurstClient.INSTANCE.getHax().tooManyHaxHack;
+				WurstClient.INSTANCE.getHackRegistry().tooManyHaxHack;
 			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(cmd))
 			{
 				ChatUtils.error(cmd.getName() + " is blocked by TooManyHax.");

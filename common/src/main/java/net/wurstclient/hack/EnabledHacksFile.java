@@ -8,11 +8,11 @@
 package net.wurstclient.hack;
 
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
-import net.wurstclient.WurstClient;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.wurstclient.util.profiles.ProfileFileReader;
 
 public final class EnabledHacksFile extends ProfileFileReader
@@ -22,19 +22,12 @@ public final class EnabledHacksFile extends ProfileFileReader
 	}
 
 
-	public Set<Hack> loadHacks() {
-		Set<Hack> hackSet = new HashSet<>();
-
-		for (Map.Entry<String, String> entry : load().getAllStrings().entrySet()) {
+	public TreeMap<String, Boolean> loadHacks() {
+		TreeMap<String, Boolean> hackSet = new TreeMap<>();
+		JsonObject fileContents = load().toJsonObject();
+		for (Map.Entry<String, JsonElement> entry : fileContents.entrySet()) {
 			String keyName = entry.getKey();
-			boolean isEnabled = Boolean.parseBoolean(entry.getValue());
-
-			if (isInvalidKeyName(keyName))
-				continue;
-
-			Hack hack = WurstClient.INSTANCE.getHax().getHackByName(keyName);
-			hack.setEnabled(isEnabled);
-			hackSet.add(hack);
+			hackSet.put(keyName, Boolean.parseBoolean(String.valueOf(entry.getValue())));
 		}
 		return hackSet;
 	}

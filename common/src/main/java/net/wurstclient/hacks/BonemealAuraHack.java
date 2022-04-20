@@ -108,7 +108,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// wait for AutoFarm
-		if(WURST.getHax().autoFarmHack.isBusy())
+		if(WURST.getHackRegistry().autoFarmHack.isBusy())
 			return;
 		
 		// check held item

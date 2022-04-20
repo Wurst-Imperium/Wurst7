@@ -30,7 +30,7 @@ public final class ExcavateCmd extends Command
 		
 		BlockPos pos1 = argsToXyzPos(args[0], args[1], args[2]);
 		BlockPos pos2 = argsToXyzPos(args[3], args[4], args[5]);
-		WURST.getHax().excavatorHack.enableWithArea(pos1, pos2);
+		WURST.getHackRegistry().excavatorHack.enableWithArea(pos1, pos2);
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError

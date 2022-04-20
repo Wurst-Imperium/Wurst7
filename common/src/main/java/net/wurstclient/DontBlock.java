@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * etc.)
  * <li>would potentially brick the whole client (e.g. ClickGUI)
  * <li>would get the feature stuck in its current state rather than turning it
- * off (e.g. HackList, WurstLogo)
+ * off (e.g. ManagedHacks, WurstLogo)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

@@ -82,14 +82,14 @@ public final class FeedAuraHack extends Hack
 	protected void onEnable()
 	{
 		// disable other auras
-		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
-		WURST.getHax().multiAuraHack.setEnabled(false);
-		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
-		WURST.getHax().tpAuraHack.setEnabled(false);
-		WURST.getHax().shearAuraHack.setEnabled(false);
+		WURST.getHackRegistry().clickAuraHack.setEnabled(false);
+		WURST.getHackRegistry().fightBotHack.setEnabled(false);
+		WURST.getHackRegistry().killauraLegitHack.setEnabled(false);
+		WURST.getHackRegistry().multiAuraHack.setEnabled(false);
+		WURST.getHackRegistry().protectHack.setEnabled(false);
+		WURST.getHackRegistry().triggerBotHack.setEnabled(false);
+		WURST.getHackRegistry().tpAuraHack.setEnabled(false);
+		WURST.getHackRegistry().shearAuraHack.setEnabled(false);
 
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PostMotionListener.class, this);

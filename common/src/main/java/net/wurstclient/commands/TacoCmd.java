@@ -89,7 +89,7 @@ public final class TacoCmd extends Command
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
-		if(WURST.getHax().rainbowUiHack.isEnabled())
+		if(WURST.getHackRegistry().rainbowUiHack.isEnabled())
 		{
 			float[] acColor = WURST.getGui().getAcColor();
 			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 1);

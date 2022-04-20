@@ -24,7 +24,6 @@ import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
-import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
@@ -100,16 +99,16 @@ public class WurstOptionsScreen extends Screen {
     private void addManagerButtons() {
         new WurstOptionsButton(-50, 24, () -> "Enabled Hacks",
                 "Profiles to Enable or Disable Hacks",
-                b -> WurstClient.setScreen(new ManageProfilesScreen(this, WurstClient.INSTANCE.getHax())));
+                b -> WurstClient.setScreen(new EnabledHacksManagerScreen(this)));
         new WurstOptionsButton(-50, 48, () -> "Keybinds",
                 "Keybinds allow you to toggle any hack\n"
                         + "or command by simply pressing a\n" + "button.",
-                b -> WurstClient.setScreen(new ManageProfilesScreen(this, WurstClient.INSTANCE.getKeybinds()) {
+                b -> WurstClient.setScreen(new KeybindManagerScreen(this) {
                 }));
 
         new WurstOptionsButton(-50, 72, () -> "X-Ray Blocks",
                 "Manager for the blocks\n" + "that X-Ray will show.",
-                b -> WurstClient.INSTANCE.getHax().xRayHack.openBlockListEditor(this));
+                b -> WurstClient.INSTANCE.getHackRegistry().xRayHack.openBlockListEditor(this));
 
         new WurstOptionsButton(-50, 96, () -> "Zoom",
                 "The Zoom Manager allows you to\n"

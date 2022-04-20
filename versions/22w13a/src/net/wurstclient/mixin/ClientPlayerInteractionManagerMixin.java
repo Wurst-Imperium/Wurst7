@@ -34,7 +34,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
-import net.wurstclient.hack.HackList;
+import net.wurstclient.hack.HackRegistry;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -72,7 +72,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 			cancellable = true)
 	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
+		HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
 		if(hax == null || !hax.reachHack.isEnabled())
 			return;
 
@@ -84,7 +84,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 			cancellable = true)
 	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
+		HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
 		if(hax == null || !hax.reachHack.isEnabled())
 			return;
 

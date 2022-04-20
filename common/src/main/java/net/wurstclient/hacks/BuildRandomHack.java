@@ -91,7 +91,7 @@ public final class BuildRandomHack extends Hack
 	{
 		lastPos = null;
 		
-		if(WURST.getHax().freecamHack.isEnabled())
+		if(WURST.getHackRegistry().freecamHack.isEnabled())
 			return;
 		
 		// check timer

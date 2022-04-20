@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public abstract class ProfileList{
+public abstract class ManagedProfile {
 
     public Path profilesFolder;
 
@@ -31,6 +31,8 @@ public abstract class ProfileList{
         }
     }
 
+    public abstract String getDisplayName();
+
     public abstract void loadProfile(String fileName) throws IOException, JsonException;
 
     public abstract void saveProfile(String fileName) throws IOException, JsonException;
@@ -41,4 +43,8 @@ public abstract class ProfileList{
     }
 
     public abstract JsonObject createJson();
+
+    public abstract int size();
+
+    public abstract void setDefaults();
 }

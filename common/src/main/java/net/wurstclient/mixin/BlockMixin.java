@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.hack.HackRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +22,6 @@ import net.minecraft.world.BlockView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
-import net.wurstclient.hack.HackList;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
@@ -46,7 +46,7 @@ public abstract class BlockMixin implements ItemConvertible
 			cancellable = true)
 	private void onGetVelocityMultiplier(CallbackInfoReturnable<Float> cir)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
+		HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
 		if(hax == null || !hax.noSlowdownHack.isEnabled())
 			return;
 

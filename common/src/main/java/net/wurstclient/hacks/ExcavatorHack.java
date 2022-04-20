@@ -96,13 +96,13 @@ public final class ExcavatorHack extends Hack
 	{
 		// disable conflicting hacks
 		// TODO:
-		// WURST.getHax().bowAimbotMod.setEnabled(false);
-		// WURST.getHax().templateToolMod.setEnabled(false);
-		WURST.getHax().autoMineHack.setEnabled(false);
-		WURST.getHax().nukerHack.setEnabled(false);
-		WURST.getHax().nukerLegitHack.setEnabled(false);
-		WURST.getHax().speedNukerHack.setEnabled(false);
-		WURST.getHax().tunnellerHack.setEnabled(false);
+		// WURST.getHackRegistry().bowAimbotMod.setEnabled(false);
+		// WURST.getHackRegistry().templateToolMod.setEnabled(false);
+		WURST.getHackRegistry().autoMineHack.setEnabled(false);
+		WURST.getHackRegistry().nukerHack.setEnabled(false);
+		WURST.getHackRegistry().nukerLegitHack.setEnabled(false);
+		WURST.getHackRegistry().speedNukerHack.setEnabled(false);
+		WURST.getHackRegistry().tunnellerHack.setEnabled(false);
 		
 		step = Step.START_POS;
 		

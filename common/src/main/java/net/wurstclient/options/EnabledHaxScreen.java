@@ -42,7 +42,7 @@ public final class EnabledHaxScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(client, this, WurstClient.INSTANCE.getHax().listProfiles());
+		listGui = new ListGui(client, this, WurstClient.INSTANCE.currentHackProfile.listProfiles());
 
 		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
 				new LiteralText("Open Folder"), b -> openFolder()));
@@ -62,7 +62,7 @@ public final class EnabledHaxScreen extends Screen
 	private void openFolder()
 	{
 		Util.getOperatingSystem().open(
-				WurstClient.INSTANCE.getHax().getProfilesFolder().toFile());
+				WurstClient.INSTANCE.currentHackProfile.getProfilesFolder().toFile());
 	}
 
 	private void newProfile(String name)
@@ -72,7 +72,7 @@ public final class EnabledHaxScreen extends Screen
 
 		try
 		{
-			WurstClient.INSTANCE.getHax().saveProfile(name);
+			WurstClient.INSTANCE.currentHackProfile.saveProfile(name);
 
 		}catch(IOException | JsonException e)
 		{
@@ -90,7 +90,7 @@ public final class EnabledHaxScreen extends Screen
 
 		Path path = listGui.list.get(listGui.selected);
 		String fileName = "" + path.getFileName();
-		WurstClient.INSTANCE.getHax().loadProfile(fileName);
+		WurstClient.INSTANCE.currentHackProfile.loadProfile(fileName);
 		openPrevScreen();
 	}
 

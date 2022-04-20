@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.minecraft.client.util.InputUtil;
 import net.wurstclient.util.profiles.ProfileFileReader;
 
 public final class KeybindsFile extends ProfileFileReader{
@@ -34,6 +35,15 @@ public final class KeybindsFile extends ProfileFileReader{
             newKeybinds.add(keybind);
         }
         return newKeybinds;
+    }
+
+    private boolean isInvalidKeyName(String key) {
+        try {
+            InputUtil.fromTranslationKey(key);
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
+        return false;
     }
 
 }

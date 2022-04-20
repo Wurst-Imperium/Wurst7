@@ -35,8 +35,8 @@ public final class FlightHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().creativeFlightHack.setEnabled(false);
-		WURST.getHax().jetpackHack.setEnabled(false);
+		WURST.getHackRegistry().creativeFlightHack.setEnabled(false);
+		WURST.getHackRegistry().jetpackHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);

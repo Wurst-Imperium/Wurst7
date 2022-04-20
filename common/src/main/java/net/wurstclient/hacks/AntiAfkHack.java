@@ -100,7 +100,7 @@ public final class AntiAfkHack extends Hack
 			if(timer > 0)
 			{
 				timer--;
-				if(!WURST.getHax().jesusHack.isEnabled())
+				if(!WURST.getHackRegistry().jesusHack.isEnabled())
 					WurstClient.MC_GAME_OPTIONS.getJumpKey().setPressed(MC.player.isTouchingWater());
 				return;
 			}

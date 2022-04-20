@@ -26,7 +26,7 @@ public abstract class LivingEntityRendererMixin
 			"render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"})
 	private boolean canWurstSeePlayer(LivingEntity e, PlayerEntity player)
 	{
-		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().trueSightHack.isEnabled())
 			return false;
 		
 		return e.isInvisibleTo(player);

@@ -34,13 +34,13 @@ public class PathFinder
 	private final boolean creativeFlying =
 		WurstClient.MC.player.getAbilities().flying;
 	protected final boolean flying =
-		creativeFlying || wurst.getHax().flightHack.isEnabled();
+		creativeFlying || wurst.getHackRegistry().flightHack.isEnabled();
 	private final boolean immuneToFallDamage =
-		invulnerable || wurst.getHax().noFallHack.isEnabled();
+		invulnerable || wurst.getHackRegistry().noFallHack.isEnabled();
 	private final boolean noWaterSlowdown =
-		wurst.getHax().antiWaterPushHack.isPreventingSlowdown();
-	private final boolean jesus = wurst.getHax().jesusHack.isEnabled();
-	private final boolean spider = wurst.getHax().spiderHack.isEnabled();
+		wurst.getHackRegistry().antiWaterPushHack.isPreventingSlowdown();
+	private final boolean jesus = wurst.getHackRegistry().jesusHack.isEnabled();
+	private final boolean spider = wurst.getHackRegistry().spiderHack.isEnabled();
 	protected boolean fallingAllowed = true;
 	protected boolean divingAllowed = true;
 	
@@ -622,13 +622,13 @@ public class PathFinder
 		// check player abilities
 		if(invulnerable != WurstClient.MC.player.getAbilities().creativeMode
 			|| flying != (creativeFlying
-				|| wurst.getHax().flightHack.isEnabled())
+				|| wurst.getHackRegistry().flightHack.isEnabled())
 			|| immuneToFallDamage != (invulnerable
-				|| wurst.getHax().noFallHack.isEnabled())
-			|| noWaterSlowdown != wurst.getHax().antiWaterPushHack
+				|| wurst.getHackRegistry().noFallHack.isEnabled())
+			|| noWaterSlowdown != wurst.getHackRegistry().antiWaterPushHack
 				.isPreventingSlowdown()
-			|| jesus != wurst.getHax().jesusHack.isEnabled()
-			|| spider != wurst.getHax().spiderHack.isEnabled())
+			|| jesus != wurst.getHackRegistry().jesusHack.isEnabled()
+			|| spider != wurst.getHackRegistry().spiderHack.isEnabled())
 			return false;
 		
 		// if index is zero, check if first pos is safe

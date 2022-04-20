@@ -17,15 +17,15 @@ import java.util.Set;
 import com.google.gson.JsonObject;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.json.JsonException;
-import net.wurstclient.util.profiles.ProfileList;
+import net.wurstclient.util.profiles.ManagedProfile;
 
-public final class KeybindList extends ProfileList {
+public final class KeybindManaged extends ManagedProfile {
     public static final Set<Keybind> DEFAULT_KEYBINDS = createDefaultKeybinds();
     private final ArrayList<Keybind> keybinds = new ArrayList<>();
 
     private KeybindsFile currentKeybindsFile;
 
-    public KeybindList(String defaultKeybindFile) {
+    public KeybindManaged(String defaultKeybindFile) {
         this.profilesFolder = WurstClient.INSTANCE.getWurstFolder().resolve("keybinds");
         this.currentKeybindsFile = new KeybindsFile(this.profilesFolder.resolve(defaultKeybindFile));
         this.loadProfileKeybinds();
@@ -81,6 +81,11 @@ public final class KeybindList extends ProfileList {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Keybinds " + currentKeybindsFile.getBaseName();
+    }
+
+    @Override
     public void loadProfile(String fileName) throws IOException, JsonException {
         currentKeybindsFile = new KeybindsFile(profilesFolder.resolve(fileName));
         Set<Keybind> profileKeybinds = currentKeybindsFile.loadKeybinds();
@@ -101,6 +106,16 @@ public final class KeybindList extends ProfileList {
         for (Keybind kb : this.getAllKeybinds())
             json.addProperty(kb.getKey(), kb.getCommands());
         return json;
+    }
+
+    @Override
+    public int size() {
+        return this.keybinds.size();
+    }
+
+    @Override
+    public void setDefaults() {
+        setDefaultKeybinds();
     }
 
     private static Set<Keybind> createDefaultKeybinds() {

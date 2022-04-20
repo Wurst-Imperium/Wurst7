@@ -77,7 +77,7 @@ public final class ClickGui
 			windowMap.put(category, new Window(category.getName()));
 		
 		ArrayList<Feature> features = new ArrayList<>();
-		features.addAll(WURST.getHax().getAllHax());
+		features.addAll(WURST.getHackRegistry().getAllHax());
 		features.addAll(WURST.getCmds().getAllCmds());
 		features.addAll(WURST.getOtfs().getAllOtfs());
 		
@@ -90,7 +90,7 @@ public final class ClickGui
 		Window uiSettings = new Window("UI Settings");
 		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
-		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
+		ClickGuiHack clickGuiHack = WURST.getHackRegistry().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(uiSettings::add);
 		windows.add(uiSettings);
@@ -98,7 +98,7 @@ public final class ClickGui
 		for(Window window : windows)
 			window.setMinimized(true);
 		
-		windows.add(WurstClient.INSTANCE.getHax().radarHack.getWindow());
+		windows.add(WurstClient.INSTANCE.getHackRegistry().radarHack.getWindow());
 		
 		int x = 5;
 		int y = 5;
@@ -604,14 +604,14 @@ public final class ClickGui
 	
 	public void updateColors()
 	{
-		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
+		ClickGuiHack clickGui = WURST.getHackRegistry().clickGuiHack;
 		
 		opacity = clickGui.getOpacity();
 		ttOpacity = clickGui.getTooltipOpacity();
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
 		
-		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().rainbowUiHack.isEnabled())
 		{
 			float x = System.currentTimeMillis() % 2000 / 1000F;
 			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);

@@ -183,14 +183,14 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	public void onEnable()
 	{
 		// disable other killauras
-		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().killauraHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
-		WURST.getHax().multiAuraHack.setEnabled(false);
-		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
-		WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHackRegistry().clickAuraHack.setEnabled(false);
+		WURST.getHackRegistry().fightBotHack.setEnabled(false);
+		WURST.getHackRegistry().killauraHack.setEnabled(false);
+		WURST.getHackRegistry().killauraLegitHack.setEnabled(false);
+		WURST.getHackRegistry().multiAuraHack.setEnabled(false);
+		WURST.getHackRegistry().protectHack.setEnabled(false);
+		WURST.getHackRegistry().triggerBotHack.setEnabled(false);
+		WURST.getHackRegistry().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 	}

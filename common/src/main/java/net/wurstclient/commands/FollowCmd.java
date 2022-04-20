@@ -32,7 +32,7 @@ public final class FollowCmd extends Command
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		FollowHack followHack = WURST.getHax().followHack;
+		FollowHack followHack = WURST.getHackRegistry().followHack;
 		
 		if(followHack.isEnabled())
 			followHack.setEnabled(false);

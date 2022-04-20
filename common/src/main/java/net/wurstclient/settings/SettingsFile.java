@@ -24,7 +24,7 @@ import net.wurstclient.Feature;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.Command;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackList;
+import net.wurstclient.hack.HackRegistry;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.util.json.JsonException;
@@ -37,14 +37,14 @@ public final class SettingsFile
 	private final Map<String, Feature> featuresWithSettings;
 	private boolean disableSaving;
 	
-	public SettingsFile(Path path, HackList hax, CmdList cmds, OtfList otfs)
+	public SettingsFile(Path path, HackRegistry hax, CmdList cmds, OtfList otfs)
 	{
 		this.path = path;
 		featuresWithSettings = createFeatureMap(hax, cmds, otfs);
 	}
 	
-	private Map<String, Feature> createFeatureMap(HackList hax, CmdList cmds,
-		OtfList otfs)
+	private Map<String, Feature> createFeatureMap(HackRegistry hax, CmdList cmds,
+												  OtfList otfs)
 	{
 		LinkedHashMap<String, Feature> map = new LinkedHashMap<>();
 		

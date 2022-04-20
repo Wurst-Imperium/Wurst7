@@ -38,7 +38,7 @@ public final class PanicHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		for(Hack hack : WURST.getHax().getAllHax())
+		for(Hack hack : WURST.getHackRegistry().getAllHax())
 			if(hack.isEnabled() && hack != this)
 				hack.setEnabled(false);
 			

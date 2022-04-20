@@ -336,7 +336,7 @@ public final class AutoFishHack extends Hack
 				ChatUtils.message(
 						"You can't get any treasure items while fishing like this.");
 
-				if(!WURST.getHax().openWaterEspHack.isEnabled())
+				if(!WURST.getHackRegistry().openWaterEspHack.isEnabled())
 					ChatUtils.message("Use OpenWaterESP to find open water.");
 			}
 		}

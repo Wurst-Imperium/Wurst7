@@ -43,7 +43,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		int i, CallbackInfo ci)
 	{
 		if(entity instanceof LivingEntity)
-			text = WurstClient.INSTANCE.getHax().healthTagsHack
+			text = WurstClient.INSTANCE.getHackRegistry().healthTagsHack
 				.addHealth((LivingEntity)entity, text);
 		
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
@@ -64,7 +64,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		if(d > 4096)
 			return;
 		
-		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHackRegistry().nameTagsHack;
 		
 		boolean bl = !entity.isSneaky() || nameTagsHack.isEnabled();
 		float f = entity.getHeight() + 0.5F;

@@ -31,7 +31,7 @@ public final class TCmd extends Command
 		if(args.length < 1 || args.length > 2)
 			throw new CmdSyntaxError();
 		
-		Hack hack = WURST.getHax().getHackByName(args[0]);
+		Hack hack = WURST.getHackRegistry().getHackByName(args[0]);
 		if(hack == null)
 			throw new CmdError("Unknown hack: " + args[0]);
 		
@@ -55,7 +55,7 @@ public final class TCmd extends Command
 	
 	private void setEnabled(Hack hack, boolean enabled)
 	{
-		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		TooManyHaxHack tooManyHax = WURST.getHackRegistry().tooManyHaxHack;
 		if(!hack.isEnabled() && tooManyHax.isEnabled()
 			&& tooManyHax.isBlocked(hack))
 		{

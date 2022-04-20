@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.wurstclient.events.*;
+import net.wurstclient.hack.HackRegistry;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -30,16 +32,10 @@ import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.Command;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ChatOutputListener;
-import net.wurstclient.events.GUIRenderListener;
-import net.wurstclient.events.KeyPressListener;
-import net.wurstclient.events.PostMotionListener;
-import net.wurstclient.events.PreMotionListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hack.HackList;
+import net.wurstclient.hack.ManagedHacks;
 import net.wurstclient.hud.IngameHUD;
-import net.wurstclient.keybinds.KeybindList;
+import net.wurstclient.keybinds.KeybindManaged;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
@@ -52,10 +48,9 @@ import net.wurstclient.core.MCGameOptions;
 import net.wurstclient.core.MCScreen;
 import net.wurstclient.core.MCWorld;
 import net.wurstclient.core.MCResourceManager;
-import net.wurstclient.ClientVersion;
 
 
-public enum WurstClient
+public enum WurstClient implements GameSessionEventListener
 {
 	INSTANCE;
 	
@@ -70,30 +65,29 @@ public enum WurstClient
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
 	private AltManager altManager;
-	private HackList hax;
+	private HackRegistry hacks;
+	public ManagedHacks currentHackProfile;
 	private CmdList cmds;
 	private OtfList otfs;
 	private SettingsFile settingsFile;
 	private Path settingsProfileFolder;
-	private KeybindList keybinds;
+	private KeybindManaged keybinds;
 	private ClickGui gui;
 	private Navigator navigator;
 	private CmdProcessor cmdProcessor;
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
 	private FriendsList friends;
-	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private Path wurstFolder;
-	
+	public static boolean isInGame = false;
 	private KeyBinding zoomKey;
-	
+
 	public void initialize()
 	{
 		System.out.println("Starting CheddarBrat-Wurst Client...");
-		
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
@@ -102,8 +96,8 @@ public enum WurstClient
 		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
 		
 		eventManager = new EventManager(this);
-		
-		hax = new HackList("DEFAULT.json");
+		hacks = new HackRegistry();
+		currentHackProfile = new ManagedHacks("DEFAULT.json");
 
 		cmds = new CmdList();
 		
@@ -111,17 +105,17 @@ public enum WurstClient
 		
 		Path settingsFile = wurstFolder.resolve("settings.json");
 		settingsProfileFolder = wurstFolder.resolve("settings");
-		this.settingsFile = new SettingsFile(settingsFile, hax, cmds, otfs);
+		this.settingsFile = new SettingsFile(settingsFile, hacks, cmds, otfs);
 		this.settingsFile.load();
-		hax.tooManyHaxHack.loadBlockedHacksFile();
+		hacks.tooManyHaxHack.loadBlockedHacksFile();
 		
-		keybinds = new KeybindList("DEFAULT.json");
+		keybinds = new KeybindManaged("DEFAULT.json");
 
 		Path guiFile = wurstFolder.resolve("windows.json");
 		gui = new ClickGui(guiFile);
 		
 		Path preferencesFile = wurstFolder.resolve("preferences.json");
-		navigator = new Navigator(preferencesFile, hax, cmds, otfs);
+		navigator = new Navigator(preferencesFile, hacks, cmds, otfs);
 		
 		Path friendsFile = wurstFolder.resolve("friends.json");
 		friends = new FriendsList(friendsFile);
@@ -131,7 +125,7 @@ public enum WurstClient
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
 		
 		KeybindProcessor keybindProcessor =
-			new KeybindProcessor(hax, keybinds, cmdProcessor);
+			new KeybindProcessor(hacks, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
 		
 		hud = new IngameHUD();
@@ -173,7 +167,7 @@ public enum WurstClient
 		
 		return wurstFolder;
 	}
-	
+
 	public String translate(String key)
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
@@ -225,9 +219,9 @@ public enum WurstClient
 		settingsFile.saveProfile(settingsProfileFolder.resolve(fileName));
 	}
 	
-	public HackList getHax()
+	public HackRegistry getHackRegistry()
 	{
-		return hax;
+		return hacks;
 	}
 	
 	public CmdList getCmds()
@@ -242,7 +236,7 @@ public enum WurstClient
 	
 	public Feature getFeatureByName(String name)
 	{
-		Hack hack = getHax().getHackByName(name);
+		Hack hack = getHackRegistry().getHackByName(name);
 		if(hack != null)
 			return hack;
 		
@@ -254,7 +248,7 @@ public enum WurstClient
 		return otf;
 	}
 	
-	public KeybindList getKeybinds()
+	public KeybindManaged getKeybinds()
 	{
 		return keybinds;
 	}
@@ -306,8 +300,8 @@ public enum WurstClient
 		
 		if(!enabled)
 		{
-			hax.panicHack.setEnabled(true);
-			hax.panicHack.onUpdate();
+			//hacks.panicHack.setEnabled(true); // Janky hacks mate?
+			//hacks.panicHack.onUpdate();
 		}
 	}
 	
@@ -333,5 +327,10 @@ public enum WurstClient
 
 	public static void setScreen(Screen screen){
 		MCScreen.MCSetScreen(MC, screen);
+	}
+
+	@Override
+	public void onSessionChange(GameSessionEvent gameSessionEvent) {
+		isInGame = gameSessionEvent.getIsStarting();
 	}
 }

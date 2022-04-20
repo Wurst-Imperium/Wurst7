@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class LivingEntityMixin
 {
 	private final NoLevitationHack noLevitation =
-			WurstClient.INSTANCE.getHax().noLevitationHack;
+			WurstClient.INSTANCE.getHackRegistry().noLevitationHack;
 
 	@Inject(at = @At("HEAD"), method = "hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z", cancellable = true)
 	private void hasStatusEffect(StatusEffect effect, CallbackInfoReturnable<Boolean> cir)

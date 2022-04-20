@@ -151,18 +151,18 @@ public final class ProtectHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().followHack.setEnabled(false);
-		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHackRegistry().followHack.setEnabled(false);
+		WURST.getHackRegistry().tunnellerHack.setEnabled(false);
 		
 		// disable other killauras
-		WURST.getHax().clickAuraHack.setEnabled(false);
-		WURST.getHax().crystalAuraHack.setEnabled(false);
-		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
-		WURST.getHax().killauraHack.setEnabled(false);
-		WURST.getHax().multiAuraHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
-		WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHackRegistry().clickAuraHack.setEnabled(false);
+		WURST.getHackRegistry().crystalAuraHack.setEnabled(false);
+		WURST.getHackRegistry().fightBotHack.setEnabled(false);
+		WURST.getHackRegistry().killauraLegitHack.setEnabled(false);
+		WURST.getHackRegistry().killauraHack.setEnabled(false);
+		WURST.getHackRegistry().multiAuraHack.setEnabled(false);
+		WURST.getHackRegistry().triggerBotHack.setEnabled(false);
+		WURST.getHackRegistry().tpAuraHack.setEnabled(false);
 		
 		// set friend
 		if(friend == null)
@@ -346,7 +346,7 @@ public final class ProtectHack extends Hack
 			// control height if flying
 			if(!MC.player.isOnGround()
 				&& (MC.player.getAbilities().flying
-					|| WURST.getHax().flightHack.isEnabled())
+					|| WURST.getHackRegistry().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
 					target.getZ()) <= MC.player.squaredDistanceTo(
 						MC.player.getX(), target.getY(), MC.player.getZ()))
@@ -370,14 +370,14 @@ public final class ProtectHack extends Hack
 		
 		if(target == enemy)
 		{
-			WURST.getHax().autoSwordHack.setSlot();
+			WURST.getHackRegistry().autoSwordHack.setSlot();
 			
 			// check cooldown
 			if(MC.player.getAttackCooldownProgress(0) < 1)
 				return;
 			
 			// attack enemy
-			WURST.getHax().criticalsHack.doCritical();
+			WURST.getHackRegistry().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(MC.player, enemy);
 			MC.player.swingHand(Hand.MAIN_HAND);
 		}

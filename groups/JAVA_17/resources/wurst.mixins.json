@@ -54,13 +54,13 @@
     "ShulkerBoxScreenMixin",
     "SignEditScreenMixin",
     "SodiumBlockOcclusionCacheMixin",
-    "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WorldMixin"
+    "WorldMixin",
+    "GameSessionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

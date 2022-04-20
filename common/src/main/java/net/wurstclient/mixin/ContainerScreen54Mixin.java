@@ -33,7 +33,7 @@ public abstract class ContainerScreen54Mixin
     private int rows;
 
     private final AutoStealHack autoSteal =
-            WurstClient.INSTANCE.getHax().autoStealHack;
+            WurstClient.INSTANCE.getHackRegistry().autoStealHack;
     private int mode;
 
     public ContainerScreen54Mixin(WurstClient wurst,

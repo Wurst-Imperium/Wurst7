@@ -55,7 +55,7 @@ public final class TabGui implements KeyPressListener
 			tabMap.put(category, new Tab(category.getName()));
 		
 		ArrayList<Feature> features = new ArrayList<>();
-		features.addAll(WurstClient.INSTANCE.getHax().getAllHax());
+		features.addAll(WurstClient.INSTANCE.getHackRegistry().getAllHax());
 		features.addAll(WurstClient.INSTANCE.getCmds().getAllCmds());
 		features.addAll(WurstClient.INSTANCE.getOtfs().getAllOtfs());
 		
@@ -362,7 +362,7 @@ public final class TabGui implements KeyPressListener
 			Feature feature = features.get(selected);
 			
 			TooManyHaxHack tooManyHax =
-				WurstClient.INSTANCE.getHax().tooManyHaxHack;
+				WurstClient.INSTANCE.getHackRegistry().tooManyHaxHack;
 			if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 			{
 				ChatUtils

@@ -50,7 +50,7 @@ public class IngameHudMixin extends DrawableHelper
 		if(!identifier.getPath().equals("textures/misc/pumpkinblur.png"))
 			return;
 
-		if(!WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHackRegistry().noPumpkinHack.isEnabled())
 			return;
 
 		ci.cancel();

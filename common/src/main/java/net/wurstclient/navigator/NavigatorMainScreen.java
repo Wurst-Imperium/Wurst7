@@ -176,7 +176,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		}
 		
 		WurstClient wurst = WurstClient.INSTANCE;
-		TooManyHaxHack tooManyHax = wurst.getHax().tooManyHaxHack;
+		TooManyHaxHack tooManyHax = wurst.getHackRegistry().tooManyHaxHack;
 		
 		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 		{

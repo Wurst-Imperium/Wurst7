@@ -23,7 +23,7 @@ public final class RvCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		RemoteViewHack remoteView = WURST.getHax().remoteViewHack;
+		RemoteViewHack remoteView = WURST.getHackRegistry().remoteViewHack;
 		
 		if(args.length != 1)
 			throw new CmdSyntaxError();

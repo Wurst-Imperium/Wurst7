@@ -28,7 +28,7 @@ public abstract class StatusEffectInstanceMixin
 			cancellable = true)
 	private void onUpdateDuration(CallbackInfoReturnable<Integer> cir)
 	{
-		if(WurstClient.INSTANCE.getHax().potionSaverHack.isFrozen())
+		if(WurstClient.INSTANCE.getHackRegistry().potionSaverHack.isFrozen())
 			cir.setReturnValue(duration);
 	}
 }

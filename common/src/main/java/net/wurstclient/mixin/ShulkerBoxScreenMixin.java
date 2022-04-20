@@ -30,7 +30,7 @@ public abstract class ShulkerBoxScreenMixin
 	private final int rows = 3;
 
 	private final AutoStealHack autoSteal =
-			WurstClient.INSTANCE.getHax().autoStealHack;
+			WurstClient.INSTANCE.getHackRegistry().autoStealHack;
 	private int mode;
 
 	public ShulkerBoxScreenMixin(WurstClient wurst,

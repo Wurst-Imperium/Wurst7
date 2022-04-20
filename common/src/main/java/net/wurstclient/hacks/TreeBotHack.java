@@ -226,7 +226,7 @@ public final class TreeBotHack extends Hack
 		for(BlockPos pos : blocksInRange)
 			if(breakBlock(pos))
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
+				WURST.getHackRegistry().autoToolHack.equipBestTool(pos, false, true,
 					false);
 				currentBlock = pos;
 				break;

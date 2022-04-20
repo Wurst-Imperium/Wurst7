@@ -30,7 +30,7 @@ public class ChatScreenMixin extends Screen {
 
     @Inject(at = {@At("TAIL")}, method = {"init()V"})
     protected void onInit(CallbackInfo ci) {
-        if (WurstClient.INSTANCE.getHax().infiniChatHack.isEnabled())
+        if (WurstClient.INSTANCE.getHackRegistry().infiniChatHack.isEnabled())
             chatField.setMaxLength(Integer.MAX_VALUE);
     }
 }

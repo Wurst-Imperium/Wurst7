@@ -31,7 +31,7 @@ public class BackgroundRendererMixin
 		StatusEffect effect)
 	{
 		if(effect == StatusEffects.BLINDNESS
-			&& WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+			&& WurstClient.INSTANCE.getHackRegistry().antiBlindHack.isEnabled())
 			return false;
 		
 		return entity.hasStatusEffect(effect);
@@ -46,7 +46,7 @@ public class BackgroundRendererMixin
 		StatusEffect effect)
 	{
 		if(effect == StatusEffects.BLINDNESS
-			&& WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+			&& WurstClient.INSTANCE.getHackRegistry().antiBlindHack.isEnabled())
 			return false;
 		
 		return entity.hasStatusEffect(effect);
@@ -59,7 +59,7 @@ public class BackgroundRendererMixin
 	private static void applyFog(Camera c, BackgroundRenderer.FogType ft,
 		float f, boolean b, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().noFogHack.isEnabled())
 			ci.cancel();
 	}
 }

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.hack.HackRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,7 +30,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
 @Mixin(AbstractBlockState.class)
@@ -75,7 +75,7 @@ public class AbstractBlockStateMixin extends State<Block, BlockState> {
         if (context == ShapeContext.absent())
             return;
 
-        HackList hax = WurstClient.INSTANCE.getHax();
+        HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
         if (hax == null)
             return;
 

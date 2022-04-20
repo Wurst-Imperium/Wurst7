@@ -95,7 +95,7 @@ public abstract class GameRendererMixin
 			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
 	private float wurstNauseaLerp(float delta, float first, float second)
 	{
-		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHackRegistry().antiWobbleHack.isEnabled())
 			return MathHelper.lerp(delta, first, second);
 		
 		return 0;
@@ -109,7 +109,7 @@ public abstract class GameRendererMixin
 		float f, CallbackInfoReturnable<Float> cir)
 	{
 		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
+			WurstClient.INSTANCE.getHackRegistry().fullbrightHack;
 		
 		if(fullbright.isNightVisionActive())
 			cir.setReturnValue(fullbright.getNightVisionStrength());
@@ -122,7 +122,7 @@ public abstract class GameRendererMixin
 	private void onBobViewWhenHurt(MatrixStack matrixStack, float f,
 		CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().noHurtcamHack.isEnabled())
 			ci.cancel();
 	}
 	

@@ -45,7 +45,7 @@ public final class IngameHUD implements GUIRenderListener
 		hackList.render(matrixStack, partialTicks);
 		tabGui.render(matrixStack, partialTicks);
 
-		if(WurstClient.INSTANCE.getHax().hudHack.isEnabled())
+		if(WurstClient.INSTANCE.getHackRegistry().hudHack.isEnabled())
 			infoHUD.render(matrixStack);
 
 		// pinned windows

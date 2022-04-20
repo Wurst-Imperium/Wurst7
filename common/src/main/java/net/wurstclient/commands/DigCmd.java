@@ -28,7 +28,7 @@ public final class DigCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		if(args.length == 1 && args[0].equalsIgnoreCase("stop"))
-			WURST.getHax().excavatorHack.setEnabled(false);
+			WURST.getHackRegistry().excavatorHack.setEnabled(false);
 		else
 			startDigging(args);
 	}
@@ -59,7 +59,7 @@ public final class DigCmd extends Command
 		
 		pos2 = pos2.down(height > 0 ? height - 1 : height + 1);
 		
-		WURST.getHax().excavatorHack.enableWithArea(pos1, pos2);
+		WURST.getHackRegistry().excavatorHack.enableWithArea(pos1, pos2);
 	}
 	
 	private int tryParseInt(String input, String name) throws CmdSyntaxError

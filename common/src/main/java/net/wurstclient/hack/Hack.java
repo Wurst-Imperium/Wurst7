@@ -11,6 +11,8 @@ import java.util.Objects;
 
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.EnableHackListener.EnableHackEvent;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.hacks.NavigatorHack;
 import net.wurstclient.hacks.TooManyHaxHack;
@@ -22,9 +24,7 @@ public abstract class Hack extends Feature
 	private Category category;
 	
 	private boolean enabled;
-	private final boolean stateSaved =
-		!getClass().isAnnotationPresent(DontSaveState.class);
-	
+
 	public Hack(String name)
 	{
 		this.name = Objects.requireNonNull(name);
@@ -71,7 +71,7 @@ public abstract class Hack extends Feature
 		if(this.enabled == enabled)
 			return;
 		
-		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
+		TooManyHaxHack tooManyHax = WURST.getHackRegistry().tooManyHaxHack;
 		if(enabled && tooManyHax.isEnabled() && tooManyHax.isBlocked(this))
 			return;
 		
@@ -85,8 +85,8 @@ public abstract class Hack extends Feature
 		else
 			onDisable();
 		
-		if(stateSaved)
-			WURST.getHax().saveEnabledHax();
+		EnableHackEvent event = new EnableHackEvent(this);
+		EventManager.fire(event);
 	}
 	
 	@Override
@@ -99,11 +99,6 @@ public abstract class Hack extends Feature
 	public final void doPrimaryAction()
 	{
 		setEnabled(!enabled);
-	}
-	
-	public final boolean isStateSaved()
-	{
-		return stateSaved;
 	}
 	
 	protected void onEnable()

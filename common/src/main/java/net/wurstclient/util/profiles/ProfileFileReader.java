@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 
 import com.google.gson.JsonObject;
@@ -36,7 +37,11 @@ public abstract class ProfileFileReader {
     @Nullable
     public WsonObject load() {
         try {
-            return JsonUtils.parseFileToObject(path);
+            WsonObject obj = JsonUtils.parseFileToObject(path);
+            System.out.println("What is this object?");
+            System.out.println(obj);
+            System.out.println(obj.toJsonObject());
+            return obj;
 
         } catch (NoSuchFileException e) {
             // The file doesn't exist yet. No problem, we'll create it.
@@ -65,12 +70,7 @@ public abstract class ProfileFileReader {
         }
     }
 
-    public boolean isInvalidKeyName(String key) {
-        try {
-            InputUtil.fromTranslationKey(key);
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
-        return false;
+    public String getBaseName(){
+        return path.getFileName().toString().substring(0, path.getFileName().toString().toLowerCase(Locale.ROOT).indexOf(".json"));
     }
 }

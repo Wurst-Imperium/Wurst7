@@ -63,7 +63,7 @@ public final class InstantBunkerHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHackRegistry().tunnellerHack.setEnabled(false);
 		
 		if(!MC.player.isOnGround())
 		{
@@ -142,7 +142,7 @@ public final class InstantBunkerHack extends Hack
 		
 		// place next block
 		// if(blockIndex < positions.size() && (IMC.getItemUseCooldown() == 0
-		// || WURST.getHax().fastPlaceHack.isEnabled()))
+		// || WURST.getHackRegistry().fastPlaceHack.isEnabled()))
 		// {
 		// BlockPos pos = positions.get(blockIndex);
 		//

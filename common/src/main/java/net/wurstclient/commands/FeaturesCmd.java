@@ -34,7 +34,7 @@ public final class FeaturesCmd extends Command
 			ChatUtils.warning(
 				"This is just a pre-release! It doesn't (yet) have all of the features of Wurst 7.0! See download page for details.");
 		
-		int hax = WURST.getHax().countHax();
+		int hax = WURST.getHackRegistry().countHax();
 		int cmds = WURST.getCmds().countCmds();
 		int otfs = WURST.getOtfs().countOtfs();
 		int all = hax + cmds + otfs;
@@ -45,7 +45,7 @@ public final class FeaturesCmd extends Command
 		ChatUtils.message("Other features: " + otfs);
 		
 		int settings = 0;
-		for(Hack hack : WURST.getHax().getAllHax())
+		for(Hack hack : WURST.getHackRegistry().getAllHax())
 			settings += hack.getSettings().size();
 		for(Command cmd : WURST.getCmds().getAllCmds())
 			settings += cmd.getSettings().size();

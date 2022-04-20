@@ -33,7 +33,7 @@ public abstract class PowderSnowBlockMixin extends Block
 	private static void onCanWalkOnPowderSnow(Entity entity,
 											  CallbackInfoReturnable<Boolean> cir)
 	{
-		if(!WurstClient.INSTANCE.getHax().snowShoeHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHackRegistry().snowShoeHack.isEnabled())
 			return;
 
 		if(entity != WurstClient.MC.player)

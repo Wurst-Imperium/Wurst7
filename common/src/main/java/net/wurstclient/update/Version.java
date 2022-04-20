@@ -21,7 +21,6 @@ public final class Version implements Comparable<Version>
 	
 	public Version(String version)
 	{
-		System.out.println("Provided string version is: " + version);
 		if(!SYNTAX.asPredicate().test(version))
 		{
 			major = -1;
@@ -30,7 +29,6 @@ public final class Version implements Comparable<Version>
 			preRelease = Integer.MAX_VALUE;
 			return;
 		}
-		System.out.println("asPredicate test is true ");
 		int indexOfPre = version.indexOf("pre");
 		
 		String[] parts;

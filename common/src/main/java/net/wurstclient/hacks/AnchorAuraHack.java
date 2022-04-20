@@ -568,7 +568,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean isSneaking()
 	{
-		return MC.player.isSneaking() || WURST.getHax().sneakHack.isEnabled();
+		return MC.player.isSneaking() || WURST.getHackRegistry().sneakHack.isEnabled();
 	}
 	
 	private enum FaceBlocks

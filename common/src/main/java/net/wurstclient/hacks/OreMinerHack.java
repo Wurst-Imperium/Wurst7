@@ -85,11 +85,11 @@ public final class OreMinerHack extends Hack
     @Override
     public void onEnable()
     {
-		WURST.getHax().autoMineHack.setEnabled(false);
-		WURST.getHax().excavatorHack.setEnabled(false);
-		WURST.getHax().nukerHack.setEnabled(false);
-		WURST.getHax().nukerLegitHack.setEnabled(false);
-		WURST.getHax().speedNukerHack.setEnabled(false);
+		WURST.getHackRegistry().autoMineHack.setEnabled(false);
+		WURST.getHackRegistry().excavatorHack.setEnabled(false);
+		WURST.getHackRegistry().nukerHack.setEnabled(false);
+		WURST.getHackRegistry().nukerLegitHack.setEnabled(false);
+		WURST.getHackRegistry().speedNukerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
     }
@@ -98,13 +98,13 @@ public final class OreMinerHack extends Hack
     public void onDisable()
     {
         EVENTS.remove(UpdateListener.class, this);
-		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHackRegistry().excavatorHack.setEnabled(false);
     }
 
     @Override
     public void onUpdate()
     {
-		boolean isExcavating = WURST.getHax().excavatorHack.isEnabled();
+		boolean isExcavating = WURST.getHackRegistry().excavatorHack.isEnabled();
 		if(!isExcavating) {
 			BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
 			int blockRange = (int)Math.ceil(range.getValue());
@@ -128,14 +128,14 @@ public final class OreMinerHack extends Hack
 			if(mineDir == 0) {
 				if(messages.isChecked()) sendOreFoundMessage(target);
 				BlockPos end = new BlockPos(target.getX(), eyesBlock.getY()-1, eyesBlock.getZ());
-				WURST.getHax().excavatorHack.enableWithArea(eyesBlock, end);
+				WURST.getHackRegistry().excavatorHack.enableWithArea(eyesBlock, end);
 			} else if(mineDir == 1) {
 				BlockPos start = new BlockPos(target.getX(), eyesBlock.getY(), eyesBlock.getZ());
 				BlockPos end = new BlockPos(target.getX(), eyesBlock.getY()-1, target.getZ());
-				WURST.getHax().excavatorHack.enableWithArea(start, end);
+				WURST.getHackRegistry().excavatorHack.enableWithArea(start, end);
 			} else if(yRange.isChecked() && mineDir == 2) {
 				BlockPos start = new BlockPos(target.getX(), eyesBlock.getY()-(eyesBlock.getY()>target.getY()?0:1), target.getZ());
-				WURST.getHax().excavatorHack.enableWithArea(start, target);
+				WURST.getHackRegistry().excavatorHack.enableWithArea(start, target);
 			}
 
 			mineDir = (++mineDir)%(yRange.isChecked()?3:2);

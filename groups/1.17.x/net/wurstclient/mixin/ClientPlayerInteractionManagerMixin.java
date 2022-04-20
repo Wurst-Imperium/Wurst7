@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.hack.HackRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +32,6 @@ import net.minecraft.world.World;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -44,13 +44,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
-	
+
 	/**
 	 * blockHitDelay
 	 */
 	@Shadow
 	private int blockBreakingCooldown;
-	
+
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
 		ordinal = 0)},
@@ -63,67 +63,67 @@ public abstract class ClientPlayerInteractionManagerMixin
 			new BlockBreakingProgressEvent(blockPos_1, direction_1);
 		EventManager.fire(event);
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
 		method = {"getReachDistance()F"},
 		cancellable = true)
 	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
+		HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
 		if(hax == null || !hax.reachHack.isEnabled())
 			return;
-		
+
 		ci.setReturnValue(hax.reachHack.getReachDistance());
 	}
-	
+
 	@Inject(at = {@At("HEAD")},
 		method = {"hasExtendedReach()Z"},
 		cancellable = true)
 	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
+		HackRegistry hax = WurstClient.INSTANCE.getHackRegistry();
 		if(hax == null || !hax.reachHack.isEnabled())
 			return;
-		
+
 		cir.setReturnValue(true);
 	}
-	
+
 	@Override
 	public float getCurrentBreakingProgress()
 	{
 		return currentBreakingProgress;
 	}
-	
+
 	@Override
 	public void setBreakingBlock(boolean breakingBlock)
 	{
 		this.breakingBlock = breakingBlock;
 	}
-	
+
 	@Override
 	public void windowClick_PICKUP(int slot)
 	{
 		clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
 	}
-	
+
 	@Override
 	public void windowClick_QUICK_MOVE(int slot)
 	{
 		clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
 	}
-	
+
 	@Override
 	public void windowClick_THROW(int slot)
 	{
 		clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
 	}
-	
+
 	@Override
 	public void rightClickItem()
 	{
 		interactItem(client.player, client.world, Hand.MAIN_HAND);
 	}
-	
+
 	@Override
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
 	{
@@ -131,37 +131,37 @@ public abstract class ClientPlayerInteractionManagerMixin
 			new BlockHitResult(hitVec, side, pos, false));
 		interactItem(client.player, client.world, Hand.MAIN_HAND);
 	}
-	
+
 	@Override
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
 		Direction direction)
 	{
 		sendPlayerAction(action, blockPos, direction);
 	}
-	
+
 	@Shadow
 	private void sendPlayerAction(
 		PlayerActionC2SPacket.Action playerActionC2SPacket$Action_1,
 		BlockPos blockPos_1, Direction direction_1)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void setBlockHitDelay(int delay)
 	{
 		blockBreakingCooldown = delay;
 	}
-	
+
 	@Shadow
 	public abstract ActionResult interactBlock(
 		ClientPlayerEntity clientPlayerEntity_1, ClientWorld clientWorld_1,
 		Hand hand_1, BlockHitResult blockHitResult_1);
-	
+
 	@Shadow
 	public abstract ActionResult interactItem(PlayerEntity playerEntity_1,
 		World world_1, Hand hand_1);
-	
+
 	@Shadow
 	public abstract void clickSlot(int syncId, int slotId, int clickData,
 		SlotActionType actionType, PlayerEntity playerEntity);

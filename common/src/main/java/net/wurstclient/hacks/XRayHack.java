@@ -133,7 +133,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
 		
-		if(!WURST.getHax().fullbrightHack.isEnabled())
+		if(!WURST.getHackRegistry().fullbrightHack.isEnabled())
 			WurstClient.MC_GAME_OPTIONS.setGamma(0.5F);
 	}
 	

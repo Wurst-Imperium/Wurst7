@@ -108,11 +108,11 @@ public final class NukerHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getHax().autoMineHack.setEnabled(false);
-		WURST.getHax().excavatorHack.setEnabled(false);
-		WURST.getHax().nukerLegitHack.setEnabled(false);
-		WURST.getHax().speedNukerHack.setEnabled(false);
-		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHackRegistry().autoMineHack.setEnabled(false);
+		WURST.getHackRegistry().excavatorHack.setEnabled(false);
+		WURST.getHackRegistry().nukerLegitHack.setEnabled(false);
+		WURST.getHackRegistry().speedNukerHack.setEnabled(false);
+		WURST.getHackRegistry().tunnellerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);

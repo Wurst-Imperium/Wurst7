@@ -23,7 +23,7 @@ public abstract class CameraMixin {
             cancellable = true)
     private void onClipToSpace(double desiredCameraDistance,
                                CallbackInfoReturnable<Double> cir) {
-        if (WurstClient.INSTANCE.getHax().cameraNoClipHack.isEnabled())
+        if (WurstClient.INSTANCE.getHackRegistry().cameraNoClipHack.isEnabled())
             cir.setReturnValue(desiredCameraDistance);
     }
 
@@ -33,7 +33,7 @@ public abstract class CameraMixin {
             cancellable = true)
     private void onGetSubmersionType(
             CallbackInfoReturnable<CameraSubmersionType> cir) {
-        if (WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
+        if (WurstClient.INSTANCE.getHackRegistry().noOverlayHack.isEnabled())
             cir.setReturnValue(CameraSubmersionType.NONE);
     }
 }

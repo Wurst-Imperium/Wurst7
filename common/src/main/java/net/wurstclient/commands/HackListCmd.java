@@ -48,7 +48,7 @@ public class HackListCmd extends Command {
         if (args.length < 2)
             throw new CmdSyntaxError();
 
-        if (WURST.getHax().getHackByName(args[1]) == null)
+        if (WURST.getHackRegistry().getHackByName(args[1]) == null)
             throw new CmdError("The specified hack does not exist.");
 
         switch (args[0].toLowerCase()) {
@@ -68,9 +68,9 @@ public class HackListCmd extends Command {
 
     private void hideHack(String hackName)
     {
-        if (WURST.getHax().getHackByName(hackName) == null) return;
+        if (WURST.getHackRegistry().getHackByName(hackName) == null) return;
 
-        hiddenHacks.add(WURST.getHax().getHackByName(hackName));
+        hiddenHacks.add(WURST.getHackRegistry().getHackByName(hackName));
         save();
 
         ChatUtils.message(hackName + " was added to the hidden hacks list.");
@@ -78,9 +78,9 @@ public class HackListCmd extends Command {
 
     private void unhideHack(String hackName)
     {
-        if (WURST.getHax().getHackByName(hackName) == null) return;
+        if (WURST.getHackRegistry().getHackByName(hackName) == null) return;
 
-        hiddenHacks.remove(WURST.getHax().getHackByName(hackName));
+        hiddenHacks.remove(WURST.getHackRegistry().getHackByName(hackName));
         save();
 
         ChatUtils.message(hackName + " was removed to the hidden hacks list.");
@@ -116,7 +116,7 @@ public class HackListCmd extends Command {
 
             for (String hackName : JsonUtils.parseFileToArray(path).getAllStrings())
             {
-                Hack hack = WURST.getHax().getHackByName(hackName);
+                Hack hack = WURST.getHackRegistry().getHackByName(hackName);
                 if (hack == null)
                     return;
                 hiddenHacks.add(hack);
