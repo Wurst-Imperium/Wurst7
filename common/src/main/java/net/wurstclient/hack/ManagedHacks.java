@@ -95,7 +95,7 @@ public final class ManagedHacks extends ManagedProfile implements EnableHackList
     @Override
     public JsonObject createJson() {
         JsonObject json = new JsonObject();
-        WurstClient.INSTANCE.getHackRegistry().getAllHax().forEach(hack -> json.addProperty(hack.getName(), hack.isEnabled()));
+        this.hackList.entrySet().forEach(hackEntry -> json.addProperty(hackEntry.getKey(), hackEntry.getValue()));
         return json;
     }
 
