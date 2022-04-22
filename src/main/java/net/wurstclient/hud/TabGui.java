@@ -16,7 +16,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -215,7 +214,8 @@ public final class TabGui implements KeyPressListener
 		float opacity = gui.getOpacity();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// color
@@ -232,7 +232,7 @@ public final class TabGui implements KeyPressListener
 			bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		}
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline positions
 		float xi1 = x1 - 0.1F;
@@ -253,7 +253,7 @@ public final class TabGui implements KeyPressListener
 			bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
 		}
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -301,7 +301,7 @@ public final class TabGui implements KeyPressListener
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private static final class Tab

@@ -35,7 +35,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -407,7 +406,8 @@ public final class AltManagerScreen extends Screen
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		// skin preview
@@ -451,7 +451,7 @@ public final class AltManagerScreen extends Screen
 			bufferBuilder.vertex(matrix, width, height, 0).next();
 			bufferBuilder.vertex(matrix, 0, height, 0).next();
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
@@ -621,7 +621,8 @@ public final class AltManagerScreen extends Screen
 			Alt alt = list.get(id);
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// green glow when logged in
@@ -643,7 +644,7 @@ public final class AltManagerScreen extends Screen
 				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
 				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
 				bufferBuilder.end();
-				BufferRenderer.draw(bufferBuilder);
+				tessellator.draw();
 				
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);

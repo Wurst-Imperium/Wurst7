@@ -510,7 +510,8 @@ public final class AutoFarmHack extends Hack
 		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
 			return;
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;

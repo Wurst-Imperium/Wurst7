@@ -27,7 +27,6 @@ import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -267,7 +266,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(style.getSelected().lines)
 		{
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			Vec3d start = RotationUtils.getClientLookVec()
@@ -280,7 +280,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, basicChests, regionX, regionZ);
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float[] trapColorF = trapColor.getColorF();
 			RenderSystem.setShaderColor(trapColorF[0], trapColorF[1],
@@ -289,7 +289,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, trapChests, regionX, regionZ);
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float[] enderColorF = enderColor.getColorF();
 			RenderSystem.setShaderColor(enderColorF[0], enderColorF[1],
@@ -298,7 +298,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, enderChests, regionX, regionZ);
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float[] shulkerColorF = shulkerColor.getColorF();
 			RenderSystem.setShaderColor(shulkerColorF[0], shulkerColorF[1],
@@ -307,7 +307,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float[] cartColorF = cartColor.getColorF();
 			RenderSystem.setShaderColor(cartColorF[0], cartColorF[1],
@@ -316,7 +316,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 		}
 		
 		matrixStack.pop();
@@ -377,7 +377,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		ArrayList<Box> boxes, int regionX, int regionZ)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		for(Box box : boxes)
 		{

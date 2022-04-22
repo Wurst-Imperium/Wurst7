@@ -464,7 +464,8 @@ public final class CaveFinderHack extends Hack
 		
 		vertexBuffer = new VertexBuffer();
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		

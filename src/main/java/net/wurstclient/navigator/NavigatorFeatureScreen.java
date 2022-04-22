@@ -24,7 +24,6 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -372,7 +371,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			int x5 = x2 - 2;
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// window background
@@ -389,7 +389,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, x2, y2, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			setColorToBackground();
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -427,7 +427,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
 			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)

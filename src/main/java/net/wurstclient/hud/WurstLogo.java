@@ -14,7 +14,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -81,7 +80,8 @@ public final class WurstLogo
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).next();
@@ -89,6 +89,6 @@ public final class WurstLogo
 		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 }

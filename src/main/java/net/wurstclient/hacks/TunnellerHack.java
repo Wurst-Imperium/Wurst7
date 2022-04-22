@@ -273,7 +273,8 @@ public final class TunnellerHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -394,7 +395,8 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
@@ -505,7 +507,8 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
@@ -648,7 +651,8 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			

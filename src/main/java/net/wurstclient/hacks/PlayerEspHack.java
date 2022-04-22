@@ -17,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -194,7 +193,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION_COLOR);
 		
@@ -235,7 +235,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 		
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private enum Style

@@ -16,7 +16,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -165,7 +164,8 @@ public final class FeatureButton extends Component
 		float opacity = GUI.getOpacity();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -186,7 +186,7 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawSettingsBackground(MatrixStack matrixStack, int x2, int x3,
@@ -196,7 +196,8 @@ public final class FeatureButton extends Component
 		float opacity = GUI.getOpacity();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -207,7 +208,7 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
@@ -216,7 +217,8 @@ public final class FeatureButton extends Component
 		float[] acColor = GUI.getAcColor();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
@@ -227,13 +229,14 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		// separator
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
@@ -241,7 +244,7 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawSettingsArrow(MatrixStack matrixStack, int x2, int x3,
@@ -254,7 +257,8 @@ public final class FeatureButton extends Component
 		float ya2;
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		if(isSettingsWindowOpen())
 		{
@@ -276,7 +280,7 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -287,7 +291,7 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)

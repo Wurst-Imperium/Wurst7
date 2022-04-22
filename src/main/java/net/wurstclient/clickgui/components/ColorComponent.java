@@ -14,7 +14,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -106,7 +105,8 @@ public final class ColorComponent extends Component
 		float opacity = GUI.getOpacity();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
@@ -119,7 +119,7 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.end();
 		
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawBox(MatrixStack matrixStack, int x1, int x2, int y2,
@@ -130,7 +130,8 @@ public final class ColorComponent extends Component
 		float opacity = GUI.getOpacity();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(color[0], color[1], color[2],
 			hovering ? 1F : opacity);
@@ -142,7 +143,7 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
@@ -155,7 +156,7 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.end();
 		
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,

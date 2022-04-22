@@ -333,7 +333,8 @@ public final class MobSpawnEspHack extends Hack
 				vertexBuffer.close();
 			
 			vertexBuffer = new VertexBuffer();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION_COLOR);

@@ -19,7 +19,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -392,7 +391,8 @@ public final class BowAimbotHack extends Hack
 		matrixStack.push();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		String message;
 		if(velocity < 1)
@@ -415,7 +415,7 @@ public final class BowAimbotHack extends Hack
 		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
 		bufferBuilder.vertex(matrix, 0, 10, 0).next();
 		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// text
 		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
