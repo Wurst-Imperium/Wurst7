@@ -563,7 +563,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -575,7 +574,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
 		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// text
@@ -686,7 +684,6 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs1, ys2, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys2, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
-				bufferBuilder.end();
 				tessellator.draw();
 				
 				boolean hovering = mouseX >= xs1 && mouseY >= ys3
@@ -702,7 +699,6 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
-				bufferBuilder.end();
 				tessellator.draw();
 				
 				// outline
@@ -716,7 +712,6 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
 				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
-				bufferBuilder.end();
 				tessellator.draw();
 			}
 			
@@ -740,7 +735,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x5, y2, 0).next();
 			bufferBuilder.vertex(matrix, x4, y2, 0).next();
 			bufferBuilder.vertex(matrix, x4, y3, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			net.minecraft.client.util.Window sr = MC.getWindow();
@@ -789,7 +783,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
 			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			// render children
@@ -817,7 +810,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		if(!window.isMinimized())
@@ -827,7 +819,6 @@ public final class ClickGui
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 		}
 		
@@ -877,7 +868,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x3, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y5, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// title bar background
@@ -888,7 +878,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y3, 0).next();
 		bufferBuilder.vertex(matrix, x3, y3, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// window title
@@ -919,7 +908,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// background between buttons
@@ -931,7 +919,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// button outline
@@ -943,7 +930,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -981,7 +967,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -992,7 +977,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -1028,7 +1012,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float xn1 = x1 + 3.5F;
@@ -1044,7 +1027,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			// outlines
@@ -1056,7 +1038,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
@@ -1065,7 +1046,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
@@ -1104,7 +1084,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float xn1 = x1 + 3;
@@ -1121,7 +1100,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			// outlines
@@ -1133,7 +1111,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
@@ -1142,7 +1119,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
 			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
@@ -1151,7 +1127,6 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 		}
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -1195,7 +1170,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
 		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
 		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -1214,7 +1188,6 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
 		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
 		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

@@ -192,7 +192,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
 				(float)end.z - regionZ).next();
 		}
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

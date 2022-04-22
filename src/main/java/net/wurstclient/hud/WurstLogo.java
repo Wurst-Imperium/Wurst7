@@ -88,7 +88,6 @@ public final class WurstLogo
 		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 }

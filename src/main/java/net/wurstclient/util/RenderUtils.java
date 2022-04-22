@@ -195,7 +195,6 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.maxY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -209,7 +208,9 @@ public enum RenderUtils
 		drawSolidBox(bb, bufferBuilder);
 		bufferBuilder.end();
 		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawSolidBox(Box bb, BufferBuilder bufferBuilder)
@@ -342,7 +343,6 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.maxY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -356,7 +356,9 @@ public enum RenderUtils
 		drawOutlinedBox(bb, bufferBuilder);
 		bufferBuilder.end();
 		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawOutlinedBox(Box bb, BufferBuilder bufferBuilder)
@@ -489,7 +491,6 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.minY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -503,7 +504,9 @@ public enum RenderUtils
 		drawCrossBox(bb, bufferBuilder);
 		bufferBuilder.end();
 		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawCrossBox(Box bb, BufferBuilder bufferBuilder)
@@ -619,7 +622,6 @@ public enum RenderUtils
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ)
 			.next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -633,7 +635,9 @@ public enum RenderUtils
 		drawNode(bb, bufferBuilder);
 		bufferBuilder.end();
 		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawNode(Box bb, BufferBuilder bufferBuilder)
@@ -750,7 +754,6 @@ public enum RenderUtils
 		
 		matrixStack.pop();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -759,13 +762,15 @@ public enum RenderUtils
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
-		
 		drawArrow(from, to, bufferBuilder);
-		
 		bufferBuilder.end();
+		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to,

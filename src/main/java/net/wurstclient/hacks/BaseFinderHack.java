@@ -175,7 +175,9 @@ public final class BaseFinderHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			vertexBuffer.bind();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		matrixStack.pop();
@@ -217,7 +219,10 @@ public final class BaseFinderHack extends Hack
 					.next();
 			
 			bufferBuilder.end();
+			
+			vertexBuffer.bind();
 			vertexBuffer.upload(bufferBuilder);
+			VertexBuffer.unbind();
 			
 			oldRegionX = regionX;
 			oldRegionZ = regionZ;

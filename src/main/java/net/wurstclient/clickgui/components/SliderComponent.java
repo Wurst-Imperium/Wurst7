@@ -198,7 +198,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y5, 0).next();
 		bufferBuilder.vertex(matrix, x2, y4, 0).next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -235,7 +234,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xl2, y5, 0).next();
 		bufferBuilder.vertex(matrix, x4, y5, 0).next();
 		bufferBuilder.vertex(matrix, x4, y4, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// background
@@ -247,7 +245,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xl1, y5, 0).next();
 		bufferBuilder.vertex(matrix, xl2, y5, 0).next();
 		bufferBuilder.vertex(matrix, xl2, y4, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -259,7 +256,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, x4, y5, 0).next();
 		bufferBuilder.vertex(matrix, x4, y4, 0).next();
 		bufferBuilder.vertex(matrix, x3, y4, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -291,7 +287,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
 		bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 		bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -303,7 +298,6 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 		bufferBuilder.vertex(matrix, xk2, yk1, 0).next();
 		bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

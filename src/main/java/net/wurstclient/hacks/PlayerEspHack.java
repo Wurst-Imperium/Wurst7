@@ -234,7 +234,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				.color(r, g, b, 0.5F).next();
 		}
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

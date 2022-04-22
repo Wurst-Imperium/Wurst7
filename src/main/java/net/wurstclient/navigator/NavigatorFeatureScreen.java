@@ -388,7 +388,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, x5, y2, 0).next();
 			bufferBuilder.vertex(matrix, x2, y2, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			setColorToBackground();
@@ -426,7 +425,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
 			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			bufferBuilder.end();
 			tessellator.draw();
 		}
 		

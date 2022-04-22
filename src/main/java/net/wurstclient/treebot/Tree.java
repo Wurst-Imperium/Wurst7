@@ -60,7 +60,9 @@ public class Tree implements AutoCloseable
 				box.offset(log).offset(-regionX, 0, -regionZ), bufferBuilder);
 		
 		bufferBuilder.end();
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	@Override

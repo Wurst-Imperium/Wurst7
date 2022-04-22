@@ -96,7 +96,6 @@ public final class BlockListEditButton extends Component
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// box
@@ -108,7 +107,6 @@ public final class BlockListEditButton extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -118,7 +116,6 @@ public final class BlockListEditButton extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// setting name

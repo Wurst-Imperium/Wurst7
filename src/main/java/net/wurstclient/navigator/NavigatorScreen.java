@@ -246,7 +246,6 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -276,7 +275,6 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
 		bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 		bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// shadow positions
@@ -323,7 +321,6 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, x2, y2, 0)
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -345,7 +342,6 @@ public abstract class NavigatorScreen extends Screen
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, yi1, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// shadow
@@ -359,7 +355,6 @@ public abstract class NavigatorScreen extends Screen
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).color(0, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

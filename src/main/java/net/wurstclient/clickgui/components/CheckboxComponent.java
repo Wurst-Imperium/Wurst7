@@ -125,7 +125,6 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -148,7 +147,6 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -159,7 +157,6 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -196,7 +193,6 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, xc5, yc2, 0).next();
 		bufferBuilder.vertex(matrix, xc3, yc5, 0).next();
 		bufferBuilder.vertex(matrix, xc3, yc4, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -210,7 +206,6 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, xc3, yc5, 0).next();
 		bufferBuilder.vertex(matrix, xc1, yc4, 0).next();
 		bufferBuilder.vertex(matrix, xc2, yc3, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

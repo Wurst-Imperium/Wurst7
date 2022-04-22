@@ -224,7 +224,9 @@ public final class TunnellerHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			buffer.bind();
 			buffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(currentBlock != null)
@@ -291,7 +293,9 @@ public final class TunnellerHack extends Hack
 		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
 		
 		bufferBuilder.end();
+		vertexBuffers[0].bind();
 		vertexBuffers[0].upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
@@ -417,7 +421,9 @@ public final class TunnellerHack extends Hack
 			}
 			
 			bufferBuilder.end();
+			vertexBuffers[1].bind();
 			vertexBuffers[1].upload(bufferBuilder);
+			VertexBuffer.unbind();
 			
 			if(currentBlock == null)
 			{
@@ -516,7 +522,9 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
 			bufferBuilder.end();
+			vertexBuffers[2].bind();
 			vertexBuffers[2].upload(bufferBuilder);
+			VertexBuffer.unbind();
 			
 			return !blocks.isEmpty();
 		}
@@ -660,7 +668,10 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
 			bufferBuilder.end();
+			
+			vertexBuffers[3].bind();
 			vertexBuffers[3].upload(bufferBuilder);
+			VertexBuffer.unbind();
 			return true;
 		}
 		

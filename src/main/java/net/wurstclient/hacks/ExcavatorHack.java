@@ -360,7 +360,6 @@ public final class ExcavatorHack extends Hack
 		bufferBuilder.vertex(matrix, msgWidth + 2, 0, 0).next();
 		bufferBuilder.vertex(matrix, msgWidth + 2, 10, 0).next();
 		bufferBuilder.vertex(matrix, 0, 10, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// text

@@ -208,19 +208,25 @@ public final class AutoFarmHack extends Hack
 		if(greenBuffer != null)
 		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+			greenBuffer.bind();
 			greenBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(cyanBuffer != null)
 		{
 			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
+			cyanBuffer.bind();
 			cyanBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(redBuffer != null)
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+			redBuffer.bind();
 			redBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(currentBlock != null)
@@ -536,7 +542,9 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		bufferBuilder.end();
+		greenBuffer.bind();
 		greenBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 		
 		if(cyanBuffer != null)
 			cyanBuffer.close();
@@ -555,7 +563,9 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		bufferBuilder.end();
+		cyanBuffer.bind();
 		cyanBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 		
 		if(redBuffer != null)
 			redBuffer.close();
@@ -572,7 +582,9 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		bufferBuilder.end();
+		redBuffer.bind();
 		redBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 	}
 	
 	/**

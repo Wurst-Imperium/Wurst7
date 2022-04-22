@@ -110,7 +110,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 					(float)(point.y - camPos.y), (float)(point.z - camPos.z))
 				.next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

@@ -279,7 +279,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, basicChests, regionX, regionZ);
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float[] trapColorF = trapColor.getColorF();
@@ -288,7 +287,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, trapChests, regionX, regionZ);
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float[] enderColorF = enderColor.getColorF();
@@ -297,7 +295,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, enderChests, regionX, regionZ);
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float[] shulkerColorF = shulkerColor.getColorF();
@@ -306,7 +303,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			float[] cartColorF = cartColor.getColorF();
@@ -315,7 +311,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
-			bufferBuilder.end();
 			tessellator.draw();
 		}
 		
@@ -364,10 +359,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			solidBox.bind();
 			solidBox.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+			outlinedBox.bind();
 			outlinedBox.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}

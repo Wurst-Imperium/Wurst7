@@ -117,7 +117,6 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		
 		tessellator.draw();
 	}
@@ -142,7 +141,6 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -154,8 +152,6 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.end();
-		
 		tessellator.draw();
 	}
 	

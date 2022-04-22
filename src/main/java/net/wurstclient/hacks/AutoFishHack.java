@@ -371,7 +371,6 @@ public final class AutoFishHack extends Hack
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			matrixStack.pop();
 		}

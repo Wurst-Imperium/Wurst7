@@ -124,7 +124,6 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -146,7 +145,6 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		bufferBuilder.vertex(matrix, x1, yi2, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi2, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

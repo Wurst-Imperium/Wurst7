@@ -185,7 +185,6 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -207,7 +206,6 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -228,7 +226,6 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -243,7 +240,6 @@ public final class FeatureButton extends Component
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -279,7 +275,6 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -290,7 +285,6 @@ public final class FeatureButton extends Component
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

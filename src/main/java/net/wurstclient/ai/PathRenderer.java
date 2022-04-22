@@ -92,7 +92,6 @@ public final class PathRenderer
 		
 		matrixStack.pop();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	
@@ -149,7 +148,6 @@ public final class PathRenderer
 		bufferBuilder.vertex(matrix, 0, -1, 0).next();
 		bufferBuilder.vertex(matrix, 0, 0, 1).next();
 		
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		matrixStack.pop();

@@ -212,7 +212,6 @@ public final class FreecamHack extends Hack
 			.next();
 		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
 			.next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		matrixStack.pop();

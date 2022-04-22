@@ -308,7 +308,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
 			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			// outline
@@ -321,7 +320,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
 			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			// text
@@ -431,7 +429,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, bx1, by1, 0).next();
 		bufferBuilder.vertex(matrix, bx1, by2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// hovering
@@ -454,7 +451,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		bufferBuilder.vertex(matrix, ax1, ay1, 0).next();
 		bufferBuilder.vertex(matrix, ax2, ay1, 0).next();
 		bufferBuilder.vertex(matrix, ax3, ay2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// arrow shadow
@@ -465,7 +461,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		bufferBuilder.vertex(matrix, ax2, ay1, 0).next();
 		bufferBuilder.vertex(matrix, ax3, ay2, 0).next();
 		bufferBuilder.vertex(matrix, ax1, ay1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// text

@@ -450,7 +450,6 @@ public final class AltManagerScreen extends Screen
 			bufferBuilder.vertex(matrix, width, 0, 0).next();
 			bufferBuilder.vertex(matrix, width, height, 0).next();
 			bufferBuilder.vertex(matrix, 0, height, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
@@ -643,7 +642,6 @@ public final class AltManagerScreen extends Screen
 				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
 				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
 				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
-				bufferBuilder.end();
 				tessellator.draw();
 				
 				GL11.glEnable(GL11.GL_CULL_FACE);

@@ -240,7 +240,9 @@ public final class SearchHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			vertexBuffer.bind();
 			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		matrixStack.pop();
@@ -468,7 +470,10 @@ public final class SearchHack extends Hack
 			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
 		
 		bufferBuilder.end();
+		
+		vertexBuffer.bind();
 		vertexBuffer.upload(bufferBuilder);
+		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;
 	}

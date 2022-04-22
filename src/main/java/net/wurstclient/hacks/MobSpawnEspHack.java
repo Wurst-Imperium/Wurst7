@@ -246,7 +246,9 @@ public final class MobSpawnEspHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			scanner.vertexBuffer.bind();
 			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}
@@ -374,7 +376,9 @@ public final class MobSpawnEspHack extends Hack
 				});
 			
 			bufferBuilder.end();
+			vertexBuffer.bind();
 			vertexBuffer.upload(bufferBuilder);
+			VertexBuffer.unbind();
 			
 			doneCompiling = true;
 		}

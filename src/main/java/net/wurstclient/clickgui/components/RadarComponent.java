@@ -78,7 +78,6 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		float middleX = (x1 + x2) / 2.0F;
@@ -109,7 +108,6 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		// outline
@@ -121,7 +119,6 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.end();
 		tessellator.draw();
 		
 		matrixStack.pop();
@@ -189,7 +186,6 @@ public final class RadarComponent extends Component
 					middleY + (float)renderY + 0.5F, 0)
 				.color(red, green, blue, alpha).next();
 		}
-		bufferBuilder.end();
 		tessellator.draw();
 	}
 	

@@ -383,7 +383,6 @@ public abstract class AltEditorScreen extends Screen
 			bufferBuilder.vertex(matrix, width, 0, 0).next();
 			bufferBuilder.vertex(matrix, width, height, 0).next();
 			bufferBuilder.vertex(matrix, 0, height, 0).next();
-			bufferBuilder.end();
 			tessellator.draw();
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
