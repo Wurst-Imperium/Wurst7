@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,6 +104,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private InventoryManager inventoryManager = new InventoryManager();
 
     BigInteger globalTimeTaken = BigInteger.ZERO;
+
+    private final List<WurstRunnable> runnableQueue = new ArrayList<>();
 
     public AutoCraftHack() {
         super("AutoCraft");
@@ -388,7 +389,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             flight = WurstClient.INSTANCE.getHax().flightHack;
         }
         public void setFlight(boolean status) {
-            flight.setEnabled(status);
+            new WurstRunnable() {
+                @Override
+                protected void runInternal() {
+                    flight.setEnabled(status);
+                }
+            }.runUntilDone();
         }
         public boolean path(BlockPos pos) {
             GoToCmd path = new GoToCmd();
@@ -401,7 +407,42 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    public abstract class NotifyingRunnable implements Runnable {
+    public abstract class WurstRunnable implements Runnable {
+        protected boolean done = false;
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        public boolean isDone() {
+            return done;
+        }
+        @Override
+        public void run() {
+            runInternal();
+            lock.lock();
+            try {
+                done = true;
+                condition.signalAll();
+            }
+            finally {
+                lock.unlock();
+            }
+        }
+        public void runUntilDone() {
+            runnableQueue.add(this);
+            lock.lock();
+            try {
+                if (!isDone()) {
+                    condition.await();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+        }
+        protected abstract void runInternal();
+    }
+
+    public abstract class MCRunnable implements Runnable {
         protected boolean done = false;
         ReentrantLock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
@@ -496,7 +537,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public class BaritoneChatInterface {
         public BaritoneChatInterface() { }
         private void sendCommand(String cmd) {
-            new NotifyingRunnable() {
+            new MCRunnable() {
                 @Override
                 protected void runInternal() {
                     MC.player.sendChatMessage("#" + cmd);
@@ -1195,7 +1236,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 return;
             if (MC.currentScreen != null)
                 closeScreen();
-            NotifyingRunnable inventoryRunnable = new NotifyingRunnable() {
+            MCRunnable inventoryRunnable = new MCRunnable() {
                 @Override
                 protected void runInternal() {
                     MC.getTutorialManager().onInventoryOpened();
@@ -4331,7 +4372,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     private void updateTotalInventoryAvailability() {
-        NotifyingRunnable updateRunnable = new NotifyingRunnable() {
+        MCRunnable updateRunnable = new MCRunnable() {
             @Override
             protected void runInternal() {
                 synchronized (totalInventoryAvailabilityMap) {
@@ -4353,7 +4394,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (packet.getSyncId() == ScreenHandlerSlotUpdateS2CPacket.UPDATE_CURSOR_SYNC_ID || packet.getSyncId() == ScreenHandlerSlotUpdateS2CPacket.UPDATE_PLAYER_INVENTORY_SYNC_ID)
                 return;
             lastSlotUpdatePacketRevision = packet.getRevision();
-            NotifyingRunnable updateRunnable = new NotifyingRunnable() {
+            MCRunnable updateRunnable = new MCRunnable() {
                 protected void runInternal() {
                     synchronized (totalInventoryAvailabilityMap) {
                         totalInventoryAvailabilityMap.clear();
@@ -4491,6 +4532,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     @Override
     public void onUpdate() {
+        synchronized (runnableQueue) {
+            for (WurstRunnable runnable : runnableQueue) {
+                runnable.run();
+            }
+            runnableQueue.clear();
+        }
         synchronized (craftingQueue) {
             if (!isCurrentlyCrafting) {
                 if (craftingQueue.size() > 0) {
