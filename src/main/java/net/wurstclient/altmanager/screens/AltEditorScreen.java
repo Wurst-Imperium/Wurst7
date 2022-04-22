@@ -37,7 +37,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -74,34 +73,34 @@ public abstract class AltEditorScreen extends Screen
 	{
 		addDrawableChild(doneButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
-				new LiteralText(getDoneButtonText()), b -> pressDoneButton()));
+				Text.literal(getDoneButtonText()), b -> pressDoneButton()));
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
-				new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+				Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
-			200, 20, new LiteralText("Random Name"),
+			200, 20, Text.literal("Random Name"),
 			b -> nameOrEmailBox.setText(NameGenerator.generateName())));
 		
 		addDrawableChild(stealSkinButton =
 			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
-				128, 20, new LiteralText("Steal Skin"),
+				128, 20, Text.literal("Steal Skin"),
 				b -> message = stealSkin(getNameOrEmail())));
 		
 		addDrawableChild(
 			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
-				new LiteralText("Open Skin Folder"), b -> openSkinFolder()));
+				Text.literal("Open Skin Folder"), b -> openSkinFolder()));
 		
 		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
-			200, 20, new LiteralText(""));
+			200, 20, Text.literal(""));
 		nameOrEmailBox.setMaxLength(48);
 		nameOrEmailBox.setTextFieldFocused(true);
 		nameOrEmailBox.setText(getDefaultNameOrEmail());
 		addSelectableChild(nameOrEmailBox);
 		
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, new LiteralText(""));
+			200, 20, Text.literal(""));
 		passwordBox.setText(getDefaultPassword());
 		passwordBox.setRenderTextProvider((text, int_1) -> {
 			String stars = "";

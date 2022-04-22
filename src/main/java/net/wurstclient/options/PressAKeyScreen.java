@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class PressAKeyScreen extends Screen
 {
@@ -20,7 +20,7 @@ public class PressAKeyScreen extends Screen
 	
 	public PressAKeyScreen(PressAKeyCallback prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		
 		if(!(prevScreen instanceof Screen))
 			throw new IllegalArgumentException("prevScreen is not a screen");

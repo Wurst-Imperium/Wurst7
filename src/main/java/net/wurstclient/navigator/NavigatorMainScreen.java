@@ -25,7 +25,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -65,8 +65,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		TextRenderer tr = WurstClient.MC.textRenderer;
-		searchBar =
-			new TextFieldWidget(tr, 0, 32, 200, 20, new LiteralText(""));
+		searchBar = new TextFieldWidget(tr, 0, 32, 200, 20, Text.literal(""));
 		searchBar.setEditableColor(txtColor);
 		searchBar.setDrawsBackground(false);
 		searchBar.setMaxLength(128);

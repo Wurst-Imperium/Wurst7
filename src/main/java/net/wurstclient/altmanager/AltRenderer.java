@@ -20,7 +20,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.world.GameMode;
@@ -42,7 +42,7 @@ public final class AltRenderer
 			
 			PlayerListEntry entry = new PlayerListEntry(
 				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
-					GameMode.CREATIVE, new LiteralText(name)));
+					GameMode.CREATIVE, Text.literal(name)));
 			
 			loadedSkins.put(name, entry.getSkinTexture());
 		}
