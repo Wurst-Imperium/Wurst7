@@ -33,7 +33,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
@@ -894,9 +894,8 @@ public final class ClickGui
 		// window title
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = MC.textRenderer;
-		String title =
-			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
-				.getString();
+		String title = fr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
+			.getString();
 		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
