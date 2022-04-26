@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import java.util.List;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -59,30 +59,30 @@ public abstract class GameMenuScreenMixin extends Screen
 		int buttonWidth = 204;
 		int buttonHeight = 20;
 		
-		int buttonX = this.width / 2 - 102;
+		int buttonX = width / 2 - 102;
 		int buttonY = 0;
 		
 		int idx = 0;
 		
-		for (int i = 0; i < buttons.size(); ++i)
+		for(int i = 0; i < buttons.size(); ++i)
 		{
 			ClickableWidget button = buttons.get(i);
 			
 			// insert Wurst button in place of game options row
-			if (button.visible && buttonHasText(button, "menu.options"))
+			if(button.visible && buttonHasText(button, "menu.options"))
 			{
 				buttonY = button.y;
 				idx = i;
 			}
 			
 			// shift next buttons down
-			if (buttonY != 0)
-			{
+			if(buttonY != 0)
 				button.y += buttonHeight + 4;
-			}
 		}
 		
-		wurstOptionsButton = new ButtonWidget(buttonX, buttonY, buttonWidth, buttonHeight, new LiteralText("            Options"), b -> openWurstOptions());
+		wurstOptionsButton = new ButtonWidget(buttonX, buttonY, buttonWidth,
+			buttonHeight, new LiteralText("            Options"),
+			b -> openWurstOptions());
 		buttons.add(idx, wurstOptionsButton);
 	}
 	
@@ -119,9 +119,11 @@ public abstract class GameMenuScreenMixin extends Screen
 		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
 	}
 	
-	private static boolean buttonHasText(ClickableWidget button, String translationKey)
+	private static boolean buttonHasText(ClickableWidget button,
+		String translationKey)
 	{
 		Text text = button.getMessage();
-		return text instanceof TranslatableText && ((TranslatableText) text).getKey().equals(translationKey);
+		return text instanceof TranslatableText
+			&& ((TranslatableText)text).getKey().equals(translationKey);
 	}
 }
