@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -136,6 +138,21 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(54, 120, () -> "Donate",
 			"paypal.me/WurstImperium",
 			b -> os.open("https://www.wurstclient.net/donate/"));
+	}
+	
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+	{
+		if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+			client.setScreen(prevScreen);
+		
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	@Override
