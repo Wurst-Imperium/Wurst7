@@ -67,14 +67,14 @@ public abstract class MinecraftClientMixin
 	
 	@Inject(at = {@At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
-	private void onDoAttack(CallbackInfo ci)
+		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
 		EventManager.fire(event);
 		
 		if(event.isCancelled())
-			ci.cancel();
+			cir.setReturnValue(false);
 	}
 	
 	@Inject(at = {@At(value = "FIELD",

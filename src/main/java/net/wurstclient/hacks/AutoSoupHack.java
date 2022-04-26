@@ -105,7 +105,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			MC.player.getInventory().selectedSlot = soupInHotbar;
 			
 			// eat soup
-			MC.options.keyUse.setPressed(true);
+			MC.options.useKey.setPressed(true);
 			IMC.getInteractionManager().rightClickItem();
 			
 			return;
@@ -180,7 +180,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return;
 		
 		// stop eating
-		MC.options.keyUse.setPressed(false);
+		MC.options.useKey.setPressed(false);
 		
 		// reset slot
 		MC.player.getInventory().selectedSlot = oldSlot;
