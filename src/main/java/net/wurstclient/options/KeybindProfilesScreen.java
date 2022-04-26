@@ -183,6 +183,12 @@ public final class KeybindProfilesScreen extends Screen
 				mouseX, mouseY);
 	}
 	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
+	}
+	
 	private static class ListGui extends ListWidget
 	{
 		private final MinecraftClient mc;
