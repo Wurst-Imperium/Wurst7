@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
@@ -30,42 +30,41 @@ public abstract class BlockModelRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/AbstractRandom;JI)Z",
-			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/AbstractRandom;JI)Z"},
+			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/AbstractRandom;JI)V",
+			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/AbstractRandom;JI)V"},
 		cancellable = true)
-	private void onRenderSmoothOrFlat(BlockRenderView blockRenderView_1,
-		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
-		boolean depthTest, AbstractRandom random_1, long long_1, int int_1,
-		CallbackInfoReturnable<Boolean> cir)
+	private void onRenderSmoothOrFlat(BlockRenderView world, BakedModel model,
+		BlockState state, BlockPos pos, MatrixStack matrices,
+		VertexConsumer vertexConsumer, boolean cull, AbstractRandom random,
+		long seed, int overlay, CallbackInfo ci)
 	{
-		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
+		TesselateBlockEvent event = new TesselateBlockEvent(state);
 		EventManager.fire(event);
 		
 		if(event.isCancelled())
 		{
-			cir.cancel();
+			ci.cancel();
 			return;
 		}
 		
-		if(!depthTest)
+		if(!cull)
 			return;
 		
-		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState_1);
+		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(state);
 		EventManager.fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;
 		
-		renderSmooth(blockRenderView_1, bakedModel_1, blockState_1, blockPos_1,
-			matrixStack_1, vertexConsumer_1, false, random_1, long_1, int_1);
+		renderSmooth(world, model, state, pos, matrices, vertexConsumer, false,
+			random, seed, overlay);
 	}
 	
 	@Shadow
-	public boolean renderSmooth(BlockRenderView blockRenderView_1,
-		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
-		boolean boolean_1, AbstractRandom random_1, long long_1, int int_1)
+	public void renderSmooth(BlockRenderView world, BakedModel model,
+		BlockState state, BlockPos pos, MatrixStack matrices,
+		VertexConsumer vertexConsumer, boolean cull, AbstractRandom random,
+		long seed, int overlay)
 	{
-		return false;
+		
 	}
 }
