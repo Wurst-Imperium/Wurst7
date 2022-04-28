@@ -24,6 +24,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.world.GameMode;
+import net.wurstclient.WurstClient;
 
 public final class AltRenderer
 {
@@ -42,7 +43,8 @@ public final class AltRenderer
 			
 			PlayerListEntry entry = new PlayerListEntry(
 				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
-					GameMode.CREATIVE, Text.literal(name)));
+					GameMode.CREATIVE, Text.literal(name)),
+				WurstClient.MC.getSessionService());
 			
 			loadedSkins.put(name, entry.getSkinTexture());
 		}
