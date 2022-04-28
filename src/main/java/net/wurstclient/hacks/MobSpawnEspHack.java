@@ -247,7 +247,7 @@ public final class MobSpawnEspHack extends Hack
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			scanner.vertexBuffer.bind();
-			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			scanner.vertexBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 			
 			matrixStack.pop();

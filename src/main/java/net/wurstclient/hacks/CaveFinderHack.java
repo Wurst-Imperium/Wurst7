@@ -246,7 +246,7 @@ public final class CaveFinderHack extends Hack
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			vertexBuffer.bind();
-			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			vertexBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 		}
 		

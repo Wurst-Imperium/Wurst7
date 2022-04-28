@@ -360,12 +360,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			solidBox.bind();
-			solidBox.setShader(viewMatrix, projMatrix, shader);
+			solidBox.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 			outlinedBox.bind();
-			outlinedBox.setShader(viewMatrix, projMatrix, shader);
+			outlinedBox.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 			
 			matrixStack.pop();

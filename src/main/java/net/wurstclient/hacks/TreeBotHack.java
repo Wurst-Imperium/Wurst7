@@ -325,7 +325,7 @@ public final class TreeBotHack extends Hack
 		Shader shader = RenderSystem.getShader();
 		
 		tree.getVertexBuffer().bind();
-		tree.getVertexBuffer().setShader(viewMatrix, projMatrix, shader);
+		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
 		VertexBuffer.unbind();
 		
 		matrixStack.pop();

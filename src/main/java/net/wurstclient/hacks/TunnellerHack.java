@@ -225,7 +225,7 @@ public final class TunnellerHack extends Hack
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
 			buffer.bind();
-			buffer.setShader(viewMatrix, projMatrix, shader);
+			buffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 		}
 		

@@ -209,7 +209,7 @@ public final class AutoFarmHack extends Hack
 		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 			greenBuffer.bind();
-			greenBuffer.setShader(viewMatrix, projMatrix, shader);
+			greenBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 		}
 		
@@ -217,7 +217,7 @@ public final class AutoFarmHack extends Hack
 		{
 			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 			cyanBuffer.bind();
-			cyanBuffer.setShader(viewMatrix, projMatrix, shader);
+			cyanBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 		}
 		
@@ -225,7 +225,7 @@ public final class AutoFarmHack extends Hack
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			redBuffer.bind();
-			redBuffer.setShader(viewMatrix, projMatrix, shader);
+			redBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 		}
 		

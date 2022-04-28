@@ -172,7 +172,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			Shader shader = RenderSystem.getShader();
 			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
 			mobBox.bind();
-			mobBox.setShader(matrixStack.peek().getPositionMatrix(), matrix4f,
+			mobBox.draw(matrixStack.peek().getPositionMatrix(), matrix4f,
 				shader);
 			VertexBuffer.unbind();
 			
