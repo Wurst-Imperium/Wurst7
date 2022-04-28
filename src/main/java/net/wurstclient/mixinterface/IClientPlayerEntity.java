@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixinterface;
 
+import java.time.Instant;
+
+import net.minecraft.network.encryption.NetworkEncryptionUtils;
 import net.minecraft.util.math.Vec3d;
 
 public interface IClientPlayerEntity
@@ -20,4 +23,7 @@ public interface IClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier);
 	
 	public boolean isTouchingWaterBypass();
+	
+	public NetworkEncryptionUtils.class_7425 signChatMessage(Instant timestamp,
+		String message);
 }

@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.spongepowered.asm.mixin.Final;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.encryption.NetworkEncryptionUtils.class_7425;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IScreen;
@@ -43,7 +45,11 @@ public abstract class ScreenMixin extends AbstractParentElement
 		if(toHud)
 			return;
 		
-		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
+		Instant instant = Instant.now();
+		class_7425 signature =
+			WurstClient.IMC.getPlayer().signChatMessage(instant, message);
+		ChatMessageC2SPacket packet =
+			new ChatMessageC2SPacket(instant, message, signature);
 		WurstClient.MC.getNetworkHandler().sendPacket(packet);
 		ci.cancel();
 	}

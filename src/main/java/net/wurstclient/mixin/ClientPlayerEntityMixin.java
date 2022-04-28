@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import java.time.Instant;
+
+import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,6 +31,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.encryption.NetworkEncryptionUtils;
+import net.minecraft.network.encryption.NetworkEncryptionUtils.class_7425;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -81,8 +86,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		if(!event.isModified())
 			return;
 		
+		Instant instant = Instant.now();
+		message = StringUtils.normalizeSpace(event.getMessage());
+		class_7425 signature = method_43609(instant, message);
+		
 		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(event.getMessage());
+			new ChatMessageC2SPacket(instant, message, signature);
 		networkHandler.sendPacket(packet);
 		ci.cancel();
 	}
@@ -248,5 +257,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier)
 	{
 		this.movementMultiplier = movementMultiplier;
+	}
+	
+	@Override
+	public class_7425 signChatMessage(Instant timestamp, String message)
+	{
+		return method_43609(timestamp, message);
+	}
+	
+	@Shadow
+	private NetworkEncryptionUtils.class_7425 method_43609(Instant instant,
+		String string)
+	{
+		return null;
 	}
 }
