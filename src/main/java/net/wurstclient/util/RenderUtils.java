@@ -13,6 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.class_7433;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -206,10 +207,10 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		drawSolidBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
@@ -354,10 +355,10 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawOutlinedBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
@@ -502,10 +503,10 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawCrossBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
@@ -633,10 +634,10 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawNode(bb, bufferBuilder);
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
@@ -766,10 +767,10 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawArrow(from, to, bufferBuilder);
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	

@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.class_7433;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -218,10 +219,10 @@ public final class BaseFinderHack extends Hack
 					.vertex(vertex[0] - regionX, vertex[1], vertex[2] - regionZ)
 					.next();
 			
-			bufferBuilder.end();
+			class_7433 buffer = bufferBuilder.end();
 			
 			vertexBuffer.bind();
-			vertexBuffer.upload(bufferBuilder);
+			vertexBuffer.upload(buffer);
 			VertexBuffer.unbind();
 			
 			oldRegionX = regionX;

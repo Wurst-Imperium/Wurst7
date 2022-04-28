@@ -31,6 +31,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.class_7433;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -474,10 +475,10 @@ public final class CaveFinderHack extends Hack
 		for(int[] vertex : vertices)
 			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
 		
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;

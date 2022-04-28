@@ -26,6 +26,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.class_7433;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -292,9 +293,9 @@ public final class TunnellerHack extends Hack
 			.multiply(Math.max(0.5, length)).add(offset);
 		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
 		
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		vertexBuffers[0].bind();
-		vertexBuffers[0].upload(bufferBuilder);
+		vertexBuffers[0].upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
@@ -420,9 +421,9 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			}
 			
-			bufferBuilder.end();
+			class_7433 buffer = bufferBuilder.end();
 			vertexBuffers[1].bind();
-			vertexBuffers[1].upload(bufferBuilder);
+			vertexBuffers[1].upload(buffer);
 			VertexBuffer.unbind();
 			
 			if(currentBlock == null)
@@ -521,9 +522,9 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : blocks)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
+			class_7433 buffer = bufferBuilder.end();
 			vertexBuffers[2].bind();
-			vertexBuffers[2].upload(bufferBuilder);
+			vertexBuffers[2].upload(buffer);
 			VertexBuffer.unbind();
 			
 			return !blocks.isEmpty();
@@ -667,10 +668,10 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : liquids)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
+			class_7433 buffer = bufferBuilder.end();
 			
 			vertexBuffers[3].bind();
-			vertexBuffers[3].upload(bufferBuilder);
+			vertexBuffers[3].upload(buffer);
 			VertexBuffer.unbind();
 			return true;
 		}

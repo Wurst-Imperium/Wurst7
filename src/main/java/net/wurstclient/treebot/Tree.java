@@ -13,6 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.class_7433;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -59,9 +60,9 @@ public class Tree implements AutoCloseable
 			RenderUtils.drawOutlinedBox(
 				box.offset(log).offset(-regionX, 0, -regionZ), bufferBuilder);
 		
-		bufferBuilder.end();
+		class_7433 buffer = bufferBuilder.end();
 		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
