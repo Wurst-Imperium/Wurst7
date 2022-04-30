@@ -1,12 +1,16 @@
 package net.wurstclient.hacks;
 
 import io.netty.util.concurrent.ThreadPerTaskExecutor;
+import net.fabricmc.fabric.api.tool.attribute.v1.ToolManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.ToolItem;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.condition.LootConditionManager;
@@ -28,13 +32,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.WorldChunk;
 import net.wurstclient.Category;
 import net.wurstclient.WurstClient;
 import net.wurstclient.commands.GoToCmd;
@@ -43,7 +45,9 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.lwjgl.system.CallbackI;
 
+import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.*;
@@ -84,6 +88,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private LinkedHashMap<Block, Integer> worldAvailabilityMap = new LinkedHashMap<>();
     private LinkedHashMap<Block, BlockPos> nearestBlockPosMap = new LinkedHashMap<>();
     private LinkedHashMap<Block, Double> nearestBlockDistanceMap = new LinkedHashMap<>();
+
+    private Octree blockTree;
+
     private LinkedHashMap<Item, Integer> totalInventoryAvailabilityMap = new LinkedHashMap<>();
 
     private LinkedHashSet<Block> containerBlockTypes;
@@ -99,7 +106,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private boolean doneCrafting = true;
 
     private ContainerManager containerManager = new ContainerManager();
-    private ToolManager toolManager = new ToolManager();
+    private ToolCraftingManager toolCraftingManager = new ToolCraftingManager();
     private BlockManager blockManager = new BlockManager();
     private InventoryManager inventoryManager = new InventoryManager();
 
@@ -179,6 +186,31 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         return manager;
     }
 
+    private double blockBreakingTime(Block block, @Nullable ToolItem tool) {
+        double speedMultiplier = 1.0;
+        boolean canHarvest = !block.getDefaultState().isToolRequired();
+        if (tool != null) {
+            canHarvest |= ToolManager.handleIsEffectiveOn(block.getDefaultState(), new ItemStack(tool, 1), null);
+            if (canHarvest) {
+                speedMultiplier = ToolManager.handleBreakingSpeed(block.getDefaultState(), new ItemStack(tool, 1), null);
+            }
+            else {
+                speedMultiplier = 1.0;
+            }
+        }
+        double damage = speedMultiplier / block.getHardness();
+        if (canHarvest) {
+            damage /= 30;
+        }
+        else {
+            damage /= 100;
+        }
+        if (damage > 1)
+            return 0;
+        double ticks = Math.ceil(1 / damage);
+        return ticks / 20;
+    }
+
     private void initProcessMap() {
         processMap = new LinkedHashMap<>();
         RecipeManager recipeManager = MC.world.getRecipeManager();
@@ -228,24 +260,59 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
-    public class ToolManager {
-        private List<Item> tools;
-        public ToolManager() {
-            tools = new ArrayList<>();
+    public class ToolCraftingManager {
+        private LinkedHashSet<Item> tools;
+        private LinkedHashSet<List<Item>> toolClasses;
+        private LinkedHashSet<Item> essentialTools;
+        public ToolCraftingManager() {
+            tools = new LinkedHashSet<>();
+            toolClasses = new LinkedHashSet<>();
+            essentialTools = new LinkedHashSet<>();
             String[] prefixes = new String[] {"wooden", "stone", "iron", "golden", "diamond"};
             String[] suffixes = new String[] {"sword", "axe", "pickaxe", "shovel", "hoe"};
-            for (String prefix : prefixes) {
-                for (String suffix : suffixes) {
-                    tools.add(Registry.ITEM.get(new Identifier("minecraft", prefix + "_" + suffix)));
+            for (String suffix : suffixes) {
+                List<Item> toolClass = new ArrayList<>();
+                for (String prefix : prefixes) {
+                    Item tool = Registry.ITEM.get(new Identifier("minecraft", prefix + "_" + suffix));
+                    tools.add(tool);
+                    if (suffix.equals("pickaxe") || suffix.equals("sword"))
+                        essentialTools.add(tool);
+                    toolClass.add(tool);
                 }
+                toolClasses.add(toolClass);
             }
             //tools.add(Registry.ITEM.get(new Identifier("minecraft", "shears")));
+        }
+        public List<Item> getClass(Item item) {
+            for (List<Item> toolClass : toolClasses) {
+                if (toolClass.contains(item))
+                    return toolClass;
+            }
+            return new ArrayList<>();
+        }
+        public boolean isEssentialTool(Item item) {
+            return essentialTools.contains(item);
+        }
+        public Set<Item> getInferiorToolsInClass(Item item) {
+            List<Item> toolClass = getClass(item);
+            int index = toolClass.indexOf(item);
+            LinkedHashSet<Item> res = new LinkedHashSet<>();
+            for (int i = index - 1; i >= 0; i--)
+                res.add(toolClass.get(i));
+            return res;
+        }
+        public Set<Item> getInferiorTools(Item item) {
+            int index = getClass(item).indexOf(item);
+            LinkedHashSet<Item> res = new LinkedHashSet<>();
+            for (List<Item> toolClass : toolClasses) {
+                for (int i = index - 1; i >= 0; i--)
+                    res.add(toolClass.get(i));
+            }
+            return res;
         }
         public Set<Item> getMatchingTools(Block block) {
             Set<Item> res = new LinkedHashSet<>();
             BlockState state = block.getDefaultState();
-            if (!state.isToolRequired())
-                return res;
             for (Item tool : tools) {
                 ItemStack toolStack = new ItemStack(tool, 1);
                 if (toolStack.isSuitableFor(state)) {
@@ -908,7 +975,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
 
     public class WorldStorageQuery extends StorageQuery<Block> {
         public WorldStorageQuery() { }
-        private List<Chunk> getChunks(int range) {
+        public List<Chunk> getChunks(int range) {
             List<Chunk> res = new ArrayList<>();
             ChunkPos playerPos = MC.player.getChunkPos();
             for (int x = playerPos.x - range; x <= playerPos.x + range; x++) {
@@ -1401,6 +1468,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private LinkedHashMap<Node, Double> naiveEfficiencyMap = new LinkedHashMap<>();
         private LinkedHashMap<Node, Boolean> naiveEfficiencyMapGenerated = new LinkedHashMap<>();
         private LinkedHashSet<Item> visited;
+        private LinkedHashSet<Item> resetVisited = new LinkedHashSet<>();
         private List<StorageNode> storageNodes = new ArrayList<>();
         private LinkedHashMap<Item, Integer> craftingItemFrequency = new LinkedHashMap<>();
         private LinkedHashSet<Integer> deadNodes = new LinkedHashSet<>();
@@ -1427,6 +1495,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private LinkedHashMap<Node, EfficiencyEquation> efficiencyEquations = new LinkedHashMap<>();
         private LinkedHashMap<Node, Boolean> efficiencyEquationsGenerated = new LinkedHashMap<>();
         private LinkedHashSet<Integer> excessBlacklist = new LinkedHashSet<>();
+        private Stack<LinkedHashSet<Item>> visitedStack = new Stack<>();
         private int rootNodeId = 0;
         private static int maxVisitedSize = 0;
         private boolean success = false;
@@ -1475,6 +1544,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         public CraftingState clone() {
             CraftingState state = new CraftingState((LinkedHashMap<Item, Integer>) inventoryAvailability.clone(), (LinkedHashMap<Item, Integer>) storageAvailability.clone(), (LinkedHashMap<Block, Integer>) worldAvailability.clone(), (LinkedHashSet<Item>) visited.clone());
+            state.resetVisited = (LinkedHashSet<Item>) resetVisited.clone();
             state.success = success;
             state.storageNodes = new ArrayList<>(storageNodes);
             state.craftingItemFrequency = (LinkedHashMap<Item, Integer>) craftingItemFrequency.clone();
@@ -1504,6 +1574,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             state.efficiencyEquations = efficiencyEquations;
             state.efficiencyEquationsGenerated = efficiencyEquationsGenerated;
             state.excessBlacklist = (LinkedHashSet<Integer>) excessBlacklist.clone();
+            state.visitedStack = (Stack<LinkedHashSet<Item>>) visitedStack.clone();
             return state;
         }
         public void set(CraftingState other) {
@@ -1511,6 +1582,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             storageAvailability = other.storageAvailability;
             worldAvailability = other.worldAvailability;
             visited = other.visited;
+            resetVisited = other.resetVisited;
             success = other.success;
             storageNodes = other.storageNodes;
             craftingItemFrequency = other.craftingItemFrequency;
@@ -1540,6 +1612,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             efficiencyEquations = other.efficiencyEquations;
             efficiencyEquationsGenerated = other.efficiencyEquationsGenerated;
             excessBlacklist = other.excessBlacklist;
+            visitedStack = other.visitedStack;
         }
         private void generateThrowawayItems(NodeEquivalenceClass node) {
             List<String> itemNames = List.of("dirt", "cobblestone", "stone", "netherrack", "granite", "diorite", "andesite", "gravel", "sand", "end_stone");
@@ -1743,7 +1816,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                 }
             }
-            if (removedChildren && nodeChildren.size() == 0 && !node.requiresAllChildren()) {
+            if (removedChildren && nodeChildren.size() == 0 && !node.requiresAllChildren() && node.requiresAnyChildren()) {
                 clearInstanceGraph(node);
                 ancestors.remove(node);
                 return new NodeGraphGenerationInfo().failure();
@@ -1794,16 +1867,47 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return result;
         }
+        public boolean addVisited(LinkedHashSet<Item> visited, LinkedHashSet<Item> resetVisited, Node node) {
+            if (node.shouldPruneNow(visited, resetVisited))
+                return false;
+            if (node.shouldPruneTarget) {
+                if (visited.contains(node.target))
+                    return false;
+                if (node.shouldResetVisited && resetVisited.contains(node.target))
+                    return false;
+            }
+            if (node.shouldResetVisited)
+                resetVisited.add(node.target);
+            if (node.shouldRememberVisit())
+                visited.add(node.target);
+            return true;
+        }
+        public void removeVisited(LinkedHashSet<Item> visited, LinkedHashSet<Item> resetVisited, Node node) {
+            if (node.shouldResetVisited)
+                resetVisited.remove(node.target);
+            if (node.shouldRememberVisit())
+                visited.remove(node.target);
+        }
+        public void pushVisitedClone(Node node) {
+            if (node.shouldResetVisited) {
+                LinkedHashSet<Item> visitedClone = (LinkedHashSet<Item>) visited.clone();
+                visitedStack.push(visitedClone);
+                visited.clear();
+            }
+        }
+        public void popVisitedClone(Node node) {
+            if (node.shouldResetVisited) {
+                visited = visitedStack.pop();
+            }
+        }
         private int generateTreeInternal(int id, Node node) {
             assert node != null;
             assert node.canPossiblyCraft(this);
             assert !nodeInstances.containsKey(node);
             assert equivalenceRelation.containsKey(new NodeEquivalenceClass(node));
             assert equivalenceRelation.get(new NodeEquivalenceClass(node)) != null;
-            if (node.shouldPruneTarget && visited.contains(node.target))
+            if (!addVisited(visited, resetVisited, node))
                 return -1;
-            if (node.shouldRememberVisit())
-                visited.add(node.target);
             List<Node> nodeChildren;
             if (nodeInstances.containsKey(node)) {
                 node = nodeInstances.get(node);
@@ -1822,6 +1926,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 assert equivalenceRelation.containsKey(new NodeEquivalenceClass(child));
                 assert instanceProfile.containsKey(new NodeEquivalenceClass(child));
                 child.overlap = linkedHashSetOverlap(visited, instanceProfile.get(new NodeEquivalenceClass(child)));
+                child.resetOverlap = linkedHashSetOverlap(resetVisited, instanceProfile.get(new NodeEquivalenceClass(child)));
+                child.resetVisited = (LinkedHashSet<Item>) resetVisited.clone();
                 nodeChildIds.add(0, id + 1);
                 boolean pruneChild = child.shouldPruneTarget && visited.contains(child.target);
                 if (nodeInstances.containsKey(child)) {
@@ -1835,7 +1941,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     }
                 }
                 else {
+                    pushVisitedClone(child);
                     int retval = generateTreeInternal(0, child);
+                    popVisitedClone(child);
                     if (retval != -1) {
                         id = id + retval + 1;
                         child.genNaiveMaxCraftable(this);
@@ -1844,8 +1952,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 if (naiveMaxCraftable.getOrDefault(child, 0) == 0 && !child.shouldAlwaysConsiderPossible()) {
                     //clearChildren(child);
                     if (node.requiresAllChildren()) {
-                        if (node.shouldRememberVisit())
-                            visited.remove(node.target);
+                        removeVisited(visited, resetVisited, node);
                         return -1;
                     }
                     else {
@@ -1855,9 +1962,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
             }
             childScope.put(node, id);
-            if (node.shouldRememberVisit())
-                visited.remove(node.target);
-            if (initialChildren > 0 && nodeChildren.size() == 0)
+            removeVisited(visited, resetVisited, node);
+            if (initialChildren > 0 && nodeChildren.size() == 0 && node.requiresAnyChildren())
                 return -1;
             return id;
         }
@@ -2019,8 +2125,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             double epsilon = 1E-6;
             double m = s1.coefficient;
             double n = s2.coefficient;
-            double b = s1.offset + s1.base;
-            double d = s2.offset + s2.base;
+            double b = s1.offset + s1.base - m * s1.start;
+            double d = s2.offset + s2.base - n * s2.start;
             if (Math.abs(m - n) <= epsilon)
                 return 0;
             return (d - b) / (m - n);
@@ -2048,15 +2154,24 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             while (i1prev != i1 || i2prev != i2) {
                 double nextPosition = Math.min(s1.end, s2.end);
                 double intersectionPoint = findIntersectionPoint(s1, s2);
-                EfficiencyEquationSegment smallest = s1.offset + s1.base < s2.offset + s2.base ? s1 : s2;
-                if (Math.abs(s1.coefficient - s2.coefficient) > epsilon && intersectionPoint >= position && intersectionPoint < nextPosition)
-                    nextPosition = intersectionPoint;
-                EfficiencyEquationSegment newSegment = new EfficiencyEquationSegment(smallest.evaluateRelative(position), smallest.coefficient, position, nextPosition);
-                if (res.size() > 0 && Math.abs(res.get(res.size() - 1).evaluateRelative(position) - newSegment.evaluateRelative(position)) <= epsilon && Math.abs(res.get(res.size() - 1).coefficient - newSegment.coefficient) <= epsilon) {
-                    res.get(res.size() - 1).end = newSegment.end;
+                EfficiencyEquationSegment smallest = s1.evaluate(position) < s2.evaluate(position) ? s1 : s2;
+                EfficiencyEquationSegment largest = smallest == s1 ? s2 : s1;
+                EfficiencyEquationSegment priorIntersection;
+                EfficiencyEquationSegment postIntersection = null;
+                if (Math.abs(s1.coefficient - s2.coefficient) > epsilon && intersectionPoint >= position && intersectionPoint < nextPosition) {
+                    priorIntersection = new EfficiencyEquationSegment(smallest.evaluateRelative(position), smallest.coefficient, position, intersectionPoint);
+                    postIntersection = new EfficiencyEquationSegment(0, largest.coefficient, intersectionPoint, nextPosition);
                 }
                 else {
-                    res.add(newSegment);
+                    priorIntersection = new EfficiencyEquationSegment(smallest.evaluateRelative(position), smallest.coefficient, position, nextPosition);
+                }
+                if (res.size() > 0 && Math.abs(res.get(res.size() - 1).evaluateRelative(position) - priorIntersection.evaluateRelative(position)) <= epsilon && Math.abs(res.get(res.size() - 1).coefficient - priorIntersection.coefficient) <= epsilon) {
+                    res.get(res.size() - 1).end = priorIntersection.end;
+                }
+                else {
+                    res.add(priorIntersection);
+                    if (postIntersection != null)
+                        res.add(postIntersection);
                 }
                 position = nextPosition;
                 i1prev = i1;
@@ -2106,6 +2221,253 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
     }
 
+    public static abstract class Octree {
+        protected int startX, startY, startZ;
+        protected int size;
+        protected Set<Block> contents;
+        protected List<Octree> children;
+        public static Set<Block> unusedBlocks = Set.of(Blocks.AIR, Blocks.VOID_AIR, Blocks.CAVE_AIR, Blocks.WATER, Blocks.LAVA);
+        public Octree(int startX, int startY, int startZ, int size) {
+            this.startX = startX;
+            this.startY = startY;
+            this.startZ = startZ;
+            this.size = size;
+            contents = new LinkedHashSet<>();
+            children = new ArrayList<>();
+        }
+        public static Octree construct(int startX, int startY, int startZ, int size) {
+            if (size > 1)
+                return new OctreeDivisible(startX, startY, startZ, size);
+            return new OctreeLeaf(startX, startY, startZ);
+        }
+        public abstract boolean create();
+        public boolean containsPointXZ(BlockPos pos) {
+            int x = pos.getX(), z = pos.getZ();
+            return x >= startX && x < startX + size && z >= startZ && z < startZ + size;
+        }
+        public boolean containsPoint(BlockPos pos) {
+            int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+            return x >= startX && x < startX + size && y >= startY && y < startY + size && z >= startZ && z < startZ + size;
+        }
+        public BlockPos getClosestPoint(BlockPos pos) {
+            int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+            if (x < startX)
+                x = startX;
+            if (x >= startX + size)
+                x = startX + size - 1;
+            if (y < startY)
+                y = startY;
+            if (y >= startY + size)
+                y = startY + size - 1;
+            if (z < startZ)
+                z = startZ;
+            if (z >= startZ + size)
+                z = startZ + size - 1;
+            return new BlockPos(x, y, z);
+        }
+        public BlockPos getQuadrantCoordinates(BlockPos pos) {
+            int halfSize = size / 2;
+            int x = startX + halfSize;
+            int y = startY + halfSize;
+            int z = startZ + halfSize;
+            if (x > pos.getX())
+                x -= halfSize;
+            if (y > pos.getY())
+                y -= halfSize;
+            if (z > pos.getZ())
+                z -= halfSize;
+            return new BlockPos(x, y, z);
+        }
+        public BlockPos getFarthestPoint(BlockPos pos) {
+            int i = 0, j = 0, k = 0;
+            i = Math.abs(pos.getX() - startX) < Math.abs(pos.getX() - startX - size) ? 1 : 0;
+            j = Math.abs(pos.getY() - startY) < Math.abs(pos.getY() - startY - size) ? 1 : 0;
+            k = Math.abs(pos.getZ() - startZ) < Math.abs(pos.getZ() - startZ - size) ? 1 : 0;
+            return new BlockPos(startX + size * i, startY + size * j, startZ + size * k);
+        }
+        public void calculateBlockDistances(LinkedHashMap<Octree, Double> closest, LinkedHashMap<Octree, Double> farthest, BlockPos pos) {
+            BlockPos closestPos = getClosestPoint(pos);
+            BlockPos farthestPos = getFarthestPoint(pos);
+            double closestDist = new Vec3d(closestPos.getX(), closestPos.getY(), closestPos.getZ()).subtract(new Vec3d(pos.getX(), pos.getY(), pos.getZ())).length();
+            double farthestDist = new Vec3d(farthestPos.getX(), farthestPos.getY(), farthestPos.getZ()).subtract(new Vec3d(pos.getX(), pos.getY(), pos.getZ())).length();
+            closest.put(this, closestDist);
+            farthest.put(this, farthestDist);
+        }
+        public void removeTree(LinkedHashMap<Octree, Double> closest, LinkedHashMap<Octree, Double> farthest) {
+            closest.remove(this);
+            farthest.remove(this);
+        }
+        public int treeBinarySearch(List<Octree> nodes, LinkedHashMap<Octree, Double> closestDistance, int l, int r) {
+            double x = closestDistance.get(this);
+            if (r >= l) {
+                int mid = l + (r - l) / 2;
+                if (closestDistance.get(nodes.get(mid)) == x)
+                    return mid;
+                if (closestDistance.get(nodes.get(mid)) > x)
+                    return treeBinarySearch(nodes, closestDistance, l, mid - 1);
+                return treeBinarySearch(nodes, closestDistance, mid + 1, r);
+            }
+            return l;
+        }
+        public BlockPos findClosest(Block block, BlockPos pos) {
+            double epsilon = 1E-6;
+            LinkedHashMap<Octree, Double> closestDistance = new LinkedHashMap<>();
+            LinkedHashMap<Octree, Double> farthestDistance = new LinkedHashMap<>();
+            List<Octree> activeNodes = new ArrayList<>();
+            activeNodes.add(this);
+            calculateBlockDistances(closestDistance, farthestDistance, pos);
+            double minFarthest = farthestDistance.get(this);
+            while (activeNodes.size() > 0) {
+                Octree selection = null;
+                for (int i = 0; i < activeNodes.size(); i++) {
+                    if (activeNodes.get(i).children.size() > 0) {
+                        selection = activeNodes.get(i);
+                        activeNodes.remove(i);
+                        selection.removeTree(closestDistance, farthestDistance);
+                        break;
+                    }
+                }
+                if (selection == null)
+                    break;
+                for (Octree child : selection.children) {
+                    if (child.contents.contains(block)) {
+                        child.calculateBlockDistances(closestDistance, farthestDistance, pos);
+                        if (closestDistance.get(child) - epsilon > minFarthest) {
+                            child.removeTree(closestDistance, farthestDistance);
+                            continue;
+                        }
+                        minFarthest = Math.min(minFarthest, farthestDistance.get(child));
+                        double furthest = farthestDistance.get(child);
+                        for (int i = activeNodes.size() - 1; i >= 0; i--) {
+                            if (closestDistance.get(activeNodes.get(i)) - epsilon > furthest) {
+                                activeNodes.get(i).removeTree(closestDistance, farthestDistance);
+                                activeNodes.remove(i);
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        int index = child.treeBinarySearch(activeNodes, closestDistance, 0, activeNodes.size() - 1);
+                        activeNodes.add(index, child);
+                    }
+                }
+            }
+            if (activeNodes.size() == 0)
+                return null;
+            Octree leaf = activeNodes.get(0);
+            return new BlockPos(leaf.startX, leaf.startY, leaf.startZ);
+        }
+        public void addBlock(Block block, BlockPos pos) {
+            if (size == 1 || !containsPoint(pos))
+                return;
+            contents.add(block);
+            for (Octree child : children) {
+                if (child.containsPoint(pos)) {
+                    child.addBlock(block, pos);
+                    return;
+                }
+            }
+            if (size == 2) {
+                children.add(new OctreeLeaf(pos.getX(), pos.getY(), pos.getZ(), block));
+            }
+            else {
+                int halfSize = size / 2;
+                BlockPos quadrant = getQuadrantCoordinates(pos);
+                Octree child = new OctreeDivisible(quadrant.getX(), quadrant.getY(), quadrant.getZ(), halfSize);
+                children.add(child);
+                child.addBlock(block, pos);
+            }
+        }
+    }
+
+    public static class OctreeDivisible extends Octree {
+        public OctreeDivisible(int startX, int startY, int startZ, int size) {
+            super(startX, startY, startZ, size);
+        }
+        public List<Octree> divide() {
+            List<Octree> res = new ArrayList<>();
+            int halfSize = size / 2;
+            for (int i = 0; i <= 1; i++) {
+                for (int j = 0; j <= 1; j++) {
+                    for (int k = 0; k <= 1; k++) {
+                        res.add(Octree.construct(startX + i * halfSize, startY + j * halfSize, startZ + k * halfSize, halfSize));
+                    }
+                }
+            }
+            return res;
+        }
+        @Override
+        public boolean create() {
+            children = divide();
+            for (int i = children.size() - 1; i >= 0; i--) {
+                Octree child = children.get(i);
+                if (child.create()) {
+                    contents.addAll(child.contents);
+                }
+                else {
+                    children.remove(i);
+                }
+            }
+            return !children.isEmpty();
+        }
+    }
+
+    public static class OctreeLeaf extends Octree {
+        public OctreeLeaf(int startX, int startY, int startZ) {
+            super(startX, startY, startZ, 1);
+        }
+        public OctreeLeaf(int startX, int startY, int startZ, Block block) {
+            this(startX, startY, startZ);
+            contents = Set.of(block);
+        }
+        @Override
+        public boolean create() {
+            Block block = Blocks.VOID_AIR;
+            try {
+                BlockPos pos = new BlockPos(startX, startY, startZ);
+                if (MC.world != null) {
+                    BlockState state = MC.world.getBlockState(pos);
+                    if (state != null)
+                        block = state.getBlock();
+                }
+            }
+            catch (NullPointerException ignored) { }
+            contents = Set.of(block);
+            return !Octree.unusedBlocks.contains(block);
+        }
+    }
+
+    public Octree createBlockTree() {
+        List<Chunk> chunks = worldQuery.getChunks(5);
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (Chunk chunk : chunks) {
+            int bottomY = chunk.getBottomY();
+            int topY = chunk.getTopY();
+            int left = chunk.getPos().x * 16;
+            int back = chunk.getPos().z * 16;
+            int right = left + 16;
+            int front = back + 16;
+            if (bottomY < minY)
+                minY = bottomY;
+            if (topY > maxY)
+                maxY = topY;
+            if (left < minX)
+                minX = left;
+            if (back < minZ)
+                minZ = back;
+            if (right > maxX)
+                maxX = right;
+            if (front > maxZ)
+                maxZ = front;
+        }
+        int sizeFactor = Math.max(maxX - minX, Math.max(maxY - minY, maxZ - minZ));
+        int size = (int)Math.pow(2, (int)Math.ceil(Math.log(sizeFactor) / Math.log(2)));
+        Octree res = new OctreeDivisible(minX, minY, minZ, size);
+        res.create();
+        return res;
+    }
+
     public abstract class Node {
         protected Item target;
         //protected int needed;
@@ -2118,7 +2480,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         //protected int timeTaken;
         //protected int callCounter;
         private LinkedHashSet<Item> overlap = new LinkedHashSet<>();
+        private LinkedHashSet<Item> resetOverlap = new LinkedHashSet<>();
+        protected LinkedHashSet<Item> resetVisited = new LinkedHashSet<>();
         protected boolean shouldPruneTarget = true;
+        protected boolean shouldOnlyCraftOne = false;
+        protected boolean shouldResetVisited = false;
         public Class distinction = Node.class;
         private static int totalNumCalls = 0;
         private static int maxNodeId = 0;
@@ -2135,8 +2501,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             this.shouldPruneTarget = shouldPruneTarget;
             return this;
         }
+        public Node setShouldOnlyCraftOne(boolean shouldOnlyCraftOne) {
+            this.shouldOnlyCraftOne = shouldOnlyCraftOne;
+            return this;
+        }
+        public Node setShouldResetVisited(boolean shouldResetVisited) {
+            this.shouldResetVisited = shouldResetVisited;
+            return this;
+        }
         protected boolean requiresAllChildren() {
             return true;
+        }
+        protected boolean requiresAnyChildren() {
+            return true;
+        }
+        protected boolean shouldPruneNow(LinkedHashSet<Item> visited, LinkedHashSet<Item> resetVisited) {
+            return false;
         }
         protected void mergeResources(Resources<OperableInteger> base, Resources<OperableInteger> res) {
             for (Integer item : res.keySet()) {
@@ -2198,6 +2578,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 int childId = id + childIds.get(i);
                 Node child = children.get(i);
                 if (state.neededMap.getOrDefault(childId, 0) > 0) {
+                    clearNearestBlockMetrics();
+                    generateBlockMetrics();
                     int originalNumNeeded = state.neededMap.getOrDefault(childId, 0) + getTotalExcessConsumed(childId, state);
                     child.clearDeadNodes(childId, state);
                     child.clearEfficiencyEquations(state);
@@ -2238,14 +2620,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (processes == null)
                 return res;
             for (Node child : getChildrenInternal(state.visited)) {
-                if (child.shouldRememberVisit() && state.visited.contains(child.target))
+                if (!state.addVisited(state.visited, state.resetVisited, child))
                     continue;
+                state.removeVisited(state.visited, state.resetVisited, child);
                 res.add(child);
             }
             return res;
-        }
-        protected boolean shouldOnlyCraftOne() {
-            return false;
         }
         protected boolean shouldAlwaysConsiderPossible() {
             return false;
@@ -2271,13 +2651,13 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected void genEfficiencyEquations(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             if (state.efficiencyEquationsGenerated.getOrDefault(this, false))
                 return;
-            if (shouldPruneTarget && visited.contains(target))
+            /*if (shouldPruneTarget && visited.contains(target))
                 return;
             if (shouldRememberVisit())
-                visited.add(target);
+                visited.add(target);*/
             EfficiencyEquation equation = genEfficiencyEquationsInternal(state, visited, numNeeded);
-            if (shouldRememberVisit())
-                visited.remove(target);
+            /*if (shouldRememberVisit())
+                visited.remove(target);*/
             state.efficiencyEquations.put(this, equation);
             state.efficiencyEquationsGenerated.put(this, true);
         }
@@ -2313,11 +2693,21 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             originalState.set(newState);
             return amount;
         }
-        private int getNumNodes() {
+        private int getNumNodes(List<Node> ancestors) {
             int res = 1;
-            for (Node child : children) {
-                res += child.getNumNodes();
+            if (ancestors.contains(this)) {
+                int index = ancestors.indexOf(this);
+                for (int i = index; i < ancestors.size(); i++) {
+                    System.out.println(ancestors.get(i) + ", " + ancestors.get(i).target);
+                }
+                System.out.println("-----------------------------------------");
+                ancestors.clear();
             }
+            ancestors.add(this);
+            for (Node child : children) {
+                res += child.getNumNodes(ancestors);
+            }
+            ancestors.remove(ancestors.size() - 1);
             return res;
         }
         private int print(int indent, boolean ignoreNeeded, PrintStream stream, int id, CraftingState state) {
@@ -2349,7 +2739,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             System.out.println("Total number of nodes: " + maxNodeId);
             System.out.println("Number of nodes printed: " + numPrinted);
             System.out.println("Craftable: " + amount);
-            System.out.println("Nodes in tree: " + getNumNodes());
+            System.out.println("Nodes in tree: " + state.childScope.get(this));
             System.out.println("Total number of calls: " + totalNumCalls);
             BigInteger[] arr = globalTimeTaken.divideAndRemainder(new BigInteger("1000000000"));
             System.out.println("Time taken: " + arr[0] + ", " + arr[1]);
@@ -2382,10 +2772,14 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 excessItem.add(index, new Pair<>(nodeId, new Pair<>(node, value)));
         }
         protected void setExcessBlacklist(int nodeId, CraftingState state, LinkedHashSet<Item> visited, boolean blacklist) {
-            if (shouldPruneTarget && visited.contains(target))
-                return;
-            if (shouldRememberVisit())
-                visited.add(target);
+            if (blacklist) {
+                if (state.neededMap.getOrDefault(nodeId, 0) == 0)
+                    return;
+            }
+            else {
+                if (!state.excessBlacklist.contains(nodeId))
+                    return;
+            }
             if (blacklist) {
                 state.excessBlacklist.add(nodeId);
             }
@@ -2398,14 +2792,16 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Node child = children.get(i);
                 child.setExcessBlacklist(childId, state, visited, blacklist);
             }
-            if (shouldRememberVisit())
-                visited.remove(target);
         }
         protected boolean unconsumeResources(int nodeId, int lowerBoundId, int upperBoundId, CraftingState state, LinkedHashSet<Item> visited) {
-            if (shouldPruneTarget && visited.contains(target))
+            boolean modified = state.excessProduced.containsKey(nodeId) ||
+                    state.excessConsumed.containsKey(nodeId) ||
+                    state.resourceConsumed.containsKey(nodeId) ||
+                    state.inventoryConsumed.containsKey(nodeId) ||
+                    state.storageConsumed.containsKey(nodeId) ||
+                    state.worldConsumed.containsKey(nodeId);
+            if (!modified && state.neededMap.getOrDefault(nodeId, 0) == 0)
                 return true;
-            if (shouldRememberVisit())
-                visited.add(target);
             if (excessGetOrDefault(nodeId, 0, state.excess.getOrDefault(target, new ArrayList<>())) > 0)
                 excessPut(nodeId, this, 0, state.excess.get(target));
             if (state.excessProduced.containsKey(nodeId)) {
@@ -2469,16 +2865,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     return false;
                 }
             }
-            if (shouldRememberVisit())
-                visited.remove(target);
             return true;
         }
         protected boolean consumeResources(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
-            /*if (shouldPruneTarget && visited.contains(target))
-                return true;
-            if (shouldRememberVisit())
-                visited.add(target);*/
-            if (shouldOnlyCraftOne())
+            if (shouldOnlyCraftOne)
                 excessOverflow = 0;
             int originalExcessOverflow = excessOverflow;
             if (!state.deadNodes.contains(nodeId) && resources.containsKey(nodeId) && resources.get(nodeId).getLeft().getValue() > 0) {
@@ -2558,12 +2948,10 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
                 if (shouldRememberVisit())
                     visited.remove(target);
-                if (shouldOnlyCraftOne())
+                if (shouldOnlyCraftOne)
                     state.deadNodes.add(nodeId);
                 return consumeResourcesInternal(nodeId, resources, state, excessOverflow, visited);
             }
-            /*if (shouldRememberVisit())
-                visited.remove(target);*/
             return true;
         }
         protected boolean consumeResourcesInternal(int nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
@@ -2597,7 +2985,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         private Pair<Boolean, Resources<OperableInteger>> getBaseResources(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
             if (!state.idInstanceMap.containsKey(nodeId))
                 state.idInstanceMap.put(nodeId, this);
-            if (shouldOnlyCraftOne()) {
+            if (shouldOnlyCraftOne) {
                 numNeeded = Math.min(numNeeded, 1);
                 actualNeeded = Math.min(actualNeeded, 1);
             }
@@ -2678,19 +3066,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         protected abstract void genNaiveMaxCraftableInternal(CraftingState state);
         protected void genNaiveMaxCraftable(CraftingState state) {
-            if (shouldPruneTarget && state.visited.contains(target))
-                return;
             if (state.naiveMaxCraftableGenerated.getOrDefault(this, false))
                 return;
-            if (shouldRememberVisit())
-                state.visited.add(target);
+            if (!state.addVisited(state.visited, state.resetVisited, this))
+                return;
+            state.pushVisitedClone(this);
             for (Node child : children) {
                 child.genNaiveMaxCraftable(state);
             }
             genNaiveMaxCraftableInternal(state);
             state.naiveMaxCraftableGenerated.put(this, true);
-            if (shouldRememberVisit())
-                state.visited.remove(target);
+            state.popVisitedClone(this);
+            state.removeVisited(state.visited, state.resetVisited, this);
         }
         protected abstract boolean shouldRememberVisit();
         public abstract LinkedHashMap<Item, ItemStack> collectIngredients();
@@ -2702,6 +3089,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         protected int hashCodeInternal(int hash) {
             return hash;
         }
+        protected int equivalenceClassHashCodeInternal(int hash) {
+            return hash;
+        }
         @Override
         public int hashCode() {
             int hash = 7;
@@ -2710,6 +3100,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             hash = 31 * hash + getClass().hashCode();
             hash = 31 * hash + distinction.hashCode();
             hash = 31 * hash + overlap.hashCode();
+            hash = 31 * hash + resetVisited.hashCode();
             hash = hashCodeInternal(hash);
             return hash;
         }
@@ -2719,24 +3110,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             hash = 31 * hash + target.hashCode();
             hash = 31 * hash + getClass().hashCode();
             hash = 31 * hash + distinction.hashCode();
-            hash = hashCodeInternal(hash);
+            hash = equivalenceClassHashCodeInternal(hash);
             return hash;
         }
         protected boolean equalsInternal(Object other) {
             return true;
         }
+        protected boolean equivalenceClassEqualsInternal(Object other) {
+            return true;
+        }
         @Override
         public boolean equals(Object other) {
-            if (other instanceof Node) {
-                Node o = (Node)other;
-                return overlap.size() == o.overlap.size() && target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equalsInternal(other) && overlap.equals(o.overlap);
+            if (other instanceof Node o) {
+                return overlap.size() == o.overlap.size() && resetVisited.size() == o.resetVisited.size() && target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equalsInternal(other) && overlap.equals(o.overlap) && resetVisited.equals(o.resetVisited);
             }
             return false;
         }
         public boolean equivalenceClassEquals(Object other) {
-            if (other instanceof Node) {
-                Node o = (Node)other;
-                return target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equalsInternal(other);
+            if (other instanceof Node o) {
+                return target.equals(o.target) && stackShift == o.stackShift && getClass().equals(o.getClass()) && distinction.equals(o.distinction) && equivalenceClassEqualsInternal(other);
             }
             return false;
         }
@@ -2748,7 +3140,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             cloned.processes = new ArrayList<>(processes);
             cloned.children = new ArrayList<>(children);
             cloned.overlap = (LinkedHashSet<Item>) overlap.clone();
+            cloned.resetOverlap = (LinkedHashSet<Item>) resetOverlap.clone();
+            cloned.resetVisited = (LinkedHashSet<Item>) resetVisited.clone();
             cloned.shouldPruneTarget = shouldPruneTarget;
+            cloned.shouldOnlyCraftOne = shouldOnlyCraftOne;
+            cloned.shouldResetVisited = shouldResetVisited;
             cloned.distinction = distinction;
             return cloned;
         }
@@ -3437,6 +3833,23 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             super(target, processes);
         }
         @Override
+        protected boolean shouldPruneNow(LinkedHashSet<Item> visited, LinkedHashSet<Item> resetVisited) {
+            if (toolCraftingManager.tools.contains(target)) {
+                if (!toolCraftingManager.isEssentialTool(target)) {
+                    for (Item item : resetVisited) {
+                        if (toolCraftingManager.tools.contains(item))
+                            return true;
+                    }
+                }
+                Set<Item> inferiorTools = toolCraftingManager.getInferiorTools(target);
+                for (Item tool : inferiorTools) {
+                    if (resetVisited.contains(tool))
+                        return true;
+                }
+            }
+            return false;
+        }
+        @Override
         protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             List<Node> res = new ArrayList<>();
             for (CraftingProcess process : processes) {
@@ -3574,6 +3987,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public int getOutputCount() {
             return 1;
         }
+        /*@Override
+        protected int hashCodeInternal(int hash) {
+            if (toolCraftingManager.tools.contains(target))
+                return 31 * hash + resetVisited.hashCode();
+            return hash;
+        }
+        @Override
+        protected boolean equalsInternal(Object other) {
+            if (other instanceof ChoiceNode && toolCraftingManager.tools.contains(target) && toolCraftingManager.tools.contains(((ChoiceNode) other).target))
+                return resetVisited.equals(((ChoiceNode) other).resetVisited);
+            return false;
+        }*/
         @Override
         protected Node cloneInternal() {
             return new ChoiceNode(target, processes);
@@ -3865,21 +4290,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
             Block block = ((WorldCraftingProcess) processes.get(0)).block;
-            if (block.getDefaultState().isToolRequired())
-                return List.of(new ToolCraftingProcess(block).getNode());
-            return new ArrayList<>();
-        }
-        @Override
-        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
-            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
-            double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
-            if (block.getDefaultState().isToolRequired()) {
-                for (Node child : children) {
-                    child.genEfficiencyEquations(state, visited, 1);
-                    base += state.efficiencyEquations.get(child).evaluate(1);
-                }
-            }
-            return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 100, 0, state.naiveMaxCraftable.get(this))));
+            return List.of(new ToolCraftingProcess(block).getNode());
         }
         @Override
         protected boolean canPossiblyCraft(CraftingState state) {
@@ -3895,22 +4306,31 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return state.worldAvailability.get(block) >= 0;
         }
         @Override
+        protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
+            Block targetBlock = ((WorldCraftingProcess) processes.get(0)).block;
+            double base = getNearestBlockDistance(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            EfficiencyEquation eq = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, state.naiveMaxCraftable.get(this))));
+            for (Node child : children) {
+                child.genEfficiencyEquations(state, visited, 1);
+                eq = eq.add(state.efficiencyEquations.get(child));
+            }
+            return eq;
+        }
+        @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
             Resources<OperableInteger> res = new Resources<>();
             if (!getActivePathfinder().isMiningSupported())
                 return new Pair<>(false, res);
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.WORLD));
             state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) - actualNeeded);
-            if (block.getDefaultState().isToolRequired()) {
-                List<Integer> childIds = state.children.get(this);
-                for (int i = 0; i < children.size(); i++) {
-                    int childId = nodeId + childIds.get(i);
-                    Node child = children.get(i);
-                    Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, 1, Math.min(1, actualNeeded), state, useHeuristic, visited);
-                    if (!childRes.getLeft())
-                        return new Pair<>(false, res);
-                    mergeResources(res, childRes.getRight());
-                }
+            List<Integer> childIds = state.children.get(this);
+            for (int i = 0; i < children.size(); i++) {
+                int childId = nodeId + childIds.get(i);
+                Node child = children.get(i);
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
+                if (!childRes.getLeft())
+                    return new Pair<>(false, res);
+                mergeResources(res, childRes.getRight());
             }
             return new Pair<>(state.worldAvailability.get(block) >= 0, res);
         }
@@ -3930,7 +4350,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         public boolean execute(int nodeId, CraftingState state) {
             if (!block.getDefaultState().isToolRequired())
                 return worldQuery.acquire(block, dropped, state.neededMap.getOrDefault(nodeId, 0));
-            if (!toolManager.canMine(block))
+            if (!toolCraftingManager.canMine(block))
                 return false;
             return worldQuery.acquire(block, dropped, state.neededMap.getOrDefault(nodeId, 0));
         }
@@ -3943,7 +4363,18 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return 31 * hash + block.hashCode();
         }
         @Override
+        protected int equivalenceClassHashCodeInternal(int hash) {
+            return 31 * hash + block.hashCode();
+        }
+        @Override
         protected boolean equalsInternal(Object other) {
+            if (other instanceof WorldNode) {
+                return block.equals(((WorldNode)other).block);
+            }
+            return false;
+        }
+        @Override
+        protected boolean equivalenceClassEqualsInternal(Object other) {
             if (other instanceof WorldNode) {
                 return block.equals(((WorldNode)other).block);
             }
@@ -3971,7 +4402,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         @Override
         protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             Block targetBlock = ((PathingCraftingProcess) processes.get(0)).block;
-            double base = nearestBlockDistanceMap.getOrDefault(targetBlock, 0.0) / MC.player.getMovementSpeed();
+            double base = getNearestBlockDistance(targetBlock, 0.0) / MC.player.getMovementSpeed();
             return new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, 0, 0, 1)));
         }
         @Override
@@ -4073,6 +4504,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             Block block = ((PlacementCraftingProcess) processes.get(0)).block;
             containerManager.addContainer(block, pos);
             state.worldAvailability.put(block, state.worldAvailability.getOrDefault(block, 0) + 1);
+            blockTree.addBlock(block, pos);
             return true;
         }
         @Override
@@ -4088,6 +4520,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     public class WorkbenchNode extends Node {
         public WorkbenchNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
+            setShouldOnlyCraftOne(true);
         }
         @Override
         protected void stackResourcesInternal(int nodeId, CraftingState state, int num, Resources<OperableInteger> dest, Resources<OperableInteger> src, LinkedHashSet<Item> visited) {
@@ -4140,10 +4573,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
         }
         @Override
-        protected boolean shouldOnlyCraftOne() {
-            return true;
-        }
-        @Override
         protected boolean shouldRememberVisit() {
             return false;
         }
@@ -4166,9 +4595,12 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     }
 
     public class ToolNode extends Node {
+        private LinkedHashMap<Node, EfficiencyEquation> toolEfficiencyEquations;
+        private EfficiencyEquation handEfficiencyEquation;
         public ToolNode(Item target, List<CraftingProcess> processes) {
             super(target, processes);
             setShouldPruneTarget(false);
+            toolEfficiencyEquations = new LinkedHashMap<>();
         }
         @Override
         protected void stackResourcesInternal(int nodeId, CraftingState state, int num, Resources<OperableInteger> dest, Resources<OperableInteger> src, LinkedHashSet<Item> visited) {
@@ -4185,56 +4617,94 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         }
         @Override
         protected List<Node> getChildrenInternal(LinkedHashSet<Item> nodes) {
-            Set<Item> matchingTools = toolManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
-            List<CraftingProcess> toolProcesses = new ArrayList<>();
+            Set<Item> matchingTools = toolCraftingManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
+            List<Node> toolNodes = new ArrayList<>();
             for (Item tool : matchingTools) {
                 CraftingPlan plan = getCraftingPlan(Registry.ITEM.getId(tool).getPath());
-                toolProcesses.addAll(plan.processes);
+                toolNodes.add(plan.getNode());
             }
-            return List.of(new ChoiceNode(target, toolProcesses).setDistinction(getClass()).setShouldPruneTarget(false));
+            for (Node node : toolNodes) {
+                node.setDistinction(getClass()).setShouldOnlyCraftOne(true).setShouldResetVisited(true);
+            }
+            return toolNodes;
         }
         @Override
         protected EfficiencyEquation genEfficiencyEquationsInternal(CraftingState state, LinkedHashSet<Item> visited, int numNeeded) {
             EfficiencyEquation res = new EfficiencyEquation();
+            Block block = ((ToolCraftingProcess) processes.get(0)).block;
+            int blockAvailability = state.worldAvailability.getOrDefault(block, 0);
             for (Node child : children) {
                 child.genEfficiencyEquations(state, visited, numNeeded);
-                res = res.add(state.efficiencyEquations.get(child));
+                double base = state.efficiencyEquations.get(child).evaluate(1);
+                double coefficient = blockBreakingTime(block, (ToolItem)child.target) * 30;
+                EfficiencyEquation eq = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(base, coefficient, 0, blockAvailability)));
+                toolEfficiencyEquations.put(child, eq);
+                res = res.min(eq);
             }
+            handEfficiencyEquation = new EfficiencyEquation(List.of(new EfficiencyEquationSegment(0, blockBreakingTime(block, null) * 30, 0, blockAvailability)));
+            if (!block.getDefaultState().isToolRequired())
+                res = res.min(handEfficiencyEquation);
             return res;
         }
         @Override
         protected Pair<Boolean, Resources<OperableInteger>> getBaseResourcesInternal(int nodeId, int numNeeded, int actualNeeded, CraftingState state, boolean useHeuristic, LinkedHashSet<Item> visited) {
             Resources<OperableInteger> res = new Resources<>();
-            if (children.size() == 0)
-                return new Pair<>(true, res);
-            Set<Item> possibleTools = toolManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
+            Set<Item> possibleTools = toolCraftingManager.getMatchingTools(((ToolCraftingProcess) processes.get(0)).block);
             for (Item item : totalInventoryAvailabilityMap.keySet()) {
                 if (possibleTools.contains(item)) {
                     return new Pair<>(true, res);
                 }
             }
             List<Integer> childIds = state.children.get(this);
+            List<Pair<Integer, Node>> options = new ArrayList<>();
             for (int i = 0; i < children.size(); i++) {
                 int childId = nodeId + childIds.get(i);
                 Node child = children.get(i);
-                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, numNeeded, actualNeeded, state, useHeuristic, visited);
-                if (!childRes.getLeft())
-                    return new Pair<>(false, new Resources<>());
-                mergeResources(res, childRes.getRight());
+                if (state.naiveMaxCraftable.getOrDefault(child, 0) > 0)
+                    options.add(new Pair<>(childId, child));
             }
+            LinkedHashMap<Node, Double> efficiency = new LinkedHashMap<>();
+            for (Pair<Integer, Node> option : options) {
+                efficiency.put(option.getRight(), toolEfficiencyEquations.get(option.getRight()).evaluate(numNeeded));
+            }
+            options.sort(Comparator.comparingDouble(x -> efficiency.get(x.getRight())));
+            double handEfficiency = handEfficiencyEquation.evaluate(numNeeded);
+            boolean toolRequired = ((ToolCraftingProcess) processes.get(0)).block.getDefaultState().isToolRequired();
+            boolean foundCompatibleTool = false;
+            for (Pair<Integer, Node> option : options) {
+                int childId = option.getLeft();
+                Node child = option.getRight();
+                if (!toolRequired && efficiency.get(child) >= handEfficiency)
+                    break;
+                Pair<Boolean, Resources<OperableInteger>> childRes = child.getBaseResources(childId, Math.min(1, numNeeded), Math.min(1, actualNeeded), state, useHeuristic, visited);
+                if (childRes.getLeft()) {
+                    foundCompatibleTool = true;
+                    mergeResources(res, childRes.getRight());
+                    break;
+                }
+            }
+            if (toolRequired && !foundCompatibleTool)
+                return new Pair<>(false, res);
             res.put(nodeId, new Pair<>(new OperableInteger(numNeeded), ResourceDomain.COMPOSITE));
             return new Pair<>(true, res);
         }
         @Override
         protected void genNaiveMaxCraftableInternal(CraftingState state) {
             state.naiveMaxCraftable.put(this, 0);
+            int childrenCraftable = 0;
             for (Node child : children) {
-                state.naiveMaxCraftable.put(this, state.naiveMaxCraftable.get(child));
+                childrenCraftable += state.naiveMaxCraftable.get(child);
             }
+            if (childrenCraftable > 0 || !requiresAnyChildren())
+                state.naiveMaxCraftable.put(this, state.worldAvailability.getOrDefault(((ToolCraftingProcess) processes.get(0)).block, 0));
         }
         @Override
-        protected boolean shouldOnlyCraftOne() {
-            return true;
+        protected boolean requiresAllChildren() {
+            return false;
+        }
+        @Override
+        protected boolean requiresAnyChildren() {
+            return ((ToolCraftingProcess) processes.get(0)).block.getDefaultState().isToolRequired();
         }
         @Override
         protected boolean shouldRememberVisit() {
@@ -4466,6 +4936,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
     private void craft(String itemId, int count, boolean craftAll) {
         isCurrentlyCrafting = true;
         new Thread(() -> {
+            generateBlockMetrics();
             containerManager.updateContainers(worldQuery.getLocations(containerBlockTypes));
             Node root = makeRootNode(itemId);
             Item item = root.target;
@@ -4530,6 +5001,40 @@ public class AutoCraftHack extends Hack implements UpdateListener {
         EVENTS.add(UpdateListener.class, this);
     }
 
+    public BlockPos getNearestBlockPos(Block block) {
+        return nearestBlockPosMap.computeIfAbsent(block, k -> {
+            Vec3d playerPos = MC.player.getPos();
+            BlockPos playerBlockPos = new BlockPos((int)playerPos.getX(), (int)playerPos.getY(), (int)playerPos.getZ());
+            return blockTree.findClosest(block, playerBlockPos);
+        });
+    }
+
+    public double getNearestBlockDistance(Block block, double defaultValue) {
+        BlockPos pos = getNearestBlockPos(block);
+        if (pos == null)
+            return defaultValue;
+        return nearestBlockDistanceMap.computeIfAbsent(block, k -> {
+            Vec3d vecPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+            Vec3d playerPos = MC.player.getPos();
+            return vecPos.subtract(playerPos).length();
+        });
+    }
+
+    public void clearNearestBlockMetrics() {
+        nearestBlockPosMap.clear();
+        nearestBlockDistanceMap.clear();
+    }
+
+    public void generateBlockMetrics() {
+        Vec3d playerPos = MC.player.getPos();
+        BlockPos playerBlockPos = new BlockPos((int)playerPos.getX(), (int)playerPos.getY(), (int)playerPos.getZ());
+        if (blockTree == null || !blockTree.containsPointXZ(playerBlockPos)) {
+            blockTree = createBlockTree();
+            nearestBlockPosMap = new LinkedHashMap<>();
+            nearestBlockDistanceMap = new LinkedHashMap<>();
+        }
+    }
+
     @Override
     public void onUpdate() {
         synchronized (runnableQueue) {
@@ -4549,8 +5054,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                         }
                         storageAvailabilityMap = containerQuery.getAvailabilityMap();
                         worldAvailabilityMap = worldQuery.getAvailabilityMap();
-                        nearestBlockPosMap = worldQuery.getNearestPositions();
-                        nearestBlockDistanceMap = worldQuery.getNearestBlockDistances(nearestBlockPosMap);
                         doneCrafting = false;
                     }
                     craft(entry.itemId, entry.count, entry.craftAll);
