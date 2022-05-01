@@ -268,7 +268,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             tools = new LinkedHashSet<>();
             toolClasses = new LinkedHashSet<>();
             essentialTools = new LinkedHashSet<>();
-            String[] prefixes = new String[] {"wooden", "stone", "iron", "golden", "diamond"};
+            String[] prefixes = new String[] {"wooden", "stone", "iron", "golden", "diamond", "netherite"};
             String[] suffixes = new String[] {"sword", "axe", "pickaxe", "shovel", "hoe"};
             for (String suffix : suffixes) {
                 List<Item> toolClass = new ArrayList<>();
@@ -761,11 +761,11 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             final int alreadyPossessed;
             if (isCurrentlyCrafting) {
                 synchronized (totalInventoryAvailabilityMap) {
-                    alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(block.asItem(), 0);
+                    alreadyPossessed = totalInventoryAvailabilityMap.getOrDefault(dropped, 0);
                 }
             }
             else {
-                alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(block.asItem(), 0);
+                alreadyPossessed = inventoryQuery.getAvailabilityMap().getOrDefault(dropped, 0);
             }
             updateSettings();
             BaritoneChatProcess process = baritoneChatInterface.mine(count + alreadyPossessed, block, dropped);
@@ -1387,8 +1387,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, slot, 0, SlotActionType.PICKUP, MC.player);
         }
         public void swapSlots(int slot1, int slot2) {
-            System.out.println("Slot 1: " + slot1);
-            System.out.println("Slot 2: " + slot2);
             leftClickSlot(slot1);
             leftClickSlot(slot2);
             leftClickSlot(slot1);
@@ -2681,13 +2679,15 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             Pair<Boolean, Resources<OperableInteger>> resources = getBaseResources(state.rootNodeId, 1, 1, clonedState, useHeuristic, new LinkedHashSet<>());
             int amount = 0;
             while (amount < upperBound && resources.getLeft()) {
-                amount++;
                 state = newState;
                 newState = state.clone();
                 if (!consumeResources(state.rootNodeId, resources.getRight(), newState, 0, new LinkedHashSet<>())) {
                     newState = state.clone();
                     clonedState = newState.clone();
                     resources = getBaseResources(state.rootNodeId, 1, 1, clonedState, useHeuristic, new LinkedHashSet<>());
+                }
+                else {
+                    amount++;
                 }
             }
             originalState.set(newState);
@@ -3926,36 +3926,46 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             if (options.size() == 0)
                 return new Pair<>(actualNeeded == 0, res);
             CraftingState newState = state.clone();
-            Pair<Boolean, Resources<OperableInteger>> childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState, useHeuristic, visited);
+            Pair<Boolean, Resources<OperableInteger>> childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState.clone(), useHeuristic, visited);
             int amount = 0;
+            int actualAmount = 0;
             while (numNeeded > 0 && options.size() > 0) {
                 if (!childRes.getLeft()) {
                     options.remove(0);
                     if (options.size() == 0) {
                         break;
                     }
-                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState, useHeuristic, visited);
+                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), newState.clone(), useHeuristic, visited);
                     continue;
                 }
-                if (options.get(0).getLeft().consumeResources(options.get(0).getRight(), childRes.getRight(), newState, 0, visited)) {
+                if (actualNeeded == 0 || options.get(0).getLeft().consumeResources(options.get(0).getRight(), childRes.getRight(), newState, 0, visited)) {
                     numNeeded--;
+                    if (actualNeeded > 0)
+                        actualAmount++;
                     actualNeeded = Math.max(0, actualNeeded - 1);
                     amount++;
                     if (amount > 0 && numNeeded == 0) {
                         Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight(), state, amount, childRes.getRight(), visited);
-                        options.get(0).getLeft().consumeResources(options.get(0).getRight(), toConsume, state, 0, visited);
+                        if (actualAmount > 0) {
+                            Resources<OperableInteger> actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight(), state, actualAmount, childRes.getRight(), visited);
+                            options.get(0).getLeft().consumeResources(options.get(0).getRight(), actualToConsume, state, 0, visited);
+                        }
                         mergeResources(res, toConsume);
                     }
                 }
                 else {
                     if (amount > 0) {
                         Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight(), state, amount, childRes.getRight(), visited);
-                        options.get(0).getLeft().consumeResources(options.get(0).getRight(), toConsume, state, 0, visited);
+                        if (actualAmount > 0) {
+                            Resources<OperableInteger> actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight(), state, actualAmount, childRes.getRight(), visited);
+                            options.get(0).getLeft().consumeResources(options.get(0).getRight(), actualToConsume, state, 0, visited);
+                        }
                         mergeResources(res, toConsume);
                     }
                     amount = 0;
+                    actualAmount = 0;
                     newState = state.clone();
-                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), state, useHeuristic, visited);
+                    childRes = options.get(0).getLeft().getBaseResources(options.get(0).getRight(), 1, Math.min(1, actualNeeded), state.clone(), useHeuristic, visited);
                 }
             }
             res.put(nodeId, new Pair<>(new OperableInteger(originalNumNeeded), ResourceDomain.COMPOSITE));
