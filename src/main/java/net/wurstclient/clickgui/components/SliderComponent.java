@@ -268,8 +268,7 @@ public final class SliderComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		
-		double percentage = (setting.getValue() - setting.getMinimum())
-			/ (setting.getMaximum() - setting.getMinimum());
+		double percentage = setting.getPercentage();
 		float xk1 = x1 + (x2 - x1 - 8) * (float)percentage;
 		float xk2 = xk1 + 8;
 		float yk1 = y3 + 1.5F;

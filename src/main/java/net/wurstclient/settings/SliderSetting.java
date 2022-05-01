@@ -132,9 +132,9 @@ public class SliderSetting extends Setting implements SliderLock
 		return increment;
 	}
 	
-	public final float getPercentage()
+	public final double getPercentage()
 	{
-		return (float)((getValue() - minimum) / getRange());
+		return (getValue() - minimum) / getRange();
 	}
 	
 	public final boolean isLocked()
