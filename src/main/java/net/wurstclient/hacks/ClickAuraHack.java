@@ -38,6 +38,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -52,6 +53,9 @@ public final class ClickAuraHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -114,6 +118,7 @@ public final class ClickAuraHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
+		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(filterPlayers);
@@ -146,6 +151,7 @@ public final class ClickAuraHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
 	}
@@ -163,7 +169,8 @@ public final class ClickAuraHack extends Hack
 		if(!MC.options.attackKey.isPressed())
 			return;
 		
-		if(MC.player.getAttackCooldownProgress(0) < 1)
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
 			return;
 		
 		attack();
@@ -180,9 +187,6 @@ public final class ClickAuraHack extends Hack
 		// set entity
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		
-		if(player.getAttackCooldownProgress(0) < 1)
-			return;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
@@ -280,6 +284,7 @@ public final class ClickAuraHack extends Hack
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	private enum Priority

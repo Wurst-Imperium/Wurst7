@@ -38,6 +38,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -48,10 +49,13 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"TpAura", "tp aura", "EnderAura", "Ender-Aura", "ender aura"})
 public final class TpAuraHack extends Hack implements UpdateListener
 {
-	private Random random = new Random();
+	private final Random random = new Random();
 	
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -111,6 +115,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		
 		addSetting(range);
+		addSetting(speed);
 		addSetting(priority);
 		
 		addSetting(filterPlayers);
@@ -143,6 +148,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -155,6 +161,10 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		
 		// set entity
@@ -256,6 +266,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, entity);
 		player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	private enum Priority

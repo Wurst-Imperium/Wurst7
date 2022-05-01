@@ -279,8 +279,8 @@ public final class SliderComponent extends Component
 			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
 		{
-			float f = (float)(2 * percentage);
-			RenderSystem.setShaderColor(f, 2 - f, 0, hSlider ? 1 : 0.75F);
+			float[] c = setting.getKnobColor();
+			RenderSystem.setShaderColor(c[0], c[1], c[2], hSlider ? 1 : 0.75F);
 		}
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

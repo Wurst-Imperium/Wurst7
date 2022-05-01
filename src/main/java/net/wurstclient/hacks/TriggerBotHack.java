@@ -34,6 +34,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -44,6 +45,9 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -93,7 +97,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	{
 		super("TriggerBot");
 		setCategory(Category.COMBAT);
+		
 		addSetting(range);
+		addSetting(speed);
+		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -124,6 +131,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -136,9 +144,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
-		if(player.getAttackCooldownProgress(0) < 1)
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
 			return;
+		
+		ClientPlayerEntity player = MC.player;
 		
 		if(MC.crosshairTarget == null
 			|| !(MC.crosshairTarget instanceof EntityHitResult))
@@ -153,6 +163,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	private boolean isCorrectEntity(Entity entity)

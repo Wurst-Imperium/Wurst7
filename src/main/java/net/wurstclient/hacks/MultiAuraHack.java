@@ -38,6 +38,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -47,19 +48,11 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"multi aura", "ForceField", "force field"})
 public final class MultiAuraHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting useCooldown = new CheckboxSetting(
-		"Use cooldown", "Use your weapon's cooldown as the attack speed.\n"
-			+ "When checked, the 'Speed' slider will be ignored.",
-		true);
-	
-	private final SliderSetting speed = new SliderSetting("Speed",
-		"Attack speed in clicks per second.\n"
-			+ "This value will be ignored when\n"
-			+ "'Use cooldown' is checked.",
-		12, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
-	
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
@@ -108,16 +101,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
-	private int timer;
-	
 	public MultiAuraHack()
 	{
 		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
-		addSetting(useCooldown);
-		addSetting(speed);
 		addSetting(range);
+		addSetting(speed);
 		addSetting(fov);
 		
 		addSetting(filterPlayers);
@@ -150,7 +140,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
-		timer = 0;
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -163,16 +153,12 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		
-		// update timer
-		timer += 50;
-		
-		// check timer / cooldown
-		if(useCooldown.isChecked() ? player.getAttackCooldownProgress(0) < 1
-			: timer < 1000 / speed.getValue())
-			return;
 		
 		// get entities
 		double rangeSq = Math.pow(range.getValue(), 2);
@@ -274,8 +260,6 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		}
 		
 		player.swingHand(Hand.MAIN_HAND);
-		
-		// reset timer
-		timer = 0;
+		speed.resetTimer();
 	}
 }

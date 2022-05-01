@@ -45,6 +45,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -59,6 +60,9 @@ public final class KillauraLegitHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -126,10 +130,13 @@ public final class KillauraLegitHack extends Hack
 	{
 		super("KillauraLegit");
 		setCategory(Category.COMBAT);
+		
 		addSetting(range);
+		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(damageIndicator);
+		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -160,6 +167,7 @@ public final class KillauraLegitHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -175,11 +183,12 @@ public final class KillauraLegitHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		
-		if(player.getAttackCooldownProgress(0) < 1)
-			return;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
@@ -272,6 +281,7 @@ public final class KillauraLegitHack extends Hack
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	private boolean faceEntityClient(Entity entity)

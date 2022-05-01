@@ -138,6 +138,17 @@ public class SliderSetting extends Setting implements SliderLock
 		return (getValue() - minimum) / getRange();
 	}
 	
+	public float[] getKnobColor()
+	{
+		float f = (float)(2 * getPercentage());
+		
+		float red = MathUtils.clamp(f, 0, 1);
+		float green = MathUtils.clamp(2 - f, 0, 1);
+		float blue = 0;
+		
+		return new float[]{red, green, blue};
+	}
+	
 	public final boolean isLocked()
 	{
 		return lock != null;
