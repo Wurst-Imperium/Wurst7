@@ -72,7 +72,7 @@ public final class KillauraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	public final SliderSetting fov =
+	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
@@ -91,14 +91,13 @@ public final class KillauraHack extends Hack
 				+ "look like corpses.",
 			false);
 	
-	private final SliderSetting filterFlying = new SliderSetting(
-		"Filter flying",
-		"Won't attack players that are at least\n"
-			+ "the given distance above ground.\n\n"
-			+ "Useful for servers that place a flying\n"
-			+ "player behind you to try and detect\n" + "your Killaura.",
-		0, 0, 2, 0.05,
-		v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+	private final SliderSetting filterFlying =
+		new SliderSetting("Filter flying",
+			"Won't attack players that are at least\n"
+				+ "the given distance above ground.\n\n"
+				+ "Useful for servers that place a flying\n"
+				+ "player behind you to try and detect\n" + "your Killaura.",
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
