@@ -17,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -160,7 +161,7 @@ public enum BlockUtils
 		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
 	}
 
-	public static boolean rightClickBlockLegit(BlockPos pos, boolean checkLOS, int range)
+	public static boolean rightClickBlockLegit(BlockPos pos, boolean checkLOS, boolean interactWithItem, int range)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d posVec = Vec3d.ofCenter(pos);
@@ -187,7 +188,12 @@ public enum BlockUtils
 			WurstClient.INSTANCE.getRotationFaker().faceVectorPacket(hitVec);
 
 			// right click block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			if (interactWithItem) {
+				IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			}
+			else {
+				IMC.getInteractionManager().rightClickBlockNoItem(pos, side, hitVec);
+			}
 			MC.player.swingHand(Hand.MAIN_HAND);
 			IMC.setItemUseCooldown(4);
 			return true;

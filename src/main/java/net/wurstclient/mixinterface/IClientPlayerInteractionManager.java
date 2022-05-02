@@ -27,6 +27,8 @@ public interface IClientPlayerInteractionManager
 	public void rightClickItem();
 	
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec);
+
+	public void rightClickBlockNoItem(BlockPos pos, Direction side, Vec3d hitVec);
 	
 	public void sendPlayerActionC2SPacket(PlayerActionC2SPacket.Action action,
 		BlockPos blockPos, Direction direction);

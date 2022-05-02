@@ -131,6 +131,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 			new BlockHitResult(hitVec, side, pos, false));
 		interactItem(client.player, client.world, Hand.MAIN_HAND);
 	}
+
+	@Override
+	public void rightClickBlockNoItem(BlockPos pos, Direction side, Vec3d hitVec)
+	{
+		interactBlock(client.player, client.world, Hand.MAIN_HAND,
+			new BlockHitResult(hitVec, side, pos, false));
+	}
 	
 	@Override
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
