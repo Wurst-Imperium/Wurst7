@@ -2878,7 +2878,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return true;
         }
         protected boolean consumeResources(long nodeId, Resources<OperableInteger> resources, CraftingState state, int excessOverflow, LinkedHashSet<Item> visited) {
-            if (shouldOnlyCraftOne)
+             if (shouldOnlyCraftOne)
                 excessOverflow = 0;
             int originalExcessOverflow = excessOverflow;
             if (!state.deadNodes.contains(nodeId) && resources.containsKey(nodeId) && resources.get(nodeId).getLeft().getValue() > 0) {
@@ -2931,21 +2931,22 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 }
                 state.resourceConsumed.put(nodeId, state.resourceConsumed.getOrDefault(nodeId, 0) + numNeeded - originalExcessOverflow);
                 state.neededMap.put(nodeId, originalNeeded + numNeeded - originalExcessOverflow);
+                int effectiveNeeded = numNeeded - excessOverflow;
                 if (domain == ResourceDomain.INVENTORY) {
-                    if (state.inventoryAvailability.getOrDefault(target, 0) < numNeeded)
+                    if (state.inventoryAvailability.getOrDefault(target, 0) < effectiveNeeded)
                         return false;
-                    state.inventoryConsumed.put(nodeId, state.inventoryConsumed.getOrDefault(nodeId, 0) + numNeeded);
-                    state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - numNeeded);
+                    state.inventoryConsumed.put(nodeId, state.inventoryConsumed.getOrDefault(nodeId, 0) + effectiveNeeded);
+                    state.inventoryAvailability.put(target, state.inventoryAvailability.getOrDefault(target, 0) - effectiveNeeded);
                 } else if (domain == ResourceDomain.STORAGE) {
-                    if (state.storageAvailability.getOrDefault(target, 0) < numNeeded)
+                    if (state.storageAvailability.getOrDefault(target, 0) < effectiveNeeded)
                         return false;
-                    state.storageConsumed.put(nodeId, state.storageConsumed.getOrDefault(nodeId, 0) + numNeeded);
-                    state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - numNeeded);
+                    state.storageConsumed.put(nodeId, state.storageConsumed.getOrDefault(nodeId, 0) + effectiveNeeded);
+                    state.storageAvailability.put(target, state.storageAvailability.getOrDefault(target, 0) - effectiveNeeded);
                 } else if (domain == ResourceDomain.WORLD) {
-                    if (state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) < numNeeded)
+                    if (state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) < effectiveNeeded)
                         return false;
-                    state.worldConsumed.put(nodeId, state.worldConsumed.getOrDefault(nodeId, 0) + numNeeded);
-                    state.worldAvailability.put(((WorldCraftingProcess) processes.get(0)).block, state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) - numNeeded);
+                    state.worldConsumed.put(nodeId, state.worldConsumed.getOrDefault(nodeId, 0) + effectiveNeeded);
+                    state.worldAvailability.put(((WorldCraftingProcess) processes.get(0)).block, state.worldAvailability.getOrDefault(((WorldCraftingProcess) processes.get(0)).block, 0) - effectiveNeeded);
                 }
                 if (shouldOnlyCraftOne)
                     state.deadNodes.add(nodeId);
@@ -3967,7 +3968,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     if (amount > 0 && numNeeded == 0) {
                         Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, amount, childRes.getRight(), visited);
                         if (actualAmount > 0) {
-                            Resources<OperableInteger> actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, actualAmount, childRes.getRight(), visited);
+                            Resources<OperableInteger> actualToConsume = toConsume;
+                            if (actualAmount != amount)
+                                actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, actualAmount, childRes.getRight(), visited);
                             options.get(0).getLeft().consumeResources(options.get(0).getRight().getLeft(), actualToConsume, state, 0, visited);
                         }
                         mergeResources(res, toConsume);
@@ -3977,7 +3980,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     if (amount > 0) {
                         Resources<OperableInteger> toConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, amount, childRes.getRight(), visited);
                         if (actualAmount > 0) {
-                            Resources<OperableInteger> actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, actualAmount, childRes.getRight(), visited);
+                            Resources<OperableInteger> actualToConsume = toConsume;
+                            if (actualAmount != amount)
+                                actualToConsume = options.get(0).getLeft().stackResourcesBase(options.get(0).getRight().getLeft(), state, actualAmount, childRes.getRight(), visited);
                             options.get(0).getLeft().consumeResources(options.get(0).getRight().getLeft(), actualToConsume, state, 0, visited);
                         }
                         mergeResources(res, toConsume);
