@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.lwjgl.opengl.GL11;
@@ -38,15 +39,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.minecraft.world.chunk.WorldChunk;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IWorld;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.BlockUtils;
@@ -135,12 +136,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		enderChests.clear();
 		shulkerBoxes.clear();
 		
-		for(BlockEntityTickInvoker blockEntityTicker : ((IWorld)MC.world)
-			.getBlockEntityTickers())
-		{
-			BlockEntity blockEntity =
-				MC.world.getBlockEntity(blockEntityTicker.getPos());
-			
+		ArrayList<BlockEntity> blockEntities = getLoadedBlockEntities()
+			.collect(Collectors.toCollection(ArrayList::new));
+		
+		for(BlockEntity blockEntity : blockEntities)
 			if(blockEntity instanceof TrappedChestBlockEntity)
 			{
 				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
@@ -182,12 +181,51 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				Box bb = BlockUtils.getBoundingBox(pos);
 				basicChests.add(bb);
 			}
-		}
 		
 		minecarts.clear();
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
 				minecarts.add(entity);
+	}
+	
+	private Stream<BlockEntity> getLoadedBlockEntities()
+	{
+		return getLoadedChunks()
+			.flatMap(chunk -> chunk.getBlockEntities().values().stream());
+	}
+	
+	private Stream<WorldChunk> getLoadedChunks()
+	{
+		int radius = Math.max(2, MC.options.getViewDistance()) + 3;
+		int diameter = radius * 2 + 1;
+		
+		ChunkPos center = MC.player.getChunkPos();
+		ChunkPos min = new ChunkPos(center.x - radius, center.z - radius);
+		ChunkPos max = new ChunkPos(center.x + radius, center.z + radius);
+		
+		Stream<WorldChunk> stream = Stream.<ChunkPos> iterate(min, pos -> {
+			
+			int x = pos.x;
+			int z = pos.z;
+			
+			x++;
+			
+			if(x > max.x)
+			{
+				x = min.x;
+				z++;
+			}
+			
+			if(z > max.z)
+				throw new IllegalStateException("Stream limit didn't work.");
+			
+			return new ChunkPos(x, z);
+			
+		}).limit(diameter * diameter)
+			.filter(c -> MC.world.isChunkLoaded(c.x, c.z))
+			.map(c -> MC.world.getChunk(c.x, c.z)).filter(Objects::nonNull);
+		
+		return stream;
 	}
 	
 	private Box getBoxFromChest(ChestBlockEntity chestBE)
