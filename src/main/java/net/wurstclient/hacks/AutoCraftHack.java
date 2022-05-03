@@ -2581,6 +2581,25 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             }
             return res;
         }
+        public void reformulateCraftingTree(long nodeId, CraftingState state) {
+            clearNearestBlockMetrics();
+            generateBlockMetrics();
+            int originalNumNeeded = state.neededMap.getOrDefault(nodeId, 0) + getTotalExcessConsumed(nodeId, state);
+            clearDeadNodes(nodeId, state);
+            clearEfficiencyEquations(state);
+            genEfficiencyEquations(state, new LinkedHashSet<>(), originalNumNeeded);
+            clearNaiveMaxCraftable(state);
+            genNaiveMaxCraftable(state);
+            setExcessBlacklist(nodeId, state, new LinkedHashSet<>(), true);
+            unconsumeResources(nodeId, nodeId + state.childScope.get(this), nodeId, state, new LinkedHashSet<>());
+            setExcessBlacklist(nodeId, state, new LinkedHashSet<>(), false);
+            clearNaiveMaxCraftable(state);
+            genNaiveMaxCraftable(state);
+            clearEfficiencyEquations(state);
+            genEfficiencyEquations(state, new LinkedHashSet<>(), originalNumNeeded);
+            Pair<Boolean, Resources<OperableInteger>> res = getBaseResources(nodeId, originalNumNeeded, originalNumNeeded, state.clone(), true, new LinkedHashSet<>());
+            consumeResources(nodeId, res.getRight(), state, 0, new LinkedHashSet<>());
+        }
         public boolean doCraft(long id, CraftingState state) {
             if (state.neededMap.getOrDefault(id, 0) == 0)
                 return true;
@@ -2589,23 +2608,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 long childId = id + childIds.get(i);
                 Node child = children.get(i);
                 if (state.neededMap.getOrDefault(childId, 0) > 0) {
-                    clearNearestBlockMetrics();
-                    generateBlockMetrics();
-                    int originalNumNeeded = state.neededMap.getOrDefault(childId, 0) + getTotalExcessConsumed(childId, state);
-                    child.clearDeadNodes(childId, state);
-                    child.clearEfficiencyEquations(state);
-                    child.genEfficiencyEquations(state, new LinkedHashSet<>(), originalNumNeeded);
-                    child.clearNaiveMaxCraftable(state);
-                    child.genNaiveMaxCraftable(state);
-                    child.setExcessBlacklist(childId, state, new LinkedHashSet<>(), true);
-                    child.unconsumeResources(childId, childId + state.childScope.get(child), childId, state, new LinkedHashSet<>());
-                    child.setExcessBlacklist(childId, state, new LinkedHashSet<>(), false);
-                    child.clearNaiveMaxCraftable(state);
-                    child.genNaiveMaxCraftable(state);
-                    child.clearEfficiencyEquations(state);
-                    child.genEfficiencyEquations(state, new LinkedHashSet<>(), originalNumNeeded);
-                    Pair<Boolean, Resources<OperableInteger>> res = child.getBaseResources(childId, originalNumNeeded, originalNumNeeded, state.clone(), true, new LinkedHashSet<>());
-                    child.consumeResources(childId, res.getRight(), state, 0, new LinkedHashSet<>());
+                    child.reformulateCraftingTree(childId, state);
                 }
                 if (!child.doCraft(childId, state)) {
                     return false;
@@ -2703,6 +2706,7 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                     amount++;
                 }
             }
+            reformulateCraftingTree(newState.rootNodeId, newState);
             originalState.set(newState);
             return amount;
         }
