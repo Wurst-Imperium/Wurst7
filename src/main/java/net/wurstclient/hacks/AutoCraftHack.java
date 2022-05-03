@@ -2582,8 +2582,6 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         public boolean doCraft(long id, CraftingState state) {
-            if (this instanceof SmeltingNode && target == Items.STONE)
-                System.out.println("reached");
             if (state.neededMap.getOrDefault(id, 0) == 0)
                 return true;
             List<Long> childIds = state.children.getOrDefault(this, new ArrayList<>());
@@ -2890,6 +2888,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                 Pair<OperableInteger, ResourceDomain> resource = resources.get(nodeId);
                 ResourceDomain domain = resource.getRight();
                 int numNeeded = resource.getLeft().getValue();
+                if (numNeeded - excessOverflow <= 0)
+                    return true;
                 if (state.excess.containsKey(target)) {
                     List<Pair<Long, Pair<Node, Integer>>> itemList = state.excess.get(target);
                     for (int i = itemList.size() - 1; i >= 0; i--) {
