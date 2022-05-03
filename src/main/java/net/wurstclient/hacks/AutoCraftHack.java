@@ -898,6 +898,9 @@ public class AutoCraftHack extends Hack implements UpdateListener {
                             for (int x = 0; x < count; x++)
                                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, emptySlotId, 1, SlotActionType.PICKUP, MC.player);
                             MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, MC.player);
+                            synchronized (totalInventoryAvailabilityMap) {
+                                totalInventoryAvailabilityMap.put(item, totalInventoryAvailabilityMap.getOrDefault(item, 0) + count);
+                            }
                             count = 0;
                         }
                     }
@@ -2579,6 +2582,8 @@ public class AutoCraftHack extends Hack implements UpdateListener {
             return res;
         }
         public boolean doCraft(long id, CraftingState state) {
+            if (this instanceof SmeltingNode && target == Items.STONE)
+                System.out.println("reached");
             if (state.neededMap.getOrDefault(id, 0) == 0)
                 return true;
             List<Long> childIds = state.children.getOrDefault(this, new ArrayList<>());
