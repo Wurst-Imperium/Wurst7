@@ -21,6 +21,7 @@ import net.minecraft.block.entity.BarrelBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.EnderChestBlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.client.render.GameRenderer;
@@ -76,13 +77,18 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Shulker boxes will be highlighted in this color.", Color.MAGENTA),
 		new CheckboxSetting("Include shulkers", true));
 	
+	private final ChestEspBlockGroup hoppers = new ChestEspBlockGroup(
+		new ColorSetting("Hopper color",
+			"Hoppers will be highlighted in this color.", Color.BLACK),
+		new CheckboxSetting("Include hoppers", false));
+	
 	private final ChestEspEntityGroup minecarts = new ChestEspEntityGroup(
 		new ColorSetting("Cart color",
 			"Minecarts will be highlighted in this color.", Color.GREEN),
 		new CheckboxSetting("Include carts", true));
 	
 	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
-		trapChests, enderChests, barrels, shulkerBoxes, minecarts);
+		trapChests, enderChests, barrels, shulkerBoxes, hoppers, minecarts);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
 		Arrays.asList(minecarts);
@@ -138,6 +144,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				shulkerBoxes.add(blockEntity);
 			else if(blockEntity instanceof BarrelBlockEntity)
 				barrels.add(blockEntity);
+			else if(blockEntity instanceof HopperBlockEntity)
+				hoppers.add(blockEntity);
 			
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
