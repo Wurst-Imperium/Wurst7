@@ -101,9 +101,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			new Color(0xFF8000)),
 		new CheckboxSetting("Include dispensers", false));
 	
+	private final ChestEspBlockGroup furnaces =
+		new ChestEspBlockGroup(new ColorSetting("Furnace color",
+			"Furnaces, smokers, and blast furnaces will be highlighted in this color.",
+			Color.RED), new CheckboxSetting("Include furnaces", false));
+	
 	private final List<ChestEspGroup> groups =
 		Arrays.asList(basicChests, trapChests, enderChests, chestCarts, barrels,
-			shulkerBoxes, hoppers, hopperCarts, droppers, dispensers);
+			shulkerBoxes, hoppers, hopperCarts, droppers, dispensers, furnaces);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
 		Arrays.asList(chestCarts, hopperCarts);
@@ -165,6 +170,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				droppers.add(blockEntity);
 			else if(blockEntity instanceof DispenserBlockEntity)
 				dispensers.add(blockEntity);
+			else if(blockEntity instanceof AbstractFurnaceBlockEntity)
+				furnaces.add(blockEntity);
 			
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
