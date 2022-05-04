@@ -305,56 +305,25 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(style.getSelected().lines)
 		{
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 			
-			float[] basicColorF = basicColor.getColorF();
-			RenderSystem.setShaderColor(basicColorF[0], basicColorF[1],
-				basicColorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			renderLines(matrixStack, start, basicChests, regionX, regionZ);
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			renderLines(matrixStack, start, basicChests, basicColor.getColorF(),
+				regionX, regionZ);
 			
-			float[] trapColorF = trapColor.getColorF();
-			RenderSystem.setShaderColor(trapColorF[0], trapColorF[1],
-				trapColorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			renderLines(matrixStack, start, trapChests, regionX, regionZ);
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			renderLines(matrixStack, start, trapChests, trapColor.getColorF(),
+				regionX, regionZ);
 			
-			float[] enderColorF = enderColor.getColorF();
-			RenderSystem.setShaderColor(enderColorF[0], enderColorF[1],
-				enderColorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			renderLines(matrixStack, start, enderChests, regionX, regionZ);
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			renderLines(matrixStack, start, enderChests, enderColor.getColorF(),
+				regionX, regionZ);
 			
-			float[] shulkerColorF = shulkerColor.getColorF();
-			RenderSystem.setShaderColor(shulkerColorF[0], shulkerColorF[1],
-				shulkerColorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			renderLines(matrixStack, start, shulkerBoxes, regionX, regionZ);
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			renderLines(matrixStack, start, shulkerBoxes,
+				shulkerColor.getColorF(), regionX, regionZ);
 			
-			float[] cartColorF = cartColor.getColorF();
-			RenderSystem.setShaderColor(cartColorF[0], cartColorF[1],
-				cartColorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			renderLines(matrixStack, start, minecartBoxes, regionX, regionZ);
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			renderLines(matrixStack, start, minecartBoxes,
+				cartColor.getColorF(), regionX, regionZ);
 		}
 		
 		matrixStack.pop();
@@ -412,10 +381,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderLines(MatrixStack matrixStack, Vec3d start,
-		ArrayList<Box> boxes, int regionX, int regionZ)
+		ArrayList<Box> boxes, float[] colorF, int regionX, int regionZ)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
 		
 		for(Box box : boxes)
 		{
@@ -429,6 +402,9 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
 				.next();
 		}
+		
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
 	}
 	
 	private enum Style
