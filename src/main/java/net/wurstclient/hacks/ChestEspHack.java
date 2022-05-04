@@ -61,6 +61,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		new ChestEspBlockGroup(new ColorSetting("Ender color",
 			"Ender chests will be highlighted in this color.", Color.CYAN));
 	
+	private final ChestEspBlockGroup barrels =
+		new ChestEspBlockGroup(new ColorSetting("Barrel color",
+			"Barrels will be highlighted in this color.", Color.GREEN));
+	
 	private final ChestEspBlockGroup shulkerBoxes =
 		new ChestEspBlockGroup(new ColorSetting("Shulker color",
 			"Shulker boxes will be highlighted in this color.", Color.MAGENTA));
@@ -70,7 +74,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Minecarts will be highlighted in this color.", Color.GREEN));
 	
 	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
-		trapChests, enderChests, shulkerBoxes, minecarts);
+		trapChests, enderChests, barrels, shulkerBoxes, minecarts);
 	
 	public ChestEspHack()
 	{
@@ -122,7 +126,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			else if(blockEntity instanceof ShulkerBoxBlockEntity)
 				shulkerBoxes.add(blockEntity);
 			else if(blockEntity instanceof BarrelBlockEntity)
-				basicChests.add(blockEntity);
+				barrels.add(blockEntity);
 			
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
