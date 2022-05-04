@@ -62,9 +62,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		new CheckboxSetting("Include ender chests", true));
 	
 	private final ChestEspEntityGroup chestCarts =
-		new ChestEspEntityGroup(new ColorSetting("Chest cart color",
-			"Minecarts with chests will be highlighted in this color.",
-			Color.GREEN), new CheckboxSetting("Include chest carts", true));
+		new ChestEspEntityGroup(
+			new ColorSetting("Chest cart color",
+				"Minecarts with chests will be highlighted in this color.",
+				Color.YELLOW),
+			new CheckboxSetting("Include chest carts", true));
 	
 	private final ChestEspBlockGroup barrels = new ChestEspBlockGroup(
 		new ColorSetting("Barrel color",
@@ -85,7 +87,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		new ChestEspEntityGroup(
 			new ColorSetting("Hopper cart color",
 				"Minecarts with hoppers will be highlighted in this color.",
-				Color.WHITE),
+				Color.YELLOW),
 			new CheckboxSetting("Include hopper carts", false));
 	
 	private final ChestEspBlockGroup droppers = new ChestEspBlockGroup(
