@@ -22,6 +22,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
+import net.minecraft.entity.vehicle.HopperMinecartEntity;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
@@ -80,6 +81,13 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Hoppers will be highlighted in this color.", Color.WHITE),
 		new CheckboxSetting("Include hoppers", false));
 	
+	private final ChestEspEntityGroup hopperCarts =
+		new ChestEspEntityGroup(
+			new ColorSetting("Hopper cart color",
+				"Minecarts with hoppers will be highlighted in this color.",
+				Color.WHITE),
+			new CheckboxSetting("Include hopper carts", false));
+	
 	private final ChestEspBlockGroup droppers = new ChestEspBlockGroup(
 		new ColorSetting("Dropper color",
 			"Droppers will be highlighted in this color.", Color.WHITE),
@@ -87,10 +95,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private final List<ChestEspGroup> groups =
 		Arrays.asList(basicChests, trapChests, enderChests, chestCarts, barrels,
-			shulkerBoxes, hoppers, droppers);
+			shulkerBoxes, hoppers, hopperCarts, droppers);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
-		Arrays.asList(chestCarts);
+		Arrays.asList(chestCarts, hopperCarts);
 	
 	public ChestEspHack()
 	{
@@ -151,6 +159,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
 				chestCarts.add(entity);
+			else if(entity instanceof HopperMinecartEntity)
+				hopperCarts.add(entity);
 	}
 	
 	@Override
