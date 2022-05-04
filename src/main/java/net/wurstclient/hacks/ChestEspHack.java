@@ -57,6 +57,9 @@ import net.wurstclient.util.RotationUtils;
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
+	private final EnumSetting<Style> style =
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
+	
 	private final ColorSetting basicColor = new ColorSetting("Chest color",
 		"Normal chests will be\n" + "highlighted in this color.", Color.GREEN);
 	
@@ -74,9 +77,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private final ColorSetting cartColor = new ColorSetting("Cart color",
 		"Minecarts will be\n" + "highlighted in this color.", Color.GREEN);
 	
-	private final EnumSetting<Style> style =
-		new EnumSetting<>("Style", Style.values(), Style.BOXES);
-	
 	private final ArrayList<Box> basicChests = new ArrayList<>();
 	private final ArrayList<Box> trapChests = new ArrayList<>();
 	private final ArrayList<Box> enderChests = new ArrayList<>();
@@ -89,14 +89,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	public ChestEspHack()
 	{
 		super("ChestESP");
-		
 		setCategory(Category.RENDER);
+		addSetting(style);
+		
 		addSetting(basicColor);
 		addSetting(trapColor);
 		addSetting(enderColor);
 		addSetting(shulkerColor);
 		addSetting(cartColor);
-		addSetting(style);
 	}
 	
 	@Override
@@ -131,10 +131,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		basicChests.clear();
-		trapChests.clear();
-		enderChests.clear();
-		shulkerBoxes.clear();
+		Stream.of(basicChests, trapChests, enderChests, shulkerBoxes)
+			.forEach(ArrayList::clear);
 		
 		ArrayList<BlockEntity> blockEntities = getLoadedBlockEntities()
 			.collect(Collectors.toCollection(ArrayList::new));
@@ -160,8 +158,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
-				enderChests.add(bb);
+				Box box = BlockUtils.getBoundingBox(pos);
+				enderChests.add(box);
 				
 			}else if(blockEntity instanceof ShulkerBoxBlockEntity)
 			{
@@ -169,8 +167,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
-				shulkerBoxes.add(bb);
+				Box box = BlockUtils.getBoundingBox(pos);
+				shulkerBoxes.add(box);
 				
 			}else if(blockEntity instanceof BarrelBlockEntity)
 			{
@@ -178,8 +176,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				if(!BlockUtils.canBeClicked(pos))
 					continue;
 				
-				Box bb = BlockUtils.getBoundingBox(pos);
-				basicChests.add(bb);
+				Box box = BlockUtils.getBoundingBox(pos);
+				basicChests.add(box);
 			}
 		
 		minecarts.clear();
@@ -306,22 +304,16 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		if(style.getSelected().lines)
 		{
 			RenderSystem.setShader(GameRenderer::getPositionShader);
-			
 			Vec3d start = RotationUtils.getClientLookVec()
 				.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
-			
 			renderLines(matrixStack, start, basicChests, basicColor.getColorF(),
 				regionX, regionZ);
-			
 			renderLines(matrixStack, start, trapChests, trapColor.getColorF(),
 				regionX, regionZ);
-			
 			renderLines(matrixStack, start, enderChests, enderColor.getColorF(),
 				regionX, regionZ);
-			
 			renderLines(matrixStack, start, shulkerBoxes,
 				shulkerColor.getColorF(), regionX, regionZ);
-			
 			renderLines(matrixStack, start, minecartBoxes,
 				cartColor.getColorF(), regionX, regionZ);
 		}
@@ -366,11 +358,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			matrixStack.scale((float)(box.maxX - box.minX),
 				(float)(box.maxY - box.minY), (float)(box.maxZ - box.minZ));
 			
-			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
-			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
+			
+			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			solidBox.setShader(viewMatrix, projMatrix, shader);
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
