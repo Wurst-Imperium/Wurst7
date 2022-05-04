@@ -60,6 +60,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Ender chests will be highlighted in this color.", Color.CYAN),
 		new CheckboxSetting("Include ender chests", true));
 	
+	private final ChestEspEntityGroup chestCarts =
+		new ChestEspEntityGroup(new ColorSetting("Chest cart color",
+			"Minecarts with chests will be highlighted in this color.",
+			Color.GREEN), new CheckboxSetting("Include chest carts", true));
+	
 	private final ChestEspBlockGroup barrels = new ChestEspBlockGroup(
 		new ColorSetting("Barrel color",
 			"Barrels will be highlighted in this color.", Color.GREEN),
@@ -80,17 +85,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Droppers will be highlighted in this color.", Color.WHITE),
 		new CheckboxSetting("Include droppers", false));
 	
-	private final ChestEspEntityGroup minecarts = new ChestEspEntityGroup(
-		new ColorSetting("Cart color",
-			"Minecarts will be highlighted in this color.", Color.GREEN),
-		new CheckboxSetting("Include carts", true));
-	
 	private final List<ChestEspGroup> groups =
-		Arrays.asList(basicChests, trapChests, enderChests, barrels,
-			shulkerBoxes, hoppers, droppers, minecarts);
+		Arrays.asList(basicChests, trapChests, enderChests, chestCarts, barrels,
+			shulkerBoxes, hoppers, droppers);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
-		Arrays.asList(minecarts);
+		Arrays.asList(chestCarts);
 	
 	public ChestEspHack()
 	{
@@ -150,7 +150,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
-				minecarts.add(entity);
+				chestCarts.add(entity);
 	}
 	
 	@Override
