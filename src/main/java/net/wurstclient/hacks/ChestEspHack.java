@@ -138,18 +138,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(BlockEntity blockEntity : blockEntities)
-			if(blockEntity instanceof TrappedChestBlockEntity)
+			if(blockEntity instanceof ChestBlockEntity)
 			{
 				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
+				if(box == null)
+					continue;
 				
-				if(box != null)
+				if(blockEntity instanceof TrappedChestBlockEntity)
 					trapChests.add(box);
-				
-			}else if(blockEntity instanceof ChestBlockEntity)
-			{
-				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
-				
-				if(box != null)
+				else
 					basicChests.add(box);
 				
 			}else if(blockEntity instanceof EnderChestBlockEntity)
