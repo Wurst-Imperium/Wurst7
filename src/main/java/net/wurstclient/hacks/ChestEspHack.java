@@ -73,12 +73,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private final ChestEspBlockGroup hoppers = new ChestEspBlockGroup(
 		new ColorSetting("Hopper color",
-			"Hoppers will be highlighted in this color.", Color.BLACK),
+			"Hoppers will be highlighted in this color.", Color.WHITE),
 		new CheckboxSetting("Include hoppers", false));
 	
 	private final ChestEspBlockGroup droppers = new ChestEspBlockGroup(
 		new ColorSetting("Dropper color",
-			"Droppers will be highlighted in this color.", Color.BLACK),
+			"Droppers will be highlighted in this color.", Color.WHITE),
 		new CheckboxSetting("Include droppers", false));
 	
 	private final ChestEspEntityGroup minecarts = new ChestEspEntityGroup(
