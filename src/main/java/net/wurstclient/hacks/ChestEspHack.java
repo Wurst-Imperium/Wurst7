@@ -49,12 +49,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Normal chests will be highlighted in this color.", Color.GREEN),
 		null);
 	
-	private final ChestEspBlockGroup trapChests =
-		new ChestEspBlockGroup(
-			new ColorSetting("Trap color",
-				"Trapped chests will be highlighted in this color.",
-				new Color(0xFF8000)),
-			new CheckboxSetting("Include traps", true));
+	private final ChestEspBlockGroup trapChests = new ChestEspBlockGroup(
+		new ColorSetting("Trap chest color",
+			"Trapped chests will be highlighted in this color.",
+			new Color(0xFF8000)),
+		new CheckboxSetting("Include trap chests", true));
 	
 	private final ChestEspBlockGroup enderChests = new ChestEspBlockGroup(
 		new ColorSetting("Ender color",
