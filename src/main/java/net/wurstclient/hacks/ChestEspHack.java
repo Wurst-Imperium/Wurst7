@@ -95,9 +95,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Droppers will be highlighted in this color.", Color.WHITE),
 		new CheckboxSetting("Include droppers", false));
 	
+	private final ChestEspBlockGroup dispensers = new ChestEspBlockGroup(
+		new ColorSetting("Dispenser color",
+			"Dispensers will be highlighted in this color.",
+			new Color(0xFF8000)),
+		new CheckboxSetting("Include dispensers", false));
+	
 	private final List<ChestEspGroup> groups =
 		Arrays.asList(basicChests, trapChests, enderChests, chestCarts, barrels,
-			shulkerBoxes, hoppers, hopperCarts, droppers);
+			shulkerBoxes, hoppers, hopperCarts, droppers, dispensers);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
 		Arrays.asList(chestCarts, hopperCarts);
@@ -157,6 +163,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				hoppers.add(blockEntity);
 			else if(blockEntity instanceof DropperBlockEntity)
 				droppers.add(blockEntity);
+			else if(blockEntity instanceof DispenserBlockEntity)
+				dispensers.add(blockEntity);
 			
 		for(Entity entity : MC.world.getEntities())
 			if(entity instanceof ChestMinecartEntity)
