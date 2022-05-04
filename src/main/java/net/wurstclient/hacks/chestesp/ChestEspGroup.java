@@ -11,18 +11,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import net.minecraft.util.math.Box;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.settings.Setting;
 
 public abstract class ChestEspGroup
 {
 	protected final ArrayList<Box> boxes = new ArrayList<>();
 	private final ColorSetting color;
+	private final CheckboxSetting enabled;
 	
-	public ChestEspGroup(ColorSetting color)
+	public ChestEspGroup(ColorSetting color, CheckboxSetting enabled)
 	{
 		this.color = Objects.requireNonNull(color);
+		this.enabled = enabled;
 	}
 	
 	public void clear()
@@ -30,9 +35,14 @@ public abstract class ChestEspGroup
 		boxes.clear();
 	}
 	
-	public ColorSetting getSetting()
+	public boolean isEnabled()
 	{
-		return color;
+		return enabled == null || enabled.isChecked();
+	}
+	
+	public Stream<Setting> getSettings()
+	{
+		return Stream.of(enabled, color).filter(Objects::nonNull);
 	}
 	
 	public float[] getColorF()

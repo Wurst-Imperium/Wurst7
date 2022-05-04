@@ -37,6 +37,7 @@ import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.hacks.chestesp.ChestEspRenderer;
 import net.wurstclient.hacks.chestesp.ChestEspStyle;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChunkUtils;
@@ -48,33 +49,43 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	private final EnumSetting<ChestEspStyle> style =
 		new EnumSetting<>("Style", ChestEspStyle.values(), ChestEspStyle.BOXES);
 	
-	private final ChestEspBlockGroup basicChests =
-		new ChestEspBlockGroup(new ColorSetting("Chest color",
-			"Normal chests will be highlighted in this color.", Color.GREEN));
+	private final ChestEspBlockGroup basicChests = new ChestEspBlockGroup(
+		new ColorSetting("Chest color",
+			"Normal chests will be highlighted in this color.", Color.GREEN),
+		null);
 	
 	private final ChestEspBlockGroup trapChests =
-		new ChestEspBlockGroup(new ColorSetting("Trap color",
-			"Trapped chests will be highlighted in this color.",
-			new Color(0xFF8000)));
+		new ChestEspBlockGroup(
+			new ColorSetting("Trap color",
+				"Trapped chests will be highlighted in this color.",
+				new Color(0xFF8000)),
+			new CheckboxSetting("Include traps", true));
 	
-	private final ChestEspBlockGroup enderChests =
-		new ChestEspBlockGroup(new ColorSetting("Ender color",
-			"Ender chests will be highlighted in this color.", Color.CYAN));
+	private final ChestEspBlockGroup enderChests = new ChestEspBlockGroup(
+		new ColorSetting("Ender color",
+			"Ender chests will be highlighted in this color.", Color.CYAN),
+		new CheckboxSetting("Include ender chests", true));
 	
-	private final ChestEspBlockGroup barrels =
-		new ChestEspBlockGroup(new ColorSetting("Barrel color",
-			"Barrels will be highlighted in this color.", Color.GREEN));
+	private final ChestEspBlockGroup barrels = new ChestEspBlockGroup(
+		new ColorSetting("Barrel color",
+			"Barrels will be highlighted in this color.", Color.GREEN),
+		new CheckboxSetting("Include barrels", true));
 	
-	private final ChestEspBlockGroup shulkerBoxes =
-		new ChestEspBlockGroup(new ColorSetting("Shulker color",
-			"Shulker boxes will be highlighted in this color.", Color.MAGENTA));
+	private final ChestEspBlockGroup shulkerBoxes = new ChestEspBlockGroup(
+		new ColorSetting("Shulker color",
+			"Shulker boxes will be highlighted in this color.", Color.MAGENTA),
+		new CheckboxSetting("Include shulkers", true));
 	
-	private final ChestEspEntityGroup minecarts =
-		new ChestEspEntityGroup(new ColorSetting("Cart color",
-			"Minecarts will be highlighted in this color.", Color.GREEN));
+	private final ChestEspEntityGroup minecarts = new ChestEspEntityGroup(
+		new ColorSetting("Cart color",
+			"Minecarts will be highlighted in this color.", Color.GREEN),
+		new CheckboxSetting("Include carts", true));
 	
 	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
 		trapChests, enderChests, barrels, shulkerBoxes, minecarts);
+	
+	private final List<ChestEspEntityGroup> entityGroups =
+		Arrays.asList(minecarts);
 	
 	public ChestEspHack()
 	{
@@ -82,7 +93,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		
 		addSetting(style);
-		groups.stream().map(ChestEspGroup::getSetting)
+		groups.stream().flatMap(ChestEspGroup::getSettings)
 			.forEach(this::addSetting);
 	}
 	
@@ -154,19 +165,23 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		minecarts.updateBoxes(partialTicks);
+		entityGroups.stream().filter(ChestEspGroup::isEnabled)
+			.forEach(g -> g.updateBoxes(partialTicks));
+		
 		ChestEspRenderer espRenderer = new ChestEspRenderer(matrixStack);
 		
 		if(style.getSelected().hasBoxes())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionShader);
-			groups.forEach(espRenderer::renderBoxes);
+			groups.stream().filter(ChestEspGroup::isEnabled)
+				.forEach(espRenderer::renderBoxes);
 		}
 		
 		if(style.getSelected().hasLines())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionShader);
-			groups.forEach(espRenderer::renderLines);
+			groups.stream().filter(ChestEspGroup::isEnabled)
+				.forEach(espRenderer::renderLines);
 		}
 		
 		matrixStack.pop();
