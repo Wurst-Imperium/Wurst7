@@ -51,12 +51,6 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
-	{
-		return false;
-	}
-	
-	@Override
 	public void init()
 	{
 		listGui = new ListGui(client, this, blockList.getBlockNames());
@@ -207,6 +201,18 @@ public final class EditBlockListScreen extends Screen
 		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
+	}
+	
+	@Override
+	public boolean isPauseScreen()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

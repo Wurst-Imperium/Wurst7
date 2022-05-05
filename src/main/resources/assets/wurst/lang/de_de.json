@@ -51,6 +51,7 @@
   "description.wurst.setting.invwalk.allow_clickgui": "Ermöglicht dir, herumzulaufen während Wursts ClickGUI offen ist.",
   "description.wurst.setting.invwalk.allow_other": "Ermöglicht dir, herumzulaufen während andere In-Game-Fenster offen sind (z.B. Kisten, Pferde, Dorfbewohner-Handel), es sei denn das Fenster hat ein Textfeld.",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen.",
+  "description.wurst.setting.generic.attack_speed": "Angriffsgeschwindigkeit in Klicks pro Sekunde.\n0 = Geschwindigkeit passt sich dynamisch an deine Abklingzeit an.",
   "description.wurst.altmanager.premium": "Dieser Alt hat ein Passwort und kann allen Servern beitreten.",
   "description.wurst.altmanager.cracked": "Dieser Alt hat kein Passwort und funktioniert nur auf cracked Servern.",
   "description.wurst.altmanager.failed": "Als du das letzte Mal versucht hast, dich mit diesem Alt einzuloggen, hat es nicht funktioniert.",
