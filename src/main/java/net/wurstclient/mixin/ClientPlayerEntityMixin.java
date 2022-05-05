@@ -7,8 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import java.time.Instant;
-
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -22,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.class_7469;
+import net.minecraft.class_7470;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -31,9 +31,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.network.encryption.NetworkEncryptionUtils;
-import net.minecraft.network.encryption.NetworkEncryptionUtils.class_7425;
+import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -63,10 +63,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	private Screen tempCurrentScreen;
 	
-	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
-		GameProfile gameProfile_1)
+	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
+		GameProfile profile, PlayerPublicKey playerPublicKey)
 	{
-		super(clientWorld_1, gameProfile_1);
+		super(world, profile, playerPublicKey);
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -86,14 +86,27 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		if(!event.isModified())
 			return;
 		
-		Instant instant = Instant.now();
-		message = StringUtils.normalizeSpace(event.getMessage());
-		class_7425 signature = method_43609(instant, message);
-		
-		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(instant, message, signature);
-		networkHandler.sendPacket(packet);
+		sendChatMessageBypass(event.getMessage());
 		ci.cancel();
+	}
+	
+	@Override
+	public void sendChatMessageBypass(String message)
+	{
+		class_7470 metadataForSignature = class_7470.method_43866(getUuid());
+		message = StringUtils.normalizeSpace(message);
+		
+		if(message.startsWith("/"))
+			method_43787(metadataForSignature, message.substring(1));
+		else
+		{
+			class_7469 signature =
+				signChatMessage(metadataForSignature, Text.literal(message));
+			
+			ChatMessageC2SPacket packet =
+				new ChatMessageC2SPacket(message, signature);
+			networkHandler.sendPacket(packet);
+		}
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -259,16 +272,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		this.movementMultiplier = movementMultiplier;
 	}
 	
-	@Override
-	public class_7425 signChatMessage(Instant timestamp, String message)
-	{
-		return method_43609(timestamp, message);
-	}
-	
 	@Shadow
-	private NetworkEncryptionUtils.class_7425 method_43609(Instant instant,
-		String string)
+	private class_7469 signChatMessage(class_7470 arg, Text text)
 	{
 		return null;
+	}
+	
+	/**
+	 * Signs and sends a /command.
+	 */
+	@Shadow
+	private void method_43787(class_7470 arg, String string)
+	{
+		
 	}
 }

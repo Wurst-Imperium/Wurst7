@@ -7,10 +7,6 @@
  */
 package net.wurstclient.commands;
 
-import java.time.Instant;
-
-import net.minecraft.network.encryption.NetworkEncryptionUtils.class_7425;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -33,11 +29,6 @@ public final class SayCmd extends Command
 			throw new CmdSyntaxError();
 		
 		String message = String.join(" ", args);
-		Instant instant = Instant.now();
-		class_7425 signature =
-			IMC.getPlayer().signChatMessage(instant, message);
-		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(instant, message, signature);
-		MC.getNetworkHandler().sendPacket(packet);
+		IMC.getPlayer().sendChatMessageBypass(message);
 	}
 }

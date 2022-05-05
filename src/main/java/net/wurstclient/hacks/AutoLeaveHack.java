@@ -7,10 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.time.Instant;
-
-import net.minecraft.network.encryption.NetworkEncryptionUtils.class_7425;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
@@ -96,12 +92,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			break;
 			
 			case CHARS:
-			Instant instant = Instant.now();
-			String message = "\u00a7";
-			class_7425 signature =
-				IMC.getPlayer().signChatMessage(instant, message);
-			MC.player.networkHandler.sendPacket(
-				new ChatMessageC2SPacket(instant, message, signature));
+			IMC.getPlayer().sendChatMessageBypass("\u00a7");
 			break;
 			
 			case TELEPORT:
