@@ -46,6 +46,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -58,8 +59,8 @@ public final class MobSpawnEspHack extends Hack
 	private final EnumSetting<DrawDistance> drawDistance = new EnumSetting<>(
 		"Draw distance", DrawDistance.values(), DrawDistance.D9);
 	
-	private final SliderSetting loadingSpeed =
-		new SliderSetting("Loading speed", 1, 1, 5, 1, v -> (int)v + "x");
+	private final SliderSetting loadingSpeed = new SliderSetting(
+		"Loading speed", 1, 1, 5, 1, ValueDisplay.INTEGER.withSuffix("x"));
 	
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);

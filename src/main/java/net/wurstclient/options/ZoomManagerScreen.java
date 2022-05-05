@@ -80,6 +80,12 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	}
 	
 	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
+	}
+	
+	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{

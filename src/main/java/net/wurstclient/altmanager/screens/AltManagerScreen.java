@@ -555,6 +555,12 @@ public final class AltManagerScreen extends Screen
 			tooltip.add(Text.literal(line));
 	}
 	
+	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
+	}
+	
 	public static final class ListGui extends ListWidget
 	{
 		private final List<Alt> list;

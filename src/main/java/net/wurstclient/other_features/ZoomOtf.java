@@ -22,7 +22,7 @@ import net.wurstclient.util.MathUtils;
 public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 {
 	private final SliderSetting level = new SliderSetting("Zoom level", 3, 1,
-		50, 0.1, v -> ValueDisplay.DECIMAL.getValueString(v) + "x");
+		50, 0.1, ValueDisplay.DECIMAL.withSuffix("x"));
 	
 	private final CheckboxSetting scroll = new CheckboxSetting(
 		"Use mouse wheel", "If enabled, you can use the mouse wheel\n"

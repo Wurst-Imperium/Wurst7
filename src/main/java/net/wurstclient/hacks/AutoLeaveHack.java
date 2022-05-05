@@ -28,8 +28,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	private final SliderSetting health = new SliderSetting("Health",
 		"Leaves the server when your health\n"
 			+ "reaches this value or falls below it.",
-		4, 0.5, 9.5, 0.5,
-		v -> ValueDisplay.DECIMAL.getValueString(v) + " hearts");
+		4, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts"));
 	
 	public final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"\u00a7lQuit\u00a7r mode just quits the game normally.\n"

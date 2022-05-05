@@ -266,8 +266,7 @@ public final class SliderComponent extends Component
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		double percentage = (setting.getValue() - setting.getMinimum())
-			/ (setting.getMaximum() - setting.getMinimum());
+		double percentage = setting.getPercentage();
 		float xk1 = x1 + (x2 - x1 - 8) * (float)percentage;
 		float xk2 = xk1 + 8;
 		float yk1 = y3 + 1.5F;
@@ -278,8 +277,8 @@ public final class SliderComponent extends Component
 			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
 		{
-			float f = (float)(2 * percentage);
-			RenderSystem.setShaderColor(f, 2 - f, 0, hSlider ? 1 : 0.75F);
+			float[] c = setting.getKnobColor();
+			RenderSystem.setShaderColor(c[0], c[1], c[2], hSlider ? 1 : 0.75F);
 		}
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

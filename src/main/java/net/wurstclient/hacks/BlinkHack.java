@@ -17,6 +17,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
@@ -27,7 +28,7 @@ public final class BlinkHack extends Hack
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"Automatically restarts Blink once\n" + "the given number of packets\n"
 			+ "have been suspended.\n\n" + "0 = no limit",
-		0, 0, 500, 1, v -> v == 0 ? "disabled" : (int)v + "");
+		0, 0, 500, 1, ValueDisplay.INTEGER.withLabel(0, "disabled"));
 	
 	private final ArrayDeque<PlayerMoveC2SPacket> packets = new ArrayDeque<>();
 	private FakePlayerEntity fakePlayer;
