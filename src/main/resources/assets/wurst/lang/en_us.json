@@ -152,6 +152,7 @@
   "description.wurst.hack.truesight": "Allows you to see invisible entities.",
   "description.wurst.hack.tunneller": "Automatically digs a tunnel.\n\n§c§lWARNING:§r Although this bot will try to avoid lava and other dangers, there is no guarantee that it won't die. Only send it out with gear that you don't mind losing.",
   "description.wurst.hack.x-ray": "Allows you to see ores through walls.",
+  "description.wurst.setting.generic.attack_speed": "Attack speed in clicks per second.\n0 = dynamically adjusts the speed to match your attack cooldown.",
   "description.wurst.altmanager.premium": "This alt has a password and can join all servers.",
   "description.wurst.altmanager.cracked": "This alt has no password and will only work on cracked servers.",
   "description.wurst.altmanager.failed": "Last time you tried to log in with this alt, it didn't work.",

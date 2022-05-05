@@ -39,6 +39,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"\u00a7lFast\u00a7r mode can use bone meal on\n"
 			+ "multiple blocks at once.\n"
