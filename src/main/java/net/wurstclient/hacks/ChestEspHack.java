@@ -21,6 +21,7 @@ import net.minecraft.block.entity.*;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.vehicle.ChestBoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.HopperMinecartEntity;
 import net.wurstclient.Category;
@@ -68,6 +69,13 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				Color.YELLOW),
 			new CheckboxSetting("Include chest carts", true));
 	
+	private final ChestEspEntityGroup chestBoats =
+		new ChestEspEntityGroup(
+			new ColorSetting("Chest boat color",
+				"Boats with chests will be highlighted in this color.",
+				Color.YELLOW),
+			new CheckboxSetting("Include chest boats", true));
+	
 	private final ChestEspBlockGroup barrels = new ChestEspBlockGroup(
 		new ColorSetting("Barrel color",
 			"Barrels will be highlighted in this color.", Color.GREEN),
@@ -106,12 +114,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Furnaces, smokers, and blast furnaces will be highlighted in this color.",
 			Color.RED), new CheckboxSetting("Include furnaces", false));
 	
-	private final List<ChestEspGroup> groups =
-		Arrays.asList(basicChests, trapChests, enderChests, chestCarts, barrels,
-			shulkerBoxes, hoppers, hopperCarts, droppers, dispensers, furnaces);
+	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
+		trapChests, enderChests, chestCarts, chestBoats, barrels, shulkerBoxes,
+		hoppers, hopperCarts, droppers, dispensers, furnaces);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
-		Arrays.asList(chestCarts, hopperCarts);
+		Arrays.asList(chestCarts, chestBoats, hopperCarts);
 	
 	public ChestEspHack()
 	{
@@ -178,6 +186,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				chestCarts.add(entity);
 			else if(entity instanceof HopperMinecartEntity)
 				hopperCarts.add(entity);
+			else if(entity instanceof ChestBoatEntity)
+				chestBoats.add(entity);
 	}
 	
 	@Override
