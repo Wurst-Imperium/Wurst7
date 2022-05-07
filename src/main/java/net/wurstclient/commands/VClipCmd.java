@@ -7,10 +7,20 @@
  */
 package net.wurstclient.commands;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
+
+import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
 public final class VClipCmd extends Command
@@ -18,7 +28,7 @@ public final class VClipCmd extends Command
 	public VClipCmd()
 	{
 		super("vclip", "Lets you clip through blocks vertically.\n"
-			+ "The maximum distance is 10 blocks.", ".vclip <height>");
+			+ "The maximum distance is 10 blocks.", ".vclip <height> or .vclip <above | below>");
 	}
 	
 	@Override
@@ -27,11 +37,38 @@ public final class VClipCmd extends Command
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(!MathUtils.isInteger(args[0]))
-			throw new CmdSyntaxError();
-		
 		ClientPlayerEntity player = MC.player;
+		
+		if(!MathUtils.isInteger(args[0])) {
+			Stream<BlockPos> blockStream = null;
+			switch (args[0].toLowerCase()) 
+			{
+				case "above":
+					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().up(2), player.getBlockPos().up(10));
+					break;
+				
+				case "below":
+					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().down(10), player.getBlockPos().down());
+					break;
+				
+				default:
+					throw new CmdSyntaxError();
+			}
+			List<BlockPos> blockList = blockStream.filter(pos -> player.getPose() == EntityPose.SWIMMING ? 
+							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) :
+							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) && BlockUtils.getState(pos.up()).getMaterial().equals(Material.AIR)
+							)
+						.sorted(Comparator.comparingDouble(p -> player.squaredDistanceTo(Vec3d.of(p))))
+						.limit(1).toList();
+			if (!blockList.isEmpty()) {
+				player.setPosition(player.getBlockPos().getX() + 0.5,blockList.get(0).getY(),player.getBlockPos().getZ() + 0.5);
+			}
+			else {ChatUtils.error("There are no free blocks where you can fit!");}
+			return;
+		}
+		
 		player.setPosition(player.getX(),
 			player.getY() + Integer.parseInt(args[0]), player.getZ());
+		
 	}
 }
