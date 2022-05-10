@@ -41,27 +41,31 @@ public final class VClipCmd extends Command
 		
 		if(!MathUtils.isInteger(args[0])) {
 			Stream<BlockPos> blockStream = null;
+			boolean above;
 			switch (args[0].toLowerCase()) 
 			{
 				case "above":
 					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().up(2), player.getBlockPos().up(10));
+					above = true;
 					break;
 				
 				case "below":
 					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().down(10), player.getBlockPos().down());
+					above = false;
 					break;
 				
 				default:
 					throw new CmdSyntaxError();
 			}
-			List<BlockPos> blockList = blockStream.filter(pos -> player.getPose() == EntityPose.SWIMMING ? 
+			List<BlockPos> blockList = blockStream.filter(pos -> above ? BlockUtils.getState(pos.down()).getMaterial().isSolid() : true)
+						.filter(pos -> player.getPose() == EntityPose.SWIMMING ? 
 							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) :
 							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) && BlockUtils.getState(pos.up()).getMaterial().equals(Material.AIR)
 							)
 						.sorted(Comparator.comparingDouble(p -> player.squaredDistanceTo(Vec3d.of(p))))
 						.limit(1).toList();
 			if (!blockList.isEmpty()) {
-				player.setPosition(player.getBlockPos().getX() + 0.5,blockList.get(0).getY(),player.getBlockPos().getZ() + 0.5);
+				player.updatePosition(player.getX(),blockList.get(0).getY(),player.getZ());
 			}
 			else {ChatUtils.error("There are no free blocks where you can fit!");}
 			return;
