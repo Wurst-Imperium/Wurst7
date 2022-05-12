@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -96,13 +97,20 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera.getPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return Vec3d.ZERO;
+		
+		return camera.getPos();
 	}
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera
-			.getBlockPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return BlockPos.ORIGIN;
+		
+		return camera.getBlockPos();
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)
