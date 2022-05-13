@@ -31,21 +31,6 @@ public abstract class ScreenMixin extends AbstractParentElement
 	@Final
 	private List<Drawable> drawables;
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
-		ordinal = 0),
-		method = {"sendMessage(Ljava/lang/String;Z)V"},
-		cancellable = true)
-	private void onSendChatMessage(String message, boolean toHud,
-		CallbackInfo ci)
-	{
-		if(toHud)
-			return;
-		
-		WurstClient.IMC.getPlayer().sendChatMessageBypass(message);
-		ci.cancel();
-	}
-	
 	@Inject(at = {@At("HEAD")},
 		method = {
 			"renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"},

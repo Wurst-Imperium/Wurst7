@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.class_7469;
-import net.minecraft.class_7470;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -31,8 +29,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.encryption.ChatMessageSigner;
 import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -70,9 +68,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "sendChatMessage(Ljava/lang/String;)V",
+		method = "method_44096(Ljava/lang/String;Lnet/minecraft/text/Text;)V",
 		cancellable = true)
-	private void onSendChatMessage(String message, CallbackInfo ci)
+	private void onSendChatMessage(String message, @Nullable Text text,
+		CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
 		EventManager.fire(event);
@@ -93,20 +92,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Override
 	public void sendChatMessageBypass(String message)
 	{
-		class_7470 metadataForSignature = class_7470.method_43866(getUuid());
-		message = StringUtils.normalizeSpace(message);
-		
-		if(message.startsWith("/"))
-			method_43787(metadataForSignature, message.substring(1));
-		else
-		{
-			class_7469 signature =
-				signChatMessage(metadataForSignature, Text.literal(message));
-			
-			ChatMessageC2SPacket packet =
-				new ChatMessageC2SPacket(message, signature);
-			networkHandler.sendPacket(packet);
-		}
+		ChatMessageSigner signer = ChatMessageSigner.create(getUuid());
+		method_44097(signer, message, null);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -273,16 +260,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Shadow
-	private class_7469 signChatMessage(class_7470 arg, Text text)
-	{
-		return null;
-	}
-	
-	/**
-	 * Signs and sends a /command.
-	 */
-	@Shadow
-	private void method_43787(class_7470 arg, String string)
+	private void method_44097(ChatMessageSigner chatMessageSigner,
+		String string, @Nullable Text text)
 	{
 		
 	}
