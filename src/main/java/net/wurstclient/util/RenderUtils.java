@@ -22,6 +22,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -111,6 +112,18 @@ public enum RenderUtils
 			return BlockPos.ORIGIN;
 		
 		return camera.getBlockPos();
+	}
+	
+	public static float[] getRainbowColor()
+	{
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float pi = (float)Math.PI;
+		
+		float[] rainbow = new float[3];
+		rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
+		rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
+		rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+		return rainbow;
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)

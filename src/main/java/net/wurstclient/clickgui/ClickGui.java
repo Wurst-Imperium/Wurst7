@@ -42,6 +42,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.components.FeatureButton;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.json.JsonUtils;
 
 public final class ClickGui
@@ -613,13 +614,8 @@ public final class ClickGui
 		txtColor = clickGui.getTextColor();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
-		{
-			float x = System.currentTimeMillis() % 2000 / 1000F;
-			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
-			acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
-			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
-			
-		}else
+			acColor = RenderUtils.getRainbowColor();
+		else
 			acColor = clickGui.getAccentColor();
 	}
 	

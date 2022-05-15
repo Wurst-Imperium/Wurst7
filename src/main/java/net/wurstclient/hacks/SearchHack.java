@@ -42,7 +42,6 @@ import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
@@ -225,15 +224,9 @@ public final class SearchHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		// generate rainbow color
-		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float red = 0.5F + 0.5F * MathHelper.sin(x * (float)Math.PI);
-		float green =
-			0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * (float)Math.PI);
-		float blue =
-			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
+		float[] rainbow = RenderUtils.getRainbowColor();
+		RenderSystem.setShaderColor(rainbow[0], rainbow[1], rainbow[2], 0.5F);
 		
-		RenderSystem.setShaderColor(red, green, blue, 0.5F);
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(vertexBuffer != null)
