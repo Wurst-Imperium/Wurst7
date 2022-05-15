@@ -183,7 +183,7 @@ public final class SearchHack extends Hack
 		Block currentBlock = block.getBlock();
 		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
 		
-		ChunkPos center = getPlayerChunkPos(eyesPos);
+		ChunkPos center = MC.player.getChunkPos();
 		int range = area.getSelected().chunkRange;
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
@@ -252,13 +252,6 @@ public final class SearchHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
-	{
-		int chunkX = eyesPos.getX() >> 4;
-		int chunkZ = eyesPos.getZ() >> 4;
-		return MC.world.getChunk(chunkX, chunkZ).getPos();
 	}
 	
 	private void addSearchersInRange(ChunkPos center, int chunkRange,
