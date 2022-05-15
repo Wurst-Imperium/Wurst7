@@ -136,7 +136,10 @@ public final class SearchHack extends Hack
 		pool2.shutdownNow();
 		
 		if(vertexBuffer != null)
+		{
 			vertexBuffer.close();
+			vertexBuffer = null;
+		}
 		
 		chunksToUpdate.clear();
 	}
