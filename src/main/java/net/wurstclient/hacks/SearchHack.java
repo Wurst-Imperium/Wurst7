@@ -467,7 +467,7 @@ public final class SearchHack extends Hack
 		bufferUpToDate = true;
 	}
 	
-	public ArrayList<int[]> getVerticesFromTask()
+	private ArrayList<int[]> getVerticesFromTask()
 	{
 		try
 		{
