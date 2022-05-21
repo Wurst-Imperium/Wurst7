@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.BlockPos;
@@ -59,8 +58,8 @@ public final class VClipCmd extends Command
 			}
 			List<BlockPos> blockList = blockStream.filter(pos -> above ? BlockUtils.getState(pos.down()).getMaterial().isSolid() : true)
 						.filter(pos -> player.getPose() == EntityPose.SWIMMING ? 
-							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) :
-							BlockUtils.getState(pos).getMaterial().equals(Material.AIR) && BlockUtils.getState(pos.up()).getMaterial().equals(Material.AIR)
+								BlockUtils.getState(pos.up()).isAir() :
+								BlockUtils.getState(pos).isAir() && BlockUtils.getState(pos.up()).isAir()
 							)
 						.sorted(Comparator.comparingDouble(p -> player.squaredDistanceTo(Vec3d.of(p))))
 						.limit(1).toList();
