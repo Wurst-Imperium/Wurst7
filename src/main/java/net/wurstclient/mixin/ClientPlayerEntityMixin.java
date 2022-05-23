@@ -68,9 +68,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "method_44096(Ljava/lang/String;Lnet/minecraft/text/Text;)V",
+		method = "sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V",
 		cancellable = true)
-	private void onSendChatMessage(String message, @Nullable Text text,
+	private void onSendChatMessage(String message, @Nullable Text preview,
 		CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
@@ -93,7 +93,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void sendChatMessageBypass(String message)
 	{
 		ChatMessageSigner signer = ChatMessageSigner.create(getUuid());
-		method_44097(signer, message, null);
+		sendChatMessagePacket(signer, message, null);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -260,8 +260,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Shadow
-	private void method_44097(ChatMessageSigner chatMessageSigner,
-		String string, @Nullable Text text)
+	private void sendChatMessagePacket(ChatMessageSigner signer, String message,
+		@Nullable Text preview)
 	{
 		
 	}

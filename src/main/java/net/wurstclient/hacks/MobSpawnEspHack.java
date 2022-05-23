@@ -20,7 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.class_7433;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -377,7 +377,7 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 1, 0, 0.5F).next();
 				});
 			
-			class_7433 buffer = bufferBuilder.end();
+			BuiltBuffer buffer = bufferBuilder.end();
 			vertexBuffer.bind();
 			vertexBuffer.upload(buffer);
 			VertexBuffer.unbind();

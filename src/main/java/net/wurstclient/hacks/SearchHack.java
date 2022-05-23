@@ -29,7 +29,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.class_7433;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -439,7 +439,7 @@ public final class SearchHack extends Hack
 		for(int[] vertex : vertices)
 			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
 		
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);

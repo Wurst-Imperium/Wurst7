@@ -13,7 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.class_7433;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -228,7 +228,7 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		drawSolidBox(bb, bufferBuilder);
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
@@ -376,7 +376,7 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawOutlinedBox(bb, bufferBuilder);
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
@@ -524,7 +524,7 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawCrossBox(bb, bufferBuilder);
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
@@ -655,7 +655,7 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawNode(bb, bufferBuilder);
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
@@ -788,7 +788,7 @@ public enum RenderUtils
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawArrow(from, to, bufferBuilder);
-		class_7433 buffer = bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);

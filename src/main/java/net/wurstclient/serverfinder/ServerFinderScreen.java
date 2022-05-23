@@ -184,8 +184,10 @@ public class ServerFinderScreen extends Screen
 					if(!isServerInList(pingers.get(i).getServerIP()))
 					{
 						prevScreen.getServerList()
-							.add(new ServerInfo("Grief me #" + working,
-								pingers.get(i).getServerIP(), false));
+							.add(
+								new ServerInfo("Grief me #" + working,
+									pingers.get(i).getServerIP(), false),
+								false);
 						prevScreen.getServerList().saveFile();
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
 							.setSelected(null);

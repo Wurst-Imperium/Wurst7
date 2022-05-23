@@ -12,7 +12,7 @@ import java.util.Optional;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.util.math.random.AbstractRandom;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.wurstclient.Category;
@@ -36,7 +36,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 			+ "Doesn't seem to affect performance.",
 		1, 1, 64, 1, ValueDisplay.INTEGER);
 	
-	private final AbstractRandom random = AbstractRandom.create();
+	private final Random random = Random.createLocal();
 	
 	public ItemGeneratorHack()
 	{
