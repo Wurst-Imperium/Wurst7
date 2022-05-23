@@ -51,13 +51,13 @@ public class ChatScreenMixin extends Screen
 		if(normalized.startsWith(".say "))
 		{
 			// send preview, but only for the part after ".say "
-			chatPreviewer.method_44274(normalized.substring(5));
+			chatPreviewer.tryRequest(normalized.substring(5));
 			ci.cancel();
 			
 		}else if(normalized.startsWith("."))
 		{
 			// disable & delete preview
-			chatPreviewer.method_44275();
+			chatPreviewer.disablePreview();
 			ci.cancel();
 		}
 	}
