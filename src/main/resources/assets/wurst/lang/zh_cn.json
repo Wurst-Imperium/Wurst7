@@ -73,7 +73,6 @@
   "description.wurst.hack.jesus": "允许你走在水面上。\n耶稣曾经用这个功能约 ~2000 年前。",
   "description.wurst.hack.jetpack": "模仿你好像真的有飞行背包一样飞行。\n\n§c§l警告：§r 如果你不使用 NoFall，会导致受到掉落伤害。",
   "description.wurst.hack.kaboom": "像爆炸一样破坏你附近的方块。\n这个可能比 Nuker 功能破坏更快如果服务器没有反作弊的话，使用适合的工具和破坏脆弱的方块可以事半功倍。\n注意：这并不是真正的爆炸。",
-  "description.wurst.hack.killauralegit": "KillauraLegit 更难被反作弊检测。\n在正常的 NoCheat+（NCP）服务器上不需要！",
   "description.wurst.hack.killaura": "自动攻击你附近的实体。",
   "description.wurst.hack.killpotion": "生成一个能杀死绝大多数生物的药水，包括创造模式的玩家，但对那些不死的生物或者已死生物无效。\n\n需要在创造模式下。",
   "description.wurst.hack.liquids": "取消限制，允许你在水中直接放置方块。",

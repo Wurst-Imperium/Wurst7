@@ -79,7 +79,6 @@
   "description.wurst.hack.jesus": "水面を歩けるようになる。\n忍者はこのハックを使用していたらしい。",
   "description.wurst.hack.jetpack": "ジェットパックを使用しているように飛ぶことができる。\n\n§c§l注意: §rNoFallと併用しない場合、落下ダメージが発生する。",
   "description.wurst.hack.kaboom": "爆発が起きたかのように自分の周囲のブロックを破壊する。\nNoCheat+を使用していないサーバー上であればNukerより遥かに早い。効率の良いツールと壊れやすいブロック上での使用が最適。\nメモ: 実際に爆発が起きているわけではない。",
-  "description.wurst.hack.killauralegit": "検知されにくい遅いKillaura。\n大抵のNoCheat+サーバーでは使う必要なし。",
   "description.wurst.hack.killaura": "周囲のエンティティを自動で攻撃する。",
   "description.wurst.hack.killpotion": "クリエイティブモードのプレイヤーを含む、ほぼすべての生き物を倒すことができるポーションを生成する。\nアンデッドのモブはすでに死んでいるため使用不可。\n\nクリエイティブモード必須。",
   "description.wurst.hack.liquids": "水面に直接ブロックを設置できるようになる。",

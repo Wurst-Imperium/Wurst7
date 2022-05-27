@@ -39,6 +39,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -53,6 +55,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
@@ -78,6 +81,11 @@ public final class KillauraHack extends Hack
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final CheckboxSetting legit = new CheckboxSetting("Legit Mode",
+			"Slows down Killaura so it is harder to detect."
+			+ "\nNot required on normal NoCheat+ servers!",
+			false);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -153,6 +161,7 @@ public final class KillauraHack extends Hack
 		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(legit);
 		addSetting(damageIndicator);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -178,7 +187,6 @@ public final class KillauraHack extends Hack
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
-		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
@@ -295,8 +303,15 @@ public final class KillauraHack extends Hack
 		
 		WURST.getHax().autoSwordHack.setSlot();
 		
-		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+		if(!legit.isChecked())
+		{
+			WURST.getRotationFaker()
+				.faceVectorPacket(target.getBoundingBox().getCenter());
+		}
+		else if(!faceEntityClient(target))
+		{
+			target = null;
+		}
 	}
 	
 	@Override
@@ -312,6 +327,45 @@ public final class KillauraHack extends Hack
 		
 		target = null;
 		speed.resetTimer();
+	}
+	
+	private boolean faceEntityClient(Entity entity)
+	{
+		// get position & rotation
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d lookVec = RotationUtils.getServerLookVec();
+		
+		// try to face center of boundingBox
+		Box bb = entity.getBoundingBox();
+		if(faceVectorClient(bb.getCenter()))
+			return true;
+		
+		// if not facing center, check if facing anything in boundingBox
+		return bb
+			.raycast(eyesPos, eyesPos.add(lookVec.multiply(range.getValue())))
+			.isPresent();
+	}
+	
+	private boolean faceVectorClient(Vec3d vec)
+	{
+		Rotation rotation = RotationUtils.getNeededRotations(vec);
+		
+		float oldYaw = MC.player.prevYaw;
+		float oldPitch = MC.player.prevPitch;
+		
+		MC.player.setYaw(limitAngleChange(oldYaw, rotation.getYaw(), 30));
+		MC.player.setPitch(rotation.getPitch());
+		
+		return Math.abs(oldYaw - rotation.getYaw())
+			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;
+	}
+	
+	private float limitAngleChange(float current, float intended,
+								   float maxChange)
+	{
+		float change = MathHelper.wrapDegrees(intended - current);
+		change = MathHelper.clamp(change, -maxChange, maxChange);
+		return MathHelper.wrapDegrees(current + change);
 	}
 	
 	@Override

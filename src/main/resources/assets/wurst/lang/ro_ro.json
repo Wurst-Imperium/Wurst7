@@ -88,7 +88,6 @@
   "description.wurst.hack.jesus": "Iti permite sa umblii pe apa.\nIsus Hristos a folosit acest hack acum ~2000 de ani.",
   "description.wurst.hack.jetpack": "Iti permite sa zbori de parca ai un jetpack.\n\n§c§lATENTIE:§r Iti vei lua fall damage daca nu folosesti NoFall.",
   "description.wurst.hack.kaboom": "Strica block-urile din jurul tau ca si o explozie.\nPoate fi mai rapid decat Nuker daca serverul nu are NoCheat+. Functioneaza cel mai bine cu unelte bune si blockuri slabe.\nNota: Aceasta nu este o explozie adevarata.",
-  "description.wurst.hack.killauralegit": "Killaura mai incet dar mai greu de detectat.\nNu este necesar pe serverele normale cu NoCheat+!",
   "description.wurst.hack.killaura": "Ataca automat entitatile din jurul tau.",
   "description.wurst.hack.killpotion": "Genereaza o potiune care poate ucide orice, inclusiv playerii in Creativ. Nu functioneaza pe mortaciuni, fiindca mortaciunile-s deja moarte.\n\nNecesita Creativ.",
   "description.wurst.hack.liquids": "Iti permite sa pui block-uri in lichide.",
