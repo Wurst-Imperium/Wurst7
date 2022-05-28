@@ -139,6 +139,12 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
+	}
+	
+	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{

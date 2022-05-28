@@ -41,12 +41,6 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public boolean shouldPause()
-	{
-		return false;
-	}
-	
-	@Override
 	public void init()
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
@@ -176,6 +170,18 @@ public final class SelectFileScreen extends Screen
 			renderTooltip(matrixStack,
 				Arrays.asList(new LiteralText("You must first select a file.")),
 				mouseX, mouseY);
+	}
+	
+	@Override
+	public boolean shouldPause()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

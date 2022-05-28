@@ -45,6 +45,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -64,6 +65,9 @@ public final class KillauraHack extends Hack
 			+ "specified value will not be attacked.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
+	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -72,8 +76,13 @@ public final class KillauraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	public final SliderSetting fov =
+	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final CheckboxSetting damageIndicator = new CheckboxSetting(
+		"Damage indicator",
+		"Renders a colored box within the target, inversely proportional to its remaining health.",
+		true);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -86,14 +95,13 @@ public final class KillauraHack extends Hack
 				+ "look like corpses.",
 			false);
 	
-	private final SliderSetting filterFlying = new SliderSetting(
-		"Filter flying",
-		"Won't attack players that are at least\n"
-			+ "the given distance above ground.\n\n"
-			+ "Useful for servers that place a flying\n"
-			+ "player behind you to try and detect\n" + "your Killaura.",
-		0, 0, 2, 0.05,
-		v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+	private final SliderSetting filterFlying =
+		new SliderSetting("Filter flying",
+			"Won't attack players that are at least\n"
+				+ "the given distance above ground.\n\n"
+				+ "Useful for servers that place a flying\n"
+				+ "player behind you to try and detect\n" + "your Killaura.",
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
@@ -142,8 +150,10 @@ public final class KillauraHack extends Hack
 		setCategory(Category.COMBAT);
 		
 		addSetting(range);
+		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(damageIndicator);
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
 		addSetting(filterFlying);
@@ -174,6 +184,7 @@ public final class KillauraHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PostMotionListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -193,11 +204,12 @@ public final class KillauraHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		
-		if(player.getAttackCooldownProgress(0) < 1)
-			return;
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
@@ -299,12 +311,13 @@ public final class KillauraHack extends Hack
 		player.swingHand(Hand.MAIN_HAND);
 		
 		target = null;
+		speed.resetTimer();
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(renderTarget == null)
+		if(renderTarget == null || !damageIndicator.isChecked())
 			return;
 		
 		// GL settings

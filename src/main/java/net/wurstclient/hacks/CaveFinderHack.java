@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,16 +77,14 @@ public final class CaveFinderHack extends Hack
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"The maximum number of blocks to display.\n"
 			+ "Higher values require a faster computer.",
-		5, 3, 6, 1,
-		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+		5, 3, 6, 1, ValueDisplay.LOGARITHMIC);
 	
 	private final ColorSetting color = new ColorSetting("Color",
 		"Caves will be highlighted\n" + "in this color.", Color.RED);
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity",
 		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
-		0, 1, 0.01,
-		v -> v == 0 ? "Breathing" : ValueDisplay.PERCENTAGE.getValueString(v));
+		0, 1, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "breathing"));
 	
 	private int prevLimit;
 	private boolean notify;

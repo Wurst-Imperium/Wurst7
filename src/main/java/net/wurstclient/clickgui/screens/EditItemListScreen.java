@@ -53,12 +53,6 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean shouldPause()
-	{
-		return false;
-	}
-	
-	@Override
 	public void init()
 	{
 		listGui = new ListGui(client, this, itemList.getItemNames());
@@ -214,6 +208,18 @@ public final class EditItemListScreen extends Screen
 		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
+	}
+	
+	@Override
+	public boolean shouldPause()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget
