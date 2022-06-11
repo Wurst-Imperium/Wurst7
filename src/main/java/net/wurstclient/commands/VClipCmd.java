@@ -26,8 +26,10 @@ public final class VClipCmd extends Command
 {
 	public VClipCmd()
 	{
-		super("vclip", "Lets you clip through blocks vertically.\n"
-			+ "The maximum distance is 10 blocks.", ".vclip <height> or .vclip <above | below>");
+		super("vclip",
+			"Lets you clip through blocks vertically.\n"
+				+ "The maximum distance is 10 blocks.",
+			".vclip <height> or .vclip <above | below>");
 	}
 	
 	@Override
@@ -38,40 +40,51 @@ public final class VClipCmd extends Command
 		
 		ClientPlayerEntity player = MC.player;
 		
-		if(!MathUtils.isInteger(args[0])) {
+		if(!MathUtils.isInteger(args[0]))
+		{
 			Stream<BlockPos> blockStream = null;
 			boolean above;
-			switch (args[0].toLowerCase()) 
+			
+			switch(args[0].toLowerCase())
 			{
 				case "above":
-					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().up(2), player.getBlockPos().up(10));
-					above = true;
-					break;
+				blockStream = BlockUtils.getAllInBoxStream(
+					player.getBlockPos().up(2), player.getBlockPos().up(10));
+				above = true;
+				break;
 				
 				case "below":
-					blockStream = BlockUtils.getAllInBoxStream(player.getBlockPos().down(10), player.getBlockPos().down());
-					above = false;
-					break;
+				blockStream = BlockUtils.getAllInBoxStream(
+					player.getBlockPos().down(10), player.getBlockPos().down());
+				above = false;
+				break;
 				
 				default:
-					throw new CmdSyntaxError();
+				throw new CmdSyntaxError();
 			}
-			List<BlockPos> blockList = blockStream.filter(pos -> above ? BlockUtils.getState(pos.down()).getMaterial().isSolid() : true)
-						.filter(pos -> player.getPose() == EntityPose.SWIMMING ? 
-								BlockUtils.getState(pos.up()).isAir() :
-								BlockUtils.getState(pos).isAir() && BlockUtils.getState(pos.up()).isAir()
-							)
-						.sorted(Comparator.comparingDouble(p -> player.squaredDistanceTo(Vec3d.of(p))))
-						.limit(1).toList();
-			if (!blockList.isEmpty()) {
-				player.updatePosition(player.getX(),blockList.get(0).getY(),player.getZ());
-			}
-			else {ChatUtils.error("There are no free blocks where you can fit!");}
+			
+			List<BlockPos> blockList =
+				blockStream
+					.filter(pos -> above ? BlockUtils.getState(pos.down())
+						.getMaterial().isSolid() : true)
+					.filter(pos -> player.getPose() == EntityPose.SWIMMING
+						? BlockUtils.getState(pos.up()).isAir()
+						: BlockUtils.getState(pos).isAir()
+							&& BlockUtils.getState(pos.up()).isAir())
+					.sorted(Comparator.comparingDouble(
+						p -> player.squaredDistanceTo(Vec3d.of(p))))
+					.limit(1).toList();
+			
+			if(!blockList.isEmpty())
+				player.updatePosition(player.getX(), blockList.get(0).getY(),
+					player.getZ());
+			else
+				ChatUtils.error("There are no free blocks where you can fit!");
+			
 			return;
 		}
 		
 		player.setPosition(player.getX(),
 			player.getY() + Integer.parseInt(args[0]), player.getZ());
-		
 	}
 }
