@@ -29,7 +29,7 @@ public final class VClipCmd extends Command
 		super("vclip",
 			"Lets you clip through blocks vertically.\n"
 				+ "The maximum distance is 10 blocks.",
-			".vclip <height> or .vclip <above | below>");
+			".vclip <height>", ".vclip (above|below)");
 	}
 	
 	@Override
