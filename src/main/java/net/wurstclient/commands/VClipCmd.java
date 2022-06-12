@@ -24,7 +24,7 @@ public final class VClipCmd extends Command
 		super("vclip",
 			"Lets you clip through blocks vertically.\n"
 				+ "The maximum distance is 10 blocks.",
-			".vclip <height>", ".vclip (above|below)");
+			".vclip <height>", ".vclip (up|down)");
 	}
 	
 	@Override
@@ -41,11 +41,11 @@ public final class VClipCmd extends Command
 		
 		switch(args[0].toLowerCase())
 		{
-			case "above":
+			case "up":
 			vclip(calculateHeight(Direction.UP));
 			break;
 			
-			case "below":
+			case "down":
 			vclip(calculateHeight(Direction.DOWN));
 			break;
 			
