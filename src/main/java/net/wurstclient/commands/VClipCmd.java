@@ -7,19 +7,14 @@
  */
 package net.wurstclient.commands;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
-
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
 
 public final class VClipCmd extends Command
@@ -38,53 +33,80 @@ public final class VClipCmd extends Command
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		ClientPlayerEntity player = MC.player;
-		
-		if(!MathUtils.isInteger(args[0]))
+		if(MathUtils.isInteger(args[0]))
 		{
-			Stream<BlockPos> blockStream = null;
-			boolean above;
-			
-			switch(args[0].toLowerCase())
-			{
-				case "above":
-				blockStream = BlockUtils.getAllInBoxStream(
-					player.getBlockPos().up(2), player.getBlockPos().up(10));
-				above = true;
-				break;
-				
-				case "below":
-				blockStream = BlockUtils.getAllInBoxStream(
-					player.getBlockPos().down(10), player.getBlockPos().down());
-				above = false;
-				break;
-				
-				default:
-				throw new CmdSyntaxError();
-			}
-			
-			List<BlockPos> blockList =
-				blockStream
-					.filter(pos -> above ? BlockUtils.getState(pos.down())
-						.getMaterial().isSolid() : true)
-					.filter(pos -> player.getPose() == EntityPose.SWIMMING
-						? BlockUtils.getState(pos.up()).isAir()
-						: BlockUtils.getState(pos).isAir()
-							&& BlockUtils.getState(pos.up()).isAir())
-					.sorted(Comparator.comparingDouble(
-						p -> player.squaredDistanceTo(Vec3d.of(p))))
-					.limit(1).toList();
-			
-			if(!blockList.isEmpty())
-				player.updatePosition(player.getX(), blockList.get(0).getY(),
-					player.getZ());
-			else
-				ChatUtils.error("There are no free blocks where you can fit!");
-			
+			vclip(Integer.parseInt(args[0]));
 			return;
 		}
 		
-		player.setPosition(player.getX(),
-			player.getY() + Integer.parseInt(args[0]), player.getZ());
+		switch(args[0].toLowerCase())
+		{
+			case "above":
+			vclip(calculateHeight(Direction.UP));
+			break;
+			
+			case "below":
+			vclip(calculateHeight(Direction.DOWN));
+			break;
+			
+			default:
+			throw new CmdSyntaxError();
+		}
+	}
+	
+	private double calculateHeight(Direction direction) throws CmdError
+	{
+		Box box = MC.player.getBoundingBox();
+		
+		Box maxOffsetBox = box.offset(0, direction.getOffsetY() * 10, 0);
+		if(!hasCollisions(box.union(maxOffsetBox)))
+			throw new CmdError("There is nothing to clip through!");
+		
+		for(int i = 1; i <= 10; i++)
+		{
+			double height = direction.getOffsetY() * i;
+			Box offsetBox = box.offset(0, height, 0);
+			
+			if(hasCollisions(offsetBox))
+			{
+				double subBlockOffset = getSubBlockOffset(offsetBox);
+				if(subBlockOffset >= 1 || height + subBlockOffset > 10)
+					continue;
+				
+				Box newOffsetBox = offsetBox.offset(0, subBlockOffset, 0);
+				if(hasCollisions(newOffsetBox))
+					continue;
+				
+				height += subBlockOffset;
+				offsetBox = newOffsetBox;
+			}
+			
+			if(!hasCollisions(box.union(offsetBox)))
+				continue;
+			
+			return height;
+		}
+		
+		throw new CmdError("There are no free blocks where you can fit!");
+	}
+	
+	private boolean hasCollisions(Box box)
+	{
+		Iterable<VoxelShape> collisions =
+			MC.world.getBlockCollisions(MC.player, box);
+		
+		return collisions.iterator().hasNext();
+	}
+	
+	private double getSubBlockOffset(Box offsetBox)
+	{
+		return IMC.getWorld().getCollidingBoxes(MC.player, offsetBox)
+			.mapToDouble(box -> box.maxY).max().getAsDouble() - offsetBox.minY;
+	}
+	
+	private void vclip(double height)
+	{
+		ClientPlayerEntity p = MC.player;
+		p.setPosition(p.getX(), p.getY() + height, p.getZ());
 	}
 }
