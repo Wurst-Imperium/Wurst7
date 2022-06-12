@@ -33,9 +33,9 @@ public final class VClipCmd extends Command
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(MathUtils.isInteger(args[0]))
+		if(MathUtils.isDouble(args[0]))
 		{
-			vclip(Integer.parseInt(args[0]));
+			vclip(Double.parseDouble(args[0]));
 			return;
 		}
 		
