@@ -17,7 +17,7 @@ import net.wurstclient.settings.SliderSetting;
 import java.awt.*;
 
 @SearchTags({"Ingame Background", "Background", "background", "ingame background", "ibackground", "IBackground"})
-public final class IngameBackground extends Hack
+public final class IngameBackgroundHack extends Hack
 {
 
 	private final Color first = new Color(-1072689136, true);
@@ -31,7 +31,7 @@ public final class IngameBackground extends Hack
 	public final SliderSetting firstAlpha = new SliderSetting("First Alpha", "The alpha of the first colour", 100, 1, 255, 1, SliderSetting.ValueDisplay.INTEGER);
 	public final SliderSetting secondAlpha = new SliderSetting("First Alpha", "The alpha of the second colour", 100, 1, 255, 1, SliderSetting.ValueDisplay.INTEGER);
 
-	public IngameBackground()
+	public IngameBackgroundHack()
 	{
 		super("IBackground");
 		this.setCategory(Category.RENDER);
