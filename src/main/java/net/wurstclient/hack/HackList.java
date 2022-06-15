@@ -119,7 +119,7 @@ public final class HackList implements UpdateListener
 	public final NameProtectHack nameProtectHack = new NameProtectHack();
 	public final NameTagsHack nameTagsHack = new NameTagsHack();
 	public final NavigatorHack navigatorHack = new NavigatorHack();
-	public final NoBackgroundHack noBackgroundHack = new NoBackgroundHack();
+	public final IngameBackgroundHack ingameBackgroundHack = new IngameBackgroundHack();
 	public final NoClipHack noClipHack = new NoClipHack();
 	public final NocomCrashHack nocomCrashHack = new NocomCrashHack();
 	public final NoFallHack noFallHack = new NoFallHack();

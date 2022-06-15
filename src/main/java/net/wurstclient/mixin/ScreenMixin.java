@@ -9,6 +9,9 @@ package net.wurstclient.mixin;
 
 import java.util.List;
 
+import net.minecraft.client.MinecraftClient;
+import net.wurstclient.hacks.IngameBackgroundHack;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,7 +34,15 @@ public abstract class ScreenMixin extends AbstractParentElement
 	@Shadow
 	@Final
 	private List<Drawable> drawables;
-	
+
+	@Shadow @Nullable protected MinecraftClient client;
+
+	@Shadow public abstract void renderBackgroundTexture(int vOffset);
+
+	@Shadow public int width;
+
+	@Shadow public int height;
+
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V",
 		ordinal = 0),
@@ -47,17 +58,33 @@ public abstract class ScreenMixin extends AbstractParentElement
 		WurstClient.MC.getNetworkHandler().sendPacket(packet);
 		ci.cancel();
 	}
-	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"},
-		cancellable = true)
-	public void onRenderBackground(MatrixStack matrices, CallbackInfo ci)
+
+	/**
+	 * @author EnZaXD (Florian Michael)
+	 */
+	@Inject(method = {
+			"renderBackground(Lnet/minecraft/client/util/math/MatrixStack;I)V"
+			},
+			at = @At("HEAD"),
+	cancellable = true)
+	public void onRenderBackground(MatrixStack matrices, int vOffset, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled())
+		//Minecraft Code
+		if (WurstClient.INSTANCE.getHax().ingameBackgroundHack.isEnabled())
+		{
+			final IngameBackgroundHack hack = WurstClient.INSTANCE.getHax().ingameBackgroundHack;
+
+			if (this.client.world != null) {
+				if (!hack.remove.isChecked()) {
+					this.fillGradient(matrices, 0, 0, this.width, this.height, hack.firstColor(), hack.secondColor());
+				}
+			} else {
+				this.renderBackgroundTexture(vOffset);
+			}
 			ci.cancel();
+		}
 	}
-	
+
 	@Override
 	public List<Drawable> getButtons()
 	{
