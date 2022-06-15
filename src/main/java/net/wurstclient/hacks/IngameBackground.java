@@ -19,6 +19,7 @@ import java.awt.*;
 @SearchTags({"Ingame Background", "Background", "background", "ingame background", "ibackground", "IBackground"})
 public final class IngameBackground extends Hack
 {
+
 	private final Color first = new Color(-1072689136, true);
 	private final Color second = new Color(-804253680, true);
 
@@ -33,22 +34,22 @@ public final class IngameBackground extends Hack
 	public IngameBackground()
 	{
 		super("IBackground");
-		setCategory(Category.RENDER);
+		this.setCategory(Category.RENDER);
 
-		addSetting(this.remove);
-		addSetting(this.firstColor);
-		addSetting(this.secondColor);
+		this.addSetting(this.remove);
+		this.addSetting(this.firstColor);
+		this.addSetting(this.secondColor);
 	}
 
 	public int firstColor()
 	{
-		return new Color(firstColor.getRed(), firstColor.getGreen(), firstColor.getBlue(), firstAlpha.getValueI()).getRGB();
+		return new Color(this.firstColor.getRed(), this.firstColor.getGreen(), this.firstColor.getBlue(), this.firstAlpha.getValueI()).getRGB();
 	}
 
 
 	public int secondColor()
 	{
-		return new Color(secondColor.getRed(), secondColor.getGreen(), secondColor.getBlue(), secondAlpha.getValueI()).getRGB();
+		return new Color(this.secondColor.getRed(), this.secondColor.getGreen(), this.secondColor.getBlue(), this.secondAlpha.getValueI()).getRGB();
 	}
 
 	// See ScreenMixin.onRenderBackground()
