@@ -30,7 +30,7 @@ public enum ChunkUtils
 	
 	public static Stream<WorldChunk> getLoadedChunks()
 	{
-		int radius = Math.max(2, MC.options.getViewDistance()) + 3;
+		int radius = Math.max(2, MC.options.getClampedViewDistance()) + 3;
 		int diameter = radius * 2 + 1;
 		
 		ChunkPos center = MC.player.getChunkPos();

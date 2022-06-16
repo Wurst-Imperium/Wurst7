@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
@@ -57,17 +56,16 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		lastServerButton =
-			addDrawableChild(new ButtonWidget(width / 2 - 154, 10, 100, 20,
-				new LiteralText("Last Server"), b -> LastServerRememberer
-					.joinLastServer((MultiplayerScreen)(Object)this)));
+		lastServerButton = addDrawableChild(new ButtonWidget(width / 2 - 154,
+			10, 100, 20, Text.literal("Last Server"), b -> LastServerRememberer
+				.joinLastServer((MultiplayerScreen)(Object)this)));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 52, 100,
-			20, new LiteralText("Server Finder"), b -> client.setScreen(
+			20, Text.literal("Server Finder"), b -> client.setScreen(
 				new ServerFinderScreen((MultiplayerScreen)(Object)this))));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 154 + 4, height - 28, 100,
-			20, new LiteralText("Clean Up"), b -> client.setScreen(
+			20, Text.literal("Clean Up"), b -> client.setScreen(
 				new CleanUpScreen((MultiplayerScreen)(Object)this))));
 	}
 	

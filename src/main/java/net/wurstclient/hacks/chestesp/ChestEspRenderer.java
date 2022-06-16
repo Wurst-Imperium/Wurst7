@@ -14,7 +14,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -68,10 +67,14 @@ public final class ChestEspRenderer
 			Shader shader = RenderSystem.getShader();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
-			solidBox.setShader(viewMatrix, projMatrix, shader);
+			solidBox.bind();
+			solidBox.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
-			outlinedBox.setShader(viewMatrix, projMatrix, shader);
+			outlinedBox.bind();
+			outlinedBox.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}
@@ -80,7 +83,8 @@ public final class ChestEspRenderer
 	public void renderLines(ChestEspGroup group)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		float[] colorF = group.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
@@ -101,8 +105,7 @@ public final class ChestEspRenderer
 				.next();
 		}
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void prepareBuffers()
