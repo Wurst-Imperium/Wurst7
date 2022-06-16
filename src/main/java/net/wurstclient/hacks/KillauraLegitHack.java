@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -185,6 +186,10 @@ public final class KillauraLegitHack extends Hack
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
+			return;
+		
+		// don't attack when a container/inventory screen is open
+		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
 		ClientPlayerEntity player = MC.player;
