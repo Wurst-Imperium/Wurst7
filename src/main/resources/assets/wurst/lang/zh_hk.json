@@ -152,6 +152,8 @@
   "description.wurst.hack.truesight": "允許你睇到隱身嘅實體。",
   "description.wurst.hack.tunneller": "自動挖一個隧道。\n\n§c§l警告：§r 盡管呢個 AI 會自動避開岩漿同埋其他牙煙嘅地下，但係唔包生仔，除非你唔介意你嘅嘢全部有一定概率會失去。",
   "description.wurst.hack.x-ray": "允許你透視礦物所喺嘅位置（請自行確保伺服器內無假礦插件）。",
+  "description.wurst.setting.generic.attack_speed": "每秒點擊嘅攻擊速度，0 = 動態調整速度以匹配你嘅攻擊冷卻時間。",
+  "description.wurst.setting.generic.pause_attack_on_containers": "當容器介面（譬如：儲物箱、漏斗）開啟時會暫停攻擊，對於用儲物箱介面作為菜單嘅迷你遊戲伺服器好有用。",
   "description.wurst.altmanager.premium": "呢個帳號擁有密碼，且可以加入所有伺服器。",
   "description.wurst.altmanager.cracked": "呢個帳號冇密碼，只能加入盜版伺服器。",
   "description.wurst.altmanager.failed": "上次你嘗試登錄呢個，但係佢唔起作用。",
