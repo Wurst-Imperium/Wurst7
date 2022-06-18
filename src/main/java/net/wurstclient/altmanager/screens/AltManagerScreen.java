@@ -98,7 +98,7 @@ public final class AltManagerScreen extends Screen
 			Runnable action = () -> confirmGenerate(false);
 			
 			NoticeScreen screen =
-				new NoticeScreen(action, title, message, buttonText);
+				new NoticeScreen(action, title, message, buttonText, false);
 			client.setScreen(screen);
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
