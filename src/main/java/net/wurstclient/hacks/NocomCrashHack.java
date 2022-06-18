@@ -11,7 +11,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Random;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -82,19 +81,18 @@ public final class NocomCrashHack extends Hack
 			
 			Thread.sleep(10);
 			
-			// generate and send the packet
-			PlayerInteractBlockC2SPacket packet = createNocomPacket();
-			MC.getNetworkHandler().sendPacket(packet);
+			sendNocomPacket();
 		}
 	}
 	
-	public PlayerInteractBlockC2SPacket createNocomPacket()
+	public void sendNocomPacket()
 	{
 		Vec3d pos = pickRandomPos();
 		BlockHitResult blockHitResult =
 			new BlockHitResult(pos, Direction.DOWN, new BlockPos(pos), false);
 		
-		return new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, blockHitResult);
+		IMC.getInteractionManager()
+			.sendPlayerInteractBlockPacket(Hand.MAIN_HAND, blockHitResult);
 	}
 	
 	private Vec3d pickRandomPos()

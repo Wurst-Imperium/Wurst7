@@ -15,7 +15,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -354,7 +353,8 @@ public final class AutoFishHack extends Hack
 	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(lastSoundPos != null)
@@ -371,8 +371,7 @@ public final class AutoFishHack extends Hack
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			matrixStack.pop();
 		}
 	}

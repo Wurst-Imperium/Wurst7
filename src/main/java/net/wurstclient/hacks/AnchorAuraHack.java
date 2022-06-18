@@ -194,7 +194,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.world.getDimension().isRespawnAnchorWorking())
+		// It says respawnAnchorWorks() but actually
+		// returns true if respawn anchors DON'T work
+		if(MC.world.getDimension().respawnAnchorWorks())
 		{
 			ChatUtils.error("Respawn anchors don't explode in this dimension.");
 			setEnabled(false);

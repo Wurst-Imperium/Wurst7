@@ -13,7 +13,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -112,7 +111,8 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		int y2)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		float[] acColor = gui.getAcColor();
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -124,8 +124,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawValueBackground(MatrixStack matrixStack, int x1, int x2,
@@ -135,7 +134,8 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		float alpha = gui.getOpacity() * (hValue ? 1.5F : 1);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], alpha);
 		
@@ -145,8 +145,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		bufferBuilder.vertex(matrix, x1, yi2, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi2, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void drawValueName(MatrixStack matrixStack, int x1, int yi1,

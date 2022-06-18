@@ -21,7 +21,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
@@ -50,13 +50,13 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	{
 		// OK button
 		removeButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
-			new LiteralText("Remove"), b -> remove());
+			Text.literal("Remove"), b -> remove());
 		removeButton.active = !selectedKey.isEmpty();
 		addDrawableChild(removeButton);
 		
 		// cancel button
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> client.setScreen(parent)));
+			Text.literal("Cancel"), b -> client.setScreen(parent)));
 	}
 	
 	private void remove()

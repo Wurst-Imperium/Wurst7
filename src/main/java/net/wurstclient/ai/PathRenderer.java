@@ -7,8 +7,9 @@
  */
 package net.wurstclient.ai;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -22,7 +23,8 @@ public final class PathRenderer
 	public static void renderArrow(MatrixStack matrixStack, BlockPos start,
 		BlockPos end)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -90,8 +92,7 @@ public final class PathRenderer
 		
 		matrixStack.pop();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void renderNode(MatrixStack matrixStack, BlockPos pos)
@@ -102,7 +103,8 @@ public final class PathRenderer
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -146,8 +148,7 @@ public final class PathRenderer
 		bufferBuilder.vertex(matrix, 0, -1, 0).next();
 		bufferBuilder.vertex(matrix, 0, 0, 1).next();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		matrixStack.pop();
 	}

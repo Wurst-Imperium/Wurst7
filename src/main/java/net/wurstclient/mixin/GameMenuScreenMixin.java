@@ -24,7 +24,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.crash.CrashException;
@@ -84,7 +83,7 @@ public abstract class GameMenuScreenMixin extends Screen
 					"Someone deleted the Feedback button!"));
 		
 		wurstOptionsButton = new ButtonWidget(width / 2 - 102, buttonY, 204, 20,
-			new LiteralText("            Options"), b -> openWurstOptions());
+			Text.literal("            Options"), b -> openWurstOptions());
 		buttons.add(buttonI, wurstOptionsButton);
 	}
 	

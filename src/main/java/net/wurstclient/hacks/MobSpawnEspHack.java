@@ -20,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -247,7 +248,9 @@ public final class MobSpawnEspHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
-			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			scanner.vertexBuffer.bind();
+			scanner.vertexBuffer.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}
@@ -334,7 +337,8 @@ public final class MobSpawnEspHack extends Hack
 				vertexBuffer.close();
 			
 			vertexBuffer = new VertexBuffer();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION_COLOR);
@@ -373,8 +377,10 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 1, 0, 0.5F).next();
 				});
 			
-			bufferBuilder.end();
-			vertexBuffer.upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffer.bind();
+			vertexBuffer.upload(buffer);
+			VertexBuffer.unbind();
 			
 			doneCompiling = true;
 		}
