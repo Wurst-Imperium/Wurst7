@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,9 +19,9 @@ import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
@@ -56,8 +56,7 @@ public final class RemoteViewHack extends Hack
 		new SliderSetting("Filter flying",
 			"Won't view players that\n" + "are at least the given\n"
 				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't view zombies, creepers, etc.", true);
@@ -172,8 +171,8 @@ public final class RemoteViewHack extends Hack
 				stream = stream
 					.filter(e -> !(e instanceof TameableEntity
 						&& ((TameableEntity)e).isTamed()))
-					.filter(e -> !(e instanceof HorseBaseEntity
-						&& ((HorseBaseEntity)e).isTame()));
+					.filter(e -> !(e instanceof AbstractHorseEntity
+						&& ((AbstractHorseEntity)e).isTame()));
 			
 			if(filterTraders.isChecked())
 				stream = stream.filter(e -> !(e instanceof MerchantEntity));

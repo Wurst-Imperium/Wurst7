@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,9 +23,9 @@ import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
@@ -38,7 +38,9 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -47,19 +49,17 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"multi aura", "ForceField", "force field"})
 public final class MultiAuraHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting useCooldown = new CheckboxSetting(
-		"Use cooldown", "Use your weapon's cooldown as the attack speed.\n"
-			+ "When checked, the 'Speed' slider will be ignored.",
-		true);
-	
-	private final SliderSetting speed = new SliderSetting("Speed",
-		"Attack speed in clicks per second.\n"
-			+ "This value will be ignored when\n"
-			+ "'Use cooldown' is checked.",
-		12, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
-	
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
+	
+	private final SliderSetting fov =
+		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final PauseAttackOnContainersSetting pauseOnContainers =
+		new PauseAttackOnContainersSetting(false);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -69,8 +69,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		new SliderSetting("Filter flying",
 			"Won't attack players that\n" + "are at least the given\n"
 				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
@@ -106,16 +105,15 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
-	private int timer;
-	
 	public MultiAuraHack()
 	{
 		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
-		addSetting(useCooldown);
-		addSetting(speed);
 		addSetting(range);
+		addSetting(speed);
+		addSetting(fov);
+		addSetting(pauseOnContainers);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -147,7 +145,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
-		timer = 0;
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -160,16 +158,15 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
+		if(pauseOnContainers.shouldPause())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		
-		// update timer
-		timer += 50;
-		
-		// check timer / cooldown
-		if(useCooldown.isChecked() ? player.getAttackCooldownProgress(0) < 1
-			: timer < 1000 / speed.getValue())
-			return;
 		
 		// get entities
 		double rangeSq = Math.pow(range.getValue(), 2);
@@ -183,6 +180,10 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		
+		if(fov.getValue() < 360.0)
+			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
+				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
 		
 		if(filterPlayers.isChecked())
 			stream = stream.filter(e -> !(e instanceof PlayerEntity));
@@ -224,8 +225,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			stream = stream
 				.filter(e -> !(e instanceof TameableEntity
 					&& ((TameableEntity)e).isTamed()))
-				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()));
+				.filter(e -> !(e instanceof AbstractHorseEntity
+					&& ((AbstractHorseEntity)e).isTame()));
 		
 		if(filterTraders.isChecked())
 			stream = stream.filter(e -> !(e instanceof MerchantEntity));
@@ -267,8 +268,6 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		}
 		
 		player.swingHand(Hand.MAIN_HAND);
-		
-		// reset timer
-		timer = 0;
+		speed.resetTimer();
 	}
 }

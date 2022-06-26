@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,8 +22,8 @@ public abstract class PathProcessor
 	protected static final MinecraftClient MC = WurstClient.MC;
 	
 	private static final KeyBinding[] CONTROLS =
-		{MC.options.keyForward, MC.options.keyBack, MC.options.keyRight,
-			MC.options.keyLeft, MC.options.keyJump, MC.options.keySneak};
+		{MC.options.forwardKey, MC.options.backKey, MC.options.rightKey,
+			MC.options.leftKey, MC.options.jumpKey, MC.options.sneakKey};
 	
 	protected final ArrayList<PathPos> path;
 	protected int index;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
@@ -32,7 +32,7 @@ public final class KeybindManagerScreen extends Screen
 	
 	public KeybindManagerScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
@@ -42,32 +42,32 @@ public final class KeybindManagerScreen extends Screen
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 102,
-			height - 52, 100, 20, new LiteralText("Add"),
+			height - 52, 100, 20, Text.literal("Add"),
 			b -> client.setScreen(new KeybindEditorScreen(this))));
 		
 		addDrawableChild(editButton = new ButtonWidget(width / 2 + 2,
-			height - 52, 100, 20, new LiteralText("Edit"), b -> edit()));
+			height - 52, 100, 20, Text.literal("Edit"), b -> edit()));
 		
 		addDrawableChild(removeButton = new ButtonWidget(width / 2 - 102,
-			height - 28, 100, 20, new LiteralText("Remove"), b -> remove()));
+			height - 28, 100, 20, Text.literal("Remove"), b -> remove()));
 		
 		addDrawableChild(
 			backButton = new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
-				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
+				Text.literal("Back"), b -> client.setScreen(prevScreen)));
 		
 		addDrawableChild(
-			new ButtonWidget(8, 8, 100, 20, new LiteralText("Reset Keybinds"),
+			new ButtonWidget(8, 8, 100, 20, Text.literal("Reset Keybinds"),
 				b -> client.setScreen(new ConfirmScreen(confirmed -> {
 					if(confirmed)
 						WurstClient.INSTANCE.getKeybinds()
 							.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
 					client.setScreen(this);
-				}, new LiteralText(
-					"Are you sure you want to reset your keybinds?"),
-					new LiteralText("This cannot be undone!")))));
+				}, Text
+					.literal("Are you sure you want to reset your keybinds?"),
+					Text.literal("This cannot be undone!")))));
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Profiles..."),
+			Text.literal("Profiles..."),
 			b -> client.setScreen(new KeybindProfilesScreen(this))));
 	}
 	

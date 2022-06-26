@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,11 +19,12 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.world.GameMode;
+import net.wurstclient.WurstClient;
 
 public final class AltRenderer
 {
@@ -32,14 +33,18 @@ public final class AltRenderer
 	
 	private static void bindSkinTexture(String name)
 	{
+		if(name.isEmpty())
+			name = "Steve";
+		
 		if(loadedSkins.get(name) == null)
 		{
-			UUID uuid = PlayerEntity
+			UUID uuid = DynamicSerializableUuid
 				.getUuidFromProfile(new GameProfile((UUID)null, name));
 			
 			PlayerListEntry entry = new PlayerListEntry(
 				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
-					GameMode.CREATIVE, new LiteralText(name)));
+					GameMode.CREATIVE, Text.literal(name), null),
+				WurstClient.MC.getServicesSignatureVerifier());
 			
 			loadedSkins.put(name, entry.getSkinTexture());
 		}
@@ -90,7 +95,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(PlayerEntity.getOfflinePlayerUuid(name))
+				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
@@ -222,7 +227,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(PlayerEntity.getOfflinePlayerUuid(name))
+				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);

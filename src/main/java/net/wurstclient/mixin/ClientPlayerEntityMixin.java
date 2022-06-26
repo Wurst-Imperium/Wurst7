@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +29,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.network.encryption.PlayerPublicKey;
+import net.minecraft.network.message.ChatMessageSigner;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -58,16 +61,17 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	private Screen tempCurrentScreen;
 	
-	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
-		GameProfile gameProfile_1)
+	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
+		GameProfile profile, PlayerPublicKey playerPublicKey)
 	{
-		super(clientWorld_1, gameProfile_1);
+		super(world, profile, playerPublicKey);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "sendChatMessage(Ljava/lang/String;)V",
+		method = "sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V",
 		cancellable = true)
-	private void onSendChatMessage(String message, CallbackInfo ci)
+	private void onSendChatMessage(String message, @Nullable Text preview,
+		CallbackInfo ci)
 	{
 		ChatOutputEvent event = new ChatOutputEvent(message);
 		EventManager.fire(event);
@@ -81,10 +85,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		if(!event.isModified())
 			return;
 		
-		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(event.getMessage());
-		networkHandler.sendPacket(packet);
+		sendChatMessageBypass(event.getMessage());
 		ci.cancel();
+	}
+	
+	@Override
+	public void sendChatMessageBypass(String message)
+	{
+		ChatMessageSigner signer = ChatMessageSigner.create(getUuid());
+		sendChatMessagePacket(signer, message, null);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -248,5 +257,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier)
 	{
 		this.movementMultiplier = movementMultiplier;
+	}
+	
+	@Shadow
+	private void sendChatMessagePacket(ChatMessageSigner signer, String message,
+		@Nullable Text preview)
+	{
+		
 	}
 }

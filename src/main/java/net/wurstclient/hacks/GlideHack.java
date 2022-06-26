@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,8 +34,7 @@ public final class GlideHack extends Hack implements UpdateListener
 	
 	private final SliderSetting minHeight = new SliderSetting("Min height",
 		"Won't glide when you are\n" + "too close to the ground.", 0, 0, 2,
-		0.01,
-		v -> v == 0 ? "disabled" : ValueDisplay.DECIMAL.getValueString(v));
+		0.01, ValueDisplay.DECIMAL.withLabel(0, "disabled"));
 	
 	public GlideHack()
 	{

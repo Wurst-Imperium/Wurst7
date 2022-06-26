@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -39,6 +39,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"\u00a7lFast\u00a7r mode can use bone meal on\n"
 			+ "multiple blocks at once.\n"

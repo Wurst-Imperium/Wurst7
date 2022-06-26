@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
@@ -49,7 +49,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	{
 		// OK button
 		okButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
-			new LiteralText("OK"), b -> {
+			Text.literal("OK"), b -> {
 				if(choosingKey)
 				{
 					String newCommands = selectedCommand.getCommand();
@@ -84,7 +84,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			new LiteralText("Cancel"), b -> WurstClient.MC.setScreen(parent)));
+			Text.literal("Cancel"), b -> WurstClient.MC.setScreen(parent)));
 	}
 	
 	@Override

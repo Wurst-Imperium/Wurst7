@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
@@ -323,7 +324,9 @@ public final class TreeBotHack extends Hack
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		Shader shader = RenderSystem.getShader();
 		
-		tree.getVertexBuffer().setShader(viewMatrix, projMatrix, shader);
+		tree.getVertexBuffer().bind();
+		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
+		VertexBuffer.unbind();
 		
 		matrixStack.pop();
 	}

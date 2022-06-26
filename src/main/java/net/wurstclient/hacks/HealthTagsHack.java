@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -32,7 +31,7 @@ public final class HealthTagsHack extends Hack
 		
 		int health = (int)entity.getHealth();
 		
-		MutableText formattedHealth = new LiteralText(" ")
+		MutableText formattedHealth = Text.literal(" ")
 			.append(Integer.toString(health)).formatted(getColor(health));
 		return ((MutableText)nametag).append(formattedHealth);
 	}
@@ -50,4 +49,6 @@ public final class HealthTagsHack extends Hack
 		
 		return Formatting.GREEN;
 	}
+	
+	// See EntityRendererMixin.onRenderLabelIfPresent()
 }

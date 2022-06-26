@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,11 +25,10 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ListWidget;
-import net.wurstclient.util.MathUtils;
 
 public final class EditBlockListScreen extends Screen
 {
@@ -46,15 +45,9 @@ public final class EditBlockListScreen extends Screen
 	
 	public EditBlockListScreen(Screen prevScreen, BlockListSetting blockList)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.blockList = blockList;
-	}
-	
-	@Override
-	public boolean isPauseScreen()
-	{
-		return false;
 	}
 	
 	@Override
@@ -63,32 +56,32 @@ public final class EditBlockListScreen extends Screen
 		listGui = new ListGui(client, this, blockList.getBlockNames());
 		
 		blockNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
+			width / 2 - 152, height - 55, 150, 18, Text.literal(""));
 		addSelectableChild(blockNameField);
 		blockNameField.setMaxLength(256);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, new LiteralText("Add"), b -> {
+			height - 56, 30, 20, Text.literal("Add"), b -> {
 				blockList.add(blockToAdd);
 				blockNameField.setText("");
 			}));
 		
 		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, new LiteralText("Remove Selected"),
+			height - 56, 100, 20, Text.literal("Remove Selected"),
 			b -> blockList.remove(listGui.selected)));
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"),
+			Text.literal("Reset to Defaults"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					blockList.resetToDefaults();
 				client.setScreen(EditBlockListScreen.this);
-			}, new LiteralText("Reset to Defaults"),
-				new LiteralText("Are you sure?")))));
+			}, Text.literal("Reset to Defaults"),
+				Text.literal("Are you sure?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+				Text.literal("Done"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override
@@ -136,14 +129,19 @@ public final class EditBlockListScreen extends Screen
 		switch(keyCode)
 		{
 			case GLFW.GLFW_KEY_ENTER:
-			addButton.onPress();
+			if(addButton.active)
+				addButton.onPress();
 			break;
+			
 			case GLFW.GLFW_KEY_DELETE:
-			removeButton.onPress();
+			if(!blockNameField.isFocused())
+				removeButton.onPress();
 			break;
+			
 			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
 			break;
+			
 			default:
 			break;
 		}
@@ -157,12 +155,7 @@ public final class EditBlockListScreen extends Screen
 		blockNameField.tick();
 		
 		String nameOrId = blockNameField.getText();
-		if(MathUtils.isInteger(nameOrId))
-			blockToAdd =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
-		
+		blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		addButton.active = blockToAdd != null;
 		
 		removeButton.active =
@@ -208,6 +201,18 @@ public final class EditBlockListScreen extends Screen
 		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
+	}
+	
+	@Override
+	public boolean shouldPause()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

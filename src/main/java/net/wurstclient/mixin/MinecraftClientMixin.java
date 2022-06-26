@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -67,14 +67,14 @@ public abstract class MinecraftClientMixin
 	
 	@Inject(at = {@At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
-	private void onDoAttack(CallbackInfo ci)
+		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
 		EventManager.fire(event);
 		
 		if(event.isCancelled())
-			ci.cancel();
+			cir.setReturnValue(false);
 	}
 	
 	@Inject(at = {@At(value = "FIELD",

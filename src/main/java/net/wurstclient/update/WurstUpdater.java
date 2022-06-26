@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,6 @@
 package net.wurstclient.update;
 
 import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
@@ -101,10 +100,8 @@ public final class WurstUpdater implements UpdateListener
 	
 	private void showLink(String text, String url)
 	{
-		component = new LiteralText(text);
-		
 		ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
-		component.getStyle().withClickEvent(event);
+		component = Text.literal(text).styled(s -> s.withClickEvent(event));
 	}
 	
 	private boolean containsCompatibleAsset(WsonArray wsonArray)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -62,9 +62,9 @@ public final class NoClipHack extends Hack implements UpdateListener,
 		float speed = 0.2F;
 		player.airStrafingSpeed = speed;
 		
-		if(MC.options.keyJump.isPressed())
+		if(MC.options.jumpKey.isPressed())
 			player.addVelocity(0, speed, 0);
-		if(MC.options.keySneak.isPressed())
+		if(MC.options.sneakKey.isPressed())
 			player.addVelocity(0, -speed, 0);
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -21,6 +22,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -96,13 +98,32 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera.getPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return Vec3d.ZERO;
+		
+		return camera.getPos();
 	}
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera
-			.getBlockPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return BlockPos.ORIGIN;
+		
+		return camera.getBlockPos();
+	}
+	
+	public static float[] getRainbowColor()
+	{
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float pi = (float)Math.PI;
+		
+		float[] rainbow = new float[3];
+		rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
+		rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
+		rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+		return rainbow;
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)
@@ -113,7 +134,8 @@ public enum RenderUtils
 	public static void drawSolidBox(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -195,20 +217,22 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.maxY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void drawSolidBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		drawSolidBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawSolidBox(Box bb, BufferBuilder bufferBuilder)
@@ -252,7 +276,8 @@ public enum RenderUtils
 	public static void drawOutlinedBox(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
@@ -340,20 +365,22 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.maxY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void drawOutlinedBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawOutlinedBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawOutlinedBox(Box bb, BufferBuilder bufferBuilder)
@@ -398,7 +425,8 @@ public enum RenderUtils
 	public static void drawCrossBox(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -485,20 +513,22 @@ public enum RenderUtils
 		bufferBuilder
 			.vertex(matrix, (float)bb.minX, (float)bb.minY, (float)bb.minZ)
 			.next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void drawCrossBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawCrossBox(bb, bufferBuilder);
-		bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawCrossBox(Box bb, BufferBuilder bufferBuilder)
@@ -543,7 +573,8 @@ public enum RenderUtils
 	public static void drawNode(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
@@ -613,20 +644,22 @@ public enum RenderUtils
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ)
 			.next();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void drawNode(Box bb, VertexBuffer vertexBuffer)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		drawNode(bb, bufferBuilder);
-		bufferBuilder.end();
+		BuiltBuffer buffer = bufferBuilder.end();
 		
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawNode(Box bb, BufferBuilder bufferBuilder)
@@ -676,7 +709,8 @@ public enum RenderUtils
 	{
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -742,21 +776,23 @@ public enum RenderUtils
 		
 		matrixStack.pop();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to,
 		VertexBuffer vertexBuffer)
 	{
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
-		
 		drawArrow(from, to, bufferBuilder);
+		BuiltBuffer buffer = bufferBuilder.end();
 		
-		bufferBuilder.end();
-		vertexBuffer.upload(bufferBuilder);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to,

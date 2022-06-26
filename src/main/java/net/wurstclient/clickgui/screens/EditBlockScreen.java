@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,11 +21,10 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.MathUtils;
 
 public final class EditBlockScreen extends Screen
 {
@@ -37,7 +36,7 @@ public final class EditBlockScreen extends Screen
 	
 	public EditBlockScreen(Screen prevScreen, BlockSetting setting)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.setting = setting;
 	}
@@ -52,8 +51,7 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		String valueString = setting.getBlockName();
 		
-		blockField =
-			new TextFieldWidget(tr, x1, y1, 178, 18, new LiteralText(""));
+		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, Text.literal(""));
 		blockField.setText(valueString);
 		blockField.setSelectionStart(0);
 		blockField.setMaxLength(256);
@@ -62,21 +60,15 @@ public final class EditBlockScreen extends Screen
 		setInitialFocus(blockField);
 		blockField.setTextFieldFocused(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+		doneButton = new ButtonWidget(x1, y2, 200, 20, Text.literal("Done"),
 			b -> done());
 		addDrawableChild(doneButton);
 	}
 	
 	private void done()
 	{
-		Block block;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			block =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			block = BlockUtils.getBlockFromName(nameOrId);
+		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -147,14 +139,8 @@ public final class EditBlockScreen extends Screen
 		
 		matrixStack.pop();
 		
-		Block blockToAdd;
 		String nameOrId = blockField.getText();
-		
-		if(MathUtils.isInteger(nameOrId))
-			blockToAdd =
-				Block.getStateFromRawId(Integer.parseInt(nameOrId)).getBlock();
-		else
-			blockToAdd = BlockUtils.getBlockFromName(nameOrId);
+		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
@@ -164,7 +150,7 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public final class EnterProfileNameScreen extends Screen
 {
@@ -28,7 +28,7 @@ public final class EnterProfileNameScreen extends Screen
 	
 	public EnterProfileNameScreen(Screen prevScreen, Consumer<String> callback)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.callback = callback;
 	}
@@ -42,8 +42,7 @@ public final class EnterProfileNameScreen extends Screen
 		
 		TextRenderer tr = client.textRenderer;
 		
-		valueField =
-			new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
+		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
 		valueField.setText("");
 		valueField.setSelectionStart(0);
 		
@@ -51,7 +50,7 @@ public final class EnterProfileNameScreen extends Screen
 		setInitialFocus(valueField);
 		valueField.setTextFieldFocused(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+		doneButton = new ButtonWidget(x1, y2, 200, 20, Text.literal("Done"),
 			b -> done());
 		addDrawableChild(doneButton);
 	}
@@ -101,7 +100,7 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

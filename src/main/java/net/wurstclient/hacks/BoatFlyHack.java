@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -45,7 +45,7 @@ public final class BoatFlyHack extends Hack implements UpdateListener
 		// fly
 		Entity vehicle = MC.player.getVehicle();
 		Vec3d velocity = vehicle.getVelocity();
-		double motionY = MC.options.keyJump.isPressed() ? 0.3 : 0;
+		double motionY = MC.options.jumpKey.isPressed() ? 0.3 : 0;
 		vehicle.setVelocity(new Vec3d(velocity.x, motionY, velocity.z));
 	}
 }

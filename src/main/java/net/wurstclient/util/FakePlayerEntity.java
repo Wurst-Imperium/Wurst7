@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,7 +22,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public FakePlayerEntity()
 	{
-		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
+		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile(),
+			WurstClient.MC.player.getPublicKey());
 		copyPositionAndRotation(player);
 		
 		copyInventory();

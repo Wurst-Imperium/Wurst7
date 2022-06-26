@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,10 +38,10 @@ public abstract class Setting
 	
 	public final String getDescription()
 	{
-		return description;
+		return WurstClient.INSTANCE.translate(description);
 	}
 	
-	public String getWrappedDescription(int width)
+	public final String getWrappedDescription(int width)
 	{
 		List<StringVisitable> lines = WurstClient.MC.textRenderer
 			.getTextHandler().wrapLines(getDescription(), width, Style.EMPTY);

@@ -1,14 +1,22 @@
 # Wurst Client v7
 
-## ⚠ We Are Looking For Translators ⚠
+## ⚠ We Are Looking For Translators & Proofreaders ⚠
 
-If you speak both English and some other language, please help us by translating Wurst. The translation files are located in `src/main/resources/assets/wurst/lang` and work the same as in other Minecraft mods.
+Mostly proofreaders. Many translations are currently stuck because we have no one who can proofread them.
 
-At the moment, only hack descriptions can be translated. Other descriptions and tooltips will become translatable in the future.
+### Current Status of Translations
 
-Names of featues (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+- [Check the current status of translations here.](https://github.com/orgs/Wurst-Imperium/projects/4/views/1)
 
-See [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) for discussion about translations.
+- [Check which translations need proofreaders here.](https://github.com/orgs/Wurst-Imperium/projects/4/views/3)
+
+The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
+
+You don't need permission to become a translator or proofreader. You just need a free GitHub account and then you can submit translations ("pull requests") or proofreading ("reviews").
+
+Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+
+For discussion about translations, see [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) here or [#wurst-translations](https://chat.wurstimperium.net/channel/wurst-translations) on our RocketChat server.
 
 ## Downloads (for users)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -88,7 +88,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(ElytraItem.isUsable(chest) && MC.options.keyJump.isPressed())
+		if(ElytraItem.isUsable(chest) && MC.options.jumpKey.isPressed())
 			doInstantFly();
 	}
 	
@@ -106,9 +106,9 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		Vec3d v = MC.player.getVelocity();
 		
-		if(MC.options.keyJump.isPressed())
+		if(MC.options.jumpKey.isPressed())
 			MC.player.setVelocity(v.x, v.y + 0.08, v.z);
-		else if(MC.options.keySneak.isPressed())
+		else if(MC.options.sneakKey.isPressed())
 			MC.player.setVelocity(v.x, v.y - 0.04, v.z);
 	}
 	
@@ -123,9 +123,9 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		Vec3d v = MC.player.getVelocity();
 		
-		if(MC.options.keyForward.isPressed())
+		if(MC.options.forwardKey.isPressed())
 			MC.player.setVelocity(v.add(forward));
-		else if(MC.options.keyBack.isPressed())
+		else if(MC.options.backKey.isPressed())
 			MC.player.setVelocity(v.subtract(forward));
 	}
 	

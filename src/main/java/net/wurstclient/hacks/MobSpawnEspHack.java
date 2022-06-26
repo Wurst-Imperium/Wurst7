@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -45,6 +46,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -57,8 +59,8 @@ public final class MobSpawnEspHack extends Hack
 	private final EnumSetting<DrawDistance> drawDistance = new EnumSetting<>(
 		"Draw distance", DrawDistance.values(), DrawDistance.D9);
 	
-	private final SliderSetting loadingSpeed =
-		new SliderSetting("Loading speed", 1, 1, 5, 1, v -> (int)v + "x");
+	private final SliderSetting loadingSpeed = new SliderSetting(
+		"Loading speed", 1, 1, 5, 1, ValueDisplay.INTEGER.withSuffix("x"));
 	
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);
@@ -246,7 +248,9 @@ public final class MobSpawnEspHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
-			scanner.vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			scanner.vertexBuffer.bind();
+			scanner.vertexBuffer.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}
@@ -333,7 +337,8 @@ public final class MobSpawnEspHack extends Hack
 				vertexBuffer.close();
 			
 			vertexBuffer = new VertexBuffer();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION_COLOR);
@@ -372,8 +377,10 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 1, 0, 0.5F).next();
 				});
 			
-			bufferBuilder.end();
-			vertexBuffer.upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffer.bind();
+			vertexBuffer.upload(buffer);
+			VertexBuffer.unbind();
 			
 			doneCompiling = true;
 		}

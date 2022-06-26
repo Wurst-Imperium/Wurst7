@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -67,16 +67,14 @@ public abstract class GameRendererMixin
 		EventManager.fire(event);
 	}
 	
-	@Redirect(
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0),
-		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
-	private double getFov(GameOptions options)
+	@Inject(at = @At(value = "RETURN", ordinal = 1),
+		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"},
+		cancellable = true)
+	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
+		CallbackInfoReturnable<Double> cir)
 	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(options.fov);
+		cir.setReturnValue(WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(cir.getReturnValueD()));
 	}
 	
 	@Inject(at = {@At(value = "INVOKE",

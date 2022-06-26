@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -62,7 +62,7 @@ public final class JesusHack extends Hack
 	public void onUpdate()
 	{
 		// check if sneaking
-		if(MC.options.keySneak.isPressed())
+		if(MC.options.sneakKey.isPressed())
 			return;
 		
 		ClientPlayerEntity player = MC.player;
@@ -180,6 +180,6 @@ public final class JesusHack extends Hack
 	public boolean shouldBeSolid()
 	{
 		return isEnabled() && MC.player != null && MC.player.fallDistance <= 3
-			&& !MC.options.keySneak.isPressed() && !MC.player.isTouchingWater();
+			&& !MC.options.sneakKey.isPressed() && !MC.player.isTouchingWater();
 	}
 }
