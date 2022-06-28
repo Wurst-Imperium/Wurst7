@@ -29,6 +29,9 @@ public final class SayCmd extends Command
 			throw new CmdSyntaxError();
 		
 		String message = String.join(" ", args);
-		IMC.getPlayer().sendChatMessageBypass(message);
+		if(message.startsWith("/"))
+			MC.player.sendCommand(message.substring(1));
+		else
+			IMC.getPlayer().sendChatMessageBypass(message);
 	}
 }
