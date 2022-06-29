@@ -7,21 +7,24 @@
  */
 package net.wurstclient.mixin;
 
-import net.minecraft.client.render.LightmapTextureManager;
-import net.wurstclient.WurstClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.client.render.LightmapTextureManager;
+import net.wurstclient.WurstClient;
+
 @Mixin(LightmapTextureManager.class)
-public class LightTextureManagerMixin {
+public class LightTextureManagerMixin
+{
 	@Inject(at = {@At("HEAD")},
-			method = {
-					"getDarknessFactor(F)F"},
-			cancellable = true)
-	private void getDarknessFactor(float delta, CallbackInfoReturnable<Float> ci) {
-		if (WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+		method = {"getDarknessFactor(F)F"},
+		cancellable = true)
+	private void getDarknessFactor(float delta,
+		CallbackInfoReturnable<Float> ci)
+	{
+		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			ci.setReturnValue(0.0f);
 	}
 }
