@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.BackgroundRenderer;
+import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
 import net.minecraft.entity.Entity;
 import net.wurstclient.WurstClient;
 
@@ -23,8 +24,8 @@ public class BackgroundRendererMixin
 		method = {
 			"getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;"},
 		cancellable = true)
-	private static void getFogModifier(Entity entity, float tickDelta,
-		CallbackInfoReturnable<Object> ci)
+	private static void onGetFogModifier(Entity entity, float tickDelta,
+		CallbackInfoReturnable<StatusEffectFogModifier> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			ci.setReturnValue(null);

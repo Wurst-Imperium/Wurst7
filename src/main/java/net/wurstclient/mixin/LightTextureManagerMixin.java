@@ -21,10 +21,10 @@ public class LightTextureManagerMixin
 	@Inject(at = {@At("HEAD")},
 		method = {"getDarknessFactor(F)F"},
 		cancellable = true)
-	private void getDarknessFactor(float delta,
+	private void onGetDarknessFactor(float delta,
 		CallbackInfoReturnable<Float> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			ci.setReturnValue(0.0f);
+			ci.setReturnValue(0F);
 	}
 }

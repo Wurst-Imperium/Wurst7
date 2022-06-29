@@ -22,7 +22,8 @@ public class WorldRendererMixin
 	@Inject(at = {@At("HEAD")},
 		method = {"method_43788(Lnet/minecraft/client/render/Camera;)Z"},
 		cancellable = true)
-	private void method_43788(Camera camera, CallbackInfoReturnable<Boolean> ci)
+	private void onHasBlindnessOrDarknessEffect(Camera camera,
+		CallbackInfoReturnable<Boolean> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			ci.setReturnValue(false);

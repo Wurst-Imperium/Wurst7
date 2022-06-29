@@ -12,7 +12,9 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness",
-	"AntiDarkness", "NoDarkness", "anti darkness", "no darkness"})
+	"AntiDarkness", "NoDarkness", "anti darkness", "no darkness",
+	"AntiWardenEffect", "anti warden effect", "NoWardenEffect",
+	"no warden effect"})
 public final class AntiBlindHack extends Hack
 {
 	public AntiBlindHack()
