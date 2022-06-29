@@ -78,14 +78,3 @@ publishing {
 		// retrieving dependencies.
 	}
 }
-
-afterEvaluate {
-  // Loom 0.11's devlibs folder messes with my other scripts,
-  // so I'm moving these files back to the old location.
-  tasks.named("remapJar") {
-    doLast {
-      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
-    }
-  }
-}
