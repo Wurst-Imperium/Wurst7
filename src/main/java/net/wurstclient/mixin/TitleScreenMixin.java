@@ -56,7 +56,7 @@ public abstract class TitleScreenMixin extends Screen
 		
 		if(realmsButton == null)
 			throw new IllegalStateException("Couldn't find realms button!");
-		
+		/*
 		// make Realms button smaller
 		realmsButton.setWidth(98);
 		
@@ -65,6 +65,7 @@ public abstract class TitleScreenMixin extends Screen
 			realmsButton.y, 98, 20, Text.literal("Alt Manager"),
 			b -> client.setScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
+		*/
 	}
 	
 	@Inject(at = {@At("RETURN")}, method = {"tick()V"})
