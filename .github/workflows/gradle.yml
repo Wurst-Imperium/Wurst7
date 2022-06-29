@@ -42,7 +42,6 @@ jobs:
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
         arguments: build
-    - run: gradle --stop
     - name: Upload JAR to GitHub
       uses: actions/upload-artifact@v3
       with:
