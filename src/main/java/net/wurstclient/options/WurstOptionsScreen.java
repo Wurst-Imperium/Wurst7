@@ -21,7 +21,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
-import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.mixinterface.IScreen;
@@ -55,7 +54,6 @@ public class WurstOptionsScreen extends Screen
 		WurstClient wurst = WurstClient.INSTANCE;
 		FriendsCmd friendsCmd = wurst.getCmds().friendsCmd;
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
-		WurstAnalytics analytics = wurst.getAnalytics();
 		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
 		CheckboxSetting forceEnglish =
 			wurst.getOtfs().translationsOtf.getForceEnglish();
@@ -66,19 +64,6 @@ public class WurstOptionsScreen extends Screen
 			middleClickFriends.getWrappedDescription(200),
 			b -> middleClickFriends
 				.setChecked(!middleClickFriends.isChecked()));
-		
-		new WurstOptionsButton(-154, 48,
-			() -> "Count Users: " + (analytics.isEnabled() ? "ON" : "OFF"),
-			"Counts how many people are using Wurst\n"
-				+ "and which versions are the most popular.\n"
-				+ "We use this data to decide when to stop\n"
-				+ "supporting old Minecraft versions.\n\n"
-				+ "We use a random ID to tell users apart\n"
-				+ "so that this data can never be linked to\n"
-				+ "your Minecraft account. The random ID is\n"
-				+ "changed every 3 days to make extra sure\n"
-				+ "that you remain anonymous.",
-			b -> analytics.setEnabled(!analytics.isEnabled()));
 		
 		new WurstOptionsButton(-154, 72,
 			() -> "Spoof Vanilla: "

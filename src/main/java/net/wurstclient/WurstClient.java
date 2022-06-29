@@ -23,7 +23,6 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.altmanager.AltManager;
-import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
@@ -58,7 +57,6 @@ public enum WurstClient
 	public static final String VERSION = "7.27";
 	public static final String MC_VERSION = "1.19";
 	
-	private WurstAnalytics analytics;
 	private EventManager eventManager;
 	private AltManager altManager;
 	private HackList hax;
@@ -86,11 +84,6 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
-		
-		String trackingID = "UA-52838431-5";
-		String hostname = "client.wurstclient.net";
-		Path analyticsFile = wurstFolder.resolve("analytics.json");
-		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
 		
 		eventManager = new EventManager(this);
 		
@@ -146,9 +139,6 @@ public enum WurstClient
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, "Zoom");
 		KeyBindingHelper.registerKeyBinding(zoomKey);
-		
-		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
-			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
 	
 	private Path createWurstFolder()
@@ -175,11 +165,6 @@ public enum WurstClient
 			return IMC.getLanguageManager().getEnglish().get(key);
 		
 		return I18n.translate(key);
-	}
-	
-	public WurstAnalytics getAnalytics()
-	{
-		return analytics;
 	}
 	
 	public EventManager getEventManager()
