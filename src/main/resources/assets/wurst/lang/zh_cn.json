@@ -31,7 +31,7 @@
 	"description.wurst.hack.autoreconnect": "被踢出服务器后自动重连。",
 	"description.wurst.hack.autorespawn": "死亡后自动重生。",
 	"description.wurst.hack.autosign": "瞬间在每个告示牌上写下你想要的文字。激活此功能后，你只需要正常在第一个告示牌上输入文字，接下来所有的告示牌上的文字都将与第一个相同。",
-	"description.wurst.hack.autosoup": "当你生命值低下的时候自动喝汤。\n\n§l注意：§r 这个功能是无视 “饥饿值”设定的，因为在特定服务器的小游戏内（如 Hypixel），喝汤是直接补充生命，而不是回复饥饿值。如果你正在玩的服务器没有这个功能，请使用 AutoEat 功能而不是这个。",
+	"description.wurst.hack.autosoup": "当你生命值低下的时候自动喝汤。\n\n§l注意：§r 这个功能是无视“饥饿值”设定的，因为在特定服务器的小游戏内（如 Hypixel），喝汤是直接补充生命，而不是回复饥饿值。如果你正在玩的服务器没有这个功能，请使用 AutoEat 功能而不是这个。",
 	"description.wurst.hack.autosprint": "使你自动疾跑。",
 	"description.wurst.hack.autosteal": "自动盗窃你所打开的箱子以及潜影盒内的所有物品。",
 	"description.wurst.hack.autoswim": "在水中自动切换泳姿状态。",
@@ -164,7 +164,7 @@
 	"description.wurst.altmanager.window_freeze": "当打开另一个窗口时，这会导致游戏看起来未响应。",
 	"description.wurst.altmanager.fullscreen": "§c请关闭全屏模式！",
 	"gui.wurst.altmanager.folder_error.title": "无法创建 “.Wurst encryption” 文件夹！",
-	"gui.wurst.altmanager.folder_error.message": "你也许不小心禁止了 Wurst 访问这个目录，\n因此 Altmanager 无法加解密你的备用账户列表。\n你仍然可以使用 Altamnager，但你新建的备用账户将不会被保存。\n\n完整错误信息如下：\n%s",
+	"gui.wurst.altmanager.folder_error.message": "你也许不小心禁止了 Wurst 访问这个目录，\n因此 AltManager 无法加解密你的备用账户列表。\n你仍然可以使用 AltManager，但你新建的备用账户将不会被保存。\n\n完整错误信息如下：\n%s",
 	"gui.wurst.altmanager.empty.title": "你的备用账户列表为空。",
 	"gui.wurst.altmanager.empty.message": "你希望创建一些随机的备用账户吗？"
 }
