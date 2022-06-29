@@ -3,6 +3,6 @@ contact_links:
   - name: Reddit Community
     url: https://www.reddit.com/r/WurstClient/
     about: For general discussion, support, memes, etc.
-  - name: Contact Alexander
+  - name: Contact Alexander for upstream issues
     url: https://www.wurstclient.net/contact/
-    about: For anything that shouldn't be public.
+    about: For anything that shouldn't be public, and for anything from the Wurst-Imperium repository.
