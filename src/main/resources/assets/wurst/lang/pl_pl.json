@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Automatycznie umieszcza (opcjonalnie), ładuje i wysadza kotwice odrodzenia, aby zabijać otaczające cię istoty.",
   "description.wurst.hack.antiafk": "Spaceruje losowo dookoła, aby ukryć cię przed wykrywaczami AFK.\nWymaga co najmniej 3x3 bloków wolnego miejsca.",
-  "description.wurst.hack.antiblind": "Zapobiega oślepieniu.\nNiekompatybilny z OptiFine.",
+  "OUTDATED.description.wurst.hack.antiblind": "Zapobiega oślepieniu.\nNiekompatybilny z OptiFine.",
   "description.wurst.hack.anticactus": "Ochrania cię przed obrażeniami od kaktusa.",
   "description.wurst.hack.antiknockback": "Zapobiega popychaniu cię przez innych graczy i moby.",
   "description.wurst.hack.antispam": "Blokuje spam na czacie, dodając licznik do powtarzających się wiadomości.",
