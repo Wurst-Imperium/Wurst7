@@ -139,11 +139,6 @@ public final class Version implements Comparable<Version>
 	
 	public String getChangelogLink()
 	{
-		String version = major + "-" + minor;
-		
-		if(isPreRelease())
-			version += "pre" + preRelease;
-		
-		return "https://www.wurstclient.net/updates/wurst-" + version + "/";
+		return "https://github.com/RedSeal9/artemis7/";
 	}
 }

@@ -6,11 +6,12 @@
   "name": "Wurst Client",
   "description": "Wurst Wurst Wurst!",
   "authors": [
+    "RedSeal9",
     "Alexander01998"
   ],
   "contact": {
-    "homepage": "https://www.wurstclient.net/",
-    "sources": "https://www.wurstclient.net/github/"
+    "homepage": "https://github.com/RedSeal9/artemis7",
+    "sources": "https://github.com/RedSeal9/artemis7"
   },
 
   "license": "GPL-3.0-or-later",
