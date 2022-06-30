@@ -21,7 +21,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 {
 
 	private final CheckboxSetting goNCP = new CheckboxSetting("Abide by NoCheatPlus", true);
-	private final SliderSetting speedMultiplier = new SliderSetting("Speed Multiplier", 2, 1, 10, .5, ValueDisplay.INTEGER);
+	private final SliderSetting speedMultiplier = new SliderSetting("Speed Multiplier", 2, 1, 10, .5, ValueDisplay.DECIMAL);
 
 	public SpeedHackHack()
 	{
@@ -61,7 +61,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		
 		Vec3d v = MC.player.getVelocity();
 		// MC.player.setVelocity(v.x * 1.8, v.y + 0.1, v.z * 1.8); // old
-		MC.player.setVelocity(v.x * speedMultiplier.getValueI(), v.y + 0.1, v.z * speedMultiplier.getValueI());
+		MC.player.setVelocity(v.x * speedMultiplier.getValueF(), v.y + 0.1, v.z * speedMultiplier.getValueF());
 		
 		v = MC.player.getVelocity();
 		double currentSpeed = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.z, 2));
