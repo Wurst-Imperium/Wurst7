@@ -3,7 +3,7 @@
   "id": "wurst",
   "version": "${version}",
 
-  "name": "Wurst Client",
+  "name": "Artemis (Wurst) Client",
   "description": "Wurst Wurst Wurst!",
   "authors": [
     "RedSeal9",
