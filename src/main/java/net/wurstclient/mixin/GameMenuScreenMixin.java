@@ -55,6 +55,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void addWurstOptionsButton()
 	{
+		if(!WurstClient.INSTANCE.getHax().clickGuiHack.showWurstOptions.isChecked()) return;
+
 		List<ClickableWidget> buttons = Screens.getButtons(this);
 		
 		int buttonY = -1;

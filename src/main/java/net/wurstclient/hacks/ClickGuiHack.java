@@ -14,6 +14,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -37,6 +38,8 @@ public final class ClickGuiHack extends Hack
 	
 	private final SliderSetting ttOpacity = new SliderSetting("Tooltip opacity",
 		0.75, 0.15, 1, 0.01, ValueDisplay.PERCENTAGE);
+
+	public CheckboxSetting showWurstOptions = new CheckboxSetting("Show in options", false);
 	
 	public ClickGuiHack()
 	{
@@ -46,6 +49,7 @@ public final class ClickGuiHack extends Hack
 		addSetting(txtColor);
 		addSetting(opacity);
 		addSetting(ttOpacity);
+		addSetting(showWurstOptions);
 	}
 	
 	@Override
