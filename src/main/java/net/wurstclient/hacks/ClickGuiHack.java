@@ -39,7 +39,7 @@ public final class ClickGuiHack extends Hack
 	private final SliderSetting ttOpacity = new SliderSetting("Tooltip opacity",
 		0.75, 0.15, 1, 0.01, ValueDisplay.PERCENTAGE);
 
-	public CheckboxSetting showWurstOptions = new CheckboxSetting("Show in options", false);
+	public CheckboxSetting showWurstOptions = new CheckboxSetting("Show in options", true);
 	
 	public ClickGuiHack()
 	{
