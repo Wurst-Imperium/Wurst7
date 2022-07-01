@@ -39,6 +39,7 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
+    "LightTextureManagerMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
@@ -59,7 +60,8 @@
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WorldMixin"
+    "WorldMixin",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
