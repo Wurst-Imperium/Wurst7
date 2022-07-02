@@ -85,7 +85,7 @@
   "description.wurst.setting.invwalk.allow_other": "Iti permite sa te misti in timp ce alte ferestre sunt deschise (ex: chest, cal, trade cu villagerii), mai putin daca fereastra are un text box.",
   "description.wurst.hack.itemesp": "Contureaza itemele din apropiere.",
   "description.wurst.hack.itemgenerator": "Genereaza iteme la intamplare si le arunca pe jos.\n§oDoar Creativ.§r",
-  "description.wurst.hack.jesus": "Iti permite sa umblii pe apa.\nIsus Hristos a folosit acest hack acum ~2000 de ani.",
+  "description.wurst.hack.waterwalker": "Iti permite sa umblii pe apa.\nIsus Hristos a folosit acest hack acum ~2000 de ani.",
   "description.wurst.hack.jetpack": "Iti permite sa zbori de parca ai un jetpack.\n\n§c§lATENTIE:§r Iti vei lua fall damage daca nu folosesti NoFall.",
   "description.wurst.hack.kaboom": "Strica block-urile din jurul tau ca si o explozie.\nPoate fi mai rapid decat Nuker daca serverul nu are NoCheat+. Functioneaza cel mai bine cu unelte bune si blockuri slabe.\nNota: Aceasta nu este o explozie adevarata.",
   "description.wurst.hack.killauralegit": "Killaura mai incet dar mai greu de detectat.\nNu este necesar pe serverele normale cu NoCheat+!",

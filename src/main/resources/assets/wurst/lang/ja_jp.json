@@ -85,7 +85,7 @@
   "description.wurst.setting.invwalk.allow_other": "その他の文字入力の必要のないゲームメニュー（チェストや馬のメニュー、村人との取引画面など）を開いた状態で歩けるようになる。",
   "description.wurst.hack.itemesp": "周囲のアイテムをハイライト表示する。",
   "description.wurst.hack.itemgenerator": "ランダムにアイテムを生成し地面に捨て続ける。\n§oクリエイティブモードのみ。§r",
-  "description.wurst.hack.jesus": "水面を歩けるようになる。\n忍者はこのハックを使用していたらしい。",
+  "description.wurst.hack.waterwalker": "水面を歩けるようになる。\n忍者はこのハックを使用していたらしい。",
   "description.wurst.hack.jetpack": "ジェットパックを使用しているように飛ぶことができる。\n\n§c§l注意: §rNoFallと併用しない場合、落下ダメージが発生する。",
   "description.wurst.hack.kaboom": "爆発が起きたかのように自分の周囲のブロックを破壊する。\nNoCheat+を使用していないサーバー上であればNukerより遥かに早い。効率の良いツールと壊れやすいブロック上での使用が最適。\nメモ: 実際に爆発が起きているわけではない。",
   "description.wurst.hack.killauralegit": "検知されにくい遅いKillaura。\n大抵のNoCheat+サーバーでは使う必要なし。",

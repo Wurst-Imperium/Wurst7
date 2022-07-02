@@ -74,19 +74,19 @@ public class WalkPathProcessor extends PathProcessor
 			.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 90)
 			return;
 		
-		if(WURST.getHax().jesusHack.isEnabled())
+		if(WURST.getHax().waterwalkerHack.isEnabled())
 		{
-			// wait for Jesus to swim up
+			// wait for WaterWalker to swim up
 			if(WurstClient.MC.player.getY() < nextPos.getY()
 				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()))
 				return;
 			
-			// manually swim down if using Jesus
+			// manually swim down if using WaterWalker
 			if(WurstClient.MC.player.getY() - nextPos.getY() > 0.5
 				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()
-					|| WURST.getHax().jesusHack.isOverLiquid()))
+					|| WURST.getHax().waterwalkerHack.isOverLiquid()))
 				MC.options.sneakKey.setPressed(true);
 		}
 		

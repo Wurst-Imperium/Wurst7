@@ -70,7 +70,7 @@
   "description.wurst.hack.instantbunker": "建造一个小小的火柴盒，需要57个方块。",
   "description.wurst.hack.itemesp": "高亮附近的掉落物品。",
   "description.wurst.hack.itemgenerator": "生成随机的物品并将其丢在地上。\n§o需要创造模式。§r",
-  "description.wurst.hack.jesus": "允许你走在水面上。\n耶稣曾经在约 ~2000 年前使用这个功能。",
+  "description.wurst.hack.waterwalker": "允许你走在水面上。\n耶稣曾经在约 ~2000 年前使用这个功能。",
   "description.wurst.hack.jetpack": "模仿你好像真的有飞行背包一样飞行。\n\n§c§l警告：§r 如果你不使用 NoFall 则可能会摔落致死。",
   "description.wurst.hack.kaboom": "像爆炸一样破坏你附近的方块。\n这个可能比 Nuker 功能破坏更快如果服务器没有反作弊的话，使用适合的工具和破坏脆弱的方块可以事半功倍。\n注意：这并不是真正的爆炸。",
   "description.wurst.hack.killauralegit": "KillauraLegit 更难被反作弊检测。\n在正常的 NoCheat+（NCP）服务器上不需要！",

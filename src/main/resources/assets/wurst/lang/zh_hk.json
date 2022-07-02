@@ -85,7 +85,7 @@
   "description.wurst.setting.invwalk.allow_other": "允許你開着游戲內嘅其他窗口（如箱子，馬，村民交易）時周圍走，除非窗口上有文本框。",
   "description.wurst.hack.itemesp": "高亮附近嘅掉落物品。",
   "description.wurst.hack.itemgenerator": "生成隨機嘅物品然後掉喺地上。\n§o僅限創造模式。§r",
-  "description.wurst.hack.jesus": "允許你喺水上暢行。\n耶穌喺 ~2000 年前用過呢個功能。",
+  "description.wurst.hack.waterwalker": "允許你喺水上暢行。\n耶穌喺 ~2000 年前用過呢個功能。",
   "description.wurst.hack.jetpack": "模仿你好似真係有飛行背包一樣飛行。\n\n§c§l警告：§r 如果你唔使用 NoFall，可能會仆街。",
   "description.wurst.hack.kaboom": "似爆炸一樣破壞你附近嘅方塊。\n呢個可能比 Nuker 功能破壞更快如果伺服器冇反作弊話，用合適嘅工具破壞脆弱嘅方塊可以事半功倍。\n注意：呢並唔係真正嘅爆炸。",
   "description.wurst.hack.killauralegit": "KillauraLegit 更難被反作弊檢測。\n喺正常嘅 NoCheat+（NCP）伺服器上唔使！",

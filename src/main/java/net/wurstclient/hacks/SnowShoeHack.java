@@ -11,7 +11,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"snow shoe", "SnowJesus", "snow jesus", "NoSnowSink",
+@SearchTags({"snow shoe", "SnowWaterWalker", "snow waterwalker", "NoSnowSink",
 	"no snow sink", "AntiSnowSink", "anti snow sink"})
 public final class SnowShoeHack extends Hack
 {

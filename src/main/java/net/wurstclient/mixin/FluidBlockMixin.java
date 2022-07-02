@@ -41,7 +41,7 @@ public abstract class FluidBlockMixin extends Block implements FluidDrainable
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
-		if(hax != null && hax.jesusHack.shouldBeSolid())
+		if(hax != null && hax.waterwalkerHack.shouldBeSolid())
 		{
 			cir.setReturnValue(VoxelShapes.fullCube());
 			cir.cancel();

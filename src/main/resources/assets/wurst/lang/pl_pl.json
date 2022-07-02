@@ -76,7 +76,7 @@
   "description.wurst.setting.invwalk.allow_other": "Pozwala poruszać się, gdy inne okna w grze są otwarte (np. skrzynia, koń, handel z osadnikami), o ile okno nie ma pola tekstowego.",
   "description.wurst.hack.itemesp": "Podświetla pobliskie przedmioty.",
   "description.wurst.hack.itemgenerator": "Generuje losowe przedmioty i wyrzuca je na ziemię.\n§oTylko tryb kreatywny.§r",
-  "description.wurst.hack.jesus": "Umożliwia chodzenie po wodzie.\nJezus użył tego hacka ~2000 lat temu.",
+  "description.wurst.hack.waterwalker": "Umożliwia chodzenie po wodzie.\nJezus użył tego hacka ~2000 lat temu.",
   "description.wurst.hack.jetpack": "Pozwala latać tak, jakbyś miał plecak odrzutowy.\n\n§c§lOSTRZERZENIE:§r Odniesiesz obrażenia od upadku, jeśli nie użyjesz NoFall.",
   "description.wurst.hack.kaboom": "Niszczy bloki wokół ciebie, tak jak eksplozja.\nMoże to być dużo szybsze niż Nuker, jeśli serwer nie ma NoCheat+. Działa najlepiej z szybkimi narzędziami i słabymi blokami.\nUwaga: to nie jest prawdziwa eksplozja.",
   "description.wurst.hack.killauralegit": "Wolniejsza Killaura, trudniejsza do wykrycia.\nNiewymagane na normalnych serwerach NoCheat+!",

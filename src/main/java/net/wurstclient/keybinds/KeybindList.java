@@ -122,7 +122,7 @@ public final class KeybindList
 		addKB(set, "g", "flight");
 		addKB(set, "semicolon", "speednuker");
 		addKB(set, "h", "say /home");
-		addKB(set, "j", "jesus");
+		addKB(set, "j", "waterwalker");
 		addKB(set, "k", "multiaura");
 		addKB(set, "n", "nuker");
 		addKB(set, "r", "killaura");

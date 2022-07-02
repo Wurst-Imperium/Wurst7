@@ -82,7 +82,7 @@
   "description.wurst.hack.instantbunker": "建造一個小小的火柴盒，需要57個方塊。",
   "description.wurst.hack.itemesp": "高亮附近的掉落物品。",
   "description.wurst.hack.itemgenerator": "生成隨機的物品並將其丟在地上。\n§o僅限創造模式。§r",
-  "description.wurst.hack.jesus": "允許你走在水面上。\n耶穌曾經用這個功能約~2000年前。",
+  "description.wurst.hack.waterwalker": "允許你走在水面上。\n耶穌曾經用這個功能約~2000年前。",
   "description.wurst.hack.jetpack": "模仿你好像真的有飛行背包一樣飛行。\n\n§c§l警告：§r如果你不使用NoFall，會導致受到掉落傷害。",
   "description.wurst.hack.kaboom": "像爆炸一樣破壞你附近的方塊。\n這個可能比Nuker功能破壞更快如果服務器沒有反作弊的話，使用適合的工具和破壞脆弱的方塊可以事半功倍。\n注意：這並不是真正的爆炸。",
   "description.wurst.hack.killauralegit": "KillauraLegit更難被反作弊檢測。\n在正常的NoCheat+（NCP）服務器上不需要！",

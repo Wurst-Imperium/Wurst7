@@ -27,7 +27,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"WaterWalking", "water walking"})
-public final class JesusHack extends Hack
+public final class WaterWalkerHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting bypass =
@@ -37,9 +37,9 @@ public final class JesusHack extends Hack
 	private int tickTimer = 10;
 	private int packetTimer = 0;
 	
-	public JesusHack()
+	public WaterWalkerHack()
 	{
-		super("Jesus");
+		super("WaterWalker");
 		setCategory(Category.MOVEMENT);
 		addSetting(bypass);
 	}

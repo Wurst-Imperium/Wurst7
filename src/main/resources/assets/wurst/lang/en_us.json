@@ -85,7 +85,7 @@
   "description.wurst.setting.invwalk.allow_other": "Allows you to move around while other in-game screens are open (e.g. chest, horse, villager trading), unless the screen has a text box.",
   "description.wurst.hack.itemesp": "Highlights nearby items.",
   "description.wurst.hack.itemgenerator": "Generates random items and drops them on the ground.\n§oCreative mode only.§r",
-  "description.wurst.hack.jesus": "Allows you to walk on water.\nJesus used this hack ~2000 years ago.",
+  "description.wurst.hack.waterwalker": "Allows you to walk on water.\nWaterWalker used this hack ~2000 years ago.",
   "description.wurst.hack.jetpack": "Allows you to fly as if you had a jetpack.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.kaboom": "Breaks blocks around you like an explosion.\nThis can be a lot faster than Nuker if the server doesn't have NoCheat+. It works best with fast tools and weak blocks.\nNote: This is not an actual explosion.",
   "description.wurst.hack.killauralegit": "Slower Killaura that is harder to detect.\nNot required on normal NoCheat+ servers!",

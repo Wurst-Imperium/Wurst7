@@ -39,7 +39,7 @@ public class PathFinder
 		invulnerable || wurst.getHax().noFallHack.isEnabled();
 	private final boolean noWaterSlowdown =
 		wurst.getHax().antiWaterPushHack.isPreventingSlowdown();
-	private final boolean jesus = wurst.getHax().jesusHack.isEnabled();
+	private final boolean waterwalker = wurst.getHax().waterwalkerHack.isEnabled();
 	private final boolean spider = wurst.getHax().spiderHack.isEnabled();
 	protected boolean fallingAllowed = true;
 	protected boolean divingAllowed = true;
@@ -285,7 +285,7 @@ public class PathFinder
 		
 		return material.blocksMovement()
 			&& !(block instanceof AbstractSignBlock)
-			|| block instanceof LadderBlock || jesus
+			|| block instanceof LadderBlock || waterwalker
 				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
@@ -627,7 +627,7 @@ public class PathFinder
 				|| wurst.getHax().noFallHack.isEnabled())
 			|| noWaterSlowdown != wurst.getHax().antiWaterPushHack
 				.isPreventingSlowdown()
-			|| jesus != wurst.getHax().jesusHack.isEnabled()
+			|| waterwalker != wurst.getHax().waterwalkerHack.isEnabled()
 			|| spider != wurst.getHax().spiderHack.isEnabled())
 			return false;
 		

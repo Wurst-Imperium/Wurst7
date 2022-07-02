@@ -85,7 +85,7 @@
 	"description.wurst.setting.invwalk.allow_other": "Umožňuje pohybovat se s dalšími překrytími (např. truhly, koně, obchodu s vesničany...), pokud obrazovka neobsahuje textové pole (např. cedule).",
 	"description.wurst.hack.itemesp": "Zvýrazní blízké položky.",
 	"description.wurst.hack.itemgenerator": "Vytváří náhodné položky a odhazuje je na zem.\n§oPouze v kreativním režiu.§r",
-	"description.wurst.hack.jesus": "Umožňuje chodit po vodě.\nJežíš použil tento hack asi tak před 2000 lety.",
+	"description.wurst.hack.waterwalker": "Umožňuje chodit po vodě.\nJežíš použil tento hack asi tak před 2000 lety.",
 	"description.wurst.hack.jetpack": "Umožňuje létat, jako byste měli jetpack.\n\n§c§lUPOZORNĚNÍ:§r Pokud nepoužijete NoFall, zraníte se pádem.",
 	"description.wurst.hack.kaboom": "Rozbíjí bloky kolem vás polo-explozí.\nMůže být mnohem rychlejší než Nuker, pokud server nemá NoCheat+. Nejlépe to funguje s rychlými nástroji a slabými bloky.\nPoznámka: Nejedná se o skutečnou explozi.",
 	"description.wurst.hack.killauralegit": "Pomalejší, hůře detekovatelná Killaura.\nZbytečné na obyčejných NoCheat+ serverech!",
