@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Automatically places (optional), charges, and detonates respawn anchors to kill entities around you.",
   "description.wurst.hack.antiafk": "Walks around randomly to hide you from AFK detectors.\nNeeds at least 3x3 blocks of free space.",
-  "description.wurst.hack.antiblind": "Prevents blindness.\nIncompatible with OptiFine.",
+  "description.wurst.hack.antiblind": "Prevents blindness effects.\nIncompatible with OptiFine.",
   "description.wurst.hack.anticactus": "Protects you from cactus damage.",
   "description.wurst.hack.antiknockback": "Prevents you from getting pushed by players and mobs.",
   "description.wurst.hack.antispam": "Blocks chat spam by adding a counter to repeated messages.",

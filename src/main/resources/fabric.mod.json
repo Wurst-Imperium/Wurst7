@@ -25,6 +25,7 @@
   "mixins": [
     "wurst.mixins.json"
   ],
+  "accessWidener" : "wurst.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.12.12",
