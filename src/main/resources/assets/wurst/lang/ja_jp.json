@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "リスポーンアンカーを自動で設置（任意）、チャージ、爆発させ、付近にいるエンティティを倒す。",
   "description.wurst.hack.antiafk": "離席を検知されないよう、辺りをランダムに歩き回る。\n最低3×3の広さの自由なスペースが必要。",
-  "description.wurst.hack.antiblind": "盲目効果を無効化する。\nOptiFineとの同時使用不可。",
+  "OUTDATED.description.wurst.hack.antiblind": "盲目効果を無効化する。\nOptiFineとの同時使用不可。",
   "description.wurst.hack.anticactus": "サボテンのダメージを無効化する。",
   "description.wurst.hack.antiknockback": "プレイヤーやモブからのノックバックを無効化する。",
   "description.wurst.hack.antispam": "繰り返し送信されたメッセージにカウントを表示し、チャットスパムを防ぐ。",

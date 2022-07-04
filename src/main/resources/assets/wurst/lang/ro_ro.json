@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Plaseaza automat (optional), incarca, si detoneaza respawn anchoruri pentru a ucide entitati din jurul tau.",
   "description.wurst.hack.antiafk": "Umbla anapoda pentru a evita pluginuri anti-afk.\nNeceseita un spatiu liber de cel putin 3x3.",
-  "description.wurst.hack.antiblind": "Previne efectul de orbire.\nIncompatibl cu OptiFine.",
+  "OUTDATED.description.wurst.hack.antiblind": "Previne efectul de orbire.\nIncompatibl cu OptiFine.",
   "description.wurst.hack.anticactus": "Esti protejat de damage-ul dat de cactusi.",
   "description.wurst.hack.antiknockback": "Te previne din a fi impins de catre playeri sau mobi.",
   "description.wurst.hack.antispam": "Opreste chat spam-ul prin adaugarea unui raspuns la mesaje repetate.",
