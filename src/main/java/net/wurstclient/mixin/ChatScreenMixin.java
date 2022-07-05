@@ -19,6 +19,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ChatPreviewer;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 
 @Mixin(ChatScreen.class)
 public class ChatScreenMixin extends Screen
@@ -29,9 +31,9 @@ public class ChatScreenMixin extends Screen
 	@Shadow
 	private ChatPreviewer chatPreviewer;
 	
-	private ChatScreenMixin(WurstClient wurst, Text text_1)
+	private ChatScreenMixin(WurstClient wurst, Text text)
 	{
-		super(text_1);
+		super(text);
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"init()V"})
@@ -46,6 +48,9 @@ public class ChatScreenMixin extends Screen
 		cancellable = true)
 	private void onUpdatePreviewer(String chatText, CallbackInfo ci)
 	{
+		if(!shouldPreviewChat())
+			return;
+		
 		String normalized = normalize(chatText);
 		
 		if(normalized.startsWith(".say "))
@@ -62,9 +67,49 @@ public class ChatScreenMixin extends Screen
 		}
 	}
 	
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V"),
+		method = "sendMessage(Ljava/lang/String;Z)V",
+		cancellable = true)
+	public void onSendMessage(String message, boolean addToHistory,
+		CallbackInfo ci)
+	{
+		if(!addToHistory || (message = normalize(message)).isEmpty())
+			return;
+		
+		ChatOutputEvent event = new ChatOutputEvent(message);
+		EventManager.fire(event);
+		
+		if(event.isCancelled())
+		{
+			ci.cancel();
+			return;
+		}
+		
+		if(!event.isModified())
+			return;
+		
+		String newMessage = event.getMessage();
+		client.inGameHud.getChatHud().addToMessageHistory(newMessage);
+		Text preview = chatPreviewer.tryConsumeResponse(newMessage);
+		
+		if(newMessage.startsWith("/"))
+			client.player.sendCommand(newMessage.substring(1), preview);
+		else
+			client.player.sendChatMessage(newMessage, preview);
+		
+		ci.cancel();
+	}
+	
 	@Shadow
 	public String normalize(String chatText)
 	{
 		return null;
+	}
+	
+	@Shadow
+	private boolean shouldPreviewChat()
+	{
+		return false;
 	}
 }

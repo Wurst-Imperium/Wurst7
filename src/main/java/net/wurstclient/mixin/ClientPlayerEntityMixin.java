@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,12 +29,9 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.network.message.ChatMessageSigner;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
@@ -65,35 +61,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		GameProfile profile, PlayerPublicKey playerPublicKey)
 	{
 		super(world, profile, playerPublicKey);
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V",
-		cancellable = true)
-	private void onSendChatMessage(String message, @Nullable Text preview,
-		CallbackInfo ci)
-	{
-		ChatOutputEvent event = new ChatOutputEvent(message);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
-		{
-			ci.cancel();
-			return;
-		}
-		
-		if(!event.isModified())
-			return;
-		
-		sendChatMessageBypass(event.getMessage());
-		ci.cancel();
-	}
-	
-	@Override
-	public void sendChatMessageBypass(String message)
-	{
-		ChatMessageSigner signer = ChatMessageSigner.create(getUuid());
-		sendChatMessagePacket(signer, message, null);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -257,12 +224,5 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier)
 	{
 		this.movementMultiplier = movementMultiplier;
-	}
-	
-	@Shadow
-	private void sendChatMessagePacket(ChatMessageSigner signer, String message,
-		@Nullable Text preview)
-	{
-		
 	}
 }
