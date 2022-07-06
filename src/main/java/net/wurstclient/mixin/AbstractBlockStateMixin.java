@@ -103,7 +103,7 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 			return;
 		
 		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.jesusHack.shouldBeSolid())
+		if(hax == null || !hax.waterwalkerHack.shouldBeSolid())
 			return;
 		
 		cir.setReturnValue(VoxelShapes.fullCube());
