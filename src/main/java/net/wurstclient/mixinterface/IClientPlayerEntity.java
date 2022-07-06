@@ -20,6 +20,4 @@ public interface IClientPlayerEntity
 	public void setMovementMultiplier(Vec3d movementMultiplier);
 	
 	public boolean isTouchingWaterBypass();
-	
-	public void sendChatMessageBypass(String message);
 }
