@@ -1,2 +1,3 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
+accessible	class	net/minecraft/client/util/telemetry/TelemetrySender$PlayerGameMode
