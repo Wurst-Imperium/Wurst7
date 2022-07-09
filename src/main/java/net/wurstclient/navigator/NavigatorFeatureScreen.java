@@ -312,7 +312,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		
+		primaryButton.setMessage(Text.literal(feature.getPrimaryAction()));
 	}
 	
 	@Override
