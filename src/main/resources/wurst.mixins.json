@@ -54,6 +54,7 @@
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
+    "TelemetrySenderMixin",
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
