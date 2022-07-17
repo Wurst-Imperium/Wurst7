@@ -47,6 +47,7 @@
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
+    "ProfileKeysMixin",
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",

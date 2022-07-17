@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.ParseResults;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,10 +27,15 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.encryption.PlayerPublicKey;
+import net.minecraft.network.message.ArgumentSignatureDataMap;
+import net.minecraft.network.message.ChatMessageSigner;
+import net.minecraft.network.message.MessageSignature;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -136,6 +143,27 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "signChatMessage(Lnet/minecraft/network/message/ChatMessageSigner;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignature;",
+		cancellable = true)
+	private void onSignChatMessage(ChatMessageSigner signer, Text message,
+		CallbackInfoReturnable<MessageSignature> cir)
+	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(MessageSignature.none());
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "signArguments(Lnet/minecraft/network/message/ChatMessageSigner;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		cancellable = true)
+	private void onSignArguments(ChatMessageSigner signer,
+		ParseResults<CommandSource> parseResults, @Nullable Text preview,
+		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
+	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(ArgumentSignatureDataMap.empty());
 	}
 	
 	@Override

@@ -20,33 +20,53 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
+import net.wurstclient.nochatreports.ForcedChatReportsScreen;
+import net.wurstclient.nochatreports.NcrModRequiredScreen;
 import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(DisconnectedScreen.class)
 public class DisconnectedScreenMixin extends Screen
 {
 	private int autoReconnectTimer;
-	
 	private ButtonWidget autoReconnectButton;
 	
 	@Shadow
 	@Final
+	private Text reason;
+	@Shadow
+	@Final
 	private Screen parent;
-	
 	@Shadow
 	private int reasonHeight;
 	
-	private DisconnectedScreenMixin(WurstClient wurst, Text text_1)
+	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = {"init()V"})
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
+		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
+		{
+			client.setScreen(new ForcedChatReportsScreen(parent));
+			return;
+		}
+		
+		if(NcrModRequiredScreen.isCausedByLackOfNCR(reason))
+		{
+			client.setScreen(new NcrModRequiredScreen(parent));
+			return;
+		}
+		
+		addReconnectButtons();
+	}
+	
+	private void addReconnectButtons()
+	{
 		int backButtonX = width / 2 - 100;
 		int backButtonY =
 			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
