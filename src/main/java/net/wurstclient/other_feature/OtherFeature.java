@@ -29,7 +29,7 @@ public abstract class OtherFeature extends Feature
 	@Override
 	public String getDescription()
 	{
-		return description;
+		return WURST.translate(description);
 	}
 	
 	@Override

@@ -30,7 +30,6 @@
     "EntityMixin",
     "EntityRendererMixin",
     "FishingBobberEntityMixin",
-    "FluidBlockMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
@@ -39,6 +38,7 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
+    "LightTextureManagerMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
@@ -47,6 +47,7 @@
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
+    "ProfileKeysMixin",
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",
@@ -57,10 +58,12 @@
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
+    "TelemetrySenderMixin",
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WorldMixin"
+    "WorldMixin",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
