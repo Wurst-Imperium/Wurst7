@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import java.io.File;
+import java.util.UUID;
+
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,11 +20,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.authlib.minecraft.UserApiService;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.resource.language.LanguageManager;
+import net.minecraft.client.util.ProfileKeys;
 import net.minecraft.client.util.Session;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -44,6 +52,9 @@ public abstract class MinecraftClientMixin
 	implements WindowEventHandler, IMinecraftClient
 {
 	@Shadow
+	@Final
+	public File runDirectory;
+	@Shadow
 	private int itemUseCooldown;
 	@Shadow
 	private ClientPlayerInteractionManager interactionManager;
@@ -57,8 +68,12 @@ public abstract class MinecraftClientMixin
 	@Shadow
 	@Final
 	private Session session;
+	@Shadow
+	@Final
+	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
+	private ProfileKeys wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -103,7 +118,7 @@ public abstract class MinecraftClientMixin
 		WurstClient.INSTANCE.getFriends().middleClick(entity);
 	}
 	
-	@Inject(at = {@At("HEAD")},
+	@Inject(at = @At("HEAD"),
 		method = {"getSession()Lnet/minecraft/client/util/Session;"},
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
@@ -124,7 +139,19 @@ public abstract class MinecraftClientMixin
 	{
 		if(wurstSession != null)
 			return wurstSession;
+		
 		return session;
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
+		cancellable = true)
+	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
+	{
+		if(wurstProfileKeys == null)
+			return;
+		
+		cir.setReturnValue(wurstProfileKeys);
 	}
 	
 	@Override
@@ -173,6 +200,25 @@ public abstract class MinecraftClientMixin
 	public void setSession(Session session)
 	{
 		wurstSession = session;
+		
+		UserApiService userApiService =
+			wurst_createUserApiService(session.getAccessToken());
+		UUID uuid = wurstSession.getProfile().getId();
+		wurstProfileKeys =
+			new ProfileKeys(userApiService, uuid, runDirectory.toPath());
+	}
+	
+	private UserApiService wurst_createUserApiService(String accessToken)
+	{
+		try
+		{
+			return authenticationService.createUserApiService(accessToken);
+			
+		}catch(AuthenticationException e)
+		{
+			e.printStackTrace();
+			return UserApiService.OFFLINE;
+		}
 	}
 	
 	@Shadow
