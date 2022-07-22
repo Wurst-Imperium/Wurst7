@@ -146,7 +146,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signChatMessage(Lnet/minecraft/network/message/ChatMessageSigner;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignature;",
+		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignatureData;",
 		cancellable = true)
 	private void onSignChatMessage(MessageMetadata signer, Text message,
 		CallbackInfoReturnable<MessageSignatureData> cir)
@@ -156,7 +156,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signArguments(Lnet/minecraft/network/message/ChatMessageSigner;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
 		cancellable = true)
 	private void onSignArguments(MessageMetadata signer,
 		ParseResults<CommandSource> parseResults, @Nullable Text preview,
