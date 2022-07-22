@@ -100,6 +100,6 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		int beginIndex = message.indexOf(prefix) + prefix.length();
 		String repeated = message.substring(beginIndex).trim();
 		repeated = StringUtils.normalizeSpace(repeated);
-		MC.player.sendChatMessage(repeated);
+		MC.player.sendChatMessage(repeated, null);
 	}
 }

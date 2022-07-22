@@ -152,7 +152,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		CallbackInfoReturnable<MessageSignatureData> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(MessageSignatureData.none(signer.sender()));
+			cir.setReturnValue(MessageSignatureData.EMPTY);
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -163,7 +163,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(ArgumentSignatureDataMap.empty());
+			cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
 	}
 	
 	@Override

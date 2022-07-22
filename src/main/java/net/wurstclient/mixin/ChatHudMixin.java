@@ -22,6 +22,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.event.EventManager;
@@ -53,8 +54,7 @@ public class ChatHudMixin extends DrawableHelper
 		}
 		
 		message = event.getComponent();
-		shadow$addMessage(message, client.inGameHud.getTicks(), indicator,
-			false);
+		shadow$addMessage(message, null, indicator);
 		
 		String messageString =
 			message.getString().replace("\r", "\\r").replace("\n", "\\n");
@@ -70,8 +70,9 @@ public class ChatHudMixin extends DrawableHelper
 	}
 	
 	@Shadow
-	private void shadow$addMessage(Text message, int messageId,
-		@Nullable MessageIndicator indicator, boolean refresh)
+	private void shadow$addMessage(Text message,
+		@Nullable MessageSignatureData signature,
+		@Nullable MessageIndicator indicator)
 	{
 		
 	}
