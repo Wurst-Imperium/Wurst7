@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.network.message.MessageHandler;
 import net.minecraft.client.network.message.MessageTrustStatus;
-import net.minecraft.network.message.MessageSender;
+import net.minecraft.network.message.MessageSourceProfile;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -31,7 +31,7 @@ public class MessageHandlerMixin
 	@Inject(at = @At("HEAD"),
 		method = "getStatus(Lnet/minecraft/network/message/MessageSender;Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/text/Text;Lnet/minecraft/client/network/PlayerListEntry;)Lnet/minecraft/client/network/message/MessageTrustStatus;",
 		cancellable = true)
-	private void onGetStatus(MessageSender messageSender, SignedMessage message,
+	private void onGetStatus(MessageSourceProfile messageSender, SignedMessage message,
 		Text decorated, @Nullable PlayerListEntry senderEntry,
 		CallbackInfoReturnable<MessageTrustStatus> cir)
 	{
