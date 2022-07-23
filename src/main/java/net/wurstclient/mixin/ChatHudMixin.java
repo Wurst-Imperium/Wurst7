@@ -24,7 +24,6 @@ import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
@@ -39,9 +38,10 @@ public class ChatHudMixin extends DrawableHelper
 	private MinecraftClient client;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
+		method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
 		cancellable = true)
 	private void onAddMessage(Text message,
+		@Nullable MessageSignatureData signature,
 		@Nullable MessageIndicator indicator, CallbackInfo ci)
 	{
 		ChatInputEvent event = new ChatInputEvent(message, visibleMessages);
@@ -54,25 +54,15 @@ public class ChatHudMixin extends DrawableHelper
 		}
 		
 		message = event.getComponent();
-		shadow$addMessage(message, null, indicator);
-		
-		String messageString =
-			message.getString().replace("\r", "\\r").replace("\n", "\\n");
-		String indicatorString =
-			Util.map(indicator, MessageIndicator::loggedName);
-		
-		if(indicatorString != null)
-			LOGGER.info("[{}] [CHAT] {}", indicatorString, messageString);
-		else
-			LOGGER.info("[CHAT] {}", messageString);
-		
+		shadow$addMessage(message, signature, client.inGameHud.getTicks(),
+			indicator, false);
 		ci.cancel();
 	}
 	
 	@Shadow
 	private void shadow$addMessage(Text message,
-		@Nullable MessageSignatureData signature,
-		@Nullable MessageIndicator indicator)
+		@Nullable MessageSignatureData signature, int ticks,
+		@Nullable MessageIndicator indicator, boolean refresh)
 	{
 		
 	}
