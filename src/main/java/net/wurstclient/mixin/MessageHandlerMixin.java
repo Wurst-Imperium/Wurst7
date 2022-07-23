@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixin;
 
+import java.time.Instant;
+
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,10 +30,10 @@ public class MessageHandlerMixin
 	 * "modified" when NoChatReports is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getStatus(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/text/Text;Lnet/minecraft/client/network/PlayerListEntry;)Lnet/minecraft/client/network/message/MessageTrustStatus;",
+		method = "getStatus(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/text/Text;Lnet/minecraft/client/network/PlayerListEntry;Ljava/time/Instant;)Lnet/minecraft/client/network/message/MessageTrustStatus;",
 		cancellable = true)
 	private void onGetStatus(SignedMessage message, Text decorated,
-		@Nullable PlayerListEntry senderEntry,
+		@Nullable PlayerListEntry senderEntry, Instant receptionTimestamp,
 		CallbackInfoReturnable<MessageTrustStatus> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())

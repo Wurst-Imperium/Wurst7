@@ -33,6 +33,8 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.network.message.ArgumentSignatureDataMap;
+import net.minecraft.network.message.DecoratedContents;
+import net.minecraft.network.message.LastSeenMessageList;
 import net.minecraft.network.message.MessageMetadata;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
@@ -146,9 +148,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignatureData;",
+		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
 		cancellable = true)
-	private void onSignChatMessage(MessageMetadata signer, Text message,
+	private void onSignChatMessage(MessageMetadata metadata,
+		DecoratedContents content, LastSeenMessageList lastSeenMessages,
 		CallbackInfoReturnable<MessageSignatureData> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
@@ -156,10 +159,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
 		cancellable = true)
-	private void onSignArguments(MessageMetadata signer,
+	private void onSignArguments(MessageMetadata metadata,
 		ParseResults<CommandSource> parseResults, @Nullable Text preview,
+		LastSeenMessageList lastSeenMessages,
 		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
