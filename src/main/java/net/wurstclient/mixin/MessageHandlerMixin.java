@@ -27,17 +27,16 @@ import net.wurstclient.WurstClient;
 public class MessageHandlerMixin
 {
 	/**
-	 * Stops unreportable chat messages from being labeled as "not secure" or
-	 * "modified" when NoChatReports is enabled.
+	 * Stops unreportable chat messages from being labeled as "not secure".
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(at = @At("RETURN"),
 		method = "getStatus(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/text/Text;Lnet/minecraft/client/network/PlayerListEntry;Ljava/time/Instant;)Lnet/minecraft/client/network/message/MessageTrustStatus;",
 		cancellable = true)
 	private void onGetStatus(SignedMessage message, Text decorated,
 		@Nullable PlayerListEntry senderEntry, Instant receptionTimestamp,
 		CallbackInfoReturnable<MessageTrustStatus> cir)
 	{
-		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+		if(cir.getReturnValue() != MessageTrustStatus.MODIFIED)
 			cir.setReturnValue(MessageTrustStatus.SECURE);
 	}
 	

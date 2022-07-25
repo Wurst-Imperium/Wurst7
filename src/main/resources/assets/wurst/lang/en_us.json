@@ -175,6 +175,7 @@
   "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\" Server",
   "gui.wurst.nochatreports.ncr_mod_server.message": "This server uses the \"No Chat Reports\" mod.\n\nYou can join this server if you block chat signatures and disable VanillaSpoof.",
   "button.wurst.nochatreports.signatures_status": "Signatures: ",
+  "description.wurst.nochatreports.message_is_reportable": "This message has a valid signature and is thus vulnerable to fraudulent chat reports.",
   "gui.wurst.generic.allcaps_blocked": "BLOCKED",
   "gui.wurst.generic.allcaps_allowed": "ALLOWED"
 }

@@ -10,7 +10,6 @@ package net.wurstclient.mixin;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,6 +23,7 @@ import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
@@ -32,8 +32,6 @@ public class ChatHudMixin extends DrawableHelper
 {
 	@Shadow
 	private List<ChatHudLine.Visible> visibleMessages;
-	@Shadow
-	private static Logger LOGGER;
 	@Shadow
 	private MinecraftClient client;
 	
@@ -54,6 +52,8 @@ public class ChatHudMixin extends DrawableHelper
 		}
 		
 		message = event.getComponent();
+		indicator = WurstClient.INSTANCE.getOtfs().noChatReportsOtf
+			.modifyIndicator(message, signature, indicator);
 		shadow$addMessage(message, signature, client.inGameHud.getTicks(),
 			indicator, false);
 		ci.cancel();
