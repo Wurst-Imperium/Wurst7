@@ -64,6 +64,9 @@ public final class NoChatReportsOtf extends OtherFeature
 	public MessageIndicator modifyIndicator(Text message,
 		MessageSignatureData signature, MessageIndicator indicator)
 	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return indicator;
+		
 		if(indicator != null || signature == null || signature.isEmpty())
 			return indicator;
 		

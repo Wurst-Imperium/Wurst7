@@ -36,6 +36,9 @@ public class MessageHandlerMixin
 		@Nullable PlayerListEntry senderEntry, Instant receptionTimestamp,
 		CallbackInfoReturnable<MessageTrustStatus> cir)
 	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return;
+		
 		if(cir.getReturnValue() != MessageTrustStatus.MODIFIED)
 			cir.setReturnValue(MessageTrustStatus.SECURE);
 	}
@@ -47,6 +50,9 @@ public class MessageHandlerMixin
 	@Inject(at = @At("HEAD"), method = "method_45031()V", cancellable = true)
 	private void onMethod_45031(CallbackInfo ci)
 	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return;
+		
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
 			ci.cancel();
 	}
