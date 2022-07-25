@@ -101,6 +101,6 @@ public final class NoChatReportsOtf extends OtherFeature
 		disableSignatures.setChecked(!disableSignatures.isChecked());
 	}
 	
-	// See ChatHudMixin, ClientPlayerEntityMixin, MessageHandlerMixin,
-	// ProfileKeysMixin
+	// See ChatHudMixin, ClientPlayerEntityMixin, ClientPlayNetworkHandlerMixin,
+	// MessageHandlerMixin, ProfileKeysMixin
 }
