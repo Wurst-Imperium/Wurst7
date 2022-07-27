@@ -56,7 +56,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 			return;
 		
 		// Remove Mojang's dishonest warning toast on safe servers
-		if(!packet.method_45058())
+		if(!packet.isSecureChatEnforced())
 		{
 			client.getToastManager().toastQueue.removeIf(toast -> toast
 				.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);
