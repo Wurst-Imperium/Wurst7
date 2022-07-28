@@ -47,8 +47,8 @@ public class MessageHandlerMixin
 	 * Prevents the client from disconnecting with "Chat message validation
 	 * failure" when it receives an unreportable chat message.
 	 */
-	@Inject(at = @At("HEAD"), method = "method_45031()V", cancellable = true)
-	private void onMethod_45031(CallbackInfo ci)
+	@Inject(at = @At("HEAD"), method = "disconnect()V", cancellable = true)
+	private void onDisconnect(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
