@@ -169,7 +169,7 @@
   "gui.wurst.altmanager.folder_error.title": "Impossible de créer le dossier '.Wurst encryption' !",
   "gui.wurst.altmanager.folder_error.message": "Vous avez peut-être accidentellement bloqué l'accès de Wurst à ce dossier.\nL'AltManager ne peut pas chiffrer ou déchiffrer votre liste d'alt sans lui.\nVous pouvez toujours utiliser l'AltManager, mais les alts que vous créez maintenant ne seront pas enregistrés.\n\nL'erreur complète est la suivante :\n%s",
   "gui.wurst.altmanager.empty.title": "Votre liste d'alt est vide.",
-  "gui.wurst.altmanager.empty.message": "Aimeriez-vous quelques alts aléatoires pour commencer ?"
+  "gui.wurst.altmanager.empty.message": "Aimeriez-vous quelques alts aléatoires pour commencer ?",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lATTENTION:§r Serveur non sécurisé",
   "gui.wurst.nochatreports.unsafe_server.message": "Ce serveur nécessite l'activation des signatures de chat, ce qui expose votre compte au risque de signalements de chat frauduleux.\n\nVous pouvez rejoindre ce serveur si vous débloquez les signatures de chat, puis vous reconnectez. Si vous le faites, envisagez de ne pas utiliser le chat du tout. Ou jouez sur un compte secondaire que cela ne vous dérange pas de perdre.\n\nS'il s'agit de votre serveur, vous pouvez résoudre ce problème en définissant 'enforce-secure-profile' sur false dans server.properties. À la manière typique de Mojang, ce paramètre fait le contraire de ce à quoi il ressemble.",
   "toast.wurst.nochatreports.unsafe_server.title": "Les messages de chat peuvent être signalés",
