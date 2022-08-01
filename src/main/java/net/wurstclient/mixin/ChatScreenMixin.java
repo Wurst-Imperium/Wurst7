@@ -12,12 +12,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ChatPreviewer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
@@ -69,10 +71,10 @@ public class ChatScreenMixin extends Screen
 	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V"),
-		method = "sendMessage(Ljava/lang/String;Z)V",
+		method = "sendMessage(Ljava/lang/String;Z)Z",
 		cancellable = true)
 	public void onSendMessage(String message, boolean addToHistory,
-		CallbackInfo ci)
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(!addToHistory || (message = normalize(message)).isEmpty())
 			return;
@@ -82,7 +84,7 @@ public class ChatScreenMixin extends Screen
 		
 		if(event.isCancelled())
 		{
-			ci.cancel();
+			cir.setReturnValue(true);
 			return;
 		}
 		
@@ -91,14 +93,15 @@ public class ChatScreenMixin extends Screen
 		
 		String newMessage = event.getMessage();
 		client.inGameHud.getChatHud().addToMessageHistory(newMessage);
-		Text preview = chatPreviewer.tryConsumeResponse(newMessage);
+		Text preview = Util.map(chatPreviewer.tryConsumeResponse(newMessage),
+			ChatPreviewer.Response::previewText);
 		
 		if(newMessage.startsWith("/"))
 			client.player.sendCommand(newMessage.substring(1), preview);
 		else
 			client.player.sendChatMessage(newMessage, preview);
 		
-		ci.cancel();
+		cir.setReturnValue(true);
 	}
 	
 	@Shadow
