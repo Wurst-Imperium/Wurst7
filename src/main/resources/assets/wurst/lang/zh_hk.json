@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "自動放置（可選），充能並引爆重生錨以擊殺你附近嘅實體。",
   "description.wurst.hack.antiafk": "隨便行，避免被伺服器掛機檢查。\n需 3x3 嘅區域。",
-  "OUTDATED.description.wurst.hack.antiblind": "以防盲咗。\n同 OptiFine（高清修復）唔兼容。",
+  "description.wurst.hack.antiblind": "以防盲咗。\n同 OptiFine（高清修復）唔兼容。",
   "description.wurst.hack.anticactus": "保護你避免受到仙人掌傷害。",
   "description.wurst.hack.antiknockback": "保護你唔會被其他生物或者玩家推動同埋用劍擊退。",
   "description.wurst.hack.antispam": "預防存在嘅重復刷屏，改為用計數器顯示。",
@@ -152,6 +152,9 @@
   "description.wurst.hack.truesight": "允許你睇到隱身嘅實體。",
   "description.wurst.hack.tunneller": "自動挖一個隧道。\n\n§c§l警告：§r 盡管呢個 AI 會自動避開岩漿同埋其他牙煙嘅地下，但係唔包生仔，除非你唔介意你嘅嘢全部有一定概率會失去。",
   "description.wurst.hack.x-ray": "允許你透視礦物所喺嘅位置（請自行確保伺服器內無假礦插件）。",
+  "description.wurst.other_feature.nochatreports": "Disables the cryptographic signatures that since 1.19 are attached to your chat messages.\n\n§c§lWARNING: §cIf §cyou §csend §cchat §cmessages §cwith §csignatures, §cyour §cMinecraft §caccount §ccan §cget §creported §cand §cglobally §cbanned §cfrom §cmultiplayer!§r\n\nEven if you only say harmless things in chat, your signed messages can be abused to create a fake chat report that gets your account banned unfairly.\n\nIf you have to re-enable chat signatures to join a server, consider not using their chat at all. Or play on an alt account that you don't mind losing.",
+  "button.wurst.nochatreports.disable_signatures": "Disable Signatures",
+  "button.wurst.nochatreports.re-enable_signatures": "Re-enable Signatures",
   "description.wurst.setting.generic.attack_speed": "每秒點擊嘅攻擊速度，\n0 = 動態調整速度以匹配你嘅攻擊冷卻時間。",
   "description.wurst.setting.generic.pause_attack_on_containers": "當容器介面（譬如：儲物箱、漏斗）開啟時會暫停攻擊，\n對於用儲物箱介面作為菜單嘅迷你遊戲伺服器好有用。",
   "description.wurst.altmanager.premium": "呢個帳號擁有密碼，且可以加入所有伺服器。",
@@ -166,5 +169,15 @@
   "gui.wurst.altmanager.folder_error.title": "無法創建 「.Wurst encryption」 文件夾！",
   "gui.wurst.altmanager.folder_error.message": "你可能唔小心阻止 Wurst 訪問呢個文件夾。\n如果Wurst無法訪問， AltManager 將無法加密或解密你嘅帳號列表。\n你依然可以使用 AltManager，但你依家創建嘅任何帳號將冇辦法被保存。\n\n全部錯誤如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你嘅帳號列表係空嘅。",
-  "gui.wurst.altmanager.empty.message": "你想唔想要啲隨機嘅帳號嚟開始？"
+  "gui.wurst.altmanager.empty.message": "你想唔想要啲隨機嘅帳號嚟開始？",
+  "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNING:§r Unsafe Server",
+  "gui.wurst.nochatreports.unsafe_server.message": "This server requires chat signatures to be enabled, which puts your account at risk of fraudulent chat reports.\n\nYou can join this server if you un-block chat signatures and then reconnect. If you do, consider not using the chat at all. Or play on an alt account that you don't mind losing.\n\nIf this is your server, you can fix this by setting 'enforce-secure-profile' to false in server.properties. In typical Mojang fashion, this setting does the opposite of what it sounds like.",
+  "toast.wurst.nochatreports.unsafe_server.title": "Chat messages can be reported",
+  "toast.wurst.nochatreports.unsafe_server.message": "Messages sent on this server may be reported to Big Brother Mojang and might get your account banned globally",
+  "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\" Server",
+  "gui.wurst.nochatreports.ncr_mod_server.message": "This server uses the \"No Chat Reports\" mod.\n\nYou can join this server if you block chat signatures and disable VanillaSpoof.",
+  "button.wurst.nochatreports.signatures_status": "Signatures: ",
+  "description.wurst.nochatreports.message_is_reportable": "This message has a valid signature and is thus vulnerable to fraudulent chat reports.",
+  "gui.wurst.generic.allcaps_blocked": "BLOCKED",
+  "gui.wurst.generic.allcaps_allowed": "ALLOWED"
 }
