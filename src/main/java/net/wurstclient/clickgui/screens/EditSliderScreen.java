@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
@@ -29,7 +29,7 @@ public final class EditSliderScreen extends Screen
 	
 	public EditSliderScreen(Screen prevScreen, SliderSetting slider)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.slider = slider;
 	}
@@ -45,8 +45,7 @@ public final class EditSliderScreen extends Screen
 		ValueDisplay vd = ValueDisplay.DECIMAL;
 		String valueString = vd.getValueString(slider.getValue());
 		
-		valueField =
-			new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
+		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
 		valueField.setText(valueString);
 		valueField.setSelectionStart(0);
 		
@@ -54,7 +53,7 @@ public final class EditSliderScreen extends Screen
 		setInitialFocus(valueField);
 		valueField.setTextFieldFocused(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
+		doneButton = new ButtonWidget(x1, y2, 200, 20, Text.literal("Done"),
 			b -> done());
 		addDrawableChild(doneButton);
 	}

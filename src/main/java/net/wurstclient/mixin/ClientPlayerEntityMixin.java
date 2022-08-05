@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.ParseResults;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,14 +27,20 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.network.encryption.PlayerPublicKey;
+import net.minecraft.network.message.ArgumentSignatureDataMap;
+import net.minecraft.network.message.DecoratedContents;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.message.MessageMetadata;
+import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
@@ -58,33 +66,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	private Screen tempCurrentScreen;
 	
-	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld clientWorld_1,
-		GameProfile gameProfile_1)
+	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
+		GameProfile profile, PlayerPublicKey playerPublicKey)
 	{
-		super(clientWorld_1, gameProfile_1);
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "sendChatMessage(Ljava/lang/String;)V",
-		cancellable = true)
-	private void onSendChatMessage(String message, CallbackInfo ci)
-	{
-		ChatOutputEvent event = new ChatOutputEvent(message);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
-		{
-			ci.cancel();
-			return;
-		}
-		
-		if(!event.isModified())
-			return;
-		
-		ChatMessageC2SPacket packet =
-			new ChatMessageC2SPacket(event.getMessage());
-		networkHandler.sendPacket(packet);
-		ci.cancel();
+		super(world, profile, playerPublicKey);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -160,6 +145,29 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
+		cancellable = true)
+	private void onSignChatMessage(MessageMetadata metadata,
+		DecoratedContents content, LastSeenMessageList lastSeenMessages,
+		CallbackInfoReturnable<MessageSignatureData> cir)
+	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(MessageSignatureData.EMPTY);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		cancellable = true)
+	private void onSignArguments(MessageMetadata metadata,
+		ParseResults<CommandSource> parseResults, @Nullable Text preview,
+		LastSeenMessageList lastSeenMessages,
+		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
+	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
 	}
 	
 	@Override

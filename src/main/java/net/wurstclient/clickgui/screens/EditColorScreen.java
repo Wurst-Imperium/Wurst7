@@ -24,7 +24,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
@@ -59,7 +59,7 @@ public final class EditColorScreen extends Screen
 	
 	public EditColorScreen(Screen prevScreen, ColorSetting colorSetting)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.colorSetting = colorSetting;
 		color = colorSetting.getColor();
@@ -70,7 +70,7 @@ public final class EditColorScreen extends Screen
 	{
 		// Cache color palette
 		try(InputStream stream = client.getResourceManager()
-			.getResource(paletteIdentifier).getInputStream())
+			.getResourceOrThrow(paletteIdentifier).getInputStream())
 		{
 			paletteAsBufferedImage = ImageIO.read(stream);
 			
@@ -86,27 +86,27 @@ public final class EditColorScreen extends Screen
 		fieldsX = width / 2 - 100;
 		fieldsY = 129 + 5;
 		
-		hexValueField = new TextFieldWidget(tr, fieldsX, fieldsY, 92, 20,
-			new LiteralText(""));
+		hexValueField =
+			new TextFieldWidget(tr, fieldsX, fieldsY, 92, 20, Text.literal(""));
 		hexValueField.setText(ColorUtils.toHex(color).substring(1));
 		hexValueField.setMaxLength(6);
 		hexValueField.setChangedListener(s -> updateColor(true));
 		
 		// RGB fields
 		redValueField = new TextFieldWidget(tr, fieldsX, fieldsY + 35, 50, 20,
-			new LiteralText(""));
+			Text.literal(""));
 		redValueField.setText("" + color.getRed());
 		redValueField.setMaxLength(3);
 		redValueField.setChangedListener(s -> updateColor(false));
 		
 		greenValueField = new TextFieldWidget(tr, fieldsX + 75, fieldsY + 35,
-			50, 20, new LiteralText(""));
+			50, 20, Text.literal(""));
 		greenValueField.setText("" + color.getGreen());
 		greenValueField.setMaxLength(3);
 		greenValueField.setChangedListener(s -> updateColor(false));
 		
 		blueValueField = new TextFieldWidget(tr, fieldsX + 150, fieldsY + 35,
-			50, 20, new LiteralText(""));
+			50, 20, Text.literal(""));
 		blueValueField.setText("" + color.getBlue());
 		blueValueField.setMaxLength(3);
 		blueValueField.setChangedListener(s -> updateColor(false));
@@ -122,7 +122,7 @@ public final class EditColorScreen extends Screen
 		hexValueField.setSelectionEnd(6);
 		
 		doneButton = new ButtonWidget(fieldsX, height - 30, 200, 20,
-			new LiteralText("Done"), b -> done());
+			Text.literal("Done"), b -> done());
 		addDrawableChild(doneButton);
 	}
 	

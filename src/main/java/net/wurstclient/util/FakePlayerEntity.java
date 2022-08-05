@@ -22,7 +22,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public FakePlayerEntity()
 	{
-		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
+		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile(),
+			WurstClient.MC.player.getPublicKey());
 		copyPositionAndRotation(player);
 		
 		copyInventory();

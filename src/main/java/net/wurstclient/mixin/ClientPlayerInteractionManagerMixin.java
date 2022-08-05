@@ -17,10 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -28,7 +30,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
@@ -130,30 +131,31 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public void rightClickItem()
 	{
-		interactItem(client.player, client.world, Hand.MAIN_HAND);
+		interactItem(client.player, Hand.MAIN_HAND);
 	}
 	
 	@Override
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
 	{
-		interactBlock(client.player, client.world, Hand.MAIN_HAND,
+		interactBlock(client.player, Hand.MAIN_HAND,
 			new BlockHitResult(hitVec, side, pos, false));
-		interactItem(client.player, client.world, Hand.MAIN_HAND);
+		interactItem(client.player, Hand.MAIN_HAND);
 	}
 	
 	@Override
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
 		Direction direction)
 	{
-		sendPlayerAction(action, blockPos, direction);
+		sendSequencedPacket(client.world,
+			i -> new PlayerActionC2SPacket(action, blockPos, direction, i));
 	}
 	
-	@Shadow
-	private void sendPlayerAction(
-		PlayerActionC2SPacket.Action playerActionC2SPacket$Action_1,
-		BlockPos blockPos_1, Direction direction_1)
+	@Override
+	public void sendPlayerInteractBlockPacket(Hand hand,
+		BlockHitResult blockHitResult)
 	{
-		
+		sendSequencedPacket(client.world,
+			i -> new PlayerInteractBlockC2SPacket(hand, blockHitResult, i));
 	}
 	
 	@Override
@@ -163,13 +165,20 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Shadow
+	private void sendSequencedPacket(ClientWorld world,
+		SequencedPacketCreator packetCreator)
+	{
+		
+	}
+	
+	@Shadow
 	public abstract ActionResult interactBlock(
-		ClientPlayerEntity clientPlayerEntity_1, ClientWorld clientWorld_1,
-		Hand hand_1, BlockHitResult blockHitResult_1);
+		ClientPlayerEntity clientPlayerEntity_1, Hand hand_1,
+		BlockHitResult blockHitResult_1);
 	
 	@Shadow
 	public abstract ActionResult interactItem(PlayerEntity playerEntity_1,
-		World world_1, Hand hand_1);
+		Hand hand_1);
 	
 	@Shadow
 	public abstract void clickSlot(int syncId, int slotId, int clickData,

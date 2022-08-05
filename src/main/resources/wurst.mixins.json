@@ -1,5 +1,6 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "net.wurstclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
@@ -29,7 +30,6 @@
     "EntityMixin",
     "EntityRendererMixin",
     "FishingBobberEntityMixin",
-    "FluidBlockMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
@@ -38,7 +38,9 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
+    "LightTextureManagerMixin",
     "LivingEntityRendererMixin",
+    "MessageHandlerMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
     "MouseMixin",
@@ -46,19 +48,23 @@
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
+    "ProfileKeysMixin",
     "RenderTickCounterMixin",
     "ScreenMixin",
     "ServerListMixin",
     "ShulkerBoxScreenMixin",
     "SignEditScreenMixin",
+    "SimpleOptionMixin",
     "SodiumBlockOcclusionCacheMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "SwordItemMixin",
+    "TelemetrySenderMixin",
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WorldMixin"
+    "WorldMixin",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

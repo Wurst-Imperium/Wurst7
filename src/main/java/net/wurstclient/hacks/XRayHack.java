@@ -28,6 +28,7 @@ import net.wurstclient.events.ShouldDrawSideListener;
 import net.wurstclient.events.TesselateBlockListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
@@ -122,14 +123,24 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
 		
+		@SuppressWarnings("unchecked")
+		ISimpleOption<Double> gammaOption =
+			(ISimpleOption<Double>)(Object)MC.options.getGamma();
+		
+		// TODO: Why does this use 0.5 instead of
+		// FullBright's defaultGamma setting?
 		if(!WURST.getHax().fullbrightHack.isEnabled())
-			MC.options.gamma = 0.5F;
+			gammaOption.forceSetValue(0.5);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		MC.options.gamma = 16;
+		@SuppressWarnings("unchecked")
+		ISimpleOption<Double> gammaOption =
+			(ISimpleOption<Double>)(Object)MC.options.getGamma();
+		
+		gammaOption.forceSetValue(16.0);
 	}
 	
 	@Override

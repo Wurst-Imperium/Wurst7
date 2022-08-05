@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -34,6 +34,10 @@ dependencies {
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }
 
 processResources {
@@ -77,4 +81,15 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+afterEvaluate {
+  // Loom 0.11's devlibs folder messes with my other scripts,
+  // so I'm moving these files back to the old location.
+  tasks.named("remapJar") {
+    doLast {
+      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
+      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+    }
+  }
 }
