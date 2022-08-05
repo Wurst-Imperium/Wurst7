@@ -11,7 +11,10 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness"})
+@SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness",
+	"AntiDarkness", "NoDarkness", "anti darkness", "no darkness",
+	"AntiWardenEffect", "anti warden effect", "NoWardenEffect",
+	"no warden effect"})
 public final class AntiBlindHack extends Hack
 {
 	public AntiBlindHack()
@@ -20,5 +23,5 @@ public final class AntiBlindHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See BackgroundRendererMixin
+	// See BackgroundRendererMixin, LightTextureManagerMixin, WorldRendererMixin
 }

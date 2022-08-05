@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Automatically places (optional), charges, and detonates respawn anchors to kill entities around you.",
   "description.wurst.hack.antiafk": "Walks around randomly to hide you from AFK detectors.\nNeeds at least 3x3 blocks of free space.",
-  "description.wurst.hack.antiblind": "Prevents blindness.\nIncompatible with OptiFine.",
+  "description.wurst.hack.antiblind": "Prevents blindness and darkness effects.\nIncompatible with OptiFine.",
   "description.wurst.hack.anticactus": "Protects you from cactus damage.",
   "description.wurst.hack.antiknockback": "Prevents you from getting pushed by players and mobs.",
   "description.wurst.hack.antispam": "Blocks chat spam by adding a counter to repeated messages.",
@@ -153,6 +153,9 @@
   "description.wurst.hack.truesight": "Allows you to see invisible entities.",
   "description.wurst.hack.tunneller": "Automatically digs a tunnel.\n\n§c§lWARNING:§r Although this bot will try to avoid lava and other dangers, there is no guarantee that it won't die. Only send it out with gear that you don't mind losing.",
   "description.wurst.hack.x-ray": "Allows you to see ores through walls.",
+  "description.wurst.other_feature.nochatreports": "Disables the cryptographic signatures that since 1.19 are attached to your chat messages.\n\n§c§lWARNING: §cIf §cyou §csend §cchat §cmessages §cwith §csignatures, §cyour §cMinecraft §caccount §ccan §cget §creported §cand §cglobally §cbanned §cfrom §cmultiplayer!§r\n\nEven if you only say harmless things in chat, your signed messages can be abused to create a fake chat report that gets your account banned unfairly.\n\nIf you have to re-enable chat signatures to join a server, consider not using their chat at all. Or play on an alt account that you don't mind losing.",
+  "button.wurst.nochatreports.disable_signatures": "Disable Signatures",
+  "button.wurst.nochatreports.re-enable_signatures": "Re-enable Signatures",
   "description.wurst.setting.generic.attack_speed": "Attack speed in clicks per second.\n0 = dynamically adjusts the speed to match your attack cooldown.",
   "description.wurst.setting.generic.pause_attack_on_containers": "Won't attack while a container screen (chest, hopper, etc.) is open.\nUseful for minigame servers that display chest-like menus.",
   "description.wurst.altmanager.premium": "This alt has a password and can join all servers.",
@@ -167,5 +170,15 @@
   "gui.wurst.altmanager.folder_error.title": "Couldn't create the '.Wurst encryption' folder!",
   "gui.wurst.altmanager.folder_error.message": "You may have accidentally blocked Wurst from accessing this folder.\nAltManager cannot encrypt or decrypt your alt list without it.\nYou can still use AltManager, but any alts you create now won't be saved.\n\nThe full error is as follows:\n%s",
   "gui.wurst.altmanager.empty.title": "Your alt list is empty.",
-  "gui.wurst.altmanager.empty.message": "Would you like some random alts to get started?"
+  "gui.wurst.altmanager.empty.message": "Would you like some random alts to get started?",
+  "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNING:§r Unsafe Server",
+  "gui.wurst.nochatreports.unsafe_server.message": "This server requires chat signatures to be enabled, which puts your account at risk of fraudulent chat reports.\n\nYou can join this server if you un-block chat signatures and then reconnect. If you do, consider not using the chat at all. Or play on an alt account that you don't mind losing.\n\nIf this is your server, you can fix this by setting 'enforce-secure-profile' to false in server.properties. In typical Mojang fashion, this setting does the opposite of what it sounds like.",
+  "toast.wurst.nochatreports.unsafe_server.title": "Chat messages can be reported",
+  "toast.wurst.nochatreports.unsafe_server.message": "Messages sent on this server may be reported to Big Brother Mojang and might get your account banned globally",
+  "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\" Server",
+  "gui.wurst.nochatreports.ncr_mod_server.message": "This server uses the \"No Chat Reports\" mod.\n\nYou can join this server if you block chat signatures and disable VanillaSpoof.",
+  "button.wurst.nochatreports.signatures_status": "Signatures: ",
+  "description.wurst.nochatreports.message_is_reportable": "This message has a valid signature and is thus vulnerable to fraudulent chat reports.",
+  "gui.wurst.generic.allcaps_blocked": "BLOCKED",
+  "gui.wurst.generic.allcaps_allowed": "ALLOWED"
 }

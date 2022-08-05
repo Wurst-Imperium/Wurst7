@@ -9,7 +9,7 @@ package net.wurstclient.mixin;
 
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,8 +20,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.OrderedText;
+import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
@@ -29,18 +31,18 @@ import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 public class ChatHudMixin extends DrawableHelper
 {
 	@Shadow
-	private List<ChatHudLine<OrderedText>> visibleMessages;
-	@Shadow
-	private static Logger LOGGER;
+	private List<ChatHudLine.Visible> visibleMessages;
 	@Shadow
 	private MinecraftClient client;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/text/Text;I)V",
+		method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
 		cancellable = true)
-	private void onAddMessage(Text chatText, int chatLineId, CallbackInfo ci)
+	private void onAddMessage(Text message,
+		@Nullable MessageSignatureData signature,
+		@Nullable MessageIndicator indicator, CallbackInfo ci)
 	{
-		ChatInputEvent event = new ChatInputEvent(chatText, visibleMessages);
+		ChatInputEvent event = new ChatInputEvent(message, visibleMessages);
 		
 		EventManager.fire(event);
 		if(event.isCancelled())
@@ -49,18 +51,18 @@ public class ChatHudMixin extends DrawableHelper
 			return;
 		}
 		
-		chatText = event.getComponent();
-		shadow$addMessage(chatText, chatLineId, client.inGameHud.getTicks(),
-			false);
-		
-		LOGGER.info("[CHAT] {}",
-			chatText.getString().replace("\r", "\\r").replace("\n", "\\n"));
+		message = event.getComponent();
+		indicator = WurstClient.INSTANCE.getOtfs().noChatReportsOtf
+			.modifyIndicator(message, signature, indicator);
+		shadow$addMessage(message, signature, client.inGameHud.getTicks(),
+			indicator, false);
 		ci.cancel();
 	}
 	
 	@Shadow
-	private void shadow$addMessage(Text text, int messageId, int timestamp,
-		boolean bl)
+	private void shadow$addMessage(Text message,
+		@Nullable MessageSignatureData signature, int ticks,
+		@Nullable MessageIndicator indicator, boolean refresh)
 	{
 		
 	}

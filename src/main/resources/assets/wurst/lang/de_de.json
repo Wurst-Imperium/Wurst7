@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Platziert automatisch Seelenanker um dich herum, lädt diese mit Glowstone auf, und sprengt sie dann, um damit Mobs und Spieler um dich herum zu killen.",
   "description.wurst.hack.antiafk": "Läuft zufällig durch die Gegend, um dich vor Anti-AFK Plugins zu verstecken.\nBenötigt mindestens 3x3 Blöcke freien Platz.",
-  "description.wurst.hack.antiblind": "Verhindert den Blindheitseffekt.\nNicht kompatibel mit OptiFine.",
+  "description.wurst.hack.antiblind": "Verhindert Blindheits- und Dunkelheitseffekte.\nNicht kompatibel mit OptiFine.",
   "description.wurst.hack.anticactus": "Schützt dich vor Kakteen.",
   "description.wurst.hack.antiknockback": "Verhindert dass du von Mobs und Spielern weggeschubst wirst.",
   "description.wurst.hack.antispam": "Blockiert Chat-Spam indem es wiederholte Nachrichten durch einen Zähler ersetzt.",
@@ -51,6 +51,9 @@
   "description.wurst.setting.invwalk.allow_clickgui": "Ermöglicht dir, herumzulaufen während Wursts ClickGUI offen ist.",
   "description.wurst.setting.invwalk.allow_other": "Ermöglicht dir, herumzulaufen während andere In-Game-Fenster offen sind (z.B. Kisten, Pferde, Dorfbewohner-Handel), es sei denn das Fenster hat ein Textfeld.",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen.",
+  "description.wurst.other_feature.nochatreports": "Deaktiviert die kryptografischen Signaturen, die seit 1.19 an deine Chat-Nachrichten angehängt sind.\n\n§c§lWARNUNG: §cWenn §cdu §cChat-Nachrichten §cmit §cSignaturen §csendest, §ckann §cdein §cMinecraft-Account §cgemeldet §cund §cglobal §cvom §cMultiplayer §cverbannt §cwerden!§r\n\nSelbst wenn du immer nur harmlosere Dinge im Chat sagst, können deine signierten Nachrichten missbraucht werden um einen gefälschten Chat-Report zu erstellen, durch den dein Account dann trotzdem gesperrt wird.\n\nWenn du die Chat-Signaturen wieder aktivieren musst um einem Server beizutreten, solltest du in Erwägung ziehen, dort überhaupt nicht zu chatten. Oder du kannst einen Alt-Account benutzen, bei dem es dir egal ist wenn du ihn verlierst.",
+  "button.wurst.nochatreports.disable_signatures": "Signaturen deaktivieren",
+  "button.wurst.nochatreports.re-enable_signatures": "Signaturen wieder aktivieren",
   "description.wurst.setting.generic.attack_speed": "Angriffsgeschwindigkeit in Klicks pro Sekunde.\n0 = Geschwindigkeit passt sich dynamisch an deine Abklingzeit an.",
   "description.wurst.setting.generic.pause_attack_on_containers": "Greift nicht an wenn ein Behälter (Kiste, Trichter, usw.) geöffnet ist.\nNützlich für Minigame-Server die ein Kisten-ähnliches Inventar als Menü anzeigen.",
   "description.wurst.altmanager.premium": "Dieser Alt hat ein Passwort und kann allen Servern beitreten.",
@@ -65,5 +68,15 @@
   "gui.wurst.altmanager.folder_error.title": "Konnte den '.Wurst encryption'-Ordner nicht erstellen!",
   "gui.wurst.altmanager.folder_error.message": "Eventuell hast du Wurst aus Versehen den Zugriff auf diesen Ordner verweigert.\nAltManager kann deine Alt-Liste ohne diesen Ordner nicht ver- order entschlüsseln.\nDu kannst AltManager trotzdem noch benutzen, aber alle Alts die du jetzt erstellst werden nicht gespeichert.\n\nDie komplette Fehlermeldung lautet wie folgt:\n%s",
   "gui.wurst.altmanager.empty.title": "Deine Alt-Liste ist noch leer.",
-  "gui.wurst.altmanager.empty.message": "Möchtest du mit ein paar zufällig generierten Alts anfangen?"
+  "gui.wurst.altmanager.empty.message": "Möchtest du mit ein paar zufällig generierten Alts anfangen?",
+  "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNUNG:§r Unsicherer Server",
+  "gui.wurst.nochatreports.unsafe_server.message": "Dieser Server verlangt dass Chat-Signaturen aktiviert sind, was deinen Account dem Risiko von betrügerischen Chat-Reports aussetzt.\n\nDu kannst diesem Server beitreten, wenn du Chat-Signaturen erlaubst und dich dann neu verbindest. Wenn du das tust, solltest du in Erwägung ziehen, überhaupt nicht zu chatten. Oder benutze einen Alt-Account, bei dem es dir egal ist wenn du ihn verlierst.\n\nWenn das dein Server ist, kannst du das Problem beheben, indem du 'enforce-secure-profile' in server.properties auf false setzt. In typischer Mojang-Manier bewirkt diese Einstellung genau das Gegenteil von dem, wonach es klingt.",
+  "toast.wurst.nochatreports.unsafe_server.title": "Chatnachrichten können gemeldet werden",
+  "toast.wurst.nochatreports.unsafe_server.message": "Die auf diesem Server gesendeten Nachrichten können an Big Brother Mojang gemeldet werden und möglicherweise zur globalen Verbannung deines Accounts führen.",
+  "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\"-Server",
+  "gui.wurst.nochatreports.ncr_mod_server.message": "Dieser Server benutzt den \"No Chat Reports\"-Mod.\n\nDu kannst diesem Server beitreten, wenn du Chat-Signaturen blockierst und VanillaSpoof ausschaltest.",
+  "button.wurst.nochatreports.signatures_status": "Signaturen: ",
+  "description.wurst.nochatreports.message_is_reportable": "Diese Nachricht hat eine gültige Signatur und kann daher für betrügerische Chat-Reports missbraucht werden.",
+  "gui.wurst.generic.allcaps_blocked": "BLOCKIERT",
+  "gui.wurst.generic.allcaps_allowed": "ERLAUBT"
 }

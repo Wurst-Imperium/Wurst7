@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Posiziona automaticamente (opzionale), carica e fa esplodere le ancore di rigenerazione per uccidere le entità intorno a te.",
   "description.wurst.hack.antiafk": "Cammina randomicamente per nasconderti dai detector di player AFK.\nHa bisogno di almeno un 3x3 di spazio libero.",
-  "description.wurst.hack.antiblind": "Previene gli effetti della pozione di cecità.\nIncompatibile con la OptiFine.",
+  "OUTDATED.description.wurst.hack.antiblind": "Previene gli effetti della pozione di cecità.\nIncompatibile con la OptiFine.",
   "description.wurst.hack.anticactus": "Ti protegge dai danni causati dai cactus.",
   "description.wurst.hack.antiknockback": "Annulla il knockback (non permette alle entità di spingerti).",
   "description.wurst.hack.antispam": "Blocca gli spammer in chat mettendo un counter per i messaggi.",

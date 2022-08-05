@@ -12,22 +12,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.render.BackgroundRenderer;
-import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.wurstclient.WurstClient;
 
-@Mixin(BackgroundRenderer.class)
-public class BackgroundRendererMixin
+@Mixin(LightmapTextureManager.class)
+public class LightTextureManagerMixin
 {
 	@Inject(at = {@At("HEAD")},
-		method = {
-			"getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;"},
+		method = {"getDarknessFactor(F)F"},
 		cancellable = true)
-	private static void onGetFogModifier(Entity entity, float tickDelta,
-		CallbackInfoReturnable<StatusEffectFogModifier> ci)
+	private void onGetDarknessFactor(float delta,
+		CallbackInfoReturnable<Float> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			ci.setReturnValue(null);
+			ci.setReturnValue(0F);
 	}
 }

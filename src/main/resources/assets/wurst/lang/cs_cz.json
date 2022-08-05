@@ -1,7 +1,7 @@
 {
 	"description.wurst.hack.anchoraura": "Automaticky umísťí (volitelně), nabije a odpalí kotvy oživení k zabití entit kolem vás.",
 	"description.wurst.hack.antiafk": "Prochází se náhodně, aby vás skryl před AFK detektory.\nPotřebuje alespoň 3x3 bloků volného místa.",
-	"description.wurst.hack.antiblind": "Zabraňuje slepotě.\nNekompatibilní s OptiFine.",
+	"OUTDATED.description.wurst.hack.antiblind": "Zabraňuje slepotě.\nNekompatibilní s OptiFine.",
 	"description.wurst.hack.anticactus": "Chrání vás před poškozením kaktusem.",
 	"description.wurst.hack.antiknockback": "Zabraní strkání hráči a moby.",
 	"description.wurst.hack.antispam": "Blokuje spam chatu přidáním čítače k opakovaným zprávám.",
