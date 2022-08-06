@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.minecraft.class_7648;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketCallbacks;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ConnectionPacketOutputListener.ConnectionPacketOutputEvent;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
@@ -64,7 +64,7 @@ public abstract class ClientConnectionMixin
 		method = {
 			"send(Lnet/minecraft/network/Packet;Lnet/minecraft/class_7648;)V"},
 		cancellable = true)
-	private void onSendPacket(Packet<?> packet, @Nullable class_7648 callback,
+	private void onSendPacket(Packet<?> packet, @Nullable PacketCallbacks callback,
 		CallbackInfo ci)
 	{
 		ConnectionPacketOutputEvent event = getEvent(packet);
