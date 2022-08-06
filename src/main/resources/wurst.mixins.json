@@ -26,6 +26,7 @@
     "CustomPayloadC2SPacketAccessor",
     "DeathScreenMixin",
     "DirectConnectScreenMixin",
+    "DisconnectedRealmsScreenMixin",
     "DisconnectedScreenMixin",
     "EntityMixin",
     "EntityRendererMixin",
