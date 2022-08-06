@@ -16,10 +16,17 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.ChatInputListener;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 
 public final class AnnoyCmd extends Command implements ChatInputListener
 {
+	private final CheckboxSetting rcMode = new CheckboxSetting("RC mode",
+		"Remote control mode. Re-enables a bug that allows .annoy to run Wurst"
+			+ " commands. Not recommended for security reasons, but until we have a"
+			+ " proper remote control feature, this is at least better than nothing.",
+		false);
+	
 	private boolean enabled;
 	private String target;
 	
@@ -27,6 +34,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	{
 		super("annoy", "Annoys a player by repeating everything they say.",
 			".annoy <player>", "Turn off: .annoy");
+		addSetting(rcMode);
 	}
 	
 	@Override
@@ -102,7 +110,12 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		String repeated = message.substring(beginIndex).trim();
 		repeated = StringUtils.normalizeSpace(repeated);
 		
-		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(repeated);
-		MC.getNetworkHandler().sendPacket(packet);
+		if(rcMode.isChecked() && repeated.startsWith("."))
+			WURST.getCmdProcessor().process(repeated.substring(1));
+		else
+		{
+			ChatMessageC2SPacket packet = new ChatMessageC2SPacket(repeated);
+			MC.getNetworkHandler().sendPacket(packet);
+		}
 	}
 }
