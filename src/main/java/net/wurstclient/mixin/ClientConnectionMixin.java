@@ -49,7 +49,7 @@ public abstract class ClientConnectionMixin
 	}
 	
 	@ModifyVariable(
-		method = "send(Lnet/minecraft/network/Packet;Lnet/minecraft/class_7648;)V",
+		method = "send(Lnet/minecraft/network/Packet;Lnet/minecraft/network/PacketCallbacks;)V",
 		at = @At("HEAD"))
 	public Packet<?> onSendPacket(Packet<?> packet)
 	{
@@ -62,10 +62,10 @@ public abstract class ClientConnectionMixin
 	
 	@Inject(at = {@At(value = "HEAD")},
 		method = {
-			"send(Lnet/minecraft/network/Packet;Lnet/minecraft/class_7648;)V"},
+			"send(Lnet/minecraft/network/Packet;Lnet/minecraft/network/PacketCallbacks;)V"},
 		cancellable = true)
-	private void onSendPacket(Packet<?> packet, @Nullable PacketCallbacks callback,
-		CallbackInfo ci)
+	private void onSendPacket(Packet<?> packet,
+		@Nullable PacketCallbacks callback, CallbackInfo ci)
 	{
 		ConnectionPacketOutputEvent event = getEvent(packet);
 		if(event == null)
