@@ -35,6 +35,14 @@ Requirements: [JDK 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspo
 
 2. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
 
+# Setup (for developers) (using Windows 10 & IntelliJ IDEA)
+
+1. In IntelliJ IDEA, click `Import Project`, press the refresh button on the top, and go to where you placed this project at, open the folder and select `build.gradle`.
+
+2. Wait for the import to finish.
+
+3. To run, click on `Add Configuration...`, expand `Applications` in the left tab of the window that appears, click on `Minecraft Client`, press `Ok` and run.
+
 ## License
 
 This code is licensed under the GNU General Public License v3. **You can only use this code in open-source clients that you release under the same license! Using it in closed-source/proprietary clients is not allowed!**
