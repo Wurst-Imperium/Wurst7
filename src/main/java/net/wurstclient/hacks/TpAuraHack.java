@@ -61,8 +61,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
-			+ "the least head movement.\n"
+			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
@@ -73,11 +72,10 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		"Filter players", "Won't attack other players.", false);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't attack sleeping players.", false);
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
+	private final SliderSetting filterFlying = new SliderSetting(
+		"Filter flying",
+		"Won't attack players that are at least the given distance above ground.",
+		0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
@@ -88,12 +86,10 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals", "Won't attack pigs, cows, etc.", false);
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
+	private final CheckboxSetting filterBabies = new CheckboxSetting(
+		"Filter babies", "Won't attack baby pigs, baby villagers, etc.", false);
+	private final CheckboxSetting filterPets = new CheckboxSetting(
+		"Filter pets", "Won't attack tamed wolves, tamed horses, etc.", false);
 	
 	private final CheckboxSetting filterTraders =
 		new CheckboxSetting("Filter traders",
@@ -101,7 +97,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
+			"Won't attack iron golems, snow golems and shulkers.", false);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't attack invisible entities.", false);

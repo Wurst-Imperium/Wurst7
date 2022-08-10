@@ -72,11 +72,10 @@ public final class FollowHack extends Hack
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't follow sleeping players.", false);
 	
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't follow players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
+	private final SliderSetting filterFlying = new SliderSetting(
+		"Filter flying",
+		"Won't follow players that are at least the given distance above ground.",
+		0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't follow zombies, creepers, etc.", true);
@@ -90,13 +89,11 @@ public final class FollowHack extends Hack
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals", "Won't follow pigs, cows, etc.", true);
 	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't follow baby pigs,\n" + "baby villagers, etc.", true);
+	private final CheckboxSetting filterBabies = new CheckboxSetting(
+		"Filter babies", "Won't follow baby pigs, baby villagers, etc.", true);
 	
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't follow tamed wolves,\n" + "tamed horses, etc.", true);
+	private final CheckboxSetting filterPets = new CheckboxSetting(
+		"Filter pets", "Won't follow tamed wolves, tamed horses, etc.", true);
 	
 	private final CheckboxSetting filterTraders =
 		new CheckboxSetting("Filter traders",
@@ -104,7 +101,7 @@ public final class FollowHack extends Hack
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
-			"Won't follow iron golems,\n" + "snow golems and shulkers.", true);
+			"Won't follow iron golems, snow golems and shulkers.", true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't follow invisible entities.", false);

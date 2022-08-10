@@ -48,16 +48,14 @@ public final class FeedAuraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far FeedAura will reach\n" + "to feed animals.\n"
-			+ "Anything that is further away than the\n"
-			+ "specified value will not be fed.",
+		"Determines how far FeedAura will reach to feed animals.\n"
+			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which animal will be fed first.\n"
 			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires\n"
-			+ "the least head movement.\n"
+			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	

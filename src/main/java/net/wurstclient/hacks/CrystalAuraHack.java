@@ -59,104 +59,78 @@ import net.wurstclient.util.RotationUtils.Rotation;
 public final class CrystalAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far CrystalAura will reach\n"
-			+ "to place and detonate crystals.",
+		"Determines how far CrystalAura will reach to place and detonate crystals.",
 		6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting autoPlace =
-		new CheckboxSetting("Auto-place crystals",
-			"When enabled, CrystalAura will automatically\n"
-				+ "place crystals near valid entities.\n"
-				+ "When disabled, CrystalAura will only\n"
-				+ "detonate manually placed crystals.",
-			true);
+	private final CheckboxSetting autoPlace = new CheckboxSetting(
+		"Auto-place crystals",
+		"When enabled, CrystalAura will automatically place crystals near valid entities.\n"
+			+ "When disabled, CrystalAura will only detonate manually placed crystals.",
+		true);
 	
-	private final EnumSetting<FaceBlocks> faceBlocks =
-		new EnumSetting<>("Face crystals",
-			"Whether or not CrystalAura should face\n"
-				+ "the correct direction when placing and\n"
-				+ "left-clicking end crystals.\n\n"
-				+ "Slower but can help with anti-cheat\n" + "plugins.",
-			FaceBlocks.values(), FaceBlocks.OFF);
+	private final EnumSetting<FaceBlocks> faceBlocks = new EnumSetting<>(
+		"Face crystals",
+		"Whether or not CrystalAura should face the correct direction when placing and left-clicking end crystals.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
+		FaceBlocks.values(), FaceBlocks.OFF);
 	
-	private final CheckboxSetting checkLOS =
-		new CheckboxSetting("Check line of sight",
-			"Ensures that you don't reach through\n"
-				+ "blocks when placing or left-clicking\n" + "end crystals.\n\n"
-				+ "Slower but can help with anti-cheat\n" + "plugins.",
-			false);
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight",
+		"Ensures that you don't reach through blocks when placing or left-clicking end crystals.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
+		false);
 	
 	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
 		new EnumSetting<>("Take items from", "Where to look for end crystals.",
 			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
 	
-	private final CheckboxSetting filterPlayers =
-		new CheckboxSetting("Filter players",
-			"Won't target other players\n" + "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			false);
+	private final CheckboxSetting filterPlayers = new CheckboxSetting(
+		"Filter players",
+		"Won't target other players when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		false);
 	
-	private final CheckboxSetting filterMonsters =
-		new CheckboxSetting("Filter monsters",
-			"Won't target zombies, creepers, etc.\n"
-				+ "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			true);
+	private final CheckboxSetting filterMonsters = new CheckboxSetting(
+		"Filter monsters",
+		"Won't target zombies, creepers, etc. when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		true);
 	
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals",
-		"Won't target pigs, cows, etc.\n" + "when auto-placing crystals.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing crystal.",
+		"Won't target pigs, cows, etc. when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
 		true);
 	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't target villagers, wandering traders, etc.\n"
-				+ "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			true);
+	private final CheckboxSetting filterTraders = new CheckboxSetting(
+		"Filter traders",
+		"Won't target villagers, wandering traders, etc. when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		true);
 	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't target iron golems,\n" + "snow golems and shulkers.\n"
-				+ "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			true);
+	private final CheckboxSetting filterGolems = new CheckboxSetting(
+		"Filter golems",
+		"Won't target iron golems, snow golems and shulkers when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible",
-		"Won't target invisible entities\n" + "when auto-placing crystals.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing crystal.",
+		"Won't target invisible entities when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
 		false);
 	
-	private final CheckboxSetting filterNamed =
-		new CheckboxSetting("Filter named",
-			"Won't target name-tagged entities\n"
-				+ "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			false);
+	private final CheckboxSetting filterNamed = new CheckboxSetting(
+		"Filter named",
+		"Won't target name-tagged entities when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		false);
 	
-	private final CheckboxSetting filterStands =
-		new CheckboxSetting("Filter armor stands",
-			"Won't target armor stands.\n" + "when auto-placing crystals.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing crystal.",
-			true);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands",
+		"Won't target armor stands when auto-placing crystals.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing crystal.",
+		true);
 	
 	public CrystalAuraHack()
 	{

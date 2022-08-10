@@ -59,104 +59,78 @@ import net.wurstclient.util.RotationUtils.Rotation;
 public final class AnchorAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far AnchorAura will reach\n"
-			+ "to place, charge and detonate anchors.",
+		"Determines how far AnchorAura will reach to place, charge and detonate anchors.",
 		6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting autoPlace =
-		new CheckboxSetting("Auto-place anchors",
-			"When enabled, AnchorAura will automatically\n"
-				+ "place anchors near valid entities.\n"
-				+ "When disabled, AnchorAura will only charge\n"
-				+ "and detonate manually placed anchors.",
-			true);
+	private final CheckboxSetting autoPlace = new CheckboxSetting(
+		"Auto-place anchors",
+		"When enabled, AnchorAura will automatically place anchors near valid entities.\n"
+			+ "When disabled, AnchorAura will only charge and detonate manually placed anchors.",
+		true);
 	
-	private final EnumSetting<FaceBlocks> faceBlocks =
-		new EnumSetting<>("Face anchors",
-			"Whether or not AnchorAura should face\n"
-				+ "the correct direction when placing and\n"
-				+ "right-clicking respawn anchors.\n\n"
-				+ "Slower but can help with anti-cheat\n" + "plugins.",
-			FaceBlocks.values(), FaceBlocks.OFF);
+	private final EnumSetting<FaceBlocks> faceBlocks = new EnumSetting<>(
+		"Face anchors",
+		"Whether or not AnchorAura should face the correct direction when placing and right-clicking respawn anchors.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
+		FaceBlocks.values(), FaceBlocks.OFF);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
-		"Ensures that you don't reach through\n"
-			+ "blocks when placing or right-clicking\n" + "respawn anchors.\n\n"
-			+ "Slower but can help with anti-cheat\n" + "plugins.",
+		"Ensures that you don't reach through blocks when placing or right-clicking respawn anchors.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
 		false);
 	
-	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
-		new EnumSetting<>("Take items from",
-			"Where to look for respawn anchors\n" + "and glowstone.",
-			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
+		"Take items from", "Where to look for respawn anchors and glowstone.",
+		TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
 	
-	private final CheckboxSetting filterPlayers =
-		new CheckboxSetting("Filter players",
-			"Won't target other players\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			false);
+	private final CheckboxSetting filterPlayers = new CheckboxSetting(
+		"Filter players",
+		"Won't target other players when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		false);
 	
-	private final CheckboxSetting filterMonsters =
-		new CheckboxSetting("Filter monsters",
-			"Won't target zombies, creepers, etc.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterMonsters = new CheckboxSetting(
+		"Filter monsters",
+		"Won't target zombies, creepers, etc. when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		true);
 	
-	private final CheckboxSetting filterAnimals =
-		new CheckboxSetting("Filter animals",
-			"Won't target pigs, cows, etc.\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterAnimals = new CheckboxSetting(
+		"Filter animals",
+		"Won't target pigs, cows, etc. when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		true);
 	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't target villagers, wandering traders, etc.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterTraders = new CheckboxSetting(
+		"Filter traders",
+		"Won't target villagers, wandering traders, etc. when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		true);
 	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't target iron golems,\n" + "snow golems and shulkers.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterGolems = new CheckboxSetting(
+		"Filter golems",
+		"Won't target iron golems, snow golems and shulkers when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible",
-		"Won't target invisible entities\n" + "when auto-placing anchors.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
+		"Won't target invisible entities when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
 		false);
 	
 	private final CheckboxSetting filterNamed = new CheckboxSetting(
 		"Filter named",
-		"Won't target name-tagged entities\n" + "when auto-placing anchors.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
+		"Won't target name-tagged entities when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
 		false);
 	
-	private final CheckboxSetting filterStands =
-		new CheckboxSetting("Filter armor stands",
-			"Won't target armor stands.\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final CheckboxSetting filterStands = new CheckboxSetting(
+		"Filter armor stands",
+		"Won't target armor stands. when auto-placing anchors.\n\n"
+			+ "They can still take damage if they get too close to a valid target or an existing anchor.",
+		true);
 	
 	public AnchorAuraHack()
 	{

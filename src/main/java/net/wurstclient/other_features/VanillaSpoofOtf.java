@@ -28,8 +28,8 @@ public final class VanillaSpoofOtf extends OtherFeature
 	
 	public VanillaSpoofOtf()
 	{
-		super("VanillaSpoof", "Bypasses anti-Fabric plugins by\n"
-			+ "pretending to be a vanilla client.");
+		super("VanillaSpoof",
+			"Bypasses anti-Fabric plugins by pretending to be a vanilla client.");
 		addSetting(spoof);
 		
 		EVENTS.add(ConnectionPacketOutputListener.class, this);

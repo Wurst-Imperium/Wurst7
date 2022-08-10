@@ -52,11 +52,10 @@ public final class RemoteViewHack extends Hack
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't view sleeping players.", false);
 	
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't view players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
+	private final SliderSetting filterFlying = new SliderSetting(
+		"Filter flying",
+		"Won't view players that are at least the given distance above ground.",
+		0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't view zombies, creepers, etc.", true);
@@ -70,13 +69,11 @@ public final class RemoteViewHack extends Hack
 	private final CheckboxSetting filterAnimals = new CheckboxSetting(
 		"Filter animals", "Won't view pigs, cows, etc.", true);
 	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't view baby pigs,\n" + "baby villagers, etc.", true);
+	private final CheckboxSetting filterBabies = new CheckboxSetting(
+		"Filter babies", "Won't view baby pigs, baby villagers, etc.", true);
 	
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't view tamed wolves,\n" + "tamed horses, etc.", true);
+	private final CheckboxSetting filterPets = new CheckboxSetting(
+		"Filter pets", "Won't view tamed wolves, tamed horses, etc.", true);
 	
 	private final CheckboxSetting filterTraders =
 		new CheckboxSetting("Filter traders",
@@ -84,7 +81,7 @@ public final class RemoteViewHack extends Hack
 	
 	private final CheckboxSetting filterGolems =
 		new CheckboxSetting("Filter golems",
-			"Won't view iron golems,\n" + "snow golems and shulkers.", true);
+			"Won't view iron golems, snow golems and shulkers.", true);
 	
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't view invisible entities.", false);
