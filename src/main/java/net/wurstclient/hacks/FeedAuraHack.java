@@ -35,10 +35,10 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -59,10 +59,9 @@ public final class FeedAuraHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
-			false);
+	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
+		"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
+		false);
 	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
@@ -120,7 +119,7 @@ public final class FeedAuraHack extends Hack
 			.filter(AnimalEntity::canEat);
 		
 		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !e.isBaby());
+			stream = stream.filter(filterBabies);
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;

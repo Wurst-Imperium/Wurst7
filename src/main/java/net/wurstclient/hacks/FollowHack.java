@@ -18,22 +18,8 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.minecraft.entity.passive.AbstractHorseEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -47,6 +33,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filterlists.FollowFilterList;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
@@ -66,50 +54,7 @@ public final class FollowHack extends Hack
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
 	
-	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't follow other players.", false);
-	
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't follow sleeping players.", false);
-	
-	private final SliderSetting filterFlying = new SliderSetting(
-		"Filter flying",
-		"Won't follow players that are at least the given distance above ground.",
-		0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
-	
-	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't follow zombies, creepers, etc.", true);
-	
-	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't follow zombie pigmen.", true);
-	
-	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't follow endermen.", true);
-	
-	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't follow pigs, cows, etc.", true);
-	
-	private final CheckboxSetting filterBabies = new CheckboxSetting(
-		"Filter babies", "Won't follow baby pigs, baby villagers, etc.", true);
-	
-	private final CheckboxSetting filterPets = new CheckboxSetting(
-		"Filter pets", "Won't follow tamed wolves, tamed horses, etc.", true);
-	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't follow villagers, wandering traders, etc.", true);
-	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't follow iron golems, snow golems and shulkers.", true);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't follow invisible entities.", false);
-	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't follow armor stands.", true);
-	
-	private final CheckboxSetting filterCarts = new CheckboxSetting(
-		"Filter minecarts", "Won't follow minecarts.", true);
+	private final EntityFilterList entityFilters = FollowFilterList.create();
 	
 	public FollowHack()
 	{
@@ -119,20 +64,7 @@ public final class FollowHack extends Hack
 		addSetting(distance);
 		addSetting(useAi);
 		
-		addSetting(filterPlayers);
-		addSetting(filterSleeping);
-		addSetting(filterFlying);
-		addSetting(filterMonsters);
-		addSetting(filterPigmen);
-		addSetting(filterEndermen);
-		addSetting(filterAnimals);
-		addSetting(filterBabies);
-		addSetting(filterPets);
-		addSetting(filterTraders);
-		addSetting(filterGolems);
-		addSetting(filterInvisible);
-		addSetting(filterStands);
-		addSetting(filterCarts);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -161,65 +93,7 @@ public final class FollowHack extends Hack
 					.filter(e -> e != MC.player)
 					.filter(e -> !(e instanceof FakePlayerEntity));
 			
-			if(filterPlayers.isChecked())
-				stream = stream.filter(e -> !(e instanceof PlayerEntity));
-			
-			if(filterSleeping.isChecked())
-				stream = stream.filter(e -> !(e instanceof PlayerEntity
-					&& ((PlayerEntity)e).isSleeping()));
-			
-			if(filterFlying.getValue() > 0)
-				stream = stream.filter(e -> {
-					
-					if(!(e instanceof PlayerEntity))
-						return true;
-					
-					Box box = e.getBoundingBox();
-					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-					return !MC.world.isSpaceEmpty(box);
-				});
-			
-			if(filterMonsters.isChecked())
-				stream = stream.filter(e -> !(e instanceof Monster));
-			
-			if(filterPigmen.isChecked())
-				stream =
-					stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
-			
-			if(filterEndermen.isChecked())
-				stream = stream.filter(e -> !(e instanceof EndermanEntity));
-			
-			if(filterAnimals.isChecked())
-				stream = stream.filter(e -> !(e instanceof AnimalEntity
-					|| e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-			
-			if(filterBabies.isChecked())
-				stream = stream.filter(e -> !(e instanceof PassiveEntity
-					&& ((PassiveEntity)e).isBaby()));
-			
-			if(filterPets.isChecked())
-				stream = stream
-					.filter(e -> !(e instanceof TameableEntity
-						&& ((TameableEntity)e).isTamed()))
-					.filter(e -> !(e instanceof AbstractHorseEntity
-						&& ((AbstractHorseEntity)e).isTame()));
-			
-			if(filterTraders.isChecked())
-				stream = stream.filter(e -> !(e instanceof MerchantEntity));
-			
-			if(filterGolems.isChecked())
-				stream = stream.filter(e -> !(e instanceof GolemEntity));
-			
-			if(filterInvisible.isChecked())
-				stream = stream.filter(e -> !e.isInvisible());
-			
-			if(filterStands.isChecked())
-				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
-			
-			if(filterCarts.isChecked())
-				stream =
-					stream.filter(e -> !(e instanceof AbstractMinecartEntity));
+			stream = entityFilters.applyTo(stream);
 			
 			entity = stream
 				.min(Comparator

@@ -36,8 +36,8 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -53,8 +53,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't show invisible mobs.", false);
+	private final FilterInvisibleSetting filterInvisible =
+		new FilterInvisibleSetting("Won't show invisible mobs.", false);
 	
 	private final ArrayList<MobEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
@@ -102,7 +102,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 				.filter(e -> !e.isRemoved() && e.getHealth() > 0);
 		
 		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
+			stream = stream.filter(filterInvisible);
 		
 		mobs.addAll(stream.collect(Collectors.toList()));
 	}
