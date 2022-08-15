@@ -70,16 +70,14 @@ public final class TunnellerHack extends Hack
 		"Tunnel size", TunnelSize.values(), TunnelSize.SIZE_3X3);
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
-		"Automatically stops once the tunnel\n"
-			+ "has reached the given length.\n\n" + "0 = no limit",
+		"Automatically stops once the tunnel has reached the given length.\n\n"
+			+ "0 = no limit",
 		0, 0, 1000, 1, ValueDisplay.INTEGER.withSuffix(" blocks")
 			.withLabel(1, "1 block").withLabel(0, "disabled"));
 	
-	private final CheckboxSetting torches =
-		new CheckboxSetting(
-			"Place torches", "Places just enough torches\n"
-				+ "to prevent mobs from\n" + "spawning inside the tunnel.",
-			false);
+	private final CheckboxSetting torches = new CheckboxSetting("Place torches",
+		"Places just enough torches to prevent mobs from spawning inside the tunnel.",
+		false);
 	
 	private BlockPos start;
 	private Direction direction;

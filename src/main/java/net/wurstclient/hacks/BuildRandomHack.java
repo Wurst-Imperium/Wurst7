@@ -46,17 +46,15 @@ public final class BuildRandomHack extends Hack
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
-	private final CheckboxSetting checkItem =
-		new CheckboxSetting("Check held item",
-			"Only builds when you are actually holding a block.\n"
-				+ "Turn this off to build with fire, water, lava,\n"
-				+ "spawn eggs, or if you just want to right click\n"
-				+ "with an empty hand in random places.",
-			true);
+	private final CheckboxSetting checkItem = new CheckboxSetting(
+		"Check held item",
+		"Only builds when you are actually holding a block.\n"
+			+ "Turn this off to build with fire, water, lava, spawn eggs, or if you just want to right click with an empty hand in random places.",
+		true);
 	
-	private final CheckboxSetting fastPlace = new CheckboxSetting(
-		"Always FastPlace",
-		"Builds as if FastPlace was enabled,\n" + "even if it's not.", false);
+	private final CheckboxSetting fastPlace =
+		new CheckboxSetting("Always FastPlace",
+			"Builds as if FastPlace was enabled, even if it's not.", false);
 	
 	private final Random random = new Random();
 	private BlockPos lastPos;

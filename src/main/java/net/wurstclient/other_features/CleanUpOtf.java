@@ -17,9 +17,7 @@ public final class CleanUpOtf extends OtherFeature
 {
 	public CleanUpOtf()
 	{
-		super("CleanUp",
-			"Cleans up your server list.\n"
-				+ "To use it, press the 'Clean Up' button\n"
-				+ "on the server selection screen.");
+		super("CleanUp", "Cleans up your server list.\n"
+			+ "To use it, press the 'Clean Up' button on the server selection screen.");
 	}
 }

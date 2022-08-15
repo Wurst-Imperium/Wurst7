@@ -17,11 +17,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.Window;
@@ -31,6 +26,12 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filters.FilterAnimalsSetting;
+import net.wurstclient.settings.filters.FilterInvisibleSetting;
+import net.wurstclient.settings.filters.FilterMonstersSetting;
+import net.wurstclient.settings.filters.FilterPlayersSetting;
+import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"MiniMap", "mini map"})
@@ -44,16 +45,12 @@ public final class RadarHack extends Hack implements UpdateListener
 	private final CheckboxSetting rotate =
 		new CheckboxSetting("Rotate with player", true);
 	
-	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't show other players.", false);
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't show sleeping players.", false);
-	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't show zombies, creepers, etc.", false);
-	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't show pigs, cows, etc.", false);
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't show invisible entities.", false);
+	private final EntityFilterList entityFilters = new EntityFilterList(
+		new FilterPlayersSetting("Won't show other players.", false),
+		new FilterSleepingSetting("Won't show sleeping players.", false),
+		new FilterMonstersSetting("Won't show zombies, creepers, etc.", false),
+		new FilterAnimalsSetting("Won't show pigs, cows, etc.", false),
+		new FilterInvisibleSetting("Won't show invisible entities.", false));
 	
 	public RadarHack()
 	{
@@ -62,11 +59,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		setCategory(Category.RENDER);
 		addSetting(radius);
 		addSetting(rotate);
-		addSetting(filterPlayers);
-		addSetting(filterSleeping);
-		addSetting(filterMonsters);
-		addSetting(filterAnimals);
-		addSetting(filterInvisible);
+		entityFilters.forEach(this::addSetting);
 		
 		window = new Window("Radar");
 		window.setPinned(true);
@@ -102,23 +95,7 @@ public final class RadarHack extends Hack implements UpdateListener
 				.filter(e -> e instanceof LivingEntity)
 				.filter(e -> ((LivingEntity)e).getHealth() > 0);
 		
-		if(filterPlayers.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity));
-		
-		if(filterSleeping.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity
-				&& ((PlayerEntity)e).isSleeping()));
-		
-		if(filterMonsters.isChecked())
-			stream = stream.filter(e -> !(e instanceof Monster));
-		
-		if(filterAnimals.isChecked())
-			stream = stream.filter(
-				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
+		stream = entityFilters.applyTo(stream);
 		
 		entities.addAll(stream.collect(Collectors.toList()));
 	}
