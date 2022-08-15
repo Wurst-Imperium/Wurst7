@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Автоматически ставит (если отмечено), заряжает, и взрывает якоря возрождения чтобы убить сущности вокруг.",
   "description.wurst.hack.antiafk": "Ходит в случайном направлении чтобы сервер не знал что Вы АФК.\nДля работы необходимо пустое пространство в 3 на 3 блока.",
-  "description.wurst.hack.antiblind": "Отключает эффект слепоты.\nНесовместим с OptiFine.",
+  "OUTDATED.description.wurst.hack.antiblind": "Отключает эффект слепоты.\nНесовместим с OptiFine.",
   "description.wurst.hack.anticactus": "Защищает Вас от урона от столкновения с кактусами.",
   "description.wurst.hack.antiknockback": "Предотвращает откидывание при получении урона.",
   "description.wurst.hack.antispam": "Блокирует спам в чате добавляя счетчик повторений у сообщения.",

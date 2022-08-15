@@ -24,7 +24,6 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -32,7 +31,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -91,7 +90,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(hasPrimaryAction)
 		{
 			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
-				hasHelp ? 149 : 302, 18, new LiteralText(primaryAction), b -> {
+				hasHelp ? 149 : 302, 18, Text.literal(primaryAction), b -> {
 					
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
@@ -104,8 +103,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					
 					feature.doPrimaryAction();
 					
-					primaryButton.setMessage(
-						new LiteralText(feature.getPrimaryAction()));
+					primaryButton
+						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
 				});
@@ -313,7 +312,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		
+		if(primaryButton != null)
+			primaryButton.setMessage(Text.literal(feature.getPrimaryAction()));
 	}
 	
 	@Override
@@ -372,7 +372,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			int x5 = x2 - 2;
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionShader);
 			
 			// window background
@@ -388,8 +389,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, x5, y2, 0).next();
 			bufferBuilder.vertex(matrix, x2, y2, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			setColorToBackground();
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -426,8 +426,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
 			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)

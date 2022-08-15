@@ -20,7 +20,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.ListWidget;
@@ -35,7 +35,7 @@ public final class KeybindProfilesScreen extends Screen
 	
 	public KeybindProfilesScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
@@ -46,18 +46,17 @@ public final class KeybindProfilesScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
 		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Open Folder"), b -> openFolder()));
+			Text.literal("Open Folder"), b -> openFolder()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			new LiteralText("New Profile"), b -> client.setScreen(
+			Text.literal("New Profile"), b -> client.setScreen(
 				new EnterProfileNameScreen(this, this::newProfile))));
 		
-		loadButton =
-			addDrawableChild(new ButtonWidget(width / 2 - 50, height - 48, 100,
-				20, new LiteralText("Load"), b -> loadSelected()));
+		loadButton = addDrawableChild(new ButtonWidget(width / 2 - 50,
+			height - 48, 100, 20, Text.literal("Load"), b -> loadSelected()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
-			new LiteralText("Cancel"), b -> openPrevScreen()));
+			Text.literal("Cancel"), b -> openPrevScreen()));
 	}
 	
 	private void openFolder()
@@ -179,8 +178,14 @@ public final class KeybindProfilesScreen extends Screen
 		
 		if(loadButton.isHovered() && !loadButton.active)
 			renderTooltip(matrixStack,
-				Arrays.asList(new LiteralText("You must first select a file.")),
+				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

@@ -8,11 +8,11 @@
 package net.wurstclient.hacks;
 
 import java.util.Optional;
-import java.util.Random;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.wurstclient.Category;
@@ -27,8 +27,7 @@ import net.wurstclient.util.ChatUtils;
 public final class ItemGeneratorHack extends Hack implements UpdateListener
 {
 	private final SliderSetting speed = new SliderSetting("Speed",
-		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton\n"
-			+ "of lag and can easily crash the game!",
+		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton of lag and can easily crash the game!",
 		1, 1, 36, 1, ValueDisplay.INTEGER);
 	
 	private final SliderSetting stackSize = new SliderSetting("Stack size",
@@ -36,7 +35,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 			+ "Doesn't seem to affect performance.",
 		1, 1, 64, 1, ValueDisplay.INTEGER);
 	
-	private final Random random = new Random();
+	private final Random random = Random.createLocal();
 	
 	public ItemGeneratorHack()
 	{

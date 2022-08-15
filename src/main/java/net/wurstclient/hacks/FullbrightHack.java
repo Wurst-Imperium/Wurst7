@@ -7,12 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.SimpleOption;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -24,21 +25,17 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
-			+ "beyond 100%. Incompatible with shader packs.\n\n"
-			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
-			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
-			+ "shader packs.",
+		"\u00a7lGamma\u00a7r works by setting your brightness slider beyond 100%. Incompatible with shader packs.\n\n"
+			+ "\u00a7lNight Vision\u00a7r works by applying the night vision effect. This \u00a7ousually\u00a7r works with shader packs.",
 		Method.values(), Method.GAMMA);
 	
 	private final CheckboxSetting fade = new CheckboxSetting("Fade",
 		"Slowly fades between brightness and darkness.", true);
 	
-	private final SliderSetting defaultGamma =
-		new SliderSetting("Default brightness",
-			"Fullbright will set your brightness slider\n"
-				+ "back to this value when you turn it off.",
-			0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+	private final SliderSetting defaultGamma = new SliderSetting(
+		"Default brightness",
+		"Fullbright will set your brightness slider back to this value when you turn it off.",
+		0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private boolean wasGammaChanged;
 	private float nightVisionStrength;
@@ -62,7 +59,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			@Override
 			public void onUpdate()
 			{
-				double gamma = MC.options.gamma;
+				double gamma = MC.options.getGamma().getValue();
 				System.out.println("Brightness started at " + gamma);
 				
 				if(gamma > 1)
@@ -100,35 +97,44 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	private void setGamma(double target)
 	{
 		wasGammaChanged = true;
-		GameOptions options = MC.options;
 		
-		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
+		SimpleOption<Double> gammaOption = MC.options.getGamma();
+		@SuppressWarnings("unchecked")
+		ISimpleOption<Double> gammaOption2 =
+			(ISimpleOption<Double>)(Object)gammaOption;
+		double oldGammaValue = gammaOption.getValue();
+		
+		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
-			options.gamma = target;
+			gammaOption2.forceSetValue(target);
 			return;
 		}
 		
-		if(options.gamma < target)
-			options.gamma += 0.5;
+		if(oldGammaValue < target)
+			gammaOption2.forceSetValue(oldGammaValue + 0.5);
 		else
-			options.gamma -= 0.5;
+			gammaOption2.forceSetValue(oldGammaValue - 0.5);
 	}
 	
 	private void resetGamma(double target)
 	{
-		GameOptions options = MC.options;
+		SimpleOption<Double> gammaOption = MC.options.getGamma();
+		@SuppressWarnings("unchecked")
+		ISimpleOption<Double> gammaOption2 =
+			(ISimpleOption<Double>)(Object)gammaOption;
+		double oldGammaValue = gammaOption.getValue();
 		
-		if(!fade.isChecked() || Math.abs(options.gamma - target) <= 0.5)
+		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
-			options.gamma = target;
+			gammaOption2.forceSetValue(target);
 			wasGammaChanged = false;
 			return;
 		}
 		
-		if(options.gamma < target)
-			options.gamma += 0.5;
+		if(oldGammaValue < target)
+			gammaOption2.forceSetValue(oldGammaValue + 0.5);
 		else
-			options.gamma -= 0.5;
+			gammaOption2.forceSetValue(oldGammaValue - 0.5);
 	}
 	
 	private void updateNightVision()

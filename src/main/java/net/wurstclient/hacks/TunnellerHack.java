@@ -26,6 +26,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -56,6 +57,7 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -69,16 +71,14 @@ public final class TunnellerHack extends Hack
 		"Tunnel size", TunnelSize.values(), TunnelSize.SIZE_3X3);
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
-		"Automatically stops once the tunnel\n"
-			+ "has reached the given length.\n\n" + "0 = no limit",
-		0, 0, 1000, 1,
-		v -> v == 0 ? "disabled" : v == 1 ? "1 block" : (int)v + " blocks");
+		"Automatically stops once the tunnel has reached the given length.\n\n"
+			+ "0 = no limit",
+		0, 0, 1000, 1, ValueDisplay.INTEGER.withSuffix(" blocks")
+			.withLabel(1, "1 block").withLabel(0, "disabled"));
 	
-	private final CheckboxSetting torches =
-		new CheckboxSetting(
-			"Place torches", "Places just enough torches\n"
-				+ "to prevent mobs from\n" + "spawning inside the tunnel.",
-			false);
+	private final CheckboxSetting torches = new CheckboxSetting("Place torches",
+		"Places just enough torches to prevent mobs from spawning inside the tunnel.",
+		false);
 	
 	private BlockPos start;
 	private Direction direction;
@@ -224,7 +224,9 @@ public final class TunnellerHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
-			buffer.setShader(viewMatrix, projMatrix, shader);
+			buffer.bind();
+			buffer.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(currentBlock != null)
@@ -273,7 +275,8 @@ public final class TunnellerHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -289,8 +292,10 @@ public final class TunnellerHack extends Hack
 			.multiply(Math.max(0.5, length)).add(offset);
 		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
 		
-		bufferBuilder.end();
-		vertexBuffers[0].upload(bufferBuilder);
+		BuiltBuffer buffer = bufferBuilder.end();
+		vertexBuffers[0].bind();
+		vertexBuffers[0].upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
@@ -394,7 +399,8 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
@@ -414,8 +420,10 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			}
 			
-			bufferBuilder.end();
-			vertexBuffers[1].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffers[1].bind();
+			vertexBuffers[1].upload(buffer);
+			VertexBuffer.unbind();
 			
 			if(currentBlock == null)
 			{
@@ -505,15 +513,18 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
 			for(BlockPos pos : blocks)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
-			vertexBuffers[2].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffers[2].bind();
+			vertexBuffers[2].upload(buffer);
+			VertexBuffer.unbind();
 			
 			return !blocks.isEmpty();
 		}
@@ -648,15 +659,19 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
 				-regionZ);
 			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
 			for(BlockPos pos : liquids)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
-			vertexBuffers[3].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			
+			vertexBuffers[3].bind();
+			vertexBuffers[3].upload(buffer);
+			VertexBuffer.unbind();
 			return true;
 		}
 		

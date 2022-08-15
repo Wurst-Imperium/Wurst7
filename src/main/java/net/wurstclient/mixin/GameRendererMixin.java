@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -35,22 +35,43 @@ import net.wurstclient.mixinterface.IGameRenderer;
 public abstract class GameRendererMixin
 	implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
 {
-	@Redirect(at = @At(value = "INVOKE",
+	private boolean cancelNextBobView;
+	
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
 		ordinal = 0),
 		method = {
 			"renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V"})
-	private void onRenderWorldViewBobbing(GameRenderer gameRenderer,
-		MatrixStack matrixStack, float partalTicks)
+	private void onRenderWorldViewBobbing(float tickDelta, long limitTime,
+		MatrixStack matrices, CallbackInfo ci)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
 		EventManager.fire(event);
 		
 		if(event.isCancelled())
+			cancelNextBobView = true;
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
+		cancellable = true)
+	private void onBobView(MatrixStack matrices, float tickDelta,
+		CallbackInfo ci)
+	{
+		if(!cancelNextBobView)
 			return;
 		
-		bobView(matrixStack, partalTicks);
+		ci.cancel();
+		cancelNextBobView = false;
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V")
+	private void renderHand(MatrixStack matrices, Camera camera,
+		float tickDelta, CallbackInfo ci)
+	{
+		cancelNextBobView = false;
 	}
 	
 	@Inject(
@@ -67,16 +88,14 @@ public abstract class GameRendererMixin
 		EventManager.fire(event);
 	}
 	
-	@Redirect(
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0),
-		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
-	private double getFov(GameOptions options)
+	@Inject(at = @At(value = "RETURN", ordinal = 1),
+		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"},
+		cancellable = true)
+	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
+		CallbackInfoReturnable<Double> cir)
 	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(options.fov);
+		cir.setReturnValue(WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(cir.getReturnValueD()));
 	}
 	
 	@Inject(at = {@At(value = "INVOKE",

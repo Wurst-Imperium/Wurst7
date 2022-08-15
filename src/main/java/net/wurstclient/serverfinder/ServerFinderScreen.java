@@ -19,7 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
@@ -39,7 +39,7 @@ public class ServerFinderScreen extends Screen
 	
 	public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		prevScreen = prevMultiplayerMenu;
 	}
 	
@@ -48,25 +48,25 @@ public class ServerFinderScreen extends Screen
 	{
 		addDrawableChild(searchButton =
 			new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20,
-				new LiteralText("Search"), b -> searchOrCancel()));
+				Text.literal("Search"), b -> searchOrCancel()));
 		
 		addDrawableChild(new ButtonWidget(width / 2 - 100,
-			height / 4 + 120 + 12, 200, 20, new LiteralText("Tutorial"),
+			height / 4 + 120 + 12, 200, 20, Text.literal("Tutorial"),
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
 		
 		addDrawableChild(
 			new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200, 20,
-				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
+				Text.literal("Back"), b -> client.setScreen(prevScreen)));
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
-			height / 4 + 34, 200, 20, new LiteralText(""));
+			height / 4 + 34, 200, 20, Text.literal(""));
 		ipBox.setMaxLength(200);
 		ipBox.setTextFieldFocused(true);
 		addSelectableChild(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
-			height / 4 + 58, 26, 12, new LiteralText(""));
+			height / 4 + 58, 26, 12, Text.literal(""));
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
 		addSelectableChild(maxThreadsBox);
@@ -153,8 +153,8 @@ public class ServerFinderScreen extends Screen
 	{
 		ipBox.tick();
 		
-		searchButton.setMessage(
-			new LiteralText(state.isRunning() ? "Cancel" : "Search"));
+		searchButton
+			.setMessage(Text.literal(state.isRunning() ? "Cancel" : "Search"));
 		ipBox.active = !state.isRunning();
 		maxThreadsBox.active = !state.isRunning();
 		
@@ -184,8 +184,10 @@ public class ServerFinderScreen extends Screen
 					if(!isServerInList(pingers.get(i).getServerIP()))
 					{
 						prevScreen.getServerList()
-							.add(new ServerInfo("Grief me #" + working,
-								pingers.get(i).getServerIP(), false));
+							.add(
+								new ServerInfo("Grief me #" + working,
+									pingers.get(i).getServerIP(), false),
+								false);
 						prevScreen.getServerList().saveFile();
 						((IMultiplayerScreen)prevScreen).getServerListSelector()
 							.setSelected(null);

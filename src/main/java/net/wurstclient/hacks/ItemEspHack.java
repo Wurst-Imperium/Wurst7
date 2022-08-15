@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -46,10 +45,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
 	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
-		"\u00a7lAccurate\u00a7r mode shows the exact\n"
-			+ "hitbox of each item.\n"
-			+ "\u00a7lFancy\u00a7r mode shows larger boxes\n"
-			+ "that look better.",
+		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each item.\n"
+			+ "\u00a7lFancy\u00a7r mode shows larger boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
 	private final ColorSetting color = new ColorSetting("Color",
@@ -172,7 +169,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		Vec3d start =
@@ -192,8 +190,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			bufferBuilder.vertex(matrix, (float)end.x - regionX, (float)end.y,
 				(float)end.z - regionZ).next();
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private enum Style

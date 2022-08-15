@@ -1,0 +1,4 @@
+accessWidener	v1	named
+accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
+accessible	class	net/minecraft/client/util/telemetry/TelemetrySender$PlayerGameMode
+accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;

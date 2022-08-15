@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -18,7 +19,6 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.screens.AltManagerScreen;
@@ -63,7 +63,7 @@ public abstract class TitleScreenMixin extends Screen
 		
 		// add AltManager button
 		addDrawableChild(altsButton = new ButtonWidget(width / 2 + 2,
-			realmsButton.y, 98, 20, new LiteralText("Alt Manager"),
+			realmsButton.y, 98, 20, Text.literal("Alt Manager"),
 			b -> client.setScreen(new AltManagerScreen(this,
 				WurstClient.INSTANCE.getAltManager()))));
 	}
@@ -77,5 +77,17 @@ public abstract class TitleScreenMixin extends Screen
 		// adjust AltManager button if Realms button has been moved
 		// happens when ModMenu is installed
 		altsButton.y = realmsButton.y;
+	}
+	
+	/**
+	 * Stops the multiplayer button being grayed out if the user's Microsoft
+	 * account is parental-control'd or banned from online play.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "getMultiplayerDisabledText()Lnet/minecraft/text/Text;",
+		cancellable = true)
+	private void onGetMultiplayerDisabledText(CallbackInfoReturnable<Text> cir)
+	{
+		cir.setReturnValue(null);
 	}
 }

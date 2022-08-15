@@ -92,7 +92,7 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 		
-		MC.player.sendChatMessage("/tpa " + players.get(index));
+		MC.player.sendCommand("tpa " + players.get(index));
 		index++;
 		timer = 20;
 	}

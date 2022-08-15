@@ -25,7 +25,7 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
@@ -47,15 +47,9 @@ public final class EditItemListScreen extends Screen
 	
 	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.itemList = itemList;
-	}
-	
-	@Override
-	public boolean shouldPause()
-	{
-		return false;
 	}
 	
 	@Override
@@ -64,32 +58,32 @@ public final class EditItemListScreen extends Screen
 		listGui = new ListGui(client, this, itemList.getItemNames());
 		
 		itemNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
+			width / 2 - 152, height - 55, 150, 18, Text.literal(""));
 		addSelectableChild(itemNameField);
 		itemNameField.setMaxLength(256);
 		
 		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, new LiteralText("Add"), b -> {
+			height - 56, 30, 20, Text.literal("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
 			}));
 		
 		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, new LiteralText("Remove Selected"),
+			height - 56, 100, 20, Text.literal("Remove Selected"),
 			b -> itemList.remove(listGui.selected)));
 		
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"),
+			Text.literal("Reset to Defaults"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
 				client.setScreen(EditItemListScreen.this);
-			}, new LiteralText("Reset to Defaults"),
-				new LiteralText("Are you sure?")))));
+			}, Text.literal("Reset to Defaults"),
+				Text.literal("Are you sure?")))));
 		
 		addDrawableChild(
 			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				new LiteralText("Done"), b -> client.setScreen(prevScreen)));
+				Text.literal("Done"), b -> client.setScreen(prevScreen)));
 	}
 	
 	@Override
@@ -214,6 +208,18 @@ public final class EditItemListScreen extends Screen
 		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
+	}
+	
+	@Override
+	public boolean shouldPause()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

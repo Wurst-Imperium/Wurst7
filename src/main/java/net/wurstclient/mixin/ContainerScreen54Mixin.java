@@ -19,7 +19,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
@@ -55,10 +54,10 @@ public abstract class ContainerScreen54Mixin
 		if(autoSteal.areButtonsVisible())
 		{
 			addDrawableChild(new ButtonWidget(x + backgroundWidth - 108, y + 4,
-				50, 12, new LiteralText("Steal"), b -> steal()));
+				50, 12, Text.literal("Steal"), b -> steal()));
 			
 			addDrawableChild(new ButtonWidget(x + backgroundWidth - 56, y + 4,
-				50, 12, new LiteralText("Store"), b -> store()));
+				50, 12, Text.literal("Store"), b -> store()));
 		}
 		
 		if(autoSteal.isEnabled())

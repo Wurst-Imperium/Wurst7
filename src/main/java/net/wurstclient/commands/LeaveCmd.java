@@ -23,7 +23,7 @@ public final class LeaveCmd extends Command
 	{
 		if(args.length == 1 && args[0].equalsIgnoreCase("taco"))
 			for(int i = 0; i < 128; i++)
-				MC.player.sendChatMessage("Taco!");
+				MC.player.sendChatMessage("Taco!", null);
 		else if(args.length != 0)
 			throw new CmdSyntaxError();
 		
