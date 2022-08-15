@@ -114,6 +114,18 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(wurstSession);
 	}
 	
+	/**
+	 * Stops the multiplayer button being grayed out if the user's Microsoft
+	 * account is parental-control'd.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "isMultiplayerEnabled()Z",
+		cancellable = true)
+	public void isMultiplayerEnabled(CallbackInfoReturnable<Boolean> cir)
+	{
+		cir.setReturnValue(true);
+	}
+	
 	@Redirect(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
 		opcode = Opcodes.GETFIELD,
