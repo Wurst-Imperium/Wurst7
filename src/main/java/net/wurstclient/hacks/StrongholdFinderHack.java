@@ -127,7 +127,7 @@ public class StrongholdFinderHack extends Hack implements UpdateListener, Render
 				this.strongholdz = (Math.tan(yaw)* (firstPos.z - MC.player.getPos().z) + (MC.player.getPos().x - firstPos.x)) / (firstYaw - Math.tan(yaw));
 				this.strongholdx = firstYaw * strongholdz;
 				strongholdz += firstPos.z; strongholdx += firstPos.x;
-				ChatUtils.message("Done! Stronghold cords:");
+				ChatUtils.message("Done! Stronghold coords:");
 				ChatUtils.message("X:"+ strongholdx);
 				ChatUtils.message("Z:"+ strongholdz);
 				EVENTS.add(RenderListener.class, this);
