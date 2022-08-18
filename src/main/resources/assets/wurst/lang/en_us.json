@@ -139,6 +139,7 @@
   "description.wurst.hack.speednuker": "Faster version of Nuker that cannot bypass NoCheat+.",
   "description.wurst.hack.spider": "Allows you to climb up walls like a spider.",
   "description.wurst.hack.step": "Allows you to step up full blocks.",
+  "description.wurst.hack.strongholdfinder": "Calculates the stronghold's position almost perfectly by walking.",
   "description.wurst.hack.throw": "Uses an item multiple times. Can be used to throw snowballs and eggs, spawn mobs, place minecarts, etc. in very large quantities.\n\nThis can cause a lot of lag and even crash a server.",
   "description.wurst.hack.tillaura": "Automatically turns dirt, grass, etc. into farmland.\nNot to be confused with Killaura.",
   "description.wurst.hack.timer": "Changes the speed of almost everything.",
