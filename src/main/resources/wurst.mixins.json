@@ -45,6 +45,7 @@
     "MiningToolItemMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
+    "PackScreenMixin",
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
