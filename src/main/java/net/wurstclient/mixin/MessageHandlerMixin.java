@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.network.PlayerListEntry;
@@ -41,19 +40,5 @@ public class MessageHandlerMixin
 		
 		if(cir.getReturnValue() != MessageTrustStatus.MODIFIED)
 			cir.setReturnValue(MessageTrustStatus.SECURE);
-	}
-	
-	/**
-	 * Prevents the client from disconnecting with "Chat message validation
-	 * failure" when it receives an unreportable chat message.
-	 */
-	@Inject(at = @At("HEAD"), method = "disconnect()V", cancellable = true)
-	private void onDisconnect(CallbackInfo ci)
-	{
-		if(!WurstClient.INSTANCE.isEnabled())
-			return;
-		
-		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			ci.cancel();
 	}
 }
