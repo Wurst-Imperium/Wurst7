@@ -16,6 +16,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.wurstclient.WurstClient;
@@ -25,10 +26,13 @@ import net.wurstclient.util.LastServerRememberer;
 
 public final class ForcedChatReportsScreen extends Screen
 {
-	private static final List<String> DISCONNECT_REASONS =
+	private static final List<String> TRANSLATABLE_DISCONNECT_REASONS =
 		Arrays.asList("multiplayer.disconnect.missing_public_key",
 			"multiplayer.disconnect.invalid_public_key_signature",
 			"multiplayer.disconnect.invalid_public_key");
+	
+	private static final List<String> LITERAL_DISCONNECT_REASONS =
+		Arrays.asList("An internal error occurred in your connection.");
 	
 	private final Screen prevScreen;
 	private final Text reason;
@@ -120,10 +124,14 @@ public final class ForcedChatReportsScreen extends Screen
 		if(!WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
 			return false;
 		
-		if(!(disconnectReason
-			.getContent() instanceof TranslatableTextContent tr))
-			return false;
+		if(disconnectReason.getContent() instanceof TranslatableTextContent tr
+			&& TRANSLATABLE_DISCONNECT_REASONS.contains(tr.getKey()))
+			return true;
 		
-		return DISCONNECT_REASONS.contains(tr.getKey());
+		if(disconnectReason.getContent() instanceof LiteralTextContent lt
+			&& LITERAL_DISCONNECT_REASONS.contains(lt.string()))
+			return true;
+		
+		return false;
 	}
 }

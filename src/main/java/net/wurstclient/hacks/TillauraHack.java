@@ -49,11 +49,11 @@ public final class TillauraHack extends Hack implements UpdateListener
 		new CheckboxSetting("MultiTill", "Tills multiple blocks at once.\n"
 			+ "Faster, but can't bypass NoCheat+.", false);
 	
-	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Prevents Tillaura from reaching through blocks.\n"
-			+ "Good for NoCheat+ servers,\n" + "but unnecessary in vanilla.",
-		true);
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"Prevents Tillaura from reaching through blocks.\n"
+				+ "Good for NoCheat+ servers, but unnecessary in vanilla.",
+			true);
 	
 	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
 		Blocks.DIRT_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);

@@ -50,6 +50,8 @@ public class DisconnectedScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
+		System.out.println("Disconnected: " + reason);
+		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
 		{
 			client.setScreen(new ForcedChatReportsScreen(parent));
