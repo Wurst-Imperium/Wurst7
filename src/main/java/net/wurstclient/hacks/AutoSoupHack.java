@@ -31,8 +31,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoSoupHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Eats a soup when your health\n"
-			+ "reaches this value or falls below it.",
+		"Eats a soup when your health reaches this value or falls below it.",
 		6.5, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL);
 	
 	private int oldSlot = -1;

@@ -45,24 +45,20 @@ public final class SpeedNukerHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
-			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
-			+ "type. Left-click on a block to select it.\n"
-			+ "\u00a7lMultiID\u00a7r mode only breaks the block types\n"
-			+ "in your MultiID List.\n"
-			+ "\u00a7lFlat\u00a7r mode flattens the area around you,\n"
-			+ "but won't dig down.\n"
-			+ "\u00a7lSmash\u00a7r mode only breaks blocks that\n"
-			+ "can be destroyed instantly (e.g. tall grass).",
+		"\u00a7lNormal\u00a7r mode simply breaks everything around you.\n"
+			+ "\u00a7lID\u00a7r mode only breaks the selected block type. Left-click on a block to select it.\n"
+			+ "\u00a7lMultiID\u00a7r mode only breaks the block types in your MultiID List.\n"
+			+ "\u00a7lFlat\u00a7r mode flattens the area around you, but won't dig down.\n"
+			+ "\u00a7lSmash\u00a7r mode only breaks blocks that can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	
 	private final BlockSetting id =
 		new BlockSetting("ID", "The type of block to break in ID mode.\n"
 			+ "air = won't break anything", "minecraft:air", true);
 	
-	private final CheckboxSetting lockId =
-		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
-			+ "on blocks or restarting Nuker.", false);
+	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
+		"Prevents changing the ID by clicking on blocks or restarting Nuker.",
+		false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
 		"MultiID List", "The types of blocks to break in MultiID mode.",

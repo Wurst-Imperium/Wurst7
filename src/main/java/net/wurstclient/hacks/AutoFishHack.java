@@ -51,16 +51,12 @@ public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final SliderSetting validRange = new SliderSetting("Valid range",
-		"Any bites that occur outside of this range\n" + "will be ignored.\n\n"
-			+ "Increase your range if bites are not being\n"
-			+ "detected, decrease it if other people's\n"
-			+ "bites are being detected as yours.",
+		"Any bites that occur outside of this range will be ignored.\n\n"
+			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
 	private CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring and where\n"
-			+ "they will be detected. Useful for optimizing\n"
-			+ "your 'Valid range' setting.",
+		"Shows where bites are occurring and where they will be detected. Useful for optimizing your 'Valid range' setting.",
 		false);
 	
 	private final ColorSetting ddColor = new ColorSetting("DD color",
