@@ -20,14 +20,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -49,6 +41,8 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.AnchorAuraFilterList;
+import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
@@ -59,104 +53,33 @@ import net.wurstclient.util.RotationUtils.Rotation;
 public final class AnchorAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far AnchorAura will reach\n"
-			+ "to place, charge and detonate anchors.",
+		"Determines how far AnchorAura will reach to place, charge and detonate anchors.",
 		6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting autoPlace =
-		new CheckboxSetting("Auto-place anchors",
-			"When enabled, AnchorAura will automatically\n"
-				+ "place anchors near valid entities.\n"
-				+ "When disabled, AnchorAura will only charge\n"
-				+ "and detonate manually placed anchors.",
-			true);
+	private final CheckboxSetting autoPlace = new CheckboxSetting(
+		"Auto-place anchors",
+		"When enabled, AnchorAura will automatically place anchors near valid entities.\n"
+			+ "When disabled, AnchorAura will only charge and detonate manually placed anchors.",
+		true);
 	
-	private final EnumSetting<FaceBlocks> faceBlocks =
-		new EnumSetting<>("Face anchors",
-			"Whether or not AnchorAura should face\n"
-				+ "the correct direction when placing and\n"
-				+ "right-clicking respawn anchors.\n\n"
-				+ "Slower but can help with anti-cheat\n" + "plugins.",
-			FaceBlocks.values(), FaceBlocks.OFF);
+	private final EnumSetting<FaceBlocks> faceBlocks = new EnumSetting<>(
+		"Face anchors",
+		"Whether or not AnchorAura should face the correct direction when placing and right-clicking respawn anchors.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
+		FaceBlocks.values(), FaceBlocks.OFF);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
-		"Ensures that you don't reach through\n"
-			+ "blocks when placing or right-clicking\n" + "respawn anchors.\n\n"
-			+ "Slower but can help with anti-cheat\n" + "plugins.",
+		"Ensures that you don't reach through blocks when placing or right-clicking respawn anchors.\n\n"
+			+ "Slower but can help with anti-cheat plugins.",
 		false);
 	
-	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
-		new EnumSetting<>("Take items from",
-			"Where to look for respawn anchors\n" + "and glowstone.",
-			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
+		"Take items from", "Where to look for respawn anchors and glowstone.",
+		TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
 	
-	private final CheckboxSetting filterPlayers =
-		new CheckboxSetting("Filter players",
-			"Won't target other players\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			false);
-	
-	private final CheckboxSetting filterMonsters =
-		new CheckboxSetting("Filter monsters",
-			"Won't target zombies, creepers, etc.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
-	
-	private final CheckboxSetting filterAnimals =
-		new CheckboxSetting("Filter animals",
-			"Won't target pigs, cows, etc.\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
-	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't target villagers, wandering traders, etc.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
-	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't target iron golems,\n" + "snow golems and shulkers.\n"
-				+ "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible",
-		"Won't target invisible entities\n" + "when auto-placing anchors.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
-		false);
-	
-	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named",
-		"Won't target name-tagged entities\n" + "when auto-placing anchors.\n\n"
-			+ "They can still take damage if\n"
-			+ "they get too close to a valid\n"
-			+ "target or an existing anchor.",
-		false);
-	
-	private final CheckboxSetting filterStands =
-		new CheckboxSetting("Filter armor stands",
-			"Won't target armor stands.\n" + "when auto-placing anchors.\n\n"
-				+ "They can still take damage if\n"
-				+ "they get too close to a valid\n"
-				+ "target or an existing anchor.",
-			true);
+	private final EntityFilterList entityFilters =
+		AnchorAuraFilterList.create();
 	
 	public AnchorAuraHack()
 	{
@@ -169,14 +92,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		addSetting(checkLOS);
 		addSetting(takeItemsFrom);
 		
-		addSetting(filterPlayers);
-		addSetting(filterMonsters);
-		addSetting(filterAnimals);
-		addSetting(filterTraders);
-		addSetting(filterGolems);
-		addSetting(filterInvisible);
-		addSetting(filterNamed);
-		addSetting(filterStands);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -194,8 +110,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		// It says respawnAnchorWorks() but actually
-		// returns true if respawn anchors DON'T work
 		if(MC.world.getDimension().respawnAnchorWorks())
 		{
 			ChatUtils.error("Respawn anchors don't explode in this dimension.");
@@ -478,31 +392,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				.filter(e -> !WURST.getFriends().contains(e.getEntityName()))
 				.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
-		if(filterPlayers.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity));
-		
-		if(filterMonsters.isChecked())
-			stream = stream.filter(e -> !(e instanceof Monster));
-		
-		if(filterAnimals.isChecked())
-			stream = stream.filter(
-				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-		
-		if(filterTraders.isChecked())
-			stream = stream.filter(e -> !(e instanceof MerchantEntity));
-		
-		if(filterGolems.isChecked())
-			stream = stream.filter(e -> !(e instanceof GolemEntity));
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
-		
-		if(filterNamed.isChecked())
-			stream = stream.filter(e -> !e.hasCustomName());
-		
-		if(filterStands.isChecked())
-			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
+		stream = entityFilters.applyTo(stream);
 		
 		return stream.sorted(furthestFromPlayer)
 			.collect(Collectors.toCollection(ArrayList::new));

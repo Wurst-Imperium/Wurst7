@@ -41,20 +41,16 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lFast\u00a7r mode can use bone meal on\n"
-			+ "multiple blocks at once.\n"
+		"\u00a7lFast\u00a7r mode can use bone meal on multiple blocks at once.\n"
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
 	private final EnumSetting<AutomationLevel> automationLevel =
 		new EnumSetting<>("Automation",
 			"How much of the bone-mealing process to automate.\n"
-				+ "\u00a7lRight Click\u00a7r simply right clicks plants with the bone\n"
-				+ "meal in your hand.\n"
-				+ "\u00a7lHotbar\u00a7r selects bone meal in your hotbar and then\n"
-				+ "uses it on plants.\n"
-				+ "\u00a7lInventory\u00a7r finds bone meal in your inventory,\n"
-				+ "moves it to your hotbar and then uses it.",
+				+ "\u00a7lRight Click\u00a7r simply right clicks plants with the bone meal in your hand.\n"
+				+ "\u00a7lHotbar\u00a7r selects bone meal in your hotbar and then uses it on plants.\n"
+				+ "\u00a7lInventory\u00a7r finds bone meal in your inventory, moves it to your hotbar and then uses it.",
 			AutomationLevel.values(), AutomationLevel.RIGHT_CLICK);
 	
 	private final CheckboxSetting saplings =
