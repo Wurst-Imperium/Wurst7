@@ -29,7 +29,7 @@ public final class IngameBackgroundHack extends Hack
 	public final ColorSetting secondColor = new ColorSetting("Second Color", second);
 
 	public final SliderSetting firstAlpha = new SliderSetting("First Alpha", "The alpha of the first colour", 100, 1, 255, 1, SliderSetting.ValueDisplay.INTEGER);
-	public final SliderSetting secondAlpha = new SliderSetting("First Alpha", "The alpha of the second colour", 100, 1, 255, 1, SliderSetting.ValueDisplay.INTEGER);
+	public final SliderSetting secondAlpha = new SliderSetting("Second Alpha", "The alpha of the second colour", 100, 1, 255, 1, SliderSetting.ValueDisplay.INTEGER);
 
 	public IngameBackgroundHack()
 	{
