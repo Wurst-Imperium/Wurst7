@@ -1,4 +1,3 @@
-/*
  * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
@@ -47,7 +46,7 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"stronghold esp", "stronghold", "esp", "finder", "strongholdfinder", "stronghold finder"})
+@SearchTags({"strongholdesp", "stronghold", "esp", "finder", "strongholdfinder"})
 public class StrongholdFinderHack extends Hack implements UpdateListener, RenderListener {
 
 	private boolean first = true;
@@ -59,8 +58,8 @@ public class StrongholdFinderHack extends Hack implements UpdateListener, Render
 	private double strongholdx;
 	
 	private final SliderSetting accuracy = new SliderSetting("Distance to walk",
-			"Causes more accuracy sometimes.", 100, 50,
-			500, 1, ValueDisplay.INTEGER);
+			"Causes more accuracy sometimes.", 30, 10,
+			100, 1, ValueDisplay.INTEGER);
 	
 	private final EnumSetting<FindingDirection> direction = new EnumSetting<FindingDirection>("Direction to walk", "Causes more accuracy sometimes.",FindingDirection.values(), FindingDirection.N);
 	
@@ -174,7 +173,7 @@ public class StrongholdFinderHack extends Hack implements UpdateListener, Render
 		// line
 		Vec3d start =
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
-		Vec3d end = new Vec3d(strongholdx+0.5, 0, strongholdz+0.5);
+		Vec3d end = new Vec3d(strongholdx+0.5, 0.5, strongholdz+0.5);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
