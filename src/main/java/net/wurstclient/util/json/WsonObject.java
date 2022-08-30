@@ -30,32 +30,74 @@ public final class WsonObject
 	
 	public boolean getBoolean(String key) throws JsonException
 	{
-		return JsonUtils.getAsBoolean(json.get(key));
+		try
+		{
+			return JsonUtils.getAsBoolean(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Boolean \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public int getInt(String key) throws JsonException
 	{
-		return JsonUtils.getAsInt(json.get(key));
+		try
+		{
+			return JsonUtils.getAsInt(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public long getLong(String key) throws JsonException
 	{
-		return JsonUtils.getAsLong(json.get(key));
+		try
+		{
+			return JsonUtils.getAsLong(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public String getString(String key) throws JsonException
 	{
-		return JsonUtils.getAsString(json.get(key));
+		try
+		{
+			return JsonUtils.getAsString(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("String \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public WsonArray getArray(String key) throws JsonException
 	{
-		return JsonUtils.getAsArray(json.get(key));
+		try
+		{
+			return JsonUtils.getAsArray(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Array \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public WsonObject getObject(String key) throws JsonException
 	{
-		return JsonUtils.getAsObject(json.get(key));
+		try
+		{
+			return JsonUtils.getAsObject(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Object \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public JsonElement getElement(String key)
@@ -119,5 +161,11 @@ public final class WsonObject
 	public JsonObject toJsonObject()
 	{
 		return json;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return json.toString();
 	}
 }
