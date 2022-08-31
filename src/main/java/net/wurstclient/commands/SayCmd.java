@@ -32,6 +32,6 @@ public final class SayCmd extends Command
 		if(message.startsWith("/"))
 			MC.player.sendCommand(message.substring(1));
 		else
-			MC.player.sendChatMessage(message);
+			MC.player.sendChatMessage(message, null);
 	}
 }

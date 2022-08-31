@@ -33,8 +33,10 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.network.message.ArgumentSignatureDataMap;
-import net.minecraft.network.message.ChatMessageSigner;
-import net.minecraft.network.message.MessageSignature;
+import net.minecraft.network.message.DecoratedContents;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.message.MessageMetadata;
+import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -146,24 +148,26 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signChatMessage(Lnet/minecraft/network/message/ChatMessageSigner;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignature;",
+		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
 		cancellable = true)
-	private void onSignChatMessage(ChatMessageSigner signer, Text message,
-		CallbackInfoReturnable<MessageSignature> cir)
+	private void onSignChatMessage(MessageMetadata metadata,
+		DecoratedContents content, LastSeenMessageList lastSeenMessages,
+		CallbackInfoReturnable<MessageSignatureData> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(MessageSignature.none());
+			cir.setReturnValue(MessageSignatureData.EMPTY);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signArguments(Lnet/minecraft/network/message/ChatMessageSigner;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
 		cancellable = true)
-	private void onSignArguments(ChatMessageSigner signer,
+	private void onSignArguments(MessageMetadata metadata,
 		ParseResults<CommandSource> parseResults, @Nullable Text preview,
+		LastSeenMessageList lastSeenMessages,
 		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(ArgumentSignatureDataMap.empty());
+			cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
 	}
 	
 	@Override

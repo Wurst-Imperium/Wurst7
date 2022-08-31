@@ -11,14 +11,19 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.client.gui.hud.MessageIndicator.Icon;
 import net.minecraft.client.network.ClientLoginNetworkHandler;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.Text;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.util.ChatUtils;
 
 @DontBlock
 @SearchTags({"no chat reports", "NoEncryption", "no encryption",
@@ -56,6 +61,22 @@ public final class NoChatReportsOtf extends OtherFeature
 			.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
 	}
 	
+	public MessageIndicator modifyIndicator(Text message,
+		MessageSignatureData signature, MessageIndicator indicator)
+	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return indicator;
+		
+		if(indicator != null || signature == null || signature.isEmpty())
+			return indicator;
+		
+		return new MessageIndicator(0xE84F58, Icon.CHAT_NOT_SECURE,
+			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - ")
+				.append(Text.translatable(
+					"description.wurst.nochatreports.message_is_reportable")),
+			"Reportable");
+	}
+	
 	@Override
 	public boolean isEnabled()
 	{
@@ -80,5 +101,6 @@ public final class NoChatReportsOtf extends OtherFeature
 		disableSignatures.setChecked(!disableSignatures.isChecked());
 	}
 	
-	// See ClientPlayerEntityMixin, ProfileKeysMixin
+	// See ChatHudMixin, ClientPlayerEntityMixin, ClientPlayNetworkHandlerMixin,
+	// MessageHandlerMixin, ProfileKeysMixin
 }

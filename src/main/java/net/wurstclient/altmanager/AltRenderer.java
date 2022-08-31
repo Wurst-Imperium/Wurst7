@@ -44,7 +44,7 @@ public final class AltRenderer
 			PlayerListEntry entry = new PlayerListEntry(
 				new PlayerListS2CPacket.Entry(new GameProfile(uuid, name), 0,
 					GameMode.CREATIVE, Text.literal(name), null),
-				WurstClient.MC.getServicesSignatureVerifier());
+				WurstClient.MC.getServicesSignatureVerifier(), false);
 			
 			loadedSkins.put(name, entry.getSkinTexture());
 		}

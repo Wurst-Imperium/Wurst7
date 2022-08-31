@@ -25,21 +25,17 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
-			+ "beyond 100%. Incompatible with shader packs.\n\n"
-			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
-			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
-			+ "shader packs.",
+		"\u00a7lGamma\u00a7r works by setting your brightness slider beyond 100%. Incompatible with shader packs.\n\n"
+			+ "\u00a7lNight Vision\u00a7r works by applying the night vision effect. This \u00a7ousually\u00a7r works with shader packs.",
 		Method.values(), Method.GAMMA);
 	
 	private final CheckboxSetting fade = new CheckboxSetting("Fade",
 		"Slowly fades between brightness and darkness.", true);
 	
-	private final SliderSetting defaultGamma =
-		new SliderSetting("Default brightness",
-			"Fullbright will set your brightness slider\n"
-				+ "back to this value when you turn it off.",
-			0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+	private final SliderSetting defaultGamma = new SliderSetting(
+		"Default brightness",
+		"Fullbright will set your brightness slider back to this value when you turn it off.",
+		0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private boolean wasGammaChanged;
 	private float nightVisionStrength;
