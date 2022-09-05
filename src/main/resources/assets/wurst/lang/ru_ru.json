@@ -163,8 +163,8 @@
   "description.wurst.altmanager.window": "Эта кнопка открывает другое окно.",
   "description.wurst.altmanager.window_freeze": "Может показаться, что игра не отвечает пока открыто это окно.",
   "description.wurst.altmanager.fullscreen": "§cВыйдите из полноэкранного режима!",
-  "gui.wurst.altmanager.folder_error.title": "Не удалось создать папку «.Wurst encryption»!",
-  "gui.wurst.altmanager.folder_error.message": "Возможно, вы случайно заблокировали Wurst доступ к этой папке.\nAltManager не может зашифровать или расшифровать ваш альт. список без неё.\nВы по-прежнему можете использовать AltManager, но любые созданные вами альт. профили не будут сохранены.\n\nПолная ошибка выглядит следующим образом:\n%s",
-  "gui.wurst.altmanager.empty.title": "Ваш альт. список пуст.",
+  "gui.wurst.altmanager.folder_error.title": "Не удалось создать папку \".Wurst encryption\"!",
+  "gui.wurst.altmanager.folder_error.message": "Возможно, вы случайно заблокировали Wurst доступ к этой папке.\nAltManager не может зашифровать или расшифровать ваш альт список без неё.\nВы по-прежнему можете использовать AltManager, но любые созданные вами альт профили не будут сохранены.\n\nПолная ошибка выглядит следующим образом:\n%s",
+  "gui.wurst.altmanager.empty.title": "Ваш альт список пуст.",
   "gui.wurst.altmanager.empty.message": "Хотели бы вы увидеть, случайные альты для начала?"
 }
