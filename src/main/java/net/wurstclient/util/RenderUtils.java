@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -21,6 +22,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -96,13 +98,32 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera.getPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return Vec3d.ZERO;
+		
+		return camera.getPos();
 	}
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		return WurstClient.MC.getBlockEntityRenderDispatcher().camera
-			.getBlockPos();
+		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		if(camera == null)
+			return BlockPos.ORIGIN;
+		
+		return camera.getBlockPos();
+	}
+	
+	public static float[] getRainbowColor()
+	{
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float pi = (float)Math.PI;
+		
+		float[] rainbow = new float[3];
+		rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
+		rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
+		rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+		return rainbow;
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)
