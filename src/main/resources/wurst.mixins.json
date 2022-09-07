@@ -29,7 +29,6 @@
     "EntityMixin",
     "EntityRendererMixin",
     "FishingBobberEntityMixin",
-    "FluidBlockMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
