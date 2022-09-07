@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "自动放置（可选），充能，引爆重生锚并击杀你附近的实体。",
   "description.wurst.hack.antiafk": "随机走动，用于避免服务器挂机检测。\n需要至少有 3x3 的区域可以走动。",
-  "OUTDATED.description.wurst.hack.antiblind": "防止失明。\n与 OptiFine（即高清修复）不兼容。",
+  "description.wurst.hack.antiblind": "防止失明和黑暗效果。\n与 OptiFine 不兼容。",
   "description.wurst.hack.anticactus": "保护你免受仙人掌伤害。",
   "description.wurst.hack.antiknockback": "保护你不被其他生物或玩家推动和用剑击退。",
   "description.wurst.hack.antispam": "将重复的刷屏改为计数器显示。",
@@ -152,6 +152,8 @@
   "description.wurst.hack.truesight": "允许你看到隐身的实体。",
   "description.wurst.hack.tunneller": "自动挖一个隧道。\n\n§c§l警告：§r 尽管这个 AI 会自动避开岩浆和其他危险，但无法确保你不会死亡，除非你不介意一定概率失去你的全部物品。",
   "description.wurst.hack.x-ray": "透视矿物所在位置（请自行确保服务器内无假矿插件）。",
+  "button.wurst.nochatreports.disable_signatures": "禁用签名",
+  "button.wurst.nochatreports.re-enable_signatures": "重新启用签名",
   "description.wurst.setting.generic.attack_speed": "以每秒点击次数计算的攻击速度。\n0 = 根据你的攻击冷却时间动态调整攻击速度。",
   "description.wurst.setting.generic.pause_attack_on_containers": "当一个容器界面（如箱子、漏洞等）打开时不会攻击。\n在一些显示容器界面作为菜单的小游戏服务器很有用。",
   "description.wurst.altmanager.premium": "这个账户拥有密码，且可以加入所有服务器。",
@@ -166,5 +168,13 @@
   "gui.wurst.altmanager.folder_error.title": "无法创建 “.Wurst encryption” 文件夹！",
   "gui.wurst.altmanager.folder_error.message": "你也许不小心禁止了 Wurst 访问这个目录，\n因此 AltManager 无法加解密你的备用账户列表。\n你仍然可以使用 AltManager，但你新建的备用账户将不会被保存。\n\n完整错误信息如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你的备用账户列表为空。",
-  "gui.wurst.altmanager.empty.message": "你希望创建一些随机的备用账户吗？"
+  "gui.wurst.altmanager.empty.message": "你希望创建一些随机的备用账户吗？",
+  "gui.wurst.nochatreports.unsafe_server.title": "§4§l警告:§r 不安全的服务器",
+  "toast.wurst.nochatreports.unsafe_server.title": "聊天消息可以被报告",
+  "toast.wurst.nochatreports.unsafe_server.message": "在这个服务器上发送的消息可能会被报告给大兄弟Mojang，您的帐户可能会在全球被封禁",
+  "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\"服务器",
+  "button.wurst.nochatreports.signatures_status": "签名: ",
+  "description.wurst.nochatreports.message_is_reportable": "此消息有一个有效的签名，因此容易受到欺诈性聊天报告的伤害。",
+  "gui.wurst.generic.allcaps_blocked": "黑名单",
+  "gui.wurst.generic.allcaps_allowed": "已允许"
 }
