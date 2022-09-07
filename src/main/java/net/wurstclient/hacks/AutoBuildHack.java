@@ -51,10 +51,8 @@ public final class AutoBuildHack extends Hack
 {
 	private final FileSetting templateSetting = new FileSetting("Template",
 		"Determines what to build.\n\n"
-			+ "Templates are just JSON files. Feel free to\n"
-			+ "add your own or to edit / delete the\n"
-			+ "default templates.\n\n" + "If you mess up, simply press the\n"
-			+ "'Reset to Defaults' button or\n" + "delete the folder.",
+			+ "Templates are just JSON files. Feel free to add your own or to edit / delete the default templates.\n\n"
+			+ "If you mess up, simply press the 'Reset to Defaults' button or delete the folder.",
 		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
 	private final SliderSetting range = new SliderSetting("Range",
@@ -62,21 +60,19 @@ public final class AutoBuildHack extends Hack
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting checkLOS =
-		new CheckboxSetting("Check line of sight",
-			"Makes sure that you don't reach through walls\n"
-				+ "when placing blocks. Can help with AntiCheat\n"
-				+ "plugins but slows down building.",
-			false);
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight",
+		"Makes sure that you don't reach through walls when placing blocks. Can help with AntiCheat plugins but slows down building.",
+		false);
 	
 	private final CheckboxSetting instaBuild = new CheckboxSetting("InstaBuild",
 		"Builds small templates (<= 64 blocks) instantly.\n"
 			+ "For best results, stand close to the block you're placing.",
 		true);
 	
-	private final CheckboxSetting fastPlace = new CheckboxSetting(
-		"Always FastPlace",
-		"Builds as if FastPlace was enabled,\n" + "even if it's not.", true);
+	private final CheckboxSetting fastPlace =
+		new CheckboxSetting("Always FastPlace",
+			"Builds as if FastPlace was enabled, even if it's not.", true);
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;

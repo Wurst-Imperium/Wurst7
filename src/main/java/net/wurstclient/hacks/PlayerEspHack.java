@@ -36,8 +36,10 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filters.FilterInvisibleSetting;
+import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -50,17 +52,13 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		new EnumSetting<>("Style", Style.values(), Style.LINES_AND_BOXES);
 	
 	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
-		"\u00a7lAccurate\u00a7r mode shows the exact\n"
-			+ "hitbox of each player.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
-			+ "boxes that look better.",
+		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't show sleeping players.", false);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't show invisible players.", false);
+	private final EntityFilterList entityFilters = new EntityFilterList(
+		new FilterSleepingSetting("Won't show sleeping players.", false),
+		new FilterInvisibleSetting("Won't show invisible players.", false));
 	
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
@@ -71,8 +69,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		addSetting(style);
 		addSetting(boxSize);
-		addSetting(filterSleeping);
-		addSetting(filterInvisible);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -104,11 +101,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
 		
-		if(filterSleeping.isChecked())
-			stream = stream.filter(e -> !e.isSleeping());
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
+		stream = entityFilters.applyTo(stream);
 		
 		players.addAll(stream.collect(Collectors.toList()));
 	}
