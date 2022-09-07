@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.stream.MalformedJsonException;
 
 public enum JsonUtils
 {
@@ -44,6 +45,9 @@ public enum JsonUtils
 			
 		}catch(JsonParseException e)
 		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
 			throw new JsonException(e);
 		}
 	}
@@ -51,23 +55,13 @@ public enum JsonUtils
 	public static WsonArray parseFileToArray(Path path)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseFile(path);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
+		return getAsArray(parseFile(path));
 	}
 	
 	public static WsonObject parseFileToObject(Path path)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseFile(path);
-		
-		if(!json.isJsonObject())
-			throw new JsonException();
-		
-		return new WsonObject(json.getAsJsonObject());
+		return getAsObject(parseFile(path));
 	}
 	
 	public static JsonElement parseURL(String url)
@@ -82,6 +76,9 @@ public enum JsonUtils
 			
 		}catch(JsonParseException e)
 		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
 			throw new JsonException(e);
 		}
 	}
@@ -89,23 +86,13 @@ public enum JsonUtils
 	public static WsonArray parseURLToArray(String url)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseURL(url);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
+		return getAsArray(parseURL(url));
 	}
 	
 	public static WsonObject parseURLToObject(String url)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseURL(url);
-		
-		if(!json.isJsonObject())
-			throw new JsonException();
-		
-		return new WsonObject(json.getAsJsonObject());
+		return getAsObject(parseURL(url));
 	}
 	
 	/**
@@ -122,6 +109,9 @@ public enum JsonUtils
 			
 		}catch(JsonParseException e)
 		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
 			throw new JsonException(e);
 		}
 	}
@@ -133,12 +123,7 @@ public enum JsonUtils
 	public static WsonArray parseConnectionToArray(URLConnection connection)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseConnection(connection);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
+		return getAsArray(parseConnection(connection));
 	}
 	
 	/**
@@ -148,12 +133,7 @@ public enum JsonUtils
 	public static WsonObject parseConnectionToObject(URLConnection connection)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseConnection(connection);
-		
-		if(!json.isJsonObject())
-			throw new JsonException();
-		
-		return new WsonObject(json.getAsJsonObject());
+		return getAsObject(parseConnection(connection));
 	}
 	
 	public static void toJson(JsonElement json, Path path)
@@ -181,7 +161,7 @@ public enum JsonUtils
 	public static boolean getAsBoolean(JsonElement json) throws JsonException
 	{
 		if(!isBoolean(json))
-			throw new JsonException();
+			throw new JsonException("Not a boolean: " + json);
 		
 		return json.getAsBoolean();
 	}
@@ -206,7 +186,7 @@ public enum JsonUtils
 	public static int getAsInt(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
-			throw new JsonException();
+			throw new JsonException("Not a number: " + json);
 		
 		return json.getAsInt();
 	}
@@ -222,7 +202,7 @@ public enum JsonUtils
 	public static long getAsLong(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
-			throw new JsonException();
+			throw new JsonException("Not a number: " + json);
 		
 		return json.getAsLong();
 	}
@@ -247,7 +227,7 @@ public enum JsonUtils
 	public static String getAsString(JsonElement json) throws JsonException
 	{
 		if(!isString(json))
-			throw new JsonException();
+			throw new JsonException("Not a string: " + json);
 		
 		return json.getAsString();
 	}
@@ -263,7 +243,7 @@ public enum JsonUtils
 	public static WsonArray getAsArray(JsonElement json) throws JsonException
 	{
 		if(!json.isJsonArray())
-			throw new JsonException();
+			throw new JsonException("Not an array: " + json);
 		
 		return new WsonArray(json.getAsJsonArray());
 	}
@@ -271,7 +251,7 @@ public enum JsonUtils
 	public static WsonObject getAsObject(JsonElement json) throws JsonException
 	{
 		if(!json.isJsonObject())
-			throw new JsonException();
+			throw new JsonException("Not an object: " + json);
 		
 		return new WsonObject(json.getAsJsonObject());
 	}

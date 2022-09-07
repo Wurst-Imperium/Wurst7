@@ -166,5 +166,7 @@
   "gui.wurst.altmanager.folder_error.title": "无法创建 “.Wurst encryption” 文件夹！",
   "gui.wurst.altmanager.folder_error.message": "你也许不小心禁止了 Wurst 访问这个目录，\n因此 AltManager 无法加解密你的备用账户列表。\n你仍然可以使用 AltManager，但你新建的备用账户将不会被保存。\n\n完整错误信息如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你的备用账户列表为空。",
-  "gui.wurst.altmanager.empty.message": "你希望创建一些随机的备用账户吗？"
+  "gui.wurst.altmanager.empty.message": "你希望创建一些随机的备用账户吗？",
+  "gui.wurst.generic.allcaps_blocked": "黑名单",
+  "gui.wurst.generic.allcaps_allowed": "已允许"
 }
