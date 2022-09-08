@@ -34,7 +34,7 @@ public final class TpCmd extends Command
 		BlockPos pos = argsToPos(args);
 		
 		ClientPlayerEntity player = MC.player;
-		player.updatePosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -74,8 +74,7 @@ public final class TpCmd extends Command
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
 		BlockPos playerPos = new BlockPos(MC.player.getPos());
-		int[] player =
-			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
+		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		
 		for(int i = 0; i < 3; i++)

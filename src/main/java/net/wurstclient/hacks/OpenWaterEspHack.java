@@ -45,8 +45,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		
 		if(isInOpenWater(bobber))
 			return getName() + " [open]";
-		else
-			return getName() + " [shallow]";
+		return getName() + " [shallow]";
 	}
 	
 	@Override

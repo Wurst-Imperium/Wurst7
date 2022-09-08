@@ -30,7 +30,7 @@ public enum BlockVertexCompiler
 	{
 		return () -> blocks.parallelStream()
 			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	public static Callable<ArrayList<int[]>> createTask(

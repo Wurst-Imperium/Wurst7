@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.StatsListener;
 import net.minecraft.client.gui.screen.StatsScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -39,7 +39,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		updateWurstButtonText(toggleWurstButton);
 		addButton(toggleWurstButton);
 		
-		for(AbstractButtonWidget button : buttons)
+		for(ClickableWidget button : buttons)
 		{
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("gui.done")))

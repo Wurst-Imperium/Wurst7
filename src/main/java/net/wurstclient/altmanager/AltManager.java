@@ -105,7 +105,7 @@ public final class AltManager
 	private void sortAlts()
 	{
 		ArrayList<Alt> newAlts = alts.stream().distinct().sorted()
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 		
 		alts.clear();
 		alts.addAll(newAlts);

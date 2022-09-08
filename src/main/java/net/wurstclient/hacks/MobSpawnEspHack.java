@@ -267,7 +267,7 @@ public final class MobSpawnEspHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private class ChunkScanner
+	private static class ChunkScanner
 	{
 		public Future<?> future;
 		private final Chunk chunk;

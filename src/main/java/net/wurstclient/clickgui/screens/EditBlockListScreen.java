@@ -159,7 +159,7 @@ public final class EditBlockListScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
@@ -278,23 +278,21 @@ public final class EditBlockListScreen extends Screen
 				
 				return "\u00a7ounknown block\u00a7r";
 				
-			}else
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(x, y, 0);
-				if(large)
-					GL11.glScaled(1.5, 1.5, 1.5);
-				else
-					GL11.glScaled(0.75, 0.75, 0.75);
-				
-				DiffuseLighting.enable();
-				mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-				DiffuseLighting.disable();
-				
-				GL11.glPopMatrix();
-				
-				return stack.getName().getString();
 			}
+			GL11.glPushMatrix();
+			GL11.glTranslated(x, y, 0);
+			if(large)
+				GL11.glScaled(1.5, 1.5, 1.5);
+			else
+				GL11.glScaled(0.75, 0.75, 0.75);
+			
+			DiffuseLighting.enable();
+			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
+			DiffuseLighting.disable();
+			
+			GL11.glPopMatrix();
+			
+			return stack.getName().getString();
 		}
 	}
 }

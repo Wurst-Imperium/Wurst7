@@ -9,8 +9,8 @@ package net.wurstclient.hacks;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -52,10 +52,10 @@ public final class CrashChestHack extends Hack
 		
 		// generate item
 		ItemStack stack = new ItemStack(Blocks.CHEST);
-		CompoundTag nbtCompound = new CompoundTag();
-		ListTag nbtList = new ListTag();
+		NbtCompound nbtCompound = new NbtCompound();
+		NbtList nbtList = new NbtList();
 		for(int i = 0; i < 40000; i++)
-			nbtList.add(new ListTag());
+			nbtList.add(new NbtList());
 		nbtCompound.put("www.wurstclient.net", nbtList);
 		stack.setTag(nbtCompound);
 		stack.setCustomName(new LiteralText("Copy Me"));

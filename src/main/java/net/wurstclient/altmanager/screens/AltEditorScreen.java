@@ -86,7 +86,7 @@ public abstract class AltEditorScreen extends Screen
 		emailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60, 200,
 			20, new LiteralText(""));
 		emailBox.setMaxLength(48);
-		emailBox.setSelected(true);
+		emailBox.setTextFieldFocused(true);
 		emailBox.setText(getDefaultEmail());
 		children.add(emailBox);
 		
@@ -97,7 +97,7 @@ public abstract class AltEditorScreen extends Screen
 			String stars = "";
 			for(int i = 0; i < text.length(); i++)
 				stars += "*";
-			return OrderedText.styledString(stars, Style.EMPTY);
+			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
 		});
 		passwordBox.setMaxLength(256);
 		children.add(passwordBox);
@@ -336,7 +336,7 @@ public abstract class AltEditorScreen extends Screen
 			width / 2 - 100, 47, 10526880);
 		drawStringWithShadow(matrixStack, textRenderer, "Password",
 			width / 2 - 100, 87, 10526880);
-		drawCenteredString(matrixStack, textRenderer, message, width / 2, 142,
+		drawCenteredText(matrixStack, textRenderer, message, width / 2, 142,
 			16777215);
 		
 		// text boxes

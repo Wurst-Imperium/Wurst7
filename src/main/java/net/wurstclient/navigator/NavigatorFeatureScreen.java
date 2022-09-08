@@ -26,8 +26,8 @@ import java.util.TreeMap;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
@@ -316,7 +316,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	{
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
+		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, 0xffffff);
 		glDisable(GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -446,7 +446,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
@@ -469,7 +469,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		glDisable(GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(ClickableWidget button : buttons)
 		{
 			// positions
 			int x1 = button.x;
@@ -496,7 +496,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -543,7 +543,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		return getStringHeight(text);
 	}
 	
-	public abstract class ButtonData extends Rectangle
+	public abstract static class ButtonData extends Rectangle
 	{
 		public String buttonText;
 		public Color color;

@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -141,20 +141,19 @@ public class WurstOptionsScreen extends Screen
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredString(matrixStack, tr, "Wurst Options", middleX, y1,
+		drawCenteredText(matrixStack, tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		drawCenteredString(matrixStack, tr, "Settings", middleX - 104, y2,
+		drawCenteredText(matrixStack, tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredString(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredString(matrixStack, tr, "Links", middleX + 104, y2,
-			0xcccccc);
+		drawCenteredText(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredText(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(ClickableWidget button : buttons)
 		{
 			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
@@ -184,7 +183,7 @@ public class WurstOptionsScreen extends Screen
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new LiteralText[0]);
+				this.tooltip = Arrays.asList();
 			else
 			{
 				String[] lines = tooltip.split("\n");

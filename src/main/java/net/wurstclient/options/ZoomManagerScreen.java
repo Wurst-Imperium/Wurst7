@@ -9,7 +9,7 @@ package net.wurstclient.options;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -87,7 +87,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, textRenderer, "Zoom Manager", width / 2,
+		drawCenteredText(matrixStack, textRenderer, "Zoom Manager", width / 2,
 			40, 0xffffff);
 		drawStringWithShadow(matrixStack, textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,

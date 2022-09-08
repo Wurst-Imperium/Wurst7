@@ -125,7 +125,7 @@ public final class FileSetting extends Setting
 		try(Stream<Path> files = Files.list(folder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{

@@ -49,7 +49,7 @@ public final class EnterProfileNameScreen extends Screen
 		
 		children.add(valueField);
 		setInitialFocus(valueField);
-		valueField.setSelected(true);
+		valueField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
@@ -93,7 +93,7 @@ public final class EnterProfileNameScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, client.textRenderer,
+		drawCenteredText(matrixStack, client.textRenderer,
 			"Name your new profile", width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(matrixStack, mouseX, mouseY, partialTicks);

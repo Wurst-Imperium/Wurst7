@@ -57,7 +57,7 @@ public final class EditBlockScreen extends Screen
 		
 		children.add(blockField);
 		setInitialFocus(blockField);
-		blockField.setSelected(true);
+		blockField.setTextFieldFocused(true);
 		
 		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
 			b -> done());
@@ -105,7 +105,7 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, tr, setting.getName(), width / 2, 20,
+		drawCenteredText(matrixStack, tr, setting.getName(), width / 2, 20,
 			0xFFFFFF);
 		
 		blockField.render(matrixStack, mouseX, mouseY, partialTicks);

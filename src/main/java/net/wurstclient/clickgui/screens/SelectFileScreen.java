@@ -93,8 +93,8 @@ public final class SelectFileScreen extends Screen
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
-		client.openScreen(
-			new ConfirmScreen(c -> confirmReset(c), title, message));
+		client
+			.openScreen(new ConfirmScreen(this::confirmReset, title, message));
 	}
 	
 	private void confirmReset(boolean confirmed)
@@ -168,7 +168,7 @@ public final class SelectFileScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredString(matrixStack, client.textRenderer, setting.getName(),
+		drawCenteredText(matrixStack, client.textRenderer, setting.getName(),
 			width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

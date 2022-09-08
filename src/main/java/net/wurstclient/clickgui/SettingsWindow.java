@@ -20,7 +20,7 @@ public final class SettingsWindow extends Window
 		super(feature.getName() + " Settings");
 		
 		Stream<Setting> settings = feature.getSettings().values().stream();
-		settings.map(Setting::getComponent).forEach(c -> add(c));
+		settings.map(Setting::getComponent).forEach(this::add);
 		
 		setClosable(true);
 		setMinimizable(false);

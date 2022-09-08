@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -71,10 +71,10 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private boolean isFeedbackOrBugReportButton(Element element)
 	{
-		if(element == null || !(element instanceof AbstractButtonWidget))
+		if(element == null || !(element instanceof ClickableWidget))
 			return false;
 		
-		AbstractButtonWidget button = (AbstractButtonWidget)element;
+		ClickableWidget button = (ClickableWidget)element;
 		String message = button.getMessage().getString();
 		
 		return message != null

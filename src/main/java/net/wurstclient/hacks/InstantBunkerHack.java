@@ -135,10 +135,7 @@ public final class InstantBunkerHack extends Hack
 			MC.player.swingHand(Hand.MAIN_HAND);
 			
 			if(MC.player.isOnGround())
-			{
 				setEnabled(false);
-				return;
-			}
 		}
 		
 		// place next block

@@ -145,8 +145,7 @@ public final class ProtectHack extends Hack
 	{
 		if(friend != null)
 			return "Protecting " + friend.getName().getString();
-		else
-			return "Protect";
+		return "Protect";
 	}
 	
 	@Override
@@ -157,6 +156,7 @@ public final class ProtectHack extends Hack
 		
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);

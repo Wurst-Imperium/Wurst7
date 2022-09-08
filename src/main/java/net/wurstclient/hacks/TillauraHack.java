@@ -96,7 +96,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 		
 		// get valid blocks
 		ArrayList<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), (p) -> isCorrectBlock(p));
+			getValidBlocks(range.getValue(), this::isCorrectBlock);
 		
 		if(multiTill.isChecked())
 		{
@@ -133,7 +133,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			.filter(validator)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)

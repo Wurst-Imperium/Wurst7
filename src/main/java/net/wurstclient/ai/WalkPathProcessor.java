@@ -54,7 +54,8 @@ public class WalkPathProcessor extends PathProcessor
 			if(index >= path.size())
 				done = true;
 			return;
-		}else if(posIndex > index)
+		}
+		if(posIndex > index)
 		{
 			index = posIndex + 1;
 			

@@ -7,18 +7,22 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerAbilities;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"jet pack", "AirJump", "air jump"})
-public final class JetpackHack extends Hack implements UpdateListener
+@SearchTags({"creative flight", "CreativeFly", "creative fly"})
+public final class CreativeFlightHack extends Hack implements UpdateListener
 {
-	public JetpackHack()
+	public CreativeFlightHack()
 	{
-		super("Jetpack", "Allows you to fly as if you had a jetpack.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("CreativeFlight",
+			"Allows you to you fly like in Creative Mode.\n\n"
+				+ "\u00a7c\u00a7lWARNING:\u00a7r"
+				+ " You will take fall damage if you don't use NoFall.");
 		
 		setCategory(Category.MOVEMENT);
 	}
@@ -26,7 +30,7 @@ public final class JetpackHack extends Hack implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().creativeFlightHack.setEnabled(false);
+		WURST.getHax().jetpackHack.setEnabled(false);
 		WURST.getHax().flightHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
@@ -36,12 +40,18 @@ public final class JetpackHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		
+		ClientPlayerEntity player = MC.player;
+		PlayerAbilities abilities = player.abilities;
+		
+		boolean creative = player.isCreative();
+		abilities.flying = creative && !player.isOnGround();
+		abilities.allowFlying = creative;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(MC.options.keyJump.isPressed())
-			MC.player.jump();
+		MC.player.abilities.allowFlying = true;
 	}
 }

@@ -363,7 +363,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onHeldItemChange(HeldItemChangeS2CPacket var1)
+	public void onHeldItemChange(UpdateSelectedSlotS2CPacket var1)
 	{
 		
 	}
@@ -622,7 +622,7 @@ public class ClientPlayNetworkHandlerMixin implements ClientPlayPacketListener
 	
 	@Shadow
 	@Override
-	public void onTagQuery(TagQueryResponseS2CPacket var1)
+	public void onTagQuery(NbtQueryResponseS2CPacket var1)
 	{
 		
 	}

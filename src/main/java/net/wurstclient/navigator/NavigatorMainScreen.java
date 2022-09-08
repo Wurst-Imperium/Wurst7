@@ -55,12 +55,12 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		searchBar =
 			new TextFieldWidget(tr, 0, 32, 200, 20, new LiteralText(""));
-		searchBar.setHasBorder(false);
+		searchBar.setDrawsBackground(false);
 		searchBar.setMaxLength(128);
 		
 		children.add(searchBar);
 		setInitialFocus(searchBar);
-		searchBar.setSelected(true);
+		searchBar.setTextFieldFocused(true);
 		
 		searchBar.x = middleX - 100;
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
@@ -122,11 +122,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// left click
 		if(button == 0)
-		{
 			leftClick(hoveredFeature);
-			return;
-		}
-		
+			
 		// right click
 		// if(button == 1)
 		// {

@@ -378,13 +378,12 @@ public final class CaveFinderHack extends Hack
 	{
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		Callable<HashSet<BlockPos>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator
-					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-				.limit(maxBlocks)
-				.collect(Collectors.toCollection(() -> new HashSet<>()));
+		Callable<HashSet<BlockPos>> task = () -> searchers.values()
+			.parallelStream()
+			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+			.sorted(Comparator
+				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}

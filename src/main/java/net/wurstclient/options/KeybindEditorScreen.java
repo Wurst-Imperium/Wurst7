@@ -63,7 +63,7 @@ public final class KeybindEditorScreen extends Screen
 		commandField.setMaxLength(65536);
 		children.add(commandField);
 		setInitialFocus(commandField);
-		commandField.setSelected(true);
+		commandField.setTextFieldFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -97,7 +97,7 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		

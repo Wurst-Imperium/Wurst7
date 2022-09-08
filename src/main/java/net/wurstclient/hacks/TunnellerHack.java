@@ -20,8 +20,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -102,8 +102,7 @@ public final class TunnellerHack extends Hack
 	{
 		if(limit.getValueI() == 0)
 			return getName();
-		else
-			return getName() + " [" + length + "/" + limit.getValueI() + "]";
+		return getName() + " [" + length + "/" + limit.getValueI() + "]";
 	}
 	
 	@Override
@@ -718,7 +717,7 @@ public final class TunnellerHack extends Hack
 		}
 	}
 	
-	private class WaitForFallingBlocksTask extends Task
+	private static class WaitForFallingBlocksTask extends Task
 	{
 		@Override
 		public boolean canRun()

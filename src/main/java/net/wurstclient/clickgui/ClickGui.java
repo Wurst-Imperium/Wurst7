@@ -198,8 +198,8 @@ public final class ClickGui
 			if(popup.getOwner().getParent().isClosing())
 				popup.close();
 			
-		windows.removeIf(w -> w.isClosing());
-		popups.removeIf(p -> p.isClosing());
+		windows.removeIf(Window::isClosing);
+		popups.removeIf(Popup::isClosing);
 	}
 	
 	public void handleMouseRelease(double mouseX, double mouseY,
@@ -250,7 +250,7 @@ public final class ClickGui
 				if(popup.getOwner().getParent().isClosing())
 					popup.close();
 				
-			popups.removeIf(p -> p.isClosing());
+			popups.removeIf(Popup::isClosing);
 		}
 		
 		return popupClicked;
@@ -268,7 +268,7 @@ public final class ClickGui
 			if(popup.getOwner().getParent().isClosing())
 				popup.close();
 			
-		popups.removeIf(p -> p.isClosing());
+		popups.removeIf(Popup::isClosing);
 	}
 	
 	private boolean handlePopupMouseClick(double mouseX, double mouseY,

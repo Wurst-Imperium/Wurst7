@@ -159,7 +159,7 @@ public final class NukerHack extends Hack
 		
 		List<BlockPos> blocks2 = stream
 			.filter(pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(pos -> BlockUtils.canBeClicked(pos))
+			.filter(BlockUtils::canBeClicked)
 			.filter(mode.getSelected().getValidator(this))
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos))))
@@ -285,7 +285,7 @@ public final class NukerHack extends Hack
 	
 	private enum Mode
 	{
-		NORMAL("Normal", n -> n.getName(), (n, p) -> true),
+		NORMAL("Normal", NukerHack::getName, (n, p) -> true),
 		
 		ID("ID",
 			n -> "IDNuker [" + n.id.getBlockName().replace("minecraft:", "")

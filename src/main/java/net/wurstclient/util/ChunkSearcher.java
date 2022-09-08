@@ -42,7 +42,7 @@ public final class ChunkSearcher
 			throw new IllegalStateException();
 		
 		status = Status.SEARCHING;
-		future = pool.submit(() -> searchNow());
+		future = pool.submit(this::searchNow);
 	}
 	
 	private void searchNow()
@@ -79,7 +79,7 @@ public final class ChunkSearcher
 	
 	public void cancelSearching()
 	{
-		new Thread(() -> cancelNow(), "ChunkSearcher-canceller").start();
+		new Thread(this::cancelNow, "ChunkSearcher-canceller").start();
 	}
 	
 	private void cancelNow()
