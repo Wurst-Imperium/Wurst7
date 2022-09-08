@@ -62,6 +62,7 @@ public final class EditBlockListScreen extends Screen
 		blockNameField = new TextFieldWidget(client.textRenderer,
 			width / 2 - 152, height - 55, 150, 18, new LiteralText(""));
 		children.add(blockNameField);
+		blockNameField.setMaxLength(256);
 		
 		addButton(addButton = new ButtonWidget(width / 2 - 2, height - 56, 30,
 			20, new LiteralText("Add"), b -> {

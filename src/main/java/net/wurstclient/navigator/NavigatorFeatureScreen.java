@@ -468,13 +468,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// scissor box
 		glDisable(GL_SCISSOR_TEST);
 		
-		GL11.glPushMatrix();
-		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
-			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
-		GL11.glPopMatrix();
-		
 		// buttons below scissor box
 		for(AbstractButtonWidget button : buttons)
 		{
@@ -508,6 +501,13 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				0xffffff);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
+		
+		GL11.glPushMatrix();
+		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
+			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
+		GL11.glPopMatrix();
 		
 		// GL resets
 		glEnable(GL_CULL_FACE);
