@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
@@ -20,7 +21,6 @@ import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +31,7 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
@@ -39,31 +40,45 @@ import net.wurstclient.util.RotationUtils;
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
+	private final ColorSetting basicColor = new ColorSetting("Chest color",
+		"Normal chests will be\n" + "highlighted in this color.", Color.GREEN);
+	
+	private final ColorSetting trapColor = new ColorSetting("Trap color",
+		"Trapped chests will be\n" + "highlighted in this color.",
+		new Color(0xFF8000));
+	
+	private final ColorSetting enderColor = new ColorSetting("Ender color",
+		"Ender chests will be\n" + "highlighted in this color.", Color.CYAN);
+	
+	private final ColorSetting shulkerColor = new ColorSetting("Shulker color",
+		"Shulker boxes will be\n" + "highlighted in this color.",
+		Color.MAGENTA);
+	
+	private final ColorSetting cartColor = new ColorSetting("Cart color",
+		"Minecarts will be\n" + "highlighted in this color.", Color.GREEN);
+	
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
 	private final ArrayList<Box> basicChests = new ArrayList<>();
-	private final ArrayList<Box> trappedChests = new ArrayList<>();
+	private final ArrayList<Box> trapChests = new ArrayList<>();
 	private final ArrayList<Box> enderChests = new ArrayList<>();
 	private final ArrayList<Box> shulkerBoxes = new ArrayList<>();
 	private final ArrayList<Entity> minecarts = new ArrayList<>();
 	
-	private int greenBox;
-	private int orangeBox;
-	private int cyanBox;
-	private int purpleBox;
-	private int normalChests;
+	private int solidBox;
+	private int outlinedBox;
 	
 	public ChestEspHack()
 	{
-		super("ChestESP",
-			"Highlights nearby chests.\n"
-				+ "\u00a7agreen\u00a7r - normal chests & barrels\n"
-				+ "\u00a76orange\u00a7r - trapped chests\n"
-				+ "\u00a7bcyan\u00a7r - ender chests\n"
-				+ "\u00a7dpurple\u00a7r - shulker boxes");
+		super("ChestESP", "Highlights nearby chests.");
 		
 		setCategory(Category.RENDER);
+		addSetting(basicColor);
+		addSetting(trapColor);
+		addSetting(enderColor);
+		addSetting(shulkerColor);
+		addSetting(cartColor);
 		addSetting(style);
 	}
 	
@@ -81,39 +96,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	{
 		Box box = new Box(BlockPos.ORIGIN);
 		
-		greenBox = GL11.glGenLists(1);
-		GL11.glNewList(greenBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 0, 0.25F);
+		solidBox = GL11.glGenLists(1);
+		GL11.glNewList(solidBox, GL11.GL_COMPILE);
 		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(0, 1, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
 		
-		orangeBox = GL11.glGenLists(1);
-		GL11.glNewList(orangeBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0.5F, 0, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(1, 0.5F, 0, 0.5F);
+		outlinedBox = GL11.glGenLists(1);
+		GL11.glNewList(outlinedBox, GL11.GL_COMPILE);
 		RenderUtils.drawOutlinedBox(box);
 		GL11.glEndList();
-		
-		cyanBox = GL11.glGenLists(1);
-		GL11.glNewList(cyanBox, GL11.GL_COMPILE);
-		GL11.glColor4f(0, 1, 1, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(0, 1, 1, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		purpleBox = GL11.glGenLists(1);
-		GL11.glNewList(purpleBox, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 1, 0.25F);
-		RenderUtils.drawSolidBox(box);
-		GL11.glColor4f(1, 0, 1, 0.5F);
-		RenderUtils.drawOutlinedBox(box);
-		GL11.glEndList();
-		
-		normalChests = GL11.glGenLists(1);
 	}
 	
 	@Override
@@ -128,18 +119,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	private void deleteDisplayLists()
 	{
-		GL11.glDeleteLists(greenBox, 1);
-		GL11.glDeleteLists(orangeBox, 1);
-		GL11.glDeleteLists(cyanBox, 1);
-		GL11.glDeleteLists(purpleBox, 1);
-		GL11.glDeleteLists(normalChests, 1);
+		GL11.glDeleteLists(solidBox, 1);
+		GL11.glDeleteLists(outlinedBox, 1);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		basicChests.clear();
-		trappedChests.clear();
+		trapChests.clear();
 		enderChests.clear();
 		shulkerBoxes.clear();
 		
@@ -149,7 +137,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				Box box = getBoxFromChest((ChestBlockEntity)blockEntity);
 				
 				if(box != null)
-					trappedChests.add(box);
+					trapChests.add(box);
 				
 			}else if(blockEntity instanceof ChestBlockEntity)
 			{
@@ -185,20 +173,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				Box bb = BlockUtils.getBoundingBox(pos);
 				basicChests.add(bb);
 			}
-		
-		if(BlockEntityRenderDispatcher.INSTANCE.camera != null)
-		{
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
-			
-			GL11.glNewList(normalChests, GL11.GL_COMPILE);
-			renderBoxes(basicChests, greenBox, regionX, regionZ);
-			renderBoxes(trappedChests, orangeBox, regionX, regionZ);
-			renderBoxes(enderChests, cyanBox, regionX, regionZ);
-			renderBoxes(shulkerBoxes, purpleBox, regionX, regionZ);
-			GL11.glEndList();
-		}
 		
 		minecarts.clear();
 		for(Entity entity : MC.world.getEntities())
@@ -271,8 +245,12 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(style.getSelected().boxes)
 		{
-			GL11.glCallList(normalChests);
-			renderBoxes(minecartBoxes, greenBox, regionX, regionZ);
+			renderBoxes(basicChests, basicColor.getColorF(), regionX, regionZ);
+			renderBoxes(trapChests, trapColor.getColorF(), regionX, regionZ);
+			renderBoxes(enderChests, enderColor.getColorF(), regionX, regionZ);
+			renderBoxes(shulkerBoxes, shulkerColor.getColorF(), regionX,
+				regionZ);
+			renderBoxes(minecartBoxes, cartColor.getColorF(), regionX, regionZ);
 		}
 		
 		if(style.getSelected().lines)
@@ -282,18 +260,28 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			
 			GL11.glBegin(GL11.GL_LINES);
 			
-			GL11.glColor4f(0, 1, 0, 0.5F);
+			float[] basicColorF = basicColor.getColorF();
+			GL11.glColor4f(basicColorF[0], basicColorF[1], basicColorF[2],
+				0.5F);
 			renderLines(start, basicChests, regionX, regionZ);
-			renderLines(start, minecartBoxes, regionX, regionZ);
 			
-			GL11.glColor4f(1, 0.5F, 0, 0.5F);
-			renderLines(start, trappedChests, regionX, regionZ);
+			float[] trapColorF = trapColor.getColorF();
+			GL11.glColor4f(trapColorF[0], trapColorF[1], trapColorF[2], 0.5F);
+			renderLines(start, trapChests, regionX, regionZ);
 			
-			GL11.glColor4f(0, 1, 1, 0.5F);
+			float[] enderColorF = enderColor.getColorF();
+			GL11.glColor4f(enderColorF[0], enderColorF[1], enderColorF[2],
+				0.5F);
 			renderLines(start, enderChests, regionX, regionZ);
 			
-			GL11.glColor4f(1, 0, 1, 0.5F);
+			float[] shulkerColorF = shulkerColor.getColorF();
+			GL11.glColor4f(shulkerColorF[0], shulkerColorF[1], shulkerColorF[2],
+				0.5F);
 			renderLines(start, shulkerBoxes, regionX, regionZ);
+			
+			float[] cartColorF = cartColor.getColorF();
+			GL11.glColor4f(cartColorF[0], cartColorF[1], cartColorF[2], 0.5F);
+			renderLines(start, minecartBoxes, regionX, regionZ);
 			
 			GL11.glEnd();
 		}
@@ -326,16 +314,24 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		return minecartBoxes;
 	}
 	
-	private void renderBoxes(ArrayList<Box> boxes, int displayList, int regionX,
+	private void renderBoxes(ArrayList<Box> boxes, float[] colorF, int regionX,
 		int regionZ)
 	{
 		for(Box box : boxes)
 		{
 			GL11.glPushMatrix();
+			
 			GL11.glTranslated(box.minX - regionX, box.minY, box.minZ - regionZ);
+			
 			GL11.glScaled(box.maxX - box.minX, box.maxY - box.minY,
 				box.maxZ - box.minZ);
-			GL11.glCallList(displayList);
+			
+			GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.25F);
+			GL11.glCallList(solidBox);
+			
+			GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
+			GL11.glCallList(outlinedBox);
+			
 			GL11.glPopMatrix();
 		}
 	}

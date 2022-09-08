@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -23,6 +25,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -41,6 +44,9 @@ public final class FreecamHack extends Hack
 	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
 		"Draws a line to your character's actual position.", false);
 	
+	private final ColorSetting color =
+		new ColorSetting("Tracer color", Color.WHITE);
+	
 	private FakePlayerEntity fakePlayer;
 	private int playerBox;
 	
@@ -51,6 +57,7 @@ public final class FreecamHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(speed);
 		addSetting(tracer);
+		addSetting(color);
 	}
 	
 	@Override
@@ -179,7 +186,8 @@ public final class FreecamHack extends Hack
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		GL11.glColor4f(1, 1, 1, 0.5F);
+		float[] colorF = color.getColorF();
+		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
 		
 		// box
 		GL11.glPushMatrix();

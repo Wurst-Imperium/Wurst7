@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
@@ -20,6 +21,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -27,11 +29,15 @@ import net.wurstclient.util.RotationUtils;
 	"arrow trajectories"})
 public final class TrajectoriesHack extends Hack implements RenderListener
 {
+	private final ColorSetting color =
+		new ColorSetting("Color", "Color of the trajectory.", Color.GREEN);
+	
 	public TrajectoriesHack()
 	{
 		super("Trajectories",
 			"Predicts the flight path of arrows and throwable items.");
 		setCategory(Category.RENDER);
+		addSetting(color);
 	}
 	
 	@Override
@@ -98,14 +104,15 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		double renderX = end.x - camPos.x;
 		double renderY = end.y - camPos.y;
 		double renderZ = end.z - camPos.z;
+		float[] colorF = color.getColorF();
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
 		
-		GL11.glColor4f(0, 1, 0, 0.25F);
+		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.25F);
 		RenderUtils.drawSolidBox();
 		
-		GL11.glColor4f(0, 1, 0, 0.75F);
+		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.75F);
 		RenderUtils.drawOutlinedBox();
 		
 		GL11.glPopMatrix();

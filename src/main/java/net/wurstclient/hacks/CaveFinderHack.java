@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +43,10 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
@@ -66,6 +69,15 @@ public final class CaveFinderHack extends Hack
 			+ "Higher values require a faster computer.",
 		5, 3, 6, 1,
 		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+	
+	private final ColorSetting color = new ColorSetting("Color",
+		"Caves will be highlighted\n" + "in this color.", Color.RED);
+	
+	private final SliderSetting opacity = new SliderSetting("Opacity",
+		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,
+		0, 1, 0.01,
+		v -> v == 0 ? "Breathing" : ValueDisplay.PERCENTAGE.getValueString(v));
+	
 	private int prevLimit;
 	private boolean notify;
 	
@@ -83,11 +95,13 @@ public final class CaveFinderHack extends Hack
 	
 	public CaveFinderHack()
 	{
-		super("CaveFinder",
-			"Helps you to find caves by\n" + "highlighting them in red.");
+		super("CaveFinder", "Helps you to find caves by\n"
+			+ "highlighting them in the\n" + "selected color.");
 		setCategory(Category.RENDER);
 		addSetting(area);
 		addSetting(limit);
+		addSetting(color);
+		addSetting(opacity);
 	}
 	
 	@Override
@@ -217,7 +231,11 @@ public final class CaveFinderHack extends Hack
 		float x = System.currentTimeMillis() % 2000 / 1000F;
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
 		
-		GL11.glColor4f(1, 0, 0, alpha);
+		if(opacity.getValue() > 0)
+			alpha = opacity.getValueF();
+		
+		float[] colorF = color.getColorF();
+		GL11.glColor4f(colorF[0], colorF[1], colorF[2], alpha);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glCallList(displayList);
 		GL11.glEnd();

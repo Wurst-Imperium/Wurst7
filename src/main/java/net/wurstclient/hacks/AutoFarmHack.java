@@ -280,10 +280,10 @@ public final class AutoFarmHack extends Hack
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
-		else if(block instanceof CactusBlock)
+		if(block instanceof CactusBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
-		else if(block instanceof KelpPlantBlock)
+		if(block instanceof KelpPlantBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);

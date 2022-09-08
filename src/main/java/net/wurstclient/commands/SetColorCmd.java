@@ -13,21 +13,22 @@ import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
-import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.CmdUtils;
-import net.wurstclient.util.MathUtils;
+import net.wurstclient.util.ColorUtils;
+import net.wurstclient.util.json.JsonException;
 
 @DontBlock
-public final class SetSliderCmd extends Command
+public final class SetColorCmd extends Command
 {
-	public SetSliderCmd()
+	public SetColorCmd()
 	{
-		super("setslider",
-			"Changes a slider setting of a feature. Allows you to\n"
-				+ "move sliders through keybinds.",
-			".setslider <feature> <setting> <value>",
-			".setslider <feature> <setting> (more|less)");
+		super("setcolor",
+			"Changes a color setting of a feature. Allows you\n"
+				+ "to set RGB values through keybinds.",
+			".setcolor <feature> <setting> <RGB>",
+			"Example: .setcolor ClickGUI AC #FF0000");
 	}
 	
 	@Override
@@ -38,38 +39,30 @@ public final class SetSliderCmd extends Command
 		
 		Feature feature = CmdUtils.findFeature(args[0]);
 		Setting setting = CmdUtils.findSetting(feature, args[1]);
-		SliderSetting slider = getAsSlider(feature, setting);
-		setValue(args[2], slider);
+		ColorSetting colorSetting = getAsColor(feature, setting);
+		setColor(colorSetting, args[2]);
 	}
 	
-	private SliderSetting getAsSlider(Feature feature, Setting setting)
+	private ColorSetting getAsColor(Feature feature, Setting setting)
 		throws CmdError
 	{
-		if(!(setting instanceof SliderSetting))
+		if(!(setting instanceof ColorSetting))
 			throw new CmdError(feature.getName() + " " + setting.getName()
-				+ " is not a slider setting.");
+				+ " is not a color setting.");
 		
-		return (SliderSetting)setting;
+		return (ColorSetting)setting;
 	}
 	
-	private void setValue(String value, SliderSetting slider)
+	private void setColor(ColorSetting setting, String value)
 		throws CmdSyntaxError
 	{
-		switch(value.toLowerCase())
+		try
 		{
-			case "more":
-			slider.increaseValue();
-			break;
+			setting.setColor(ColorUtils.parseHex(value));
 			
-			case "less":
-			slider.decreaseValue();
-			break;
-			
-			default:
-			if(!MathUtils.isDouble(value))
-				throw new CmdSyntaxError("Value must be a number.");
-			slider.setValue(Double.parseDouble(value));
-			break;
+		}catch(JsonException e)
+		{
+			throw new CmdSyntaxError("Invalid color: " + value);
 		}
 	}
 }

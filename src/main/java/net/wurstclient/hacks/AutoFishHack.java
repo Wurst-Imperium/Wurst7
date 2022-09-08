@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -29,6 +31,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
@@ -50,6 +53,9 @@ public final class AutoFishHack extends Hack
 			+ "they will be detected. Useful for optimizing\n"
 			+ "your 'Valid range' setting.",
 		false);
+	
+	private final ColorSetting ddColor = new ColorSetting("DD color",
+		"Color of the debug draw, if enabled.", Color.RED);
 	
 	private int bestRodValue;
 	private int bestRodSlot;
@@ -73,6 +79,7 @@ public final class AutoFishHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(validRange);
 		addSetting(debugDraw);
+		addSetting(ddColor);
 	}
 	
 	@Override
@@ -90,7 +97,6 @@ public final class AutoFishHack extends Hack
 		
 		biteCross = GL11.glGenLists(1);
 		GL11.glNewList(biteCross, GL11.GL_COMPILE);
-		GL11.glColor4f(1, 0, 0, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(-0.125, 0, -0.125);
 		GL11.glVertex3d(0.125, 0, 0.125);
@@ -181,7 +187,6 @@ public final class AutoFishHack extends Hack
 			Box box = new Box(-validRange.getValue(), -1 / 16.0,
 				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
 				validRange.getValue());
-			GL11.glColor4f(1, 0, 0, 0.5F);
 			RenderUtils.drawOutlinedBox(box);
 			GL11.glEndList();
 		}
@@ -354,6 +359,8 @@ public final class AutoFishHack extends Hack
 	private void drawValidRange(FishingBobberEntity bobber, int regionX,
 		int regionZ)
 	{
+		float[] colorF = ddColor.getColorF();
+		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
 		GL11.glPushMatrix();
 		GL11.glTranslated(bobber.getX() - regionX, bobber.getY(),
 			bobber.getZ() - regionZ);
@@ -365,6 +372,8 @@ public final class AutoFishHack extends Hack
 	{
 		if(lastSoundPos != null)
 		{
+			float[] colorF = ddColor.getColorF();
+			GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
 			GL11.glPushMatrix();
 			GL11.glTranslated(lastSoundPos.x - regionX, lastSoundPos.y,
 				lastSoundPos.z - regionZ);

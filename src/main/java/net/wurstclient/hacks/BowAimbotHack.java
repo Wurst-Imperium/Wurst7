@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
@@ -45,6 +46,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -115,6 +117,10 @@ public final class BowAimbotHack extends Hack
 	private final CheckboxSetting filterCrystals = new CheckboxSetting(
 		"Filter end crystals", "Won't attack end crystals.", false);
 	
+	private final ColorSetting color = new ColorSetting("ESP color",
+		"Color of the box that BowAimbot\n" + "draws around the target.",
+		Color.RED);
+	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
 	
@@ -144,6 +150,8 @@ public final class BowAimbotHack extends Hack
 		addSetting(filterNamed);
 		addSetting(filterStands);
 		addSetting(filterCrystals);
+		
+		addSetting(color);
 	}
 	
 	@Override
@@ -342,12 +350,14 @@ public final class BowAimbotHack extends Hack
 		double v = 1 / velocity;
 		GL11.glScaled(v, v, v);
 		
+		float[] colorF = color.getColorF();
+		
 		// draw outline
-		GL11.glColor4d(1, 0, 0, 0.5F * velocity);
+		GL11.glColor4d(colorF[0], colorF[1], colorF[2], 0.5F * velocity);
 		RenderUtils.drawOutlinedBox(TARGET_BOX);
 		
 		// draw box
-		GL11.glColor4d(1, 0, 0, 0.25F * velocity);
+		GL11.glColor4d(colorF[0], colorF[1], colorF[2], 0.25F * velocity);
 		RenderUtils.drawSolidBox(TARGET_BOX);
 		
 		GL11.glPopMatrix();

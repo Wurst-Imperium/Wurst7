@@ -69,7 +69,7 @@ public abstract class GameRendererMixin
 	
 	@Redirect(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
 		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})

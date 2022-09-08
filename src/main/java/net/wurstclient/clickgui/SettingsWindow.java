@@ -9,6 +9,7 @@ package net.wurstclient.clickgui;
 
 import java.util.stream.Stream;
 
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
@@ -24,6 +25,7 @@ public final class SettingsWindow extends Window
 		
 		setClosable(true);
 		setMinimizable(false);
+		setMaxHeight(187);
 		pack();
 		
 		setInitialPosition(parent, buttonY);
@@ -40,6 +42,9 @@ public final class SettingsWindow extends Window
 			x = parent.getX() - getWidth() - 5;
 		if(y + getHeight() > mcWindow.getScaledHeight())
 			y -= getHeight() - 14;
+		
+		x = MathHelper.clamp(x, 0, mcWindow.getScaledWidth());
+		y = MathHelper.clamp(y, 0, mcWindow.getScaledHeight());
 		
 		setX(x);
 		setY(y);
