@@ -19,8 +19,7 @@ public final class FishHack extends Hack implements UpdateListener
 {
 	public FishHack()
 	{
-		super("Fish",
-			"Disables underwater gravity\n" + "so you can swim like a fish.");
+		super("Fish");
 		setCategory(Category.MOVEMENT);
 	}
 	

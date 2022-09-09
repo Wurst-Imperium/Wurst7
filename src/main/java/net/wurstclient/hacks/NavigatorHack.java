@@ -21,8 +21,7 @@ public final class NavigatorHack extends Hack
 {
 	public NavigatorHack()
 	{
-		super("Navigator",
-			"A searchable GUI that learns your preferences over time.");
+		super("Navigator");
 	}
 	
 	@Override

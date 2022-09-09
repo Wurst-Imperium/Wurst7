@@ -51,7 +51,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	public MobEspHack()
 	{
-		super("MobESP", "Highlights nearby mobs.");
+		super("MobESP");
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);

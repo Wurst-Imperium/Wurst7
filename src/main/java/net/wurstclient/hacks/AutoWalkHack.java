@@ -19,7 +19,7 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 {
 	public AutoWalkHack()
 	{
-		super("AutoWalk", "Makes you walk automatically.");
+		super("AutoWalk");
 		setCategory(Category.MOVEMENT);
 	}
 	

@@ -32,8 +32,7 @@ public final class NoWeatherHack extends Hack
 	
 	public NoWeatherHack()
 	{
-		super("NoWeather", "Allows you to alter the client-side weather,\n"
-			+ "time and moon phase.");
+		super("NoWeather");
 		setCategory(Category.RENDER);
 		
 		addSetting(disableRain);

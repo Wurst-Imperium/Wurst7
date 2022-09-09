@@ -71,7 +71,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	
 	public ChestEspHack()
 	{
-		super("ChestESP", "Highlights nearby chests.");
+		super("ChestESP");
 		
 		setCategory(Category.RENDER);
 		addSetting(basicColor);

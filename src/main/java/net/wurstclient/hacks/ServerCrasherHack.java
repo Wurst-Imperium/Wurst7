@@ -27,8 +27,7 @@ public final class ServerCrasherHack extends Hack
 {
 	public ServerCrasherHack()
 	{
-		super("ServerCrasher", "Generates an item that can\n"
-			+ "crash 1.15.x servers.\n" + "\u00a7oCreative mode only.\u00a7r");
+		super("ServerCrasher");
 		
 		setCategory(Category.ITEMS);
 	}

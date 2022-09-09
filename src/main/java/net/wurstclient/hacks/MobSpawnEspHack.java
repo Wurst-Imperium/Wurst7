@@ -7,13 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -63,10 +57,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	public MobSpawnEspHack()
 	{
-		super("MobSpawnESP",
-			"Highlights areas where mobs can spawn.\n" + "\u00a7eyellow\u00a7r"
-				+ " - mobs can spawn at night\n" + "\u00a7cred\u00a7r"
-				+ " - mobs can always spawn");
+		super("MobSpawnESP");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
 		addSetting(loadingSpeed);
@@ -343,7 +334,7 @@ public final class MobSpawnEspHack extends Hack
 			{
 				GL11.glColor4f(1, 0, 0, 0.5F);
 				GL11.glBegin(GL11.GL_LINES);
-				new ArrayList<>(red).stream()
+				new ArrayList<>(red).stream().filter(Objects::nonNull)
 					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 						pos.getZ() - regionZ))
 					.forEach(pos -> {
@@ -358,7 +349,7 @@ public final class MobSpawnEspHack extends Hack
 					});
 				
 				GL11.glColor4f(1, 1, 0, 0.5F);
-				new ArrayList<>(yellow).stream()
+				new ArrayList<>(yellow).stream().filter(Objects::nonNull)
 					.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
 						pos.getZ() - regionZ))
 					.forEach(pos -> {

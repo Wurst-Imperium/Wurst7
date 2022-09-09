@@ -59,7 +59,7 @@ public final class BuildRandomHack extends Hack
 	
 	public BuildRandomHack()
 	{
-		super("BuildRandom", "Randomly places blocks around you.");
+		super("BuildRandom");
 		setCategory(Category.BLOCKS);
 		addSetting(mode);
 		addSetting(checkItem);

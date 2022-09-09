@@ -17,6 +17,8 @@ public interface IMinecraftClient
 	
 	public IClientPlayerInteractionManager getInteractionManager();
 	
+	public ILanguageManager getLanguageManager();
+	
 	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();

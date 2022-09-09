@@ -16,8 +16,7 @@ public final class TiredHack extends Hack implements UpdateListener
 {
 	public TiredHack()
 	{
-		super("Tired", "Makes you look like Alexander\n"
-			+ "back in April 2015.\n" + "Only visible to other players.");
+		super("Tired");
 		setCategory(Category.FUN);
 	}
 	

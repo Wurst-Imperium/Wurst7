@@ -160,10 +160,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	public AnchorAuraHack()
 	{
-		super("AnchorAura",
-			"Automatically places (optional), charges,\n"
-				+ "and detonates respawn anchors to kill\n"
-				+ "entities around you.");
+		super("AnchorAura");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);

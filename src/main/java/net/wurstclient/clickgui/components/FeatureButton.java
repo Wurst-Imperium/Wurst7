@@ -132,7 +132,7 @@ public final class FeatureButton extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = feature.getDescription();
+		String tooltip = feature.getWrappedDescription(200);
 		
 		// if(feature.isBlocked())
 		// {

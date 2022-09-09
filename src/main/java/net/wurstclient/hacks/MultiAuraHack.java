@@ -110,8 +110,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	public MultiAuraHack()
 	{
-		super("MultiAura",
-			"Faster Killaura that attacks multiple entities at once.");
+		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
 		addSetting(useCooldown);

@@ -63,10 +63,7 @@ public final class TreeBotHack extends Hack
 	
 	public TreeBotHack()
 	{
-		super("TreeBot",
-			"An experimental bot that automatically\n"
-				+ "walks around and chops down trees.\n"
-				+ "Limited to small trees for now.");
+		super("TreeBot");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 	}

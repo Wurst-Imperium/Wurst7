@@ -134,7 +134,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			text += ", Category: " + feature.getCategory().getName();
 		
 		// description
-		String description = feature.getDescription();
+		String description = feature.getWrappedDescription(300);
 		if(!description.isEmpty())
 			text += "\n\nDescription:\n" + description;
 		

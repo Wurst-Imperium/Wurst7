@@ -377,7 +377,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				renderAsHovered ? opacity * 1.5F : opacity);
 		
 		// tooltip
-		String tt = feature.getDescription();
+		String tt = feature.getWrappedDescription(200);
 		// if(feature.isBlocked())
 		// {
 		// if(tt == null)

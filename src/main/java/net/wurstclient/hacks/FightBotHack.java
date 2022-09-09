@@ -120,9 +120,7 @@ public final class FightBotHack extends Hack
 	
 	public FightBotHack()
 	{
-		super("FightBot",
-			"A bot that automatically walks around and kills everything.\n"
-				+ "Good for MobArena.");
+		super("FightBot");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);

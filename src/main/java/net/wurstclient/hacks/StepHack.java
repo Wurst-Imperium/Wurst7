@@ -36,7 +36,7 @@ public final class StepHack extends Hack implements UpdateListener
 	
 	public StepHack()
 	{
-		super("Step", "Allows you to step up full blocks.");
+		super("Step");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(height);

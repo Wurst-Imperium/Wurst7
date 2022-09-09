@@ -59,8 +59,7 @@ public final class ExcavatorHack extends Hack
 	
 	public ExcavatorHack()
 	{
-		super("Excavator",
-			"Automatically breaks all blocks in the selected area.");
+		super("Excavator");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
