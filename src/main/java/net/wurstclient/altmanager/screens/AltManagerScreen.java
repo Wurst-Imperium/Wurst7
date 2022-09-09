@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,9 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -30,6 +32,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -42,6 +46,8 @@ import net.wurstclient.util.json.WsonObject;
 
 public final class AltManagerScreen extends Screen
 {
+	private static final HashSet<Alt> failedLogins = new HashSet<>();
+	
 	private final Screen prevScreen;
 	private final AltManager altManager;
 	
@@ -181,8 +187,11 @@ public final class AltManagerScreen extends Screen
 		if(!error.isEmpty())
 		{
 			errorTimer = 8;
+			failedLogins.add(alt);
 			return;
 		}
+		
+		failedLogins.remove(alt);
 		
 		altManager.setChecked(listGui.selected,
 			client.getSession().getUsername());
@@ -425,6 +434,53 @@ public final class AltManagerScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		renderAltTooltip(matrixStack, mouseX, mouseY);
+	}
+	
+	private void renderAltTooltip(MatrixStack matrixStack, int mouseX,
+		int mouseY)
+	{
+		if(!listGui.isMouseInList(mouseX, mouseY))
+			return;
+		
+		List<Alt> altList = altManager.getList();
+		int hoveredIndex = listGui.getItemAtPosition(mouseX, mouseY);
+		
+		if(hoveredIndex < 0 || hoveredIndex >= altList.size())
+			return;
+		
+		int itemX = mouseX - (width - listGui.getRowWidth()) / 2;
+		int itemY = mouseY - 36 + (int)listGui.getScrollAmount() - 4
+			- hoveredIndex * 30;
+		
+		if(itemX < 31 || itemY < 15 || itemY >= 25)
+			return;
+		
+		Alt alt = altList.get(hoveredIndex);
+		ArrayList<Text> tooltip = new ArrayList<>();
+		
+		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
+			return;
+		
+		if(alt.isCracked())
+			addTooltip(tooltip, "cracked");
+		else
+		{
+			addTooltip(tooltip, "premium");
+			
+			if(failedLogins.contains(alt))
+				addTooltip(tooltip, "failed");
+			
+			if(alt.isUnchecked())
+				addTooltip(tooltip, "unchecked");
+			else
+				addTooltip(tooltip, "checked");
+		}
+		
+		if(alt.isStarred())
+			addTooltip(tooltip, "favorite");
+		
+		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
@@ -439,20 +495,34 @@ public final class AltManagerScreen extends Screen
 				continue;
 			
 			ArrayList<Text> tooltip = new ArrayList<>();
-			tooltip.add(new LiteralText("This button opens another window."));
+			addTooltip(tooltip, "window");
+			
 			if(client.options.fullscreen)
-				tooltip
-					.add(new LiteralText("\u00a7cTurn off fullscreen mode!"));
+				addTooltip(tooltip, "fullscreen");
 			else
-			{
-				tooltip
-					.add(new LiteralText("It might look like the game is not"));
-				tooltip.add(
-					new LiteralText("responding while that window is open."));
-			}
+				addTooltip(tooltip, "window_freeze");
+			
 			renderTooltip(matrixStack, tooltip, mouseX, mouseY);
 			break;
 		}
+	}
+	
+	private void addTooltip(ArrayList<Text> tooltip, String trKey)
+	{
+		// translate
+		String translated = WurstClient.INSTANCE
+			.translate("description.wurst.altmanager." + trKey);
+		
+		// line-wrap
+		StringJoiner joiner = new StringJoiner("\n");
+		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
+			.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		String wrapped = joiner.toString();
+		
+		// add to tooltip
+		for(String line : wrapped.split("\n"))
+			tooltip.add(new LiteralText(line));
 	}
 	
 	public static final class ListGui extends ListWidget
@@ -551,14 +621,24 @@ public final class AltManagerScreen extends Screen
 			client.textRenderer.draw(matrixStack,
 				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
 			
-			// tags
-			String tags = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
-			if(alt.isStarred())
-				tags += "\u00a7r, \u00a7efavorite";
-			if(alt.isUnchecked())
-				tags += "\u00a7r, \u00a7cunchecked";
-			client.textRenderer.draw(matrixStack, tags, x + 31, y + 15,
+			String bottomText = getBottomText(alt);
+			client.textRenderer.draw(matrixStack, bottomText, x + 31, y + 15,
 				10526880);
+		}
+		
+		public String getBottomText(Alt alt)
+		{
+			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
+			
+			if(alt.isStarred())
+				text += "\u00a7r, \u00a7efavorite";
+			
+			if(failedLogins.contains(alt))
+				text += "\u00a7r, \u00a7cwrong password?";
+			else if(alt.isUnchecked())
+				text += "\u00a7r, \u00a7cunchecked";
+			
+			return text;
 		}
 	}
 }

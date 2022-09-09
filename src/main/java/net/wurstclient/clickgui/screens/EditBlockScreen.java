@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -66,8 +66,8 @@ public final class EditBlockScreen extends Screen
 	
 	private void done()
 	{
-		String value = blockField.getText();
-		Block block = BlockUtils.getBlockFromName(value);
+		String nameOrId = blockField.getText();
+		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
@@ -116,21 +116,25 @@ public final class EditBlockScreen extends Screen
 		
 		boolean lblAbove =
 			!blockField.getText().isEmpty() || blockField.isFocused();
-		String lblText = lblAbove ? "Block name or ID:" : "block name or ID";
+		String lblText =
+			lblAbove ? "Block ID or number:" : "block ID or number";
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
 		drawStringWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
-		fill(matrixStack, 48, -56, 64, -36, 0xffa0a0a0);
-		fill(matrixStack, 49, -55, 64, -37, 0xff000000);
-		fill(matrixStack, 214, -56, 244, -55, 0xffa0a0a0);
-		fill(matrixStack, 214, -37, 244, -36, 0xffa0a0a0);
-		fill(matrixStack, 244, -56, 246, -36, 0xffa0a0a0);
-		fill(matrixStack, 214, -55, 243, -52, 0xff000000);
-		fill(matrixStack, 214, -40, 243, -37, 0xff000000);
-		fill(matrixStack, 215, -55, 216, -37, 0xff000000);
-		fill(matrixStack, 242, -55, 245, -37, 0xff000000);
+		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
+		
+		fill(matrixStack, 48, -56, 64, -36, border);
+		fill(matrixStack, 49, -55, 64, -37, black);
+		fill(matrixStack, 214, -56, 244, -55, border);
+		fill(matrixStack, 214, -37, 244, -36, border);
+		fill(matrixStack, 244, -56, 246, -36, border);
+		fill(matrixStack, 214, -55, 243, -52, black);
+		fill(matrixStack, 214, -40, 243, -37, black);
+		fill(matrixStack, 215, -55, 216, -37, black);
+		fill(matrixStack, 242, -55, 245, -37, black);
 		
 		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
 		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);

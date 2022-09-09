@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -130,12 +130,25 @@ public final class EditBlockListScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
-			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
+			if(addButton.active)
+				addButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_DELETE:
+			if(!blockNameField.isFocused())
+				removeButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
+			break;
+			
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -145,7 +158,8 @@ public final class EditBlockListScreen extends Screen
 	{
 		blockNameField.tick();
 		
-		blockToAdd = BlockUtils.getBlockFromName(blockNameField.getText());
+		String nameOrId = blockNameField.getText();
+		blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		addButton.active = blockToAdd != null;
 		
 		removeButton.active =
@@ -175,15 +189,19 @@ public final class EditBlockListScreen extends Screen
 			drawStringWithShadow(matrixStack, client.textRenderer,
 				"block name or ID", 68, height - 50, 0x808080);
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
-		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 55, 216, height - 37, 0xff000000);
-		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
+		int border = blockNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
+		
+		fill(matrixStack, 48, height - 56, 64, height - 36, border);
+		fill(matrixStack, 49, height - 55, 64, height - 37, black);
+		fill(matrixStack, 214, height - 56, 244, height - 55, border);
+		fill(matrixStack, 214, height - 37, 244, height - 36, border);
+		fill(matrixStack, 244, height - 56, 246, height - 36, border);
+		fill(matrixStack, 214, height - 55, 243, height - 52, black);
+		fill(matrixStack, 214, height - 40, 243, height - 37, black);
+		fill(matrixStack, 214, height - 55, 216, height - 37, black);
+		fill(matrixStack, 242, height - 55, 245, height - 37, black);
+		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(blockToAdd), 52,
 			height - 52, false);
 		
@@ -237,14 +255,16 @@ public final class EditBlockListScreen extends Screen
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			ItemStack stack = new ItemStack(BlockUtils.getBlockFromName(name));
+			Block block = BlockUtils.getBlockFromName(name);
+			ItemStack stack = new ItemStack(block);
 			TextRenderer fr = mc.textRenderer;
 			
 			String displayName =
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + BlockUtils.getBlockFromName(name),
+			fr.draw(matrixStack,
+				"ID: " + Block.getRawIdFromState(block.getDefaultState()),
 				x + 28, y + 18, 0xa0a0a0);
 		}
 		

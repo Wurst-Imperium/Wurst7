@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,9 +25,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
 
 public final class EditItemListScreen extends Screen
@@ -132,12 +132,25 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int int_3)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			addButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_DELETE)
-			removeButton.onPress();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+		switch(keyCode)
+		{
+			case GLFW.GLFW_KEY_ENTER:
+			if(addButton.active)
+				addButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_DELETE:
+			if(!itemNameField.isFocused())
+				removeButton.onPress();
+			break;
+			
+			case GLFW.GLFW_KEY_ESCAPE:
 			doneButton.onPress();
+			break;
+			
+			default:
+			break;
+		}
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
@@ -147,23 +160,12 @@ public final class EditItemListScreen extends Screen
 	{
 		itemNameField.tick();
 		
-		itemToAdd = Registry.ITEM.get(getItemIDFromField());
+		itemToAdd = ItemUtils
+			.getItemFromNameOrID(itemNameField.getText().toLowerCase());
 		addButton.active = itemToAdd != null;
 		
 		removeButton.active =
 			listGui.selected >= 0 && listGui.selected < listGui.list.size();
-	}
-	
-	private Identifier getItemIDFromField()
-	{
-		try
-		{
-			return new Identifier(itemNameField.getText().toLowerCase());
-			
-		}catch(InvalidIdentifierException e)
-		{
-			return null;
-		}
 	}
 	
 	@Override
@@ -177,8 +179,11 @@ public final class EditItemListScreen extends Screen
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 300);
 		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		GL11.glPopMatrix();
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(-64 + width / 2 - 152, 0, 0);
@@ -192,15 +197,19 @@ public final class EditItemListScreen extends Screen
 			GL11.glPopMatrix();
 		}
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 49, height - 55, 64, height - 37, 0xff000000);
-		fill(matrixStack, 214, height - 56, 244, height - 55, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 37, 244, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 244, height - 56, 246, height - 36, 0xffa0a0a0);
-		fill(matrixStack, 214, height - 55, 243, height - 52, 0xff000000);
-		fill(matrixStack, 214, height - 40, 243, height - 37, 0xff000000);
-		fill(matrixStack, 215, height - 55, 216, height - 37, 0xff000000);
-		fill(matrixStack, 242, height - 55, 245, height - 37, 0xff000000);
+		int border = itemNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
+		int black = 0xff000000;
+		
+		fill(matrixStack, 48, height - 56, 64, height - 36, border);
+		fill(matrixStack, 49, height - 55, 64, height - 37, black);
+		fill(matrixStack, 214, height - 56, 244, height - 55, border);
+		fill(matrixStack, 214, height - 37, 244, height - 36, border);
+		fill(matrixStack, 244, height - 56, 246, height - 36, border);
+		fill(matrixStack, 214, height - 55, 243, height - 52, black);
+		fill(matrixStack, 214, height - 40, 243, height - 37, black);
+		fill(matrixStack, 215, height - 55, 216, height - 37, black);
+		fill(matrixStack, 242, height - 55, 245, height - 37, black);
+		
 		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd), 52,
 			height - 52, false);
 		
@@ -262,8 +271,8 @@ public final class EditItemListScreen extends Screen
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registry.ITEM.getId(item).toString(),
-				x + 28, y + 18, 0xa0a0a0);
+			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
+				y + 18, 0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(MatrixStack matrixStack,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -767,6 +767,9 @@ public final class ClickGui
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		
 		// window outline
 		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
 		GL11.glBegin(GL11.GL_LINE_LOOP);
@@ -790,7 +793,6 @@ public final class ClickGui
 		int y4 = y1 + 2;
 		int y5 = y3 - 2;
 		boolean hoveringY = mouseY >= y4 && mouseY < y5;
-		
 		if(window.isClosable())
 		{
 			x3 -= 11;

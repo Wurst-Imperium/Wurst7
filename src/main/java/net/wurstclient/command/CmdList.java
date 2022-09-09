@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ public final class CmdList
 	public final BindCmd bindCmd = new BindCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
 	public final BlinkCmd blinkCmd = new BlinkCmd();
+	public final BlockListCmd blockListCmd = new BlockListCmd();
 	public final ClearCmd clearCmd = new ClearCmd();
 	public final CopyItemCmd copyitemCmd = new CopyItemCmd();
 	public final DamageCmd damageCmd = new DamageCmd();
@@ -42,6 +43,7 @@ public final class CmdList
 	public final HelpCmd helpCmd = new HelpCmd();
 	public final InvseeCmd invseeCmd = new InvseeCmd();
 	public final IpCmd ipCmd = new IpCmd();
+	public final ItemListCmd itemListCmd = new ItemListCmd();
 	public final JumpCmd jumpCmd = new JumpCmd();
 	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
@@ -53,6 +55,7 @@ public final class CmdList
 	public final RvCmd rvCmd = new RvCmd();
 	public final SvCmd svCmd = new SvCmd();
 	public final SayCmd sayCmd = new SayCmd();
+	public final SetBlockCmd setBlockCmd = new SetBlockCmd();
 	public final SetCheckboxCmd setCheckboxCmd = new SetCheckboxCmd();
 	public final SetColorCmd setColorCmd = new SetColorCmd();
 	public final SetModeCmd setModeCmd = new SetModeCmd();
@@ -65,6 +68,7 @@ public final class CmdList
 	public final UnbindCmd unbindCmd = new UnbindCmd();
 	public final VClipCmd vClipCmd = new VClipCmd();
 	public final ViewNbtCmd viewNbtCmd = new ViewNbtCmd();
+	public final XrayCmd xrayCmd = new XrayCmd();
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>(String::compareToIgnoreCase);
