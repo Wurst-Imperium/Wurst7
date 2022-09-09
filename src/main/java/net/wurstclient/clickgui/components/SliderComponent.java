@@ -139,7 +139,7 @@ public final class SliderComponent extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = setting.getDescription();
+		String tooltip = setting.getWrappedDescription(200);
 		
 		if(setting.isLocked())
 		{
@@ -271,6 +271,9 @@ public final class SliderComponent extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
 		int y1, boolean renderAsDisabled)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
@@ -278,9 +281,8 @@ public final class SliderComponent extends Component
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		int color = renderAsDisabled ? 0xAAAAAA : 0xF0F0F0;
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, txtColor);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);

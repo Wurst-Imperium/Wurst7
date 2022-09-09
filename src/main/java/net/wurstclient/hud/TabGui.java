@@ -118,6 +118,9 @@ public final class TabGui implements KeyPressListener
 		if(tabGuiOtf.isHidden())
 			return;
 		
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -148,7 +151,7 @@ public final class TabGui implements KeyPressListener
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
 			WurstClient.MC.textRenderer.draw(matrixStack, tabName, 2, textY,
-				0xffffffff);
+				txtColor);
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -186,7 +189,7 @@ public final class TabGui implements KeyPressListener
 					fName = ">" + fName;
 				
 				WurstClient.MC.textRenderer.draw(matrixStack, fName, 2,
-					tabTextY, 0xffffffff);
+					tabTextY, txtColor);
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);

@@ -61,7 +61,8 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
 				+ (middleClickFriends.isChecked() ? "ON" : "OFF"),
-			middleClickFriends.getDescription(), b -> middleClickFriends
+			middleClickFriends.getWrappedDescription(200),
+			b -> middleClickFriends
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,

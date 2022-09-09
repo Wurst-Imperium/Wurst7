@@ -128,9 +128,12 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	private void drawValueName(MatrixStack matrixStack, int x1, int yi1,
 		Enum<?> value)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, 0xF0F0F0);
+		tr.draw(matrixStack, value.toString(), x1 + 2, yi1 + 2, txtColor);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

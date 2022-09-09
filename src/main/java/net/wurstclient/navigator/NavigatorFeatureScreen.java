@@ -34,6 +34,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.command.Command;
@@ -314,6 +315,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		// title bar
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
@@ -344,7 +348,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		glEnable(GL_SCISSOR_TEST);
 		
 		// settings
-		WurstClient.INSTANCE.getGui().setTooltip("");
+		gui.setTooltip("");
 		window.validate();
 		
 		int windowY = bgy1 + scroll + window.getY();
@@ -459,8 +463,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawStringWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, 0xffffff);
+			client.textRenderer.draw(matrixStack, line, bgx1 + 2, textY,
+				txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -496,17 +500,24 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredText(matrixStack, client.textRenderer,
-				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
-				0xffffff);
+			String buttonText = button.getMessage().getString();
+			client.textRenderer.draw(matrixStack, buttonText,
+				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
+				y1 + 5, txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
+		// popups & tooltip
 		GL11.glPushMatrix();
+		
 		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
-			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
+		
+		gui.renderPopups(matrixStack, mouseX - bgx1,
+			mouseY - bgy1 - scroll + 13);
+		gui.renderTooltip(matrixStack, mouseX - bgx1,
+			mouseY - bgy1 - scroll + 13);
+		
 		GL11.glPopMatrix();
 		
 		// GL resets

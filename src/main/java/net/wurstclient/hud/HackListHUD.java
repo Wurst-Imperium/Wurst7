@@ -55,7 +55,7 @@ public final class HackListHUD implements UpdateListener
 				| (int)(acColor[1] * 256) << 8 | (int)(acColor[2] * 256);
 			
 		}else
-			textColor = 0x04ffffff;
+			textColor = 0x04000000 | otf.getColor();
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		

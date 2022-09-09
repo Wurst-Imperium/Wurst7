@@ -14,6 +14,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
+import net.wurstclient.other_features.WurstLogoOtf;
 
 public final class WurstLogo
 {
@@ -22,7 +23,8 @@ public final class WurstLogo
 	
 	public void render(MatrixStack matrixStack)
 	{
-		if(!WurstClient.INSTANCE.getOtfs().wurstLogoOtf.isVisible())
+		WurstLogoOtf otf = WurstClient.INSTANCE.getOtfs().wurstLogoOtf;
+		if(!otf.isVisible())
 			return;
 		
 		String version = getVersionString();
@@ -32,21 +34,20 @@ public final class WurstLogo
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
+		float[] color;
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
-		{
-			float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-			
-		}else
-			GL11.glColor4f(1, 1, 1, 0.5F);
+			color = WurstClient.INSTANCE.getGui().getAcColor();
+		else
+			color = otf.getBackgroundColor();
 		
-		drawQuads(0, 6, tr.getWidth(version) + 76, 17);
+		drawQuads(0, 6, tr.getWidth(version) + 76, 17, color[0], color[1],
+			color[2], 0.5F);
 		
 		// draw version string
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		tr.draw(matrixStack, version, 74, 8, 0xFF000000);
+		tr.draw(matrixStack, version, 74, 8, otf.getTextColor());
 		
 		// draw Wurst logo
 		GL11.glColor4f(1, 1, 1, 1);
@@ -66,8 +67,10 @@ public final class WurstLogo
 		return version;
 	}
 	
-	private void drawQuads(int x1, int y1, int x2, int y2)
+	private void drawQuads(int x1, int y1, int x2, int y2, float r, float g,
+		float b, float a)
 	{
+		GL11.glColor4f(r, g, b, a);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(x1, y1);
 		GL11.glVertex2i(x2, y1);

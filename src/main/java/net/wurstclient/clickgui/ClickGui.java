@@ -46,7 +46,9 @@ public final class ClickGui
 	
 	private float[] bgColor = new float[3];
 	private float[] acColor = new float[3];
+	private int txtColor;
 	private float opacity;
+	private float ttOpacity;
 	
 	private String tooltip = "";
 	
@@ -484,17 +486,16 @@ public final class ClickGui
 		}
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		renderPopupsAndTooltip(matrixStack, mouseX, mouseY);
+		renderPopups(matrixStack, mouseX, mouseY);
+		renderTooltip(matrixStack, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopupsAndTooltip(MatrixStack matrixStack, int mouseX,
-		int mouseY)
+	public void renderPopups(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
-		// popups
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -513,60 +514,62 @@ public final class ClickGui
 			
 			GL11.glPopMatrix();
 		}
+	}
+	
+	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+	{
+		if(tooltip.isEmpty())
+			return;
 		
-		// tooltip
-		if(!tooltip.isEmpty())
+		String[] lines = tooltip.split("\n");
+		TextRenderer fr = MC.textRenderer;
+		
+		int tw = 0;
+		int th = lines.length * fr.fontHeight;
+		for(String line : lines)
 		{
-			String[] lines = tooltip.split("\n");
-			TextRenderer fr = MC.textRenderer;
-			
-			int tw = 0;
-			int th = lines.length * fr.fontHeight;
-			for(String line : lines)
-			{
-				int lw = fr.getWidth(line);
-				if(lw > tw)
-					tw = lw;
-			}
-			int sw = MC.currentScreen.width;
-			int sh = MC.currentScreen.height;
-			
-			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
-			int xt2 = xt1 + tw + 3;
-			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
-			int yt2 = yt1 + th + 2;
-			
-			GL11.glPushMatrix();
-			GL11.glTranslated(0, 0, 300);
-			
-			// background
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], 0.75F);
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
-			
-			// outline
-			GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-			GL11.glBegin(GL11.GL_LINE_LOOP);
-			GL11.glVertex2i(xt1, yt1);
-			GL11.glVertex2i(xt1, yt2);
-			GL11.glVertex2i(xt2, yt2);
-			GL11.glVertex2i(xt2, yt1);
-			GL11.glEnd();
-			
-			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			for(int i = 0; i < lines.length; i++)
-				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 2 + i * fr.fontHeight, 0xffffff);
-			GL11.glEnable(GL11.GL_BLEND);
-			
-			GL11.glPopMatrix();
+			int lw = fr.getWidth(line);
+			if(lw > tw)
+				tw = lw;
 		}
+		int sw = MC.currentScreen.width;
+		int sh = MC.currentScreen.height;
+		
+		int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
+		int xt2 = xt1 + tw + 3;
+		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
+		int yt2 = yt1 + th + 2;
+		
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 300);
+		
+		// background
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2], ttOpacity);
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex2i(xt1, yt1);
+		GL11.glVertex2i(xt1, yt2);
+		GL11.glVertex2i(xt2, yt2);
+		GL11.glVertex2i(xt2, yt1);
+		GL11.glEnd();
+		
+		// outline
+		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
+		GL11.glBegin(GL11.GL_LINE_LOOP);
+		GL11.glVertex2i(xt1, yt1);
+		GL11.glVertex2i(xt1, yt2);
+		GL11.glVertex2i(xt2, yt2);
+		GL11.glVertex2i(xt2, yt1);
+		GL11.glEnd();
+		
+		// text
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		for(int i = 0; i < lines.length; i++)
+			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				txtColor);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		GL11.glPopMatrix();
 	}
 	
 	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
@@ -593,7 +596,9 @@ public final class ClickGui
 		ClickGuiHack clickGui = WURST.getHax().clickGuiHack;
 		
 		opacity = clickGui.getOpacity();
-		bgColor = clickGui.getBgColor();
+		ttOpacity = clickGui.getTooltipOpacity();
+		bgColor = clickGui.getBackgroundColor();
+		txtColor = clickGui.getTextColor();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 		{
@@ -603,7 +608,7 @@ public final class ClickGui
 			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
 			
 		}else
-			acColor = clickGui.getAcColor();
+			acColor = clickGui.getAccentColor();
 	}
 	
 	private void renderWindow(MatrixStack matrixStack, Window window,
@@ -841,7 +846,7 @@ public final class ClickGui
 		String title =
 			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
 				.getString();
-		fr.draw(matrixStack, title, x1 + 2, y1 + 3, 0xf0f0f0);
+		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -1113,6 +1118,11 @@ public final class ClickGui
 	public float[] getAcColor()
 	{
 		return acColor;
+	}
+	
+	public int getTxtColor()
+	{
+		return txtColor;
 	}
 	
 	public float getOpacity()

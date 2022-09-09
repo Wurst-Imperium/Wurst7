@@ -110,7 +110,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getDescription());
+			gui.setTooltip(setting.getWrappedDescription(200));
 		
 		drawBackground(x1, x4, y1, y2);
 		drawBox(x2, x4, y1, y2, hBox);
@@ -220,15 +220,17 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
 		int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
-		int color = 0xF0F0F0;
 		
-		tr.draw(matrixStack, name, x1, y1 + 2, color);
-		tr.draw(matrixStack, value, x4 + 2, y1 + 2, color);
+		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
+		tr.draw(matrixStack, value, x4 + 2, y1 + 2, txtColor);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);

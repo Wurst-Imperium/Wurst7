@@ -86,7 +86,7 @@ public final class CheckboxComponent extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = setting.getDescription();
+		String tooltip = setting.getWrappedDescription(200);
 		
 		if(setting.isLocked())
 		{
@@ -178,14 +178,16 @@ public final class CheckboxComponent extends Component
 	
 	private void drawName(MatrixStack matrixStack, int x3, int y1)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		String name = setting.getName();
 		int tx = x3 + 2;
 		int ty = y1 + 2;
-		int color = setting.isLocked() ? 0xAAAAAA : 0xF0F0F0;
-		MC.textRenderer.draw(matrixStack, name, tx, ty, color);
+		MC.textRenderer.draw(matrixStack, name, tx, ty, txtColor);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
