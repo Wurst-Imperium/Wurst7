@@ -75,12 +75,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 			.map(ModContainer::getMetadata).map(ModMetadata::getId)
 			.collect(Collectors.toList());
 		
-		Pattern sodium = Pattern.compile("sodium.*");
 		Pattern optifine = Pattern.compile("opti(?:fine|fabric).*");
 		
-		if(mods.stream().anyMatch(sodium.asPredicate()))
-			warning = "Sodium is installed. X-Ray will not work properly!";
-		else if(mods.stream().anyMatch(optifine.asPredicate()))
+		if(mods.stream().anyMatch(optifine.asPredicate()))
 			warning = "OptiFine is installed. X-Ray will not work properly!";
 		else
 			warning = null;
