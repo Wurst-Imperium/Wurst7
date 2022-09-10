@@ -145,5 +145,9 @@
   "description.wurst.altmanager.favorite": "你標記了這其中一個帳戶為你的喜愛。",
   "description.wurst.altmanager.window": "這個按鈕是打開另一個視窗的。",
   "description.wurst.altmanager.window_freeze": "當打開另一個視窗時，這會導致遊戲看起來未響應。",
-  "description.wurst.altmanager.fullscreen": "§c請關閉全屏模式！"
+  "description.wurst.altmanager.fullscreen": "§c請關閉全屏模式！",
+  "gui.wurst.altmanager.folder_error.title": "無法創建 “.Wurst encryption” 文件夾。",
+  "gui.wurst.altmanager.folder_error.message": "你可能在無意中阻止了 Wurst 訪問這個文件夾。\nAltManager 無法在沒有權限的情況下加密或解密 Alt List。\n你可以繼續使用 AltManager，但是你新建的 Alt 都無法被存儲。\n\n完整的錯誤信息如下：\n%s",
+  "gui.wurst.altmanager.empty.title": "你的 Alt List 是空的。",
+  "gui.wurst.altmanager.empty.message": "你希望 Wurst 生成一些離綫賬戶嗎？"
 }

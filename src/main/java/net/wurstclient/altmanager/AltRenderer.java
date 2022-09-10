@@ -29,6 +29,9 @@ public final class AltRenderer
 	
 	private static void bindSkinTexture(String name)
 	{
+		if(name.isEmpty())
+			name = "Steve";
+		
 		Identifier location = AbstractClientPlayerEntity.getSkinId(name);
 		
 		if(loadedSkins.contains(name))

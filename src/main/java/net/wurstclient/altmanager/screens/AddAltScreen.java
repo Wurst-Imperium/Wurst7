@@ -10,6 +10,8 @@ package net.wurstclient.altmanager.screens;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.wurstclient.altmanager.AltManager;
+import net.wurstclient.altmanager.CrackedAlt;
+import net.wurstclient.altmanager.MojangAlt;
 
 public final class AddAltScreen extends AltEditorScreen
 {
@@ -30,7 +32,14 @@ public final class AddAltScreen extends AltEditorScreen
 	@Override
 	protected void pressDoneButton()
 	{
-		altManager.add(getEmail(), getPassword(), false);
+		String nameOrEmail = getNameOrEmail();
+		String password = getPassword();
+		
+		if(password.isEmpty())
+			altManager.add(new CrackedAlt(nameOrEmail));
+		else
+			altManager.add(new MojangAlt(nameOrEmail, password));
+		
 		client.openScreen(prevScreen);
 	}
 }

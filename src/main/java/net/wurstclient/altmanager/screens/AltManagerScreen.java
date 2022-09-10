@@ -25,8 +25,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -35,6 +37,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
@@ -75,10 +78,33 @@ public final class AltManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, this, altManager.getList());
 		
-		if(altManager.getList().isEmpty() && shouldAsk)
-			client.openScreen(new ConfirmScreen(this::confirmGenerate,
-				new LiteralText("Your alt list is empty."), new LiteralText(
-					"Would you like some random alts to get started?")));
+		Exception folderException = altManager.getFolderException();
+		if(folderException != null && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.folder_error.title");
+			TranslatableText message = new TranslatableText(
+				"gui.wurst.altmanager.folder_error.message", folderException);
+			TranslatableText buttonText = new TranslatableText("gui.done");
+			
+			// This just sets shouldAsk to false and closes the message.
+			Runnable action = () -> confirmGenerate(false);
+			
+			NoticeScreen screen =
+				new NoticeScreen(action, title, message, buttonText);
+			client.openScreen(screen);
+			
+		}else if(altManager.getList().isEmpty() && shouldAsk)
+		{
+			TranslatableText title =
+				new TranslatableText("gui.wurst.altmanager.empty.title");
+			TranslatableText message =
+				new TranslatableText("gui.wurst.altmanager.empty.message");
+			BooleanConsumer callback = this::confirmGenerate;
+			
+			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
+			client.openScreen(screen);
+		}
 		
 		addButton(useButton = new ButtonWidget(width / 2 - 154, height - 52,
 			100, 20, new LiteralText("Login"), b -> pressLogin()));
@@ -175,27 +201,17 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		if(alt.isCracked())
+		try
 		{
-			LoginManager.changeCrackedName(alt.getEmail());
+			altManager.login(alt);
+			failedLogins.remove(alt);
 			client.openScreen(prevScreen);
-			return;
-		}
-		
-		String error = LoginManager.login(alt.getEmail(), alt.getPassword());
-		
-		if(!error.isEmpty())
+			
+		}catch(LoginException e)
 		{
 			errorTimer = 8;
 			failedLogins.add(alt);
-			return;
 		}
-		
-		failedLogins.remove(alt);
-		
-		altManager.setChecked(listGui.selected,
-			client.getSession().getUsername());
-		client.openScreen(prevScreen);
 	}
 	
 	private void pressFavorite()
@@ -204,7 +220,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		altManager.setStarred(listGui.selected, !alt.isStarred());
+		altManager.toggleFavorite(alt);
 		listGui.selected = -1;
 	}
 	
@@ -226,7 +242,7 @@ public final class AltManagerScreen extends Screen
 		LiteralText text =
 			new LiteralText("Are you sure you want to remove this alt?");
 		
-		String altName = alt.getNameOrEmail();
+		String altName = alt.getDisplayName();
 		LiteralText message = new LiteralText(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
@@ -276,11 +292,11 @@ public final class AltManagerScreen extends Screen
 			switch(data.length)
 			{
 				case 1:
-				alts.add(new Alt(data[0], null, null));
+				alts.add(new CrackedAlt(data[0]));
 				break;
 				
 				case 2:
-				alts.add(new Alt(data[0], data[1], null));
+				alts.add(new MojangAlt(data[0], data[1]));
 				break;
 			}
 		}
@@ -345,11 +361,8 @@ public final class AltManagerScreen extends Screen
 		List<String> lines = new ArrayList<>();
 		
 		for(Alt alt : altManager.getList())
-			if(alt.isCracked())
-				lines.add(alt.getEmail());
-			else
-				lines.add(alt.getEmail() + ":" + alt.getPassword());
-			
+			lines.add(alt.exportAsTXT());
+		
 		Files.write(path, lines);
 	}
 	
@@ -359,7 +372,7 @@ public final class AltManagerScreen extends Screen
 		{
 			ArrayList<Alt> alts = new ArrayList<>();
 			for(int i = 0; i < 8; i++)
-				alts.add(new Alt(NameGenerator.generateName(), null, null));
+				alts.add(new CrackedAlt(NameGenerator.generateName()));
 			
 			altManager.addAll(alts);
 		}
@@ -370,6 +383,9 @@ public final class AltManagerScreen extends Screen
 	
 	private void confirmRemove(boolean confirmed)
 	{
+		if(listGui.getSelectedAlt() == null)
+			return;
+		
 		if(confirmed)
 			altManager.remove(listGui.selected);
 		
@@ -391,9 +407,9 @@ public final class AltManagerScreen extends Screen
 			if(alt == null)
 				return;
 			
-			AltRenderer.drawAltBack(matrixStack, alt.getNameOrEmail(),
+			AltRenderer.drawAltBack(matrixStack, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(matrixStack, alt.getNameOrEmail(),
+			AltRenderer.drawAltBody(matrixStack, alt.getName(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
@@ -471,13 +487,13 @@ public final class AltManagerScreen extends Screen
 			if(failedLogins.contains(alt))
 				addTooltip(tooltip, "failed");
 			
-			if(alt.isUnchecked())
-				addTooltip(tooltip, "unchecked");
-			else
+			if(alt.isCheckedPremium())
 				addTooltip(tooltip, "checked");
+			else
+				addTooltip(tooltip, "unchecked");
 		}
 		
-		if(alt.isStarred())
+		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
 		renderTooltip(matrixStack, tooltip, mouseX, mouseY);
@@ -550,6 +566,9 @@ public final class AltManagerScreen extends Screen
 			return selected;
 		}
 		
+		/**
+		 * @return The selected Alt, or null if no Alt is selected.
+		 */
 		protected Alt getSelectedAlt()
 		{
 			if(selected < 0 || selected >= list.size())
@@ -614,12 +633,12 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			AltRenderer.drawAltFace(matrixStack, alt.getNameOrEmail(), x + 1,
-				y + 1, 24, 24, isSelectedItem(id));
+			AltRenderer.drawAltFace(matrixStack, alt.getName(), x + 1, y + 1,
+				24, 24, isSelectedItem(id));
 			
 			// name / email
 			client.textRenderer.draw(matrixStack,
-				"Name: " + alt.getNameOrEmail(), x + 31, y + 3, 10526880);
+				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880);
 			
 			String bottomText = getBottomText(alt);
 			client.textRenderer.draw(matrixStack, bottomText, x + 31, y + 15,
@@ -630,12 +649,12 @@ public final class AltManagerScreen extends Screen
 		{
 			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			
-			if(alt.isStarred())
+			if(alt.isFavorite())
 				text += "\u00a7r, \u00a7efavorite";
 			
 			if(failedLogins.contains(alt))
 				text += "\u00a7r, \u00a7cwrong password?";
-			else if(alt.isUnchecked())
+			else if(alt.isUncheckedPremium())
 				text += "\u00a7r, \u00a7cunchecked";
 			
 			return text;
