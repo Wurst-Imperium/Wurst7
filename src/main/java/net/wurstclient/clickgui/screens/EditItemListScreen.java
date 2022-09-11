@@ -51,12 +51,6 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean isPauseScreen()
-	{
-		return false;
-	}
-	
-	@Override
 	public void init()
 	{
 		listGui = new ListGui(client, this, itemList.getItemNames());
@@ -214,6 +208,18 @@ public final class EditItemListScreen extends Screen
 			height - 52, false);
 		
 		GL11.glPopMatrix();
+	}
+	
+	@Override
+	public boolean isPauseScreen()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget

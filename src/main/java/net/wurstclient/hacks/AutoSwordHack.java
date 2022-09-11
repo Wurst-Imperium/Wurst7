@@ -23,6 +23,7 @@ import net.wurstclient.mixinterface.ISwordItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
@@ -39,7 +40,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		"Time until AutoSword will switch back from\n"
 			+ "the weapon to the previously selected slot.\n\n"
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
-		10, 1, 200, 1, v -> (int)v + " ticks");
+		10, 1, 200, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
 	private int oldSlot;
 	private int timer;

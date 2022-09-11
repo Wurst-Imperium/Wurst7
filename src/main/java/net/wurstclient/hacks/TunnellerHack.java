@@ -45,6 +45,7 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -60,8 +61,8 @@ public final class TunnellerHack extends Hack
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"Automatically stops once the tunnel\n"
 			+ "has reached the given length.\n\n" + "0 = no limit",
-		0, 0, 1000, 1,
-		v -> v == 0 ? "disabled" : v == 1 ? "1 block" : (int)v + " blocks");
+		0, 0, 1000, 1, ValueDisplay.INTEGER.withSuffix(" blocks")
+			.withLabel(1, "1 block").withLabel(0, "disabled"));
 	
 	private final CheckboxSetting torches =
 		new CheckboxSetting(

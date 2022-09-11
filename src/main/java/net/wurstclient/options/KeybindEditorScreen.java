@@ -112,6 +112,12 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
+	public void onClose()
+	{
+		client.openScreen(prevScreen);
+	}
+	
+	@Override
 	public void setKey(String key)
 	{
 		this.key = key;

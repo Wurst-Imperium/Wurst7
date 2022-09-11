@@ -7,6 +7,7 @@
  */
 package net.wurstclient.settings;
 
+import java.text.DecimalFormat;
 import java.util.LinkedHashSet;
 
 import com.google.gson.JsonElement;
@@ -21,6 +22,9 @@ import net.wurstclient.util.json.JsonUtils;
 
 public class SliderSetting extends Setting implements SliderLock
 {
+	private static final DecimalFormat LOGARITHMIC_FORMAT =
+		new DecimalFormat("#,###");
+	
 	private double value;
 	private final double defaultValue;
 	private final double minimum;
@@ -132,9 +136,20 @@ public class SliderSetting extends Setting implements SliderLock
 		return increment;
 	}
 	
-	public final float getPercentage()
+	public final double getPercentage()
 	{
-		return (float)((getValue() - minimum) / getRange());
+		return (getValue() - minimum) / getRange();
+	}
+	
+	public float[] getKnobColor()
+	{
+		float f = (float)(2 * getPercentage());
+		
+		float red = MathUtils.clamp(f, 0, 1);
+		float green = MathUtils.clamp(2 - f, 0, 1);
+		float blue = 0;
+		
+		return new float[]{red, green, blue};
 	}
 	
 	public final boolean isLocked()
@@ -252,18 +267,36 @@ public class SliderSetting extends Setting implements SliderLock
 	
 	public static interface ValueDisplay
 	{
+		public static final ValueDisplay INTEGER = v -> (int)v + "";
+		
 		public static final ValueDisplay DECIMAL =
 			v -> Math.round(v * 1e6) / 1e6 + "";
-		
-		public static final ValueDisplay INTEGER = v -> (int)v + "";
 		
 		public static final ValueDisplay PERCENTAGE =
 			v -> (int)(Math.round(v * 1e8) / 1e6) + "%";
 		
-		public static final ValueDisplay DEGREES = v -> (int)v + "\u00b0";
+		public static final ValueDisplay LOGARITHMIC =
+			v -> LOGARITHMIC_FORMAT.format(Math.pow(10, v));
+		
+		public static final ValueDisplay DEGREES = INTEGER.withSuffix("\u00b0");
 		
 		public static final ValueDisplay NONE = v -> "";
 		
 		public String getValueString(double value);
+		
+		public default ValueDisplay withLabel(double value, String label)
+		{
+			return v -> v == value ? label : getValueString(v);
+		}
+		
+		public default ValueDisplay withPrefix(String prefix)
+		{
+			return v -> prefix + getValueString(v);
+		}
+		
+		public default ValueDisplay withSuffix(String suffix)
+		{
+			return v -> getValueString(v) + suffix;
+		}
 	}
 }

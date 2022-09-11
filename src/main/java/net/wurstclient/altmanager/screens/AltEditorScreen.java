@@ -382,4 +382,10 @@ public abstract class AltEditorScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
+	
+	@Override
+	public final void onClose()
+	{
+		client.openScreen(prevScreen);
+	}
 }

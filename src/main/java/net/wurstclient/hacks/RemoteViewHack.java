@@ -56,8 +56,7 @@ public final class RemoteViewHack extends Hack
 		new SliderSetting("Filter flying",
 			"Won't view players that\n" + "are at least the given\n"
 				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't view zombies, creepers, etc.", true);

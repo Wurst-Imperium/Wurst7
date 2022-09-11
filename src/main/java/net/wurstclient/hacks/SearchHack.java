@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,6 +43,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
@@ -65,8 +65,7 @@ public final class SearchHack extends Hack
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"The maximum number of blocks to display.\n"
 			+ "Higher values require a faster computer.",
-		4, 3, 6, 1,
-		v -> new DecimalFormat("##,###,###").format(Math.pow(10, v)));
+		4, 3, 6, 1, ValueDisplay.LOGARITHMIC);
 	private int prevLimit;
 	private boolean notify;
 	

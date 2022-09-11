@@ -237,8 +237,7 @@ public final class SliderComponent extends Component
 	private void drawKnob(int x1, int x2, int y2, int y3, boolean hSlider,
 		boolean renderAsDisabled)
 	{
-		double percentage = (setting.getValue() - setting.getMinimum())
-			/ (setting.getMaximum() - setting.getMinimum());
+		double percentage = setting.getPercentage();
 		double xk1 = x1 + (x2 - x1 - 8) * percentage;
 		double xk2 = xk1 + 8;
 		double yk1 = y3 + 1.5;
@@ -249,8 +248,8 @@ public final class SliderComponent extends Component
 			GL11.glColor4f(0.5F, 0.5F, 0.5F, 0.75F);
 		else
 		{
-			float f = (float)(2 * percentage);
-			GL11.glColor4f(f, 2 - f, 0, hSlider ? 1 : 0.75F);
+			float[] c = setting.getKnobColor();
+			GL11.glColor4f(c[0], c[1], c[2], hSlider ? 1 : 0.75F);
 		}
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2d(xk1, yk1);

@@ -42,6 +42,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -54,6 +55,9 @@ public final class FightBotHack extends Hack
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Attack range (like Killaura)", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
 	
 	private final SliderSetting distance = new SliderSetting("Distance",
 		"How closely to follow the target.\n"
@@ -73,8 +77,7 @@ public final class FightBotHack extends Hack
 		new SliderSetting("Filter flying",
 			"Won't attack players that\n" + "are at least the given\n"
 				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+			0, 0, 2, 0.05, ValueDisplay.DECIMAL.withLabel(0, "off"));
 	
 	private final CheckboxSetting filterMonsters = new CheckboxSetting(
 		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
@@ -124,6 +127,7 @@ public final class FightBotHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
+		addSetting(speed);
 		addSetting(distance);
 		addSetting(useAi);
 		
@@ -160,6 +164,7 @@ public final class FightBotHack extends Hack
 		
 		pathFinder = new EntityPathFinder(MC.player);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -180,6 +185,8 @@ public final class FightBotHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		
 		// set entity
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
@@ -325,7 +332,7 @@ public final class FightBotHack extends Hack
 		}
 		
 		// check cooldown
-		if(MC.player.getAttackCooldownProgress(0) < 1)
+		if(!speed.isTimeToAttack())
 			return;
 		
 		// check range
@@ -336,6 +343,7 @@ public final class FightBotHack extends Hack
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, entity);
 		MC.player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	@Override
