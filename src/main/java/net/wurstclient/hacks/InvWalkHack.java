@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -34,12 +37,24 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		new CheckboxSetting("Allow other screens",
 			"description.wurst.setting.invwalk.allow_other", true);
 	
+	private final CheckboxSetting allowSneak =
+		new CheckboxSetting("Allow sneak key", true);
+	
+	private final CheckboxSetting allowSprint =
+		new CheckboxSetting("Allow sprint key", true);
+	
+	private final CheckboxSetting allowJump =
+		new CheckboxSetting("Allow jump key", true);
+	
 	public InvWalkHack()
 	{
 		super("InvWalk");
 		setCategory(Category.MOVEMENT);
 		addSetting(allowClickGUI);
 		addSetting(allowOther);
+		addSetting(allowSneak);
+		addSetting(allowSprint);
+		addSetting(allowJump);
 	}
 	
 	@Override
@@ -64,9 +79,18 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		if(!isAllowedScreen(screen))
 			return;
 		
-		KeyBinding[] keys = {MC.options.keyForward, MC.options.keyBack,
-			MC.options.keyLeft, MC.options.keyRight, MC.options.keyJump,
-			MC.options.keySprint, MC.options.keySneak};
+		ArrayList<KeyBinding> keys =
+			new ArrayList<>(Arrays.asList(MC.options.keyForward,
+				MC.options.keyBack, MC.options.keyLeft, MC.options.keyRight));
+		
+		if(allowSneak.isChecked())
+			keys.add(MC.options.keySneak);
+		
+		if(allowSprint.isChecked())
+			keys.add(MC.options.keySprint);
+		
+		if(allowJump.isChecked())
+			keys.add(MC.options.keyJump);
 		
 		for(KeyBinding key : keys)
 			key.setPressed(((IKeyBinding)key).isActallyPressed());
