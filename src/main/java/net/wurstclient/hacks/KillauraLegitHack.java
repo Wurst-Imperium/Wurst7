@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -181,6 +182,10 @@ public final class KillauraLegitHack extends Hack
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
+			return;
+		
+		// don't attack when a container/inventory screen is open
+		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
 		ClientPlayerEntity player = MC.player;

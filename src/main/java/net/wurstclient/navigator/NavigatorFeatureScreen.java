@@ -308,7 +308,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		
+		if(primaryButton != null)
+			primaryButton
+				.setMessage(new LiteralText(feature.getPrimaryAction()));
 	}
 	
 	@Override

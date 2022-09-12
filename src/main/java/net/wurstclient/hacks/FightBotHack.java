@@ -44,6 +44,7 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -66,6 +67,9 @@ public final class FightBotHack extends Hack
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
+	
+	private final PauseAttackOnContainersSetting pauseOnContainers =
+		new PauseAttackOnContainersSetting(true);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -130,6 +134,7 @@ public final class FightBotHack extends Hack
 		addSetting(speed);
 		addSetting(distance);
 		addSetting(useAi);
+		addSetting(pauseOnContainers);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -186,6 +191,9 @@ public final class FightBotHack extends Hack
 	public void onUpdate()
 	{
 		speed.updateTimer();
+		
+		if(pauseOnContainers.shouldPause())
+			return;
 		
 		// set entity
 		Stream<Entity> stream = StreamSupport

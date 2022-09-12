@@ -20,4 +20,12 @@ public interface IWorld
 {
 	public Stream<VoxelShape> getBlockCollisionsStream(@Nullable Entity entity,
 		Box box);
+	
+	public default Stream<Box> getCollidingBoxes(@Nullable Entity entity,
+		Box box)
+	{
+		return getBlockCollisionsStream(entity, box)
+			.flatMap(vs -> vs.getBoundingBoxes().stream())
+			.filter(b -> b.intersects(box));
+	}
 }

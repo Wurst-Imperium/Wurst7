@@ -78,6 +78,9 @@ public class DisconnectedScreenMixin extends Screen
 	@Override
 	public void tick()
 	{
+		if(!WurstClient.INSTANCE.isEnabled() || autoReconnectButton == null)
+			return;
+		
 		AutoReconnectHack autoReconnect =
 			WurstClient.INSTANCE.getHax().autoReconnectHack;
 		

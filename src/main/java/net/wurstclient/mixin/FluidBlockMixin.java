@@ -8,6 +8,9 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,21 +27,24 @@ import net.wurstclient.hack.HackList;
 @Mixin(FluidBlock.class)
 public abstract class FluidBlockMixin extends Block implements FluidDrainable
 {
-	private FluidBlockMixin(WurstClient wurst, Settings block$Settings_1)
+	private FluidBlockMixin(WurstClient wurst, Settings settings)
 	{
-		super(block$Settings_1);
+		super(settings);
 	}
-	
-	@Override
-	public VoxelShape getCollisionShape(BlockState blockState_1,
-		BlockView blockView_1, BlockPos blockPos_1,
-		ShapeContext entityContext_1)
+
+	@Inject(method = "getCollisionShape",
+		at = @At(value = "HEAD"),
+		cancellable = true)
+	private void getCollisionShape(BlockState state, BlockView world,
+		BlockPos pos, ShapeContext context,
+		CallbackInfoReturnable<VoxelShape> cir)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax != null && hax.jesusHack.shouldBeSolid())
-			return VoxelShapes.fullCube();
 		
-		return super.getCollisionShape(blockState_1, blockView_1, blockPos_1,
-			entityContext_1);
+		if(hax != null && hax.jesusHack.shouldBeSolid())
+		{
+			cir.setReturnValue(VoxelShapes.fullCube());
+			cir.cancel();
+		}
 	}
 }

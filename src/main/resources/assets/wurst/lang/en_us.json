@@ -153,6 +153,7 @@
   "description.wurst.hack.tunneller": "Automatically digs a tunnel.\n\n§c§lWARNING:§r Although this bot will try to avoid lava and other dangers, there is no guarantee that it won't die. Only send it out with gear that you don't mind losing.",
   "description.wurst.hack.x-ray": "Allows you to see ores through walls.",
   "description.wurst.setting.generic.attack_speed": "Attack speed in clicks per second.\n0 = dynamically adjusts the speed to match your attack cooldown.",
+  "description.wurst.setting.generic.pause_attack_on_containers": "Won't attack while a container screen (chest, hopper, etc.) is open.\nUseful for minigame servers that display chest-like menus.",
   "description.wurst.altmanager.premium": "This alt has a password and can join all servers.",
   "description.wurst.altmanager.cracked": "This alt has no password and will only work on cracked servers.",
   "description.wurst.altmanager.failed": "Last time you tried to log in with this alt, it didn't work.",

@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.stream.Stream;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -146,6 +147,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
+			return;
+		
+		// don't attack when a container/inventory screen is open
+		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
 		ClientPlayerEntity player = MC.player;

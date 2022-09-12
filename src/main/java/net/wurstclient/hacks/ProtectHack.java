@@ -43,6 +43,7 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
@@ -56,6 +57,9 @@ public final class ProtectHack extends Hack
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
+	
+	private final PauseAttackOnContainersSetting pauseOnContainers =
+		new PauseAttackOnContainersSetting(true);
 	
 	private final CheckboxSetting filterPlayers = new CheckboxSetting(
 		"Filter players", "Won't attack other players.", false);
@@ -124,6 +128,7 @@ public final class ProtectHack extends Hack
 		setCategory(Category.COMBAT);
 		addSetting(speed);
 		addSetting(useAi);
+		addSetting(pauseOnContainers);
 		
 		addSetting(filterPlayers);
 		addSetting(filterSleeping);
@@ -212,6 +217,9 @@ public final class ProtectHack extends Hack
 	public void onUpdate()
 	{
 		speed.updateTimer();
+		
+		if(pauseOnContainers.shouldPause())
+			return;
 		
 		// check if player died, friend died or disappeared
 		if(friend == null || friend.removed || !(friend instanceof LivingEntity)
