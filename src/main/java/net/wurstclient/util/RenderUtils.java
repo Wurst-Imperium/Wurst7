@@ -22,7 +22,7 @@ public enum RenderUtils
 {
 	;
 	
-	private static final Box DEFAULT_AABB = new Box(0, 0, 0, 1, 1, 1);
+	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
 	
 	public static void scissorBox(int startX, int startY, int endX, int endY)
 	{
@@ -42,6 +42,7 @@ public enum RenderUtils
 	{
 		applyCameraRotationOnly();
 		Vec3d camPos = getCameraPos();
+		
 		GL11.glTranslated(-camPos.x, -camPos.y, -camPos.z);
 	}
 	
@@ -80,17 +81,37 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		return BlockEntityRenderDispatcher.INSTANCE.camera.getPos();
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
+		if(camera == null)
+			return Vec3d.ZERO;
+		
+		return camera.getPos();
 	}
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		return BlockEntityRenderDispatcher.INSTANCE.camera.getBlockPos();
+		Camera camera = BlockEntityRenderDispatcher.INSTANCE.camera;
+		if(camera == null)
+			return BlockPos.ORIGIN;
+		
+		return camera.getBlockPos();
+	}
+	
+	public static float[] getRainbowColor()
+	{
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float pi = (float)Math.PI;
+		
+		float[] rainbow = new float[3];
+		rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
+		rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
+		rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+		return rainbow;
 	}
 	
 	public static void drawSolidBox()
 	{
-		drawSolidBox(DEFAULT_AABB);
+		drawSolidBox(DEFAULT_BOX);
 	}
 	
 	public static void drawSolidBox(Box bb)
@@ -130,7 +151,7 @@ public enum RenderUtils
 	
 	public static void drawOutlinedBox()
 	{
-		drawOutlinedBox(DEFAULT_AABB);
+		drawOutlinedBox(DEFAULT_BOX);
 	}
 	
 	public static void drawOutlinedBox(Box bb)
@@ -176,7 +197,7 @@ public enum RenderUtils
 	
 	public static void drawCrossBox()
 	{
-		drawCrossBox(DEFAULT_AABB);
+		drawCrossBox(DEFAULT_BOX);
 	}
 	
 	public static void drawCrossBox(Box bb)

@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -86,15 +85,8 @@ public final class PlayerFinderHack extends Hack
 		GL11.glPushMatrix();
 		RenderUtils.applyRenderOffset();
 		
-		// generate rainbow color
-		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float red = 0.5F + 0.5F * MathHelper.sin(x * (float)Math.PI);
-		float green =
-			0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * (float)Math.PI);
-		float blue =
-			0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * (float)Math.PI);
-		
-		GL11.glColor4f(red, green, blue, 0.5F);
+		float[] rainbow = RenderUtils.getRainbowColor();
+		GL11.glColor4f(rainbow[0], rainbow[1], rainbow[2], 0.5F);
 		
 		// tracer line
 		GL11.glBegin(GL11.GL_LINES);
@@ -119,7 +111,7 @@ public final class PlayerFinderHack extends Hack
 			
 			RenderUtils.drawOutlinedBox();
 			
-			GL11.glColor4f(red, green, blue, 0.25F);
+			GL11.glColor4f(rainbow[0], rainbow[1], rainbow[2], 0.25F);
 			RenderUtils.drawSolidBox();
 			
 			GL11.glPopMatrix();
