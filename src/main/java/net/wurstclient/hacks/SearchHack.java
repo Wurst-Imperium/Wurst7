@@ -29,6 +29,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -234,7 +235,9 @@ public final class SearchHack extends Hack
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			Shader shader = RenderSystem.getShader();
-			vertexBuffer.setShader(viewMatrix, projMatrix, shader);
+			vertexBuffer.bind();
+			vertexBuffer.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		matrixStack.pop();
@@ -428,15 +431,19 @@ public final class SearchHack extends Hack
 		
 		vertexBuffer = new VertexBuffer();
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		
 		for(int[] vertex : vertices)
 			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
 		
-		bufferBuilder.end();
-		vertexBuffer.upload(bufferBuilder);
+		BuiltBuffer buffer = bufferBuilder.end();
+		
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;
 	}

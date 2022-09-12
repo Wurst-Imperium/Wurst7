@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
@@ -23,22 +22,17 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoLeaveHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Leaves the server when your health\n"
-			+ "reaches this value or falls below it.",
+		"Leaves the server when your health reaches this value or falls below it.",
 		4, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts"));
 	
 	public final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"\u00a7lQuit\u00a7r mode just quits the game normally.\n"
 			+ "Bypasses NoCheat+ but not CombatLog.\n\n"
-			+ "\u00a7lChars\u00a7r mode sends a special chat message that\n"
-			+ "causes the server to kick you.\n"
+			+ "\u00a7lChars\u00a7r mode sends a special chat message that causes the server to kick you.\n"
 			+ "Bypasses NoCheat+ and some versions of CombatLog.\n\n"
-			+ "\u00a7lTP\u00a7r mode teleports you to an invalid location,\n"
-			+ "causing the server to kick you.\n"
+			+ "\u00a7lTP\u00a7r mode teleports you to an invalid location, causing the server to kick you.\n"
 			+ "Bypasses CombatLog, but not NoCheat+.\n\n"
-			+ "\u00a7lSelfHurt\u00a7r mode sends the packet for attacking\n"
-			+ "another player, but with yourself as both the attacker\n"
-			+ "and the target. This causes the server to kick you.\n"
+			+ "\u00a7lSelfHurt\u00a7r mode sends the packet for attacking another player, but with yourself as both the attacker and the target. This causes the server to kick you.\n"
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
 	
@@ -93,8 +87,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			break;
 			
 			case CHARS:
-			MC.player.networkHandler
-				.sendPacket(new ChatMessageC2SPacket("\u00a7"));
+			MC.player.sendChatMessage("\u00a7", null);
 			break;
 			
 			case TELEPORT:

@@ -9,7 +9,7 @@ package net.wurstclient.clickgui.screens;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.clickgui.ClickGui;
 
 public final class ClickGuiScreen extends Screen
@@ -18,7 +18,7 @@ public final class ClickGuiScreen extends Screen
 	
 	public ClickGuiScreen(ClickGui gui)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.gui = gui;
 	}
 	

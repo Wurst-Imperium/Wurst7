@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.ListWidget;
@@ -35,7 +35,7 @@ public final class SelectFileScreen extends Screen
 	
 	public SelectFileScreen(Screen prevScreen, FileSetting blockList)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		setting = blockList;
 	}
@@ -46,14 +46,14 @@ public final class SelectFileScreen extends Screen
 		listGui = new ListGui(client, this, setting.listFiles());
 		
 		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Open Folder"), b -> openFolder()));
+			Text.literal("Open Folder"), b -> openFolder()));
 		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
+			Text.literal("Reset to Defaults"), b -> askToConfirmReset()));
 		
 		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
-			height - 48, 100, 20, new LiteralText("Done"), b -> done()));
+			height - 48, 100, 20, Text.literal("Done"), b -> done()));
 		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			new LiteralText("Cancel"), b -> openPrevScreen()));
+			Text.literal("Cancel"), b -> openPrevScreen()));
 	}
 	
 	private void openFolder()
@@ -80,10 +80,10 @@ public final class SelectFileScreen extends Screen
 	
 	private void askToConfirmReset()
 	{
-		LiteralText title = new LiteralText("Reset Folder");
+		Text title = Text.literal("Reset Folder");
 		
-		LiteralText message = new LiteralText(
-			"This will empty the '" + setting.getFolder().getFileName()
+		Text message = Text
+			.literal("This will empty the '" + setting.getFolder().getFileName()
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
@@ -168,7 +168,7 @@ public final class SelectFileScreen extends Screen
 		
 		if(doneButton.isHovered() && !doneButton.active)
 			renderTooltip(matrixStack,
-				Arrays.asList(new LiteralText("You must first select a file.")),
+				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
 	}
 	

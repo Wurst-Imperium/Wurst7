@@ -35,10 +35,10 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -48,23 +48,20 @@ public final class FeedAuraHack extends Hack
 	implements UpdateListener, PostMotionListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far FeedAura will reach\n" + "to feed animals.\n"
-			+ "Anything that is further away than the\n"
-			+ "specified value will not be fed.",
+		"Determines how far FeedAura will reach to feed animals.\n"
+			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which animal will be fed first.\n"
 			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires\n"
-			+ "the least head movement.\n"
+			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
-			false);
+	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
+		"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
+		false);
 	
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
@@ -122,7 +119,7 @@ public final class FeedAuraHack extends Hack
 			.filter(AnimalEntity::canEat);
 		
 		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !e.isBaby());
+			stream = stream.filter(filterBabies);
 		
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		renderTarget = target;

@@ -18,7 +18,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
@@ -37,8 +36,8 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -50,14 +49,12 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
 	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
-		"\u00a7lAccurate\u00a7r mode shows the exact\n"
-			+ "hitbox of each mob.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger\n"
-			+ "boxes that look better.",
+		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't show invisible mobs.", false);
+	private final FilterInvisibleSetting filterInvisible =
+		new FilterInvisibleSetting("Won't show invisible mobs.", false);
 	
 	private final ArrayList<MobEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
@@ -105,7 +102,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 				.filter(e -> !e.isRemoved() && e.getHealth() > 0);
 		
 		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
+			stream = stream.filter(filterInvisible);
 		
 		mobs.addAll(stream.collect(Collectors.toList()));
 	}
@@ -172,8 +169,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			
 			Shader shader = RenderSystem.getShader();
 			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
-			mobBox.setShader(matrixStack.peek().getPositionMatrix(), matrix4f,
+			mobBox.bind();
+			mobBox.draw(matrixStack.peek().getPositionMatrix(), matrix4f,
 				shader);
+			VertexBuffer.unbind();
 			
 			matrixStack.pop();
 		}
@@ -187,7 +186,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION_COLOR);
 		
@@ -215,8 +215,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 				.color(r, g, 0, 0.5F).next();
 		}
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 	}
 	

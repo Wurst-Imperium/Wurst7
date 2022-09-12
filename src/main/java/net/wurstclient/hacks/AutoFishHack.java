@@ -15,7 +15,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -52,16 +51,12 @@ public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
 	private final SliderSetting validRange = new SliderSetting("Valid range",
-		"Any bites that occur outside of this range\n" + "will be ignored.\n\n"
-			+ "Increase your range if bites are not being\n"
-			+ "detected, decrease it if other people's\n"
-			+ "bites are being detected as yours.",
+		"Any bites that occur outside of this range will be ignored.\n\n"
+			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
 	private CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring and where\n"
-			+ "they will be detected. Useful for optimizing\n"
-			+ "your 'Valid range' setting.",
+		"Shows where bites are occurring and where they will be detected. Useful for optimizing your 'Valid range' setting.",
 		false);
 	
 	private final ColorSetting ddColor = new ColorSetting("DD color",
@@ -354,7 +349,8 @@ public final class AutoFishHack extends Hack
 	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		
 		if(lastSoundPos != null)
@@ -371,8 +367,7 @@ public final class AutoFishHack extends Hack
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
 			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
 			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			matrixStack.pop();
 		}
 	}

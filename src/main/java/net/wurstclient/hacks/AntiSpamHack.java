@@ -47,7 +47,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine<OrderedText>> chatLines = event.getChatLines();
+		List<ChatHudLine.Visible> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
 		
@@ -91,7 +91,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		{
 			JustGiveMeTheStringVisitor oldLineVS =
 				new JustGiveMeTheStringVisitor();
-			chatLines.get(i).getText().accept(oldLineVS);
+			chatLines.get(i).content().accept(oldLineVS);
 			String oldLine = oldLineVS.toString();
 			
 			if(matchingLines <= newLines.size() - 1)
@@ -121,7 +121,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				{
 					JustGiveMeTheStringVisitor nextOldLineVS =
 						new JustGiveMeTheStringVisitor();
-					chatLines.get(i - 1).getText().accept(nextOldLineVS);
+					chatLines.get(i - 1).content().accept(nextOldLineVS);
 					String nextOldLine = nextOldLineVS.toString();
 					
 					String twoLines = oldLine + nextOldLine;

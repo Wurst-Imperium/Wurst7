@@ -1,23 +1,5 @@
 # Wurst Client v7
 
-## ⚠ We Are Looking For Translators & Proofreaders ⚠
-
-Mostly proofreaders. Many translations are currently stuck because we have no one who can proofread them.
-
-### Current Status of Translations
-
-- [Check the current status of translations here.](https://github.com/orgs/Wurst-Imperium/projects/4/views/1)
-
-- [Check which translations need proofreaders here.](https://github.com/orgs/Wurst-Imperium/projects/4/views/3)
-
-The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
-
-You don't need permission to become a translator or proofreader. You just need a free GitHub account and then you can submit translations ("pull requests") or proofreading ("reviews").
-
-Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
-
-For discussion about translations, see [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) here or [#wurst-translations](https://chat.wurstimperium.net/channel/wurst-translations) on our RocketChat server.
-
 ## Downloads (for users)
 
 https://www.wurstclient.net/download/
@@ -34,6 +16,16 @@ Requirements: [JDK 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspo
 ```
 
 2. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
+
+## Translations
+
+I am experimenting with using Crowdin for translations. For now, you can submit translations either [on Crowdin](https://crowdin.com/project/wurst7) or here on GitHub.
+
+The translation files are located [here](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang) and work the same as in other Minecraft mods.
+
+Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
+
+For discussion about translations, see [Issue #404](https://github.com/Wurst-Imperium/Wurst7/issues/404) here on GitHub, or [#wurst-translations](https://chat.wurstimperium.net/channel/wurst-translations) on our RocketChat server, or the comments section on [Crowdin](https://crowdin.com/project/wurst7).
 
 ## License
 
