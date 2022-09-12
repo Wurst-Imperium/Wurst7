@@ -25,8 +25,7 @@ import net.wurstclient.util.ChatUtils;
 public final class ItemGeneratorHack extends Hack implements UpdateListener
 {
 	private final SliderSetting speed = new SliderSetting("Speed",
-		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton\n"
-			+ "of lag and can easily crash the game!",
+		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton of lag and can easily crash the game!",
 		1, 1, 36, 1, ValueDisplay.INTEGER);
 	
 	private final SliderSetting stackSize = new SliderSetting("Stack size",

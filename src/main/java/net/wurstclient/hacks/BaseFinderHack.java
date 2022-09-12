@@ -33,8 +33,8 @@ public final class BaseFinderHack extends Hack
 {
 	private final BlockListSetting naturalBlocks = new BlockListSetting(
 		"Natural Blocks",
-		"These blocks will be considered\n" + "part of natural generation.\n\n"
-			+ "They will NOT be highlighted\n" + "as player bases.",
+		"These blocks will be considered part of natural generation.\n\n"
+			+ "They will NOT be highlighted as player bases.",
 		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
 		"minecraft:allium", "minecraft:andesite", "minecraft:azure_bluet",
 		"minecraft:bedrock", "minecraft:birch_leaves", "minecraft:birch_log",
@@ -65,7 +65,7 @@ public final class BaseFinderHack extends Hack
 		"minecraft:water", "minecraft:white_tulip");
 	
 	private final ColorSetting color = new ColorSetting("Color",
-		"Man-made blocks will be\n" + "highlighted in this color.", Color.RED);
+		"Man-made blocks will be highlighted in this color.", Color.RED);
 	
 	private ArrayList<String> blockNames;
 	

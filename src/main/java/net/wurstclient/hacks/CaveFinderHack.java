@@ -69,7 +69,7 @@ public final class CaveFinderHack extends Hack
 		5, 3, 6, 1, ValueDisplay.LOGARITHMIC);
 	
 	private final ColorSetting color = new ColorSetting("Color",
-		"Caves will be highlighted\n" + "in this color.", Color.RED);
+		"Caves will be highlighted in this color.", Color.RED);
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity",
 		"How opaque the highlights should be.\n" + "0 = breathing animation", 0,

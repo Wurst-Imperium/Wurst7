@@ -32,6 +32,9 @@ public class DisconnectedScreenMixin extends Screen
 	
 	@Shadow
 	@Final
+	private Text reason;
+	@Shadow
+	@Final
 	private Screen parent;
 	
 	@Shadow
@@ -47,6 +50,8 @@ public class DisconnectedScreenMixin extends Screen
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
+		
+		System.out.println("Disconnected: " + reason);
 		
 		int backButtonX = width / 2 - 100;
 		int backButtonY =

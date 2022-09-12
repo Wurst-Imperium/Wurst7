@@ -24,8 +24,7 @@ public final class SneakHack extends Hack
 	implements PreMotionListener, PostMotionListener
 {
 	private final EnumSetting<SneakMode> mode = new EnumSetting<>("Mode",
-		"\u00a7lPacket\u00a7r mode makes it look like you're\n"
-			+ "sneaking without slowing you down.\n"
+		"\u00a7lPacket\u00a7r mode makes it look like you're sneaking without slowing you down.\n"
 			+ "\u00a7lLegit\u00a7r mode actually makes you sneak.",
 		SneakMode.values(), SneakMode.LEGIT);
 	

@@ -26,8 +26,8 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		50, 0.1, ValueDisplay.DECIMAL.withSuffix("x"));
 	
 	private final CheckboxSetting scroll = new CheckboxSetting(
-		"Use mouse wheel", "If enabled, you can use the mouse wheel\n"
-			+ "while zooming to zoom in even further.",
+		"Use mouse wheel",
+		"If enabled, you can use the mouse wheel while zooming to zoom in even further.",
 		true);
 	
 	private Double currentLevel;
