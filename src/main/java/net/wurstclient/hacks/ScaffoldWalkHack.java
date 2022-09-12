@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Arrays;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
@@ -89,10 +91,40 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		int oldSlot = MC.player.inventory.selectedSlot;
 		MC.player.inventory.selectedSlot = newSlot;
 		
-		placeBlock(belowPlayer);
+		scaffoldTo(belowPlayer);
 		
 		// reset slot
 		MC.player.inventory.selectedSlot = oldSlot;
+	}
+	
+	private void scaffoldTo(BlockPos belowPlayer)
+	{
+		// tries to place a block directly under the player
+		if(placeBlock(belowPlayer))
+			return;
+			
+		// if that doesn't work, tries to place a block next to the block that's
+		// under the player
+		Direction[] sides = Direction.values();
+		for(Direction side : sides)
+		{
+			BlockPos neighbor = belowPlayer.offset(side);
+			if(placeBlock(neighbor))
+				return;
+		}
+		
+		// if that doesn't work, tries to place a block next to a block that's
+		// next to the block that's under the player
+		for(Direction side : sides)
+			for(Direction side2 : Arrays.copyOfRange(sides, side.ordinal(), 6))
+			{
+				if(side.getOpposite().equals(side2))
+					continue;
+				
+				BlockPos neighbor = belowPlayer.offset(side).offset(side2);
+				if(placeBlock(neighbor))
+					return;
+			}
 	}
 	
 	private boolean placeBlock(BlockPos pos)

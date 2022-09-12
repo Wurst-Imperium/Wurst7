@@ -31,32 +31,74 @@ public final class WsonArray
 	
 	public boolean getBoolean(int index) throws JsonException
 	{
-		return JsonUtils.getAsBoolean(json.get(index));
+		try
+		{
+			return JsonUtils.getAsBoolean(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Boolean at [" + index + "] not found.", e);
+		}
 	}
 	
 	public int getInt(int index) throws JsonException
 	{
-		return JsonUtils.getAsInt(json.get(index));
+		try
+		{
+			return JsonUtils.getAsInt(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number at [" + index + "] not found.", e);
+		}
 	}
 	
 	public long getLong(int index) throws JsonException
 	{
-		return JsonUtils.getAsLong(json.get(index));
+		try
+		{
+			return JsonUtils.getAsLong(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number at [" + index + "] not found.", e);
+		}
 	}
 	
 	public String getString(int index) throws JsonException
 	{
-		return JsonUtils.getAsString(json.get(index));
+		try
+		{
+			return JsonUtils.getAsString(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("String at [" + index + "] not found.", e);
+		}
 	}
 	
 	public WsonArray getArray(int index) throws JsonException
 	{
-		return JsonUtils.getAsArray(json.get(index));
+		try
+		{
+			return JsonUtils.getAsArray(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Array at [" + index + "] not found.", e);
+		}
 	}
 	
 	public WsonObject getObject(int index) throws JsonException
 	{
-		return JsonUtils.getAsObject(json.get(index));
+		try
+		{
+			return JsonUtils.getAsObject(json.get(index));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Object at [" + index + "] not found.", e);
+		}
 	}
 	
 	public JsonElement getElement(int index)
@@ -82,5 +124,11 @@ public final class WsonArray
 	public JsonArray toJsonArray()
 	{
 		return json;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return json.toString();
 	}
 }
