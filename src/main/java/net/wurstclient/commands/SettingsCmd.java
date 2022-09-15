@@ -13,11 +13,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import net.wurstclient.DontBlock;
+import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.CmdUtils;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonException;
 
@@ -27,7 +29,8 @@ public final class SettingsCmd extends Command
 	public SettingsCmd()
 	{
 		super("settings", "Allows you to make profiles of your settings.",
-			".settings load-profile <file>", ".settings save-profile <file>",
+			".settings load-profile <file> [<features>]",
+			".settings save-profile <file> [<features>]",
 			".settings list-profiles [<page>]",
 			"Profiles are saved in '.minecraft/wurst/settings'.");
 	}
@@ -59,14 +62,15 @@ public final class SettingsCmd extends Command
 	
 	private void loadProfile(String[] args) throws CmdException
 	{
-		if(args.length != 2)
+		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
 		String name = parseFileName(args[1]);
+		Feature[] features = parseFeatures(args);
 		
 		try
 		{
-			WURST.loadSettingsProfile(name);
+			WURST.loadSettingsProfile(name, features);
 			ChatUtils.message("Settings loaded: " + name);
 			
 		}catch(NoSuchFileException e)
@@ -88,14 +92,15 @@ public final class SettingsCmd extends Command
 	
 	private void saveProfile(String[] args) throws CmdException
 	{
-		if(args.length != 2)
+		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
 		String name = parseFileName(args[1]);
+		Feature[] features = parseFeatures(args);
 		
 		try
 		{
-			WURST.saveSettingsProfile(name);
+			WURST.saveSettingsProfile(name, features);
 			ChatUtils.message("Settings saved: " + name);
 			
 		}catch(IOException | JsonException e)
@@ -149,5 +154,22 @@ public final class SettingsCmd extends Command
 			throw new CmdSyntaxError("Not a number: " + args[1]);
 		
 		return Integer.parseInt(args[1]);
+	}
+	
+	private Feature[] parseFeatures(String[] args) throws CmdError
+	{
+		if(args.length < 3)
+			return null;
+		
+		Feature[] features = new Feature[args.length - 2];
+		
+		for(int i = 2; i < args.length; i++)
+		{
+			Feature feature = CmdUtils.findFeature(args[i]);
+			
+			features[i - 2] = feature;
+		}
+		
+		return features;
 	}
 }

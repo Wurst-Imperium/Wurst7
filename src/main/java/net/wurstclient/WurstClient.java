@@ -215,16 +215,18 @@ public enum WurstClient
 		}
 	}
 	
-	public void loadSettingsProfile(String fileName)
+	public void loadSettingsProfile(String fileName, Feature[] features)
 		throws IOException, JsonException
 	{
-		settingsFile.loadProfile(settingsProfileFolder.resolve(fileName));
+		settingsFile.loadProfile(settingsProfileFolder.resolve(fileName),
+			features);
 	}
 	
-	public void saveSettingsProfile(String fileName)
+	public void saveSettingsProfile(String fileName, Feature[] features)
 		throws IOException, JsonException
 	{
-		settingsFile.saveProfile(settingsProfileFolder.resolve(fileName));
+		settingsFile.saveProfile(settingsProfileFolder.resolve(fileName),
+			features);
 	}
 	
 	public HackList getHax()

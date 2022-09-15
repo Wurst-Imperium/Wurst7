@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -68,7 +69,7 @@ public final class SettingsFile
 		try
 		{
 			WsonObject wson = JsonUtils.parseFileToObject(path);
-			loadSettings(wson);
+			loadSettings(wson, null);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -83,32 +84,44 @@ public final class SettingsFile
 		save();
 	}
 	
-	public void loadProfile(Path profilePath) throws IOException, JsonException
+	public void loadProfile(Path profilePath, Feature[] features)
+		throws IOException, JsonException
 	{
 		if(!profilePath.getFileName().toString().endsWith(".json"))
 			throw new IllegalArgumentException();
 		
 		WsonObject wson = JsonUtils.parseFileToObject(profilePath);
-		loadSettings(wson);
+		loadSettings(wson, features);
 		
 		save();
 	}
 	
-	private void loadSettings(WsonObject wson)
+	private void loadSettings(WsonObject wson, Feature[] features)
 	{
 		try
 		{
 			disableSaving = true;
 			
-			for(Entry<String, JsonObject> e : wson.getAllJsonObjects()
-				.entrySet())
-			{
-				Feature feature = featuresWithSettings.get(e.getKey());
-				if(feature == null)
-					continue;
-				
-				loadSettings(feature, e.getValue());
-			}
+			if(features != null)
+				for(Feature feature : features)
+				{
+					JsonObject json = (JsonObject)wson.getElement(
+						feature.getName());
+					if(json == null)
+						continue;
+					
+					loadSettings(feature, json);
+				}
+			else
+				for(Entry<String, JsonObject> e : wson.getAllJsonObjects()
+					.entrySet())
+				{
+					Feature feature = featuresWithSettings.get(e.getKey());
+					if(feature == null)
+						continue;
+					
+					loadSettings(feature, e.getValue());
+				}
 			
 		}finally
 		{
@@ -135,7 +148,7 @@ public final class SettingsFile
 		if(disableSaving)
 			return;
 		
-		JsonObject json = createJson();
+		JsonObject json = createJson(null);
 		
 		try
 		{
@@ -148,21 +161,23 @@ public final class SettingsFile
 		}
 	}
 	
-	public void saveProfile(Path profilePath) throws IOException, JsonException
+	public void saveProfile(Path profilePath, Feature[] features)
+		throws IOException, JsonException
 	{
 		if(!profilePath.getFileName().toString().endsWith(".json"))
 			throw new IllegalArgumentException();
 		
-		JsonObject json = createJson();
+		JsonObject json = createJson(features);
 		Files.createDirectories(profilePath.getParent());
 		JsonUtils.toJson(json, profilePath);
 	}
 	
-	private JsonObject createJson()
+	private JsonObject createJson(Feature[] features)
 	{
 		JsonObject json = new JsonObject();
 		
-		for(Feature feature : featuresWithSettings.values())
+		for(Feature feature : features != null ? Arrays.asList(features) :
+			featuresWithSettings.values())
 		{
 			Collection<Setting> settings = feature.getSettings().values();
 			
