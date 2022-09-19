@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,6 @@ public final class ReconnectOtf extends OtherFeature
 	public ReconnectOtf()
 	{
 		super("Reconnect",
-			"Whenever you get kicked from a server, Wurst gives you a\n"
-				+ "\"Reconnect\" button that lets you instantly join again.");
+			"Whenever you get kicked from a server, Wurst gives you a \"Reconnect\" button that lets you instantly join again.");
 	}
 }

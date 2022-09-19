@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto steal", "ChestStealer", "chest stealer",
 	"steal store buttons", "Steal/Store buttons"})
@@ -20,15 +21,14 @@ public final class AutoStealHack extends Hack
 	private final SliderSetting delay = new SliderSetting("Delay",
 		"Delay between moving stacks of items.\n"
 			+ "Should be at least 70ms for NoCheat+ servers.",
-		100, 0, 500, 10, v -> (int)v + "ms");
+		100, 0, 500, 10, ValueDisplay.INTEGER.withSuffix("ms"));
 	
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
 	public AutoStealHack()
 	{
-		super("AutoSteal", "Automatically steals everything\n"
-			+ "from all chests and shulker boxes that you open.");
+		super("AutoSteal");
 		setCategory(Category.ITEMS);
 		addSetting(buttons);
 		addSetting(delay);
@@ -43,4 +43,6 @@ public final class AutoStealHack extends Hack
 	{
 		return delay.getValueI();
 	}
+	
+	// See ContainerScreen54Mixin and ShulkerBoxScreenMixin
 }

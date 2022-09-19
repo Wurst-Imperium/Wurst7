@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,9 +17,13 @@ public interface IMinecraftClient
 	
 	public IClientPlayerInteractionManager getInteractionManager();
 	
+	public ILanguageManager getLanguageManager();
+	
 	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();
+	
+	public IWorld getWorld();
 	
 	public void setSession(Session session);
 }

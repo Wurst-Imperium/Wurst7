@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,6 +14,11 @@ import java.util.Objects;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+/**
+ * Custom version of {@link JsonObject} that only throws checked exceptions and
+ * generally makes it easier to process untrusted JSON data without accidentally
+ * crashing something.
+ */
 public final class WsonObject
 {
 	private final JsonObject json;
@@ -25,27 +30,79 @@ public final class WsonObject
 	
 	public boolean getBoolean(String key) throws JsonException
 	{
-		return JsonUtils.getAsBoolean(json.get(key));
+		try
+		{
+			return JsonUtils.getAsBoolean(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Boolean \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public int getInt(String key) throws JsonException
 	{
-		return JsonUtils.getAsInt(json.get(key));
+		try
+		{
+			return JsonUtils.getAsInt(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public long getLong(String key) throws JsonException
 	{
-		return JsonUtils.getAsLong(json.get(key));
+		try
+		{
+			return JsonUtils.getAsLong(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public String getString(String key) throws JsonException
 	{
-		return JsonUtils.getAsString(json.get(key));
+		try
+		{
+			return JsonUtils.getAsString(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("String \"" + key + "\" not found.", e);
+		}
 	}
 	
 	public WsonArray getArray(String key) throws JsonException
 	{
-		return JsonUtils.getAsArray(json.get(key));
+		try
+		{
+			return JsonUtils.getAsArray(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Array \"" + key + "\" not found.", e);
+		}
+	}
+	
+	public WsonObject getObject(String key) throws JsonException
+	{
+		try
+		{
+			return JsonUtils.getAsObject(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Object \"" + key + "\" not found.", e);
+		}
+	}
+	
+	public JsonElement getElement(String key)
+	{
+		return json.get(key);
 	}
 	
 	public LinkedHashMap<String, String> getAllStrings()
@@ -96,8 +153,19 @@ public final class WsonObject
 		return map;
 	}
 	
+	public boolean has(String memberName)
+	{
+		return json.has(memberName);
+	}
+	
 	public JsonObject toJsonObject()
 	{
 		return json;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return json.toString();
 	}
 }

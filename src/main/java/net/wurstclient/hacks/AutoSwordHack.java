@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import net.wurstclient.mixinterface.ISwordItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
@@ -31,24 +32,21 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back", "Switches back to the previously selected slot\n"
-			+ "after \u00a7lRelease time\u00a7r has passed.",
+		"Switch back",
+		"Switches back to the previously selected slot after \u00a7lRelease time\u00a7r has passed.",
 		true);
 	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
-		"Time until AutoSword will switch back from\n"
-			+ "the weapon to the previously selected slot.\n\n"
+		"Time until AutoSword will switch back from the weapon to the previously selected slot.\n\n"
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
-		10, 1, 200, 1, v -> (int)v + " ticks");
+		10, 1, 200, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
 	private int oldSlot;
 	private int timer;
 	
 	public AutoSwordHack()
 	{
-		super("AutoSword",
-			"Automatically uses the best weapon in your hotbar to attack entities.\n"
-				+ "Tip: This works with Killaura.");
+		super("AutoSword");
 		
 		setCategory(Category.COMBAT);
 		
@@ -110,10 +108,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// skip empty slots
-			if(MC.player.inventory.getStack(i).isEmpty())
+			if(MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.inventory.getStack(i).getItem();
+			Item item = MC.player.getInventory().getStack(i).getItem();
 			
 			// get damage
 			float value = getValue(item);
@@ -132,10 +130,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.inventory.selectedSlot;
+			oldSlot = MC.player.getInventory().selectedSlot;
 		
 		// set slot
-		MC.player.inventory.selectedSlot = bestSlot;
+		MC.player.getInventory().selectedSlot = bestSlot;
 		
 		// start timer
 		timer = releaseTime.getValueI();
@@ -148,14 +146,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			case SPEED:
 			if(item instanceof SwordItem)
 				return ((ISwordItem)item).fuckMcAfee();
-			else if(item instanceof MiningToolItem)
+			if(item instanceof MiningToolItem)
 				return ((IMiningToolItem)item).fuckMcAfee2();
 			break;
 			
 			case DAMAGE:
 			if(item instanceof SwordItem)
 				return ((SwordItem)item).getAttackDamage();
-			else if(item instanceof MiningToolItem)
+			if(item instanceof MiningToolItem)
 				return ((IMiningToolItem)item).fuckMcAfee1();
 			break;
 		}
@@ -173,7 +171,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		if(oldSlot != -1)
 		{
-			MC.player.inventory.selectedSlot = oldSlot;
+			MC.player.getInventory().selectedSlot = oldSlot;
 			oldSlot = -1;
 		}
 	}

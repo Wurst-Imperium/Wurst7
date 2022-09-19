@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,11 +7,16 @@
  */
 package net.wurstclient.settings;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import com.google.gson.JsonElement;
 
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
+import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.keybinds.PossibleKeybind;
 
@@ -33,7 +38,19 @@ public abstract class Setting
 	
 	public final String getDescription()
 	{
-		return description;
+		return WurstClient.INSTANCE.translate(description);
+	}
+	
+	public final String getWrappedDescription(int width)
+	{
+		List<StringVisitable> lines = WurstClient.MC.textRenderer
+			.getTextHandler().wrapLines(getDescription(), width, Style.EMPTY);
+		
+		StringJoiner joiner = new StringJoiner("\n");
+		lines.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		
+		return joiner.toString();
 	}
 	
 	public abstract Component getComponent();

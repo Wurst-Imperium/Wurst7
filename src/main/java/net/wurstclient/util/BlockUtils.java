@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.util;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -53,6 +54,12 @@ public enum BlockUtils
 		return Registry.BLOCK.getId(block).toString();
 	}
 	
+	/**
+	 * @param name
+	 *            a String containing the block's name ({@link Identifier})
+	 * @return the requested block, or <code>minecraft:air</code> if the block
+	 *         doesn't exist.
+	 */
 	public static Block getBlockFromName(String name)
 	{
 		try
@@ -62,6 +69,34 @@ public enum BlockUtils
 		}catch(InvalidIdentifierException e)
 		{
 			return Blocks.AIR;
+		}
+	}
+	
+	/**
+	 * @param nameOrId
+	 *            a String containing the block's name ({@link Identifier}) or
+	 *            numeric ID.
+	 * @return the requested block, or null if the block doesn't exist.
+	 */
+	public static Block getBlockFromNameOrID(String nameOrId)
+	{
+		if(MathUtils.isInteger(nameOrId))
+		{
+			BlockState state = Block.STATE_IDS.get(Integer.parseInt(nameOrId));
+			if(state == null)
+				return null;
+			
+			return state.getBlock();
+		}
+		
+		try
+		{
+			return Registry.BLOCK.getOrEmpty(new Identifier(nameOrId))
+				.orElse(null);
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
 		}
 	}
 	
@@ -100,5 +135,44 @@ public enum BlockUtils
 					blocks.add(new BlockPos(x, y, z));
 				
 		return blocks;
+	}
+	
+	public static Stream<BlockPos> getAllInBoxStream(BlockPos from, BlockPos to)
+	{
+		BlockPos min = new BlockPos(Math.min(from.getX(), to.getX()),
+			Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
+		BlockPos max = new BlockPos(Math.max(from.getX(), to.getX()),
+			Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+		
+		Stream<BlockPos> stream = Stream.<BlockPos> iterate(min, pos -> {
+			
+			int x = pos.getX();
+			int y = pos.getY();
+			int z = pos.getZ();
+			
+			x++;
+			
+			if(x > max.getX())
+			{
+				x = min.getX();
+				y++;
+			}
+			
+			if(y > max.getY())
+			{
+				y = min.getY();
+				z++;
+			}
+			
+			if(z > max.getZ())
+				throw new IllegalStateException("Stream limit didn't work.");
+			
+			return new BlockPos(x, y, z);
+		});
+		
+		int limit = (max.getX() - min.getX() + 1)
+			* (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
+		
+		return stream.limit(limit);
 	}
 }

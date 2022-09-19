@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,14 +33,12 @@ public final class GlideHack extends Hack implements UpdateListener
 			5, 0.05, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting minHeight = new SliderSetting("Min height",
-		"Won't glide when you are\n" + "too close to the ground.", 0, 0, 2,
-		0.01,
-		v -> v == 0 ? "disabled" : ValueDisplay.DECIMAL.getValueString(v));
+		"Won't glide when you are too close to the ground.", 0, 0, 2, 0.01,
+		ValueDisplay.DECIMAL.withLabel(0, "disabled"));
 	
 	public GlideHack()
 	{
-		super("Glide", "Makes you glide down slowly when falling.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take fall damage if you don't use NoFall.");
+		super("Glide");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(fallSpeed);
@@ -91,6 +89,6 @@ public final class GlideHack extends Hack implements UpdateListener
 		}
 		
 		player.setVelocity(v.x, Math.max(v.y, -fallSpeed.getValue()), v.z);
-		player.flyingSpeed *= moveSpeed.getValueF();
+		player.airStrafingSpeed *= moveSpeed.getValueF();
 	}
 }

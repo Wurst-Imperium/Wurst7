@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,9 +11,17 @@ import java.util.Objects;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -100,20 +108,22 @@ public final class FeatureButton extends Component
 		boolean hHack = hovering && mouseX < x3;
 		boolean hSettings = hovering && mouseX >= x3;
 		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		
 		if(hHack)
 			setTooltip();
 		
-		drawButtonBackground(x1, x3, y1, y2, hHack);
+		drawButtonBackground(matrixStack, x1, x3, y1, y2, hHack);
 		
 		if(hasSettings)
-			drawSettingsBackground(x2, x3, y1, y2, hSettings);
+			drawSettingsBackground(matrixStack, x2, x3, y1, y2, hSettings);
 		
-		drawOutline(x1, x2, y1, y2);
+		drawOutline(matrixStack, x1, x2, y1, y2);
 		
 		if(hasSettings)
 		{
-			drawSeparator(x3, y1, y2);
-			drawSettingsArrow(x2, x3, y1, y2, hSettings);
+			drawSeparator(matrixStack, x3, y1, y2);
+			drawSettingsArrow(matrixStack, x2, x3, y1, y2, hSettings);
 		}
 		
 		drawName(matrixStack, x1, x3, y1);
@@ -132,7 +142,7 @@ public final class FeatureButton extends Component
 	
 	private void setTooltip()
 	{
-		String tooltip = feature.getDescription();
+		String tooltip = feature.getWrappedDescription(200);
 		
 		// if(feature.isBlocked())
 		// {
@@ -147,111 +157,143 @@ public final class FeatureButton extends Component
 		GUI.setTooltip(tooltip);
 	}
 	
-	private void drawButtonBackground(int x1, int x3, int y1, int y2,
-		boolean hHack)
+	private void drawButtonBackground(MatrixStack matrixStack, int x1, int x3,
+		int y1, int y2, boolean hHack)
 	{
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glBegin(GL11.GL_QUADS);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
 		
 		if(feature.isEnabled())
 			// if(feature.isBlocked())
 			// glColor4f(1, 0, 0, hHack ? opacity * 1.5F : opacity);
 			// else
-			GL11.glColor4f(0, 1, 0, hHack ? opacity * 1.5F : opacity);
+			RenderSystem.setShaderColor(0, 1, 0,
+				hHack ? opacity * 1.5F : opacity);
 		else
-			GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				hHack ? opacity * 1.5F : opacity);
 		
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x3, y1);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		
-		GL11.glEnd();
+		tessellator.draw();
 	}
 	
-	private void drawSettingsBackground(int x2, int x3, int y1, int y2,
-		boolean hSettings)
+	private void drawSettingsBackground(MatrixStack matrixStack, int x2, int x3,
+		int y1, int y2, boolean hSettings)
 	{
 		float[] bgColor = GUI.getBgColor();
 		float opacity = GUI.getOpacity();
 		
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glColor4f(bgColor[0], bgColor[1], bgColor[2],
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hSettings ? opacity * 1.5F : opacity);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		tessellator.draw();
 	}
 	
-	private void drawOutline(int x1, int x2, int y1, int y2)
+	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
+		int y2)
 	{
 		float[] acColor = GUI.getAcColor();
 		
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glColor4f(acColor[0], acColor[1], acColor[2], 0.5F);
-		GL11.glVertex2i(x1, y1);
-		GL11.glVertex2i(x1, y2);
-		GL11.glVertex2i(x2, y2);
-		GL11.glVertex2i(x2, y1);
-		GL11.glEnd();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).next();
+		bufferBuilder.vertex(matrix, x2, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		tessellator.draw();
 	}
 	
-	private void drawSeparator(int x3, int y1, int y2)
+	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
 		// separator
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex2i(x3, y1);
-		GL11.glVertex2i(x3, y2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x3, y2, 0).next();
+		tessellator.draw();
 	}
 	
-	private void drawSettingsArrow(int x2, int x3, int y1, int y2,
-		boolean hSettings)
+	private void drawSettingsArrow(MatrixStack matrixStack, int x2, int x3,
+		int y1, int y2, boolean hSettings)
 	{
-		double xa1 = x3 + 1;
-		double xa2 = (x3 + x2) / 2.0;
-		double xa3 = x2 - 1;
-		double ya1;
-		double ya2;
+		float xa1 = x3 + 1;
+		float xa2 = (x3 + x2) / 2.0F;
+		float xa3 = x2 - 1;
+		float ya1;
+		float ya2;
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		if(isSettingsWindowOpen())
 		{
-			ya1 = y2 - 3.5;
+			ya1 = y2 - 3.5F;
 			ya2 = y1 + 3;
-			GL11.glColor4f(hSettings ? 1 : 0.85F, 0, 0, 1);
+			RenderSystem.setShaderColor(hSettings ? 1 : 0.85F, 0, 0, 1);
 			
 		}else
 		{
-			ya1 = y1 + 3.5;
+			ya1 = y1 + 3.5F;
 			ya2 = y2 - 3;
-			GL11.glColor4f(0, hSettings ? 1 : 0.85F, 0, 1);
+			RenderSystem.setShaderColor(0, hSettings ? 1 : 0.85F, 0, 1);
 		}
 		
 		// arrow
-		GL11.glBegin(GL11.GL_TRIANGLES);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		tessellator.draw();
 		
 		// outline
-		GL11.glColor4f(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex2d(xa1, ya1);
-		GL11.glVertex2d(xa3, ya1);
-		GL11.glVertex2d(xa2, ya2);
-		GL11.glEnd();
+		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
+		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
+		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
+		tessellator.draw();
 	}
 	
 	private void drawName(MatrixStack matrixStack, int x1, int x3, int y1)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		TextRenderer tr = MC.textRenderer;
 		String name = feature.getName();
@@ -259,9 +301,8 @@ public final class FeatureButton extends Component
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		tr.draw(matrixStack, name, tx, ty, 0xF0F0F0);
+		tr.draw(matrixStack, name, tx, ty, txtColor);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

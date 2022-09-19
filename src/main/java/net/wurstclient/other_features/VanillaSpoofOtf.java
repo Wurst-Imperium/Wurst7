@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,12 +8,12 @@
 package net.wurstclient.other_features;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.impl.networking.CustomPayloadC2SPacketAccessor;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
+import net.wurstclient.mixin.CustomPayloadC2SPacketAccessor;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -28,11 +28,11 @@ public final class VanillaSpoofOtf extends OtherFeature
 	
 	public VanillaSpoofOtf()
 	{
-		super("VanillaSpoof", "Bypasses anti-Fabric plugins by\n"
-			+ "pretending to be a vanilla client.");
+		super("VanillaSpoof",
+			"Bypasses anti-Fabric plugins by pretending to be a vanilla client.");
 		addSetting(spoof);
 		
-		WURST.getEventManager().add(ConnectionPacketOutputListener.class, this);
+		EVENTS.add(ConnectionPacketOutputListener.class, this);
 	}
 	
 	@Override
@@ -41,11 +41,12 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!spoof.isChecked())
 			return;
 		
-		if(!(event.getPacket() instanceof CustomPayloadC2SPacket))
+		if(!(event.getPacket() instanceof CustomPayloadC2SPacketAccessor))
 			return;
 		
 		CustomPayloadC2SPacketAccessor packet =
 			(CustomPayloadC2SPacketAccessor)event.getPacket();
+		
 		if(packet.getChannel().getNamespace().equals("minecraft")
 			&& packet.getChannel().getPath().equals("register"))
 			event.cancel();

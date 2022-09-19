@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.command.CmdError;
@@ -39,13 +39,13 @@ public final class ModifyCmd extends Command
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		if(!player.abilities.creativeMode)
+		if(!player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = player.inventory.getMainHandStack();
+		ItemStack stack = player.getInventory().getMainHandStack();
 		
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
@@ -70,7 +70,7 @@ public final class ModifyCmd extends Command
 		
 		MC.player.networkHandler
 			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.inventory.selectedSlot, stack));
+				36 + player.getInventory().selectedSlot, stack));
 		
 		ChatUtils.message("Item modified.");
 	}
@@ -80,13 +80,13 @@ public final class ModifyCmd extends Command
 		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
-		if(!stack.hasTag())
-			stack.setTag(new CompoundTag());
+		if(!stack.hasNbt())
+			stack.setNbt(new NbtCompound());
 		
 		try
 		{
-			CompoundTag tag = StringNbtReader.parse(nbt);
-			stack.getTag().copyFrom(tag);
+			NbtCompound tag = StringNbtReader.parse(nbt);
+			stack.getNbt().copyFrom(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -102,8 +102,8 @@ public final class ModifyCmd extends Command
 		
 		try
 		{
-			CompoundTag tag = StringNbtReader.parse(nbt);
-			stack.setTag(tag);
+			NbtCompound tag = StringNbtReader.parse(nbt);
+			stack.setNbt(tag);
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -117,7 +117,7 @@ public final class ModifyCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		NbtPath path = parseNbtPath(stack.getTag(), args[1]);
+		NbtPath path = parseNbtPath(stack.getNbt(), args[1]);
 		
 		if(path == null)
 			throw new CmdError("The path does not exist.");
@@ -125,11 +125,11 @@ public final class ModifyCmd extends Command
 		path.base.remove(path.key);
 	}
 	
-	private NbtPath parseNbtPath(CompoundTag tag, String path)
+	private NbtPath parseNbtPath(NbtCompound tag, String path)
 	{
 		String[] parts = path.split("\\.");
 		
-		CompoundTag base = tag;
+		NbtCompound base = tag;
 		if(base == null)
 			return null;
 		
@@ -137,7 +137,7 @@ public final class ModifyCmd extends Command
 		{
 			String part = parts[i];
 			
-			if(!base.contains(part) || !(base.get(part) instanceof CompoundTag))
+			if(!base.contains(part) || !(base.get(part) instanceof NbtCompound))
 				return null;
 			
 			base = base.getCompound(part);
@@ -151,10 +151,10 @@ public final class ModifyCmd extends Command
 	
 	private static class NbtPath
 	{
-		public CompoundTag base;
+		public NbtCompound base;
 		public String key;
 		
-		public NbtPath(CompoundTag base, String key)
+		public NbtPath(NbtCompound base, String key)
 		{
 			this.base = base;
 			this.key = key;

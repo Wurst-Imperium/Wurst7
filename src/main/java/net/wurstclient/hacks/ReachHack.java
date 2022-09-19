@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,25 +10,27 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"range"})
 public final class ReachHack extends Hack
 {
+	private final SliderSetting range =
+		new SliderSetting("Range", 6, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	
 	public ReachHack()
 	{
-		super("Reach", "Allows you to reach further.");
+		super("Reach");
 		setCategory(Category.OTHER);
+		addSetting(range);
 	}
 	
-	@Override
-	public void onEnable()
+	public float getReachDistance()
 	{
-		IMC.getInteractionManager().setOverrideReach(true);
+		return range.getValueF();
 	}
 	
-	@Override
-	public void onDisable()
-	{
-		IMC.getInteractionManager().setOverrideReach(false);
-	}
+	// See ClientPlayerInteractionManagerMixin.onGetReachDistance() and
+	// ClientPlayerInteractionManagerMixin.hasExtendedReach()
 }

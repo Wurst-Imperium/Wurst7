@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -28,6 +28,7 @@ import net.wurstclient.util.json.JsonException;
 
 public final class HackList implements UpdateListener
 {
+	public final AnchorAuraHack anchorAuraHack = new AnchorAuraHack();
 	public final AntiAfkHack antiAfkHack = new AntiAfkHack();
 	public final AntiBlindHack antiBlindHack = new AntiBlindHack();
 	public final AntiCactusHack antiCactusHack = new AntiCactusHack();
@@ -35,6 +36,7 @@ public final class HackList implements UpdateListener
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
 	public final AntiWaterPushHack antiWaterPushHack = new AntiWaterPushHack();
 	public final AntiWobbleHack antiWobbleHack = new AntiWobbleHack();
+	public final ArrowDmgHack arrowDmgHack = new ArrowDmgHack();
 	public final AutoArmorHack autoArmorHack = new AutoArmorHack();
 	public final AutoBuildHack autoBuildHack = new AutoBuildHack();
 	public final AutoDropHack autoDropHack = new AutoDropHack();
@@ -71,7 +73,10 @@ public final class HackList implements UpdateListener
 	public final ClickAuraHack clickAuraHack = new ClickAuraHack();
 	public final ClickGuiHack clickGuiHack = new ClickGuiHack();
 	public final CrashChestHack crashChestHack = new CrashChestHack();
+	public final CreativeFlightHack creativeFlightHack =
+		new CreativeFlightHack();
 	public final CriticalsHack criticalsHack = new CriticalsHack();
+	public final CrystalAuraHack crystalAuraHack = new CrystalAuraHack();
 	public final DerpHack derpHack = new DerpHack();
 	public final DolphinHack dolphinHack = new DolphinHack();
 	public final ExcavatorHack excavatorHack = new ExcavatorHack();
@@ -80,6 +85,7 @@ public final class HackList implements UpdateListener
 	public final FastBreakHack fastBreakHack = new FastBreakHack();
 	public final FastLadderHack fastLadderHack = new FastLadderHack();
 	public final FastPlaceHack fastPlaceHack = new FastPlaceHack();
+	public final FeedAuraHack feedAuraHack = new FeedAuraHack();
 	public final FightBotHack fightBotHack = new FightBotHack();
 	public final FishHack fishHack = new FishHack();
 	public final FlightHack flightHack = new FlightHack();
@@ -94,6 +100,7 @@ public final class HackList implements UpdateListener
 	public final HighJumpHack highJumpHack = new HighJumpHack();
 	public final InfiniChatHack infiniChatHack = new InfiniChatHack();
 	public final InstantBunkerHack instantBunkerHack = new InstantBunkerHack();
+	public final InvWalkHack invWalkHack = new InvWalkHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
 	public final ItemGeneratorHack itemGeneratorHack = new ItemGeneratorHack();
 	public final JesusHack jesusHack = new JesusHack();
@@ -112,6 +119,7 @@ public final class HackList implements UpdateListener
 	public final NameProtectHack nameProtectHack = new NameProtectHack();
 	public final NameTagsHack nameTagsHack = new NameTagsHack();
 	public final NavigatorHack navigatorHack = new NavigatorHack();
+	public final NoBackgroundHack noBackgroundHack = new NoBackgroundHack();
 	public final NoClipHack noClipHack = new NoClipHack();
 	public final NoFallHack noFallHack = new NoFallHack();
 	public final NoFireOverlayHack noFireOverlayHack = new NoFireOverlayHack();
@@ -124,11 +132,13 @@ public final class HackList implements UpdateListener
 	public final NoWebHack noWebHack = new NoWebHack();
 	public final NukerHack nukerHack = new NukerHack();
 	public final NukerLegitHack nukerLegitHack = new NukerLegitHack();
+	public final OpenWaterEspHack openWaterEspHack = new OpenWaterEspHack();
 	public final OverlayHack overlayHack = new OverlayHack();
 	public final PanicHack panicHack = new PanicHack();
 	public final ParkourHack parkourHack = new ParkourHack();
 	public final PlayerEspHack playerEspHack = new PlayerEspHack();
 	public final PlayerFinderHack playerFinderHack = new PlayerFinderHack();
+	public final PortalGuiHack portalGuiHack = new PortalGuiHack();
 	public final PotionSaverHack potionSaverHack = new PotionSaverHack();
 	public final ProphuntEspHack prophuntEspHack = new ProphuntEspHack();
 	public final ProtectHack protectHack = new ProtectHack();
@@ -142,16 +152,19 @@ public final class HackList implements UpdateListener
 	public final ServerCrasherHack serverCrasherHack = new ServerCrasherHack();
 	public final SkinDerpHack skinDerpHack = new SkinDerpHack();
 	public final SneakHack sneakHack = new SneakHack();
+	public final SnowShoeHack snowShoeHack = new SnowShoeHack();
 	public final SpeedHackHack speedHackHack = new SpeedHackHack();
 	public final SpeedNukerHack speedNukerHack = new SpeedNukerHack();
 	public final SpiderHack spiderHack = new SpiderHack();
 	public final StepHack stepHack = new StepHack();
 	public final ThrowHack throwHack = new ThrowHack();
+	public final TillauraHack tillauraHack = new TillauraHack();
 	public final TimerHack timerHack = new TimerHack();
 	public final TiredHack tiredHack = new TiredHack();
 	public final TooManyHaxHack tooManyHaxHack = new TooManyHaxHack();
 	public final TpAuraHack tpAuraHack = new TpAuraHack();
 	public final TrajectoriesHack trajectoriesHack = new TrajectoriesHack();
+	public final TreeBotHack treeBotHack = new TreeBotHack();
 	public final TriggerBotHack triggerBotHack = new TriggerBotHack();
 	public final TrollPotionHack trollPotionHack = new TrollPotionHack();
 	public final TrueSightHack trueSightHack = new TrueSightHack();
@@ -159,7 +172,7 @@ public final class HackList implements UpdateListener
 	public final XRayHack xRayHack = new XRayHack();
 	
 	private final TreeMap<String, Hack> hax =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+		new TreeMap<>(String::compareToIgnoreCase);
 	
 	private final EnabledHacksFile enabledHacksFile;
 	private final Path profilesFolder =
@@ -228,7 +241,7 @@ public final class HackList implements UpdateListener
 		try(Stream<Path> files = Files.list(profilesFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{

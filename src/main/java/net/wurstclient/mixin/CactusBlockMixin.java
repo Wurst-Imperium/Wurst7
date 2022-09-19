@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,18 +33,14 @@ public abstract class CactusBlockMixin extends Block
 	
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"getOutlineShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+			"getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
 		cancellable = true)
 	private void onGetCollisionShape(BlockState blockState_1,
 		BlockView blockView_1, BlockPos blockPos_1,
 		ShapeContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
 	{
-		EventManager events = WurstClient.INSTANCE.getEventManager();
-		if(events == null)
-			return;
-		
 		CactusCollisionShapeEvent event = new CactusCollisionShapeEvent();
-		events.fire(event);
+		EventManager.fire(event);
 		
 		VoxelShape collisionShape = event.getCollisionShape();
 		if(collisionShape != null)

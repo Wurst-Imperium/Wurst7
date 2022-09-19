@@ -22,12 +22,16 @@ import net.wurstclient.hacks.NoLevitationHack;
 public class LivingEntityMixin
 {
 	private final NoLevitationHack noLevitation =
-			WurstClient.INSTANCE.getHax().noLevitationHack;
-
-	@Inject(at = @At("HEAD"), method = "hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z", cancellable = true)
-	private void hasStatusEffect(StatusEffect effect, CallbackInfoReturnable<Boolean> cir)
+		WurstClient.INSTANCE.getHax().noLevitationHack;
+	
+	@Inject(at = @At("HEAD"),
+		method = "hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
+		cancellable = true)
+	private void hasStatusEffect(StatusEffect effect,
+		CallbackInfoReturnable<Boolean> cir)
 	{
-		if (noLevitation.isEnabled() && effect.equals(StatusEffects.LEVITATION)) {
+		if(noLevitation.isEnabled() && effect.equals(StatusEffects.LEVITATION))
+		{
 			cir.setReturnValue(false);
 		}
 	}

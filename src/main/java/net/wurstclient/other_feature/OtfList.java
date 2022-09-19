@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,16 +22,19 @@ public final class OtfList
 	public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();
 	public final LastServerOtf lastServerOtf = new LastServerOtf();
+	public final NoChatReportsOtf noChatReportsOtf = new NoChatReportsOtf();
+	public final NoTelemetryOtf noTelemetryOtf = new NoTelemetryOtf();
 	public final ReconnectOtf reconnectOtf = new ReconnectOtf();
 	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
 	public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
+	public final TranslationsOtf translationsOtf = new TranslationsOtf();
 	public final VanillaSpoofOtf vanillaSpoofOtf = new VanillaSpoofOtf();
 	public final WurstCapesOtf wurstCapesOtf = new WurstCapesOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
 	public final ZoomOtf zoomOtf = new ZoomOtf();
 	
 	private final TreeMap<String, OtherFeature> otfs =
-		new TreeMap<>((o1, o2) -> o1.compareToIgnoreCase(o2));
+		new TreeMap<>(String::compareToIgnoreCase);
 	
 	public OtfList()
 	{

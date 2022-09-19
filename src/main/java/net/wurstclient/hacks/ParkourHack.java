@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,10 +19,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 {
 	public ParkourHack()
 	{
-		super("Parkour",
-			"Makes you jump automatically when reaching\n"
-				+ "the edge of a block.\n"
-				+ "Useful for parkours and jump'n'runs.");
+		super("Parkour");
 		
 		setCategory(Category.MOVEMENT);
 	}
@@ -43,17 +40,17 @@ public final class ParkourHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(!MC.player.isOnGround() || MC.options.keyJump.isPressed())
+		if(!MC.player.isOnGround() || MC.options.jumpKey.isPressed())
 			return;
 		
-		if(MC.player.isSneaking() || MC.options.keySneak.isPressed())
+		if(MC.player.isSneaking() || MC.options.sneakKey.isPressed())
 			return;
 		
 		Box box = MC.player.getBoundingBox();
 		Box adjustedBox = box.offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
 		
 		Stream<VoxelShape> blockCollisions =
-			MC.world.getBlockCollisions(MC.player, adjustedBox);
+			IMC.getWorld().getBlockCollisionsStream(MC.player, adjustedBox);
 		
 		if(blockCollisions.findAny().isPresent())
 			return;

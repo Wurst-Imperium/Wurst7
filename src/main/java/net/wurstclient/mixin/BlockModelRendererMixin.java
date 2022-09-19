@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,13 +7,11 @@
  */
 package net.wurstclient.mixin;
 
-import java.util.Random;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
@@ -21,8 +19,9 @@ import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 
@@ -31,42 +30,41 @@ public abstract class BlockModelRendererMixin
 {
 	@Inject(at = {@At("HEAD")},
 		method = {
-			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z",
-			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLjava/util/Random;JI)Z"},
+			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
+			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V"},
 		cancellable = true)
-	private void onRenderSmoothOrFlat(BlockRenderView blockRenderView_1,
-		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
-		boolean depthTest, Random random_1, long long_1, int int_1,
-		CallbackInfoReturnable<Boolean> cir)
+	private void onRenderSmoothOrFlat(BlockRenderView world, BakedModel model,
+		BlockState state, BlockPos pos, MatrixStack matrices,
+		VertexConsumer vertexConsumer, boolean cull, Random random, long seed,
+		int overlay, CallbackInfo ci)
 	{
-		TesselateBlockEvent event = new TesselateBlockEvent(blockState_1);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		TesselateBlockEvent event = new TesselateBlockEvent(state);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 		{
-			cir.cancel();
+			ci.cancel();
 			return;
 		}
 		
-		if(!depthTest)
+		if(!cull)
 			return;
 		
-		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(blockState_1);
-		WurstClient.INSTANCE.getEventManager().fire(event2);
+		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(state);
+		EventManager.fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;
 		
-		renderSmooth(blockRenderView_1, bakedModel_1, blockState_1, blockPos_1,
-			matrixStack_1, vertexConsumer_1, false, random_1, long_1, int_1);
+		renderSmooth(world, model, state, pos, matrices, vertexConsumer, false,
+			random, seed, overlay);
 	}
 	
 	@Shadow
-	public boolean renderSmooth(BlockRenderView blockRenderView_1,
-		BakedModel bakedModel_1, BlockState blockState_1, BlockPos blockPos_1,
-		MatrixStack matrixStack_1, VertexConsumer vertexConsumer_1,
-		boolean boolean_1, Random random_1, long long_1, int int_1)
+	public void renderSmooth(BlockRenderView world, BakedModel model,
+		BlockState state, BlockPos pos, MatrixStack matrices,
+		VertexConsumer vertexConsumer, boolean cull, Random random, long seed,
+		int overlay)
 	{
-		return false;
+		
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
@@ -24,8 +24,8 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.CheckboxSetting;
 
 public class WurstOptionsScreen extends Screen
@@ -34,15 +34,16 @@ public class WurstOptionsScreen extends Screen
 	
 	public WurstOptionsScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200,
-			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(
+			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
+				Text.literal("Back"), b -> client.setScreen(prevScreen)));
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -56,11 +57,14 @@ public class WurstOptionsScreen extends Screen
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
 		WurstAnalytics analytics = wurst.getAnalytics();
 		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
+		CheckboxSetting forceEnglish =
+			wurst.getOtfs().translationsOtf.getForceEnglish();
 		
 		new WurstOptionsButton(-154, 24,
 			() -> "Click Friends: "
 				+ (middleClickFriends.isChecked() ? "ON" : "OFF"),
-			middleClickFriends.getDescription(), b -> middleClickFriends
+			middleClickFriends.getWrappedDescription(200),
+			b -> middleClickFriends
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,
@@ -72,20 +76,23 @@ public class WurstOptionsScreen extends Screen
 				+ "We use a random ID to tell users apart\n"
 				+ "so that this data can never be linked to\n"
 				+ "your Minecraft account. The random ID is\n"
-				+ "changed every 30 days to make extra sure\n"
+				+ "changed every 3 days to make extra sure\n"
 				+ "that you remain anonymous.",
 			b -> analytics.setEnabled(!analytics.isEnabled()));
 		
 		new WurstOptionsButton(-154, 72,
-			() -> "Sentry: " + (SentryConfig.isEnabled() ? "ON" : "OFF"),
-			"Automatically reports crashes\n" + "so you don't have to.",
-			b -> SentryConfig.setEnabled(!SentryConfig.isEnabled()));
-		
-		new WurstOptionsButton(-154, 96,
 			() -> "Spoof Vanilla: "
 				+ (vanillaSpoofOtf.isEnabled() ? "ON" : "OFF"),
-			vanillaSpoofOtf.getDescription(),
+			vanillaSpoofOtf.getWrappedDescription(200),
 			b -> vanillaSpoofOtf.doPrimaryAction());
+		
+		new WurstOptionsButton(-154, 96,
+			() -> "Translations: " + (!forceEnglish.isChecked() ? "ON" : "OFF"),
+			"§cThis is an experimental feature!\n"
+				+ "We don't have many translations yet. If you\n"
+				+ "speak both English and some other language,\n"
+				+ "please help us by adding more translations.",
+			b -> forceEnglish.setChecked(!forceEnglish.isChecked()));
 	}
 	
 	private void addManagerButtons()
@@ -95,7 +102,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "Keybinds",
 			"Keybinds allow you to toggle any hack\n"
 				+ "or command by simply pressing a\n" + "button.",
-			b -> client.openScreen(new KeybindManagerScreen(this)));
+			b -> client.setScreen(new KeybindManagerScreen(this)));
 		
 		new WurstOptionsButton(-50, 48, () -> "X-Ray Blocks",
 			"Manager for the blocks\n" + "that X-Ray will show.",
@@ -105,7 +112,7 @@ public class WurstOptionsScreen extends Screen
 			"The Zoom Manager allows you to\n"
 				+ "change the zoom key, how far it\n"
 				+ "will zoom in and more.",
-			b -> client.openScreen(new ZoomManagerScreen(this)));
+			b -> client.setScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()
@@ -131,6 +138,12 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
+	}
+	
+	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
@@ -147,25 +160,30 @@ public class WurstOptionsScreen extends Screen
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredString(matrixStack, tr, "Wurst Options", middleX, y1,
+		drawCenteredText(matrixStack, tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		drawCenteredString(matrixStack, tr, "Settings", middleX - 104, y2,
+		drawCenteredText(matrixStack, tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredString(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredString(matrixStack, tr, "Links", middleX + 104, y2,
-			0xcccccc);
+		drawCenteredText(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredText(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
 		int mouseY)
 	{
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
 				continue;
 			
 			WurstOptionsButton woButton = (WurstOptionsButton)button;
+			
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
@@ -185,31 +203,31 @@ public class WurstOptionsScreen extends Screen
 		{
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
-				new LiteralText(messageSupplier.get()), pressAction);
+				Text.literal(messageSupplier.get()), pressAction);
 			
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
-				this.tooltip = Arrays.asList(new LiteralText[0]);
+				this.tooltip = Arrays.asList();
 			else
 			{
 				String[] lines = tooltip.split("\n");
 				
-				LiteralText[] lines2 = new LiteralText[lines.length];
+				Text[] lines2 = new Text[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = new LiteralText(lines[i]);
+					lines2[i] = Text.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
 			
-			addButton(this);
+			addDrawableChild(this);
 		}
 		
 		@Override
 		public void onPress()
 		{
 			super.onPress();
-			setMessage(new LiteralText(messageSupplier.get()));
+			setMessage(Text.literal(messageSupplier.get()));
 		}
 	}
 }

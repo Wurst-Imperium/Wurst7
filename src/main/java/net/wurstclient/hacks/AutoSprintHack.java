@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,7 +18,7 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 {
 	public AutoSprintHack()
 	{
-		super("AutoSprint", "Makes you sprint automatically.");
+		super("AutoSprint");
 		setCategory(Category.MOVEMENT);
 	}
 	
@@ -42,7 +42,7 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		if(player.horizontalCollision || player.isSneaking())
 			return;
 		
-		if(player.isWet() || player.isSubmergedInWater())
+		if(player.isInsideWaterOrBubbleColumn() || player.isSubmergedInWater())
 			return;
 		
 		if(player.forwardSpeed > 0)

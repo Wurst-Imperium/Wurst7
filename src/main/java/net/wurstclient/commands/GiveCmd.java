@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.Identifier;
@@ -44,7 +44,7 @@ public final class GiveCmd extends Command
 		if(args.length < 1)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.abilities.creativeMode)
+		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
@@ -63,7 +63,7 @@ public final class GiveCmd extends Command
 			if(!MathUtils.isInteger(args[1]))
 				throw new CmdSyntaxError("Not a number: " + args[1]);
 			
-			amount = Integer.valueOf(args[1]);
+			amount = Integer.parseInt(args[1]);
 			
 			if(amount < 1)
 				throw new CmdError("Amount cannot be less than 1.");
@@ -82,8 +82,8 @@ public final class GiveCmd extends Command
 		if(nbt != null)
 			try
 			{
-				CompoundTag tag = StringNbtReader.parse(nbt);
-				stack.setTag(tag);
+				NbtCompound tag = StringNbtReader.parse(nbt);
+				stack.setNbt(tag);
 				
 			}catch(CommandSyntaxException e)
 			{
@@ -92,10 +92,9 @@ public final class GiveCmd extends Command
 			}
 		
 		// give item
-		if(placeStackInHotbar(stack))
-			ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
-		else
+		if(!placeStackInHotbar(stack))
 			throw new CmdError("Please clear a slot in your hotbar.");
+		ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
 	}
 	
 	private Item getItem(String id) throws CmdSyntaxError
@@ -114,7 +113,7 @@ public final class GiveCmd extends Command
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			if(!MC.player.inventory.getStack(i).isEmpty())
+			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
 			MC.player.networkHandler.sendPacket(

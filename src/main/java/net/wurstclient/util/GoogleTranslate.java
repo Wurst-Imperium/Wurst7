@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,8 +17,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringEscapeUtils;
 
 public class GoogleTranslate
 {
@@ -88,9 +86,10 @@ public class GoogleTranslate
 		return connection;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private String parseHTML(String html)
 	{
-		String regex = "class=\"t0\">([^<]*)<\\/div>";
+		String regex = "class=\"result-container\">([^<]*)<\\/div>";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		
 		Matcher matcher = pattern.matcher(html);
@@ -99,7 +98,9 @@ public class GoogleTranslate
 		
 		if(match == null || match.isEmpty())
 			return null;
-		
-		return StringEscapeUtils.unescapeHtml4(match);
+			
+		// deprecated in favor of org.apache.commons.text.StringEscapeUtils,
+		// which isn't bundled with Minecraft
+		return org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(match);
 	}
 }

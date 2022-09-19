@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,17 +26,14 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoPotionHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Throws a potion when your health\n"
-			+ "reaches this value or falls below it.",
-		6, 0.5, 9.5, 0.5,
-		v -> ValueDisplay.DECIMAL.getValueString(v) + " hearts");
+		"Throws a potion when your health reaches this value or falls below it.",
+		6, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts"));
 	
 	private int timer;
 	
 	public AutoPotionHack()
 	{
-		super("AutoPotion", "Automatically throws splash potions of\n"
-			+ "instant health when your health is low.");
+		super("AutoPotion");
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);
@@ -76,20 +73,20 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 				return;
 			
 			// save old slot
-			int oldSlot = MC.player.inventory.selectedSlot;
+			int oldSlot = MC.player.getInventory().selectedSlot;
 			
 			// throw potion in hotbar
-			MC.player.inventory.selectedSlot = potionInHotbar;
-			MC.player.networkHandler
-				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw, 90,
+			MC.player.getInventory().selectedSlot = potionInHotbar;
+			MC.player.networkHandler.sendPacket(
+				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(), 90,
 					MC.player.isOnGround()));
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
-			MC.player.inventory.selectedSlot = oldSlot;
-			MC.player.networkHandler
-				.sendPacket(new PlayerMoveC2SPacket.LookOnly(MC.player.yaw,
-					MC.player.pitch, MC.player.isOnGround()));
+			MC.player.getInventory().selectedSlot = oldSlot;
+			MC.player.networkHandler.sendPacket(
+				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(),
+					MC.player.getPitch(), MC.player.isOnGround()));
 			
 			// reset timer
 			timer = 10;
@@ -110,7 +107,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			
 			// filter out non-splash potion items
 			if(stack.getItem() != Items.SPLASH_POTION)

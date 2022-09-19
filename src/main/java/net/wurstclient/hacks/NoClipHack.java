@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,9 +23,7 @@ public final class NoClipHack extends Hack implements UpdateListener,
 {
 	public NoClipHack()
 	{
-		super("NoClip", "Allows you to freely move through blocks.\n"
-			+ "A block (e.g. sand) must fall on your head to activate it.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r You will take damage while moving through blocks!");
+		super("NoClip");
 		setCategory(Category.MOVEMENT);
 	}
 	
@@ -58,15 +56,15 @@ public final class NoClipHack extends Hack implements UpdateListener,
 		player.fallDistance = 0;
 		player.setOnGround(false);
 		
-		player.abilities.flying = false;
+		player.getAbilities().flying = false;
 		player.setVelocity(0, 0, 0);
 		
 		float speed = 0.2F;
-		player.flyingSpeed = speed;
+		player.airStrafingSpeed = speed;
 		
-		if(MC.options.keyJump.isPressed())
+		if(MC.options.jumpKey.isPressed())
 			player.addVelocity(0, speed, 0);
-		if(MC.options.keySneak.isPressed())
+		if(MC.options.sneakKey.isPressed())
 			player.addVelocity(0, -speed, 0);
 	}
 	

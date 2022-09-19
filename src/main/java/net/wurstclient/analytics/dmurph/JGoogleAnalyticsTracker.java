@@ -79,6 +79,7 @@ import java.util.regex.MatchResult;
  *
  * @author Daniel Murphy, Stefan Brozinski
  */
+@SuppressWarnings("removal")
 public class JGoogleAnalyticsTracker
 {
 	public static enum DispatchMode
@@ -260,10 +261,10 @@ public class JGoogleAnalyticsTracker
 		if(proxyAddr != null)
 		{
 			// Split into "proxyAddr:proxyPort".
-			proxyAddr = null;
 			int proxyPort = 8080;
 			try(Scanner s = new Scanner(proxyAddr))
 			{
+				proxyAddr = null;
 				s.findInLine("(http://|)([^:/]+)(:|)([0-9]*)(/|)");
 				MatchResult m = s.match();
 				

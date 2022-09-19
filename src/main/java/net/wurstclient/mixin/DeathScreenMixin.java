@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.DeathListener.DeathEvent;
 
 @Mixin(DeathScreen.class)
@@ -29,6 +30,6 @@ public abstract class DeathScreenMixin extends Screen
 	@Inject(at = {@At(value = "TAIL")}, method = {"tick()V"})
 	private void onTick(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getEventManager().fire(DeathEvent.INSTANCE);
+		EventManager.fire(DeathEvent.INSTANCE);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class PressAKeyScreen extends Screen
 {
@@ -20,7 +20,7 @@ public class PressAKeyScreen extends Screen
 	
 	public PressAKeyScreen(PressAKeyCallback prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		
 		if(!(prevScreen instanceof Screen))
 			throw new IllegalArgumentException("prevScreen is not a screen");
@@ -34,7 +34,7 @@ public class PressAKeyScreen extends Screen
 		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(getKeyName(keyCode, scanCode));
 		
-		client.openScreen((Screen)prevScreen);
+		client.setScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
 	
@@ -54,7 +54,7 @@ public class PressAKeyScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredString(matrixStack, textRenderer, "Press a key", width / 2,
+		drawCenteredText(matrixStack, textRenderer, "Press a key", width / 2,
 			height / 4 + 48, 16777215);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}

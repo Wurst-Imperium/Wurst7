@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,7 +22,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public FakePlayerEntity()
 	{
-		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
+		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile(),
+			WurstClient.MC.player.getPublicKey());
 		copyPositionAndRotation(player);
 		
 		copyInventory();
@@ -35,7 +36,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void copyInventory()
 	{
-		inventory.clone(player.inventory);
+		getInventory().clone(player.getInventory());
 	}
 	
 	private void copyPlayerModel(Entity from, Entity to)
@@ -61,16 +62,17 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	private void spawn()
 	{
-		world.addEntity(getEntityId(), this);
+		world.addEntity(getId(), this);
 	}
 	
 	public void despawn()
 	{
-		removed = true;
+		discard();
 	}
 	
 	public void resetPlayerPosition()
 	{
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(),
+			getPitch());
 	}
 }

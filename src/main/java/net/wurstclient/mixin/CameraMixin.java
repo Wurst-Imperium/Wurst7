@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.Camera;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
+import net.minecraft.client.render.CameraSubmersionType;
 import net.wurstclient.WurstClient;
 
 @Mixin(Camera.class)
@@ -31,11 +30,13 @@ public abstract class CameraMixin
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"getSubmergedFluidState()Lnet/minecraft/fluid/FluidState;"},
+		method = {
+			"getSubmersionType()Lnet/minecraft/client/render/CameraSubmersionType;"},
 		cancellable = true)
-	private void getSubmergedFluidState(CallbackInfoReturnable<FluidState> cir)
+	private void onGetSubmersionType(
+		CallbackInfoReturnable<CameraSubmersionType> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
-			cir.setReturnValue(Fluids.EMPTY.getDefaultState());
+			cir.setReturnValue(CameraSubmersionType.NONE);
 	}
 }

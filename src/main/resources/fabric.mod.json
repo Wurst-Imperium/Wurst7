@@ -25,11 +25,13 @@
   "mixins": [
     "wurst.mixins.json"
   ],
+  "accessWidener" : "wurst.accesswidener",
 
   "depends": {
-    "fabricloader": ">=0.8.8",
-    "fabric": ">=0.12.1",
-    "minecraft": ">=1.16.2"
+    "fabricloader": ">=0.14.8",
+    "fabric": ">=0.58.3",
+    "minecraft": "~1.19.2",
+    "java": ">=17"
   },
   "suggests": {
     "flamingo": "*"

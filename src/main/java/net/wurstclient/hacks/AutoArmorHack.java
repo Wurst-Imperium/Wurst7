@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,7 +22,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClickWindowC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -38,29 +38,25 @@ public final class AutoArmorHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting useEnchantments = new CheckboxSetting(
-		"Use enchantments", "Whether or not to consider the Protection\n"
-			+ "enchantment when calculating armor strength.",
+		"Use enchantments",
+		"Whether or not to consider the Protection enchantment when calculating armor strength.",
 		true);
 	
 	private final CheckboxSetting swapWhileMoving = new CheckboxSetting(
 		"Swap while moving",
-		"Whether or not to swap armor pieces\n"
-			+ "while the player is moving.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r" + " This would not be possible\n"
-			+ "without cheats. It may raise suspicion.",
+		"Whether or not to swap armor pieces while the player is moving.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r This would not be possible without cheats. It may raise suspicion.",
 		false);
 	
-	private final SliderSetting delay =
-		new SliderSetting("Delay",
-			"Amount of ticks to wait before swapping\n"
-				+ "the next piece of armor.",
-			2, 0, 20, 1, ValueDisplay.INTEGER);
+	private final SliderSetting delay = new SliderSetting("Delay",
+		"Amount of ticks to wait before swapping the next piece of armor.", 2,
+		0, 20, 1, ValueDisplay.INTEGER);
 	
 	private int timer;
 	
 	public AutoArmorHack()
 	{
-		super("AutoArmor", "Manages your armor automatically.");
+		super("AutoArmor");
 		setCategory(Category.COMBAT);
 		addSetting(useEnchantments);
 		addSetting(swapWhileMoving);
@@ -98,7 +94,7 @@ public final class AutoArmorHack extends Hack
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.inventory;
+		PlayerInventory inventory = player.getInventory();
 		
 		if(!swapWhileMoving.isChecked() && (player.input.movementForward != 0
 			|| player.input.movementSideways != 0))
@@ -172,7 +168,7 @@ public final class AutoArmorHack extends Hack
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(event.getPacket() instanceof ClickWindowC2SPacket)
+		if(event.getPacket() instanceof ClickSlotC2SPacket)
 			timer = delay.getValueI();
 	}
 	

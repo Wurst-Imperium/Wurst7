@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,9 +11,9 @@ import java.util.Objects;
 
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
+import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.hacks.NavigatorHack;
 import net.wurstclient.hacks.TooManyHaxHack;
-import net.wurstclient.sentry.SentryConfig;
 
 public abstract class Hack extends Feature
 {
@@ -25,10 +25,10 @@ public abstract class Hack extends Feature
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
 	
-	public Hack(String name, String description)
+	public Hack(String name)
 	{
 		this.name = Objects.requireNonNull(name);
-		this.description = Objects.requireNonNull(description);
+		description = "description.wurst.hack." + name.toLowerCase();
 		addPossibleKeybind(name, "Toggle " + name);
 	}
 	
@@ -46,7 +46,7 @@ public abstract class Hack extends Feature
 	@Override
 	public final String getDescription()
 	{
-		return description;
+		return WURST.translate(description);
 	}
 	
 	@Override
@@ -75,11 +75,9 @@ public abstract class Hack extends Feature
 		if(enabled && tooManyHax.isEnabled() && tooManyHax.isBlocked(this))
 			return;
 		
-		SentryConfig.addHackToggleBreadcrumb(this, enabled);
-		
 		this.enabled = enabled;
 		
-		if(!(this instanceof NavigatorHack))
+		if(!(this instanceof NavigatorHack || this instanceof ClickGuiHack))
 			WURST.getHud().getHackList().updateState(this);
 		
 		if(enabled)

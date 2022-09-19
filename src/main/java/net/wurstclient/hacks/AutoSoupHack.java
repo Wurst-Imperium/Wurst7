@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,7 +15,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.MushroomStewItem;
+import net.minecraft.item.StewItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,18 +31,14 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoSoupHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Eats a soup when your health\n"
-			+ "reaches this value or falls below it.",
+		"Eats a soup when your health reaches this value or falls below it.",
 		6.5, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL);
 	
 	private int oldSlot = -1;
 	
 	public AutoSoupHack()
 	{
-		super("AutoSoup", "Automatically eats soup when your health is low.\n\n"
-			+ "\u00a7lNote:\u00a7r This hack ignores hunger and assumes that eating\n"
-			+ "soup directly refills your health. If the server you are\n"
-			+ "playing on is not configured to do that, use AutoEat instead.");
+		super("AutoSoup");
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);
@@ -68,12 +64,12 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		for(int i = 0; i < 36; i++)
 		{
 			// filter out non-bowl items and empty bowl slot
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			if(stack == null || stack.getItem() != Items.BOWL || i == 9)
 				continue;
 			
 			// check if empty bowl slot contains a non-bowl item
-			ItemStack emptyBowlStack = MC.player.inventory.getStack(9);
+			ItemStack emptyBowlStack = MC.player.getInventory().getStack(9);
 			boolean swap = !emptyBowlStack.isEmpty()
 				&& emptyBowlStack.getItem() != Items.BOWL;
 			
@@ -102,13 +98,13 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			
 			// save old slot
 			if(oldSlot == -1)
-				oldSlot = MC.player.inventory.selectedSlot;
+				oldSlot = MC.player.getInventory().selectedSlot;
 			
 			// set slot
-			MC.player.inventory.selectedSlot = soupInHotbar;
+			MC.player.getInventory().selectedSlot = soupInHotbar;
 			
 			// eat soup
-			MC.options.keyUse.setPressed(true);
+			MC.options.useKey.setPressed(true);
 			IMC.getInteractionManager().rightClickItem();
 			
 			return;
@@ -128,9 +124,9 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.inventory.getStack(i);
+			ItemStack stack = MC.player.getInventory().getStack(i);
 			
-			if(stack != null && stack.getItem() instanceof MushroomStewItem)
+			if(stack != null && stack.getItem() instanceof StewItem)
 				return i;
 		}
 		
@@ -183,10 +179,10 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return;
 		
 		// stop eating
-		MC.options.keyUse.setPressed(false);
+		MC.options.useKey.setPressed(false);
 		
 		// reset slot
-		MC.player.inventory.selectedSlot = oldSlot;
+		MC.player.getInventory().selectedSlot = oldSlot;
 		oldSlot = -1;
 	}
 }

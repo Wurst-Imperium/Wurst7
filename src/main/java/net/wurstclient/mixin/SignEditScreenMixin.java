@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -41,7 +41,9 @@ public abstract class SignEditScreenMixin extends Screen
 		if(autoSignText == null)
 			return;
 		
-		text = autoSignText;
+		for(int i = 0; i < 4; i++)
+			text[i] = autoSignText[i];
+		
 		finishEditing();
 	}
 	

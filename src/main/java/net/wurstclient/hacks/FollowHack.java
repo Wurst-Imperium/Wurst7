@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,24 +12,14 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -43,6 +33,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filterlists.FollowFilterList;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
@@ -62,79 +54,17 @@ public final class FollowHack extends Hack
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
 	
-	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't follow other players.", false);
-	
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't follow sleeping players.", false);
-	
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't follow players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
-	
-	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't follow zombies, creepers, etc.", true);
-	
-	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't follow zombie pigmen.", true);
-	
-	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't follow endermen.", true);
-	
-	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't follow pigs, cows, etc.", true);
-	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't follow baby pigs,\n" + "baby villagers, etc.", true);
-	
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't follow tamed wolves,\n" + "tamed horses, etc.", true);
-	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't follow villagers, wandering traders, etc.", true);
-	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't follow iron golems,\n" + "snow golems and shulkers.", true);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't follow invisible entities.", false);
-	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't follow armor stands.", true);
-	
-	private final CheckboxSetting filterCarts = new CheckboxSetting(
-		"Filter minecarts", "Won't follow minecarts.", true);
+	private final EntityFilterList entityFilters = FollowFilterList.create();
 	
 	public FollowHack()
 	{
-		super("Follow",
-			"A bot that follows the closest entity.\n" + "Very annoying.\n\n"
-				+ "Use .follow to follow a specific entity.");
+		super("Follow");
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(distance);
 		addSetting(useAi);
 		
-		addSetting(filterPlayers);
-		addSetting(filterSleeping);
-		addSetting(filterFlying);
-		addSetting(filterMonsters);
-		addSetting(filterPigmen);
-		addSetting(filterEndermen);
-		addSetting(filterAnimals);
-		addSetting(filterBabies);
-		addSetting(filterPets);
-		addSetting(filterTraders);
-		addSetting(filterGolems);
-		addSetting(filterInvisible);
-		addSetting(filterStands);
-		addSetting(filterCarts);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -142,83 +72,28 @@ public final class FollowHack extends Hack
 	{
 		if(entity != null)
 			return "Following " + entity.getName().getString();
-		else
-			return "Follow";
+		return "Follow";
 	}
 	
 	@Override
 	public void onEnable()
 	{
+		WURST.getHax().fightBotHack.setEnabled(false);
+		WURST.getHax().protectHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
+		
 		if(entity == null)
 		{
 			Stream<Entity> stream =
 				StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-					.filter(e -> !e.removed)
+					.filter(e -> !e.isRemoved())
 					.filter(e -> e instanceof LivingEntity
 						&& ((LivingEntity)e).getHealth() > 0
 						|| e instanceof AbstractMinecartEntity)
 					.filter(e -> e != MC.player)
 					.filter(e -> !(e instanceof FakePlayerEntity));
 			
-			if(filterPlayers.isChecked())
-				stream = stream.filter(e -> !(e instanceof PlayerEntity));
-			
-			if(filterSleeping.isChecked())
-				stream = stream.filter(e -> !(e instanceof PlayerEntity
-					&& ((PlayerEntity)e).isSleeping()));
-			
-			if(filterFlying.getValue() > 0)
-				stream = stream.filter(e -> {
-					
-					if(!(e instanceof PlayerEntity))
-						return true;
-					
-					Box box = e.getBoundingBox();
-					box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-					return MC.world.isSpaceEmpty(box);
-				});
-			
-			if(filterMonsters.isChecked())
-				stream = stream.filter(e -> !(e instanceof Monster));
-			
-			if(filterPigmen.isChecked())
-				stream =
-					stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
-			
-			if(filterEndermen.isChecked())
-				stream = stream.filter(e -> !(e instanceof EndermanEntity));
-			
-			if(filterAnimals.isChecked())
-				stream = stream.filter(e -> !(e instanceof AnimalEntity
-					|| e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-			
-			if(filterBabies.isChecked())
-				stream = stream.filter(e -> !(e instanceof PassiveEntity
-					&& ((PassiveEntity)e).isBaby()));
-			
-			if(filterPets.isChecked())
-				stream = stream
-					.filter(e -> !(e instanceof TameableEntity
-						&& ((TameableEntity)e).isTamed()))
-					.filter(e -> !(e instanceof HorseBaseEntity
-						&& ((HorseBaseEntity)e).isTame()));
-			
-			if(filterTraders.isChecked())
-				stream = stream.filter(e -> !(e instanceof MerchantEntity));
-			
-			if(filterGolems.isChecked())
-				stream = stream.filter(e -> !(e instanceof GolemEntity));
-			
-			if(filterInvisible.isChecked())
-				stream = stream.filter(e -> !e.isInvisible());
-			
-			if(filterStands.isChecked())
-				stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
-			
-			if(filterCarts.isChecked())
-				stream =
-					stream.filter(e -> !(e instanceof AbstractMinecartEntity));
+			stream = entityFilters.applyTo(stream);
 			
 			entity = stream
 				.min(Comparator
@@ -270,13 +145,14 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity.removed || entity instanceof LivingEntity
+		if(entity.isRemoved() || entity instanceof LivingEntity
 			&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> !e.removed && ((LivingEntity)e).getHealth() > 0)
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> entity.getName().getString()
@@ -338,37 +214,39 @@ public final class FollowHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.jumpKey.setPressed(false);
 			}
 			
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			MC.options.keyForward
+			MC.options.forwardKey
 				.setPressed(MC.player.squaredDistanceTo(entity.getX(),
 					MC.player.getY(), entity.getZ()) > distanceSq);
 		}
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	public void setEntity(Entity entity)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,25 +12,15 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -42,9 +32,12 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"fight bot"})
@@ -55,6 +48,9 @@ public final class FightBotHack extends Hack
 	private final SliderSetting range = new SliderSetting("Range",
 		"Attack range (like Killaura)", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
+	private final AttackSpeedSliderSetting speed =
+		new AttackSpeedSliderSetting();
+	
 	private final SliderSetting distance = new SliderSetting("Distance",
 		"How closely to follow the target.\n"
 			+ "This should be set to a lower value than Range.",
@@ -63,56 +59,11 @@ public final class FightBotHack extends Hack
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
 	
-	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
+	private final PauseAttackOnContainersSetting pauseOnContainers =
+		new PauseAttackOnContainersSetting(true);
 	
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
-	
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
-	
-	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
-	
-	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
-	
-	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
-	
-	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
-	
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
-	
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
-	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
-	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
-	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
-	
-	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
-	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", false);
+	private final EntityFilterList entityFilters =
+		EntityFilterList.genericCombat();
 	
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
@@ -120,30 +71,16 @@ public final class FightBotHack extends Hack
 	
 	public FightBotHack()
 	{
-		super("FightBot",
-			"A bot that automatically walks around and kills everything.\n"
-				+ "Good for MobArena.");
+		super("FightBot");
 		
 		setCategory(Category.COMBAT);
 		addSetting(range);
+		addSetting(speed);
 		addSetting(distance);
 		addSetting(useAi);
+		addSetting(pauseOnContainers);
 		
-		addSetting(filterPlayers);
-		addSetting(filterSleeping);
-		addSetting(filterFlying);
-		addSetting(filterMonsters);
-		addSetting(filterPigmen);
-		addSetting(filterEndermen);
-		addSetting(filterAnimals);
-		addSetting(filterBabies);
-		addSetting(filterPets);
-		addSetting(filterTraders);
-		addSetting(filterGolems);
-		addSetting(filterInvisible);
-		addSetting(filterNamed);
-		addSetting(filterStands);
-		addSetting(filterCrystals);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -151,15 +88,18 @@ public final class FightBotHack extends Hack
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
+		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
+		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		pathFinder = new EntityPathFinder(MC.player);
 		
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -180,76 +120,22 @@ public final class FightBotHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		speed.updateTimer();
+		
+		if(pauseOnContainers.shouldPause())
+			return;
+		
 		// set entity
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.removed)
+			.filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity));
 		
-		if(filterPlayers.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity));
-		
-		if(filterSleeping.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity
-				&& ((PlayerEntity)e).isSleeping()));
-		
-		if(filterFlying.getValue() > 0)
-			stream = stream.filter(e -> {
-				
-				if(!(e instanceof PlayerEntity))
-					return true;
-				
-				Box box = e.getBoundingBox();
-				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
-			});
-		
-		if(filterMonsters.isChecked())
-			stream = stream.filter(e -> !(e instanceof Monster));
-		
-		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
-		
-		if(filterEndermen.isChecked())
-			stream = stream.filter(e -> !(e instanceof EndermanEntity));
-		
-		if(filterAnimals.isChecked())
-			stream = stream.filter(
-				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-		
-		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !(e instanceof PassiveEntity
-				&& ((PassiveEntity)e).isBaby()));
-		
-		if(filterPets.isChecked())
-			stream = stream
-				.filter(e -> !(e instanceof TameableEntity
-					&& ((TameableEntity)e).isTamed()))
-				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()));
-		
-		if(filterTraders.isChecked())
-			stream = stream.filter(e -> !(e instanceof MerchantEntity));
-		
-		if(filterGolems.isChecked())
-			stream = stream.filter(e -> !(e instanceof GolemEntity));
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
-		
-		if(filterNamed.isChecked())
-			stream = stream.filter(e -> !e.hasCustomName());
-		
-		if(filterStands.isChecked())
-			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
-		
-		if(filterCrystals.isChecked())
-			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
+		stream = entityFilters.applyTo(stream);
 		
 		Entity entity = stream
 			.min(
@@ -301,31 +187,31 @@ public final class FightBotHack extends Hack
 			
 			// control height if flying
 			if(!MC.player.isOnGround()
-				&& (MC.player.abilities.flying
+				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
 				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
 					entity.getZ()) <= MC.player.squaredDistanceTo(
 						MC.player.getX(), entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 			}else
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyJump.setPressed(false);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.jumpKey.setPressed(false);
 			}
 			
 			// follow entity
-			MC.options.keyForward.setPressed(
+			MC.options.forwardKey.setPressed(
 				MC.player.distanceTo(entity) > distance.getValueF());
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 		}
 		
 		// check cooldown
-		if(MC.player.getAttackCooldownProgress(0) < 1)
+		if(!speed.isTimeToAttack())
 			return;
 		
 		// check range
@@ -336,13 +222,16 @@ public final class FightBotHack extends Hack
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, entity);
 		MC.player.swingHand(Hand.MAIN_HAND);
+		speed.resetTimer();
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		pathFinder.renderPath(pathCmd.isDebugMode(), pathCmd.isDepthTest());
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
+			pathCmd.isDepthTest());
 	}
 	
 	private class EntityPathFinder extends PathFinder

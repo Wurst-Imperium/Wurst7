@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,28 +11,31 @@ import java.util.ArrayDeque;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
+import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
+@SearchTags({"LagSwitch", "lag switch"})
 public final class BlinkHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final SliderSetting limit = new SliderSetting("Limit",
-		"Automatically restarts Blink once\n" + "the given number of packets\n"
-			+ "have been suspended.\n\n" + "0 = no limit",
-		0, 0, 500, 1, v -> v == 0 ? "disabled" : (int)v + "");
+		"Automatically restarts Blink once the given number of packets have been suspended.\n\n"
+			+ "0 = no limit",
+		0, 0, 500, 1, ValueDisplay.INTEGER.withLabel(0, "disabled"));
 	
 	private final ArrayDeque<PlayerMoveC2SPacket> packets = new ArrayDeque<>();
 	private FakePlayerEntity fakePlayer;
 	
 	public BlinkHack()
 	{
-		super("Blink", "Suspends all motion updates while enabled.");
+		super("Blink");
 		setCategory(Category.MOVEMENT);
 		addSetting(limit);
 	}
@@ -42,9 +45,8 @@ public final class BlinkHack extends Hack
 	{
 		if(limit.getValueI() == 0)
 			return getName() + " [" + packets.size() + "]";
-		else
-			return getName() + " [" + packets.size() + "/" + limit.getValueI()
-				+ "]";
+		return getName() + " [" + packets.size() + "/" + limit.getValueI()
+			+ "]";
 	}
 	
 	@Override

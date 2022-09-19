@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -115,6 +115,20 @@ public final class BlockListSetting extends Setting
 	@Override
 	public Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
-		return new LinkedHashSet<>();
+		String fullName = featureName + " " + getName();
+		
+		String command = ".blocklist " + featureName.toLowerCase() + " ";
+		command += getName().toLowerCase().replace(" ", "_") + " ";
+		
+		LinkedHashSet<PossibleKeybind> pkb = new LinkedHashSet<>();
+		// Can't just list all the blocks here. Would need to change UI to allow
+		// user to choose a block after selecting this option.
+		// pkb.add(new PossibleKeybind(command + "add dirt",
+		// "Add dirt to " + fullName));
+		// pkb.add(new PossibleKeybind(command + "remove dirt",
+		// "Remove dirt from " + fullName));
+		pkb.add(new PossibleKeybind(command + "reset", "Reset " + fullName));
+		
+		return pkb;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -76,7 +76,7 @@ public final class DropCmd extends Command implements UpdateListener
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
 			
-			if(!MC.player.inventory.getStack(adjustedSlot).isEmpty())
+			if(!MC.player.getInventory().getStack(adjustedSlot).isEmpty())
 				break;
 			
 			slowModeSlotCounter++;

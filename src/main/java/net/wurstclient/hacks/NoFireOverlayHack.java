@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,11 +16,9 @@ public final class NoFireOverlayHack extends Hack
 {
 	public NoFireOverlayHack()
 	{
-		super("NoFireOverlay",
-			"Blocks the overlay when you are on fire.\n\n"
-				+ "\u00a7c\u00a7lWARNING:\u00a7r This can cause you to burn\n"
-				+ "to death without noticing.");
-		
+		super("NoFireOverlay");
 		setCategory(Category.RENDER);
 	}
+	
+	// See InGameOverlayRendererMixin.onRenderFireOverlay()
 }

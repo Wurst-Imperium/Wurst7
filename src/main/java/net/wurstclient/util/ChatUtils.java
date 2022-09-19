@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,7 @@ package net.wurstclient.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -41,13 +41,13 @@ public enum ChatUtils
 			return;
 		
 		ChatHud chatHud = MC.inGameHud.getChatHud();
-		LiteralText prefix = new LiteralText(WURST_PREFIX);
+		MutableText prefix = Text.literal(WURST_PREFIX);
 		chatHud.addMessage(prefix.append(component));
 	}
 	
 	public static void message(String message)
 	{
-		component(new LiteralText(message));
+		component(Text.literal(message));
 	}
 	
 	public static void warning(String message)

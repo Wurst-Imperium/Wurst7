@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 public final class KeybindEditorScreen extends Screen
@@ -27,7 +27,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		
 		key = "NONE";
@@ -37,7 +37,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen, String key, String commands)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		
 		this.key = key;
@@ -48,22 +48,22 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addButton(new ButtonWidget(width / 2 - 100, 60, 200, 20,
-			new LiteralText("Change Key"),
-			b -> client.openScreen(new PressAKeyScreen(this))));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
+			Text.literal("Change Key"),
+			b -> client.setScreen(new PressAKeyScreen(this))));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200, 20,
-			new LiteralText("Save"), b -> save()));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
+			20, Text.literal("Save"), b -> save()));
 		
-		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200, 20,
-			new LiteralText("Cancel"), b -> client.openScreen(prevScreen)));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
+			20, Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, new LiteralText(""));
+			200, 20, Text.literal(""));
 		commandField.setMaxLength(65536);
-		children.add(commandField);
+		addSelectableChild(commandField);
 		setInitialFocus(commandField);
-		commandField.setSelected(true);
+		commandField.setTextFieldFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -75,7 +75,7 @@ public final class KeybindEditorScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
 		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getText());
-		client.openScreen(prevScreen);
+		client.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -97,7 +97,7 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredString(matrixStack, textRenderer,
+		drawCenteredText(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
@@ -109,6 +109,12 @@ public final class KeybindEditorScreen extends Screen
 		
 		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
+	}
+	
+	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,17 +24,32 @@ import net.wurstclient.util.json.WsonObject;
 public final class AltsFile
 {
 	private final Path path;
+	private final Path encFolder;
 	private boolean disableSaving;
-	private final Encryption encryption;
+	private Encryption encryption;
+	private IOException folderException;
 	
 	public AltsFile(Path path, Path encFolder)
 	{
 		this.path = path;
-		encryption = new Encryption(encFolder);
+		this.encFolder = encFolder;
 	}
 	
 	public void load(AltManager altManager)
 	{
+		try
+		{
+			if(encryption == null)
+				encryption = new Encryption(encFolder);
+			
+		}catch(IOException e)
+		{
+			System.out.println("Couldn't create '.Wurst encryption' folder.");
+			e.printStackTrace();
+			folderException = e;
+			return;
+		}
+		
 		try
 		{
 			WsonObject wson = encryption.parseFileToObject(path);
@@ -64,25 +79,17 @@ public final class AltsFile
 			Files.move(path, newPath, StandardCopyOption.REPLACE_EXISTING);
 			System.out.println("Renamed to " + newPath.getFileName());
 			
-		}catch(IOException e2)
+		}catch(IOException e)
 		{
 			System.out.println(
 				"Couldn't rename corrupted file " + path.getFileName());
-			e2.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
 	private void loadAlts(WsonObject wson, AltManager altManager)
 	{
-		ArrayList<Alt> alts = new ArrayList<>();
-		
-		for(Entry<String, JsonObject> e : wson.getAllJsonObjects().entrySet())
-		{
-			String email = e.getKey();
-			JsonObject jsonAlt = e.getValue();
-			
-			alts.add(loadAlt(email, jsonAlt));
-		}
+		ArrayList<Alt> alts = parseJson(wson);
 		
 		try
 		{
@@ -95,19 +102,52 @@ public final class AltsFile
 		}
 	}
 	
-	private Alt loadAlt(String email, JsonObject jsonAlt)
+	public static ArrayList<Alt> parseJson(WsonObject wson)
+	{
+		ArrayList<Alt> alts = new ArrayList<>();
+		
+		for(Entry<String, JsonObject> e : wson.getAllJsonObjects().entrySet())
+		{
+			String nameOrEmail = e.getKey();
+			if(nameOrEmail.isEmpty())
+				continue;
+			
+			JsonObject jsonAlt = e.getValue();
+			alts.add(loadAlt(nameOrEmail, jsonAlt));
+		}
+		
+		return alts;
+	}
+	
+	private static Alt loadAlt(String nameOrEmail, JsonObject jsonAlt)
 	{
 		String password = JsonUtils.getAsString(jsonAlt.get("password"), "");
-		String name = JsonUtils.getAsString(jsonAlt.get("name"), "");
 		boolean starred = JsonUtils.getAsBoolean(jsonAlt.get("starred"), false);
 		
-		return new Alt(email, password, name, starred);
+		if(password.isEmpty())
+			return new CrackedAlt(nameOrEmail, starred);
+		
+		String name = JsonUtils.getAsString(jsonAlt.get("name"), "");
+		return new MojangAlt(nameOrEmail, password, name, starred);
 	}
 	
 	public void save(AltManager alts)
 	{
 		if(disableSaving)
 			return;
+		
+		try
+		{
+			if(encryption == null)
+				encryption = new Encryption(encFolder);
+			
+		}catch(IOException e)
+		{
+			System.out.println("Couldn't create '.Wurst encryption' folder.");
+			e.printStackTrace();
+			folderException = e;
+			return;
+		}
 		
 		JsonObject json = createJson(alts);
 		
@@ -122,21 +162,18 @@ public final class AltsFile
 		}
 	}
 	
-	private JsonObject createJson(AltManager alts)
+	public static JsonObject createJson(AltManager alts)
 	{
 		JsonObject json = new JsonObject();
 		
 		for(Alt alt : alts.getList())
-		{
-			JsonObject jsonAlt = new JsonObject();
-			
-			jsonAlt.addProperty("password", alt.getPassword());
-			jsonAlt.addProperty("name", alt.getName());
-			jsonAlt.addProperty("starred", alt.isStarred());
-			
-			json.add(alt.getEmail(), jsonAlt);
-		}
+			alt.exportAsJson(json);
 		
 		return json;
+	}
+	
+	public IOException getFolderException()
+	{
+		return folderException;
 	}
 }

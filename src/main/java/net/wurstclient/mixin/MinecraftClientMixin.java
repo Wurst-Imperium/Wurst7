@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,8 +7,11 @@
  */
 package net.wurstclient.mixin;
 
-import org.jetbrains.annotations.Nullable;
+import java.io.File;
+import java.util.UUID;
+
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,41 +20,60 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.authlib.minecraft.UserApiService;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.resource.language.LanguageManager;
+import net.minecraft.client.util.ProfileKeys;
 import net.minecraft.client.util.Session;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
-import net.wurstclient.sentry.SentryConfig;
+import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
-	extends ReentrantThreadExecutor<Runnable> implements SnooperListener,
-	WindowEventHandler, AutoCloseable, IMinecraftClient
+	extends ReentrantThreadExecutor<Runnable>
+	implements WindowEventHandler, IMinecraftClient
 {
+	@Shadow
+	@Final
+	public File runDirectory;
 	@Shadow
 	private int itemUseCooldown;
 	@Shadow
 	private ClientPlayerInteractionManager interactionManager;
 	@Shadow
+	@Final
+	private LanguageManager languageManager;
+	@Shadow
 	private ClientPlayerEntity player;
 	@Shadow
+	public ClientWorld world;
+	@Shadow
+	@Final
 	private Session session;
+	@Shadow
+	@Final
+	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
+	private ProfileKeys wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -60,14 +82,14 @@ public abstract class MinecraftClientMixin
 	
 	@Inject(at = {@At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()V"}, cancellable = true)
-	private void onDoAttack(CallbackInfo ci)
+		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
-			ci.cancel();
+			cir.setReturnValue(false);
 	}
 	
 	@Inject(at = {@At(value = "FIELD",
@@ -76,7 +98,7 @@ public abstract class MinecraftClientMixin
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 		
 		if(event.isCancelled())
 			ci.cancel();
@@ -96,7 +118,7 @@ public abstract class MinecraftClientMixin
 		WurstClient.INSTANCE.getFriends().middleClick(entity);
 	}
 	
-	@Inject(at = {@At("HEAD")},
+	@Inject(at = @At("HEAD"),
 		method = {"getSession()Lnet/minecraft/client/util/Session;"},
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
@@ -117,31 +139,19 @@ public abstract class MinecraftClientMixin
 	{
 		if(wurstSession != null)
 			return wurstSession;
-		else
-			return session;
+		
+		return session;
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"addDetailsToCrashReport(Lnet/minecraft/util/crash/CrashReport;)Lnet/minecraft/util/crash/CrashReport;"})
-	private void onAddDetailsToCrashReport(CrashReport report,
-		CallbackInfoReturnable<CrashReport> cir)
+	@Inject(at = @At("HEAD"),
+		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
+		cancellable = true)
+	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
-		SentryConfig.addDetailsOnCrash();
-	}
-	
-	@Inject(at = {@At("HEAD")},
-		method = {"printCrashReport(Lnet/minecraft/util/crash/CrashReport;)V"})
-	private static void onPrintCrashReport(CrashReport report, CallbackInfo ci)
-	{
-		SentryConfig.reportCrash(report);
-	}
-	
-	@Inject(at = {@At("HEAD")},
-		method = {"openScreen(Lnet/minecraft/client/gui/screen/Screen;)V"})
-	private void onOpenScreen(@Nullable Screen screen, CallbackInfo ci)
-	{
-		SentryConfig.addScreenChangeBreadcrumb(screen);
+		if(wurstProfileKeys == null)
+			return;
+		
+		cir.setReturnValue(wurstProfileKeys);
 	}
 	
 	@Override
@@ -169,15 +179,46 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
+	public IWorld getWorld()
+	{
+		return (IWorld)world;
+	}
+	
+	@Override
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
 	}
 	
 	@Override
+	public ILanguageManager getLanguageManager()
+	{
+		return (ILanguageManager)languageManager;
+	}
+	
+	@Override
 	public void setSession(Session session)
 	{
 		wurstSession = session;
+		
+		UserApiService userApiService =
+			wurst_createUserApiService(session.getAccessToken());
+		UUID uuid = wurstSession.getProfile().getId();
+		wurstProfileKeys =
+			new ProfileKeys(userApiService, uuid, runDirectory.toPath());
+	}
+	
+	private UserApiService wurst_createUserApiService(String accessToken)
+	{
+		try
+		{
+			return authenticationService.createUserApiService(accessToken);
+			
+		}catch(AuthenticationException e)
+		{
+			e.printStackTrace();
+			return UserApiService.OFFLINE;
+		}
 	}
 	
 	@Shadow

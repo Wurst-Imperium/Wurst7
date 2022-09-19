@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -28,7 +28,21 @@ public final class EventManager
 		this.wurst = wurst;
 	}
 	
-	public <L extends Listener, E extends Event<L>> void fire(E event)
+	/**
+	 * Fires the given {@link Event} if Wurst is enabled and the
+	 * {@link EventManager} is ready to accept events. This method is safe to
+	 * call even when the EventManager hasn't been initialized yet.
+	 */
+	public static <L extends Listener, E extends Event<L>> void fire(E event)
+	{
+		EventManager eventManager = WurstClient.INSTANCE.getEventManager();
+		if(eventManager == null)
+			return;
+		
+		eventManager.fireImpl(event);
+	}
+	
+	private <L extends Listener, E extends Event<L>> void fireImpl(E event)
 	{
 		if(!wurst.isEnabled())
 			return;

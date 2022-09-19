@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,11 +18,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 {
 	public SpeedHackHack()
 	{
-		super("SpeedHack",
-			"Allows you to run ~2.5x faster than you would by sprinting and jumping.\n\n"
-				+ "\u00a76\u00a7lWARNING:\u00a7r Patched in NoCheat+ version 3.13.2.\n"
-				+ "Will only bypass older versions of NoCheat+.\n"
-				+ "Type \u00a7l/ncp version\u00a7r to check a server's NoCheat+ version.");
+		super("SpeedHack");
 		setCategory(Category.MOVEMENT);
 	}
 	

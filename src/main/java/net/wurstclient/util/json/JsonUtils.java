@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -22,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.stream.MalformedJsonException;
 
 public enum JsonUtils
 {
@@ -32,19 +34,32 @@ public enum JsonUtils
 	public static final Gson PRETTY_GSON =
 		new GsonBuilder().setPrettyPrinting().create();
 	
-	public static final JsonParser JSON_PARSER = new JsonParser();
-	
 	public static JsonElement parseFile(Path path)
 		throws IOException, JsonException
 	{
 		try(BufferedReader reader = Files.newBufferedReader(path))
 		{
-			return JSON_PARSER.parse(reader);
+			return JsonParser.parseReader(reader);
 			
 		}catch(JsonParseException e)
 		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
 			throw new JsonException(e);
 		}
+	}
+	
+	public static WsonArray parseFileToArray(Path path)
+		throws IOException, JsonException
+	{
+		return getAsArray(parseFile(path));
+	}
+	
+	public static WsonObject parseFileToObject(Path path)
+		throws IOException, JsonException
+	{
+		return getAsObject(parseFile(path));
 	}
 	
 	public static JsonElement parseURL(String url)
@@ -55,56 +70,68 @@ public enum JsonUtils
 		{
 			InputStreamReader reader = new InputStreamReader(input);
 			BufferedReader bufferedReader = new BufferedReader(reader);
-			return new JsonParser().parse(bufferedReader);
+			return JsonParser.parseReader(bufferedReader);
 			
 		}catch(JsonParseException e)
 		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
 			throw new JsonException(e);
 		}
-	}
-	
-	public static WsonArray parseFileToArray(Path path)
-		throws IOException, JsonException
-	{
-		JsonElement json = parseFile(path);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
 	}
 	
 	public static WsonArray parseURLToArray(String url)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseURL(url);
-		
-		if(!json.isJsonArray())
-			throw new JsonException();
-		
-		return new WsonArray(json.getAsJsonArray());
-	}
-	
-	public static WsonObject parseFileToObject(Path path)
-		throws IOException, JsonException
-	{
-		JsonElement json = parseFile(path);
-		
-		if(!json.isJsonObject())
-			throw new JsonException();
-		
-		return new WsonObject(json.getAsJsonObject());
+		return getAsArray(parseURL(url));
 	}
 	
 	public static WsonObject parseURLToObject(String url)
 		throws IOException, JsonException
 	{
-		JsonElement json = parseURL(url);
-		
-		if(!json.isJsonObject())
-			throw new JsonException();
-		
-		return new WsonObject(json.getAsJsonObject());
+		return getAsObject(parseURL(url));
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURL(String)} won't do.
+	 */
+	public static JsonElement parseConnection(URLConnection connection)
+		throws IOException, JsonException
+	{
+		try(InputStream input = connection.getInputStream())
+		{
+			InputStreamReader reader = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			return JsonParser.parseReader(bufferedReader);
+			
+		}catch(JsonParseException e)
+		{
+			if(e.getCause() instanceof MalformedJsonException c)
+				throw new JsonException(c.getMessage(), c);
+			
+			throw new JsonException(e);
+		}
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURLToArray(String)} won't
+	 * do.
+	 */
+	public static WsonArray parseConnectionToArray(URLConnection connection)
+		throws IOException, JsonException
+	{
+		return getAsArray(parseConnection(connection));
+	}
+	
+	/**
+	 * For more complex connections where {@link #parseURLToObject(String)}
+	 * won't do.
+	 */
+	public static WsonObject parseConnectionToObject(URLConnection connection)
+		throws IOException, JsonException
+	{
+		return getAsObject(parseConnection(connection));
 	}
 	
 	public static void toJson(JsonElement json, Path path)
@@ -132,7 +159,7 @@ public enum JsonUtils
 	public static boolean getAsBoolean(JsonElement json) throws JsonException
 	{
 		if(!isBoolean(json))
-			throw new JsonException();
+			throw new JsonException("Not a boolean: " + json);
 		
 		return json.getAsBoolean();
 	}
@@ -157,7 +184,7 @@ public enum JsonUtils
 	public static int getAsInt(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
-			throw new JsonException();
+			throw new JsonException("Not a number: " + json);
 		
 		return json.getAsInt();
 	}
@@ -173,7 +200,7 @@ public enum JsonUtils
 	public static long getAsLong(JsonElement json) throws JsonException
 	{
 		if(!isNumber(json))
-			throw new JsonException();
+			throw new JsonException("Not a number: " + json);
 		
 		return json.getAsLong();
 	}
@@ -198,7 +225,7 @@ public enum JsonUtils
 	public static String getAsString(JsonElement json) throws JsonException
 	{
 		if(!isString(json))
-			throw new JsonException();
+			throw new JsonException("Not a string: " + json);
 		
 		return json.getAsString();
 	}
@@ -214,8 +241,16 @@ public enum JsonUtils
 	public static WsonArray getAsArray(JsonElement json) throws JsonException
 	{
 		if(!json.isJsonArray())
-			throw new JsonException();
+			throw new JsonException("Not an array: " + json);
 		
 		return new WsonArray(json.getAsJsonArray());
+	}
+	
+	public static WsonObject getAsObject(JsonElement json) throws JsonException
+	{
+		if(!json.isJsonObject())
+			throw new JsonException("Not an object: " + json);
+		
+		return new WsonObject(json.getAsJsonObject());
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -36,8 +36,7 @@ public final class ExcavateCmd extends Command
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
 		BlockPos playerPos = new BlockPos(MC.player.getPos());
-		int[] player =
-			new int[]{playerPos.getX(), playerPos.getY(), playerPos.getZ()};
+		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		
 		for(int i = 0; i < 3; i++)

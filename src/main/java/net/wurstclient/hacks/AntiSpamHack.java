@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,7 @@ import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.text.CharacterVisitor;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.util.math.MathHelper;
@@ -28,8 +28,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 {
 	public AntiSpamHack()
 	{
-		super("AntiSpam",
-			"Blocks chat spam by adding a counter to repeated\n" + "messages.");
+		super("AntiSpam");
 		setCategory(Category.CHAT);
 	}
 	
@@ -48,7 +47,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine<OrderedText>> chatLines = event.getChatLines();
+		List<ChatHudLine.Visible> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
 		
@@ -92,7 +91,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		{
 			JustGiveMeTheStringVisitor oldLineVS =
 				new JustGiveMeTheStringVisitor();
-			chatLines.get(i).getText().accept(oldLineVS);
+			chatLines.get(i).content().accept(oldLineVS);
 			String oldLine = oldLineVS.toString();
 			
 			if(matchingLines <= newLines.size() - 1)
@@ -122,7 +121,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 				{
 					JustGiveMeTheStringVisitor nextOldLineVS =
 						new JustGiveMeTheStringVisitor();
-					chatLines.get(i - 1).getText().accept(nextOldLineVS);
+					chatLines.get(i - 1).content().accept(nextOldLineVS);
 					String nextOldLine = nextOldLineVS.toString();
 					
 					String twoLines = oldLine + nextOldLine;
@@ -171,7 +170,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		}
 		
 		if(spamCounter > 1)
-			event.setComponent(new LiteralText(
-				event.getComponent().getString() + " [x" + spamCounter + "]"));
+			event.setComponent(((MutableText)event.getComponent())
+				.append(" [x" + spamCounter + "]"));
 	}
 }

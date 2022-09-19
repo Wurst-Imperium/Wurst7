@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -35,8 +34,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	
 	public ChatTranslatorHack()
 	{
-		super("ChatTranslator",
-			"Translates incoming chat messages using Google Translate.");
+		super("ChatTranslator");
 		setCategory(Category.CHAT);
 		
 		addSetting(langFrom);
@@ -65,7 +63,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 				
 			}catch(Exception e)
 			{
-				
+				e.printStackTrace();
 			}
 		}, "ChatTranslator").start();
 	}
@@ -87,8 +85,8 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 		if(translated == null)
 			return;
 		
-		Text translationMsg = new LiteralText(translatorPrefix)
-			.append(new LiteralText(translated));
+		Text translationMsg =
+			Text.literal(translatorPrefix).append(Text.literal(translated));
 		
 		MC.inGameHud.getChatHud().addMessage(translationMsg);
 	}

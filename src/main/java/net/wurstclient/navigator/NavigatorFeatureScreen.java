@@ -1,19 +1,11 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.navigator;
-
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -26,14 +18,24 @@ import java.util.TreeMap;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.command.Command;
@@ -41,6 +43,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -55,6 +58,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private ArrayList<ButtonData> buttonDatas = new ArrayList<>();
 	
 	private Window window = new Window("");
+	private int windowComponentY;
 	
 	public NavigatorFeatureScreen(Feature feature, NavigatorMainScreen parent)
 	{
@@ -86,7 +90,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(hasPrimaryAction)
 		{
 			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
-				hasHelp ? 149 : 302, 18, new LiteralText(primaryAction), b -> {
+				hasHelp ? 149 : 302, 18, Text.literal(primaryAction), b -> {
 					
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
@@ -99,17 +103,17 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					
 					feature.doPrimaryAction();
 					
-					primaryButton.setMessage(
-						new LiteralText(feature.getPrimaryAction()));
+					primaryButton
+						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
 				});
-			addButton(primaryButton);
+			addDrawableChild(primaryButton);
 		}
 		
 		// help button
 		// if(hasHelp)
-		// addButton(new ButtonWidget(
+		// method_37063(new ButtonWidget(
 		// width / 2 + (hasPrimaryAction ? 2 : -151), height - 65,
 		// hasPrimaryAction ? 149 : 302, 20, "Help", b -> {
 		// MiscUtils.openLink("https://www.wurstclient.net/wiki/"
@@ -134,7 +138,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			text += ", Category: " + feature.getCategory().getName();
 		
 		// description
-		String description = feature.getDescription();
+		String description = feature.getWrappedDescription(300);
 		if(!description.isEmpty())
 			text += "\n\nDescription:\n" + description;
 		
@@ -146,7 +150,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(!settings.isEmpty())
 		{
 			text += "\n\nSettings:";
-			window.setY(getStringHeight(text) + 2);
+			windowComponentY = getStringHeight(text) + 2;
 			
 			for(int i = 0; i < Math.ceil(window.getInnerHeight() / 9.0); i++)
 				text += "\n";
@@ -168,7 +172,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// add keybind
-						WurstClient.MC.openScreen(new NavigatorNewKeybindScreen(
+						WurstClient.MC.setScreen(new NavigatorNewKeybindScreen(
 							possibleKeybinds, NavigatorFeatureScreen.this));
 					}
 				};
@@ -230,7 +234,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						client.openScreen(new NavigatorRemoveKeybindScreen(
+						client.setScreen(new NavigatorRemoveKeybindScreen(
 							existingKeybinds, NavigatorFeatureScreen.this));
 					}
 				});
@@ -254,8 +258,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onMouseClick(double x, double y, int button)
 	{
 		// popups
-		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(
-			x - middleX + 154, y - 60 - scroll + 13, button))
+		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
+			button))
 			return;
 		
 		// back button
@@ -282,13 +286,14 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
-			x - middleX + 154, y - 60 - scroll - window.getY(), button, window);
+			x - middleX + 154, y - 60 - scroll - windowComponentY, button,
+			window);
 	}
 	
 	private void goBack()
 	{
 		parent.setExpanding(false);
-		client.openScreen(parent);
+		client.setScreen(parent);
 	}
 	
 	@Override
@@ -307,50 +312,55 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		
+		if(primaryButton != null)
+			primaryButton.setMessage(Text.literal(feature.getPrimaryAction()));
 	}
 	
 	@Override
 	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
+		
 		// title bar
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		drawCenteredString(matrixStack, client.textRenderer, feature.getName(),
-			middleX, 32, 0xffffff);
-		glDisable(GL_TEXTURE_2D);
+		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
+			middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
 		int bgx1 = middleX - 154;
+		window.setX(bgx1);
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
 		
 		setColorToBackground();
-		drawQuads(bgx1, bgy1, bgx2,
-			Math.max(bgy1, Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
-				bgy1 + scroll + window.getY())));
-		drawQuads(bgx1,
+		drawQuads(matrixStack, bgx1, bgy1, bgx2,
 			Math.max(bgy1,
-				Math.min(bgy2 - (buttons.isEmpty() ? 0 : 24),
-					bgy1 + scroll + window.getY() + window.getInnerHeight())),
+				Math.min(bgy2
+					- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
+					bgy1 + scroll + windowComponentY)));
+		drawQuads(matrixStack, bgx1,
+			Math.max(bgy1, Math.min(bgy2
+				- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
+				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
 			bgx2, bgy2);
-		drawBoxShadow(bgx1, bgy1, bgx2, bgy2);
+		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (buttons.isEmpty() ? 0 : 24));
-		glEnable(GL_SCISSOR_TEST);
+			bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24));
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
-		WurstClient.INSTANCE.getGui().setTooltip("");
+		gui.setTooltip("");
 		window.validate();
 		
-		int windowY = bgy1 + scroll + window.getY();
-		GL11.glPushMatrix();
-		GL11.glTranslated(bgx1, windowY, 0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		int windowY = bgy1 + scroll + windowComponentY;
+		window.setY(windowY - 13);
+		matrixStack.push();
+		matrixStack.translate(bgx1, windowY, 0);
 		
 		{
 			int x1 = 0;
@@ -361,22 +371,29 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			int x3 = x1 + 2;
 			int x5 = x2 - 2;
 			
+			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
+			RenderSystem.setShader(GameRenderer::getPositionShader);
+			
 			// window background
 			// left & right
 			setColorToBackground();
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2i(x1, y3);
-			GL11.glVertex2i(x1, y2);
-			GL11.glVertex2i(x3, y2);
-			GL11.glVertex2i(x3, y3);
-			GL11.glVertex2i(x5, y3);
-			GL11.glVertex2i(x5, y2);
-			GL11.glVertex2i(x2, y2);
-			GL11.glVertex2i(x2, y3);
-			GL11.glEnd();
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0).next();
+			bufferBuilder.vertex(matrix, x1, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y2, 0).next();
+			bufferBuilder.vertex(matrix, x3, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y3, 0).next();
+			bufferBuilder.vertex(matrix, x5, y2, 0).next();
+			bufferBuilder.vertex(matrix, x2, y2, 0).next();
+			bufferBuilder.vertex(matrix, x2, y3, 0).next();
+			tessellator.draw();
 			
 			setColorToBackground();
-			GL11.glBegin(GL11.GL_QUADS);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
 			
 			// window background
 			// between children
@@ -386,10 +403,10 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			{
 				int yc1 = window.getChild(i).getY();
 				int yc2 = yc1 - 2;
-				GL11.glVertex2i(xc1, yc2);
-				GL11.glVertex2i(xc1, yc1);
-				GL11.glVertex2i(xc2, yc1);
-				GL11.glVertex2i(xc2, yc2);
+				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+				bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			}
 			
 			// window background
@@ -404,18 +421,18 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				yc1 = lastChild.getY() + lastChild.getHeight();
 			}
 			int yc2 = yc1 + 2;
-			GL11.glVertex2i(xc1, yc2);
-			GL11.glVertex2i(xc1, yc1);
-			GL11.glVertex2i(xc2, yc1);
-			GL11.glVertex2i(xc2, yc2);
+			bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
+			bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
+			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			GL11.glEnd();
+			tessellator.draw();
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
 			window.getChild(i).render(matrixStack, mouseX - bgx1,
 				mouseY - windowY, partialTicks);
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// buttons
 		activeButton = null;
@@ -439,45 +456,40 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			}else
 				alpha = 0.375F;
 			float[] rgb = buttonData.color.getColorComponents(null);
-			glColor4f(rgb[0], rgb[1], rgb[2], alpha);
+			RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], alpha);
 			
 			// button
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
+			drawCenteredText(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
-			glDisable(GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawStringWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, 0xffffff);
+			client.textRenderer.draw(matrixStack, line, bgx1 + 2, textY,
+				txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// scissor box
-		glDisable(GL_SCISSOR_TEST);
-		
-		GL11.glPushMatrix();
-		GL11.glTranslated(bgx1, bgy1 + scroll - 13, 0);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		WurstClient.INSTANCE.getGui().renderPopupsAndTooltip(matrixStack,
-			mouseX - bgx1, mouseY - bgy1 - scroll + 13);
-		GL11.glPopMatrix();
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(AbstractButtonWidget button : buttons)
+		for(Drawable d : ((IScreen)(Object)this).getButtons())
 		{
+			if(!(d instanceof ClickableWidget))
+				continue;
+			
+			ClickableWidget button = (ClickableWidget)d;
+			
 			// positions
 			int x1 = button.x;
 			int x2 = x1 + button.getWidth();
@@ -489,34 +501,38 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
 			if(feature.isEnabled() && button == primaryButton)
 				// if(feature.isBlocked())
-				// glColor4f(hovering ? 1F : 0.875F, 0F, 0F, 0.25F);
+				// RenderSystem.setShaderColor(hovering ? 1F : 0.875F, 0F, 0F,
+				// 0.25F);
 				// else
-				glColor4f(0F, hovering ? 1F : 0.875F, 0F, 0.25F);
+				RenderSystem.setShaderColor(0F, hovering ? 1F : 0.875F, 0F,
+					0.25F);
 			else if(hovering)
-				glColor4f(0.375F, 0.375F, 0.375F, 0.25F);
+				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
 			else
-				glColor4f(0.25F, 0.25F, 0.25F, 0.25F);
+				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			glDisable(GL_TEXTURE_2D);
-			drawBox(x1, y1, x2, y2);
+			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			drawCenteredString(matrixStack, client.textRenderer,
-				button.getMessage().getString(), (x1 + x2) / 2, y1 + 4,
-				0xffffff);
+			String buttonText = button.getMessage().getString();
+			client.textRenderer.draw(matrixStack, buttonText,
+				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
+				y1 + 5, txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
+		// popups & tooltip
+		gui.renderPopups(matrixStack, mouseX, mouseY);
+		gui.renderTooltip(matrixStack, mouseX, mouseY);
+		
 		// GL resets
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_TEXTURE_2D);
-		glDisable(GL_BLEND);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override
-	public void onClose()
+	public void close()
 	{
 		window.close();
 		WurstClient.INSTANCE.getGui().handleMouseClick(Integer.MIN_VALUE,
@@ -543,7 +559,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		return getStringHeight(text);
 	}
 	
-	public abstract class ButtonData extends Rectangle
+	public abstract static class ButtonData extends Rectangle
 	{
 		public String buttonText;
 		public Color color;

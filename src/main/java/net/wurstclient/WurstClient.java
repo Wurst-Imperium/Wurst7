@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,10 +18,11 @@ import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Util;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
@@ -43,10 +43,11 @@ import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
+import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
-import net.wurstclient.sentry.SentryConfig;
 import net.wurstclient.settings.SettingsFile;
+import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
 
@@ -57,8 +58,8 @@ public enum WurstClient
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
 	
-	public static final String VERSION = "7.7";
-	public static final String MC_VERSION = "1.16.4";
+	public static final String VERSION = "7.28";
+	public static final String MC_VERSION = "1.19.2";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -79,6 +80,7 @@ public enum WurstClient
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
+	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
 	
 	private KeyBinding zoomKey;
@@ -88,9 +90,6 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		wurstFolder = createWurstFolder();
-		
-		Path sentryFile = wurstFolder.resolve("sentry.json");
-		SentryConfig.setupSentry(sentryFile);
 		
 		String trackingID = "UA-52838431-5";
 		String hostname = "client.wurstclient.net";
@@ -142,8 +141,13 @@ public enum WurstClient
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
 		
+		problematicPackDetector = new ProblematicResourcePackDetector();
+		problematicPackDetector.start();
+		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
-		Path encFolder = createEncryptionFolder();
+		Path encFolder =
+			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+				.normalize();
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
@@ -172,36 +176,12 @@ public enum WurstClient
 		return wurstFolder;
 	}
 	
-	private Path createEncryptionFolder()
+	public String translate(String key)
 	{
-		Path encFolder =
-			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
-				.normalize();
+		if(otfs.translationsOtf.getForceEnglish().isChecked())
+			return IMC.getLanguageManager().getEnglish().get(key);
 		
-		try
-		{
-			Files.createDirectories(encFolder);
-			if(Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS)
-				Files.setAttribute(encFolder, "dos:hidden", true);
-			
-			Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");
-			String readmeText = "DO NOT SHARE THESE FILES WITH ANYONE!\r\n"
-				+ "They are encryption keys that protect your alt list file from being read by someone else.\r\n"
-				+ "If someone is asking you to send these files, they are 100% trying to scam you.\r\n"
-				+ "\r\n"
-				+ "DO NOT EDIT, RENAME OR DELETE THESE FILES! (unless you know what you're doing)\r\n"
-				+ "If you do, Wurst's Alt Manager can no longer read your alt list and will replace it with a blank one.\r\n"
-				+ "In other words, YOUR ALT LIST WILL BE DELETED.";
-			Files.write(readme, readmeText.getBytes("UTF-8"),
-				StandardOpenOption.CREATE);
-			
-		}catch(IOException e)
-		{
-			throw new RuntimeException(
-				"Couldn't create '.Wurst encryption' folder.", e);
-		}
-		
-		return encFolder;
+		return I18n.translate(key);
 	}
 	
 	public WurstAnalytics getAnalytics()
@@ -227,7 +207,7 @@ public enum WurstClient
 		try(Stream<Path> files = Files.list(settingsProfileFolder))
 		{
 			return files.filter(Files::isRegularFile)
-				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
 		{
@@ -273,10 +253,7 @@ public enum WurstClient
 			return cmd;
 		
 		OtherFeature otf = getOtfs().getOtfByName(name);
-		if(otf != null)
-			return otf;
-		
-		return null;
+		return otf;
 	}
 	
 	public KeybindList getKeybinds()
@@ -333,12 +310,20 @@ public enum WurstClient
 		{
 			hax.panicHack.setEnabled(true);
 			hax.panicHack.onUpdate();
+			
+			ClientPlayNetworking
+				.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
 		}
 	}
 	
 	public WurstUpdater getUpdater()
 	{
 		return updater;
+	}
+	
+	public ProblematicResourcePackDetector getProblematicPackDetector()
+	{
+		return problematicPackDetector;
 	}
 	
 	public Path getWurstFolder()

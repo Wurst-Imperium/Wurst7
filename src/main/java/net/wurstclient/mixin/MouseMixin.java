@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Mouse;
-import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 
 @Mixin(Mouse.class)
@@ -24,6 +24,6 @@ public class MouseMixin
 		CallbackInfo ci)
 	{
 		MouseScrollEvent event = new MouseScrollEvent(double_2);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 }

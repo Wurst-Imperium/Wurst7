@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
@@ -14,40 +15,36 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -59,61 +56,20 @@ public final class BowAimbotHack extends Hack
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires\n"
-			+ "the least head movement.\n"
+			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final SliderSetting predictMovement =
-		new SliderSetting("Predict movement",
-			"Controls the strength of BowAimbot's\n"
-				+ "movement prediction algorithm.",
-			0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
+	private final SliderSetting predictMovement = new SliderSetting(
+		"Predict movement",
+		"Controls the strength of BowAimbot's movement prediction algorithm.",
+		0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
-	private final CheckboxSetting filterPlayers = new CheckboxSetting(
-		"Filter players", "Won't attack other players.", false);
-	private final CheckboxSetting filterSleeping = new CheckboxSetting(
-		"Filter sleeping", "Won't attack sleeping players.", false);
-	private final SliderSetting filterFlying =
-		new SliderSetting("Filter flying",
-			"Won't attack players that\n" + "are at least the given\n"
-				+ "distance above ground.",
-			0, 0, 2, 0.05,
-			v -> v == 0 ? "off" : ValueDisplay.DECIMAL.getValueString(v));
+	private final EntityFilterList entityFilters =
+		EntityFilterList.genericCombat();
 	
-	private final CheckboxSetting filterMonsters = new CheckboxSetting(
-		"Filter monsters", "Won't attack zombies, creepers, etc.", false);
-	private final CheckboxSetting filterPigmen = new CheckboxSetting(
-		"Filter pigmen", "Won't attack zombie pigmen.", false);
-	private final CheckboxSetting filterEndermen =
-		new CheckboxSetting("Filter endermen", "Won't attack endermen.", false);
-	
-	private final CheckboxSetting filterAnimals = new CheckboxSetting(
-		"Filter animals", "Won't attack pigs, cows, etc.", false);
-	private final CheckboxSetting filterBabies =
-		new CheckboxSetting("Filter babies",
-			"Won't attack baby pigs,\n" + "baby villagers, etc.", false);
-	private final CheckboxSetting filterPets =
-		new CheckboxSetting("Filter pets",
-			"Won't attack tamed wolves,\n" + "tamed horses, etc.", false);
-	
-	private final CheckboxSetting filterTraders =
-		new CheckboxSetting("Filter traders",
-			"Won't attack villagers, wandering traders, etc.", false);
-	
-	private final CheckboxSetting filterGolems =
-		new CheckboxSetting("Filter golems",
-			"Won't attack iron golems,\n" + "snow golems and shulkers.", false);
-	
-	private final CheckboxSetting filterInvisible = new CheckboxSetting(
-		"Filter invisible", "Won't attack invisible entities.", false);
-	private final CheckboxSetting filterNamed = new CheckboxSetting(
-		"Filter named", "Won't attack name-tagged entities.", false);
-	
-	private final CheckboxSetting filterStands = new CheckboxSetting(
-		"Filter armor stands", "Won't attack armor stands.", false);
-	private final CheckboxSetting filterCrystals = new CheckboxSetting(
-		"Filter end crystals", "Won't attack end crystals.", false);
+	private final ColorSetting color = new ColorSetting("ESP color",
+		"Color of the box that BowAimbot draws around the target.", Color.RED);
 	
 	private static final Box TARGET_BOX =
 		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
@@ -123,27 +79,15 @@ public final class BowAimbotHack extends Hack
 	
 	public BowAimbotHack()
 	{
-		super("BowAimbot", "Automatically aims your bow or crossbow.");
+		super("BowAimbot");
 		
 		setCategory(Category.COMBAT);
 		addSetting(priority);
 		addSetting(predictMovement);
 		
-		addSetting(filterPlayers);
-		addSetting(filterSleeping);
-		addSetting(filterFlying);
-		addSetting(filterMonsters);
-		addSetting(filterPigmen);
-		addSetting(filterEndermen);
-		addSetting(filterAnimals);
-		addSetting(filterBabies);
-		addSetting(filterPets);
-		addSetting(filterTraders);
-		addSetting(filterGolems);
-		addSetting(filterInvisible);
-		addSetting(filterNamed);
-		addSetting(filterStands);
-		addSetting(filterCrystals);
+		entityFilters.forEach(this::addSetting);
+		
+		addSetting(color);
 	}
 	
 	@Override
@@ -168,7 +112,7 @@ public final class BowAimbotHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		
 		// check if item is ranged weapon
-		ItemStack stack = MC.player.inventory.getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		Item item = stack.getItem();
 		if(!(item instanceof BowItem || item instanceof CrossbowItem))
 		{
@@ -177,7 +121,7 @@ public final class BowAimbotHack extends Hack
 		}
 		
 		// check if using bow
-		if(item instanceof BowItem && !MC.options.keyUse.isPressed()
+		if(item instanceof BowItem && !MC.options.useKey.isPressed()
 			&& !player.isUsingItem())
 		{
 			target = null;
@@ -217,7 +161,7 @@ public final class BowAimbotHack extends Hack
 			- player.getZ();
 		
 		// set yaw
-		MC.player.yaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
+		MC.player.setYaw((float)Math.toDegrees(Math.atan2(posZ, posX)) - 90);
 		
 		// calculate needed pitch
 		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
@@ -234,84 +178,26 @@ public final class BowAimbotHack extends Hack
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
 		else
-			MC.player.pitch = neededPitch;
+			MC.player.setPitch(neededPitch);
 	}
 	
 	private Entity filterEntities(Stream<Entity> s)
 	{
-		Stream<Entity> stream = s.filter(e -> e != null && !e.removed).filter(
-			e -> e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
+		Stream<Entity> stream = s.filter(e -> e != null && !e.isRemoved())
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
-		if(filterPlayers.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity));
-		
-		if(filterSleeping.isChecked())
-			stream = stream.filter(e -> !(e instanceof PlayerEntity
-				&& ((PlayerEntity)e).isSleeping()));
-		
-		if(filterFlying.getValue() > 0)
-			stream = stream.filter(e -> {
-				
-				if(!(e instanceof PlayerEntity))
-					return true;
-				
-				Box box = e.getBoundingBox();
-				box = box.union(box.offset(0, -filterFlying.getValue(), 0));
-				return MC.world.isSpaceEmpty(box);
-			});
-		
-		if(filterMonsters.isChecked())
-			stream = stream.filter(e -> !(e instanceof Monster));
-		
-		if(filterPigmen.isChecked())
-			stream = stream.filter(e -> !(e instanceof ZombifiedPiglinEntity));
-		
-		if(filterEndermen.isChecked())
-			stream = stream.filter(e -> !(e instanceof EndermanEntity));
-		
-		if(filterAnimals.isChecked())
-			stream = stream.filter(
-				e -> !(e instanceof AnimalEntity || e instanceof AmbientEntity
-					|| e instanceof WaterCreatureEntity));
-		
-		if(filterBabies.isChecked())
-			stream = stream.filter(e -> !(e instanceof PassiveEntity
-				&& ((PassiveEntity)e).isBaby()));
-		
-		if(filterPets.isChecked())
-			stream = stream
-				.filter(e -> !(e instanceof TameableEntity
-					&& ((TameableEntity)e).isTamed()))
-				.filter(e -> !(e instanceof HorseBaseEntity
-					&& ((HorseBaseEntity)e).isTame()));
-		
-		if(filterTraders.isChecked())
-			stream = stream.filter(e -> !(e instanceof MerchantEntity));
-		
-		if(filterGolems.isChecked())
-			stream = stream.filter(e -> !(e instanceof GolemEntity));
-		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(e -> !e.isInvisible());
-		
-		if(filterNamed.isChecked())
-			stream = stream.filter(e -> !e.hasCustomName());
-		
-		if(filterStands.isChecked())
-			stream = stream.filter(e -> !(e instanceof ArmorStandEntity));
-		
-		if(filterCrystals.isChecked())
-			stream = stream.filter(e -> !(e instanceof EndCrystalEntity));
+		stream = entityFilters.applyTo(stream);
 		
 		return stream.min(priority.getSelected().comparator).orElse(null);
 	}
 	
 	@Override
-	public void onRender(float partialTicks)
+	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -320,41 +206,42 @@ public final class BowAimbotHack extends Hack
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
 		
-		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		matrixStack.push();
+		RenderUtils.applyRenderOffset(matrixStack);
 		
 		// set position
-		GL11.glTranslated(target.getX(), target.getY(), target.getZ());
+		matrixStack.translate(target.getX(), target.getY(), target.getZ());
 		
 		// set size
-		double boxWidth = target.getWidth() + 0.1;
-		double boxHeight = target.getHeight() + 0.1;
-		GL11.glScaled(boxWidth, boxHeight, boxWidth);
+		float boxWidth = target.getWidth() + 0.1F;
+		float boxHeight = target.getHeight() + 0.1F;
+		matrixStack.scale(boxWidth, boxHeight, boxWidth);
 		
 		// move to center
-		GL11.glTranslated(0, 0.5, 0);
+		matrixStack.translate(0, 0.5, 0);
 		
-		double v = 1 / velocity;
-		GL11.glScaled(v, v, v);
+		float v = 1 / velocity;
+		matrixStack.scale(v, v, v);
+		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		float[] colorF = color.getColorF();
 		
 		// draw outline
-		GL11.glColor4d(1, 0, 0, 0.5F * velocity);
-		RenderUtils.drawOutlinedBox(TARGET_BOX);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
+			0.5F * velocity);
+		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
 		
 		// draw box
-		GL11.glColor4d(1, 0, 0, 0.25F * velocity);
-		RenderUtils.drawSolidBox(TARGET_BOX);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
+			0.25F * velocity);
+		RenderUtils.drawSolidBox(TARGET_BOX, matrixStack);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
@@ -368,10 +255,13 @@ public final class BowAimbotHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
-		GL11.glPushMatrix();
+		matrixStack.push();
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		String message;
 		if(velocity < 1)
@@ -382,25 +272,23 @@ public final class BowAimbotHack extends Hack
 		// translate to center
 		Window sr = MC.getWindow();
 		int msgWidth = MC.textRenderer.getWidth(message);
-		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
+		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		GL11.glColor4f(0, 0, 0, 0.5F);
-		GL11.glBegin(GL11.GL_QUADS);
-		{
-			GL11.glVertex2d(0, 0);
-			GL11.glVertex2d(msgWidth + 3, 0);
-			GL11.glVertex2d(msgWidth + 3, 10);
-			GL11.glVertex2d(0, 10);
-		}
-		GL11.glEnd();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0).next();
+		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
+		bufferBuilder.vertex(matrix, 0, 10, 0).next();
+		tessellator.draw();
 		
 		// text
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
-		GL11.glPopMatrix();
+		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);

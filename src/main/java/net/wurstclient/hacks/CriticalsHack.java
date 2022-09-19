@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,16 +21,14 @@ import net.wurstclient.settings.EnumSetting;
 public final class CriticalsHack extends Hack implements LeftClickListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lPacket\u00a7r mode sends packets to server without actually\n"
-			+ "moving you at all.\n\n"
-			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to\n"
-			+ "get a critical hit.\n\n"
+		"\u00a7lPacket\u00a7r mode sends packets to server without actually moving you at all.\n\n"
+			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to get a critical hit.\n\n"
 			+ "\u00a7lFull Jump\u00a7r mode makes you jump normally.",
 		Mode.values(), Mode.PACKET);
 	
 	public CriticalsHack()
 	{
-		super("Criticals", "Changes all your hits to critical hits.");
+		super("Criticals");
 		setCategory(Category.COMBAT);
 		addSetting(mode);
 	}
@@ -107,7 +105,7 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	private void sendPos(double x, double y, double z, boolean onGround)
 	{
 		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionOnly(x, y, z, onGround));
+			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
 	}
 	
 	private void doMiniJump()

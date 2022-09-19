@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -71,7 +71,7 @@ public class FlyPathProcessor extends PathProcessor
 		}
 		
 		lockControls();
-		MC.player.abilities.flying = creativeFlying;
+		MC.player.getAbilities().flying = creativeFlying;
 		boolean x = posVec.x < nextBox.minX || posVec.x > nextBox.maxX;
 		boolean y = posVec.y < nextBox.minY || posVec.y > nextBox.maxY;
 		boolean z = posVec.z < nextBox.minZ || posVec.z > nextBox.maxZ;
@@ -116,17 +116,17 @@ public class FlyPathProcessor extends PathProcessor
 			if(!creativeFlying && MC.player.getPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.speed.getValue())
 			{
-				MC.player.updatePosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			
-			MC.options.keyForward.setPressed(true);
+			MC.options.forwardKey.setPressed(true);
 			
 			if(MC.player.horizontalCollision)
 				if(posVec.y > nextBox.maxY)
-					MC.options.keySneak.setPressed(true);
+					MC.options.sneakKey.setPressed(true);
 				else if(posVec.y < nextBox.minY)
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 				
 			// vertical movement
 		}else if(y)
@@ -134,19 +134,19 @@ public class FlyPathProcessor extends PathProcessor
 			if(!creativeFlying && MC.player.getPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.speed.getValue())
 			{
-				MC.player.updatePosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			
 			if(posVec.y < nextBox.minY)
-				MC.options.keyJump.setPressed(true);
+				MC.options.jumpKey.setPressed(true);
 			else
-				MC.options.keySneak.setPressed(true);
+				MC.options.sneakKey.setPressed(true);
 			
 			if(MC.player.verticalCollision)
 			{
-				MC.options.keySneak.setPressed(false);
-				MC.options.keyForward.setPressed(true);
+				MC.options.sneakKey.setPressed(false);
+				MC.options.forwardKey.setPressed(true);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,8 +25,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class StepHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lSimple\u00a7r mode can step up multiple\n"
-			+ "blocks (enables Height slider).\n"
+		"\u00a7lSimple\u00a7r mode can step up multiple blocks (enables Height slider).\n"
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.LEGIT);
 	
@@ -36,7 +35,7 @@ public final class StepHack extends Hack implements UpdateListener
 	
 	public StepHack()
 	{
-		super("Step", "Allows you to step up full blocks.");
+		super("Step");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(height);
@@ -90,9 +89,10 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		double stepHeight = -1;
 		
-		ArrayList<Box> blockCollisions = MC.world
-			.getBlockCollisions(player, box).map(VoxelShape::getBoundingBox)
-			.collect(Collectors.toCollection(() -> new ArrayList<>()));
+		ArrayList<Box> blockCollisions =
+			IMC.getWorld().getBlockCollisionsStream(player, box)
+				.map(VoxelShape::getBoundingBox)
+				.collect(Collectors.toCollection(ArrayList::new));
 		
 		for(Box bb : blockCollisions)
 			if(bb.maxY > stepHeight)
@@ -105,15 +105,15 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		ClientPlayNetworkHandler netHandler = player.networkHandler;
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
+		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
 			player.isOnGround()));
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(
+		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
 			player.isOnGround()));
 		
-		player.updatePosition(player.getX(), player.getY() + 1 * stepHeight,
+		player.setPosition(player.getX(), player.getY() + 1 * stepHeight,
 			player.getZ());
 	}
 	

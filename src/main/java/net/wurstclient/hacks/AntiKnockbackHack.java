@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,8 +30,7 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 	
 	public AntiKnockbackHack()
 	{
-		super("AntiKnockback",
-			"Prevents you from getting pushed by players and mobs.");
+		super("AntiKnockback");
 		
 		setCategory(Category.COMBAT);
 		addSetting(hStrength);

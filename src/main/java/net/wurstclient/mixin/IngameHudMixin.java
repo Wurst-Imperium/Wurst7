@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 
 @Mixin(InGameHud.class)
@@ -33,15 +35,24 @@ public class IngameHudMixin extends DrawableHelper
 			return;
 		
 		GUIRenderEvent event = new GUIRenderEvent(matrixStack, partialTicks);
-		WurstClient.INSTANCE.getEventManager().fire(event);
+		EventManager.fire(event);
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"renderPumpkinOverlay()V"},
+		method = {"renderOverlay(Lnet/minecraft/util/Identifier;F)V"},
 		cancellable = true)
-	private void onRenderPumpkinOverlay(CallbackInfo ci)
+	private void onRenderOverlay(Identifier identifier, float scale,
+		CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
-			ci.cancel();
+		if(identifier == null || identifier.getPath() == null)
+			return;
+		
+		if(!identifier.getPath().equals("textures/misc/pumpkinblur.png"))
+			return;
+		
+		if(!WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+			return;
+		
+		ci.cancel();
 	}
 }
