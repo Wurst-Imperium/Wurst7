@@ -107,6 +107,7 @@
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
+  "description.wurst.hack.nolevitation": "Disables the levitation effect when you get hit by a Shulker.\n\n§c§lWARNING:§r You will fall if you activate this while the levitation effect is already active!",
   "description.wurst.hack.nooverlay": "Blocks the overlays of water and lava.",
   "description.wurst.hack.nopumpkin": "Blocks the overlay when wearing a pumpkin on your head.",
   "description.wurst.hack.noslowdown": "Cancels slowness effects caused by honey, soul sand and using items.",
