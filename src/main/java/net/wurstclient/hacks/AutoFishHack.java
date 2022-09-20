@@ -337,6 +337,9 @@ public final class AutoFishHack extends Hack
 	private void drawValidRange(MatrixStack matrixStack,
 		FishingBobberEntity bobber, int regionX, int regionZ)
 	{
+		if(validRangeBox == null)
+			return;
+		
 		matrixStack.push();
 		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
 			bobber.getZ() - regionZ);
