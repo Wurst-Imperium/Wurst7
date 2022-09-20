@@ -7,18 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
-
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -28,23 +17,17 @@ import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.mixinterface.IFishingBobberEntity;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"FishBot", "auto fish", "fish bot", "fishing"})
 public final class AutoFishHack extends Hack
@@ -55,22 +38,14 @@ public final class AutoFishHack extends Hack
 			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
-	private CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring and where they will be detected. Useful for optimizing your 'Valid range' setting.",
-		false);
-	
-	private final ColorSetting ddColor = new ColorSetting("DD color",
-		"Color of the debug draw, if enabled.", Color.RED);
-	
 	private int bestRodValue;
 	private int bestRodSlot;
 	
 	private int castRodTimer;
 	private int reelInTimer;
 	private int scheduledWindowClick;
-	private Vec3d lastSoundPos;
 	
-	private Box validRangeBox;
+	private final AutoFishDebugDraw debugDraw = new AutoFishDebugDraw();
 	
 	private boolean wasOpenWater;
 	
@@ -80,8 +55,7 @@ public final class AutoFishHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(validRange);
-		addSetting(debugDraw);
-		addSetting(ddColor);
+		debugDraw.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
@@ -92,7 +66,7 @@ public final class AutoFishHack extends Hack
 		castRodTimer = 0;
 		reelInTimer = -1;
 		scheduledWindowClick = -1;
-		lastSoundPos = null;
+		debugDraw.reset();
 		wasOpenWater = true;
 		
 		EVENTS.add(UpdateListener.class, this);
@@ -111,7 +85,7 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		updateDebugDraw();
+		debugDraw.updateValidRange(validRange.getValue());
 		
 		if(reelInTimer > 0)
 			reelInTimer--;
@@ -164,14 +138,6 @@ public final class AutoFishHack extends Hack
 			rightClick();
 			castRodTimer = 15;
 		}
-	}
-	
-	private void updateDebugDraw()
-	{
-		if(debugDraw.isChecked())
-			validRangeBox = new Box(-validRange.getValue(), -1 / 16.0,
-				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
-				validRange.getValue());
 	}
 	
 	private void updateBestRod()
@@ -261,8 +227,7 @@ public final class AutoFishHack extends Hack
 		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.equals(sound.getSound()))
 			return;
 		
-		if(debugDraw.isChecked())
-			lastSoundPos = new Vec3d(sound.getX(), sound.getY(), sound.getZ());
+		debugDraw.updateSoundPos(sound);
 		
 		// check position
 		FishingBobberEntity bobber = player.fishHook;
@@ -288,6 +253,12 @@ public final class AutoFishHack extends Hack
 		wasOpenWater = isOpenWater;
 	}
 	
+	private boolean isInOpenWater(FishingBobberEntity bobber)
+	{
+		return ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
+	}
+	
 	private void rightClick()
 	{
 		// check held item
@@ -302,82 +273,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(!debugDraw.isChecked())
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		FishingBobberEntity bobber = MC.player.fishHook;
-		if(bobber != null)
-			drawValidRange(matrixStack, bobber, regionX, regionZ);
-		
-		drawLastBite(matrixStack, regionX, regionZ);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private void drawValidRange(MatrixStack matrixStack,
-		FishingBobberEntity bobber, int regionX, int regionZ)
-	{
-		if(validRangeBox == null)
-			return;
-		
-		matrixStack.push();
-		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
-			bobber.getZ() - regionZ);
-		float[] colorF = ddColor.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
-		RenderUtils.drawOutlinedBox(validRangeBox, matrixStack);
-		matrixStack.pop();
-	}
-	
-	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
-	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
-		
-		if(lastSoundPos != null)
-		{
-			matrixStack.push();
-			matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
-				lastSoundPos.z - regionZ);
-			float[] colorF = ddColor.getColorF();
-			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)-0.125)
-				.next();
-			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)0.125).next();
-			bufferBuilder.vertex(matrix, (float)0.125, 0, (float)-0.125).next();
-			bufferBuilder.vertex(matrix, (float)-0.125, 0, (float)0.125).next();
-			tessellator.draw();
-			matrixStack.pop();
-		}
-	}
-	
-	private boolean isInOpenWater(FishingBobberEntity bobber)
-	{
-		return ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
+		debugDraw.render(matrixStack, partialTicks);
 	}
 }
