@@ -97,6 +97,7 @@ public final class AutoFishHack extends Hack
 		{
 			IMC.getInteractionManager()
 				.windowClick_PICKUP(scheduledWindowClick);
+			scheduledWindowClick = -1;
 			castRodTimer = 15;
 			return;
 		}
