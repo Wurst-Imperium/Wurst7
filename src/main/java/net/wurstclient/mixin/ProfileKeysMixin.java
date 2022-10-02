@@ -43,7 +43,7 @@ public class ProfileKeysMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "method_45104()Ljava/util/concurrent/CompletableFuture;",
+		method = "refresh()Ljava/util/concurrent/CompletableFuture;",
 		cancellable = true)
 	private void onGetPublicKeyData(
 		CallbackInfoReturnable<CompletableFuture<Optional<PlayerPublicKey.PublicKeyData>>> cir)
