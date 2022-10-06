@@ -20,7 +20,7 @@ public final class AutoReconnectHack extends Hack
 {
 	private final SliderSetting waitTime =
 		new SliderSetting("Wait time", "Time before reconnecting in seconds.",
-			5, 0, 60, 0.5, ValueDisplay.DECIMAL);
+			5, 0, 60, 0.5, ValueDisplay.DECIMAL.withSuffix("s"));
 	
 	public AutoReconnectHack()
 	{
