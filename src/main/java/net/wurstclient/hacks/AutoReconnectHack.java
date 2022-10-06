@@ -18,9 +18,9 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @DontBlock
 public final class AutoReconnectHack extends Hack
 {
-	private final SliderSetting waitTime = new SliderSetting("Wait time",
-		"Time before reconnecting in seconds.", 5, 0, 60, 0.5,
-		ValueDisplay.DECIMAL);
+	private final SliderSetting waitTime =
+		new SliderSetting("Wait time", "Time before reconnecting in seconds.",
+			5, 0, 60, 0.5, ValueDisplay.DECIMAL);
 	
 	public AutoReconnectHack()
 	{
