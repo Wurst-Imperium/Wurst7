@@ -18,6 +18,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto totem"})
 public final class AutoTotemHack extends Hack implements UpdateListener
@@ -25,14 +27,20 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	private final CheckboxSetting showCounter = new CheckboxSetting(
 		"Show totem counter", "Displays the number of totems you have.", true);
 	
+	private final SliderSetting delay = new SliderSetting("Delay",
+		"Amount of ticks to wait before moving the totem.", 0, 0, 20, 1,
+		ValueDisplay.INTEGER);
+	
 	private int nextTickSlot;
 	private int totems;
+	private int timer;
 	
 	public AutoTotemHack()
 	{
 		super("AutoTotem");
 		setCategory(Category.COMBAT);
 		addSetting(showCounter);
+		addSetting(delay);
 	}
 	
 	@Override
@@ -56,6 +64,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		nextTickSlot = -1;
 		totems = 0;
+		timer = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -68,6 +77,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		int timerSaved = timer;
+		timer = -1;
+		
 		finishMovingTotem();
 		
 		PlayerInventory inventory = MC.player.getInventory();
@@ -85,7 +97,17 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			return;
 		
 		if(nextTotemSlot != -1)
-			moveTotem(nextTotemSlot, offhandStack);
+		{
+			timer = timerSaved;
+			
+			if(timer == -1)
+				timer = delay.getValueI();
+			
+			if(timer == 0)
+				moveTotem(nextTotemSlot, offhandStack);
+			
+			timer--;
+		}
 	}
 	
 	private void moveTotem(int nextTotemSlot, ItemStack offhandStack)
