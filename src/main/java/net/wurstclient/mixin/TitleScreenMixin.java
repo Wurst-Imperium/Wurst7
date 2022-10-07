@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -76,5 +77,17 @@ public abstract class TitleScreenMixin extends Screen
 		// adjust AltManager button if Realms button has been moved
 		// happens when ModMenu is installed
 		altsButton.y = realmsButton.y;
+	}
+	
+	/**
+	 * Stops the multiplayer button being grayed out if the user's Microsoft
+	 * account is parental-control'd or banned from online play.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "getMultiplayerDisabledText()Lnet/minecraft/text/Text;",
+		cancellable = true)
+	private void onGetMultiplayerDisabledText(CallbackInfoReturnable<Text> cir)
+	{
+		cir.setReturnValue(null);
 	}
 }

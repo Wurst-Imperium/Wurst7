@@ -9,43 +9,25 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.BackgroundRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
+import net.minecraft.entity.Entity;
 import net.wurstclient.WurstClient;
 
 @Mixin(BackgroundRenderer.class)
 public class BackgroundRendererMixin
 {
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
-		ordinal = 0),
-		method = "render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V")
-	private static boolean hasStatusEffectRender(LivingEntity entity,
-		StatusEffect effect)
+	@Inject(at = {@At("HEAD")},
+		method = {
+			"getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;"},
+		cancellable = true)
+	private static void onGetFogModifier(Entity entity, float tickDelta,
+		CallbackInfoReturnable<StatusEffectFogModifier> ci)
 	{
-		if(effect == StatusEffects.BLINDNESS
-			&& WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			return false;
-		
-		return entity.hasStatusEffect(effect);
-	}
-	
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
-		ordinal = 1),
-		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V",
-		require = 0)
-	private static boolean hasStatusEffectApplyFog(LivingEntity entity,
-		StatusEffect effect)
-	{
-		if(effect == StatusEffects.BLINDNESS
-			&& WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			return false;
-		
-		return entity.hasStatusEffect(effect);
+		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+			ci.setReturnValue(null);
 	}
 }

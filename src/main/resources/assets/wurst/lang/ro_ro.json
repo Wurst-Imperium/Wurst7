@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.anchoraura": "Plaseaza automat (optional), incarca, si detoneaza respawn anchoruri pentru a ucide entitati din jurul tau.",
   "description.wurst.hack.antiafk": "Umbla anapoda pentru a evita pluginuri anti-afk.\nNeceseita un spatiu liber de cel putin 3x3.",
-  "description.wurst.hack.antiblind": "Previne efectul de orbire.\nIncompatibl cu OptiFine.",
+  "description.wurst.hack.antiblind": "Previne orbirea si efectele întunericului.\nIncompatibl cu OptiFine.",
   "description.wurst.hack.anticactus": "Esti protejat de damage-ul dat de cactusi.",
   "description.wurst.hack.antiknockback": "Te previne din a fi impins de catre playeri sau mobi.",
   "description.wurst.hack.antispam": "Opreste chat spam-ul prin adaugarea unui raspuns la mesaje repetate.",
@@ -152,6 +152,8 @@
   "description.wurst.hack.truesight": "Iti permite sa vezi entitati invizibile.",
   "description.wurst.hack.tunneller": "Sapa automat un tunel.\n\n§c§lATENTIE:§r Desi acest bot va incerca sa nu moara de la fall damage sau lava, nu este garantat ca nu va muri. Foloseste-l numai cu echipament pe care esti dispus sa il pierzi.",
   "description.wurst.hack.x-ray": "Iti permite sa vezi minereuri prin pereti.",
+  "button.wurst.nochatreports.disable_signatures": "Dezactivează semnăturile",
+  "button.wurst.nochatreports.re-enable_signatures": "Re-activează semnăturile",
   "description.wurst.altmanager.premium": "Acest cont alternativ are o parola si poate intra pe servere.",
   "description.wurst.altmanager.cracked": "Acest cont alternativ nu are o parola si nu poate intra decat pe servere 'cracked'.",
   "description.wurst.altmanager.failed": "Ultima data cand ai incercat sa te loghezi cu acest cont alternativ, nu a functionat.",
@@ -162,5 +164,16 @@
   "description.wurst.altmanager.window_freeze": "Ar putea sa para de parca jocul nu raspunde atunci cand acea fereastra este deschisa.",
   "description.wurst.altmanager.fullscreen": "§cOpreste modul fullscreen!",
   "gui.wurst.altmanager.folder_error.title": "Folderul '.Wurst encryption' nu a putut fi creeat!",
-  "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripta sau decripta conturi alternative fara acesta.\nInca poti folosi AltManager, dar orice cont alternativ pe care il creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s"
+  "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripta sau decripta conturi alternative fara acesta.\nInca poti folosi AltManager, dar orice cont alternativ pe care il creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s",
+  "gui.wurst.altmanager.empty.title": "Lista voastră de alt-uri este goala.",
+  "gui.wurst.altmanager.empty.message": "Ți-ar plăcea niște alt-uri la întâmplare ca sa începi?",
+  "gui.wurst.nochatreports.unsafe_server.title": "§4§lAVERTIZARE:§r Server nesigur",
+  "toast.wurst.nochatreports.unsafe_server.title": "Mesajele chat-ului pot fi raportate",
+  "toast.wurst.nochatreports.unsafe_server.message": "Mesajele trimise pe acest server pot fi raportate către Fratele Mare Mojang si poți lua ban global pe contul tău",
+  "gui.wurst.nochatreports.ncr_mod_server.title": "Server \"No Chat Reports\"",
+  "gui.wurst.nochatreports.ncr_mod_server.message": "Acest server folosește mod-ul \"No Chat Reports\".\n\nPoți intra in serverul acesta daca blochezi semnăturile chat-ului si dezactivezi VanillaSpoof.",
+  "button.wurst.nochatreports.signatures_status": "Semnături: ",
+  "description.wurst.nochatreports.message_is_reportable": "Acest mesaj are o semnătura valida si prin urmare este vulnerabil la rapoarte de chat.",
+  "gui.wurst.generic.allcaps_blocked": "BLOCAT",
+  "gui.wurst.generic.allcaps_allowed": "PERMIS"
 }

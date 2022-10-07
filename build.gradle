@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -34,6 +34,10 @@ dependencies {
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }
 
 processResources {
