@@ -22,13 +22,19 @@ import net.wurstclient.settings.SliderSetting;
 @SearchTags({"creative flight", "CreativeFly", "creative fly"})
 public final class CreativeFlightHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting antiKick =
-			new CheckboxSetting("Anti Kick", "Makes you fall a little bit every now and then.", false);
+	private final CheckboxSetting antiKick = new CheckboxSetting("Anti-Kick",
+		"Makes you fall a little bit every now and then to prevent you from getting kicked.",
+		false);
+	
 	private final SliderSetting antiKickInterval =
-			new SliderSetting("Anti Kick Interval", 30, 5, 100, 1.0, SliderSetting.ValueDisplay.INTEGER);
-
+		new SliderSetting("Anti-Kick Interval",
+			"How often Anti-Kick should prevent you from getting kicked.\n"
+				+ "Most servers will kick you after 80 ticks.",
+			30, 5, 80, 1,
+			SliderSetting.ValueDisplay.INTEGER.withSuffix(" ticks"));
+	
 	private int tickCounter = 0;
-
+	
 	public CreativeFlightHack()
 	{
 		super("CreativeFlight");
@@ -41,7 +47,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	public void onEnable()
 	{
 		tickCounter = 0;
-
+		
 		WURST.getHax().jetpackHack.setEnabled(false);
 		WURST.getHax().flightHack.setEnabled(false);
 		
@@ -59,8 +65,8 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		boolean creative = player.isCreative();
 		abilities.flying = creative && !player.isOnGround();
 		abilities.allowFlying = creative;
-
-		restoreKeyPress();
+		
+		restoreKeyPresses();
 	}
 	
 	@Override
@@ -68,44 +74,51 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	{
 		PlayerAbilities abilities = MC.player.getAbilities();
 		abilities.allowFlying = true;
-
-		if (antiKick.isChecked() && abilities.flying) {
-			Vec3d velocity = MC.player.getVelocity();
-			if (tickCounter > antiKickInterval.getValueI() + 2) {
-				tickCounter = 0;
-			}
-			switch (tickCounter) {
-				case 0 -> {
-					if (MC.options.sneakKey.isPressed()) {
-						tickCounter = 3;
-					}
-					else {
-						MC.options.sneakKey.setPressed(false);
-						MC.options.jumpKey.setPressed(false);
-						MC.player.setVelocity(velocity.x, -0.07D, velocity.z);
-					}
-				}
-				case 1 -> {
-					MC.options.sneakKey.setPressed(false);
-					MC.options.jumpKey.setPressed(false);
-					MC.player.setVelocity(velocity.x, 0.07D, velocity.z);
-				}
-				case 2 -> {
-					MC.options.sneakKey.setPressed(false);
-					MC.options.jumpKey.setPressed(false);
-					MC.player.setVelocity(velocity.x, 0, velocity.z);
-				}
-				case 3 -> {
-					restoreKeyPress();
-				}
-			}
-			tickCounter++;
-		}
+		
+		if(antiKick.isChecked() && abilities.flying)
+			doAntiKick();
 	}
-	private void restoreKeyPress() {
-		IKeyBinding sneakKey = (IKeyBinding) MC.options.sneakKey;
-		((KeyBinding) sneakKey).setPressed(sneakKey.isActallyPressed());
-		IKeyBinding jumpKey = (IKeyBinding) MC.options.jumpKey;
-		((KeyBinding) jumpKey).setPressed(jumpKey.isActallyPressed());
+	
+	private void doAntiKick()
+	{
+		if(tickCounter > antiKickInterval.getValueI() + 2)
+			tickCounter = 0;
+		
+		switch(tickCounter)
+		{
+			case 0 ->
+			{
+				if(MC.options.sneakKey.isPressed()
+					&& !MC.options.jumpKey.isPressed())
+					tickCounter = 3;
+				else
+					setMotionY(-0.07);
+			}
+			
+			case 1 -> setMotionY(0.07);
+			
+			case 2 -> setMotionY(0);
+			
+			case 3 -> restoreKeyPresses();
+		}
+		
+		tickCounter++;
+	}
+	
+	private void setMotionY(double motionY)
+	{
+		MC.options.sneakKey.setPressed(false);
+		MC.options.jumpKey.setPressed(false);
+		
+		Vec3d velocity = MC.player.getVelocity();
+		MC.player.setVelocity(velocity.x, motionY, velocity.z);
+	}
+	
+	private void restoreKeyPresses()
+	{
+		KeyBinding[] bindings = {MC.options.jumpKey, MC.options.sneakKey};
+		
+		for(KeyBinding binding : bindings)
+			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
 	}
 }
