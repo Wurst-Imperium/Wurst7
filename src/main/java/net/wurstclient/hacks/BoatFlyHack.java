@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -18,20 +17,26 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 
-@SearchTags({"BoatFlight", "boat fly", "boat flight"})
+@SearchTags({"boat fly", "BoatFlight", "boat flight", "EntitySpeed",
+	"entity speed"})
 public final class BoatFlyHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting changeforwardSpeed =
-			new CheckboxSetting("Change Forward Speed", "Allows Forward Speed to be changed, disables smooth acceleration.", false);
-	public final SliderSetting forwardSpeed =
-			new SliderSetting("Forward Speed", 1, 0.05, 5, 0.05, SliderSetting.ValueDisplay.DECIMAL);
-	public final SliderSetting upwardSpeed =
-			new SliderSetting("Upward Speed", 0.3, 0, 5, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+	private final CheckboxSetting changeForwardSpeed = new CheckboxSetting(
+		"Change Forward Speed",
+		"Allows \u00a7eForward Speed\u00a7r to be changed, disables smooth acceleration.",
+		false);
+	
+	private final SliderSetting forwardSpeed = new SliderSetting(
+		"Forward Speed", 1, 0.05, 5, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+	
+	private final SliderSetting upwardSpeed = new SliderSetting("Upward Speed",
+		0.3, 0, 5, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+	
 	public BoatFlyHack()
 	{
 		super("BoatFly");
 		setCategory(Category.MOVEMENT);
-		addSetting(changeforwardSpeed);
+		addSetting(changeForwardSpeed);
 		addSetting(forwardSpeed);
 		addSetting(upwardSpeed);
 	}
@@ -54,19 +59,32 @@ public final class BoatFlyHack extends Hack implements UpdateListener
 		// check if riding
 		if(!MC.player.hasVehicle())
 			return;
-		// check is boat
+		
 		Entity vehicle = MC.player.getVehicle();
-		if (!(vehicle instanceof BoatEntity)) return;
-
-		// fly
 		Vec3d velocity = vehicle.getVelocity();
-		double motionY = MC.options.jumpKey.isPressed() ? upwardSpeed.getValue() : 0;
-		if (changeforwardSpeed.isChecked() && MC.options.forwardKey.isPressed()) {
-			double f = forwardSpeed.getValue();
-			vehicle.setVelocity(MathHelper.sin(-vehicle.getYaw() * ((float)Math.PI / 180)) * f, motionY, MathHelper.cos(vehicle.getYaw() * ((float)Math.PI / 180)) * f);
+		
+		// default motion
+		double motionX = velocity.x;
+		double motionY = 0;
+		double motionZ = velocity.z;
+		
+		// up/down
+		if(MC.options.jumpKey.isPressed())
+			motionY = upwardSpeed.getValue();
+		else if(MC.options.sprintKey.isPressed())
+			motionY = velocity.y;
+		
+		// forward
+		if(MC.options.forwardKey.isPressed() && changeForwardSpeed.isChecked())
+		{
+			double speed = forwardSpeed.getValue();
+			float yawRad = vehicle.getYaw() * MathHelper.RADIANS_PER_DEGREE;
+			
+			motionX = MathHelper.sin(-yawRad) * speed;
+			motionZ = MathHelper.cos(yawRad) * speed;
 		}
-		else {
-			vehicle.setVelocity(new Vec3d(velocity.x, motionY, velocity.z));
-		}
+		
+		// apply motion
+		vehicle.setVelocity(motionX, motionY, motionZ);
 	}
 }
