@@ -18,6 +18,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto totem"})
 public final class AutoTotemHack extends Hack implements UpdateListener
@@ -25,14 +27,21 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	private final CheckboxSetting showCounter = new CheckboxSetting(
 		"Show totem counter", "Displays the number of totems you have.", true);
 	
+	private final SliderSetting delay = new SliderSetting("Delay",
+		"Amount of ticks to wait before equipping the next totem.", 0, 0, 20, 1,
+		ValueDisplay.INTEGER);
+	
 	private int nextTickSlot;
 	private int totems;
+	private int timer;
+	private boolean wasTotemInOffhand;
 	
 	public AutoTotemHack()
 	{
 		super("AutoTotem");
 		setCategory(Category.COMBAT);
 		addSetting(showCounter);
+		addSetting(delay);
 	}
 	
 	@Override
@@ -56,6 +65,8 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		nextTickSlot = -1;
 		totems = 0;
+		timer = 0;
+		wasTotemInOffhand = false;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -77,15 +88,30 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		if(isTotem(offhandStack))
 		{
 			totems++;
+			wasTotemInOffhand = true;
 			return;
+		}
+		
+		if(wasTotemInOffhand)
+		{
+			timer = delay.getValueI();
+			wasTotemInOffhand = false;
 		}
 		
 		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
 			return;
 		
-		if(nextTotemSlot != -1)
-			moveTotem(nextTotemSlot, offhandStack);
+		if(nextTotemSlot == -1)
+			return;
+		
+		if(timer > 0)
+		{
+			timer--;
+			return;
+		}
+		
+		moveTotem(nextTotemSlot, offhandStack);
 	}
 	
 	private void moveTotem(int nextTotemSlot, ItemStack offhandStack)
