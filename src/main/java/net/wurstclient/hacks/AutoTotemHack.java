@@ -28,12 +28,13 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		"Show totem counter", "Displays the number of totems you have.", true);
 	
 	private final SliderSetting delay = new SliderSetting("Delay",
-		"Amount of ticks to wait before moving the totem.", 0, 0, 20, 1,
+		"Amount of ticks to wait before equipping the next totem.", 0, 0, 20, 1,
 		ValueDisplay.INTEGER);
 	
 	private int nextTickSlot;
 	private int totems;
 	private int timer;
+	private boolean wasTotemInOffhand;
 	
 	public AutoTotemHack()
 	{
@@ -64,7 +65,8 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		nextTickSlot = -1;
 		totems = 0;
-		timer = -1;
+		timer = 0;
+		wasTotemInOffhand = false;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -77,9 +79,6 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		int timerSaved = timer;
-		timer = -1;
-		
 		finishMovingTotem();
 		
 		PlayerInventory inventory = MC.player.getInventory();
@@ -89,25 +88,30 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		if(isTotem(offhandStack))
 		{
 			totems++;
+			wasTotemInOffhand = true;
 			return;
+		}
+		
+		if(wasTotemInOffhand)
+		{
+			timer = delay.getValueI();
+			wasTotemInOffhand = false;
 		}
 		
 		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
 			return;
 		
-		if(nextTotemSlot != -1)
+		if(nextTotemSlot == -1)
+			return;
+		
+		if(timer > 0)
 		{
-			timer = timerSaved;
-			
-			if(timer == -1)
-				timer = delay.getValueI();
-			
-			if(timer == 0)
-				moveTotem(nextTotemSlot, offhandStack);
-			
 			timer--;
+			return;
 		}
+		
+		moveTotem(nextTotemSlot, offhandStack);
 	}
 	
 	private void moveTotem(int nextTotemSlot, ItemStack offhandStack)
