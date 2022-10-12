@@ -31,6 +31,12 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		"Amount of ticks to wait before equipping the next totem.", 0, 0, 20, 1,
 		ValueDisplay.INTEGER);
 	
+	private final SliderSetting health = new SliderSetting("Health",
+		"Effectively disables AutoTotem until your health reaches this value or falls below it.\n"
+			+ "0 = always active",
+		0, 0, 10, 0.5,
+		ValueDisplay.DECIMAL.withSuffix(" hearts").withLabel(0, "ignore"));
+	
 	private int nextTickSlot;
 	private int totems;
 	private int timer;
@@ -42,6 +48,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(showCounter);
 		addSetting(delay);
+		addSetting(health);
 	}
 	
 	@Override
@@ -97,6 +104,10 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			timer = delay.getValueI();
 			wasTotemInOffhand = false;
 		}
+		
+		float healthF = health.getValueF();
+		if(healthF > 0 && MC.player.getHealth() > healthF * 2F)
+			return;
 		
 		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
