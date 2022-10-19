@@ -56,6 +56,9 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterGolemsSetting(
 			"Won't follow iron golems, snow golems and shulkers.", true));
 		
+		builder.add(new FilterAllaysSetting(
+				"Won't follow allays.", true));
+			
 		builder.add(new FilterInvisibleSetting(
 			"Won't follow invisible entities.", false));
 		
