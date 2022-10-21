@@ -12,6 +12,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -142,7 +143,8 @@ public final class KillauraHack extends Hack
 				.filter(e -> !e.isRemoved())
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity)
+					|| e instanceof EndCrystalEntity
+					|| e instanceof ShulkerBulletEntity)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))

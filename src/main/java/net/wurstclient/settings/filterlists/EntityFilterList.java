@@ -53,6 +53,7 @@ public class EntityFilterList
 	public static EntityFilterList genericCombat()
 	{
 		return new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+			FilterShulkerBulletSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterMonstersSetting.genericCombat(false),

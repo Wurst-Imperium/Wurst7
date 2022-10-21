@@ -13,6 +13,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -186,7 +187,8 @@ public final class BowAimbotHack extends Hack
 		Stream<Entity> stream = s.filter(e -> e != null && !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity)
+				|| e instanceof EndCrystalEntity
+				|| e instanceof ShulkerBulletEntity)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
