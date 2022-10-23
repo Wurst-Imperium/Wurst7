@@ -55,8 +55,8 @@ public enum WurstClient
 {
 	INSTANCE;
 	
-	public static final MinecraftClient MC = MinecraftClient.getInstance();
-	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
+	public static MinecraftClient MC;
+	public static IMinecraftClient IMC;
 	
 	public static final String VERSION = "7.29";
 	public static final String MC_VERSION = "22w42a";
@@ -89,6 +89,8 @@ public enum WurstClient
 	{
 		System.out.println("Starting Wurst Client...");
 		
+		MC = MinecraftClient.getInstance();
+		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";

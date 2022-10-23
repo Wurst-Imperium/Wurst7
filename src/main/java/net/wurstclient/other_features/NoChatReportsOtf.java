@@ -67,10 +67,10 @@ public final class NoChatReportsOtf extends OtherFeature
 		if(!WurstClient.INSTANCE.isEnabled())
 			return indicator;
 		
-		if(indicator != null || signature == null || signature.isEmpty())
+		if(indicator != null || signature == null)
 			return indicator;
 		
-		return new MessageIndicator(0xE84F58, Icon.CHAT_NOT_SECURE,
+		return new MessageIndicator(0xE84F58, Icon.CHAT_MODIFIED,
 			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - ")
 				.append(Text.translatable(
 					"description.wurst.nochatreports.message_is_reportable")),

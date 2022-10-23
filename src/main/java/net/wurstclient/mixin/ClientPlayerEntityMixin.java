@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.ParseResults;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,17 +25,9 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.command.CommandSource;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.network.message.ArgumentSignatureDataMap;
-import net.minecraft.network.message.DecoratedContents;
-import net.minecraft.network.message.LastSeenMessageList;
-import net.minecraft.network.message.MessageMetadata;
-import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -67,9 +57,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private Screen tempCurrentScreen;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
-		GameProfile profile, PlayerPublicKey playerPublicKey)
+		GameProfile profile)
 	{
-		super(world, profile, playerPublicKey);
+		super(world, profile);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -147,28 +137,31 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		tempCurrentScreen = null;
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
-		cancellable = true)
-	private void onSignChatMessage(MessageMetadata metadata,
-		DecoratedContents content, LastSeenMessageList lastSeenMessages,
-		CallbackInfoReturnable<MessageSignatureData> cir)
-	{
-		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(MessageSignatureData.EMPTY);
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
-		cancellable = true)
-	private void onSignArguments(MessageMetadata metadata,
-		ParseResults<CommandSource> parseResults, @Nullable Text preview,
-		LastSeenMessageList lastSeenMessages,
-		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
-	{
-		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
-	}
+	// FIXME
+	// @Inject(at = @At("HEAD"),
+	// method =
+	// "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
+	// cancellable = true)
+	// private void onSignChatMessage(MessageMetadata metadata,
+	// DecoratedContents content, LastSeenMessageList lastSeenMessages,
+	// CallbackInfoReturnable<MessageSignatureData> cir)
+	// {
+	// if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+	// cir.setReturnValue(MessageSignatureData.EMPTY);
+	// }
+	//
+	// @Inject(at = @At("HEAD"),
+	// method =
+	// "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+	// cancellable = true)
+	// private void onSignArguments(MessageMetadata metadata,
+	// ParseResults<CommandSource> parseResults, @Nullable Text preview,
+	// LastSeenMessageList lastSeenMessages,
+	// CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
+	// {
+	// if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+	// cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
+	// }
 	
 	@Override
 	public void setVelocityClient(double x, double y, double z)

@@ -87,7 +87,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			break;
 			
 			case CHARS:
-			MC.player.sendChatMessage("\u00a7", null);
+			MC.getNetworkHandler().method_45729("\u00a7");
 			break;
 			
 			case TELEPORT:
