@@ -22,7 +22,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.DynamicSerializableUuid;
+import net.minecraft.util.Uuids;
 import net.minecraft.world.GameMode;
 import net.wurstclient.WurstClient;
 
@@ -38,7 +38,7 @@ public final class AltRenderer
 		
 		if(loadedSkins.get(name) == null)
 		{
-			UUID uuid = DynamicSerializableUuid
+			UUID uuid = Uuids
 				.getUuidFromProfile(new GameProfile((UUID)null, name));
 			
 			PlayerListEntry entry = new PlayerListEntry(
@@ -95,7 +95,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
+				.getModel(Uuids.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
@@ -227,7 +227,7 @@ public final class AltRenderer
 			bindSkinTexture(name);
 			
 			boolean slim = DefaultSkinHelper
-				.getModel(DynamicSerializableUuid.getOfflinePlayerUuid(name))
+				.getModel(Uuids.getOfflinePlayerUuid(name))
 				.equals("slim");
 			
 			GL11.glEnable(GL11.GL_BLEND);
