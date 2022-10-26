@@ -3,6 +3,7 @@
   "description.wurst.hack.antiafk": "Läuft zufällig durch die Gegend, um dich vor Anti-AFK Plugins zu verstecken.\nBenötigt mindestens 3x3 Blöcke freien Platz.",
   "description.wurst.hack.antiblind": "Verhindert Blindheits- und Dunkelheitseffekte.\nNicht kompatibel mit OptiFine.",
   "description.wurst.hack.anticactus": "Schützt dich vor Kakteen.",
+  "description.wurst.hack.antihunger": "Verlangsamt deinen Hunger während du läufst.",
   "description.wurst.hack.antiknockback": "Verhindert dass du von Mobs und Spielern weggeschubst wirst.",
   "description.wurst.hack.antispam": "Blockiert Chat-Spam, indem es wiederholte Nachrichten durch einen Zähler ersetzt.",
   "description.wurst.hack.antiwaterpush": "Verhindert dass du von fließendem Wasser weggeschubst wirst.",
