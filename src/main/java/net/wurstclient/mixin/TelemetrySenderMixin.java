@@ -12,9 +12,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.util.telemetry.TelemetrySender;
-import net.minecraft.client.util.telemetry.TelemetrySender.PlayerGameMode;
+import net.minecraft.client.util.TelemetrySender;
+import net.minecraft.client.util.TelemetrySender.PlayerGameMode;
 import net.wurstclient.WurstClient;
 
 @Mixin(TelemetrySender.class)

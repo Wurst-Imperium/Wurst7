@@ -49,6 +49,6 @@ public final class GmCmd extends Command
 		}
 		
 		String message = "gamemode " + args2;
-		MC.getNetworkHandler().method_45730(message);
+		MC.getNetworkHandler().sendChatCommand(message);
 	}
 }
