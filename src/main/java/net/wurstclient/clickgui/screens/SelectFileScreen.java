@@ -45,15 +45,23 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			Text.literal("Open Folder"), b -> openFolder()));
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Reset to Defaults"), b -> askToConfirmReset()));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Open Folder"), b -> openFolder())
+			.method_46434(8, 8, 100, 20).method_46431());
 		
-		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
-			height - 48, 100, 20, Text.literal("Done"), b -> done()));
-		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			Text.literal("Cancel"), b -> openPrevScreen()));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Reset to Defaults"),
+				b -> askToConfirmReset())
+			.method_46434(width - 108, 8, 100, 20).method_46431());
+		
+		doneButton = addDrawableChild(
+			ButtonWidget.method_46430(Text.literal("Done"), b -> done())
+				.method_46434(width / 2 - 102, height - 48, 100, 20)
+				.method_46431());
+		
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Cancel"), b -> openPrevScreen())
+			.method_46434(width / 2 + 2, height - 48, 100, 20).method_46431());
 	}
 	
 	private void openFolder()

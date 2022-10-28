@@ -41,22 +41,28 @@ public final class KeybindManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addDrawableChild(addButton = new ButtonWidget(width / 2 - 102,
-			height - 52, 100, 20, Text.literal("Add"),
-			b -> client.setScreen(new KeybindEditorScreen(this))));
+		addDrawableChild(addButton = ButtonWidget
+			.method_46430(Text.literal("Add"),
+				b -> client.setScreen(new KeybindEditorScreen(this)))
+			.method_46434(width / 2 - 102, height - 52, 100, 20)
+			.method_46431());
 		
-		addDrawableChild(editButton = new ButtonWidget(width / 2 + 2,
-			height - 52, 100, 20, Text.literal("Edit"), b -> edit()));
+		addDrawableChild(editButton = ButtonWidget
+			.method_46430(Text.literal("Edit"), b -> edit())
+			.method_46434(width / 2 + 2, height - 52, 100, 20).method_46431());
 		
-		addDrawableChild(removeButton = new ButtonWidget(width / 2 - 102,
-			height - 28, 100, 20, Text.literal("Remove"), b -> remove()));
+		addDrawableChild(removeButton =
+			ButtonWidget.method_46430(Text.literal("Remove"), b -> remove())
+				.method_46434(width / 2 - 102, height - 28, 100, 20)
+				.method_46431());
+		
+		addDrawableChild(backButton = ButtonWidget
+			.method_46430(Text.literal("Back"),
+				b -> client.setScreen(prevScreen))
+			.method_46434(width / 2 + 2, height - 28, 100, 20).method_46431());
 		
 		addDrawableChild(
-			backButton = new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
-				Text.literal("Back"), b -> client.setScreen(prevScreen)));
-		
-		addDrawableChild(
-			new ButtonWidget(8, 8, 100, 20, Text.literal("Reset Keybinds"),
+			ButtonWidget.method_46430(Text.literal("Reset Keybinds"),
 				b -> client.setScreen(new ConfirmScreen(confirmed -> {
 					if(confirmed)
 						WurstClient.INSTANCE.getKeybinds()
@@ -64,11 +70,13 @@ public final class KeybindManagerScreen extends Screen
 					client.setScreen(this);
 				}, Text
 					.literal("Are you sure you want to reset your keybinds?"),
-					Text.literal("This cannot be undone!")))));
+					Text.literal("This cannot be undone!"))))
+				.method_46434(8, 8, 100, 20).method_46431());
 		
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Profiles..."),
-			b -> client.setScreen(new KeybindProfilesScreen(this))));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Profiles..."),
+				b -> client.setScreen(new KeybindProfilesScreen(this)))
+			.method_46434(width - 108, 8, 100, 20).method_46431());
 	}
 	
 	private void edit()

@@ -62,10 +62,12 @@ public abstract class TitleScreenMixin extends Screen
 		realmsButton.setWidth(98);
 		
 		// add AltManager button
-		addDrawableChild(altsButton = new ButtonWidget(width / 2 + 2,
-			realmsButton.y, 98, 20, Text.literal("Alt Manager"),
-			b -> client.setScreen(new AltManagerScreen(this,
-				WurstClient.INSTANCE.getAltManager()))));
+		addDrawableChild(altsButton = ButtonWidget
+			.method_46430(Text.literal("Alt Manager"),
+				b -> client.setScreen(new AltManagerScreen(this,
+					WurstClient.INSTANCE.getAltManager())))
+			.method_46434(width / 2 + 2, realmsButton.method_46427(), 98, 20)
+			.method_46431());
 	}
 	
 	@Inject(at = {@At("RETURN")}, method = {"tick()V"})
@@ -76,7 +78,7 @@ public abstract class TitleScreenMixin extends Screen
 			
 		// adjust AltManager button if Realms button has been moved
 		// happens when ModMenu is installed
-		altsButton.y = realmsButton.y;
+		altsButton.method_46419(realmsButton.method_46427());
 	}
 	
 	/**

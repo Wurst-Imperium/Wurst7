@@ -38,7 +38,7 @@ public final class AltRenderer
 				Uuids.getUuidFromProfile(new GameProfile((UUID)null, name));
 			
 			PlayerListEntry entry =
-				new PlayerListEntry(new GameProfile(uuid, name));
+				new PlayerListEntry(new GameProfile(uuid, name), false);
 			
 			loadedSkins.put(name, entry.getSkinTexture());
 		}

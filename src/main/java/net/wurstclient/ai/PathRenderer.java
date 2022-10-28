@@ -7,6 +7,9 @@
  */
 package net.wurstclient.ai;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
@@ -15,8 +18,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
 
 public final class PathRenderer
 {
@@ -53,11 +54,11 @@ public final class PathRenderer
 		int zDiff = endZ - startZ;
 		
 		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
 		
 		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
 		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		// arrow head
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();

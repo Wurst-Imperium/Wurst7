@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.util.TelemetrySender;
 import net.minecraft.client.util.TelemetrySender.PlayerGameMode;
 import net.wurstclient.WurstClient;
@@ -23,7 +24,7 @@ public class TelemetrySenderMixin
 	private boolean sent;
 	
 	@Inject(at = @At("HEAD"),
-		method = "send(Lnet/minecraft/client/util/telemetry/TelemetrySender$PlayerGameMode;)V",
+		method = "send(Lnet/minecraft/client/util/TelemetrySender$PlayerGameMode;)V",
 		cancellable = true)
 	private void onSend(PlayerGameMode gameMode, CallbackInfo ci)
 	{

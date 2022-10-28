@@ -144,7 +144,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
+		method = {"getProfileKeys()Lnet/minecraft/class_7853;"},
 		cancellable = true)
 	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{

@@ -37,8 +37,9 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
 			return;
 		
-		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 152,
-			height - 28, 150, 20, Text.literal(""), this::toggleWurst);
+		ButtonWidget toggleWurstButton = ButtonWidget
+			.method_46430(Text.literal(""), this::toggleWurst)
+			.method_46434(width / 2 - 152, height - 28, 150, 20).method_46431();
 		
 		updateWurstButtonText(toggleWurstButton);
 		addDrawableChild(toggleWurstButton);
@@ -54,7 +55,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 				.equals(I18n.translate("gui.done")))
 				continue;
 			
-			button.x = width / 2 + 2;
+			button.method_46421(width / 2 + 2);
 			button.setWidth(150);
 		}
 	}

@@ -66,7 +66,8 @@ public class ChatScreenMixin extends Screen
 			client.inGameHud.getChatHud().addToMessageHistory(newMessage);
 		
 		if(newMessage.startsWith("/"))
-			client.player.networkHandler.sendChatCommand(newMessage.substring(1));
+			client.player.networkHandler
+				.sendChatCommand(newMessage.substring(1));
 		else
 			client.player.networkHandler.sendChatMessage(newMessage);
 		

@@ -53,11 +53,15 @@ public abstract class ContainerScreen54Mixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			addDrawableChild(new ButtonWidget(x + backgroundWidth - 108, y + 4,
-				50, 12, Text.literal("Steal"), b -> steal()));
+			addDrawableChild(
+				ButtonWidget.method_46430(Text.literal("Steal"), b -> steal())
+					.method_46434(x + backgroundWidth - 108, y + 4, 50, 12)
+					.method_46431());
 			
-			addDrawableChild(new ButtonWidget(x + backgroundWidth - 56, y + 4,
-				50, 12, Text.literal("Store"), b -> store()));
+			addDrawableChild(
+				ButtonWidget.method_46430(Text.literal("Store"), b -> store())
+					.method_46434(x + backgroundWidth - 56, y + 4, 50, 12)
+					.method_46431());
 		}
 		
 		if(autoSteal.isEnabled())

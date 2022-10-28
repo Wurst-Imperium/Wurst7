@@ -9,6 +9,7 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,7 +22,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 
 public abstract class NavigatorScreen extends Screen

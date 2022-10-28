@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -44,7 +45,6 @@ import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
 import net.wurstclient.mixinterface.IScreen;
@@ -112,35 +112,45 @@ public final class AltManagerScreen extends Screen
 			client.setScreen(screen);
 		}
 		
-		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
-			height - 52, 100, 20, Text.literal("Login"), b -> pressLogin()));
+		addDrawableChild(useButton =
+			ButtonWidget.method_46430(Text.literal("Login"), b -> pressLogin())
+				.method_46434(width / 2 - 154, height - 52, 100, 20)
+				.method_46431());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
-			Text.literal("Direct Login"),
-			b -> client.setScreen(new DirectLoginScreen(this))));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Direct Login"),
+				b -> client.setScreen(new DirectLoginScreen(this)))
+			.method_46434(width / 2 - 50, height - 52, 100, 20).method_46431());
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
-			Text.literal("Add"),
-			b -> client.setScreen(new AddAltScreen(this, altManager))));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Add"),
+				b -> client.setScreen(new AddAltScreen(this, altManager)))
+			.method_46434(width / 2 + 54, height - 52, 100, 20).method_46431());
 		
-		addDrawableChild(
-			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
-				Text.literal("Favorite"), b -> pressFavorite()));
+		addDrawableChild(starButton = ButtonWidget
+			.method_46430(Text.literal("Favorite"), b -> pressFavorite())
+			.method_46434(width / 2 - 154, height - 28, 75, 20).method_46431());
 		
-		addDrawableChild(editButton = new ButtonWidget(width / 2 - 76,
-			height - 28, 74, 20, Text.literal("Edit"), b -> pressEdit()));
+		addDrawableChild(editButton = ButtonWidget
+			.method_46430(Text.literal("Edit"), b -> pressEdit())
+			.method_46434(width / 2 - 76, height - 28, 74, 20).method_46431());
 		
-		addDrawableChild(deleteButton = new ButtonWidget(width / 2 + 2,
-			height - 28, 74, 20, Text.literal("Delete"), b -> pressDelete()));
+		addDrawableChild(deleteButton = ButtonWidget
+			.method_46430(Text.literal("Delete"), b -> pressDelete())
+			.method_46434(width / 2 + 2, height - 28, 74, 20).method_46431());
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.method_46430(Text.literal("Cancel"),
+				b -> client.setScreen(prevScreen))
+			.method_46434(width / 2 + 80, height - 28, 75, 20).method_46431());
 		
-		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
-			Text.literal("Import"), b -> pressImportAlts()));
+		addDrawableChild(importButton = ButtonWidget
+			.method_46430(Text.literal("Import"), b -> pressImportAlts())
+			.method_46434(8, 8, 50, 20).method_46431());
 		
-		addDrawableChild(exportButton = new ButtonWidget(58, 8, 50, 20,
-			Text.literal("Export"), b -> pressExportAlts()));
+		addDrawableChild(exportButton = ButtonWidget
+			.method_46430(Text.literal("Export"), b -> pressExportAlts())
+			.method_46434(58, 8, 50, 20).method_46431());
 	}
 	
 	@Override

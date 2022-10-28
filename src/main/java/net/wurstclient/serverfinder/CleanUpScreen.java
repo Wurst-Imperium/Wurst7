@@ -247,7 +247,7 @@ public class CleanUpScreen extends Screen
 			String tooltip, PressAction pressAction)
 		{
 			super(x, y, 200, 20, Text.literal(messageSupplier.get()),
-				pressAction);
+				pressAction, ButtonWidget.EMPTY, ButtonWidget.field_40754);
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())

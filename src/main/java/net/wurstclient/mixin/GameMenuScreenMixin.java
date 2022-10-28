@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.class_7845;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -55,19 +56,19 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void addWurstOptionsButton()
 	{
-		List<ClickableWidget> buttons = Screens.getButtons(this);
+		List<ClickableWidget> buttons = getRealButtons();
 		
 		int buttonY = -1;
 		int buttonI = -1;
 		
-		for(int i = 0; i < buttons.size(); ++i)
+		for(int i = 0; i < buttons.size(); i++)
 		{
 			ClickableWidget button = buttons.get(i);
 			
 			// insert Wurst button in place of feedback/report row
 			if(isFeedbackButton(button))
 			{
-				buttonY = button.y;
+				buttonY = button.method_46427();
 				buttonI = i;
 			}
 			
@@ -82,9 +83,32 @@ public abstract class GameMenuScreenMixin extends Screen
 				CrashReport.create(new IllegalStateException(),
 					"Someone deleted the Feedback button!"));
 		
-		wurstOptionsButton = new ButtonWidget(width / 2 - 102, buttonY, 204, 20,
-			Text.literal("            Options"), b -> openWurstOptions());
-		buttons.add(buttonI, wurstOptionsButton);
+		wurstOptionsButton = ButtonWidget
+			.method_46430(Text.literal("            Options"),
+				b -> openWurstOptions())
+			.method_46434(width / 2 - 102, buttonY, 204, 20).method_46431();
+		buttons.add(wurstOptionsButton);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<ClickableWidget> getRealButtons()
+	{
+		// As of 22w43a, Fabric Screen API doesn't understand the new grid
+		// system (class_7845), so we must manually extract the real buttons
+		// from the grid.
+		
+		List<ClickableWidget> notButtons = Screens.getButtons(this);
+		
+		for(ClickableWidget cw : notButtons)
+		{
+			if(!(cw instanceof class_7845 grid))
+				continue;
+			
+			return (List<ClickableWidget>)grid.method_46418();
+		}
+		
+		throw new IllegalStateException(
+			"There's no longer a button grid in the game menu?");
 	}
 	
 	private boolean isFeedbackButton(ClickableWidget button)
@@ -125,8 +149,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		RenderSystem.setShaderTexture(0, wurstTexture);
 		
-		int x = wurstOptionsButton.x + 34;
-		int y = wurstOptionsButton.y + 2;
+		int x = wurstOptionsButton.method_46426() + 34;
+		int y = wurstOptionsButton.method_46427() + 2;
 		int w = 63;
 		int h = 16;
 		int fw = 63;

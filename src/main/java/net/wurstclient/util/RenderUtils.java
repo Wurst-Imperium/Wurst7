@@ -7,6 +7,8 @@
  */
 package net.wurstclient.util;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,9 +25,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
@@ -738,11 +738,11 @@ public enum RenderUtils
 		double zDiff = endZ - startZ;
 		
 		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
 		
 		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
 		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();
@@ -807,26 +807,26 @@ public enum RenderUtils
 		double endZ = to.z;
 		
 		Matrix4f matrix = new Matrix4f();
-		matrix.loadIdentity();
+		matrix.identity();
 		
 		bufferBuilder
 			.vertex(matrix, (float)startX, (float)startY, (float)startZ).next();
 		bufferBuilder.vertex(matrix, (float)endX, (float)endY, (float)endZ)
 			.next();
 		
-		matrix.multiplyByTranslation((float)endX, (float)endY, (float)endZ);
-		matrix.multiply(Matrix4f.scale(0.1F, 0.1F, 0.1F));
+		matrix.translate((float)endX, (float)endY, (float)endZ);
+		matrix.scale(0.1F, 0.1F, 0.1F);
 		
 		double xDiff = endX - startX;
 		double yDiff = endY - startY;
 		double zDiff = endZ - startZ;
 		
 		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrix.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
 		
 		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
 		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrix.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();
