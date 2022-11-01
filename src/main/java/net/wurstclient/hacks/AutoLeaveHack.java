@@ -13,6 +13,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -36,6 +37,9 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
 	
+	private final CheckboxSetting disableAutoReconnect = new CheckboxSetting(
+		"Disable AutoReconnect", true);
+	
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
@@ -43,6 +47,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
+		addSetting(disableAutoReconnect);
 	}
 	
 	@Override
@@ -79,6 +84,9 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		if(MC.player.getHealth() > health.getValueF() * 2F)
 			return;
 		
+		if(MC.player.getHealth() <= 0F)
+			return;
+		
 		// leave server
 		switch(mode.getSelected())
 		{
@@ -104,6 +112,9 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		// disable
 		setEnabled(false);
+		
+		if(disableAutoReconnect.isChecked())
+			WURST.getHax().autoReconnectHack.setEnabled(false);
 	}
 	
 	public static enum Mode
