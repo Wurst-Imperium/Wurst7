@@ -42,4 +42,13 @@ public class InGameOverlayRendererMixin
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			ci.cancel();
 	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "renderInWallOverlay(Lnet/minecraft/client/texture/Sprite;Lnet/minecraft/client/util/math/MatrixStack;)V",
+		cancellable = true)
+	private static void onRenderInWallOverlay(CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().noBlockOverlayHack.isEnabled())
+			ci.cancel();
+	}
 }

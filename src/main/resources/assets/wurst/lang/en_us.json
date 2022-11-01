@@ -103,6 +103,7 @@
   "description.wurst.hack.navigator": "A searchable GUI that learns your preferences over time.",
   "description.wurst.hack.newchunks": "Highlights newly generated chunks around you.",
   "description.wurst.hack.nobackground": "Removes the dark background behind inventories.",
+  "description.wurst.hack.noblockoverlay": "Blocks the overlay when you are suffocating in a block.",
   "description.wurst.hack.noclip": "Allows you to freely move through blocks.\nA block (e.g. sand) must fall on your head to activate it.\n\n§c§lWARNING:§r You will take damage while moving through blocks!",
   "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
