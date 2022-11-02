@@ -20,4 +20,6 @@ public final class NoBlockOverlayHack extends Hack
 		super("NoBlockOverlay");
 		setCategory(Category.RENDER);
 	}
+	
+	// See InGameOverlayRendererMixin.onRenderInWallOverlay()
 }
