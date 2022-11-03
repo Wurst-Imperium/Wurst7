@@ -72,7 +72,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		{
 			// Not sure if it's possible to get an empty optional here,
 			// but if so it will just retry.
-			Optional<RegistryEntry<Item>> optional = Optional.empty();
+			Optional<RegistryEntry.Reference<Item>> optional = Optional.empty();
 			while(optional.isEmpty())
 				optional = Registry.ITEM.getRandom(random);
 			
