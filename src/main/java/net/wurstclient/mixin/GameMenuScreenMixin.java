@@ -18,11 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.class_7845;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -68,7 +68,7 @@ public abstract class GameMenuScreenMixin extends Screen
 			// insert Wurst button in place of feedback/report row
 			if(isFeedbackButton(button))
 			{
-				buttonY = button.method_46427();
+				buttonY = button.getY();
 				buttonI = i;
 			}
 			
@@ -84,9 +84,9 @@ public abstract class GameMenuScreenMixin extends Screen
 					"Someone deleted the Feedback button!"));
 		
 		wurstOptionsButton = ButtonWidget
-			.method_46430(Text.literal("            Options"),
+			.createBuilder(Text.literal("            Options"),
 				b -> openWurstOptions())
-			.method_46434(width / 2 - 102, buttonY, 204, 20).method_46431();
+			.setPositionAndSize(width / 2 - 102, buttonY, 204, 20).build();
 		buttons.add(wurstOptionsButton);
 	}
 	
@@ -101,10 +101,10 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		for(ClickableWidget cw : notButtons)
 		{
-			if(!(cw instanceof class_7845 grid))
+			if(!(cw instanceof GridWidget grid))
 				continue;
 			
-			return (List<ClickableWidget>)grid.method_46418();
+			return (List<ClickableWidget>)grid.wrappedWidgets();
 		}
 		
 		throw new IllegalStateException(
@@ -149,8 +149,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		RenderSystem.setShaderTexture(0, wurstTexture);
 		
-		int x = wurstOptionsButton.method_46426() + 34;
-		int y = wurstOptionsButton.method_46427() + 2;
+		int x = wurstOptionsButton.getX() + 34;
+		int y = wurstOptionsButton.getY() + 2;
 		int w = 63;
 		int h = 16;
 		int fw = 63;

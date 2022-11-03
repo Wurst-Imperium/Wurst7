@@ -57,25 +57,25 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 			return;
 		
 		lastServerButton = addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Last Server"),
+			.createBuilder(Text.literal("Last Server"),
 				b -> LastServerRememberer
 					.joinLastServer((MultiplayerScreen)(Object)this))
-			.method_46434(width / 2 - 154, 10, 100, 20).method_46431());
+			.setPositionAndSize(width / 2 - 154, 10, 100, 20).build());
 		
 		addDrawableChild(
 			ButtonWidget
-				.method_46430(Text.literal("Server Finder"),
+				.createBuilder(Text.literal("Server Finder"),
 					b -> client.setScreen(new ServerFinderScreen(
 						(MultiplayerScreen)(Object)this)))
-				.method_46434(width / 2 + 154 + 4, height - 52, 100, 20)
-				.method_46431());
+				.setPositionAndSize(width / 2 + 154 + 4, height - 52, 100, 20)
+				.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Clean Up"),
+			.createBuilder(Text.literal("Clean Up"),
 				b -> client.setScreen(
 					new CleanUpScreen((MultiplayerScreen)(Object)this)))
-			.method_46434(width / 2 + 154 + 4, height - 28, 100, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 + 154 + 4, height - 28, 100, 20)
+			.build());
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"tick()V"})

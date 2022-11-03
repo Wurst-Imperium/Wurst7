@@ -9,9 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.client.util.ProfileKeys;
+import net.minecraft.client.util.ProfileKeysImpl;
 
-@Mixin(ProfileKeys.class)
+@Mixin(ProfileKeysImpl.class)
 public class ProfileKeysMixin
 {
 	// FIXME

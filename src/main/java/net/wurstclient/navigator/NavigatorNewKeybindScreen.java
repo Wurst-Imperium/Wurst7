@@ -71,7 +71,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					choosingKey = true;
 					okButton.active = false;
 				}
-			}, ButtonWidget.EMPTY, Supplier::get)
+			}, ButtonWidget.EMPTY_TOOLTIP, Supplier::get)
 		{
 			@Override
 			public boolean keyPressed(int keyCode, int scanCode, int modifiers)
@@ -85,9 +85,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Cancel"),
+			.createBuilder(Text.literal("Cancel"),
 				b -> WurstClient.MC.setScreen(parent))
-			.method_46434(width / 2 + 2, height - 65, 149, 18).method_46431());
+			.setPositionAndSize(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	
 	@Override
@@ -243,9 +243,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.method_46426();
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.method_46427();
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

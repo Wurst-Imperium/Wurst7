@@ -112,45 +112,44 @@ public final class AltManagerScreen extends Screen
 			client.setScreen(screen);
 		}
 		
-		addDrawableChild(useButton =
-			ButtonWidget.method_46430(Text.literal("Login"), b -> pressLogin())
-				.method_46434(width / 2 - 154, height - 52, 100, 20)
-				.method_46431());
+		addDrawableChild(useButton = ButtonWidget
+			.createBuilder(Text.literal("Login"), b -> pressLogin())
+			.setPositionAndSize(width / 2 - 154, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Direct Login"),
+			.createBuilder(Text.literal("Direct Login"),
 				b -> client.setScreen(new DirectLoginScreen(this)))
-			.method_46434(width / 2 - 50, height - 52, 100, 20).method_46431());
+			.setPositionAndSize(width / 2 - 50, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Add"),
+			.createBuilder(Text.literal("Add"),
 				b -> client.setScreen(new AddAltScreen(this, altManager)))
-			.method_46434(width / 2 + 54, height - 52, 100, 20).method_46431());
+			.setPositionAndSize(width / 2 + 54, height - 52, 100, 20).build());
 		
 		addDrawableChild(starButton = ButtonWidget
-			.method_46430(Text.literal("Favorite"), b -> pressFavorite())
-			.method_46434(width / 2 - 154, height - 28, 75, 20).method_46431());
+			.createBuilder(Text.literal("Favorite"), b -> pressFavorite())
+			.setPositionAndSize(width / 2 - 154, height - 28, 75, 20).build());
 		
 		addDrawableChild(editButton = ButtonWidget
-			.method_46430(Text.literal("Edit"), b -> pressEdit())
-			.method_46434(width / 2 - 76, height - 28, 74, 20).method_46431());
+			.createBuilder(Text.literal("Edit"), b -> pressEdit())
+			.setPositionAndSize(width / 2 - 76, height - 28, 74, 20).build());
 		
 		addDrawableChild(deleteButton = ButtonWidget
-			.method_46430(Text.literal("Delete"), b -> pressDelete())
-			.method_46434(width / 2 + 2, height - 28, 74, 20).method_46431());
+			.createBuilder(Text.literal("Delete"), b -> pressDelete())
+			.setPositionAndSize(width / 2 + 2, height - 28, 74, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Cancel"),
+			.createBuilder(Text.literal("Cancel"),
 				b -> client.setScreen(prevScreen))
-			.method_46434(width / 2 + 80, height - 28, 75, 20).method_46431());
+			.setPositionAndSize(width / 2 + 80, height - 28, 75, 20).build());
 		
 		addDrawableChild(importButton = ButtonWidget
-			.method_46430(Text.literal("Import"), b -> pressImportAlts())
-			.method_46434(8, 8, 50, 20).method_46431());
+			.createBuilder(Text.literal("Import"), b -> pressImportAlts())
+			.setPositionAndSize(8, 8, 50, 20).build());
 		
 		addDrawableChild(exportButton = ButtonWidget
-			.method_46430(Text.literal("Export"), b -> pressExportAlts())
-			.method_46434(58, 8, 50, 20).method_46431());
+			.createBuilder(Text.literal("Export"), b -> pressExportAlts())
+			.setPositionAndSize(58, 8, 50, 20).build());
 	}
 	
 	@Override

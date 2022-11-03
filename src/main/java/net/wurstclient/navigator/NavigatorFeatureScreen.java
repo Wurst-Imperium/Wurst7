@@ -90,7 +90,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(hasPrimaryAction)
 		{
 			primaryButton =
-				ButtonWidget.method_46430(Text.literal(primaryAction), b -> {
+				ButtonWidget.createBuilder(Text.literal(primaryAction), b -> {
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
 					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
@@ -106,8 +106,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
-				}).method_46434(width / 2 - 151, height - 65,
-					hasHelp ? 149 : 302, 18).method_46431();
+				}).setPositionAndSize(width / 2 - 151, height - 65,
+					hasHelp ? 149 : 302, 18).build();
 			addDrawableChild(primaryButton);
 		}
 		
@@ -491,9 +491,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.method_46426();
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.method_46427();
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

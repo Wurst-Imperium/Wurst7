@@ -47,21 +47,21 @@ public class ServerFinderScreen extends Screen
 	public void init()
 	{
 		addDrawableChild(searchButton = ButtonWidget
-			.method_46430(Text.literal("Search"), b -> searchOrCancel())
-			.method_46434(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
-			.method_46431());
+			.createBuilder(Text.literal("Search"), b -> searchOrCancel())
+			.setPositionAndSize(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
+			.build());
 		
-		addDrawableChild(ButtonWidget.method_46430(Text.literal("Tutorial"),
+		addDrawableChild(ButtonWidget.createBuilder(Text.literal("Tutorial"),
 			b -> Util.getOperatingSystem().open(
 				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/"))
-			.method_46434(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Back"),
+			.createBuilder(Text.literal("Back"),
 				b -> client.setScreen(prevScreen))
-			.method_46434(width / 2 - 100, height / 4 + 144 + 12, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 144 + 12, 200, 20)
+			.build());
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, Text.literal(""));

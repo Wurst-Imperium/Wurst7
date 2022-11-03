@@ -73,7 +73,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		setInitialFocus(searchBar);
 		searchBar.setTextFieldFocused(true);
 		
-		searchBar.method_46421(middleX - 100);
+		searchBar.setX(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	

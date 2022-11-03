@@ -40,41 +40,42 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Back"),
+			.createBuilder(Text.literal("Back"),
 				b -> client.setScreen(prevScreen))
-			.method_46434(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
+			.build());
 		
 		addDrawableChild(keyButton = ButtonWidget
-			.method_46430(Text.literal("Zoom Key: " + zoomKeyName),
+			.createBuilder(Text.literal("Zoom Key: " + zoomKeyName),
 				b -> client.setScreen(new PressAKeyScreen(this)))
-			.method_46434(width / 2 - 79, height / 4 + 24 - 16, 158, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 79, height / 4 + 24 - 16, 158, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("More"), b -> level.increaseValue())
-			.method_46434(width / 2 - 79, height / 4 + 72 - 16, 50, 20)
-			.method_46431());
+			.createBuilder(Text.literal("More"), b -> level.increaseValue())
+			.setPositionAndSize(width / 2 - 79, height / 4 + 72 - 16, 50, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Less"), b -> level.decreaseValue())
-			.method_46434(width / 2 - 25, height / 4 + 72 - 16, 50, 20)
-			.method_46431());
+			.createBuilder(Text.literal("Less"), b -> level.decreaseValue())
+			.setPositionAndSize(width / 2 - 25, height / 4 + 72 - 16, 50, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Default"),
+			.createBuilder(Text.literal("Default"),
 				b -> level.setValue(level.getDefaultValue()))
-			.method_46434(width / 2 + 29, height / 4 + 72 - 16, 50, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 + 29, height / 4 + 72 - 16, 50, 20)
+			.build());
 		
 		addDrawableChild(
 			scrollButton = ButtonWidget
-				.method_46430(
+				.createBuilder(
 					Text.literal(
 						"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
 					b -> toggleScroll())
-				.method_46434(width / 2 - 79, height / 4 + 96 - 16, 158, 20)
-				.method_46431());
+				.setPositionAndSize(width / 2 - 79, height / 4 + 96 - 16, 158,
+					20)
+				.build());
 	}
 	
 	private void toggleScroll()

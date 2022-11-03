@@ -46,23 +46,22 @@ public final class KeybindProfilesScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Open Folder"), b -> openFolder())
-			.method_46434(8, 8, 100, 20).method_46431());
+			.createBuilder(Text.literal("Open Folder"), b -> openFolder())
+			.setPositionAndSize(8, 8, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("New Profile"),
+			.createBuilder(Text.literal("New Profile"),
 				b -> client.setScreen(
 					new EnterProfileNameScreen(this, this::newProfile)))
-			.method_46434(width / 2 - 154, height - 48, 100, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 154, height - 48, 100, 20).build());
 		
 		loadButton = addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Load"), b -> loadSelected())
-			.method_46434(width / 2 - 50, height - 48, 100, 20).method_46431());
+			.createBuilder(Text.literal("Load"), b -> loadSelected())
+			.setPositionAndSize(width / 2 - 50, height - 48, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Cancel"), b -> openPrevScreen())
-			.method_46434(width / 2 + 54, height - 48, 100, 20).method_46431());
+			.createBuilder(Text.literal("Cancel"), b -> openPrevScreen())
+			.setPositionAndSize(width / 2 + 54, height - 48, 100, 20).build());
 	}
 	
 	private void openFolder()

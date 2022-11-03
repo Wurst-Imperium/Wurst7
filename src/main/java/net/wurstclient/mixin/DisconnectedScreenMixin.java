@@ -74,16 +74,16 @@ public class DisconnectedScreenMixin extends Screen
 			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Reconnect"),
+			.createBuilder(Text.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(parent))
-			.method_46434(backButtonX, backButtonY + 24, 200, 20)
-			.method_46431());
+			.setPositionAndSize(backButtonX, backButtonY + 24, 200, 20)
+			.build());
 		
 		autoReconnectButton = addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("AutoReconnect"),
+			.createBuilder(Text.literal("AutoReconnect"),
 				b -> pressAutoReconnect())
-			.method_46434(backButtonX, backButtonY + 48, 200, 20)
-			.method_46431());
+			.setPositionAndSize(backButtonX, backButtonY + 48, 200, 20)
+			.build());
 		
 		AutoReconnectHack autoReconnect =
 			WurstClient.INSTANCE.getHax().autoReconnectHack;

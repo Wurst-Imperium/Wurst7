@@ -71,35 +71,36 @@ public abstract class AltEditorScreen extends Screen
 	public final void init()
 	{
 		addDrawableChild(doneButton = ButtonWidget
-			.method_46430(Text.literal(getDoneButtonText()),
+			.createBuilder(Text.literal(getDoneButtonText()),
 				b -> pressDoneButton())
-			.method_46434(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Cancel"),
+			.createBuilder(Text.literal("Cancel"),
 				b -> client.setScreen(prevScreen))
-			.method_46434(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Random Name"),
+			.createBuilder(Text.literal("Random Name"),
 				b -> nameOrEmailBox.setText(NameGenerator.generateName()))
-			.method_46434(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
-			.method_46431());
+			.setPositionAndSize(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
+			.build());
 		
 		addDrawableChild(stealSkinButton = ButtonWidget
-			.method_46430(Text.literal("Steal Skin"),
+			.createBuilder(Text.literal("Steal Skin"),
 				b -> message = stealSkin(getNameOrEmail()))
-			.method_46434(width - (width / 2 - 100) / 2 - 64, height - 32, 128,
-				20)
-			.method_46431());
+			.setPositionAndSize(width - (width / 2 - 100) / 2 - 64, height - 32,
+				128, 20)
+			.build());
 		
 		addDrawableChild(ButtonWidget
-			.method_46430(Text.literal("Open Skin Folder"),
+			.createBuilder(Text.literal("Open Skin Folder"),
 				b -> openSkinFolder())
-			.method_46434((width / 2 - 100) / 2 - 64, height - 32, 128, 20)
-			.method_46431());
+			.setPositionAndSize((width / 2 - 100) / 2 - 64, height - 32, 128,
+				20)
+			.build());
 		
 		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
 			200, 20, Text.literal(""));
