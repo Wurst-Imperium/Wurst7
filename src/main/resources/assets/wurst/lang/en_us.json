@@ -173,7 +173,7 @@
   "gui.wurst.altmanager.empty.title": "Your alt list is empty.",
   "gui.wurst.altmanager.empty.message": "Would you like some random alts to get started?",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNING:§r Unsafe Server",
-  "gui.wurst.nochatreports.unsafe_server.message": "This server requires chat signatures to be enabled, which puts your account at risk of fraudulent chat reports.\n\nYou can join this server if you un-block chat signatures and then reconnect. If you do, consider not using the chat at all. Or play on an alt account that you don't mind losing.\n\nIf this is your server, you can fix this by setting 'enforce-secure-profile' to false in server.properties. In typical Mojang fashion, this setting does the opposite of what it sounds like.",
+  "gui.wurst.nochatreports.unsafe_server.message": "This server requires chat signatures to be enabled, which puts your account at risk of fraudulent chat reports.\n\nYou can chat on this server if you un-block chat signatures and then reconnect. If you do, consider playing on an alt account that you don't mind losing.\n\nIf this is your server, you can fix this by setting 'enforce-secure-profile' to false in server.properties. In typical Mojang fashion, this setting does the opposite of what it sounds like.",
   "toast.wurst.nochatreports.unsafe_server.title": "Chat messages can be reported",
   "toast.wurst.nochatreports.unsafe_server.message": "Messages sent on this server may be reported to Big Brother Mojang and might get your account banned globally",
   "gui.wurst.nochatreports.ncr_mod_server.title": "\"No Chat Reports\" Server",

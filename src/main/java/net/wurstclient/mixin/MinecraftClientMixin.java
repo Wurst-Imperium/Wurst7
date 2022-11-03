@@ -29,6 +29,7 @@ import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.resource.language.LanguageManager;
+import net.minecraft.client.util.ProfileKeys;
 import net.minecraft.client.util.ProfileKeysImpl;
 import net.minecraft.client.util.Session;
 import net.minecraft.client.world.ClientWorld;
@@ -146,8 +147,11 @@ public abstract class MinecraftClientMixin
 	@Inject(at = @At("HEAD"),
 		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
 		cancellable = true)
-	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeysImpl> cir)
+	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(ProfileKeys.MISSING);
+		
 		if(wurstProfileKeys == null)
 			return;
 		

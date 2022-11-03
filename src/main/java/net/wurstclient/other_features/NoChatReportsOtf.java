@@ -15,11 +15,14 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.hud.MessageIndicator.Icon;
 import net.minecraft.client.network.ClientLoginNetworkHandler;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.encryption.ClientPlayerSession;
+import net.minecraft.network.message.MessageChain;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
+import net.wurstclient.events.UpdateListener;
 import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -29,9 +32,17 @@ import net.wurstclient.util.ChatUtils;
 @SearchTags({"no chat reports", "NoEncryption", "no encryption",
 	"NoChatSigning", "no chat signing"})
 public final class NoChatReportsOtf extends OtherFeature
+	implements UpdateListener
 {
 	private final CheckboxSetting disableSignatures =
-		new CheckboxSetting("Disable signatures", true);
+		new CheckboxSetting("Disable signatures", true)
+		{
+			@Override
+			public void update()
+			{
+				EVENTS.add(UpdateListener.class, NoChatReportsOtf.this);
+			}
+		};
 	
 	public NoChatReportsOtf()
 	{
@@ -40,6 +51,28 @@ public final class NoChatReportsOtf extends OtherFeature
 		
 		ClientLoginConnectionEvents.INIT.register(this::onLoginStart);
 		ClientPlayConnectionEvents.DISCONNECT.register(this::onPlayDisconnect);
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		ClientPlayNetworkHandler netHandler = MC.getNetworkHandler();
+		if(netHandler == null)
+			return;
+		
+		if(isActive())
+		{
+			netHandler.session = null;
+			netHandler.messagePacker = MessageChain.Packer.NONE;
+			
+		}else if(netHandler.session == null)
+			MC.getProfileKeys().fetchKeyPair()
+				.thenAcceptAsync(
+					optional -> optional.ifPresent(profileKeys -> netHandler
+						.setSession(ClientPlayerSession.create(profileKeys))),
+					MC);
+		
+		EVENTS.remove(UpdateListener.class, this);
 	}
 	
 	private void onLoginStart(ClientLoginNetworkHandler handler,
@@ -52,6 +85,8 @@ public final class NoChatReportsOtf extends OtherFeature
 		else
 			ClientPlayNetworking
 				.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
+		
+		EVENTS.add(UpdateListener.class, NoChatReportsOtf.this);
 	}
 	
 	private void onPlayDisconnect(ClientPlayNetworkHandler handler,
@@ -101,6 +136,6 @@ public final class NoChatReportsOtf extends OtherFeature
 		disableSignatures.setChecked(!disableSignatures.isChecked());
 	}
 	
-	// See ChatHudMixin, ClientPlayerEntityMixin, ClientPlayNetworkHandlerMixin,
-	// MessageHandlerMixin, ProfileKeysMixin
+	// See ChatHudMixin, ClientPlayNetworkHandlerMixin.onOnServerMetadata(),
+	// MinecraftClientMixin.onGetProfileKeys()
 }

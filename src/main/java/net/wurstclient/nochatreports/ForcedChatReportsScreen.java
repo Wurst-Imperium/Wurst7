@@ -29,10 +29,13 @@ public final class ForcedChatReportsScreen extends Screen
 	private static final List<String> TRANSLATABLE_DISCONNECT_REASONS =
 		Arrays.asList("multiplayer.disconnect.missing_public_key",
 			"multiplayer.disconnect.invalid_public_key_signature",
-			"multiplayer.disconnect.invalid_public_key");
+			"multiplayer.disconnect.invalid_public_key",
+			"multiplayer.disconnect.unsigned_chat");
 	
 	private static final List<String> LITERAL_DISCONNECT_REASONS =
-		Arrays.asList("An internal error occurred in your connection.");
+		Arrays.asList("An internal error occurred in your connection.",
+			"A secure profile is required to join this server.",
+			"Secure profile expired.", "Secure profile invalid.");
 	
 	private final Screen prevScreen;
 	private final Text reason;
