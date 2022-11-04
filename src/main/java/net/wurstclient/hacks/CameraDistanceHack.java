@@ -13,24 +13,23 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"camera distance"})
+@SearchTags({"camera distance", "CamDistance", "cam distance"})
 public final class CameraDistanceHack extends Hack
 {
-	private final SliderSetting distance = new SliderSetting("Distance", 4, -10,
-		150, 0.5, ValueDisplay.DECIMAL);
+	private final SliderSetting distance =
+		new SliderSetting("Distance", 12, -0.5, 150, 0.5, ValueDisplay.DECIMAL);
 	
 	public CameraDistanceHack()
 	{
 		super("CameraDistance");
-		
 		setCategory(Category.RENDER);
 		addSetting(distance);
 	}
 	
 	public double getDistance()
 	{
-		return isEnabled() ? distance.getValueF() : 4;
+		return distance.getValueF();
 	}
 	
-	// See CameraMixin.onClipToSpaceDistance()
+	// See CameraMixin.changeClipToSpaceDistance()
 }

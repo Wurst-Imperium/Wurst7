@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.CameraSubmersionType;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.CameraDistanceHack;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin
@@ -23,11 +24,12 @@ public abstract class CameraMixin
 	@ModifyVariable(at = @At("HEAD"),
 		method = "clipToSpace(D)D",
 		argsOnly = true)
-	private double onClipToSpaceDistance(double desiredCameraDistance)
+	private double changeClipToSpaceDistance(double desiredCameraDistance)
 	{
-		if(WurstClient.INSTANCE.getHax().cameraDistanceHack.isEnabled())
-			return WurstClient.INSTANCE.getHax().cameraDistanceHack
-				.getDistance();
+		CameraDistanceHack cameraDistanceHack =
+			WurstClient.INSTANCE.getHax().cameraDistanceHack;
+		if(cameraDistanceHack.isEnabled())
+			return cameraDistanceHack.getDistance();
 		
 		return desiredCameraDistance;
 	}
