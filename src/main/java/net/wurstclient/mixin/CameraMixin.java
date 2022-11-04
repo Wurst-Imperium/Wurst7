@@ -20,9 +20,19 @@ import net.wurstclient.WurstClient;
 @Mixin(Camera.class)
 public abstract class CameraMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"clipToSpace(D)D"},
-		cancellable = true)
+	@ModifyVariable(at = @At("HEAD"),
+		method = "clipToSpace(D)D",
+		argsOnly = true)
+	private double onClipToSpaceDistance(double desiredCameraDistance)
+	{
+		if(WurstClient.INSTANCE.getHax().cameraDistanceHack.isEnabled())
+			return WurstClient.INSTANCE.getHax().cameraDistanceHack
+				.getDistance();
+		
+		return desiredCameraDistance;
+	}
+	
+	@Inject(at = @At("HEAD"), method = "clipToSpace(D)D", cancellable = true)
 	private void onClipToSpace(double desiredCameraDistance,
 		CallbackInfoReturnable<Double> cir)
 	{
@@ -30,20 +40,8 @@ public abstract class CameraMixin
 			cir.setReturnValue(desiredCameraDistance);
 	}
 	
-	@ModifyVariable(at = @At("HEAD"),
-		method = "clipToSpace(D)D",
-		argsOnly = true)
-	private double onClipToSpaceDistance(double desiredCameraDistance)
-	{
-		if(WurstClient.INSTANCE.getHax().cameraDistanceHack.isEnabled())
-			return WurstClient.INSTANCE.getHax().cameraDistanceHack.getDistance();
-		
-		return desiredCameraDistance;
-	}
-	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"getSubmersionType()Lnet/minecraft/client/render/CameraSubmersionType;"},
+	@Inject(at = @At("HEAD"),
+		method = "getSubmersionType()Lnet/minecraft/client/render/CameraSubmersionType;",
 		cancellable = true)
 	private void onGetSubmersionType(
 		CallbackInfoReturnable<CameraSubmersionType> cir)
