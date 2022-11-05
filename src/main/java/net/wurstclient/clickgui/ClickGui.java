@@ -90,6 +90,7 @@ public final class ClickGui
 		Window uiSettings = new Window("UI Settings");
 		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().keybindManagerOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
