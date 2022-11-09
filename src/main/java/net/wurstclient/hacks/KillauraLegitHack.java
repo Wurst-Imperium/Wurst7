@@ -245,12 +245,16 @@ public final class KillauraLegitHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		matrixStack.translate(
-			target.prevX + (target.getX() - target.prevX) * partialTicks
-				- regionX,
-			target.prevY + (target.getY() - target.prevY) * partialTicks,
-			target.prevZ + (target.getZ() - target.prevZ) * partialTicks
-				- regionZ);
+		if(target.isAlive())
+			matrixStack.translate(
+				target.prevX + (target.getX() - target.prevX) * partialTicks
+					- regionX,
+				target.prevY + (target.getY() - target.prevY) * partialTicks,
+				target.prevZ + (target.getZ() - target.prevZ) * partialTicks
+					- regionZ);
+		else
+			matrixStack.translate(target.getX() - regionX, target.getY(),
+				target.getZ() - regionZ);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),
