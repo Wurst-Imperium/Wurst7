@@ -13,7 +13,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -29,6 +28,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
