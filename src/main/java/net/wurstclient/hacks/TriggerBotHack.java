@@ -14,6 +14,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
@@ -109,7 +110,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.isRemoved())
 			.filter(e -> e instanceof LivingEntity
 				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity)
+				|| e instanceof EndCrystalEntity
+				|| e instanceof ShulkerBulletEntity)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e != player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
