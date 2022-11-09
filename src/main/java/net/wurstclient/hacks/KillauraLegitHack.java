@@ -72,7 +72,6 @@ public final class KillauraLegitHack extends Hack
 	// same filters as in Killaura, but with stricter defaults
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(true),
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
 			FilterMonstersSetting.genericCombat(false),
@@ -85,6 +84,7 @@ public final class KillauraLegitHack extends Hack
 			FilterGolemsSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
+			FilterShulkerBulletSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
 			FilterCrystalsSetting.genericCombat(false));
 	
@@ -251,6 +251,7 @@ public final class KillauraLegitHack extends Hack
 			target.prevY + (target.getY() - target.prevY) * partialTicks,
 			target.prevZ + (target.getZ() - target.prevZ) * partialTicks
 				- regionZ);
+		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),
 			target.getWidth());
