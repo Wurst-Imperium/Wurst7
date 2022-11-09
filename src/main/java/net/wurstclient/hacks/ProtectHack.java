@@ -183,7 +183,8 @@ public final class ProtectHack extends Hack
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player).filter(e -> e != friend)
 			.filter(e -> MC.player.distanceTo(e) <= 6)
-			.filter(e -> !(e instanceof FakePlayerEntity));
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		stream = entityFilters.applyTo(stream);
 		

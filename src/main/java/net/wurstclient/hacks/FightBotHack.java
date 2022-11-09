@@ -133,7 +133,8 @@ public final class FightBotHack extends Hack
 				&& ((LivingEntity)e).getHealth() > 0
 				|| e instanceof EndCrystalEntity)
 			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity));
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		stream = entityFilters.applyTo(stream);
 		
