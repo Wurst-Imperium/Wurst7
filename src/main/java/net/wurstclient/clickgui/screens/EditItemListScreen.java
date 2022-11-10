@@ -27,7 +27,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.Registries;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
@@ -272,7 +272,7 @@ public final class EditItemListScreen extends Screen
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registry.ITEM.get(new Identifier(name));
+			Item item = Registries.ITEM.get(new Identifier(name));
 			ItemStack stack = new ItemStack(item);
 			TextRenderer fr = mc.textRenderer;
 			
@@ -280,8 +280,8 @@ public final class EditItemListScreen extends Screen
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
-				y + 18, 0xa0a0a0);
+			fr.draw(matrixStack, "ID: " + Registries.ITEM.getRawId(item),
+				x + 28, y + 18, 0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(MatrixStack matrixStack,

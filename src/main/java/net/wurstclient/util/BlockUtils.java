@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.Registries;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.wurstclient.WurstClient;
@@ -51,7 +51,7 @@ public enum BlockUtils
 	
 	public static String getName(Block block)
 	{
-		return Registry.BLOCK.getId(block).toString();
+		return Registries.BLOCK.getId(block).toString();
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registry.BLOCK.get(new Identifier(name));
+			return Registries.BLOCK.get(new Identifier(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
@@ -91,7 +91,7 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registry.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
