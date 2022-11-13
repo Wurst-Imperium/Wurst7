@@ -18,7 +18,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.Registries;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -155,7 +155,7 @@ public final class PotionCmd extends Command
 			try
 			{
 				Identifier identifier = new Identifier(input);
-				StatusEffect effect = Registry.STATUS_EFFECT.get(identifier);
+				StatusEffect effect = Registries.STATUS_EFFECT.get(identifier);
 				
 				id = StatusEffect.getRawId(effect);
 				

@@ -71,7 +71,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					choosingKey = true;
 					okButton.active = false;
 				}
-			}, ButtonWidget.EMPTY_TOOLTIP, Supplier::get)
+			}, Supplier::get)
 		{
 			@Override
 			public boolean keyPressed(int keyCode, int scanCode, int modifiers)

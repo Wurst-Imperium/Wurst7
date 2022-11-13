@@ -10,7 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.Registries;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -52,7 +52,7 @@ public final class EnchantCmd extends Command
 	
 	private void enchant(ItemStack stack)
 	{
-		for(Enchantment enchantment : Registry.ENCHANTMENT)
+		for(Enchantment enchantment : Registries.ENCHANTMENT)
 		{
 			if(enchantment == Enchantments.SILK_TOUCH)
 				continue;

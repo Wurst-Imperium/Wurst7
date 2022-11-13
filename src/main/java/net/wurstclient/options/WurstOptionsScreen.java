@@ -206,7 +206,6 @@ public class WurstOptionsScreen extends Screen
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
 				Text.literal(messageSupplier.get()), pressAction,
-				ButtonWidget.EMPTY_TOOLTIP,
 				ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 			
 			this.messageSupplier = messageSupplier;
