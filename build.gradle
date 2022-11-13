@@ -16,7 +16,6 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -32,7 +31,6 @@ dependencies {
 	// which uses javax.annotation.concurrent.Immutable, which is part of
 	// the JSR305 library.
 	//
-	implementation 'com.github.buiawpkgew1.baritone:baritone-fabric:a565b5ff33'
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
