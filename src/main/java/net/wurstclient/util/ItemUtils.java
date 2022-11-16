@@ -8,9 +8,9 @@
 package net.wurstclient.util;
 
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registries;
 
 public enum ItemUtils
 {

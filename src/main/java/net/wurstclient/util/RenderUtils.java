@@ -136,7 +136,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -278,7 +278,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -575,7 +575,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
 		double midY = (bb.minY + bb.maxY) / 2;
@@ -707,7 +707,7 @@ public enum RenderUtils
 	
 	public static void drawArrow(Vec3d from, Vec3d to, MatrixStack matrixStack)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();

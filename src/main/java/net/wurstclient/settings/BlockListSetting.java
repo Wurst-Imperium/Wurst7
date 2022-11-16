@@ -19,8 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registries;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BlockListEditButton;

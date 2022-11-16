@@ -28,12 +28,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -236,13 +236,13 @@ public final class CaveFinderHack extends Hack
 		
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(vertexBuffer != null)
 		{
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			vertexBuffer.bind();
 			vertexBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();

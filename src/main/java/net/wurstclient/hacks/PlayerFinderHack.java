@@ -97,7 +97,7 @@ public final class PlayerFinderHack extends Hack
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tracer line
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

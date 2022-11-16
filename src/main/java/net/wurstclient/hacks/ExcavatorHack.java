@@ -163,7 +163,7 @@ public final class ExcavatorHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// area
 		if(area != null)
@@ -271,7 +271,7 @@ public final class ExcavatorHack extends Hack
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
 			RenderUtils.drawSolidBox(matrixStack);
 			
@@ -352,7 +352,7 @@ public final class ExcavatorHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

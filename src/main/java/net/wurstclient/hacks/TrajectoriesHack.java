@@ -97,7 +97,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);

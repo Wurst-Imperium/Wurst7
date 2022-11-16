@@ -417,7 +417,7 @@ public final class AltManagerScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
@@ -447,7 +447,7 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
@@ -637,7 +637,7 @@ public final class AltManagerScreen extends Screen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))

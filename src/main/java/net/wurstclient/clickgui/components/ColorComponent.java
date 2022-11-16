@@ -66,7 +66,7 @@ public final class ColorComponent extends Component
 		
 		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(hovering)
 			if(mouseY < y3)

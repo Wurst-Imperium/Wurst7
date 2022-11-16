@@ -144,7 +144,7 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.setShaderTexture(0,
 				DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0.0D)
@@ -209,7 +209,7 @@ public abstract class ListWidget extends AbstractParentElement
 				if(p < top)
 					p = top;
 				
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, bottom, 0.0D).color(0, 0, 0, 255)
@@ -433,7 +433,7 @@ public abstract class ListWidget extends AbstractParentElement
 		RenderSystem.setShaderTexture(0,
 			DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_TEXTURE_COLOR);
 		bufferBuilder.vertex(left, bottom, 0.0D).texture(0.0F, bottom / 32.0F)

@@ -19,11 +19,10 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
@@ -281,7 +280,7 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
@@ -322,7 +321,7 @@ public final class TreeBotHack extends Hack
 		
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		Shader shader = RenderSystem.getShader();
+		ShaderProgram shader = RenderSystem.getShader();
 		
 		tree.getVertexBuffer().bind();
 		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);

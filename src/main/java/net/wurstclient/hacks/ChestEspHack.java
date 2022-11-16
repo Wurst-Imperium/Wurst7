@@ -218,14 +218,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		if(style.getSelected().hasBoxes())
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderBoxes);
 		}
 		
 		if(style.getSelected().hasLines())
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderLines);
 		}

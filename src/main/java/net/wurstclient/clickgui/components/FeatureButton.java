@@ -108,7 +108,7 @@ public final class FeatureButton extends Component
 		boolean hHack = hovering && mouseX < x3;
 		boolean hSettings = hovering && mouseX >= x3;
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(hHack)
 			setTooltip();
