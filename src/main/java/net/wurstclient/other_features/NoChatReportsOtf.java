@@ -67,9 +67,9 @@ public final class NoChatReportsOtf extends OtherFeature
 			
 		}else if(netHandler.session == null)
 			MC.getProfileKeys().fetchKeyPair()
-				.thenAcceptAsync(
-					optional -> optional.ifPresent(profileKeys -> netHandler
-						.setSession(ClientPlayerSession.create(profileKeys))),
+				.thenAcceptAsync(optional -> optional
+					.ifPresent(profileKeys -> netHandler.session =
+						ClientPlayerSession.create(profileKeys)),
 					MC);
 		
 		EVENTS.remove(UpdateListener.class, this);
