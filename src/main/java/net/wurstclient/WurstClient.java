@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
@@ -43,7 +42,6 @@ import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
-import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
@@ -312,9 +310,6 @@ public enum WurstClient
 		{
 			hax.panicHack.setEnabled(true);
 			hax.panicHack.onUpdate();
-			
-			ClientPlayNetworking
-				.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
 		}
 	}
 	

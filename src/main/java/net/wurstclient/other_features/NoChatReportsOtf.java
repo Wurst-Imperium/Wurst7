@@ -8,8 +8,6 @@
 package net.wurstclient.other_features;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.hud.MessageIndicator.Icon;
@@ -23,7 +21,6 @@ import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
-import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
@@ -50,7 +47,6 @@ public final class NoChatReportsOtf extends OtherFeature
 		addSetting(disableSignatures);
 		
 		ClientLoginConnectionEvents.INIT.register(this::onLoginStart);
-		ClientPlayConnectionEvents.DISCONNECT.register(this::onPlayDisconnect);
 	}
 	
 	@Override
@@ -78,22 +74,7 @@ public final class NoChatReportsOtf extends OtherFeature
 	private void onLoginStart(ClientLoginNetworkHandler handler,
 		MinecraftClient client)
 	{
-		if(isActive() && !WURST.getOtfs().vanillaSpoofOtf.isEnabled())
-			ClientPlayNetworking.registerGlobalReceiver(
-				NoChatReportsChannelHandler.CHANNEL,
-				NoChatReportsChannelHandler.INSTANCE);
-		else
-			ClientPlayNetworking
-				.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
-		
 		EVENTS.add(UpdateListener.class, NoChatReportsOtf.this);
-	}
-	
-	private void onPlayDisconnect(ClientPlayNetworkHandler handler,
-		MinecraftClient client)
-	{
-		ClientPlayNetworking
-			.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
 	}
 	
 	public MessageIndicator modifyIndicator(Text message,
