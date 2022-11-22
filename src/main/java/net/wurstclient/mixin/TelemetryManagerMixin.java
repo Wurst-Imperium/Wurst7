@@ -11,17 +11,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.client.util.telemetry.TelemetryManager;
 import net.minecraft.client.util.telemetry.TelemetrySender;
 import net.wurstclient.WurstClient;
 
 @Mixin(TelemetryManager.class)
-public class TelemetrySenderMixin
+public class TelemetryManagerMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "method_47707()Lnet/minecraft/class_7965;",
+		method = "getSender()Lnet/minecraft/client/util/telemetry/TelemetrySender;",
 		cancellable = true)
-	private void onMethod_47707(CallbackInfoReturnable<TelemetrySender> cir)
+	private void onGetSender(CallbackInfoReturnable<TelemetrySender> cir)
 	{
 		if(!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled())
 			return;
