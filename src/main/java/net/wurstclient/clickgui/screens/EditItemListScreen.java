@@ -63,30 +63,30 @@ public final class EditItemListScreen extends Screen
 		itemNameField.setMaxLength(256);
 		
 		addDrawableChild(
-			addButton = ButtonWidget.createBuilder(Text.literal("Add"), b -> {
+			addButton = ButtonWidget.builder(Text.literal("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
-			}).setPositionAndSize(width / 2 - 2, height - 56, 30, 20).build());
+			}).dimensions(width / 2 - 2, height - 56, 30, 20).build());
 		
 		addDrawableChild(removeButton = ButtonWidget
-			.createBuilder(Text.literal("Remove Selected"),
+			.builder(Text.literal("Remove Selected"),
 				b -> itemList.remove(listGui.selected))
-			.setPositionAndSize(width / 2 + 52, height - 56, 100, 20).build());
+			.dimensions(width / 2 + 52, height - 56, 100, 20).build());
 		
 		addDrawableChild(
-			ButtonWidget.createBuilder(Text.literal("Reset to Defaults"),
+			ButtonWidget.builder(Text.literal("Reset to Defaults"),
 				b -> client.setScreen(new ConfirmScreen(b2 -> {
 					if(b2)
 						itemList.resetToDefaults();
 					client.setScreen(EditItemListScreen.this);
 				}, Text.literal("Reset to Defaults"),
 					Text.literal("Are you sure?"))))
-				.setPositionAndSize(width - 108, 8, 100, 20).build());
+				.dimensions(width - 108, 8, 100, 20).build());
 		
 		addDrawableChild(doneButton = ButtonWidget
-			.createBuilder(Text.literal("Done"),
+			.builder(Text.literal("Done"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(width / 2 - 100, height - 28, 200, 20).build());
+			.dimensions(width / 2 - 100, height - 28, 200, 20).build());
 	}
 	
 	@Override

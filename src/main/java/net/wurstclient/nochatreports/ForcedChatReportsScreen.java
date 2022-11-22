@@ -81,19 +81,19 @@ public final class ForcedChatReportsScreen extends Screen
 		int backButtonY = reconnectY + 24;
 		
 		addDrawableChild(signatureButton = ButtonWidget
-			.createBuilder(Text.literal(sigButtonMsg.get()),
+			.builder(Text.literal(sigButtonMsg.get()),
 				b -> toggleSignatures())
-			.setPositionAndSize(buttonX, signaturesY, 200, 20).build());
+			.dimensions(buttonX, signaturesY, 200, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Reconnect"),
+			.builder(Text.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(prevScreen))
-			.setPositionAndSize(buttonX, reconnectY, 200, 20).build());
+			.dimensions(buttonX, reconnectY, 200, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.translatable("gui.toMenu"),
+			.builder(Text.translatable("gui.toMenu"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(buttonX, backButtonY, 200, 20).build());
+			.dimensions(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()

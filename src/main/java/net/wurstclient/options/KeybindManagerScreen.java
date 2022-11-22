@@ -42,25 +42,25 @@ public final class KeybindManagerScreen extends Screen
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
 		addDrawableChild(addButton = ButtonWidget
-			.createBuilder(Text.literal("Add"),
+			.builder(Text.literal("Add"),
 				b -> client.setScreen(new KeybindEditorScreen(this)))
-			.setPositionAndSize(width / 2 - 102, height - 52, 100, 20).build());
+			.dimensions(width / 2 - 102, height - 52, 100, 20).build());
 		
 		addDrawableChild(editButton = ButtonWidget
-			.createBuilder(Text.literal("Edit"), b -> edit())
-			.setPositionAndSize(width / 2 + 2, height - 52, 100, 20).build());
+			.builder(Text.literal("Edit"), b -> edit())
+			.dimensions(width / 2 + 2, height - 52, 100, 20).build());
 		
 		addDrawableChild(removeButton = ButtonWidget
-			.createBuilder(Text.literal("Remove"), b -> remove())
-			.setPositionAndSize(width / 2 - 102, height - 28, 100, 20).build());
+			.builder(Text.literal("Remove"), b -> remove())
+			.dimensions(width / 2 - 102, height - 28, 100, 20).build());
 		
 		addDrawableChild(backButton = ButtonWidget
-			.createBuilder(Text.literal("Back"),
+			.builder(Text.literal("Back"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(width / 2 + 2, height - 28, 100, 20).build());
+			.dimensions(width / 2 + 2, height - 28, 100, 20).build());
 		
 		addDrawableChild(
-			ButtonWidget.createBuilder(Text.literal("Reset Keybinds"),
+			ButtonWidget.builder(Text.literal("Reset Keybinds"),
 				b -> client.setScreen(new ConfirmScreen(confirmed -> {
 					if(confirmed)
 						WurstClient.INSTANCE.getKeybinds()
@@ -69,12 +69,12 @@ public final class KeybindManagerScreen extends Screen
 				}, Text
 					.literal("Are you sure you want to reset your keybinds?"),
 					Text.literal("This cannot be undone!"))))
-				.setPositionAndSize(8, 8, 100, 20).build());
+				.dimensions(8, 8, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Profiles..."),
+			.builder(Text.literal("Profiles..."),
 				b -> client.setScreen(new KeybindProfilesScreen(this)))
-			.setPositionAndSize(width - 108, 8, 100, 20).build());
+			.dimensions(width - 108, 8, 100, 20).build());
 	}
 	
 	private void edit()

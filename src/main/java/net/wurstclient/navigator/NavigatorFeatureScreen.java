@@ -90,7 +90,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		if(hasPrimaryAction)
 		{
 			primaryButton =
-				ButtonWidget.createBuilder(Text.literal(primaryAction), b -> {
+				ButtonWidget.builder(Text.literal(primaryAction), b -> {
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
 					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
@@ -106,7 +106,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
-				}).setPositionAndSize(width / 2 - 151, height - 65,
+				}).dimensions(width / 2 - 151, height - 65,
 					hasHelp ? 149 : 302, 18).build();
 			addDrawableChild(primaryButton);
 		}

@@ -46,21 +46,21 @@ public final class SelectFileScreen extends Screen
 		listGui = new ListGui(client, this, setting.listFiles());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Open Folder"), b -> openFolder())
-			.setPositionAndSize(8, 8, 100, 20).build());
+			.builder(Text.literal("Open Folder"), b -> openFolder())
+			.dimensions(8, 8, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Reset to Defaults"),
+			.builder(Text.literal("Reset to Defaults"),
 				b -> askToConfirmReset())
-			.setPositionAndSize(width - 108, 8, 100, 20).build());
+			.dimensions(width - 108, 8, 100, 20).build());
 		
 		doneButton = addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Done"), b -> done())
-			.setPositionAndSize(width / 2 - 102, height - 48, 100, 20).build());
+			.builder(Text.literal("Done"), b -> done())
+			.dimensions(width / 2 - 102, height - 48, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Cancel"), b -> openPrevScreen())
-			.setPositionAndSize(width / 2 + 2, height - 48, 100, 20).build());
+			.builder(Text.literal("Cancel"), b -> openPrevScreen())
+			.dimensions(width / 2 + 2, height - 48, 100, 20).build());
 	}
 	
 	private void openFolder()

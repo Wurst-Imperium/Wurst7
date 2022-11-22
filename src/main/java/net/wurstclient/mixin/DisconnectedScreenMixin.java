@@ -74,15 +74,15 @@ public class DisconnectedScreenMixin extends Screen
 			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Reconnect"),
+			.builder(Text.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(parent))
-			.setPositionAndSize(backButtonX, backButtonY + 24, 200, 20)
+			.dimensions(backButtonX, backButtonY + 24, 200, 20)
 			.build());
 		
 		autoReconnectButton = addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("AutoReconnect"),
+			.builder(Text.literal("AutoReconnect"),
 				b -> pressAutoReconnect())
-			.setPositionAndSize(backButtonX, backButtonY + 48, 200, 20)
+			.dimensions(backButtonX, backButtonY + 48, 200, 20)
 			.build());
 		
 		AutoReconnectHack autoReconnect =

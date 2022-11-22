@@ -38,8 +38,8 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 			return;
 		
 		ButtonWidget toggleWurstButton = ButtonWidget
-			.createBuilder(Text.literal(""), this::toggleWurst)
-			.setPositionAndSize(width / 2 - 152, height - 28, 150, 20).build();
+			.builder(Text.literal(""), this::toggleWurst)
+			.dimensions(width / 2 - 152, height - 28, 150, 20).build();
 		
 		updateWurstButtonText(toggleWurstButton);
 		addDrawableChild(toggleWurstButton);

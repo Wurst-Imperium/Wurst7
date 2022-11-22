@@ -40,40 +40,40 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Back"),
+			.builder(Text.literal("Back"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
+			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
 			.build());
 		
 		addDrawableChild(keyButton = ButtonWidget
-			.createBuilder(Text.literal("Zoom Key: " + zoomKeyName),
+			.builder(Text.literal("Zoom Key: " + zoomKeyName),
 				b -> client.setScreen(new PressAKeyScreen(this)))
-			.setPositionAndSize(width / 2 - 79, height / 4 + 24 - 16, 158, 20)
+			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20)
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("More"), b -> level.increaseValue())
-			.setPositionAndSize(width / 2 - 79, height / 4 + 72 - 16, 50, 20)
+			.builder(Text.literal("More"), b -> level.increaseValue())
+			.dimensions(width / 2 - 79, height / 4 + 72 - 16, 50, 20)
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Less"), b -> level.decreaseValue())
-			.setPositionAndSize(width / 2 - 25, height / 4 + 72 - 16, 50, 20)
+			.builder(Text.literal("Less"), b -> level.decreaseValue())
+			.dimensions(width / 2 - 25, height / 4 + 72 - 16, 50, 20)
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Default"),
+			.builder(Text.literal("Default"),
 				b -> level.setValue(level.getDefaultValue()))
-			.setPositionAndSize(width / 2 + 29, height / 4 + 72 - 16, 50, 20)
+			.dimensions(width / 2 + 29, height / 4 + 72 - 16, 50, 20)
 			.build());
 		
 		addDrawableChild(
 			scrollButton = ButtonWidget
-				.createBuilder(
+				.builder(
 					Text.literal(
 						"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
 					b -> toggleScroll())
-				.setPositionAndSize(width / 2 - 79, height / 4 + 96 - 16, 158,
+				.dimensions(width / 2 - 79, height / 4 + 96 - 16, 158,
 					20)
 				.build());
 	}

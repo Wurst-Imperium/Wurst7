@@ -84,9 +84,9 @@ public abstract class GameMenuScreenMixin extends Screen
 					"Someone deleted the Feedback button!"));
 		
 		wurstOptionsButton = ButtonWidget
-			.createBuilder(Text.literal("            Options"),
+			.builder(Text.literal("            Options"),
 				b -> openWurstOptions())
-			.setPositionAndSize(width / 2 - 102, buttonY, 204, 20).build();
+			.dimensions(width / 2 - 102, buttonY, 204, 20).build();
 		buttons.add(wurstOptionsButton);
 	}
 	

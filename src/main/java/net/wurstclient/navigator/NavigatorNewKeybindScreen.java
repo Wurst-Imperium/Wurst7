@@ -85,9 +85,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		
 		// cancel button
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Cancel"),
+			.builder(Text.literal("Cancel"),
 				b -> WurstClient.MC.setScreen(parent))
-			.setPositionAndSize(width / 2 + 2, height - 65, 149, 18).build());
+			.dimensions(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	
 	@Override
