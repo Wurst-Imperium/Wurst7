@@ -8,35 +8,26 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.util.telemetry.TelemetryManager;
-import net.minecraft.client.util.telemetry.TelemetryManager.PlayerGameMode;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.class_7965;
+import net.minecraft.client.util.TelemetrySender;
 import net.wurstclient.WurstClient;
 
-@Mixin(TelemetryManager.class)
+@Mixin(TelemetrySender.class)
 public class TelemetrySenderMixin
 {
-	@Shadow
-	private boolean sent;
-	
 	@Inject(at = @At("HEAD"),
-		method = "send(Lnet/minecraft/client/util/TelemetrySender$PlayerGameMode;)V",
+		method = "method_47707()Lnet/minecraft/class_7965;",
 		cancellable = true)
-	private void onSend(PlayerGameMode gameMode, CallbackInfo ci)
+	private void onMethod_47707(CallbackInfoReturnable<class_7965> cir)
 	{
 		if(!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled())
 			return;
-			
-		// Pretend it was sent successfully so that the TelemetrySender
-		// won't try again later.
-		sent = true;
 		
-		// Don't actually send anything. :)
-		ci.cancel();
-		
-		System.out.println("Telemetry sending attempt blocked.");
+		// Return a dummy that can't actually send anything. :)
+		cir.setReturnValue(class_7965.field_41434);
 	}
 }

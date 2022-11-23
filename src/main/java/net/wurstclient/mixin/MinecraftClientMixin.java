@@ -46,6 +46,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.mixinterface.IWorld;
+import net.wurstclient.other_features.NoTelemetryOtf;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -147,7 +148,7 @@ public abstract class MinecraftClientMixin
 	@Inject(at = @At("HEAD"),
 		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
 		cancellable = true)
-	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
+	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
 			cir.setReturnValue(ProfileKeys.MISSING);
@@ -156,6 +157,22 @@ public abstract class MinecraftClientMixin
 			return;
 		
 		cir.setReturnValue(wurstProfileKeys);
+	}
+	
+	@Inject(at = @At("HEAD"), method = "method_47596()Z", cancellable = true)
+	private void onMethod_47596(CallbackInfoReturnable<Boolean> cir)
+	{
+		NoTelemetryOtf noTelemetryOtf =
+			WurstClient.INSTANCE.getOtfs().noTelemetryOtf;
+		cir.setReturnValue(!noTelemetryOtf.isEnabled());
+	}
+	
+	@Inject(at = @At("HEAD"), method = "method_47595()Z", cancellable = true)
+	private void onMethod_47595(CallbackInfoReturnable<Boolean> cir)
+	{
+		NoTelemetryOtf noTelemetryOtf =
+			WurstClient.INSTANCE.getOtfs().noTelemetryOtf;
+		cir.setReturnValue(!noTelemetryOtf.isEnabled());
 	}
 	
 	@Override

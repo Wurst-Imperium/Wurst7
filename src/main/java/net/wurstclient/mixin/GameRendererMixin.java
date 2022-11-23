@@ -154,13 +154,13 @@ public abstract class GameRendererMixin
 	}
 	
 	@Override
-	public void loadWurstShader(Identifier identifier)
+	public void loadWurstShader(Identifier id)
 	{
-		loadShader(identifier);
+		loadPostProcessor(id);
 	}
 	
 	@Shadow
-	private void loadShader(Identifier identifier)
+	private void loadPostProcessor(Identifier id)
 	{
 		
 	}

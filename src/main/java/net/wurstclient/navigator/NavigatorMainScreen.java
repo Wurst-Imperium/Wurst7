@@ -325,7 +325,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			// text
 			for(int i = 0; i < lines.length; i++)
 				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 1 + i * fr.fontHeight, txtColor);
+					yt1 + 2 + i * fr.fontHeight, txtColor);
 		}
 	}
 	
