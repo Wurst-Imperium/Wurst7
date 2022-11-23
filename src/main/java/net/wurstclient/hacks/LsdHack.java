@@ -32,8 +32,8 @@ public final class LsdHack extends Hack
 			return;
 		}
 		
-		if(MC.gameRenderer.getShader() != null)
-			MC.gameRenderer.disableShader();
+		if(MC.gameRenderer.getPostProcessor() != null)
+			MC.gameRenderer.disablePostProcessor();
 		
 		((IGameRenderer)MC.gameRenderer)
 			.loadWurstShader(new Identifier("shaders/post/wobble.json"));
@@ -42,7 +42,7 @@ public final class LsdHack extends Hack
 	@Override
 	public void onDisable()
 	{
-		if(MC.gameRenderer.getShader() != null)
-			MC.gameRenderer.disableShader();
+		if(MC.gameRenderer.getPostProcessor() != null)
+			MC.gameRenderer.disablePostProcessor();
 	}
 }

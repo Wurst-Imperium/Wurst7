@@ -297,7 +297,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// background
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -417,7 +417,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
@@ -466,7 +466,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// text
 		if(!clickTimerRunning)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			String buttonText = feature.getName();
 			client.textRenderer.draw(matrixStack, buttonText, area.x + 4,
 				area.y + 4, txtColor);

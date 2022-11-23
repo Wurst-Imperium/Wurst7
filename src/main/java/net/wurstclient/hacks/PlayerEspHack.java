@@ -181,7 +181,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, double partialTicks,
 		int regionX, int regionZ)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();

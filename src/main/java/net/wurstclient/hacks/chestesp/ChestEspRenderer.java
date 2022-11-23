@@ -13,10 +13,9 @@ import java.util.stream.Stream;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -65,7 +64,7 @@ public final class ChestEspRenderer
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			solidBox.bind();

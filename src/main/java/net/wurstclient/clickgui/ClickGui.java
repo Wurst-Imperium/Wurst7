@@ -553,7 +553,7 @@ public final class ClickGui
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -629,7 +629,7 @@ public final class ClickGui
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -893,7 +893,7 @@ public final class ClickGui
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],

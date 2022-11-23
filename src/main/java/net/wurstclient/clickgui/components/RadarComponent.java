@@ -65,7 +65,7 @@ public final class RadarComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tooltip
 		if(hovering)
@@ -127,7 +127,7 @@ public final class RadarComponent extends Component
 		matrix = matrixStack.peek().getPositionMatrix();
 		
 		// points
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);

@@ -78,7 +78,7 @@ public final class WurstLogo
 		float r, float g, float b, float a)
 	{
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();

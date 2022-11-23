@@ -238,7 +238,7 @@ public abstract class NavigatorScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -264,7 +264,7 @@ public abstract class NavigatorScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -283,7 +283,7 @@ public abstract class NavigatorScreen extends Screen
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -333,7 +333,7 @@ public abstract class NavigatorScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		float yi1 = y1 + 0.1F;
@@ -345,7 +345,7 @@ public abstract class NavigatorScreen extends Screen
 		tessellator.draw();
 		
 		// shadow
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);

@@ -295,7 +295,7 @@ public final class NukerLegitHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);

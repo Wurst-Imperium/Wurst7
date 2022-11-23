@@ -225,7 +225,7 @@ public final class BowAimbotHack extends Hack
 		float v = 1 / velocity;
 		matrixStack.scale(v, v, v);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		float[] colorF = color.getColorF();
 		
 		// draw outline
@@ -276,7 +276,7 @@ public final class BowAimbotHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

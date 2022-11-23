@@ -171,7 +171,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Vec3d start =
 			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());

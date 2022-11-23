@@ -61,8 +61,8 @@ public final class EditBlockScreen extends Screen
 		blockField.setTextFieldFocused(true);
 		
 		doneButton =
-			ButtonWidget.createBuilder(Text.literal("Done"), b -> done())
-				.setPositionAndSize(x1, y2, 200, 20).build();
+			ButtonWidget.builder(Text.literal("Done"), b -> done())
+				.dimensions(x1, y2, 200, 20).build();
 		addDrawableChild(doneButton);
 	}
 	

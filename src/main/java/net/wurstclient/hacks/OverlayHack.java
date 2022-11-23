@@ -82,7 +82,7 @@ public final class OverlayHack extends Hack implements RenderListener
 		float green = 2 - red;
 		
 		// draw box
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);

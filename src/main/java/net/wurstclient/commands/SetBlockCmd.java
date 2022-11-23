@@ -9,9 +9,9 @@ package net.wurstclient.commands;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registries;
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;

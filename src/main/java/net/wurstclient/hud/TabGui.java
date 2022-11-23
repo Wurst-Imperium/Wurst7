@@ -216,7 +216,7 @@ public final class TabGui implements KeyPressListener
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// color
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -259,7 +259,7 @@ public final class TabGui implements KeyPressListener
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		// top left

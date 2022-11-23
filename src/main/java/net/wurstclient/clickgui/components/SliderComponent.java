@@ -94,7 +94,7 @@ public final class SliderComponent extends Component
 		boolean hSlider = hovering && mouseY >= y3 || dragging;
 		boolean renderAsDisabled = setting.isDisabled() || setting.isLocked();
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(hovering && mouseY < y3)
 			setTooltip();

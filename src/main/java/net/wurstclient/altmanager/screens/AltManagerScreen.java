@@ -113,43 +113,43 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		addDrawableChild(useButton = ButtonWidget
-			.createBuilder(Text.literal("Login"), b -> pressLogin())
-			.setPositionAndSize(width / 2 - 154, height - 52, 100, 20).build());
+			.builder(Text.literal("Login"), b -> pressLogin())
+			.dimensions(width / 2 - 154, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Direct Login"),
+			.builder(Text.literal("Direct Login"),
 				b -> client.setScreen(new DirectLoginScreen(this)))
-			.setPositionAndSize(width / 2 - 50, height - 52, 100, 20).build());
+			.dimensions(width / 2 - 50, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Add"),
+			.builder(Text.literal("Add"),
 				b -> client.setScreen(new AddAltScreen(this, altManager)))
-			.setPositionAndSize(width / 2 + 54, height - 52, 100, 20).build());
+			.dimensions(width / 2 + 54, height - 52, 100, 20).build());
 		
 		addDrawableChild(starButton = ButtonWidget
-			.createBuilder(Text.literal("Favorite"), b -> pressFavorite())
-			.setPositionAndSize(width / 2 - 154, height - 28, 75, 20).build());
+			.builder(Text.literal("Favorite"), b -> pressFavorite())
+			.dimensions(width / 2 - 154, height - 28, 75, 20).build());
 		
 		addDrawableChild(editButton = ButtonWidget
-			.createBuilder(Text.literal("Edit"), b -> pressEdit())
-			.setPositionAndSize(width / 2 - 76, height - 28, 74, 20).build());
+			.builder(Text.literal("Edit"), b -> pressEdit())
+			.dimensions(width / 2 - 76, height - 28, 74, 20).build());
 		
 		addDrawableChild(deleteButton = ButtonWidget
-			.createBuilder(Text.literal("Delete"), b -> pressDelete())
-			.setPositionAndSize(width / 2 + 2, height - 28, 74, 20).build());
+			.builder(Text.literal("Delete"), b -> pressDelete())
+			.dimensions(width / 2 + 2, height - 28, 74, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Cancel"),
+			.builder(Text.literal("Cancel"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(width / 2 + 80, height - 28, 75, 20).build());
+			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
 		
 		addDrawableChild(importButton = ButtonWidget
-			.createBuilder(Text.literal("Import"), b -> pressImportAlts())
-			.setPositionAndSize(8, 8, 50, 20).build());
+			.builder(Text.literal("Import"), b -> pressImportAlts())
+			.dimensions(8, 8, 50, 20).build());
 		
 		addDrawableChild(exportButton = ButtonWidget
-			.createBuilder(Text.literal("Export"), b -> pressExportAlts())
-			.setPositionAndSize(58, 8, 50, 20).build());
+			.builder(Text.literal("Export"), b -> pressExportAlts())
+			.dimensions(58, 8, 50, 20).build());
 	}
 	
 	@Override
@@ -417,7 +417,7 @@ public final class AltManagerScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
@@ -447,7 +447,7 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
@@ -637,7 +637,7 @@ public final class AltManagerScreen extends Screen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))

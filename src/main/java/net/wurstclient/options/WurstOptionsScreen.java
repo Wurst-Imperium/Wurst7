@@ -42,9 +42,9 @@ public class WurstOptionsScreen extends Screen
 	public void init()
 	{
 		addDrawableChild(ButtonWidget
-			.createBuilder(Text.literal("Back"),
+			.builder(Text.literal("Back"),
 				b -> client.setScreen(prevScreen))
-			.setPositionAndSize(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
+			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
 			.build());
 		
 		addSettingButtons();

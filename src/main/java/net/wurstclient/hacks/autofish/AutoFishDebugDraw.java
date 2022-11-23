@@ -122,7 +122,7 @@ public final class AutoFishDebugDraw
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		matrixStack.push();
 		matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
