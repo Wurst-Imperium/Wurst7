@@ -1,0 +1,35 @@
+name: build
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        # 使用这些Java版本
+        java: [
+          17
+        ]
+        # 并同时在Linux和Windows上运行
+        os: [ubuntu-20.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: setup jdk ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: make gradle wrapper executable
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: capture build artifacts
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # 只上传由一个操作系统上的LTS java构建的工件
+        uses: actions/upload-artifact@v2
+        with:
+          name: Artifacts
+          path: build/libs/Wurst-Client-*-sources.jar
+          
