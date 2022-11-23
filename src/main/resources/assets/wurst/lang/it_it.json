@@ -169,7 +169,7 @@
   "description.wurst.altmanager.window": "Questo pulsante apre un'altra finestra.",
   "description.wurst.altmanager.window_freeze": "Potrebbe sembrare che il gioco non risponda mentre quella finestra è aperta.",
   "description.wurst.altmanager.fullscreen": "§cDisattiva la modalità a schermo intero!",
-  "gui.wurst.altmanager.folder_error.title": "Non è stato possibile creare la cartella 'Wurst encryption'!",
+  "gui.wurst.altmanager.folder_error.title": "Non è stato possibile creare la cartella '.Wurst encryption'!",
   "gui.wurst.altmanager.folder_error.message": "Potresti aver accidentalmente bloccato l'accesso a questa cartella.\nAltManager non può cifrare o decifrare la tua lista alt senza di essa.\nPuoi ancora usare AltManager, ma qualsiasi alt che crei ora non verrà salvato.\n\nL'errore completo è il seguente:\n%s",
   "gui.wurst.altmanager.empty.title": "La tua lista alt è vuota.",
   "gui.wurst.altmanager.empty.message": "Vorresti creare qualche alt casuale per iniziare?",
