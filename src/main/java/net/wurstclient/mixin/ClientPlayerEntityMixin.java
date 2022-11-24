@@ -33,19 +33,22 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.network.message.ArgumentSignatureDataMap;
-import net.minecraft.network.message.ChatMessageSigner;
-import net.minecraft.network.message.MessageSignature;
+import net.minecraft.network.message.DecoratedContents;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.message.MessageMetadata;
+import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.IsPlayerInLavaListener.IsPlayerInLavaEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
-import net.wurstclient.hacks.FullbrightHack;
+import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(ClientPlayerEntity.class)
@@ -146,24 +149,26 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signChatMessage(Lnet/minecraft/network/message/ChatMessageSigner;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/MessageSignature;",
+		method = "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
 		cancellable = true)
-	private void onSignChatMessage(ChatMessageSigner signer, Text message,
-		CallbackInfoReturnable<MessageSignature> cir)
+	private void onSignChatMessage(MessageMetadata metadata,
+		DecoratedContents content, LastSeenMessageList lastSeenMessages,
+		CallbackInfoReturnable<MessageSignatureData> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(MessageSignature.none());
+			cir.setReturnValue(MessageSignatureData.EMPTY);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "signArguments(Lnet/minecraft/network/message/ChatMessageSigner;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
+		method = "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
 		cancellable = true)
-	private void onSignArguments(ChatMessageSigner signer,
+	private void onSignArguments(MessageMetadata metadata,
 		ParseResults<CommandSource> parseResults, @Nullable Text preview,
+		LastSeenMessageList lastSeenMessages,
 		CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(ArgumentSignatureDataMap.empty());
+			cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
 	}
 	
 	@Override
@@ -182,6 +187,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		EventManager.fire(event);
 		
 		return event.isInWater();
+	}
+	
+	@Override
+	public boolean isInLava()
+	{
+		boolean inLava = super.isInLava();
+		IsPlayerInLavaEvent event = new IsPlayerInLavaEvent(inLava);
+		EventManager.fire(event);
+		
+		return event.isInLava();
+	}
+	
+	@Override
+	public boolean isSpectator()
+	{
+		return super.isSpectator()
+			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
 	}
 	
 	@Override
@@ -220,12 +242,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Override
 	public boolean hasStatusEffect(StatusEffect effect)
 	{
-		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
+		HackList hax = WurstClient.INSTANCE.getHax();
 		
 		if(effect == StatusEffects.NIGHT_VISION
-			&& fullbright.isNightVisionActive())
+			&& hax.fullbrightHack.isNightVisionActive())
 			return true;
+		
+		if(effect == StatusEffects.LEVITATION
+			&& hax.noLevitationHack.isEnabled())
+			return false;
 		
 		return super.hasStatusEffect(effect);
 	}

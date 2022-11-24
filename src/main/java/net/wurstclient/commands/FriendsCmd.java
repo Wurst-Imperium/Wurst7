@@ -21,10 +21,10 @@ public class FriendsCmd extends Command
 {
 	private static final int FRIENDS_PER_PAGE = 8;
 	
-	private final CheckboxSetting middleClickFriends = new CheckboxSetting(
-		"Middle click friends", "Add/remove friends by clicking them with\n"
-			+ "the middle mouse button.",
-		true);
+	private final CheckboxSetting middleClickFriends =
+		new CheckboxSetting("Middle click friends",
+			"Add/remove friends by clicking them with the middle mouse button.",
+			true);
 	
 	public FriendsCmd()
 	{
