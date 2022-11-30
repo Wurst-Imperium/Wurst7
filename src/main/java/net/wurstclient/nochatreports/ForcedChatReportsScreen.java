@@ -81,8 +81,7 @@ public final class ForcedChatReportsScreen extends Screen
 		int backButtonY = reconnectY + 24;
 		
 		addDrawableChild(signatureButton = ButtonWidget
-			.builder(Text.literal(sigButtonMsg.get()),
-				b -> toggleSignatures())
+			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
 			.dimensions(buttonX, signaturesY, 200, 20).build());
 		
 		addDrawableChild(ButtonWidget

@@ -49,16 +49,15 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	protected void onResize()
 	{
 		// OK button
-		removeButton = ButtonWidget
-			.builder(Text.literal("Remove"), b -> remove())
-			.dimensions(width / 2 - 151, height - 65, 149, 18).build();
+		removeButton =
+			ButtonWidget.builder(Text.literal("Remove"), b -> remove())
+				.dimensions(width / 2 - 151, height - 65, 149, 18).build();
 		removeButton.active = !selectedKey.isEmpty();
 		addDrawableChild(removeButton);
 		
 		// cancel button
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"),
-				b -> client.setScreen(parent))
+			.builder(Text.literal("Cancel"), b -> client.setScreen(parent))
 			.dimensions(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	

@@ -121,9 +121,8 @@ public final class EditColorScreen extends Screen
 		hexValueField.setSelectionStart(0);
 		hexValueField.setSelectionEnd(6);
 		
-		doneButton =
-			ButtonWidget.builder(Text.literal("Done"), b -> done())
-				.dimensions(fieldsX, height - 30, 200, 20).build();
+		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
+			.dimensions(fieldsX, height - 30, 200, 20).build();
 		addDrawableChild(doneButton);
 	}
 	

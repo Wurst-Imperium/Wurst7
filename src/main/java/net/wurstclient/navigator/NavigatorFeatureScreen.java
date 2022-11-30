@@ -106,8 +106,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
-				}).dimensions(width / 2 - 151, height - 65,
-					hasHelp ? 149 : 302, 18).build();
+				}).dimensions(width / 2 - 151, height - 65, hasHelp ? 149 : 302,
+					18).build();
 			addDrawableChild(primaryButton);
 		}
 		
@@ -276,8 +276,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons
 		if(activeButton != null)
 		{
-			client.getSoundManager().play(
-				PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1));
+			client.getSoundManager().play(PositionedSoundInstance
+				.method_47978(SoundEvents.UI_BUTTON_CLICK, 1));
 			activeButton.press();
 			WurstClient.INSTANCE.getNavigator()
 				.addPreference(feature.getName());

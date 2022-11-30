@@ -37,9 +37,9 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
 			return;
 		
-		ButtonWidget toggleWurstButton = ButtonWidget
-			.builder(Text.literal(""), this::toggleWurst)
-			.dimensions(width / 2 - 152, height - 28, 150, 20).build();
+		ButtonWidget toggleWurstButton =
+			ButtonWidget.builder(Text.literal(""), this::toggleWurst)
+				.dimensions(width / 2 - 152, height - 28, 150, 20).build();
 		
 		updateWurstButtonText(toggleWurstButton);
 		addDrawableChild(toggleWurstButton);

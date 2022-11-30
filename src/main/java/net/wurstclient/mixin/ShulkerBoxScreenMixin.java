@@ -51,13 +51,11 @@ public abstract class ShulkerBoxScreenMixin
 		{
 			addDrawableChild(ButtonWidget
 				.builder(Text.literal("Steal"), b -> steal())
-				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12)
-				.build());
+				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
 			
-			addDrawableChild(
-				ButtonWidget.builder(Text.literal("Store"), b -> store())
-					.dimensions(x + backgroundWidth - 56, y + 4, 50, 12)
-					.build());
+			addDrawableChild(ButtonWidget
+				.builder(Text.literal("Store"), b -> store())
+				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())

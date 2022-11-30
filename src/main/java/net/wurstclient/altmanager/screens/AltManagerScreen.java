@@ -112,9 +112,9 @@ public final class AltManagerScreen extends Screen
 			client.setScreen(screen);
 		}
 		
-		addDrawableChild(useButton = ButtonWidget
-			.builder(Text.literal("Login"), b -> pressLogin())
-			.dimensions(width / 2 - 154, height - 52, 100, 20).build());
+		addDrawableChild(useButton =
+			ButtonWidget.builder(Text.literal("Login"), b -> pressLogin())
+				.dimensions(width / 2 - 154, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Direct Login"),
@@ -126,30 +126,29 @@ public final class AltManagerScreen extends Screen
 				b -> client.setScreen(new AddAltScreen(this, altManager)))
 			.dimensions(width / 2 + 54, height - 52, 100, 20).build());
 		
-		addDrawableChild(starButton = ButtonWidget
-			.builder(Text.literal("Favorite"), b -> pressFavorite())
-			.dimensions(width / 2 - 154, height - 28, 75, 20).build());
+		addDrawableChild(starButton =
+			ButtonWidget.builder(Text.literal("Favorite"), b -> pressFavorite())
+				.dimensions(width / 2 - 154, height - 28, 75, 20).build());
 		
-		addDrawableChild(editButton = ButtonWidget
-			.builder(Text.literal("Edit"), b -> pressEdit())
-			.dimensions(width / 2 - 76, height - 28, 74, 20).build());
+		addDrawableChild(editButton =
+			ButtonWidget.builder(Text.literal("Edit"), b -> pressEdit())
+				.dimensions(width / 2 - 76, height - 28, 74, 20).build());
 		
-		addDrawableChild(deleteButton = ButtonWidget
-			.builder(Text.literal("Delete"), b -> pressDelete())
-			.dimensions(width / 2 + 2, height - 28, 74, 20).build());
+		addDrawableChild(deleteButton =
+			ButtonWidget.builder(Text.literal("Delete"), b -> pressDelete())
+				.dimensions(width / 2 + 2, height - 28, 74, 20).build());
 		
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"),
-				b -> client.setScreen(prevScreen))
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
 		
-		addDrawableChild(importButton = ButtonWidget
-			.builder(Text.literal("Import"), b -> pressImportAlts())
-			.dimensions(8, 8, 50, 20).build());
+		addDrawableChild(importButton =
+			ButtonWidget.builder(Text.literal("Import"), b -> pressImportAlts())
+				.dimensions(8, 8, 50, 20).build());
 		
-		addDrawableChild(exportButton = ButtonWidget
-			.builder(Text.literal("Export"), b -> pressExportAlts())
-			.dimensions(58, 8, 50, 20).build());
+		addDrawableChild(exportButton =
+			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
+				.dimensions(58, 8, 50, 20).build());
 	}
 	
 	@Override

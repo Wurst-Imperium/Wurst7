@@ -67,15 +67,13 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 				.builder(Text.literal("Server Finder"),
 					b -> client.setScreen(new ServerFinderScreen(
 						(MultiplayerScreen)(Object)this)))
-				.dimensions(width / 2 + 154 + 4, height - 52, 100, 20)
-				.build());
+				.dimensions(width / 2 + 154 + 4, height - 52, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Clean Up"),
 				b -> client.setScreen(
 					new CleanUpScreen((MultiplayerScreen)(Object)this)))
-			.dimensions(width / 2 + 154 + 4, height - 28, 100, 20)
-			.build());
+			.dimensions(width / 2 + 154 + 4, height - 28, 100, 20).build());
 	}
 	
 	@Inject(at = {@At("TAIL")}, method = {"tick()V"})

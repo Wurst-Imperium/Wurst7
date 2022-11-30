@@ -46,10 +46,10 @@ public class ServerFinderScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(searchButton = ButtonWidget
-			.builder(Text.literal("Search"), b -> searchOrCancel())
-			.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
-			.build());
+		addDrawableChild(searchButton =
+			ButtonWidget.builder(Text.literal("Search"), b -> searchOrCancel())
+				.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
+				.build());
 		
 		addDrawableChild(ButtonWidget.builder(Text.literal("Tutorial"),
 			b -> Util.getOperatingSystem().open(
@@ -58,8 +58,7 @@ public class ServerFinderScreen extends Screen
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Back"),
-				b -> client.setScreen(prevScreen))
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 - 100, height / 4 + 144 + 12, 200, 20)
 			.build());
 		

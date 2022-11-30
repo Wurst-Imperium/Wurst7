@@ -46,30 +46,27 @@ public final class KeybindManagerScreen extends Screen
 				b -> client.setScreen(new KeybindEditorScreen(this)))
 			.dimensions(width / 2 - 102, height - 52, 100, 20).build());
 		
-		addDrawableChild(editButton = ButtonWidget
-			.builder(Text.literal("Edit"), b -> edit())
-			.dimensions(width / 2 + 2, height - 52, 100, 20).build());
+		addDrawableChild(
+			editButton = ButtonWidget.builder(Text.literal("Edit"), b -> edit())
+				.dimensions(width / 2 + 2, height - 52, 100, 20).build());
 		
-		addDrawableChild(removeButton = ButtonWidget
-			.builder(Text.literal("Remove"), b -> remove())
-			.dimensions(width / 2 - 102, height - 28, 100, 20).build());
+		addDrawableChild(removeButton =
+			ButtonWidget.builder(Text.literal("Remove"), b -> remove())
+				.dimensions(width / 2 - 102, height - 28, 100, 20).build());
 		
 		addDrawableChild(backButton = ButtonWidget
-			.builder(Text.literal("Back"),
-				b -> client.setScreen(prevScreen))
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 + 2, height - 28, 100, 20).build());
 		
-		addDrawableChild(
-			ButtonWidget.builder(Text.literal("Reset Keybinds"),
-				b -> client.setScreen(new ConfirmScreen(confirmed -> {
-					if(confirmed)
-						WurstClient.INSTANCE.getKeybinds()
-							.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-					client.setScreen(this);
-				}, Text
-					.literal("Are you sure you want to reset your keybinds?"),
-					Text.literal("This cannot be undone!"))))
-				.dimensions(8, 8, 100, 20).build());
+		addDrawableChild(ButtonWidget.builder(Text.literal("Reset Keybinds"),
+			b -> client.setScreen(new ConfirmScreen(confirmed -> {
+				if(confirmed)
+					WurstClient.INSTANCE.getKeybinds()
+						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
+				client.setScreen(this);
+			}, Text.literal("Are you sure you want to reset your keybinds?"),
+				Text.literal("This cannot be undone!"))))
+			.dimensions(8, 8, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Profiles..."),

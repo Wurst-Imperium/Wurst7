@@ -159,7 +159,9 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "isTelemetryEnabledByApi()Z", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "isTelemetryEnabledByApi()Z",
+		cancellable = true)
 	private void onIsTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
 	{
 		NoTelemetryOtf noTelemetryOtf =
@@ -167,8 +169,11 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(!noTelemetryOtf.isEnabled());
 	}
 	
-	@Inject(at = @At("HEAD"), method = "isOptionalTelemetryEnabledByApi()Z", cancellable = true)
-	private void onIsOptionalTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
+	@Inject(at = @At("HEAD"),
+		method = "isOptionalTelemetryEnabledByApi()Z",
+		cancellable = true)
+	private void onIsOptionalTelemetryEnabledByApi(
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		NoTelemetryOtf noTelemetryOtf =
 			WurstClient.INSTANCE.getOtfs().noTelemetryOtf;

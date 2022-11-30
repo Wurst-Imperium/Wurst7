@@ -71,14 +71,12 @@ public abstract class AltEditorScreen extends Screen
 	public final void init()
 	{
 		addDrawableChild(doneButton = ButtonWidget
-			.builder(Text.literal(getDoneButtonText()),
-				b -> pressDoneButton())
+			.builder(Text.literal(getDoneButtonText()), b -> pressDoneButton())
 			.dimensions(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"),
-				b -> client.setScreen(prevScreen))
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
 			.build());
 		
@@ -91,15 +89,13 @@ public abstract class AltEditorScreen extends Screen
 		addDrawableChild(stealSkinButton = ButtonWidget
 			.builder(Text.literal("Steal Skin"),
 				b -> message = stealSkin(getNameOrEmail()))
-			.dimensions(width - (width / 2 - 100) / 2 - 64, height - 32,
-				128, 20)
+			.dimensions(width - (width / 2 - 100) / 2 - 64, height - 32, 128,
+				20)
 			.build());
 		
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Open Skin Folder"),
-				b -> openSkinFolder())
-			.dimensions((width / 2 - 100) / 2 - 64, height - 32, 128,
-				20)
+			.builder(Text.literal("Open Skin Folder"), b -> openSkinFolder())
+			.dimensions((width / 2 - 100) / 2 - 64, height - 32, 128, 20)
 			.build());
 		
 		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,

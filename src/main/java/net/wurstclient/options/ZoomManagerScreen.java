@@ -40,32 +40,27 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
 		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Back"),
-				b -> client.setScreen(prevScreen))
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
 			.build());
 		
 		addDrawableChild(keyButton = ButtonWidget
 			.builder(Text.literal("Zoom Key: " + zoomKeyName),
 				b -> client.setScreen(new PressAKeyScreen(this)))
-			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20)
-			.build());
+			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("More"), b -> level.increaseValue())
-			.dimensions(width / 2 - 79, height / 4 + 72 - 16, 50, 20)
-			.build());
+			.dimensions(width / 2 - 79, height / 4 + 72 - 16, 50, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Less"), b -> level.decreaseValue())
-			.dimensions(width / 2 - 25, height / 4 + 72 - 16, 50, 20)
-			.build());
+			.dimensions(width / 2 - 25, height / 4 + 72 - 16, 50, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Default"),
 				b -> level.setValue(level.getDefaultValue()))
-			.dimensions(width / 2 + 29, height / 4 + 72 - 16, 50, 20)
-			.build());
+			.dimensions(width / 2 + 29, height / 4 + 72 - 16, 50, 20).build());
 		
 		addDrawableChild(
 			scrollButton = ButtonWidget
@@ -73,8 +68,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 					Text.literal(
 						"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
 					b -> toggleScroll())
-				.dimensions(width / 2 - 79, height / 4 + 96 - 16, 158,
-					20)
+				.dimensions(width / 2 - 79, height / 4 + 96 - 16, 158, 20)
 				.build());
 	}
 	

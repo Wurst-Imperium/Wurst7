@@ -87,13 +87,11 @@ public final class NcrModRequiredScreen extends Screen
 		int backButtonY = reconnectY + 24;
 		
 		addDrawableChild(signatureButton = ButtonWidget
-			.builder(Text.literal(sigButtonMsg.get()),
-				b -> toggleSignatures())
+			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
 			.dimensions(buttonX - 48, signaturesY, 148, 20).build());
 		
 		addDrawableChild(vsButton = ButtonWidget
-			.builder(Text.literal(vsButtonMsg.get()),
-				b -> toggleVanillaSpoof())
+			.builder(Text.literal(vsButtonMsg.get()), b -> toggleVanillaSpoof())
 			.dimensions(buttonX + 102, signaturesY, 148, 20).build());
 		
 		addDrawableChild(ButtonWidget
