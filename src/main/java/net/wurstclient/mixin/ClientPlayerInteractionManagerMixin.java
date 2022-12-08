@@ -129,6 +129,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
+	public void windowClick_SWAP(int from, int to)
+	{
+		clickSlot(0, from, to, SlotActionType.SWAP, client.player);
+	}
+	
+	@Override
 	public void rightClickItem()
 	{
 		interactItem(client.player, Hand.MAIN_HAND);
