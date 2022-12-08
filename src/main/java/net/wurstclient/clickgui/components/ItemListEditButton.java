@@ -8,6 +8,7 @@
 package net.wurstclient.clickgui.components;
 
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -123,6 +124,7 @@ public final class ItemListEditButton extends Component
 		String text = setting.getName() + ": " + setting.getItemNames().size();
 		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, txtColor);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override
