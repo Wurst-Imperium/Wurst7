@@ -7,11 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -29,9 +28,13 @@ public final class RestockHack extends Hack implements UpdateListener
 	private ItemListSetting items = new ItemListSetting("Items",
 		"Item(s) to be restocked.", "minecraft:minecart");
 	
+	// TODO: Replace this checkbox with a "Restock Slot" slider. 1-9 correspond
+	// to their slots, while 0 (default) sets the slider to "auto" and behaves
+	// the same as this checkbox.
 	private final CheckboxSetting currentSlot = new CheckboxSetting(
 		"Current slot", "Always restock in the current slot.", false);
 	
+	// TODO: Customizable threshold for repair mode (also needed in AutoTool).
 	private final CheckboxSetting repairMode = new CheckboxSetting(
 		"Tools repair mode", "Swap out tools that are about to break.", false);
 	
@@ -59,38 +62,39 @@ public final class RestockHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		// check screen
-		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof InventoryScreen))
+		// Don't mess with the inventory while it's open.
+		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
 		PlayerInventory inv = MC.player.getInventory();
-		int restockSlot = currentSlot.isChecked() ? inv.selectedSlot : 0;
+		int hotbarSlot = currentSlot.isChecked() ? inv.selectedSlot : 0;
 		for(String itemName : items.getItemNames())
 		{
-			ItemStack restockStack =
-				MC.player.getInventory().getStack(restockSlot);
+			ItemStack hotbarStack =
+				MC.player.getInventory().getStack(hotbarSlot);
 			
 			boolean wrongItem =
-				restockStack.isEmpty() || !itemEqual(itemName, restockStack);
-			if(!wrongItem && restockStack.getCount() >= Math.min(2,
-				restockStack.getMaxCount()))
+				hotbarStack.isEmpty() || !itemEqual(itemName, hotbarStack);
+			// TODO: Add a "Restock Threshold" slider for the number 2 here.
+			// Default should be changed to 1.
+			if(!wrongItem && hotbarStack.getCount() >= Math.min(2,
+				hotbarStack.getMaxCount()))
 				return;
 			
 			List<Integer> searchResult =
-				searchSlotsWithItem(itemName, 0, 36, restockSlot);
+				searchSlotsWithItem(itemName, 0, 36, hotbarSlot);
 			for(int itemIndex : searchResult)
 			{
 				int pickupIndex = itemIndex < 9 ? itemIndex + 36 : itemIndex;
 				IClientPlayerInteractionManager im =
 					IMC.getInteractionManager();
 				im.windowClick_PICKUP(pickupIndex);
-				im.windowClick_PICKUP(restockSlot + 36);
+				im.windowClick_PICKUP(hotbarSlot + 36);
 				
 				if(!MC.player.playerScreenHandler.getCursorStack().isEmpty())
 					im.windowClick_PICKUP(pickupIndex);
 				
-				if(restockStack.getCount() >= restockStack.getMaxCount())
+				if(hotbarStack.getCount() >= hotbarStack.getMaxCount())
 					break;
 			}
 			
@@ -100,7 +104,7 @@ public final class RestockHack extends Hack implements UpdateListener
 			break;
 		}
 		
-		ItemStack restockStack = MC.player.getInventory().getStack(restockSlot);
+		ItemStack restockStack = MC.player.getInventory().getStack(hotbarSlot);
 		if(repairMode.isChecked() && restockStack.isDamageable()
 			&& isTooDamaged(restockStack))
 			for(int i = 36 - 1; i > 9 - 1; i--)
@@ -108,16 +112,10 @@ public final class RestockHack extends Hack implements UpdateListener
 				ItemStack stack = MC.player.getInventory().getStack(i);
 				if(stack.isEmpty() || !stack.isDamageable())
 				{
-					IMC.getInteractionManager().windowClick_SWAP(i,
-						restockSlot);
+					IMC.getInteractionManager().windowClick_SWAP(i, hotbarSlot);
 					break;
 				}
 			}
-	}
-	
-	private boolean isTooDamaged(ItemStack stack)
-	{
-		return stack.getMaxDamage() - stack.getDamage() <= 4;
 	}
 	
 	private boolean itemEqual(String itemName, ItemStack stack)
@@ -125,14 +123,20 @@ public final class RestockHack extends Hack implements UpdateListener
 		if(repairMode.isChecked() && stack.isDamageable()
 			&& isTooDamaged(stack))
 			return false;
+		
 		return Registries.ITEM.getId(stack.getItem()).toString()
 			.equals(itemName);
+	}
+	
+	private boolean isTooDamaged(ItemStack stack)
+	{
+		return stack.getMaxDamage() - stack.getDamage() <= 4;
 	}
 	
 	private List<Integer> searchSlotsWithItem(String itemName, int start,
 		int end, int skip)
 	{
-		List<Integer> slots = new LinkedList<>();
+		List<Integer> slots = new ArrayList<>();
 		
 		for(int i = start; i < end; i++)
 		{
