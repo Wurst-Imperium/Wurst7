@@ -24,9 +24,10 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 public class IngameHudMixin extends DrawableHelper
 {
 	@Inject(
-		at = {@At(value = "INVOKE",
+		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
-			ordinal = 4)},
+			remap = false,
+			ordinal = 4),
 		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;F)V"})
 	private void onRender(MatrixStack matrixStack, float partialTicks,
 		CallbackInfo ci)

@@ -12,21 +12,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -168,14 +168,14 @@ public final class BaseFinderHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		float[] colorF = color.getColorF();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.15F);
 		
 		if(vertexBuffer != null)
 		{
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			vertexBuffer.bind();
 			vertexBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();

@@ -25,9 +25,9 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
@@ -62,28 +62,29 @@ public final class EditItemListScreen extends Screen
 		addSelectableChild(itemNameField);
 		itemNameField.setMaxLength(256);
 		
-		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, Text.literal("Add"), b -> {
+		addDrawableChild(
+			addButton = ButtonWidget.builder(Text.literal("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
-			}));
+			}).dimensions(width / 2 - 2, height - 56, 30, 20).build());
 		
-		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, Text.literal("Remove Selected"),
-			b -> itemList.remove(listGui.selected)));
+		addDrawableChild(removeButton = ButtonWidget
+			.builder(Text.literal("Remove Selected"),
+				b -> itemList.remove(listGui.selected))
+			.dimensions(width / 2 + 52, height - 56, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Reset to Defaults"),
+		addDrawableChild(ButtonWidget.builder(Text.literal("Reset to Defaults"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
 				client.setScreen(EditItemListScreen.this);
 			}, Text.literal("Reset to Defaults"),
-				Text.literal("Are you sure?")))));
+				Text.literal("Are you sure?"))))
+			.dimensions(width - 108, 8, 100, 20).build());
 		
-		addDrawableChild(
-			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				Text.literal("Done"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(doneButton = ButtonWidget
+			.builder(Text.literal("Done"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height - 28, 200, 20).build());
 	}
 	
 	@Override
@@ -269,7 +270,7 @@ public final class EditItemListScreen extends Screen
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registry.ITEM.get(new Identifier(name));
+			Item item = Registries.ITEM.get(new Identifier(name));
 			ItemStack stack = new ItemStack(item);
 			TextRenderer fr = mc.textRenderer;
 			
@@ -277,8 +278,8 @@ public final class EditItemListScreen extends Screen
 				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
-				y + 18, 0xa0a0a0);
+			fr.draw(matrixStack, "ID: " + Registries.ITEM.getRawId(item),
+				x + 28, y + 18, 0xa0a0a0);
 		}
 		
 		private String renderIconAndGetName(MatrixStack matrixStack,

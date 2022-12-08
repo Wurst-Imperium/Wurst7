@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -32,7 +33,6 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -89,9 +89,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		boolean hasHelp = false;// !feature.getHelpPage().isEmpty();
 		if(hasPrimaryAction)
 		{
-			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
-				hasHelp ? 149 : 302, 18, Text.literal(primaryAction), b -> {
-					
+			primaryButton =
+				ButtonWidget.builder(Text.literal(primaryAction), b -> {
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
 					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
@@ -107,7 +106,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
-				});
+				}).dimensions(width / 2 - 151, height - 65, hasHelp ? 149 : 302,
+					18).build();
 			addDrawableChild(primaryButton);
 		}
 		
@@ -374,7 +374,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// window background
 			// left & right
@@ -491,9 +491,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.x;
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.y;
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

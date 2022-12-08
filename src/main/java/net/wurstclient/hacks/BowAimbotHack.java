@@ -13,6 +13,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -34,7 +35,6 @@ import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
@@ -227,7 +227,7 @@ public final class BowAimbotHack extends Hack
 		float v = 1 / velocity;
 		matrixStack.scale(v, v, v);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		float[] colorF = color.getColorF();
 		
 		// draw outline
@@ -278,7 +278,7 @@ public final class BowAimbotHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

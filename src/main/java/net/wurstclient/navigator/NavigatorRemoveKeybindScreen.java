@@ -49,14 +49,16 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	protected void onResize()
 	{
 		// OK button
-		removeButton = new ButtonWidget(width / 2 - 151, height - 65, 149, 18,
-			Text.literal("Remove"), b -> remove());
+		removeButton =
+			ButtonWidget.builder(Text.literal("Remove"), b -> remove())
+				.dimensions(width / 2 - 151, height - 65, 149, 18).build();
 		removeButton.active = !selectedKey.isEmpty();
 		addDrawableChild(removeButton);
 		
 		// cancel button
-		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			Text.literal("Cancel"), b -> client.setScreen(parent)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(parent))
+			.dimensions(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	
 	private void remove()
@@ -212,9 +214,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.x;
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.y;
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

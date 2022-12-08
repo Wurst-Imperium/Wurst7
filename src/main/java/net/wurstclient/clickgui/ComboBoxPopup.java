@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -18,7 +19,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 
@@ -89,7 +89,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			if(value == setting.getSelected())
 				continue;
 			
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			yi1 += 11;
 			int yi2 = yi1 + 11;

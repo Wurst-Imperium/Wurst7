@@ -48,15 +48,17 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
-			Text.literal("Change Key"),
-			b -> client.setScreen(new PressAKeyScreen(this))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Change Key"),
+				b -> client.setScreen(new PressAKeyScreen(this)))
+			.dimensions(width / 2 - 100, 60, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
-			20, Text.literal("Save"), b -> save()));
+		addDrawableChild(ButtonWidget.builder(Text.literal("Save"), b -> save())
+			.dimensions(width / 2 - 100, height / 4 + 72, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
-			20, Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 96, 200, 20).build());
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, Text.literal(""));

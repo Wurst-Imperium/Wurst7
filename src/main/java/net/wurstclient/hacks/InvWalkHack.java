@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -117,8 +117,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		if(!(screen instanceof CreativeInventoryScreen))
 			return false;
 		
-		CreativeInventoryScreen crInvScreen = (CreativeInventoryScreen)screen;
-		return crInvScreen.getSelectedTab() == ItemGroup.SEARCH.getIndex();
+		return CreativeInventoryScreen.selectedTab == ItemGroups.SEARCH;
 	}
 	
 	private boolean hasTextBox(Screen screen)

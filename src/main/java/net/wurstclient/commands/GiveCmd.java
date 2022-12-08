@@ -17,9 +17,9 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -101,7 +101,7 @@ public final class GiveCmd extends Command
 	{
 		try
 		{
-			return Registry.ITEM.get(new Identifier(id));
+			return Registries.ITEM.get(new Identifier(id));
 			
 		}catch(InvalidIdentifierException e)
 		{

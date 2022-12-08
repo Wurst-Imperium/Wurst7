@@ -145,7 +145,8 @@ public final class AutoFishHack extends Hack
 		
 		// check sound type
 		PlaySoundS2CPacket sound = (PlaySoundS2CPacket)event.getPacket();
-		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.equals(sound.getSound()))
+		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH
+			.equals(sound.getSound().value()))
 			return;
 		
 		debugDraw.updateSoundPos(sound);

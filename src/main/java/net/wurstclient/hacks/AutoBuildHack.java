@@ -369,7 +369,7 @@ public final class AutoBuildHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		int blocksDrawn = 0;
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
 			&& blocksDrawn < 1024;)
 		{

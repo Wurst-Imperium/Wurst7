@@ -30,6 +30,8 @@ public abstract class ButtonWidgetMixin extends PressableWidget
 		MinecraftClient client, int mouseX, int mouseY)
 	{
 		int i = getYImage(isHovered());
+		int x = getX();
+		int y = getY();
 		drawTexture(matrixStack, x, y, 0, 46 + i * 20, width / 2, height / 2);
 		drawTexture(matrixStack, x + width / 2, y, 200 - width / 2, 46 + i * 20,
 			width / 2, height / 2);

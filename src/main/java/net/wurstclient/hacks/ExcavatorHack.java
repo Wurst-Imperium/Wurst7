@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -31,7 +32,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -163,7 +163,7 @@ public final class ExcavatorHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// area
 		if(area != null)
@@ -271,7 +271,7 @@ public final class ExcavatorHack extends Hack
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
 			RenderUtils.drawSolidBox(matrixStack);
 			
@@ -352,7 +352,7 @@ public final class ExcavatorHack extends Hack
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);

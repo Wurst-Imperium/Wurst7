@@ -8,9 +8,11 @@
 package net.wurstclient.update;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.wurstclient.WurstClient;
@@ -74,8 +76,12 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 	{
 		try
 		{
-			ArrayList<String> lines =
-				StreamUtils.readAllLines(pack.openRoot("Selected Packs.txt"));
+			InputSupplier<InputStream> supplier =
+				pack.openRoot("Selected Packs.txt");
+			if(supplier == null)
+				return false;
+			
+			ArrayList<String> lines = StreamUtils.readAllLines(supplier.get());
 			
 			return lines.stream()
 				.anyMatch(line -> line.contains("TwinklingStars"));

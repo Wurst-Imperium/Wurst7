@@ -12,9 +12,9 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
@@ -182,7 +182,7 @@ public final class BlockListCmd extends Command
 		
 		try
 		{
-			return Registry.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)

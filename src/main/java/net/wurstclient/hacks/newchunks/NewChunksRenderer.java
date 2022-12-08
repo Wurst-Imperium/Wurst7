@@ -7,16 +7,16 @@
  */
 package net.wurstclient.hacks.newchunks;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RenderUtils;
@@ -71,10 +71,10 @@ public final class NewChunksRenderer
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		Shader shader = RenderSystem.getShader();
+		ShaderProgram shader = RenderSystem.getShader();
 		
 		float alpha = opacity.getValueF();
 		float[] newColorF = newChunksColor.getColorF();

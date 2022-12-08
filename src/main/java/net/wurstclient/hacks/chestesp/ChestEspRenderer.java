@@ -10,18 +10,19 @@ package net.wurstclient.hacks.chestesp;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -64,7 +65,7 @@ public final class ChestEspRenderer
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			solidBox.bind();

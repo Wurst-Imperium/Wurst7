@@ -41,34 +41,37 @@ public final class KeybindManagerScreen extends Screen
 	{
 		listGui = new ListGui(client, width, height, 36, height - 56, 30);
 		
-		addDrawableChild(addButton = new ButtonWidget(width / 2 - 102,
-			height - 52, 100, 20, Text.literal("Add"),
-			b -> client.setScreen(new KeybindEditorScreen(this))));
-		
-		addDrawableChild(editButton = new ButtonWidget(width / 2 + 2,
-			height - 52, 100, 20, Text.literal("Edit"), b -> edit()));
-		
-		addDrawableChild(removeButton = new ButtonWidget(width / 2 - 102,
-			height - 28, 100, 20, Text.literal("Remove"), b -> remove()));
+		addDrawableChild(addButton = ButtonWidget
+			.builder(Text.literal("Add"),
+				b -> client.setScreen(new KeybindEditorScreen(this)))
+			.dimensions(width / 2 - 102, height - 52, 100, 20).build());
 		
 		addDrawableChild(
-			backButton = new ButtonWidget(width / 2 + 2, height - 28, 100, 20,
-				Text.literal("Back"), b -> client.setScreen(prevScreen)));
+			editButton = ButtonWidget.builder(Text.literal("Edit"), b -> edit())
+				.dimensions(width / 2 + 2, height - 52, 100, 20).build());
 		
-		addDrawableChild(
-			new ButtonWidget(8, 8, 100, 20, Text.literal("Reset Keybinds"),
-				b -> client.setScreen(new ConfirmScreen(confirmed -> {
-					if(confirmed)
-						WurstClient.INSTANCE.getKeybinds()
-							.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-					client.setScreen(this);
-				}, Text
-					.literal("Are you sure you want to reset your keybinds?"),
-					Text.literal("This cannot be undone!")))));
+		addDrawableChild(removeButton =
+			ButtonWidget.builder(Text.literal("Remove"), b -> remove())
+				.dimensions(width / 2 - 102, height - 28, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Profiles..."),
-			b -> client.setScreen(new KeybindProfilesScreen(this))));
+		addDrawableChild(backButton = ButtonWidget
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 + 2, height - 28, 100, 20).build());
+		
+		addDrawableChild(ButtonWidget.builder(Text.literal("Reset Keybinds"),
+			b -> client.setScreen(new ConfirmScreen(confirmed -> {
+				if(confirmed)
+					WurstClient.INSTANCE.getKeybinds()
+						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
+				client.setScreen(this);
+			}, Text.literal("Are you sure you want to reset your keybinds?"),
+				Text.literal("This cannot be undone!"))))
+			.dimensions(8, 8, 100, 20).build());
+		
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Profiles..."),
+				b -> client.setScreen(new KeybindProfilesScreen(this)))
+			.dimensions(width - 108, 8, 100, 20).build());
 	}
 	
 	private void edit()

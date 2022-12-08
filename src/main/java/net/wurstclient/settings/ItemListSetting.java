@@ -19,8 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ItemListEditButton;
@@ -39,9 +39,9 @@ public final class ItemListSetting extends Setting
 		super(name, description);
 		
 		Arrays.stream(items).parallel()
-			.map(s -> Registry.ITEM.get(new Identifier(s)))
+			.map(s -> Registries.ITEM.get(new Identifier(s)))
 			.filter(Objects::nonNull)
-			.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted()
+			.map(i -> Registries.ITEM.getId(i).toString()).distinct().sorted()
 			.forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
 	}
@@ -53,7 +53,7 @@ public final class ItemListSetting extends Setting
 	
 	public void add(Item item)
 	{
-		String name = Registry.ITEM.getId(item).toString();
+		String name = Registries.ITEM.getId(item).toString();
 		if(Collections.binarySearch(itemNames, name) >= 0)
 			return;
 		
@@ -93,10 +93,10 @@ public final class ItemListSetting extends Setting
 			itemNames.clear();
 			
 			wson.getAllStrings().parallelStream()
-				.map(s -> Registry.ITEM.get(new Identifier(s)))
+				.map(s -> Registries.ITEM.get(new Identifier(s)))
 				.filter(Objects::nonNull)
-				.map(i -> Registry.ITEM.getId(i).toString()).distinct().sorted()
-				.forEachOrdered(s -> itemNames.add(s));
+				.map(i -> Registries.ITEM.getId(i).toString()).distinct()
+				.sorted().forEachOrdered(s -> itemNames.add(s));
 			
 		}catch(JsonException e)
 		{

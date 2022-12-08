@@ -8,6 +8,7 @@
 package net.wurstclient.navigator;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -70,7 +71,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					choosingKey = true;
 					okButton.active = false;
 				}
-			})
+			}, Supplier::get)
 		{
 			@Override
 			public boolean keyPressed(int keyCode, int scanCode, int modifiers)
@@ -83,8 +84,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		addDrawableChild(okButton);
 		
 		// cancel button
-		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 65, 149, 18,
-			Text.literal("Cancel"), b -> WurstClient.MC.setScreen(parent)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"),
+				b -> WurstClient.MC.setScreen(parent))
+			.dimensions(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	
 	@Override
@@ -240,9 +243,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.x;
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.y;
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

@@ -21,17 +21,18 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -43,7 +44,6 @@ import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketInputListener;
@@ -228,13 +228,13 @@ public final class SearchHack extends Hack
 		float[] rainbow = RenderUtils.getRainbowColor();
 		RenderSystem.setShaderColor(rainbow[0], rainbow[1], rainbow[2], 0.5F);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(vertexBuffer != null)
 		{
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			vertexBuffer.bind();
 			vertexBuffer.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
