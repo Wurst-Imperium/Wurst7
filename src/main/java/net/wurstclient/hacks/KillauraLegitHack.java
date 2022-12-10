@@ -22,8 +22,6 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -40,7 +38,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
-import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -146,14 +143,9 @@ public final class KillauraLegitHack extends Hack
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity
-					|| e instanceof ShulkerBulletEntity)
+				.filter(e -> e.isAttackable() && e.isAlive())
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		if(fov.getValue() < 360.0)

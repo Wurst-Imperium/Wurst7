@@ -74,4 +74,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(),
 			getPitch());
 	}
+
+	public boolean isAttackable(){
+		return false;
+	}
 }
