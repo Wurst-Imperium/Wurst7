@@ -25,6 +25,7 @@
   "mixins": [
     "wurst.mixins.json"
   ],
+  "accessWidener" : "wurst.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.12.12",
@@ -32,7 +33,7 @@
     "minecraft": ">=1.16.2"
   },
   "suggests": {
-    "flamingo": "*"
+    "mo_glass": "*"
   },
   "breaks": {
     "wi_zoom": "*",

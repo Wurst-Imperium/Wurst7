@@ -33,6 +33,9 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 	@Inject(at = {@At("TAIL")}, method = {"createButtons()V"})
 	private void onCreateButtons(CallbackInfo ci)
 	{
+		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
+			return;
+		
 		ButtonWidget toggleWurstButton = new ButtonWidget(width / 2 - 152,
 			height - 28, 150, 20, new LiteralText(""), this::toggleWurst);
 		

@@ -286,10 +286,10 @@ public final class AutoFarmHack extends Hack
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
 		if(block instanceof NetherWartBlock)
 			return state.get(NetherWartBlock.AGE) >= 3;
-		else if(block instanceof BambooBlock)
+		if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
-		else if(block instanceof CocoaBlock)
+		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;

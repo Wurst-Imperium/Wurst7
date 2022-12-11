@@ -7,10 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.awt.Color;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -20,22 +16,17 @@ import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.mixinterface.IFishingBobberEntity;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"FishBot", "auto fish", "fish bot", "fishing"})
 public final class AutoFishHack extends Hack
@@ -46,23 +37,14 @@ public final class AutoFishHack extends Hack
 			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
-	private CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring and where they will be detected. Useful for optimizing your 'Valid range' setting.",
-		false);
-	
-	private final ColorSetting ddColor = new ColorSetting("DD color",
-		"Color of the debug draw, if enabled.", Color.RED);
-	
 	private int bestRodValue;
 	private int bestRodSlot;
 	
 	private int castRodTimer;
 	private int reelInTimer;
 	private int scheduledWindowClick;
-	private Vec3d lastSoundPos;
 	
-	private int validRangeBox;
-	private int biteCross;
+	private final AutoFishDebugDraw debugDraw = new AutoFishDebugDraw();
 	
 	private boolean wasOpenWater;
 	
@@ -72,8 +54,7 @@ public final class AutoFishHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(validRange);
-		addSetting(debugDraw);
-		addSetting(ddColor);
+		debugDraw.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
@@ -84,20 +65,8 @@ public final class AutoFishHack extends Hack
 		castRodTimer = 0;
 		reelInTimer = -1;
 		scheduledWindowClick = -1;
-		lastSoundPos = null;
+		debugDraw.reset();
 		wasOpenWater = true;
-		
-		validRangeBox = GL11.glGenLists(1);
-		
-		biteCross = GL11.glGenLists(1);
-		GL11.glNewList(biteCross, GL11.GL_COMPILE);
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3d(-0.125, 0, -0.125);
-		GL11.glVertex3d(0.125, 0, 0.125);
-		GL11.glVertex3d(0.125, 0, -0.125);
-		GL11.glVertex3d(-0.125, 0, 0.125);
-		GL11.glEnd();
-		GL11.glEndList();
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
@@ -110,15 +79,12 @@ public final class AutoFishHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		GL11.glDeleteLists(validRangeBox, 1);
-		GL11.glDeleteLists(biteCross, 1);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		updateDebugDraw();
+		debugDraw.updateValidRange(validRange.getValue());
 		
 		if(reelInTimer > 0)
 			reelInTimer--;
@@ -130,6 +96,7 @@ public final class AutoFishHack extends Hack
 		{
 			IMC.getInteractionManager()
 				.windowClick_PICKUP(scheduledWindowClick);
+			scheduledWindowClick = -1;
 			castRodTimer = 15;
 			return;
 		}
@@ -170,19 +137,6 @@ public final class AutoFishHack extends Hack
 			reelInTimer--;
 			rightClick();
 			castRodTimer = 15;
-		}
-	}
-	
-	private void updateDebugDraw()
-	{
-		if(debugDraw.isChecked())
-		{
-			GL11.glNewList(validRangeBox, GL11.GL_COMPILE);
-			Box box = new Box(-validRange.getValue(), -1 / 16.0,
-				-validRange.getValue(), validRange.getValue(), 1 / 16.0,
-				validRange.getValue());
-			RenderUtils.drawOutlinedBox(box);
-			GL11.glEndList();
 		}
 	}
 	
@@ -273,8 +227,7 @@ public final class AutoFishHack extends Hack
 		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.equals(sound.getSound()))
 			return;
 		
-		if(debugDraw.isChecked())
-			lastSoundPos = new Vec3d(sound.getX(), sound.getY(), sound.getZ());
+		debugDraw.updateSoundPos(sound);
 		
 		// check position
 		FishingBobberEntity bobber = player.fishHook;
@@ -300,6 +253,12 @@ public final class AutoFishHack extends Hack
 		wasOpenWater = isOpenWater;
 	}
 	
+	private boolean isInOpenWater(FishingBobberEntity bobber)
+	{
+		return ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
+	}
+	
 	private void rightClick()
 	{
 		// check held item
@@ -314,71 +273,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
-		if(!debugDraw.isChecked())
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		FishingBobberEntity bobber = MC.player.fishHook;
-		if(bobber != null)
-			drawValidRange(bobber, regionX, regionZ);
-		
-		drawLastBite(regionX, regionZ);
-		
-		GL11.glPopMatrix();
-		
-		// GL resets
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private void drawValidRange(FishingBobberEntity bobber, int regionX,
-		int regionZ)
-	{
-		float[] colorF = ddColor.getColorF();
-		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
-		GL11.glPushMatrix();
-		GL11.glTranslated(bobber.getX() - regionX, bobber.getY(),
-			bobber.getZ() - regionZ);
-		GL11.glCallList(validRangeBox);
-		GL11.glPopMatrix();
-	}
-	
-	private void drawLastBite(int regionX, int regionZ)
-	{
-		if(lastSoundPos != null)
-		{
-			float[] colorF = ddColor.getColorF();
-			GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
-			GL11.glPushMatrix();
-			GL11.glTranslated(lastSoundPos.x - regionX, lastSoundPos.y,
-				lastSoundPos.z - regionZ);
-			GL11.glCallList(biteCross);
-			GL11.glPopMatrix();
-		}
-	}
-	
-	private boolean isInOpenWater(FishingBobberEntity bobber)
-	{
-		return ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
+		debugDraw.render(partialTicks);
 	}
 }

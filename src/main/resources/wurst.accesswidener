@@ -1,0 +1,3 @@
+accessWidener	v1	named
+accessible	field	net/minecraft/client/gl/VertexBuffer	vertexCount	I
+accessible	field	net/minecraft/client/render/BufferBuilder	drawMode	I

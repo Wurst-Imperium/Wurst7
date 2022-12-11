@@ -31,7 +31,7 @@ public abstract class FluidBlockMixin extends Block implements FluidDrainable
 	{
 		super(settings);
 	}
-
+	
 	@Inject(method = "getCollisionShape",
 		at = @At(value = "HEAD"),
 		cancellable = true)
