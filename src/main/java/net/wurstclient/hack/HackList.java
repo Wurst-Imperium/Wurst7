@@ -28,10 +28,12 @@ import net.wurstclient.util.json.JsonException;
 
 public final class HackList implements UpdateListener
 {
+	public final AirPlaceHack airPlaceHack = new AirPlaceHack();
 	public final AnchorAuraHack anchorAuraHack = new AnchorAuraHack();
 	public final AntiAfkHack antiAfkHack = new AntiAfkHack();
 	public final AntiBlindHack antiBlindHack = new AntiBlindHack();
 	public final AntiCactusHack antiCactusHack = new AntiCactusHack();
+	public final AntiHungerHack antiHungerHack = new AntiHungerHack();
 	public final AntiKnockbackHack antiKnockbackHack = new AntiKnockbackHack();
 	public final AntiSpamHack antiSpamHack = new AntiSpamHack();
 	public final AntiWaterPushHack antiWaterPushHack = new AntiWaterPushHack();
@@ -65,6 +67,8 @@ public final class HackList implements UpdateListener
 	public final BowAimbotHack bowAimbotHack = new BowAimbotHack();
 	public final BuildRandomHack buildRandomHack = new BuildRandomHack();
 	public final BunnyHopHack bunnyHopHack = new BunnyHopHack();
+	public final CameraDistanceHack cameraDistanceHack =
+		new CameraDistanceHack();
 	public final CameraNoClipHack cameraNoClipHack = new CameraNoClipHack();
 	public final CaveFinderHack caveFinderHack = new CaveFinderHack();
 	public final ChatTranslatorHack chatTranslatorHack =
