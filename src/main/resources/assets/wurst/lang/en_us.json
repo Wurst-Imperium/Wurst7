@@ -42,7 +42,7 @@
   "description.wurst.hack.autowalk": "Makes you walk automatically.",
   "description.wurst.hack.basefinder": "Finds player bases by searching for man-made blocks.\nThe blocks that it finds will be highlighted in the selected color.\nGood for finding faction bases.",
   "description.wurst.hack.blink": "Suspends all motion updates while enabled.",
-  "description.wurst.hack.boatfly": "Allows you to fly with boats.",
+  "description.wurst.hack.boatfly": "Allows you to fly with boats and other vehicles.\nPress the sprint key to go down faster.",
   "description.wurst.hack.bonemealaura": "Automatically uses bone meal on specific types of plants.\nUse the checkboxes to specify the types of plants.",
   "description.wurst.hack.bowaimbot": "Automatically aims your bow or crossbow.",
   "description.wurst.hack.buildrandom": "Randomly places blocks around you.",

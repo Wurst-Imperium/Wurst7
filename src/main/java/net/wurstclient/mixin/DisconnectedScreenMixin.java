@@ -65,8 +65,11 @@ public class DisconnectedScreenMixin extends Screen
 			addButton(new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
 				new LiteralText("AutoReconnect"), b -> pressAutoReconnect()));
 		
-		if(WurstClient.INSTANCE.getHax().autoReconnectHack.isEnabled())
-			autoReconnectTimer = 100;
+		AutoReconnectHack autoReconnect =
+			WurstClient.INSTANCE.getHax().autoReconnectHack;
+		
+		if(autoReconnect.isEnabled())
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	private void pressAutoReconnect()
@@ -77,7 +80,7 @@ public class DisconnectedScreenMixin extends Screen
 		autoReconnect.setEnabled(!autoReconnect.isEnabled());
 		
 		if(autoReconnect.isEnabled())
-			autoReconnectTimer = 100;
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	@Override
