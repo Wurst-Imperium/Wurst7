@@ -9,7 +9,6 @@ package net.wurstclient.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
@@ -27,19 +26,16 @@ public enum BlockVertexCompiler
 {
 	;
 	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks)
+	public static ArrayList<int[]> compile(HashSet<BlockPos> blocks)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks))
+		return blocks.parallelStream().flatMap(pos -> getVertices(pos, blocks))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks, int regionX, int regionZ)
+	public static ArrayList<int[]> compile(HashSet<BlockPos> blocks,
+		int regionX, int regionZ)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks))
+		return blocks.parallelStream().flatMap(pos -> getVertices(pos, blocks))
 			.map(v -> applyRegionOffset(v, regionX, regionZ))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
