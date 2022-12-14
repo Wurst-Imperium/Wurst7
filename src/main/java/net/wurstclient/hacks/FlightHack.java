@@ -94,8 +94,10 @@ public final class FlightHack extends Hack
 		
 		if(MC.options.sneakKey.isPressed())
 		{
-			player.airStrafingSpeed =
-				Math.min(horizontalSpeed.getValueF(), 0.85F);
+			if(slowSneaking.isChecked())
+				player.airStrafingSpeed =
+					Math.min(horizontalSpeed.getValueF(), 0.85F);
+			
 			player.setVelocity(velocity.x, -verticalSpeed.getValue(),
 				velocity.z);
 		}
