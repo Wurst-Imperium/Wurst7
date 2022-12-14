@@ -45,6 +45,12 @@ public final class FlightHack extends Hack
 				+ "Most servers will kick you after 80 ticks.",
 			30, 5, 80, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
+	private final SliderSetting antiKickDistance = new SliderSetting(
+		"Anti-Kick Distance",
+		"How far Anti-Kick should make you fall.\n"
+			+ "Most servers require at least 0.032m to stop you from getting kicked.",
+		0.07, 0.01, 0.2, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
+	
 	private int tickCounter = 0;
 	
 	public FlightHack()
@@ -56,6 +62,7 @@ public final class FlightHack extends Hack
 		addSetting(slowSneaking);
 		addSetting(antiKick);
 		addSetting(antiKickInterval);
+		addSetting(antiKickDistance);
 	}
 	
 	@Override
@@ -118,10 +125,12 @@ public final class FlightHack extends Hack
 				if(MC.options.sneakKey.isPressed())
 					tickCounter = 2;
 				else
-					MC.player.setVelocity(velocity.x, -0.07, velocity.z);
+					MC.player.setVelocity(velocity.x,
+						-antiKickDistance.getValue(), velocity.z);
 			}
 			
-			case 1 -> MC.player.setVelocity(velocity.x, 0.07, velocity.z);
+			case 1 -> MC.player.setVelocity(velocity.x,
+				antiKickDistance.getValue(), velocity.z);
 		}
 		
 		tickCounter++;
