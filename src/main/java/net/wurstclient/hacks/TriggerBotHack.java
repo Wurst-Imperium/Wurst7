@@ -85,6 +85,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			return;
 		
 		ClientPlayerEntity player = MC.player;
+		if(player.isUsingItem())
+			return;
 		
 		if(MC.crosshairTarget == null
 			|| !(MC.crosshairTarget instanceof EntityHitResult))
