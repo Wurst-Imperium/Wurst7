@@ -185,5 +185,6 @@
   "button.wurst.nochatreports.signatures_status": "签名: ",
   "description.wurst.nochatreports.message_is_reportable": "此消息有一个有效的签名，因此容易受到欺诈性聊天报告的伤害。",
   "gui.wurst.generic.allcaps_blocked": "黑名单",
-  "gui.wurst.generic.allcaps_allowed": "已允许"
+  "gui.wurst.generic.allcaps_allowed": "已允许",
+  "key.wurst.zoom": "缩放键"
 }

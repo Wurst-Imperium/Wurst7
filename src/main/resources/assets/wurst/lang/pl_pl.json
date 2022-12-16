@@ -181,5 +181,6 @@
   "button.wurst.nochatreports.signatures_status": "Sygnatury: ",
   "description.wurst.nochatreports.message_is_reportable": "Ta wiadomość ma prawidłową sygnaturę, przez co jest podatna na fałszywe zgłoszenia.",
   "gui.wurst.generic.allcaps_blocked": "ZABLOKOWANE",
-  "gui.wurst.generic.allcaps_allowed": "DOZWOLONE"
+  "gui.wurst.generic.allcaps_allowed": "DOZWOLONE",
+  "key.wurst.zoom": "Klawisz powiększenia"
 }

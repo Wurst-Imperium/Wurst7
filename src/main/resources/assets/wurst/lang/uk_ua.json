@@ -181,5 +181,6 @@
   "button.wurst.nochatreports.signatures_status": "Підписи: ",
   "description.wurst.nochatreports.message_is_reportable": "Це повідомлення має дійсний підпис і тому вразливе для шахрайських звітів чату.",
   "gui.wurst.generic.allcaps_blocked": "ЗАБЛОКОВАНО",
-  "gui.wurst.generic.allcaps_allowed": "ДОЗВОЛЕНО"
+  "gui.wurst.generic.allcaps_allowed": "ДОЗВОЛЕНО",
+  "key.wurst.zoom": "Клавіша масштабування"
 }

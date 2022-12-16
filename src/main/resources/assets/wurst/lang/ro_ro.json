@@ -176,5 +176,6 @@
   "button.wurst.nochatreports.signatures_status": "Semnături: ",
   "description.wurst.nochatreports.message_is_reportable": "Acest mesaj are o semnătura valida si prin urmare este vulnerabil la rapoarte de chat.",
   "gui.wurst.generic.allcaps_blocked": "BLOCAT",
-  "gui.wurst.generic.allcaps_allowed": "PERMIS"
+  "gui.wurst.generic.allcaps_allowed": "PERMIS",
+  "key.wurst.zoom": "Tasta Zoom"
 }
