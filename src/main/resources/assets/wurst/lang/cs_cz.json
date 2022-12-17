@@ -171,5 +171,6 @@
   "gui.wurst.nochatreports.ncr_mod_server.title": "Server \"No Chat Reports\"",
   "button.wurst.nochatreports.signatures_status": "Podpisy: ",
   "gui.wurst.generic.allcaps_blocked": "BLOKOVÁNO",
-  "gui.wurst.generic.allcaps_allowed": "POVOLENO"
+  "gui.wurst.generic.allcaps_allowed": "POVOLENO",
+  "key.wurst.zoom": "Tlačítko Zoom"
 }

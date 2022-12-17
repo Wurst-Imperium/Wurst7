@@ -182,5 +182,6 @@
   "button.wurst.nochatreports.signatures_status": "Firme: ",
   "description.wurst.nochatreports.message_is_reportable": "Questo messaggio ha una firma valida ed è quindi vulnerabile ai chat reports.",
   "gui.wurst.generic.allcaps_blocked": "BLOCCATO",
-  "gui.wurst.generic.allcaps_allowed": "PERMESSO"
+  "gui.wurst.generic.allcaps_allowed": "PERMESSO",
+  "key.wurst.zoom": "Tasto Zoom"
 }

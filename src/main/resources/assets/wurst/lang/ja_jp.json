@@ -181,5 +181,6 @@
   "button.wurst.nochatreports.signatures_status": "署名: ",
   "description.wurst.nochatreports.message_is_reportable": "このメッセージには有効な署名があるため、不正なチャット レポートに対して脆弱です。",
   "gui.wurst.generic.allcaps_blocked": "ブロックされました",
-  "gui.wurst.generic.allcaps_allowed": "許可された"
+  "gui.wurst.generic.allcaps_allowed": "許可された",
+  "key.wurst.zoom": "ズームキー"
 }
