@@ -146,6 +146,8 @@ public final class AutoToolHack extends Hack
 		
 		BlockState state = BlockUtils.getState(pos);
 		float bestSpeed = getMiningSpeed(heldItem, state);
+		if(isTooDamaged(heldItem))
+			bestSpeed = 1;
 		int bestSlot = -1;
 		
 		for(int slot = 0; slot < 9; slot++)
