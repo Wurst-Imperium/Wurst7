@@ -21,6 +21,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"restock", "AutoRestock", "auto-restock", "auto restock"})
 public final class RestockHack extends Hack implements UpdateListener
@@ -34,9 +36,11 @@ public final class RestockHack extends Hack implements UpdateListener
 	private final CheckboxSetting currentSlot = new CheckboxSetting(
 		"Current slot", "Always restock in the current slot.", false);
 	
-	// TODO: Customizable threshold for repair mode (also needed in AutoTool).
-	private final CheckboxSetting repairMode = new CheckboxSetting(
-		"Tools repair mode", "Swap out tools that are about to break.", false);
+	private final SliderSetting repairMode = new SliderSetting(
+		"Tools repair mode",
+		"Swaps out tools when their durability reaches the given threshold, so you can repair them before they break.\n"
+			+ "Can be adjusted from 0 (off) to 100.",
+		0, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	public RestockHack()
 	{
@@ -105,7 +109,7 @@ public final class RestockHack extends Hack implements UpdateListener
 		}
 		
 		ItemStack restockStack = MC.player.getInventory().getStack(hotbarSlot);
-		if(repairMode.isChecked() && restockStack.isDamageable()
+		if(repairMode.getValueI() > 0 && restockStack.isDamageable()
 			&& isTooDamaged(restockStack))
 			for(int i = 36 - 1; i > 9 - 1; i--)
 			{
@@ -120,7 +124,7 @@ public final class RestockHack extends Hack implements UpdateListener
 	
 	private boolean itemEqual(String itemName, ItemStack stack)
 	{
-		if(repairMode.isChecked() && stack.isDamageable()
+		if(repairMode.getValueI() > 0 && stack.isDamageable()
 			&& isTooDamaged(stack))
 			return false;
 		
@@ -130,7 +134,8 @@ public final class RestockHack extends Hack implements UpdateListener
 	
 	private boolean isTooDamaged(ItemStack stack)
 	{
-		return stack.getMaxDamage() - stack.getDamage() <= 4;
+		return stack.getMaxDamage() - stack.getDamage() <= repairMode
+			.getValueI();
 	}
 	
 	private List<Integer> searchSlotsWithItem(String itemName, int start,
