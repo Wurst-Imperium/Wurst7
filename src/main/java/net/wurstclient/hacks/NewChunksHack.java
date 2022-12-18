@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -25,6 +24,7 @@ import net.wurstclient.hacks.newchunks.NewChunksChunkRenderer;
 import net.wurstclient.hacks.newchunks.NewChunksReasonsRenderer;
 import net.wurstclient.hacks.newchunks.NewChunksRenderer;
 import net.wurstclient.hacks.newchunks.NewChunksShowSetting;
+import net.wurstclient.hacks.newchunks.NewChunksShowSetting.Show;
 import net.wurstclient.hacks.newchunks.NewChunksStyleSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
@@ -138,35 +138,27 @@ public final class NewChunksHack extends Hack
 	{
 		renderer.closeBuffers();
 		
+		Show showSetting = show.getSelected();
+		int dd = drawDistance.getValueI();
 		NewChunksChunkRenderer chunkRenderer =
 			style.getSelected().getChunkRenderer();
 		
-		if(show.getSelected().includesNew())
+		if(showSetting.includesNew())
 		{
-			BufferBuilder newChunksBuffer =
-				chunkRenderer.buildBuffer(newChunks, drawDistance.getValueI());
-			renderer.updateBuffer(0, newChunksBuffer);
+			renderer.updateBuffer(0, chunkRenderer.buildBuffer(newChunks, dd));
 			
 			if(showReasons.isChecked())
-			{
-				BufferBuilder newReasonsBuffer =
-					reasonsRenderer.buildBuffer(newChunkReasons);
-				renderer.updateBuffer(1, newReasonsBuffer);
-			}
+				renderer.updateBuffer(1,
+					reasonsRenderer.buildBuffer(newChunkReasons));
 		}
 		
-		if(show.getSelected().includesOld())
+		if(showSetting.includesOld())
 		{
-			BufferBuilder oldChunksBuffer =
-				chunkRenderer.buildBuffer(oldChunks, drawDistance.getValueI());
-			renderer.updateBuffer(2, oldChunksBuffer);
+			renderer.updateBuffer(2, chunkRenderer.buildBuffer(oldChunks, dd));
 			
 			if(showReasons.isChecked())
-			{
-				BufferBuilder oldReasonsBuffer =
-					reasonsRenderer.buildBuffer(oldChunkReasons);
-				renderer.updateBuffer(3, oldReasonsBuffer);
-			}
+				renderer.updateBuffer(3,
+					reasonsRenderer.buildBuffer(oldChunkReasons));
 		}
 	}
 	

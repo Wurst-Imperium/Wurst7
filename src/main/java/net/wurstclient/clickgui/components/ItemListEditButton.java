@@ -108,6 +108,7 @@ public final class ItemListEditButton extends Component
 		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		fr.draw(matrixStack, "Edit...", x3 + 2, y1 + 2, txtColor);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override

@@ -18,6 +18,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -148,7 +149,8 @@ public final class KillauraHack extends Hack
 				.filter(e -> !e.removed)
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity)
+					|| e instanceof EndCrystalEntity
+					|| e instanceof ShulkerBulletEntity)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
@@ -230,15 +232,20 @@ public final class KillauraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(
-			renderTarget.prevX
-				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
-				- regionX,
-			renderTarget.prevY
-				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
-			renderTarget.prevZ
-				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
-				- regionZ);
+		if(renderTarget.isAlive())
+			GL11.glTranslated(
+				renderTarget.prevX
+					+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
+					- regionX,
+				renderTarget.prevY
+					+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
+				renderTarget.prevZ
+					+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
+					- regionZ);
+		else
+			GL11.glTranslated(renderTarget.getX() - regionX,
+				renderTarget.getY(), renderTarget.getZ() - regionZ);
+		
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());

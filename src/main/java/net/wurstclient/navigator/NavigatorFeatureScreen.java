@@ -71,8 +71,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				window.add(c);
 		}
 		
-		window.pack();
 		window.setWidth(308);
+		window.setFixedWidth(true);
+		window.pack();
 	}
 	
 	@Override

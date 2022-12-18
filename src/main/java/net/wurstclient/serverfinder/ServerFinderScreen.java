@@ -51,9 +51,8 @@ public class ServerFinderScreen extends Screen
 				new LiteralText("Search"), b -> searchOrCancel()));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200,
-			20, new LiteralText("Tutorial"),
-			b -> Util.getOperatingSystem().open(
-				"https://www.wurstclient.net/wiki/Special_Features/Server_Finder/")));
+			20, new LiteralText("Tutorial"), b -> Util.getOperatingSystem()
+				.open("https://www.wurstclient.net/serverfinder-tutorial/")));
 		
 		addButton(new ButtonWidget(width / 2 - 100, height / 4 + 144 + 12, 200,
 			20, new LiteralText("Back"), b -> client.openScreen(prevScreen)));

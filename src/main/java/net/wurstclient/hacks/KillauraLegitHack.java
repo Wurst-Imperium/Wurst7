@@ -19,6 +19,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -79,6 +80,7 @@ public final class KillauraLegitHack extends Hack
 			FilterGolemsSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
+			FilterShulkerBulletSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
 			FilterCrystalsSetting.genericCombat(false));
 	
@@ -143,7 +145,8 @@ public final class KillauraLegitHack extends Hack
 				.filter(e -> !e.removed)
 				.filter(e -> e instanceof LivingEntity
 					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity)
+					|| e instanceof EndCrystalEntity
+					|| e instanceof ShulkerBulletEntity)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
@@ -244,12 +247,17 @@ public final class KillauraLegitHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		GL11.glTranslated(
-			target.prevX + (target.getX() - target.prevX) * partialTicks
-				- regionX,
-			target.prevY + (target.getY() - target.prevY) * partialTicks,
-			target.prevZ + (target.getZ() - target.prevZ) * partialTicks
-				- regionZ);
+		if(target.isAlive())
+			GL11.glTranslated(
+				target.prevX + (target.getX() - target.prevX) * partialTicks
+					- regionX,
+				target.prevY + (target.getY() - target.prevY) * partialTicks,
+				target.prevZ + (target.getZ() - target.prevZ) * partialTicks
+					- regionZ);
+		else
+			GL11.glTranslated(target.getX() - regionX, target.getY(),
+				target.getZ() - regionZ);
+		
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(target.getWidth(), target.getHeight(), target.getWidth());
 		GL11.glTranslated(-0.5, 0, -0.5);

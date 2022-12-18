@@ -33,6 +33,7 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
+import net.wurstclient.events.IsPlayerInLavaListener.IsPlayerInLavaEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
@@ -178,6 +179,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		EventManager.fire(event);
 		
 		return event.isInWater();
+	}
+	
+	@Override
+	public boolean isInLava()
+	{
+		boolean inLava = super.isInLava();
+		IsPlayerInLavaEvent event = new IsPlayerInLavaEvent(inLava);
+		EventManager.fire(event);
+		
+		return event.isInLava();
+	}
+	
+	@Override
+	public boolean isSpectator()
+	{
+		return super.isSpectator()
+			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
 	}
 	
 	@Override

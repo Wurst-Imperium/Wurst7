@@ -118,21 +118,22 @@ public class WurstOptionsScreen extends Screen
 		OperatingSystem os = Util.getOperatingSystem();
 		
 		new WurstOptionsButton(54, 24, () -> "Official Website",
-			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
+			"WurstClient.net", b -> os.open(
+				"https://www.wurstclient.net/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Official+Website"));
 		
-		new WurstOptionsButton(54, 48, () -> "Wurst Wiki",
-			"Wiki.WurstClient.net",
-			b -> os.open("https://wiki.wurstclient.net/"));
+		new WurstOptionsButton(54, 48, () -> "Wurst Wiki", "Wurst.Wiki",
+			b -> os.open(
+				"https://wurst.wiki/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Wurst+Wiki"));
 		
 		new WurstOptionsButton(54, 72, () -> "Twitter", "@Wurst_Imperium",
-			b -> os.open("https://twitter.com/Wurst_Imperium"));
+			b -> os.open("https://www.wurstclient.net/twitter/"));
 		
 		new WurstOptionsButton(54, 96, () -> "Reddit", "r/WurstClient",
-			b -> os.open("https://www.reddit.com/r/WurstClient/"));
+			b -> os.open("https://www.wurstclient.net/reddit/"));
 		
 		new WurstOptionsButton(54, 120, () -> "Donate",
-			"paypal.me/WurstImperium",
-			b -> os.open("https://www.wurstclient.net/donate/"));
+			"WurstClient.net/donate", b -> os.open(
+				"https://www.wurstclient.net/donate/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Donate"));
 	}
 	
 	@Override
