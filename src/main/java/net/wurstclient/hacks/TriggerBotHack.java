@@ -36,9 +36,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
-
-	private final CheckboxSetting attackWhileBlocking =
-		new CheckboxSetting("Attack while blocking", "Whether to attack while blocking with a shield / using items.", false);
+	
+	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
+		"Attack while blocking",
+		"Whether or not to attack while blocking with a shield / using items.",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
