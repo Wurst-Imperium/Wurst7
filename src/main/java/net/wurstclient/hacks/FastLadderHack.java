@@ -13,14 +13,25 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"FastClimb", "fast ladder", "fast climb"})
 public final class FastLadderHack extends Hack implements UpdateListener
 {
+	private final SliderSetting speed = new SliderSetting("Speed",
+				"Determines how fast you will climb.",
+					2.44, 0, 5, 0.01, SliderSetting.ValueDisplay.PERCENTAGE);
+
+	private final CheckboxSetting slowonsneak = new CheckboxSetting("Slow down when sneaking",
+			"Doesn't speed your climbing up when sneaking", true);
+
 	public FastLadderHack()
 	{
 		super("FastLadder");
 		setCategory(Category.MOVEMENT);
+		addSetting(speed);
+		addSetting(slowonsneak);
 	}
 	
 	@Override
@@ -40,14 +51,16 @@ public final class FastLadderHack extends Hack implements UpdateListener
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		if(!player.isClimbing() || !player.horizontalCollision)
+		if(!player.isClimbing())
 			return;
-		
-		if(player.input.movementForward == 0
-			&& player.input.movementSideways == 0)
+
+		if(player.input.sneaking && slowonsneak.isChecked())
+			return;
+
+		if(!player.input.jumping && player.input.movementForward == 0 && player.input.movementSideways == 0)
 			return;
 		
 		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, 0.2872, velocity.z);
+		player.setVelocity(velocity.x / 2, (0.2872 / 2.44 * speed.getPercentage() * speed.getMaximum()), velocity.z / 2);
 	}
 }
