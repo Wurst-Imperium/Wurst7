@@ -38,6 +38,7 @@ public class Window
 	
 	private boolean invisible;
 	
+	private boolean fixedWidth;
 	private int innerHeight;
 	private int maxHeight;
 	private int scrollOffset;
@@ -88,6 +89,9 @@ public class Window
 	
 	public final void setWidth(int width)
 	{
+		if(fixedWidth)
+			return;
+		
 		if(this.width != width)
 			invalidate();
 		
@@ -129,7 +133,7 @@ public class Window
 			childrenHeight += c.getHeight() + 2;
 		childrenHeight += 2;
 		
-		if(childrenHeight > maxHeight + 13 && maxHeight > 0)
+		if(maxHeight > 0 && childrenHeight > maxHeight + 13)
 		{
 			setWidth(Math.max(maxChildWidth + 3, titleBarWidth));
 			setHeight(maxHeight + 13);
@@ -160,14 +164,12 @@ public class Window
 		
 		innerHeight = offsetY;
 		
-		if(maxHeight == 0)
+		if(maxHeight == 0 || innerHeight < maxHeight)
 			setHeight(innerHeight + 13);
-		else if(height > maxHeight + 13)
+		else
 			setHeight(maxHeight + 13);
-		else if(height < maxHeight + 13)
-			setHeight(Math.min(maxHeight + 13, innerHeight + 13));
 		
-		scrollingEnabled = innerHeight > height - 13;
+		scrollingEnabled = innerHeight + 13 > height;
 		if(scrollingEnabled)
 			cWidth -= 3;
 		
@@ -309,6 +311,16 @@ public class Window
 	public final void setInvisible(boolean invisible)
 	{
 		this.invisible = invisible;
+	}
+	
+	public final boolean isFixedWidth()
+	{
+		return fixedWidth;
+	}
+	
+	public final void setFixedWidth(boolean fixedWidth)
+	{
+		this.fixedWidth = fixedWidth;
 	}
 	
 	public final int getInnerHeight()
