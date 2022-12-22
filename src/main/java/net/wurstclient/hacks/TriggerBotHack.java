@@ -41,6 +41,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		"Attack while blocking",
 		"Whether or not to attack while blocking with a shield / using items.",
 		false);
+
+	private final CheckboxSetting attackInContainers = new CheckboxSetting(
+		"Attack in containers (inventories)",
+		"Whether or not to attack while in a container (e.g. inventory, chest, etc.).",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
@@ -53,6 +58,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(attackWhileBlocking);
+		addSetting(attackInContainers);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -88,7 +94,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			return;
 		
 		// don't attack when a container/inventory screen is open
-		if(MC.currentScreen instanceof HandledScreen)
+		if(MC.currentScreen instanceof HandledScreen && !attackInContainers.isChecked())
 			return;
 		
 		ClientPlayerEntity player = MC.player;
