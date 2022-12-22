@@ -178,8 +178,7 @@ public class ForceOpDialog extends JDialog
 	{
 		try
 		{
-			String howToLink =
-				"https://www.wurstclient.net/Mods/Force_OP_(AuthMeCracker)/";
+			String howToLink = "https://www.wurstclient.net/forceop-tutorial/";
 			
 			Desktop.getDesktop().browse(URI.create(howToLink));
 			
