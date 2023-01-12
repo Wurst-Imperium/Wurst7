@@ -43,6 +43,7 @@
     "LanguageManagerMixin",
     "LightTextureManagerMixin",
     "LivingEntityRendererMixin",
+    "MinecraftClientInvoker",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
     "MouseMixin",
