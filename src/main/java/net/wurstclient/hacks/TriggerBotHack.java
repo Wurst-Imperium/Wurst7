@@ -12,6 +12,9 @@ import java.util.stream.Stream;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
@@ -23,6 +26,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"trigger bot"})
 public final class TriggerBotHack extends Hack implements UpdateListener
@@ -113,9 +117,13 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
 		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.isRemoved())
-			.filter(e -> e.isAttackable() && e.isAlive())
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity
+				|| e instanceof ShulkerBulletEntity)
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e != player)
+			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		stream = entityFilters.applyTo(stream);

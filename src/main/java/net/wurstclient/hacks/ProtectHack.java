@@ -15,6 +15,8 @@ import java.util.stream.StreamSupport;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -32,6 +34,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
 public final class ProtectHack extends Hack
@@ -116,8 +119,10 @@ public final class ProtectHack extends Hack
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> e instanceof LivingEntity)
-				.filter(e -> e.isAttackable() && e.isAlive())
-				.filter(e -> e != MC.player);
+				.filter(
+					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
+				.filter(e -> e != MC.player)
+				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
 				.min(Comparator
 					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
@@ -162,8 +167,8 @@ public final class ProtectHack extends Hack
 		// check if player died, friend died or disappeared
 		if(friend == null || friend.isRemoved()
 			|| !(friend instanceof LivingEntity)
-			|| friend.isAlive()
-			|| MC.player.isAlive())
+			|| ((LivingEntity)friend).getHealth() <= 0
+			|| MC.player.getHealth() <= 0)
 		{
 			friend = null;
 			enemy = null;
@@ -174,9 +179,14 @@ public final class ProtectHack extends Hack
 		// set enemy
 		Stream<Entity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e.isAttackable() && e.isAlive())
+			.filter(e -> !e.isRemoved())
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystalEntity
+				|| e instanceof ShulkerBulletEntity)
 			.filter(e -> e != MC.player).filter(e -> e != friend)
 			.filter(e -> MC.player.distanceTo(e) <= 6)
+			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
 		
 		stream = entityFilters.applyTo(stream);
