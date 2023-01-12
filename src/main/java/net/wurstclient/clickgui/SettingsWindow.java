@@ -25,7 +25,7 @@ public final class SettingsWindow extends Window
 		
 		setClosable(true);
 		setMinimizable(false);
-		setMaxHeight(187);
+		setMaxHeight(200);
 		pack();
 		
 		setInitialPosition(parent, buttonY);

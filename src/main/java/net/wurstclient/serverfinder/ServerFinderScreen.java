@@ -51,11 +51,13 @@ public class ServerFinderScreen extends Screen
 				.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
 				.build());
 		
-		addDrawableChild(ButtonWidget.builder(Text.literal("Tutorial"),
-			b -> Util.getOperatingSystem().open(
-				"https://www.wurstclient.net/serverfinder-tutorial/"))
-			.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-			.build());
+		addDrawableChild(
+			ButtonWidget
+				.builder(Text.literal("Tutorial"),
+					b -> Util.getOperatingSystem().open(
+						"https://www.wurstclient.net/serverfinder-tutorial/"))
+				.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+				.build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
