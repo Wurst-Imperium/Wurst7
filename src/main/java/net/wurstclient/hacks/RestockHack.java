@@ -19,7 +19,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -27,15 +26,27 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"restock", "AutoRestock", "auto-restock", "auto restock"})
 public final class RestockHack extends Hack implements UpdateListener
 {
+	private static final List<Integer> SEARCH_SLOTS = new ArrayList<>();
+	public static final int OFFHAND_ID = PlayerInventory.OFF_HAND_SLOT;
+	public static final int OFFHAND_PKT_ID = 45;
+	static {
+		for(int i = 0; i < 36; i++) {
+			SEARCH_SLOTS.add(i);
+		}
+		SEARCH_SLOTS.add(OFFHAND_ID);
+	}
+
 	private ItemListSetting items = new ItemListSetting("Items",
 		"Item(s) to be restocked.", "minecraft:minecart");
+	private final SliderSetting restockSlot = new SliderSetting(
+		"Slot",
+				"To which slot should we restock.",
+				0, -1, 9, 1, ValueDisplay.INTEGER.withLabel(9, "offhand").withLabel(-1, "current"));
 	
-	// TODO: Replace this checkbox with a "Restock Slot" slider. 1-9 correspond
-	// to their slots, while 0 (default) sets the slider to "auto" and behaves
-	// the same as this checkbox.
-	private final CheckboxSetting currentSlot = new CheckboxSetting(
-		"Current slot", "Always restock in the current slot.", false);
-	
+	private final SliderSetting restockAmount = new SliderSetting(
+			"Minimum amount",
+			"Minimum amount of items in hand before a new round of restocking is triggered.",
+			1, 1, 64, 1, ValueDisplay.INTEGER);
 	private final SliderSetting repairMode = new SliderSetting(
 		"Tools repair mode",
 		"Swaps out tools when their durability reaches the given threshold, so you can repair them before they break.\n"
@@ -47,7 +58,8 @@ public final class RestockHack extends Hack implements UpdateListener
 		super("Restock");
 		setCategory(Category.ITEMS);
 		addSetting(items);
-		addSetting(currentSlot);
+		addSetting(restockSlot);
+		addSetting(restockAmount);
 		addSetting(repairMode);
 	}
 	
@@ -71,29 +83,30 @@ public final class RestockHack extends Hack implements UpdateListener
 			return;
 		
 		PlayerInventory inv = MC.player.getInventory();
-		int hotbarSlot = currentSlot.isChecked() ? inv.selectedSlot : 0;
+		int hotbarSlot = restockSlot.getValueI();
+		if (hotbarSlot == -1)
+			hotbarSlot = inv.selectedSlot;
+		else if (hotbarSlot == 9)
+			hotbarSlot = OFFHAND_ID;
+
 		for(String itemName : items.getItemNames())
 		{
-			ItemStack hotbarStack =
-				MC.player.getInventory().getStack(hotbarSlot);
+			ItemStack hotbarStack = MC.player.getInventory().getStack(hotbarSlot);
 			
 			boolean wrongItem =
 				hotbarStack.isEmpty() || !itemEqual(itemName, hotbarStack);
-			// TODO: Add a "Restock Threshold" slider for the number 2 here.
-			// Default should be changed to 1.
-			if(!wrongItem && hotbarStack.getCount() >= Math.min(2,
+			if(!wrongItem && hotbarStack.getCount() >= Math.min(restockAmount.getValueI(),
 				hotbarStack.getMaxCount()))
 				return;
 			
-			List<Integer> searchResult =
-				searchSlotsWithItem(itemName, 0, 36, hotbarSlot);
+			List<Integer> searchResult = searchSlotsWithItem(itemName, hotbarSlot);
 			for(int itemIndex : searchResult)
 			{
-				int pickupIndex = itemIndex < 9 ? itemIndex + 36 : itemIndex;
+				int pickupIndex = DataSlotToNetworkSlot(itemIndex);
 				IClientPlayerInteractionManager im =
 					IMC.getInteractionManager();
 				im.windowClick_PICKUP(pickupIndex);
-				im.windowClick_PICKUP(hotbarSlot + 36);
+				im.windowClick_PICKUP(DataSlotToNetworkSlot(hotbarSlot));
 				
 				if(!MC.player.playerScreenHandler.getCursorStack().isEmpty())
 					im.windowClick_PICKUP(pickupIndex);
@@ -111,12 +124,13 @@ public final class RestockHack extends Hack implements UpdateListener
 		ItemStack restockStack = MC.player.getInventory().getStack(hotbarSlot);
 		if(repairMode.getValueI() > 0 && restockStack.isDamageable()
 			&& isTooDamaged(restockStack))
-			for(int i = 36 - 1; i > 9 - 1; i--)
+			for(int i : SEARCH_SLOTS)
 			{
+				if (i == hotbarSlot || i == OFFHAND_ID) continue;
 				ItemStack stack = MC.player.getInventory().getStack(i);
 				if(stack.isEmpty() || !stack.isDamageable())
 				{
-					IMC.getInteractionManager().windowClick_SWAP(i, hotbarSlot);
+					IMC.getInteractionManager().windowClick_SWAP(i, DataSlotToNetworkSlot(hotbarSlot));
 					break;
 				}
 			}
@@ -137,13 +151,22 @@ public final class RestockHack extends Hack implements UpdateListener
 		return stack.getMaxDamage() - stack.getDamage() <= repairMode
 			.getValueI();
 	}
+	public static int DataSlotToNetworkSlot(int index) {
+		if (index >= 0 && index <= 8) // hotbar
+			return index + 36;
+		else if (index >= 9 && index <= 35) // main inventory
+			return index;
+		else if (index == OFFHAND_ID)
+			return OFFHAND_PKT_ID;
+		else
+			throw new IllegalArgumentException("unimplemented data slot");
+	}
 	
-	private List<Integer> searchSlotsWithItem(String itemName, int start,
-		int end, int skip)
+	private List<Integer> searchSlotsWithItem(String itemName, int skip)
 	{
 		List<Integer> slots = new ArrayList<>();
 		
-		for(int i = start; i < end; i++)
+		for (int i : SEARCH_SLOTS)
 		{
 			if(i == skip)
 				continue;
