@@ -148,7 +148,7 @@ public final class JesusHack extends Hack
 				packet.getPitch(0), true);
 		
 		// send new packet
-		MC.player.networkHandler.getConnection().send(newPacket);
+		MC.player.networkHandler.method_48296().send(newPacket);
 	}
 	
 	public boolean isOverLiquid()

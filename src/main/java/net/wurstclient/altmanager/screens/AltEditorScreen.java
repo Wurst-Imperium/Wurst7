@@ -101,7 +101,7 @@ public abstract class AltEditorScreen extends Screen
 		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
 			200, 20, Text.literal(""));
 		nameOrEmailBox.setMaxLength(48);
-		nameOrEmailBox.setTextFieldFocused(true);
+		nameOrEmailBox.setFocused(true);
 		nameOrEmailBox.setText(getDefaultNameOrEmail());
 		addSelectableChild(nameOrEmailBox);
 		
@@ -117,7 +117,7 @@ public abstract class AltEditorScreen extends Screen
 		passwordBox.setMaxLength(256);
 		addSelectableChild(passwordBox);
 		
-		setInitialFocus(nameOrEmailBox);
+		setFocused(nameOrEmailBox);
 	}
 	
 	private void openSkinFolder()

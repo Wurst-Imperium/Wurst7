@@ -57,8 +57,8 @@ public final class EditBlockScreen extends Screen
 		blockField.setMaxLength(256);
 		
 		addSelectableChild(blockField);
-		setInitialFocus(blockField);
-		blockField.setTextFieldFocused(true);
+		setFocused(blockField);
+		blockField.setFocused(true);
 		
 		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
 			.dimensions(x1, y2, 200, 20).build();

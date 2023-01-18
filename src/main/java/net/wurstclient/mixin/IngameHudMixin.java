@@ -40,10 +40,11 @@ public class IngameHudMixin extends DrawableHelper
 	}
 	
 	@Inject(at = {@At("HEAD")},
-		method = {"renderOverlay(Lnet/minecraft/util/Identifier;F)V"},
+		method = {
+			"renderOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Identifier;F)V"},
 		cancellable = true)
-	private void onRenderOverlay(Identifier identifier, float scale,
-		CallbackInfo ci)
+	private void onRenderOverlay(MatrixStack matrixStack, Identifier identifier,
+		float f, CallbackInfo ci)
 	{
 		if(identifier == null || identifier.getPath() == null)
 			return;

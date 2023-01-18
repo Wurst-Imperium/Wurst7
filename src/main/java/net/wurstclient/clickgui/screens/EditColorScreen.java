@@ -116,8 +116,8 @@ public final class EditColorScreen extends Screen
 		addSelectableChild(greenValueField);
 		addSelectableChild(blueValueField);
 		
-		setInitialFocus(hexValueField);
-		hexValueField.setTextFieldFocused(true);
+		setFocused(hexValueField);
+		hexValueField.setFocused(true);
 		hexValueField.setSelectionStart(0);
 		hexValueField.setSelectionEnd(6);
 		

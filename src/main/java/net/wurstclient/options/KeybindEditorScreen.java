@@ -64,8 +64,8 @@ public final class KeybindEditorScreen extends Screen
 			200, 20, Text.literal(""));
 		commandField.setMaxLength(65536);
 		addSelectableChild(commandField);
-		setInitialFocus(commandField);
-		commandField.setTextFieldFocused(true);
+		setFocused(commandField);
+		commandField.setFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);

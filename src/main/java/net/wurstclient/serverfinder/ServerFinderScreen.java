@@ -51,11 +51,13 @@ public class ServerFinderScreen extends Screen
 				.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
 				.build());
 		
-		addDrawableChild(ButtonWidget.builder(Text.literal("Tutorial"),
-			b -> Util.getOperatingSystem().open(
-				"https://www.wurstclient.net/serverfinder-tutorial/"))
-			.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-			.build());
+		addDrawableChild(
+			ButtonWidget
+				.builder(Text.literal("Tutorial"),
+					b -> Util.getOperatingSystem().open(
+						"https://www.wurstclient.net/serverfinder-tutorial/"))
+				.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+				.build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
@@ -65,7 +67,7 @@ public class ServerFinderScreen extends Screen
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
 			height / 4 + 34, 200, 20, Text.literal(""));
 		ipBox.setMaxLength(200);
-		ipBox.setTextFieldFocused(true);
+		ipBox.setFocused(true);
 		addSelectableChild(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
@@ -74,7 +76,7 @@ public class ServerFinderScreen extends Screen
 		maxThreadsBox.setText("128");
 		addSelectableChild(maxThreadsBox);
 		
-		setInitialFocus(ipBox);
+		setFocused(ipBox);
 		state = ServerFinderState.NOT_RUNNING;
 	}
 	

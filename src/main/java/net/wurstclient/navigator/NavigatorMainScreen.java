@@ -70,10 +70,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		searchBar.setMaxLength(128);
 		
 		addSelectableChild(searchBar);
-		setInitialFocus(searchBar);
-		searchBar.setTextFieldFocused(true);
+		setFocused(searchBar);
+		searchBar.setFocused(true);
 		
-		searchBar.method_46421(middleX - 100);
+		searchBar.setX(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	
@@ -241,6 +241,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// search bar
 		if(!clickTimerRunning)
 		{
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			WurstClient.MC.textRenderer.drawWithShadow(matrixStack, "Search: ",
 				middleX - 150, 32, txtColor);
 			searchBar.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -321,6 +322,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
 			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
 			tessellator.draw();
+			
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// text
 			for(int i = 0; i < lines.length; i++)
@@ -467,6 +470,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 		{
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
 			client.textRenderer.draw(matrixStack, buttonText, area.x + 4,
 				area.y + 4, txtColor);

@@ -579,6 +579,7 @@ public final class ClickGui
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for(int i = 0; i < lines.length; i++)
 			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 				txtColor);

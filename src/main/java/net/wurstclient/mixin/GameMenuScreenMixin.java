@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -56,7 +55,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private void addWurstOptionsButton()
 	{
-		List<ClickableWidget> buttons = getRealButtons();
+		List<ClickableWidget> buttons = Screens.getButtons(this);
 		
 		int buttonY = -1;
 		int buttonI = -1;
@@ -88,27 +87,6 @@ public abstract class GameMenuScreenMixin extends Screen
 				b -> openWurstOptions())
 			.dimensions(width / 2 - 102, buttonY, 204, 20).build();
 		buttons.add(wurstOptionsButton);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private List<ClickableWidget> getRealButtons()
-	{
-		// As of 22w43a, Fabric Screen API doesn't understand the new grid
-		// system (class_7845), so we must manually extract the real buttons
-		// from the grid.
-		
-		List<ClickableWidget> notButtons = Screens.getButtons(this);
-		
-		for(ClickableWidget cw : notButtons)
-		{
-			if(!(cw instanceof GridWidget grid))
-				continue;
-			
-			return (List<ClickableWidget>)grid.wrappedWidgets();
-		}
-		
-		throw new IllegalStateException(
-			"There's no longer a button grid in the game menu?");
 	}
 	
 	private boolean isFeedbackButton(ClickableWidget button)
