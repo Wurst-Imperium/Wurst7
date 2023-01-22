@@ -22,25 +22,12 @@ import net.wurstclient.WurstClient;
 @Mixin(InGameOverlayRenderer.class)
 public class InGameOverlayRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V"},
-		cancellable = true)
-	private static void onRenderFireOverlay(MinecraftClient minecraftClient,
-		MatrixStack matrixStack, CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldCancelOverlay())
-			ci.cancel();
-	}
-	
 	@ModifyConstant(method =
 		"renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
 		constant = @Constant(floatValue = -0.3F))
 	private static float getFireOffset(float orig)
 	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.shouldLowerOverlay())
-			return -0.5F;
-		return orig;
+		return orig - WurstClient.INSTANCE.getHax().noFireOverlayHack.getOverlayOffset();
 	}
 	
 	@Inject(at = {@At("HEAD")},

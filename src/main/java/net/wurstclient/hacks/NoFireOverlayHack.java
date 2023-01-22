@@ -10,38 +10,27 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"no fire overlay"})
 public final class NoFireOverlayHack extends Hack
 {
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lLower\u00a7r mode lowers the overlay.\n"
-			+ "\u00a7lRemove\u00a7r mode removes the overlay.",
-		Mode.values(), Mode.REMOVE);
+	private final SliderSetting offset =
+		new SliderSetting("Offset", "The amount to lower the fire overlay by.",
+			0.6, 0, 0.6, 0.01, ValueDisplay.DECIMAL);
 	
 	public NoFireOverlayHack()
 	{
 		super("NoFireOverlay");
 		setCategory(Category.RENDER);
-		addSetting(mode);
+		addSetting(offset);
 	}
 	
-	public boolean shouldCancelOverlay()
+	public float getOverlayOffset()
 	{
-		return isEnabled() && mode.getSelected() == Mode.REMOVE;
+		return isEnabled() ? offset.getValueF() : 0;
 	}
 	
-	public boolean shouldLowerOverlay()
-	{
-		return isEnabled() && mode.getSelected() == Mode.LOWER;
-	}
-	
-	private enum Mode
-	{
-		LOWER,
-		REMOVE;
-	}
-	
-	// See InGameOverlayRendererMixin.onRenderFireOverlay()
+	// See InGameOverlayRendererMixin.getFireOffset()
 }
