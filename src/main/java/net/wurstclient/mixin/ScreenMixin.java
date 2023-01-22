@@ -37,7 +37,7 @@ public abstract class ScreenMixin extends AbstractParentElement
 		cancellable = true)
 	public void onRenderBackground(MatrixStack matrices, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().noBackgroundHack.shouldCancelBackground((Screen)(Object)this))
 			ci.cancel();
 	}
 	
