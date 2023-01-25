@@ -38,8 +38,8 @@ public abstract class ClientPlayNetworkHandlerMixin
 	@Final
 	private MinecraftClient client;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"sendPacket(Lnet/minecraft/network/Packet;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
 	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
 	{
