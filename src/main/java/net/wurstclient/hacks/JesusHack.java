@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -148,7 +148,7 @@ public final class JesusHack extends Hack
 				packet.getPitch(0), true);
 		
 		// send new packet
-		MC.player.networkHandler.method_48296().send(newPacket);
+		MC.player.networkHandler.getConnection().send(newPacket);
 	}
 	
 	public boolean isOverLiquid()

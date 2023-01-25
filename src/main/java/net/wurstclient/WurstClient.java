@@ -57,7 +57,7 @@ public enum WurstClient
 	public static IMinecraftClient IMC;
 	
 	public static final String VERSION = "7.31";
-	public static final String MC_VERSION = "23w03a";
+	public static final String MC_VERSION = "23w04a";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -179,7 +179,7 @@ public enum WurstClient
 	public String translate(String key)
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
-			return IMC.getLanguageManager().getEnglish().method_48307(key);
+			return IMC.getLanguageManager().getEnglish().get(key);
 		
 		return I18n.translate(key);
 	}

@@ -8,8 +8,7 @@
 package net.wurstclient.events;
 
 import java.util.ArrayList;
-
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
