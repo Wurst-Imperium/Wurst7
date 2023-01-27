@@ -42,6 +42,11 @@ public final class ClickGuiHack extends Hack
 		"Maximum window height\n" + "0 = no limit", 200, 0, 1000, 50,
 		ValueDisplay.INTEGER);
 	
+	private final SliderSetting maxSettingsHeight =
+		new SliderSetting("Max settings height",
+			"Maximum height for settings windows\n" + "0 = no limit", 200, 0,
+			1000, 50, ValueDisplay.INTEGER);
+	
 	public ClickGuiHack()
 	{
 		super("ClickGUI");
@@ -51,6 +56,7 @@ public final class ClickGuiHack extends Hack
 		addSetting(opacity);
 		addSetting(ttOpacity);
 		addSetting(maxHeight);
+		addSetting(maxSettingsHeight);
 	}
 	
 	@Override
@@ -88,5 +94,10 @@ public final class ClickGuiHack extends Hack
 	public int getMaxHeight()
 	{
 		return maxHeight.getValueI();
+	}
+	
+	public int getMaxSettingsHeight()
+	{
+		return maxSettingsHeight.getValueI();
 	}
 }

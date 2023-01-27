@@ -59,6 +59,7 @@ public final class ClickGui
 	private float opacity;
 	private float ttOpacity;
 	private int maxHeight;
+	private int maxSettingsHeight;
 	
 	private String tooltip = "";
 	
@@ -613,6 +614,7 @@ public final class ClickGui
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
 		maxHeight = clickGui.getMaxHeight();
+		maxSettingsHeight = clickGui.getMaxSettingsHeight();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 			acColor = RenderUtils.getRainbowColor();
@@ -642,7 +644,8 @@ public final class ClickGui
 		
 		if(!window.isMinimized())
 		{
-			window.setMaxHeight(maxHeight);
+			window.setMaxHeight(window instanceof SettingsWindow
+				? maxSettingsHeight : maxHeight);
 			window.validate();
 			
 			// scrollbar
