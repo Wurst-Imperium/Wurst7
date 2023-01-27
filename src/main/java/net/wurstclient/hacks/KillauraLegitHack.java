@@ -54,6 +54,10 @@ public final class KillauraLegitHack extends Hack
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
+	private final SliderSetting rotationSpeed =
+		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
+			ValueDisplay.DEGREES.withSuffix("/s"));
+	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -61,8 +65,10 @@ public final class KillauraLegitHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final SliderSetting fov =
-		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	private final SliderSetting fov = new SliderSetting("FOV",
+		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
+			+ "360\u00b0 = entities can be attacked all around you.",
+		360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -89,6 +95,8 @@ public final class KillauraLegitHack extends Hack
 			FilterCrystalsSetting.genericCombat(false));
 	
 	private Entity target;
+	private float nextYaw;
+	private float nextPitch;
 	
 	public KillauraLegitHack()
 	{
@@ -97,6 +105,7 @@ public final class KillauraLegitHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(rotationSpeed);
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(damageIndicator);
@@ -200,28 +209,52 @@ public final class KillauraLegitHack extends Hack
 	{
 		Rotation rotation = RotationUtils.getNeededRotations(vec);
 		
-		float oldYaw = MC.player.prevYaw;
-		float oldPitch = MC.player.prevPitch;
+		float startYaw = MC.player.prevYaw;
+		float startPitch = MC.player.prevPitch;
+		float endYaw = rotation.getYaw();
+		float endPitch = rotation.getPitch();
 		
-		MC.player.setYaw(limitAngleChange(oldYaw, rotation.getYaw(), 30));
-		MC.player.setPitch(rotation.getPitch());
+		float yawChange = Math.abs(MathHelper.wrapDegrees(endYaw - startYaw));
+		float pitchChange =
+			Math.abs(MathHelper.wrapDegrees(endPitch - startPitch));
 		
-		return Math.abs(oldYaw - rotation.getYaw())
-			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;
+		float maxChange = rotationSpeed.getValueI() / 20F;
+		float maxChangeYaw =
+			Math.min(maxChange, maxChange * yawChange / pitchChange);
+		float maxChangePitch =
+			Math.min(maxChange, maxChange * pitchChange / yawChange);
+		
+		nextYaw = limitAngleChange(startYaw, endYaw, maxChangeYaw);
+		nextPitch = limitAngleChange(startPitch, endPitch, maxChangePitch);
+		
+		return Math.abs(startYaw - endYaw)
+			+ Math.abs(startPitch - endPitch) < 1F;
 	}
 	
 	private float limitAngleChange(float current, float intended,
 		float maxChange)
 	{
-		float change = MathHelper.wrapDegrees(intended - current);
+		float currentWrapped = MathHelper.wrapDegrees(current);
+		float intendedWrapped = MathHelper.wrapDegrees(intended);
+		
+		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
 		change = MathHelper.clamp(change, -maxChange, maxChange);
-		return MathHelper.wrapDegrees(current + change);
+		
+		return current + change;
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(target == null || !damageIndicator.isChecked())
+		if(target == null)
+			return;
+		
+		float oldYaw = MC.player.prevYaw;
+		float oldPitch = MC.player.prevPitch;
+		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
+		MC.player.setPitch(MathHelper.lerp(partialTicks, oldPitch, nextPitch));
+		
+		if(!damageIndicator.isChecked())
 			return;
 		
 		// GL settings
