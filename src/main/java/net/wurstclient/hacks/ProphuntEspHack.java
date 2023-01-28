@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
@@ -57,7 +58,11 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
@@ -77,7 +82,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(entity.getX(), entity.getY(), entity.getZ());
+			matrixStack.translate(entity.getX() - regionX, entity.getY(),
+				entity.getZ() - regionZ);
 			
 			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX, matrixStack);
 			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX, matrixStack);

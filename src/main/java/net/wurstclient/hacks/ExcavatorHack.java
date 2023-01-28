@@ -92,9 +92,7 @@ public final class ExcavatorHack extends Hack
 	public void onEnable()
 	{
 		// disable conflicting hacks
-		// TODO:
-		// WURST.getHax().bowAimbotMod.setEnabled(false);
-		// WURST.getHax().templateToolMod.setEnabled(false);
+		WURST.getHax().bowAimbotHack.setEnabled(false);
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
@@ -161,7 +159,11 @@ public final class ExcavatorHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -178,7 +180,8 @@ public final class ExcavatorHack extends Hack
 					BlockPos pos = area.blocksList.get(i);
 					
 					matrixStack.push();
-					matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+					matrixStack.translate(pos.getX() - regionX,
+						pos.getY(), pos.getZ() - regionZ);
 					matrixStack.translate(-0.005, -0.005, -0.005);
 					matrixStack.scale(1.01F, 1.01F, 1.01F);
 					
@@ -192,8 +195,8 @@ public final class ExcavatorHack extends Hack
 				}
 			
 			matrixStack.push();
-			matrixStack.translate(area.minX + offset, area.minY + offset,
-				area.minZ + offset);
+			matrixStack.translate(area.minX + offset - regionX, area.minY + offset,
+				area.minZ + offset - regionZ);
 			matrixStack.scale(area.sizeX + scale, area.sizeY + scale,
 				area.sizeZ + scale);
 			
@@ -230,7 +233,8 @@ public final class ExcavatorHack extends Hack
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -251,8 +255,8 @@ public final class ExcavatorHack extends Hack
 			
 			// area box
 			matrixStack.push();
-			matrixStack.translate(preview.minX + offset, preview.minY + offset,
-				preview.minZ + offset);
+			matrixStack.translate(preview.minX + offset - regionX, preview.minY + offset,
+				preview.minZ + offset - regionZ);
 			matrixStack.scale(preview.sizeX + scale, preview.sizeY + scale,
 				preview.sizeZ + scale);
 			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
@@ -266,8 +270,8 @@ public final class ExcavatorHack extends Hack
 		if(posLookingAt != null)
 		{
 			matrixStack.push();
-			matrixStack.translate(posLookingAt.getX(), posLookingAt.getY(),
-				posLookingAt.getZ());
+			matrixStack.translate(posLookingAt.getX() - regionX, posLookingAt.getY(),
+				posLookingAt.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -285,8 +289,8 @@ public final class ExcavatorHack extends Hack
 		if(currentBlock != null)
 		{
 			// set position
-			matrixStack.translate(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			matrixStack.translate(currentBlock.getX() - regionX, currentBlock.getY(),
+				currentBlock.getZ() - regionZ);
 			
 			// get progress
 			float progress;

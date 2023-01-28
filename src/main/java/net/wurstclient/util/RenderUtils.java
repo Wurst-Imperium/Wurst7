@@ -49,14 +49,6 @@ public enum RenderUtils
 		GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 	}
 	
-	public static void applyRenderOffset(MatrixStack matrixStack)
-	{
-		applyCameraRotationOnly();
-		Vec3d camPos = getCameraPos();
-		
-		matrixStack.translate(-camPos.x, -camPos.y, -camPos.z);
-	}
-	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
 		applyCameraRotationOnly();

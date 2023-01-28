@@ -89,7 +89,11 @@ public final class PlayerFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		float[] rainbow = RenderUtils.getRainbowColor();
 		RenderSystem.setShaderColor(rainbow[0], rainbow[1], rainbow[2], 0.5F);
@@ -104,11 +108,11 @@ public final class PlayerFinderHack extends Hack
 			VertexFormats.POSITION);
 		
 		// set start position
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		Vec3d start = RotationUtils.getClientLookVec().
+			add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 		
 		// set end position
-		Vec3d end = Vec3d.ofCenter(pos);
+		Vec3d end = Vec3d.ofCenter(pos).subtract(regionX, 0, regionZ);
 		
 		// draw line
 		bufferBuilder
@@ -122,7 +126,8 @@ public final class PlayerFinderHack extends Hack
 		// block box
 		{
 			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			
 			RenderUtils.drawOutlinedBox(matrixStack);
 			

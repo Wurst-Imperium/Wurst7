@@ -260,7 +260,11 @@ public final class InstantBunkerHack extends Hack
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// green box
 		{
@@ -269,7 +273,8 @@ public final class InstantBunkerHack extends Hack
 			BlockPos pos = positions.get(blockIndex);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -286,7 +291,8 @@ public final class InstantBunkerHack extends Hack
 			BlockPos pos = positions.get(i);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+			matrixStack.translate(pos.getX() - regionX,
+				pos.getY(), pos.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
