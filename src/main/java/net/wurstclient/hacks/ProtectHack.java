@@ -15,8 +15,6 @@ import java.util.stream.StreamSupport;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -34,6 +32,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
@@ -104,6 +103,7 @@ public final class ProtectHack extends Hack
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		// disable other killauras
+		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
@@ -177,17 +177,9 @@ public final class ProtectHack extends Hack
 		}
 		
 		// set enemy
-		Stream<Entity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.isRemoved())
-			.filter(e -> e instanceof LivingEntity
-				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity
-				|| e instanceof ShulkerBulletEntity)
-			.filter(e -> e != MC.player).filter(e -> e != friend)
-			.filter(e -> MC.player.distanceTo(e) <= 6)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		Stream<Entity> stream = EntityUtils.getAttackableEntities()
+			.filter(e -> MC.player.squaredDistanceTo(e) <= 36)
+			.filter(e -> e != friend);
 		
 		stream = entityFilters.applyTo(stream);
 		

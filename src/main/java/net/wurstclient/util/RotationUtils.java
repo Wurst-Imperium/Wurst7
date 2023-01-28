@@ -8,6 +8,8 @@
 package net.wurstclient.util;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.RotationFaker;
@@ -67,7 +69,7 @@ public enum RotationUtils
 		float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F;
 		float pitch = (float)-Math.toDegrees(Math.atan2(diffY, diffXZ));
 		
-		return new Rotation(yaw, pitch);
+		return Rotation.wrapped(yaw, pitch);
 	}
 	
 	public static double getAngleToLookVec(Vec3d vec)
@@ -78,8 +80,8 @@ public enum RotationUtils
 		float currentYaw = MathHelper.wrapDegrees(player.getYaw());
 		float currentPitch = MathHelper.wrapDegrees(player.getPitch());
 		
-		float diffYaw = currentYaw - needed.yaw;
-		float diffPitch = currentPitch - needed.pitch;
+		float diffYaw = MathHelper.wrapDegrees(currentYaw - needed.yaw);
+		float diffPitch = MathHelper.wrapDegrees(currentPitch - needed.pitch);
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
@@ -98,11 +100,97 @@ public enum RotationUtils
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
 	
+	public static double getAngleToLastReportedLookVec(Rotation rotation)
+	{
+		float yaw = MathHelper.wrapDegrees(rotation.getYaw());
+		float pitch = MathHelper.wrapDegrees(rotation.getPitch());
+		
+		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
+		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
+		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		
+		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - yaw);
+		float diffPitch = MathHelper.wrapDegrees(lastReportedPitch - pitch);
+		
+		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+	}
+	
+	/**
+	 * Returns true if the player is already facing within 1 degree of the
+	 * specified rotation.
+	 */
+	public static boolean isAlreadyFacing(Rotation rotation)
+	{
+		return getAngleToLastReportedLookVec(rotation) <= 1.0;
+	}
+	
+	/**
+	 * Returns true if the player is facing anywhere within the given box
+	 * and is no further away than the given range.
+	 */
+	public static boolean isFacingBox(Box box, double range)
+	{
+		Vec3d start = RotationUtils.getEyesPos();
+		Vec3d end = start.add(RotationUtils.getServerLookVec().multiply(range));
+		return box.raycast(start, end).isPresent();
+	}
+	
 	public static float getHorizontalAngleToLookVec(Vec3d vec)
 	{
 		Rotation needed = getNeededRotations(vec);
 		return MathHelper.wrapDegrees(WurstClient.MC.player.getYaw())
 			- needed.yaw;
+	}
+	
+	/**
+	 * Returns the next rotation that the player should be facing in order to
+	 * slowly turn towards the specified end rotation, at a rate of roughly
+	 * <code>maxChange</code> degrees per tick.
+	 */
+	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
+	{
+		Entity player = WurstClient.MC.player;
+		float startYaw = player.prevYaw;
+		float startPitch = player.prevPitch;
+		float endYaw = end.getYaw();
+		float endPitch = end.getPitch();
+		
+		float yawChange = Math.abs(MathHelper.wrapDegrees(endYaw - startYaw));
+		float pitchChange =
+			Math.abs(MathHelper.wrapDegrees(endPitch - startPitch));
+		
+		float maxChangeYaw =
+			Math.min(maxChange, maxChange * yawChange / pitchChange);
+		float maxChangePitch =
+			Math.min(maxChange, maxChange * pitchChange / yawChange);
+		
+		float nextYaw =
+			RotationUtils.limitAngleChange(startYaw, endYaw, maxChangeYaw);
+		float nextPitch = RotationUtils.limitAngleChange(startPitch, endPitch,
+			maxChangePitch);
+		
+		return new Rotation(nextYaw, nextPitch);
+	}
+	
+	/**
+	 * Limits the change in angle between the current and intended rotation to
+	 * the specified maximum change. Useful for smoothing out rotations and
+	 * making combat hacks harder to detect.
+	 *
+	 * <p>
+	 * For best results, do not wrap the current angle before calling this
+	 * method!
+	 */
+	public static float limitAngleChange(float current, float intended,
+		float maxChange)
+	{
+		float currentWrapped = MathHelper.wrapDegrees(current);
+		float intendedWrapped = MathHelper.wrapDegrees(intended);
+		
+		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
+		change = MathHelper.clamp(change, -maxChange, maxChange);
+		
+		return current + change;
 	}
 	
 	public static final class Rotation
@@ -112,8 +200,14 @@ public enum RotationUtils
 		
 		public Rotation(float yaw, float pitch)
 		{
-			this.yaw = MathHelper.wrapDegrees(yaw);
-			this.pitch = MathHelper.wrapDegrees(pitch);
+			this.yaw = yaw;
+			this.pitch = pitch;
+		}
+		
+		public static Rotation wrapped(float yaw, float pitch)
+		{
+			return new Rotation(MathHelper.wrapDegrees(yaw),
+				MathHelper.wrapDegrees(pitch));
 		}
 		
 		public float getYaw()
