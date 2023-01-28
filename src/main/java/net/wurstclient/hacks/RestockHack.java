@@ -26,7 +26,7 @@ import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"restock", "AutoRestock", "auto-restock", "auto restock"})
+@SearchTags({"AutoRestock", "auto-restock", "auto restock"})
 public final class RestockHack extends Hack implements UpdateListener
 {
 	public static final int OFFHAND_ID = PlayerInventory.OFF_HAND_SLOT;
