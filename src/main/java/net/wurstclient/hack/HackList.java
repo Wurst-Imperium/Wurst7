@@ -142,6 +142,7 @@ public final class HackList implements UpdateListener
 	public final OverlayHack overlayHack = new OverlayHack();
 	public final PanicHack panicHack = new PanicHack();
 	public final ParkourHack parkourHack = new ParkourHack();
+	public final PlayerCollisionHack playerCollisionHack = new PlayerCollisionHack();
 	public final PlayerEspHack playerEspHack = new PlayerEspHack();
 	public final PlayerFinderHack playerFinderHack = new PlayerFinderHack();
 	public final PortalGuiHack portalGuiHack = new PortalGuiHack();
