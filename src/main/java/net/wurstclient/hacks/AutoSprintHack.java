@@ -12,14 +12,25 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto sprint"})
 public final class AutoSprintHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting allDirections = new CheckboxSetting(
+		"Omnidirectional Sprint", "Sprint in all directions, not just forward.", false);
+	private final CheckboxSetting attack = new CheckboxSetting(
+		"Attack Sprint", "Keep sprinting when attacking.", false);
+	private final CheckboxSetting hungry = new CheckboxSetting(
+		"Hungry Sprint", "Sprint even on low hunger.", false);
+	
 	public AutoSprintHack()
 	{
 		super("AutoSprint");
 		setCategory(Category.MOVEMENT);
+		addSetting(allDirections);
+		addSetting(attack);
+		addSetting(hungry);
 	}
 	
 	@Override
@@ -45,7 +56,19 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		if(player.isInsideWaterOrBubbleColumn() || player.isSubmergedInWater())
 			return;
 		
-		if(player.forwardSpeed > 0)
+		if(player.forwardSpeed > 0
+			|| (allDirections.isChecked()
+				&& (MC.player.getVelocity().x != 0 || MC.player.getVelocity().z != 0)))
 			player.setSprinting(true);
+	}
+	
+	public boolean shouldSprintAttack()
+	{
+		return isEnabled() && attack.isChecked();
+	}
+	
+	public boolean shouldSprintHungry()
+	{
+		return isEnabled() && hungry.isChecked();
 	}
 }
