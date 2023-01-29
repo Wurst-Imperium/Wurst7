@@ -174,12 +174,6 @@ public final class FeedAuraHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
-		float p = 1;
-		LivingEntity le = renderTarget;
-		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
-		float red = p * 2F;
-		float green = 2 - red;
-		
 		matrixStack.translate(
 			renderTarget.prevX
 				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks - regionX,
@@ -192,19 +186,12 @@ public final class FeedAuraHack extends Hack
 			renderTarget.getWidth());
 		matrixStack.translate(-0.5, 0, -0.5);
 		
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);
 		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();
