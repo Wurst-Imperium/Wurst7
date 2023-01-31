@@ -56,8 +56,9 @@ public final class BowAimbotHack extends Hack
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
 			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
+			+ "\u00a7lAngle+Dist\u00a7r - A hybrid of Angle and Distance. This is usually the best at figuring out what you want to aim at.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+		Priority.values(), Priority.ANGLE_DIST);
 	
 	private final SliderSetting predictMovement = new SliderSetting(
 		"Predict movement",
@@ -296,6 +297,12 @@ public final class BowAimbotHack extends Hack
 		ANGLE("Angle",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+		
+		ANGLE_DIST("Angle+Dist",
+			e -> Math
+				.pow(RotationUtils
+					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
+				+ MC.player.squaredDistanceTo(e)),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
