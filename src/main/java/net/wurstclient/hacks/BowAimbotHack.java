@@ -160,7 +160,9 @@ public final class BowAimbotHack extends Hack
 			- player.getZ();
 		
 		// set yaw
-		MC.player.setYaw((float)Math.toDegrees(Math.atan2(posZ, posX)) - 90);
+		float neededYaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
+		MC.player.setYaw(
+			RotationUtils.limitAngleChange(MC.player.getYaw(), neededYaw));
 		
 		// calculate needed pitch
 		double hDistance = Math.sqrt(posX * posX + posZ * posZ);

@@ -94,8 +94,9 @@ public enum RotationUtils
 		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
 		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
 		
-		float diffYaw = lastReportedYaw - needed.yaw;
-		float diffPitch = lastReportedPitch - needed.pitch;
+		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw);
+		float diffPitch =
+			MathHelper.wrapDegrees(lastReportedPitch - needed.pitch);
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
@@ -130,8 +131,8 @@ public enum RotationUtils
 	 */
 	public static boolean isFacingBox(Box box, double range)
 	{
-		Vec3d start = RotationUtils.getEyesPos();
-		Vec3d end = start.add(RotationUtils.getServerLookVec().multiply(range));
+		Vec3d start = getEyesPos();
+		Vec3d end = start.add(getServerLookVec().multiply(range));
 		return box.raycast(start, end).isPresent();
 	}
 	
@@ -164,10 +165,9 @@ public enum RotationUtils
 		float maxChangePitch =
 			Math.min(maxChange, maxChange * pitchChange / yawChange);
 		
-		float nextYaw =
-			RotationUtils.limitAngleChange(startYaw, endYaw, maxChangeYaw);
-		float nextPitch = RotationUtils.limitAngleChange(startPitch, endPitch,
-			maxChangePitch);
+		float nextYaw = limitAngleChange(startYaw, endYaw, maxChangeYaw);
+		float nextPitch =
+			limitAngleChange(startPitch, endPitch, maxChangePitch);
 		
 		return new Rotation(nextYaw, nextPitch);
 	}
@@ -189,6 +189,29 @@ public enum RotationUtils
 		
 		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
 		change = MathHelper.clamp(change, -maxChange, maxChange);
+		
+		return current + change;
+	}
+	
+	/**
+	 * Removes unnecessary changes in angle caused by wrapping. Useful for
+	 * making combat hacks harder to detect.
+	 *
+	 * <p>
+	 * For example, if the current angle is 179 degrees and the intended angle
+	 * is -179 degrees, you only need to turn 2 degrees to face the intended
+	 * angle, not 358 degrees.
+	 *
+	 * <p>
+	 * DO NOT wrap the current angle before calling this method! You will get
+	 * incorrect results if you do.
+	 */
+	public static float limitAngleChange(float current, float intended)
+	{
+		float currentWrapped = MathHelper.wrapDegrees(current);
+		float intendedWrapped = MathHelper.wrapDegrees(intended);
+		
+		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
 		
 		return current + change;
 	}
