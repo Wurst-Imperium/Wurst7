@@ -22,6 +22,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -202,6 +203,7 @@ public final class AutoFarmHack extends Hack
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		ShaderProgram shader = RenderSystem.getShader();
