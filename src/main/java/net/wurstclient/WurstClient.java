@@ -57,7 +57,7 @@ public enum WurstClient
 	public static IMinecraftClient IMC;
 	
 	public static final String VERSION = "7.31";
-	public static final String MC_VERSION = "23w04a";
+	public static final String MC_VERSION = "23w05a";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;

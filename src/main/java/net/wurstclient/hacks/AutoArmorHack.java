@@ -20,7 +20,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorItem.class_8051;
+import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
@@ -177,7 +177,7 @@ public final class AutoArmorHack extends Hack
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
 		int armorToughness = (int)((IArmorItem)item).getToughness();
-		int armorType = item.getMaterial().method_48403(class_8051.LEGGINGS);
+		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
