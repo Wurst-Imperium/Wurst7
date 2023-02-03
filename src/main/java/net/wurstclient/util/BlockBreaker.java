@@ -30,7 +30,6 @@ public enum BlockBreaker
 	
 	public static boolean breakOneBlock(BlockPos pos)
 	{
-		Direction side = null;
 		Direction[] sides = Direction.values();
 		
 		BlockState state = BlockUtils.getState(pos);
@@ -51,34 +50,39 @@ public enum BlockBreaker
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
+		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
+		double[] distancesSq = new double[sides.length];
+		boolean[] linesOfSight = new boolean[sides.length];
+		
 		for(int i = 0; i < sides.length; i++)
 		{
-			// check line of sight
-			if(MC.world.raycastBlock(eyesPos, hitVecs[i], pos, shape,
-				state) != null)
+			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
+			
+			// no need to raytrace the rear sides,
+			// they can't possibly have line of sight
+			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			side = sides[i];
-			break;
+			linesOfSight[i] = MC.world.raycastBlock(eyesPos, hitVecs[i], pos,
+				shape, state) == null;
 		}
 		
-		if(side == null)
+		Direction side = sides[0];
+		for(int i = 1; i < sides.length; i++)
 		{
-			double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
-			for(int i = 0; i < sides.length; i++)
+			int bestSide = side.ordinal();
+			
+			// prefer sides with LOS
+			if(!linesOfSight[bestSide] && linesOfSight[i])
 			{
-				// check if side is facing towards player
-				if(eyesPos.squaredDistanceTo(hitVecs[i]) >= distanceSqToCenter)
-					continue;
-				
 				side = sides[i];
-				break;
+				continue;
 			}
+			
+			// then pick the closest side
+			if(distancesSq[i] < distancesSq[bestSide])
+				side = sides[i];
 		}
-		
-		// player is inside of block, side doesn't matter
-		if(side == null)
-			side = sides[0];
 		
 		// face block
 		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
