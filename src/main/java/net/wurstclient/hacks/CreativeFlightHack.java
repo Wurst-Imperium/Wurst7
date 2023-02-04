@@ -127,6 +127,6 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		KeyBinding[] bindings = {MC.options.jumpKey, MC.options.sneakKey};
 		
 		for(KeyBinding binding : bindings)
-			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
+			((IKeyBinding)binding).resetPressedState();
 	}
 }
