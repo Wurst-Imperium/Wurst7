@@ -30,12 +30,38 @@ public enum BlockBreaker
 	
 	public static boolean breakOneBlock(BlockPos pos)
 	{
+		BlockBreakingParams params = getBlockBreakingParams(pos);
+		if(params == null)
+			return false;
+		
+		// face block
+		WURST.getRotationFaker().faceVectorPacket(params.hitVec);
+		
+		// damage block
+		if(!MC.interactionManager.updateBlockBreakingProgress(pos, params.side))
+			return false;
+		
+		// swing arm
+		MC.player.networkHandler
+			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		
+		return true;
+	}
+	
+	/**
+	 * Returns everything you need to break a block at the given position, such
+	 * as which side to face, the exact hit vector to face that side, the
+	 * squared distance to that hit vector, and whether or not there is line of
+	 * sight to that hit vector.
+	 */
+	public static BlockBreakingParams getBlockBreakingParams(BlockPos pos)
+	{
 		Direction[] sides = Direction.values();
 		
 		BlockState state = BlockUtils.getState(pos);
 		VoxelShape shape = state.getOutlineShape(MC.world, pos);
 		if(shape.isEmpty())
-			return false;
+			return null;
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d relCenter = shape.getBoundingBox().getCenter();
@@ -84,19 +110,13 @@ public enum BlockBreaker
 				side = sides[i];
 		}
 		
-		// face block
-		WURST.getRotationFaker().faceVectorPacket(hitVecs[side.ordinal()]);
-		
-		// damage block
-		if(!MC.interactionManager.updateBlockBreakingProgress(pos, side))
-			return false;
-		
-		// swing arm
-		MC.player.networkHandler
-			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-		
-		return true;
+		return new BlockBreakingParams(side, hitVecs[side.ordinal()],
+			distancesSq[side.ordinal()], linesOfSight[side.ordinal()]);
 	}
+	
+	public static record BlockBreakingParams(Direction side, Vec3d hitVec,
+		double distanceSq, boolean lineOfSight)
+	{}
 	
 	public static void breakBlocksWithPacketSpam(Iterable<BlockPos> blocks)
 	{
