@@ -9,6 +9,7 @@ package net.wurstclient.util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,7 +40,7 @@ public enum BlockPlacer
 		
 		// place block
 		IMC.getInteractionManager().rightClickBlock(params.neighbor,
-			params.side.getOpposite(), params.hitVec);
+			params.side, params.hitVec);
 		
 		return true;
 	}
@@ -156,12 +157,17 @@ public enum BlockPlacer
 		if(hitVecs[side.ordinal()] == null)
 			return null;
 		
-		return new BlockPlacingParams(pos.offset(side), side,
+		return new BlockPlacingParams(pos.offset(side), side.getOpposite(),
 			hitVecs[side.ordinal()], distancesSq[side.ordinal()],
 			linesOfSight[side.ordinal()]);
 	}
 	
 	public static record BlockPlacingParams(BlockPos neighbor, Direction side,
 		Vec3d hitVec, double distanceSq, boolean lineOfSight)
-	{}
+	{
+		public BlockHitResult toHitResult()
+		{
+			return new BlockHitResult(hitVec, side, neighbor, false);
+		}
+	}
 }
