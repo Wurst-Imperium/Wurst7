@@ -9,11 +9,13 @@ package net.wurstclient.util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
@@ -118,12 +120,11 @@ public enum BlockPlacer
 			if(distancesSq[i] <= distanceSqToPosVec)
 				continue;
 			
-			BlockPos neighbor = pos.offset(sides[i]);
-			BlockState state = BlockUtils.getState(neighbor);
-			VoxelShape shape = state.getOutlineShape(MC.world, neighbor);
-			
-			linesOfSight[i] = MC.world.raycastBlock(eyesPos, hitVecs[i],
-				neighbor, shape, state) == null;
+			linesOfSight[i] = MC.world
+				.raycast(new RaycastContext(eyesPos, hitVecs[i],
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player))
+				.getType() == HitResult.Type.MISS;
 		}
 		
 		// decide which side to use
@@ -142,6 +143,9 @@ public enum BlockPlacer
 				side = sides[i];
 				continue;
 			}
+			
+			if(linesOfSight[bestSide] && !linesOfSight[i])
+				continue;
 			
 			// then pick the furthest side
 			if(distancesSq[i] > distancesSq[bestSide])
