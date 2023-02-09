@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -58,7 +58,7 @@ public final class SneakHack extends Hack
 		{
 			case LEGIT:
 			IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
-			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
+			sneakKey.resetPressedState();
 			break;
 			
 			case PACKET:
@@ -79,7 +79,7 @@ public final class SneakHack extends Hack
 			break;
 			
 			case PACKET:
-			sneakKey.setPressed(((IKeyBinding)sneakKey).isActallyPressed());
+			((IKeyBinding)sneakKey).resetPressedState();
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;

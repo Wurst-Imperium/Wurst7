@@ -1,4 +1,5 @@
 {
+  "description.wurst.hack.aimassist": "Hilft dir dabei, auf Mobs und Spieler in deiner Umgebung zu zielen.",
   "description.wurst.hack.airplace": "Ermöglicht dir, Blöcke in der Luft zu platzieren.",
   "description.wurst.hack.anchoraura": "Platziert automatisch Seelenanker um dich herum, lädt diese mit Glowstone auf, und sprengt sie dann, um damit Mobs und Spieler um dich herum zu killen.",
   "description.wurst.hack.antiafk": "Läuft zufällig durch die Gegend, um dich vor Anti-AFK Plugins zu verstecken.\nBenötigt mindestens 3x3 Blöcke freien Platz.",
