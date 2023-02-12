@@ -10,6 +10,9 @@ package net.wurstclient.util;
 import java.util.Collections;
 import java.util.List;
 
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -452,5 +455,38 @@ public abstract class ListWidget extends AbstractParentElement
 	public double getScrollAmount()
 	{
 		return scrollAmount;
+	}
+	
+	protected void drawSelectionOutline(MatrixStack matrixStack, int x, int y)
+	{
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		
+		RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y + 28, 0).next();
+		bufferBuilder.vertex(matrix, x - 2, y + 28, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.setShaderColor(0, 0, 0, 1);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 1, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y + 27, 0).next();
+		bufferBuilder.vertex(matrix, x - 1, y + 27, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 }
