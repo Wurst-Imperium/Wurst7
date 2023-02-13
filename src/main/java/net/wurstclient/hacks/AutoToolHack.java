@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -85,7 +85,7 @@ public final class AutoToolHack extends Hack
 			prevSelectedSlot = MC.player.getInventory().selectedSlot;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.getValueI() > 0);
+			repairMode.getValueI());
 	}
 	
 	@Override
@@ -106,11 +106,11 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.getValueI() > 0);
+			repairMode.getValueI());
 	}
 	
 	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
-		boolean repairMode)
+		int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		if(player.getAbilities().creativeMode)
@@ -123,7 +123,7 @@ public final class AutoToolHack extends Hack
 			if(!isDamageable(heldItem))
 				return;
 			
-			if(repairMode && isTooDamaged(heldItem))
+			if(isTooDamaged(heldItem, repairMode))
 			{
 				selectFallbackSlot();
 				return;
@@ -138,7 +138,7 @@ public final class AutoToolHack extends Hack
 		player.getInventory().selectedSlot = bestSlot;
 	}
 	
-	private int getBestSlot(BlockPos pos, boolean useSwords, boolean repairMode)
+	private int getBestSlot(BlockPos pos, boolean useSwords, int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		PlayerInventory inventory = player.getInventory();
@@ -146,7 +146,7 @@ public final class AutoToolHack extends Hack
 		
 		BlockState state = BlockUtils.getState(pos);
 		float bestSpeed = getMiningSpeed(heldItem, state);
-		if(isTooDamaged(heldItem))
+		if(isTooDamaged(heldItem, repairMode))
 			bestSpeed = 1;
 		int bestSlot = -1;
 		
@@ -164,7 +164,7 @@ public final class AutoToolHack extends Hack
 			if(!useSwords && stack.getItem() instanceof SwordItem)
 				continue;
 			
-			if(repairMode && isTooDamaged(stack))
+			if(isTooDamaged(stack, repairMode))
 				continue;
 			
 			bestSpeed = speed;
@@ -194,10 +194,9 @@ public final class AutoToolHack extends Hack
 		return !stack.isEmpty() && stack.getItem().isDamageable();
 	}
 	
-	private boolean isTooDamaged(ItemStack stack)
+	private boolean isTooDamaged(ItemStack stack, int repairMode)
 	{
-		return stack.getMaxDamage() - stack.getDamage() <= repairMode
-			.getValueI();
+		return stack.getMaxDamage() - stack.getDamage() <= repairMode;
 	}
 	
 	private boolean isWrongTool(ItemStack heldItem, BlockPos pos)
