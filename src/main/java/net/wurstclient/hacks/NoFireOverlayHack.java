@@ -18,7 +18,7 @@ public final class NoFireOverlayHack extends Hack
 {
 	private final SliderSetting offset =
 		new SliderSetting("Offset", "The amount to lower the fire overlay by.",
-			0.6, 0, 0.6, 0.01, ValueDisplay.DECIMAL);
+			0.6, 0.01, 0.6, 0.01, ValueDisplay.DECIMAL);
 	
 	public NoFireOverlayHack()
 	{
