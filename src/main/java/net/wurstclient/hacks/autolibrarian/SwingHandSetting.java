@@ -18,7 +18,6 @@ import net.wurstclient.settings.EnumSetting;
 public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
-	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final MinecraftClient MC = WurstClient.MC;
 	
 	public SwingHandSetting()

@@ -7,15 +7,12 @@
  */
 package net.wurstclient.hacks.autolibrarian;
 
-import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.EnumSetting;
 
 public final class UpdateBooksSetting
 	extends EnumSetting<UpdateBooksSetting.UpdateBooks>
 {
-	protected static final WurstClient WURST = WurstClient.INSTANCE;
-	
 	public UpdateBooksSetting()
 	{
 		super("Update books",
