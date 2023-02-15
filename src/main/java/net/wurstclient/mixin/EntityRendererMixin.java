@@ -55,23 +55,21 @@ public abstract class EntityRendererMixin<T extends Entity>
 	 * an infinite loop. Also makes it easier to modify.
 	 */
 	protected void wurstRenderLabelIfPresent(T entity, Text text,
-		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-		int i)
+		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
 	{
 		double d = this.dispatcher.getSquaredDistanceToCamera(entity);
-		
-		if(d > 4096)
+		if(d > 4096.0)
 			return;
 		
 		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
 		boolean bl = !entity.isSneaky() || nameTagsHack.isEnabled();
 		float f = entity.getHeight() + 0.5F;
-		int j = "deadmau5".equals(text.getString()) ? -10 : 0;
+		int i = "deadmau5".equals(text.getString()) ? -10 : 0;
 		
-		matrixStack.push();
-		matrixStack.translate(0.0D, f, 0.0D);
-		matrixStack.multiply(this.dispatcher.getRotation());
+		matrices.push();
+		matrices.translate(0F, f, 0F);
+		matrices.multiply(this.dispatcher.getRotation());
 		
 		float scale = 0.025F;
 		if(nameTagsHack.isEnabled())
@@ -82,23 +80,25 @@ public abstract class EntityRendererMixin<T extends Entity>
 				scale *= distance / 10;
 		}
 		
-		matrixStack.scale(-scale, -scale, scale);
+		matrices.scale(-scale, -scale, scale);
 		
-		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
-		int k = (int)(g * 255.0F) << 24;
+		int j = (int)(g * 255.0F) << 24;
 		
 		TextRenderer textRenderer = this.getTextRenderer();
 		float h = -textRenderer.getWidth(text) / 2;
 		
-		textRenderer.draw(text.asOrderedText(), h, j, 553648127, false,
-			matrix4f, vertexConsumerProvider, bl, k, i);
+		textRenderer.draw(text, h, i, 0x20FFFFFF, false, matrix4f,
+			vertexConsumers, bl ? TextRenderer.TextLayerType.SEE_THROUGH
+				: TextRenderer.TextLayerType.NORMAL,
+			j, light);
 		
 		if(bl)
-			textRenderer.draw(text.asOrderedText(), h, j, -1, false, matrix4f,
-				vertexConsumerProvider, false, 0, i);
+			textRenderer.draw(text, h, i, -1, false, matrix4f, vertexConsumers,
+				TextRenderer.TextLayerType.NORMAL, 0, light);
 		
-		matrixStack.pop();
+		matrices.pop();
 	}
 	
 	@Shadow

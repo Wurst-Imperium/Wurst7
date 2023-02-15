@@ -101,8 +101,8 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Zoom Manager", width / 2,
-			40, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Zoom Manager",
+			width / 2, 40, 0xffffff);
 		drawTextWithShadow(matrixStack, textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,
 			height / 4 + 44, 0xcccccc);

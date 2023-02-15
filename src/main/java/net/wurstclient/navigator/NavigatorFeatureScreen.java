@@ -325,8 +325,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer, feature.getName(),
-			middleX, 32, txtColor);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			feature.getName(), middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background

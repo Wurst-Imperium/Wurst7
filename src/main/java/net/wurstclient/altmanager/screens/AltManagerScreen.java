@@ -435,8 +435,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Alt Manager", width / 2, 4,
-			16777215);
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Alt Manager",
+			width / 2, 4, 16777215);
 		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
 		drawCenteredTextWithShadow(

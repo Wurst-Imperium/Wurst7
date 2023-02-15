@@ -369,8 +369,8 @@ public abstract class AltEditorScreen extends Screen
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			drawCenteredTextWithShadow(matrixStack, textRenderer, lines[i], width / 2,
-				142 + 10 * i, 16777215);
+			drawCenteredTextWithShadow(matrixStack, textRenderer, lines[i],
+				width / 2, 142 + 10 * i, 16777215);
 		
 		// text boxes
 		nameOrEmailBox.render(matrixStack, mouseX, mouseY, partialTicks);

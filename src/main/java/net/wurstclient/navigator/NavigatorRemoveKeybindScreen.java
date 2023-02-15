@@ -135,8 +135,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer, "Remove Keybind",
-			middleX, 32, txtColor);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			"Remove Keybind", middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -196,8 +196,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawTextWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, txtColor);
+			drawTextWithShadow(matrixStack, client.textRenderer, line, bgx1 + 2,
+				textY, txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);

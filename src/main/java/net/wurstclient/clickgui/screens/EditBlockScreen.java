@@ -106,8 +106,8 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, tr, setting.getName(), width / 2, 20,
-			0xFFFFFF);
+		drawCenteredTextWithShadow(matrixStack, tr, setting.getName(),
+			width / 2, 20, 0xFFFFFF);
 		
 		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
