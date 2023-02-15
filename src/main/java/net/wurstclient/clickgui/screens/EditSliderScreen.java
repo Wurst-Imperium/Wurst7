@@ -96,7 +96,7 @@ public final class EditSliderScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, client.textRenderer, slider.getName(),
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer, slider.getName(),
 			width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(matrixStack, mouseX, mouseY, partialTicks);

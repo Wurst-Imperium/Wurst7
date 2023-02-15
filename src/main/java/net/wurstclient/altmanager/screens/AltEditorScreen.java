@@ -359,17 +359,17 @@ public abstract class AltEditorScreen extends Screen
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Name (for cracked alts), or", width / 2 - 100, 37, 10526880);
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"E-Mail (for premium alts)", width / 2 - 100, 47, 10526880);
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Password (leave blank for cracked alts)", width / 2 - 100, 87,
 			10526880);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			drawCenteredText(matrixStack, textRenderer, lines[i], width / 2,
+			drawCenteredTextWithShadow(matrixStack, textRenderer, lines[i], width / 2,
 				142 + 10 * i, 16777215);
 		
 		// text boxes

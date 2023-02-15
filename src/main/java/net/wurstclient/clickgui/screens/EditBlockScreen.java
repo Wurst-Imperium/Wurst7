@@ -106,7 +106,7 @@ public final class EditBlockScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, tr, setting.getName(), width / 2, 20,
+		drawCenteredTextWithShadow(matrixStack, tr, setting.getName(), width / 2, 20,
 			0xFFFFFF);
 		
 		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -122,7 +122,7 @@ public final class EditBlockScreen extends Screen
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		drawStringWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
+		drawTextWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;

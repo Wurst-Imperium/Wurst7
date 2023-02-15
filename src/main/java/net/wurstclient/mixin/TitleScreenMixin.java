@@ -77,7 +77,7 @@ public abstract class TitleScreenMixin extends Screen
 			
 		// adjust AltManager button if Realms button has been moved
 		// happens when ModMenu is installed
-		altsButton.setY(realmsButton.getY());
+		altsButton.method_46419(realmsButton.getY());
 	}
 	
 	/**

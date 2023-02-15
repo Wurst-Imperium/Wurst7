@@ -205,9 +205,9 @@ public class CleanUpScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Clean Up", width / 2, 20,
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Clean Up", width / 2, 20,
 			16777215);
-		drawCenteredText(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		

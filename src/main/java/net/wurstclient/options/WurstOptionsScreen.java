@@ -162,13 +162,13 @@ public class WurstOptionsScreen extends Screen
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredText(matrixStack, tr, "Wurst Options", middleX, y1,
+		drawCenteredTextWithShadow(matrixStack, tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		drawCenteredText(matrixStack, tr, "Settings", middleX - 104, y2,
+		drawCenteredTextWithShadow(matrixStack, tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredText(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredText(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
+		drawCenteredTextWithShadow(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
+		drawCenteredTextWithShadow(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
 	}
 	
 	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,

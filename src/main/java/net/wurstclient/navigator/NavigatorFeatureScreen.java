@@ -325,7 +325,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer, feature.getName(),
 			middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -463,7 +463,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredText(matrixStack, client.textRenderer,
+			drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);

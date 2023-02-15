@@ -54,7 +54,7 @@ public class PressAKeyScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Press a key", width / 2,
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Press a key", width / 2,
 			height / 4 + 48, 16777215);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}

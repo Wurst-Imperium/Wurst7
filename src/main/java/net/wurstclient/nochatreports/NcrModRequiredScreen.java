@@ -127,7 +127,7 @@ public final class NcrModRequiredScreen extends Screen
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredText(matrices, textRenderer, title, centerX,
+		DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, title, centerX,
 			titleY, 0xAAAAAA);
 		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
 		
