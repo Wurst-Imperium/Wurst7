@@ -61,9 +61,10 @@ public class ChatHudMixin extends DrawableHelper
 	}
 	
 	@Shadow
-	private void shadow$logChatMessage(Text message, @Nullable MessageIndicator indicator)
+	private void shadow$logChatMessage(Text message,
+		@Nullable MessageIndicator indicator)
 	{
-
+		
 	}
 	
 	@Shadow
