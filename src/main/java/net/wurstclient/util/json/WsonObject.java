@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -40,6 +40,11 @@ public final class WsonObject
 		}
 	}
 	
+	public boolean getBoolean(String key, boolean fallback)
+	{
+		return JsonUtils.getAsBoolean(json.get(key), fallback);
+	}
+	
 	public int getInt(String key) throws JsonException
 	{
 		try
@@ -50,6 +55,11 @@ public final class WsonObject
 		{
 			throw new JsonException("Number \"" + key + "\" not found.", e);
 		}
+	}
+	
+	public int getInt(String key, int fallback)
+	{
+		return JsonUtils.getAsInt(json.get(key), fallback);
 	}
 	
 	public long getLong(String key) throws JsonException
@@ -64,6 +74,45 @@ public final class WsonObject
 		}
 	}
 	
+	public long getLong(String key, long fallback)
+	{
+		return JsonUtils.getAsLong(json.get(key), fallback);
+	}
+	
+	public float getFloat(String key) throws JsonException
+	{
+		try
+		{
+			return JsonUtils.getAsFloat(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
+	}
+	
+	public float getFloat(String key, float fallback)
+	{
+		return JsonUtils.getAsFloat(json.get(key), fallback);
+	}
+	
+	public double getDouble(String key) throws JsonException
+	{
+		try
+		{
+			return JsonUtils.getAsDouble(json.get(key));
+			
+		}catch(JsonException e)
+		{
+			throw new JsonException("Number \"" + key + "\" not found.", e);
+		}
+	}
+	
+	public double getDouble(String key, double fallback)
+	{
+		return JsonUtils.getAsDouble(json.get(key), fallback);
+	}
+	
 	public String getString(String key) throws JsonException
 	{
 		try
@@ -74,6 +123,11 @@ public final class WsonObject
 		{
 			throw new JsonException("String \"" + key + "\" not found.", e);
 		}
+	}
+	
+	public String getString(String key, String fallback)
+	{
+		return JsonUtils.getAsString(json.get(key), fallback);
 	}
 	
 	public WsonArray getArray(String key) throws JsonException
