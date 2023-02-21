@@ -29,7 +29,8 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z")
 	private void setVelocityFromFluid(Entity entity, Vec3d velocity)
 	{
-		VelocityFromFluidEvent event = new VelocityFromFluidEvent((Entity)(Object)this);
+		VelocityFromFluidEvent event =
+			new VelocityFromFluidEvent((Entity)(Object)this);
 		EventManager.fire(event);
 		
 		if(!event.isCancelled())
