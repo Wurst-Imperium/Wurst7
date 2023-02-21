@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,15 +13,19 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -857,5 +861,44 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+	}
+	
+	public static void drawItem(MatrixStack matrixStack, ItemStack stack, int x,
+		int y, boolean large)
+	{
+		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
+		
+		modelViewStack.push();
+		modelViewStack.translate(x, y, 0);
+		if(large)
+			modelViewStack.scale(1.5F, 1.5F, 1.5F);
+		else
+			modelViewStack.scale(0.75F, 0.75F, 0.75F);
+		
+		ItemStack renderStack =
+			stack.isEmpty() ? new ItemStack(Blocks.GRASS_BLOCK) : stack;
+		
+		DiffuseLighting.enableGuiDepthLighting();
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
+			0, 0);
+		DiffuseLighting.disableGuiDepthLighting();
+		
+		modelViewStack.pop();
+		RenderSystem.applyModelViewMatrix();
+		
+		if(stack.isEmpty())
+		{
+			matrixStack.push();
+			matrixStack.translate(x, y, 0);
+			if(large)
+				matrixStack.scale(2, 2, 2);
+			
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			TextRenderer fr = WurstClient.MC.textRenderer;
+			fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			
+			matrixStack.pop();
+		}
 	}
 }
