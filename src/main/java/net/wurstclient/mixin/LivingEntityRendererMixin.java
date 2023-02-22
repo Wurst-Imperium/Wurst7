@@ -23,39 +23,48 @@ import net.wurstclient.WurstClient;
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin
 {
+	/**
+	 * Makes invisible entities render as ghosts if TrueSight is enabled.
+	 */
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
 		ordinal = 0),
-		method = {
-			"render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"})
-	private boolean canWurstSeePlayer(LivingEntity e, PlayerEntity player)
+		method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
+	private boolean isInvisibleToWurst(LivingEntity e, PlayerEntity player)
 	{
 		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
 			return false;
 		
 		return e.isInvisibleTo(player);
 	}
-
+	
+	/**
+	 * Disables the distance limit in hasLabel() if configured in NameTags.
+	 */
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D",
-		ordinal = 0),
-		method = {"hasLabel(Lnet/minecraft/entity/LivingEntity;)Z"})
+		ordinal = 0), method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z")
 	private double adjustDistance(EntityRenderDispatcher render, Entity entity)
 	{
+		// pretend the distance is 1 so the check always passes
 		if(WurstClient.INSTANCE.getHax().nameTagsHack.isUnlimitedRange())
 			return 1;
-
+		
 		return render.getSquaredDistanceToCamera(entity);
 	}
-
-	@Inject(at = {@At(value = "INVOKE",
+	
+	/**
+	 * Forces the nametag to be rendered if configured in NameTags.
+	 */
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/MinecraftClient;getInstance()Lnet/minecraft/client/MinecraftClient;",
-		ordinal = 0)},
-		method = {
-			"hasLabel(Lnet/minecraft/entity/LivingEntity;)Z"},
+		ordinal = 0),
+		method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z",
 		cancellable = true)
-	private void shouldForceLabel(LivingEntity e, CallbackInfoReturnable<Boolean> cir)
+	private void shouldForceLabel(LivingEntity e,
+		CallbackInfoReturnable<Boolean> cir)
 	{
+		// return true immediately after the distance check
 		if(WurstClient.INSTANCE.getHax().nameTagsHack.alwaysVisibleNametags())
 			cir.setReturnValue(true);
 	}

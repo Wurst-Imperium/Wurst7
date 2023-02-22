@@ -15,28 +15,30 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"name tags"})
 public final class NameTagsHack extends Hack
 {
-	private final CheckboxSetting alwaysVisible = new CheckboxSetting(
-		"Always See NameTags", false);	
-	private final CheckboxSetting unlimited = new CheckboxSetting(
-		"Unlimited Range Nametags", false);
-
+	private final CheckboxSetting alwaysVisible =
+		new CheckboxSetting("Always See NameTags", false);
+	
+	private final CheckboxSetting unlimited =
+		new CheckboxSetting("Unlimited Range Nametags", false);
+	
 	public NameTagsHack()
 	{
 		super("NameTags");
 		setCategory(Category.RENDER);
-		addSetting(alwaysVisible);	
+		addSetting(alwaysVisible);
 		addSetting(unlimited);
 	}
-
+	
 	public boolean alwaysVisibleNametags()
 	{
 		return isEnabled() && alwaysVisible.isChecked();
 	}
-
+	
 	public boolean isUnlimitedRange()
 	{
 		return isEnabled() && unlimited.isChecked();
 	}
 	
-	// See EntityRendererMixin.wurstRenderLabelIfPresent()
+	// See LivingEntityRendererMixin and
+	// EntityRendererMixin.wurstRenderLabelIfPresent()
 }
