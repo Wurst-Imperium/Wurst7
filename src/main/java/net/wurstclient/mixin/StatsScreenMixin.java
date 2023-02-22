@@ -55,7 +55,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 				.equals(I18n.translate("gui.done")))
 				continue;
 			
-			button.setX(width / 2 + 2);
+			button.method_46421(width / 2 + 2);
 			button.setWidth(150);
 		}
 	}
