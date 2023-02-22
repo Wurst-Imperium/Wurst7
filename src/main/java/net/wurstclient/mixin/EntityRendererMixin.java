@@ -92,8 +92,8 @@ public abstract class EntityRendererMixin<T extends Entity>
 		TextRenderer tr = getTextRenderer();
 		float labelX = -tr.getWidth(text) / 2;
 		
-		// use the see-through layer if NameTags is enabled
-		boolean seeThrough = nameTags.isEnabled();
+		// use the see-through layer if configured in NameTags
+		boolean seeThrough = nameTags.isSeeThrough();
 		
 		// draw background
 		tr.draw(text.asOrderedText(), labelX, labelY, 0x20FFFFFF, false, matrix,
