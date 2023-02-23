@@ -243,7 +243,7 @@ public final class FightBotHack extends Hack
 		
 		public EntityPathFinder(Entity entity)
 		{
-			super(new BlockPos(entity.getPos()));
+			super(BlockPos.method_49638(entity.getPos()));
 			this.entity = entity;
 			setThinkTime(1);
 		}

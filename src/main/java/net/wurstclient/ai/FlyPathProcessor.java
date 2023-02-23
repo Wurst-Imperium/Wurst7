@@ -30,7 +30,7 @@ public class FlyPathProcessor extends PathProcessor
 	public void process()
 	{
 		// get positions
-		BlockPos pos = new BlockPos(MC.player.getPos());
+		BlockPos pos = BlockPos.method_49638(MC.player.getPos());
 		Vec3d posVec = MC.player.getPos();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);

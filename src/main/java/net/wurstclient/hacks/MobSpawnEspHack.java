@@ -110,7 +110,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		ClientWorld world = MC.world;
 		
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.method_49638(RotationUtils.getEyesPos());
 		int chunkX = eyesBlock.getX() >> 4;
 		int chunkZ = eyesBlock.getZ() >> 4;
 		int chunkRange = drawDistance.getSelected().chunkRange;

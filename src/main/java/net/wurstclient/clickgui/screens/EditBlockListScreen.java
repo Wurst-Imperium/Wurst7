@@ -12,8 +12,6 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -281,21 +279,19 @@ public final class EditBlockListScreen extends Screen
 		{
 			if(stack.isEmpty())
 			{
-				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-				modelViewStack.push();
-				modelViewStack.translate(x, y, 0);
+				matrixStack.push();
+				matrixStack.translate(x, y, 0);
 				if(large)
-					modelViewStack.scale(1.5F, 1.5F, 1.5F);
+					matrixStack.scale(1.5F, 1.5F, 1.5F);
 				else
-					modelViewStack.scale(0.75F, 0.75F, 0.75F);
+					matrixStack.scale(0.75F, 0.75F, 0.75F);
 				
 				DiffuseLighting.enableGuiDepthLighting();
-				mc.getItemRenderer().renderInGuiWithOverrides(
+				mc.getItemRenderer().renderInGuiWithOverrides(matrixStack,
 					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
 				DiffuseLighting.disableGuiDepthLighting();
 				
-				modelViewStack.pop();
-				RenderSystem.applyModelViewMatrix();
+				matrixStack.pop();
 				
 				matrixStack.push();
 				matrixStack.translate(x, y, 0);
@@ -308,22 +304,21 @@ public final class EditBlockListScreen extends Screen
 				matrixStack.pop();
 				
 				return "\u00a7ounknown block\u00a7r";
-				
 			}
-			MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-			modelViewStack.push();
-			modelViewStack.translate(x, y, 0);
+			
+			matrixStack.push();
+			matrixStack.translate(x, y, 0);
 			if(large)
-				modelViewStack.scale(1.5F, 1.5F, 1.5F);
+				matrixStack.scale(1.5F, 1.5F, 1.5F);
 			else
-				modelViewStack.scale(0.75F, 0.75F, 0.75F);
+				matrixStack.scale(0.75F, 0.75F, 0.75F);
 			
 			DiffuseLighting.enableGuiDepthLighting();
-			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
+			mc.getItemRenderer().renderInGuiWithOverrides(matrixStack, stack, 0,
+				0);
 			DiffuseLighting.disableGuiDepthLighting();
 			
-			modelViewStack.pop();
-			RenderSystem.applyModelViewMatrix();
+			matrixStack.pop();
 			
 			return stack.getName().getString();
 		}

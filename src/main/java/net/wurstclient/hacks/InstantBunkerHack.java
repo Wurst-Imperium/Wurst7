@@ -85,7 +85,7 @@ public final class InstantBunkerHack extends Hack
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings
-		BlockPos startPos = new BlockPos(MC.player.getPos());
+		BlockPos startPos = BlockPos.method_49638(MC.player.getPos());
 		Direction facing = MC.player.getHorizontalFacing();
 		Direction facing2 = facing.rotateYCounterclockwise();
 		
@@ -150,7 +150,7 @@ public final class InstantBunkerHack extends Hack
 		// {
 		// if(!BlockUtils.placeBlockLegit(pos))
 		// {
-		// BlockPos playerPos = new BlockPos(MC.player);
+		// BlockPos playerPos = BlockPos.method_49638(MC.player);
 		// if(MC.player.onGround
 		// && Math.abs(pos.getX() - playerPos.getX()) == 2
 		// && pos.getY() - playerPos.getY() == 2

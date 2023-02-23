@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 
@@ -144,25 +143,20 @@ public final class BlockComponent extends Component
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-		modelViewStack.push();
+		matrixStack.push();
 		
-		Window parent = getParent();
-		modelViewStack.translate(parent.getX(),
-			parent.getY() + 13 + parent.getScrollOffset(), 0);
-		modelViewStack.translate(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		float scale = large ? 1.5F : 0.75F;
-		modelViewStack.scale(scale, scale, scale);
+		matrixStack.scale(scale, scale, scale);
 		
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
-		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
-			0, 0);
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(matrixStack,
+			renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		modelViewStack.pop();
-		RenderSystem.applyModelViewMatrix();
+		matrixStack.pop();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);

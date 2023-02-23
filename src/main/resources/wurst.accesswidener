@@ -4,3 +4,4 @@ accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/D
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
+accessible	field	net/minecraft/entity/Entity	stepHeight	F

@@ -45,7 +45,7 @@ public final class DigCmd extends Command
 		ClientPlayerEntity player = MC.player;
 		Direction direction = player.getHorizontalFacing();
 		
-		BlockPos pos1 = new BlockPos(
+		BlockPos pos1 = BlockPos.method_49638(
 			player.getPos().add(0, player.getEyeHeight(player.getPose()), 0));
 		
 		if(height < 0)

@@ -165,7 +165,7 @@ public final class JesusHack extends Hack
 		
 		for(Box bb : blockCollisions)
 		{
-			BlockPos pos = new BlockPos(bb.getCenter());
+			BlockPos pos = BlockPos.method_49638(bb.getCenter());
 			Material material = BlockUtils.getState(pos).getMaterial();
 			
 			if(material == Material.WATER || material == Material.LAVA)

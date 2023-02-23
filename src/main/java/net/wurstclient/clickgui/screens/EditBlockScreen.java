@@ -10,8 +10,6 @@ package net.wurstclient.clickgui.screens;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
@@ -164,22 +162,20 @@ public final class EditBlockScreen extends Screen
 	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-		modelViewStack.push();
+		matrixStack.push();
 		
-		modelViewStack.translate(x, y, 0);
+		matrixStack.translate(x, y, 0);
 		float scale = large ? 1.5F : 0.75F;
-		modelViewStack.scale(scale, scale, scale);
+		matrixStack.scale(scale, scale, scale);
 		
 		DiffuseLighting.enableGuiDepthLighting();
 		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
 		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
-		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
-			0, 0);
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(matrixStack,
+			renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		modelViewStack.pop();
-		RenderSystem.applyModelViewMatrix();
+		matrixStack.pop();
 		
 		if(stack.isEmpty())
 			renderQuestionMark(matrixStack, x, y, large);

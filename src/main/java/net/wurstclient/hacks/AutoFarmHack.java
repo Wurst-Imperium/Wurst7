@@ -117,7 +117,7 @@ public final class AutoFarmHack extends Hack
 	{
 		currentBlock = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.method_49638(RotationUtils.getEyesPos());
 		double rangeSq = Math.pow(range.getValue(), 2);
 		int blockRange = (int)Math.ceil(range.getValue());
 		

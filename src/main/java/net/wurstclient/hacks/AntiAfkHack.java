@@ -56,7 +56,7 @@ public final class AntiAfkHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		start = new BlockPos(MC.player.getPos());
+		start = BlockPos.method_49638(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
 		creativeFlying = MC.player.getAbilities().flying;

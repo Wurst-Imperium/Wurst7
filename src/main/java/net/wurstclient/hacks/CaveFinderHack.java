@@ -182,7 +182,7 @@ public final class CaveFinderHack extends Hack
 	public void onUpdate()
 	{
 		Block currentBlock = BlockUtils.getBlockFromName("minecraft:cave_air");
-		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesPos = BlockPos.method_49638(RotationUtils.getEyesPos());
 		
 		ChunkPos center = getPlayerChunkPos(eyesPos);
 		int range = area.getSelected().chunkRange;
