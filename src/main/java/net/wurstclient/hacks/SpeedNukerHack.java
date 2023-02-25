@@ -57,7 +57,7 @@ public final class SpeedNukerHack extends Hack
 			+ "air = won't break anything", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
-		"Prevents changing the ID by clicking on blocks or restarting Nuker.",
+		"Prevents changing the ID by clicking on blocks or restarting SpeedNuker.",
 		false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
