@@ -73,11 +73,17 @@ public final class NukerHack extends Hack
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
 		"MultiID List", "The types of blocks to break in MultiID mode.",
-		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
-		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
-		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
-		"minecraft:lapis_ore", "minecraft:nether_gold_ore",
-		"minecraft:nether_quartz_ore", "minecraft:redstone_ore");
+		"minecraft:ancient_debris", "minecraft:bone_block",
+		"minecraft:coal_ore", "minecraft:copper_ore",
+		"minecraft:deepslate_coal_ore", "minecraft:deepslate_copper_ore",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_gold_ore",
+		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
+		"minecraft:deepslate_redstone_ore", "minecraft:diamond_ore",
+		"minecraft:emerald_ore", "minecraft:glowstone", "minecraft:gold_ore",
+		"minecraft:iron_ore", "minecraft:lapis_ore",
+		"minecraft:nether_gold_ore", "minecraft:nether_quartz_ore",
+		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
+		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
