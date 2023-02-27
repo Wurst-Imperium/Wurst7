@@ -21,7 +21,7 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
 
-@SearchTags({"mass tpa"})
+@SearchTags({"pay all"})
 @DontSaveState
 public final class MassTpaHack extends Hack
 	implements UpdateListener, ChatInputListener
@@ -92,7 +92,7 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 		
-		MC.getNetworkHandler().sendChatCommand("tpa " + players.get(index));
+		MC.getNetworkHandler().sendChatCommand("pay " + players.get(index) + "100000 ");
 		index++;
 		timer = 20;
 	}
