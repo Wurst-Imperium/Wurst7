@@ -32,11 +32,11 @@ public class WalkPathProcessor extends PathProcessor
 		// get positions
 		BlockPos pos;
 		if(WurstClient.MC.player.isOnGround())
-			pos = BlockPos.method_49637(WurstClient.MC.player.getX(),
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = BlockPos.method_49638(WurstClient.MC.player.getPos());
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		

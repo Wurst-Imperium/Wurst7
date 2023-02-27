@@ -183,7 +183,7 @@ public class WurstOptionsScreen extends Screen
 			
 			ClickableWidget button = (ClickableWidget)d;
 			
-			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
+			if(!button.isSelected() || !(button instanceof WurstOptionsButton))
 				continue;
 			
 			WurstOptionsButton woButton = (WurstOptionsButton)button;

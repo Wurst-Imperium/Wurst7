@@ -258,7 +258,7 @@ public final class FollowHack extends Hack
 	{
 		public EntityPathFinder()
 		{
-			super(BlockPos.method_49638(entity.getPos()));
+			super(BlockPos.ofFloored(entity.getPos()));
 			setThinkTime(1);
 		}
 		

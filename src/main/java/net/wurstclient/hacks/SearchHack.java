@@ -181,7 +181,7 @@ public final class SearchHack extends Hack
 	public void onUpdate()
 	{
 		Block currentBlock = block.getBlock();
-		BlockPos eyesPos = BlockPos.method_49638(RotationUtils.getEyesPos());
+		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		
 		ChunkPos center = MC.player.getChunkPos();
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();

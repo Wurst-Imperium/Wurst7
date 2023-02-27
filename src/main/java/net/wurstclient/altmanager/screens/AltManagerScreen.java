@@ -527,7 +527,7 @@ public final class AltManagerScreen extends Screen
 			
 			ClickableWidget button = (ClickableWidget)d;
 			
-			if(!button.isHovered())
+			if(!button.isSelected())
 				continue;
 			
 			if(button != importButton && button != exportButton)

@@ -225,7 +225,7 @@ public class CleanUpScreen extends Screen
 			
 			ClickableWidget button = (ClickableWidget)d;
 			
-			if(!button.isHovered() || !(button instanceof CleanUpButton))
+			if(!button.isSelected() || !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;

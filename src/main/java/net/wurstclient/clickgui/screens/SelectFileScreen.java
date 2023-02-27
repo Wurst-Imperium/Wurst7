@@ -173,7 +173,7 @@ public final class SelectFileScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(doneButton.isHovered() && !doneButton.active)
+		if(doneButton.isSelected() && !doneButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);

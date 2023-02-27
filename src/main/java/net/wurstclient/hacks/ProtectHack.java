@@ -305,7 +305,7 @@ public final class ProtectHack extends Hack
 		
 		public EntityPathFinder(Entity entity, double distance)
 		{
-			super(BlockPos.method_49638(entity.getPos()));
+			super(BlockPos.ofFloored(entity.getPos()));
 			this.entity = entity;
 			distanceSq = distance * distance;
 			setThinkTime(1);

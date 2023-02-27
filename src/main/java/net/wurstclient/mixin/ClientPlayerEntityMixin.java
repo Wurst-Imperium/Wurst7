@@ -144,10 +144,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * Overridden to allow for the speed to be modified by hacks.
 	 */
 	@Override
-	protected float method_49484()
+	protected float getOffGroundSpeed()
 	{
 		AirStrafingSpeedEvent event =
-			new AirStrafingSpeedEvent(super.method_49484());
+			new AirStrafingSpeedEvent(super.getOffGroundSpeed());
 		EventManager.fire(event);
 		return event.getSpeed();
 	}

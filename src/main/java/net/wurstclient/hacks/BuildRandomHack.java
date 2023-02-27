@@ -109,7 +109,7 @@ public final class BuildRandomHack extends Hack
 		do
 		{
 			// generate random position
-			pos = BlockPos.method_49638(MC.player.getPos()).add(
+			pos = BlockPos.ofFloored(MC.player.getPos()).add(
 				random.nextInt(bound) - range, random.nextInt(bound) - range,
 				random.nextInt(bound) - range);
 			attempts++;

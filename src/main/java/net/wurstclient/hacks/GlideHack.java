@@ -79,8 +79,8 @@ public final class GlideHack extends Hack
 			if(!MC.world.isSpaceEmpty(box))
 				return;
 			
-			BlockPos min = BlockPos.method_49637(box.minX, box.minY, box.minZ);
-			BlockPos max = BlockPos.method_49637(box.maxX, box.maxY, box.maxZ);
+			BlockPos min = BlockPos.ofFloored(box.minX, box.minY, box.minZ);
+			BlockPos max = BlockPos.ofFloored(box.maxX, box.maxY, box.maxZ);
 			Stream<BlockPos> stream = StreamSupport
 				.stream(BlockUtils.getAllInBox(min, max).spliterator(), true);
 			

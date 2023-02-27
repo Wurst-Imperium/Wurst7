@@ -85,7 +85,7 @@ public final class InstantBunkerHack extends Hack
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings
-		BlockPos startPos = BlockPos.method_49638(MC.player.getPos());
+		BlockPos startPos = BlockPos.ofFloored(MC.player.getPos());
 		Direction facing = MC.player.getHorizontalFacing();
 		Direction facing2 = facing.rotateYCounterclockwise();
 		

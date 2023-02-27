@@ -181,7 +181,7 @@ public final class KeybindProfilesScreen extends Screen
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(loadButton.isHovered() && !loadButton.active)
+		if(loadButton.isSelected() && !loadButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);

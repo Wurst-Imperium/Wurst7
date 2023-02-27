@@ -64,12 +64,12 @@ public class PathFinder
 	{
 		if(WurstClient.MC.player.isOnGround())
 			start =
-				new PathPos(BlockPos.method_49637(WurstClient.MC.player.getX(),
+				new PathPos(BlockPos.ofFloored(WurstClient.MC.player.getX(),
 					WurstClient.MC.player.getY() + 0.5,
 					WurstClient.MC.player.getZ()));
 		else
 			start = new PathPos(
-				BlockPos.method_49638(WurstClient.MC.player.getPos()));
+				BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);
