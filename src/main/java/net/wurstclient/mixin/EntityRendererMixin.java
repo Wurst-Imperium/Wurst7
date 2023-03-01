@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -33,18 +34,19 @@ public abstract class EntityRendererMixin<T extends Entity>
 	@Final
 	protected EntityRenderDispatcher dispatcher;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 		cancellable = true)
 	private void onRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 		int i, CallbackInfo ci)
 	{
+		// add HealthTags info
 		if(entity instanceof LivingEntity)
 			text = WurstClient.INSTANCE.getHax().healthTagsHack
 				.addHealth((LivingEntity)entity, text);
 		
+		// do NameTags adjustments
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
 			vertexConsumerProvider, i);
 		ci.cancel();
@@ -57,46 +59,54 @@ public abstract class EntityRendererMixin<T extends Entity>
 	protected void wurstRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
 	{
-		double d = this.dispatcher.getSquaredDistanceToCamera(entity);
-		if(d > 4096.0)
+		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
+		
+		// disable distance limit if configured in NameTags
+		double distanceSq = dispatcher.getSquaredDistanceToCamera(entity);
+		if(distanceSq > 4096 && !nameTags.isUnlimitedRange())
 			return;
 		
-		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		// disable sneaking changes if NameTags is enabled
+		boolean notSneaky = !entity.isSneaky() || nameTags.isEnabled();
 		
-		boolean bl = !entity.isSneaky() || nameTagsHack.isEnabled();
-		float f = entity.getHeight() + 0.5F;
-		int i = "deadmau5".equals(text.getString()) ? -10 : 0;
+		float matrixY = entity.getHeight() + 0.5F;
+		int labelY = "deadmau5".equals(text.getString()) ? -10 : 0;
 		
 		matrices.push();
-		matrices.translate(0F, f, 0F);
-		matrices.multiply(this.dispatcher.getRotation());
+		matrices.translate(0, matrixY, 0);
+		matrices.multiply(dispatcher.getRotation());
 		
+		// adjust scale if NameTags is enabled
 		float scale = 0.025F;
-		if(nameTagsHack.isEnabled())
+		if(nameTags.isEnabled())
 		{
 			double distance = WurstClient.MC.player.distanceTo(entity);
-			
 			if(distance > 10)
 				scale *= distance / 10;
 		}
-		
 		matrices.scale(-scale, -scale, scale);
 		
-		Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
-		int j = (int)(g * 255.0F) << 24;
+		Matrix4f matrix = matrices.peek().getPositionMatrix();
+		float bgOpacity =
+			WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
+		int bgColor = (int)(bgOpacity * 255F) << 24;
+		TextRenderer tr = getTextRenderer();
+		float labelX = -tr.getWidth(text) / 2;
 		
-		TextRenderer textRenderer = this.getTextRenderer();
-		float h = -textRenderer.getWidth(text) / 2;
+		// draw background
+		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
+			vertexConsumers,
+			notSneaky ? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL,
+			bgColor, light);
 		
-		textRenderer.draw(text, h, i, 0x20FFFFFF, false, matrix4f,
-			vertexConsumers, bl ? TextRenderer.TextLayerType.SEE_THROUGH
-				: TextRenderer.TextLayerType.NORMAL,
-			j, light);
+		// use the see-through layer for text if configured in NameTags
+		TextLayerType textLayer = nameTags.isSeeThrough()
+			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
 		
-		if(bl)
-			textRenderer.draw(text, h, i, -1, false, matrix4f, vertexConsumers,
-				TextRenderer.TextLayerType.NORMAL, 0, light);
+		// draw text
+		if(notSneaky)
+			tr.draw(text, labelX, labelY, 0xFFFFFFFF, false, matrix,
+				vertexConsumers, textLayer, 0, light);
 		
 		matrices.pop();
 	}

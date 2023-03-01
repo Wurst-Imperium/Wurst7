@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -40,7 +40,7 @@ public class Window
 	
 	private boolean fixedWidth;
 	private int innerHeight;
-	private int maxHeight;
+	private int maxInnerHeight;
 	private int scrollOffset;
 	private boolean scrollingEnabled;
 	
@@ -133,10 +133,10 @@ public class Window
 			childrenHeight += c.getHeight() + 2;
 		childrenHeight += 2;
 		
-		if(maxHeight > 0 && childrenHeight > maxHeight + 13)
+		if(maxInnerHeight > 0 && childrenHeight > maxInnerHeight + 13)
 		{
 			setWidth(Math.max(maxChildWidth + 3, titleBarWidth));
-			setHeight(maxHeight + 13);
+			setHeight(maxInnerHeight + 13);
 			
 		}else
 		{
@@ -164,10 +164,10 @@ public class Window
 		
 		innerHeight = offsetY;
 		
-		if(maxHeight == 0 || innerHeight < maxHeight)
+		if(maxInnerHeight == 0 || innerHeight < maxInnerHeight)
 			setHeight(innerHeight + 13);
 		else
-			setHeight(maxHeight + 13);
+			setHeight(maxInnerHeight + 13);
 		
 		scrollingEnabled = innerHeight + 13 > height;
 		if(scrollingEnabled)
@@ -328,12 +328,20 @@ public class Window
 		return innerHeight;
 	}
 	
-	public final void setMaxHeight(int maxHeight)
+	public final void setMaxInnerHeight(int maxInnerHeight)
 	{
-		if(this.maxHeight != maxHeight)
+		if(maxInnerHeight < 0)
+			maxInnerHeight = 0;
+		
+		if(this.maxInnerHeight != maxInnerHeight)
 			invalidate();
 		
-		this.maxHeight = maxHeight;
+		this.maxInnerHeight = maxInnerHeight;
+	}
+	
+	public final void setMaxHeight(int maxHeight)
+	{
+		setMaxInnerHeight(maxHeight - 13);
 	}
 	
 	public final int getScrollOffset()

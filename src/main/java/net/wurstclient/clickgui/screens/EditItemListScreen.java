@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,16 +10,13 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +26,7 @@ import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
+import net.wurstclient.util.RenderUtils;
 
 public final class EditItemListScreen extends Screen
 {
@@ -205,7 +203,7 @@ public final class EditItemListScreen extends Screen
 		
 		matrixStack.pop();
 		
-		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
+		RenderUtils.drawItem(matrixStack, new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 	}
 	
@@ -272,62 +270,13 @@ public final class EditItemListScreen extends Screen
 			ItemStack stack = new ItemStack(item);
 			TextRenderer fr = mc.textRenderer;
 			
-			String displayName =
-				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(matrixStack, stack, x + 1, y + 1, true);
+			String displayName = stack.isEmpty() ? "\u00a7ounknown item\u00a7r"
+				: stack.getName().getString();
 			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
 			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
 			fr.draw(matrixStack, "ID: " + Registries.ITEM.getRawId(item),
 				x + 28, y + 18, 0xa0a0a0);
-		}
-		
-		private String renderIconAndGetName(MatrixStack matrixStack,
-			ItemStack stack, int x, int y, boolean large)
-		{
-			if(stack.isEmpty())
-			{
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
-				if(large)
-					matrixStack.scale(1.5F, 1.5F, 1.5F);
-				else
-					matrixStack.scale(0.75F, 0.75F, 0.75F);
-				
-				DiffuseLighting.enableGuiDepthLighting();
-				mc.getItemRenderer().renderInGuiWithOverrides(matrixStack,
-					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				DiffuseLighting.disableGuiDepthLighting();
-				
-				matrixStack.pop();
-				
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
-				if(large)
-					matrixStack.scale(2, 2, 2);
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				TextRenderer fr = mc.textRenderer;
-				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				matrixStack.pop();
-				
-				return "\u00a7ounknown item\u00a7r";
-			}
-			
-			matrixStack.push();
-			matrixStack.translate(x, y, 0);
-			
-			if(large)
-				matrixStack.scale(1.5F, 1.5F, 1.5F);
-			else
-				matrixStack.scale(0.75F, 0.75F, 0.75F);
-			
-			DiffuseLighting.enableGuiDepthLighting();
-			mc.getItemRenderer().renderInGuiWithOverrides(matrixStack, stack, 0,
-				0);
-			DiffuseLighting.disableGuiDepthLighting();
-			
-			matrixStack.pop();
-			
-			return stack.getName().getString();
 		}
 	}
 }

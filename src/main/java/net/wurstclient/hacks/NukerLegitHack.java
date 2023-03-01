@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,16 +18,17 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
@@ -64,16 +65,22 @@ public final class NukerLegitHack extends Hack
 			+ "air = won't break anything", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
-		"Prevents changing the ID by clicking on blocks or restarting Nuker.",
+		"Prevents changing the ID by clicking on blocks or restarting NukerLegit.",
 		false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
 		"MultiID List", "The types of blocks to break in MultiID mode.",
-		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
-		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
-		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
-		"minecraft:lapis_ore", "minecraft:nether_gold_ore",
-		"minecraft:nether_quartz_ore", "minecraft:redstone_ore");
+		"minecraft:ancient_debris", "minecraft:bone_block",
+		"minecraft:coal_ore", "minecraft:copper_ore",
+		"minecraft:deepslate_coal_ore", "minecraft:deepslate_copper_ore",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_emerald_ore",
+		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
+		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
+		"minecraft:diamond_ore", "minecraft:emerald_ore", "minecraft:glowstone",
+		"minecraft:gold_ore", "minecraft:iron_ore", "minecraft:lapis_ore",
+		"minecraft:nether_gold_ore", "minecraft:nether_quartz_ore",
+		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
+		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
 	private BlockPos currentBlock;
 	
@@ -202,13 +209,31 @@ public final class NukerLegitHack extends Hack
 	
 	private boolean breakBlockExtraLegit(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		Direction[] sides = Direction.values();
 		
-		for(Direction side : Direction.values())
+		BlockState state = BlockUtils.getState(pos);
+		VoxelShape shape = state.getOutlineShape(MC.world, pos);
+		if(shape.isEmpty())
+			return false;
+		
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d relCenter = shape.getBoundingBox().getCenter();
+		Vec3d center = Vec3d.of(pos).add(relCenter);
+		
+		Vec3d[] hitVecs = new Vec3d[sides.length];
+		for(int i = 0; i < sides.length; i++)
 		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
+			Vec3i dirVec = sides[i].getVector();
+			Vec3d relHitVec = new Vec3d(relCenter.x * dirVec.getX(),
+				relCenter.y * dirVec.getY(), relCenter.z * dirVec.getZ());
+			hitVecs[i] = center.add(relHitVec);
+		}
+		
+		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
+		
+		for(Direction side : sides)
+		{
+			Vec3d hitVec = hitVecs[side.ordinal()];
 			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
 			
 			// check if hitVec is within range (4.25 blocks)
@@ -216,15 +241,12 @@ public final class NukerLegitHack extends Hack
 				continue;
 			
 			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
+			if(distanceSqHitVec >= distanceSqToCenter)
 				continue;
 			
 			// check line of sight
-			if(MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(MC.world.raycastBlock(eyesPos, hitVec, pos, shape,
+				state) != null)
 				continue;
 			
 			// face block
@@ -232,9 +254,12 @@ public final class NukerLegitHack extends Hack
 			
 			if(currentBlock != null)
 				WURST.getHax().autoToolHack.equipIfEnabled(currentBlock);
+			
+			if(!MC.interactionManager.isBreakingBlock())
+				MC.interactionManager.attackBlock(pos, side);
 				
-			// if attack key is down but nothing happens, release it for one
-			// tick
+			// if attack key is down but nothing happens,
+			// release it for one tick
 			if(MC.options.attackKey.isPressed()
 				&& !MC.interactionManager.isBreakingBlock())
 			{
