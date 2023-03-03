@@ -26,6 +26,8 @@ public interface IClientPlayerInteractionManager
 	
 	public void windowClick_THROW(int slot);
 	
+	public void windowClick_SWAP(int from, int to);
+	
 	public void rightClickItem();
 	
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec);

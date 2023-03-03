@@ -133,6 +133,7 @@
   "description.wurst.hack.rainbowui": "§cM§aa§9k§ce§as §9e§cv§ae§9r§cy§at§9h§ci§an§9g §cc§ao§9l§co§ar§9f§cu§al§9.",
   "description.wurst.hack.reach": "Allows you to reach further.",
   "description.wurst.hack.remoteview": "Allows you to see the world as someone else.\nUse the .rv command to make it target a specific entity.",
+  "description.wurst.hack.restock": "Automatically restocks your hand with the selected items from your inventory. Works better with FastPlace.",
   "description.wurst.hack.safewalk": "Prevents you from falling off edges.",
   "description.wurst.hack.scaffoldwalk": "Automatically places blocks below your feet.",
   "description.wurst.hack.search": "Helps you to find specific blocks by highlighting them in rainbow color.",
