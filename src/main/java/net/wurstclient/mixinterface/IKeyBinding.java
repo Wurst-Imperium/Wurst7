@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,5 +9,14 @@ package net.wurstclient.mixinterface;
 
 public interface IKeyBinding
 {
+	/**
+	 * @return true if the user is actually pressing this key on their keyboard.
+	 */
 	public boolean isActallyPressed();
+	
+	/**
+	 * Resets the pressed state to whether or not the user is actually pressing
+	 * this key on their keyboard.
+	 */
+	public void resetPressedState();
 }
