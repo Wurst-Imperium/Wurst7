@@ -23,6 +23,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
     "ContainerScreen54Mixin",
     "CreativeInventoryScreenMixin",
     "CustomPayloadC2SPacketAccessor",
