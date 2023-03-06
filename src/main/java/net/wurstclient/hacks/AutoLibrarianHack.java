@@ -387,7 +387,7 @@ public final class AutoLibrarianHack extends Hack
 		Box box = villager.getBoundingBox();
 		Vec3d start = RotationUtils.getEyesPos();
 		Vec3d end = box.getCenter();
-		Vec3d hitVec = box.raycast(start, end).get();
+		Vec3d hitVec = box.raycast(start, end).orElse(start);
 		EntityHitResult hitResult = new EntityHitResult(villager, hitVec);
 		
 		// face end vector
