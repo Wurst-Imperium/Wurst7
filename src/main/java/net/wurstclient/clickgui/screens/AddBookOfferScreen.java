@@ -8,6 +8,7 @@
 package net.wurstclient.clickgui.screens;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
@@ -129,6 +130,16 @@ public final class AddBookOfferScreen extends Screen
 		priceMinusButton.active = false;
 		
 		addDrawableChild(
+				ButtonWidget.builder(Text.literal(">"), b -> Optional.ofNullable(offerToAdd)
+								.ifPresent(o -> updatePrice(o.possiblePriceRange()[1], false)))
+						.dimensions(width / 2 + 74, height - 58, 20, 12).build());
+		
+		addDrawableChild(
+				ButtonWidget.builder(Text.literal("<"), b -> Optional.ofNullable(offerToAdd)
+								.ifPresent(o -> updatePrice(o.possiblePriceRange()[0], false)))
+						.dimensions(width / 2 + 50, height - 58, 20, 12).build());
+		
+		addDrawableChild(
 			addButton = ButtonWidget.builder(Text.literal("Add"), b -> {
 				bookOffers.add(offerToAdd);
 				client.setScreen(prevScreen);
@@ -194,6 +205,8 @@ public final class AddBookOfferScreen extends Screen
 			String price = "" + offer.price();
 			if(!priceField.getText().equals(price))
 				priceField.setText(price);
+			
+			priceField.setEditableColor(offerToAdd.price() < offerToAdd.possiblePriceRange()[0] ? 0xff0000 : TextFieldWidget.DEFAULT_EDITABLE_COLOR);
 		}
 	}
 	
@@ -278,8 +291,8 @@ public final class AddBookOfferScreen extends Screen
 			&& offerToAdd.level() < offerToAdd.getEnchantment().getMaxLevel();
 		levelMinusButton.active = offerToAdd != null && offerToAdd.level() > 1;
 		
-		pricePlusButton.active = offerToAdd != null && offerToAdd.price() < 64;
-		priceMinusButton.active = offerToAdd != null && offerToAdd.price() > 1;
+		pricePlusButton.active = offerToAdd != null && offerToAdd.price() < offerToAdd.possiblePriceRange()[1];
+		priceMinusButton.active = offerToAdd != null && offerToAdd.price() > offerToAdd.possiblePriceRange()[0];
 		
 		levelField.tick();
 		priceField.tick();
@@ -373,7 +386,9 @@ public final class AddBookOfferScreen extends Screen
 			if(index >= 0 && index < list.size())
 			{
 				selected = index;
-				screen.updateSelectedOffer(list.get(index));
+				BookOffer offer = list.get(index);
+				screen.updateSelectedOffer(offer);
+				screen.updatePrice(offer.possiblePriceRange()[0], false);
 				lastTime = Util.getMeasuringTimeMs();
 			}
 			

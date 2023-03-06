@@ -66,6 +66,17 @@ public record BookOffer(String id, int level, int price)
 			&& level <= enchantment.getMaxLevel() && price >= 1 && price <= 64;
 	}
 	
+	public Integer[] possiblePriceRange() {
+		// see net.minecraft.village.TradeOffers
+		int min = 2 + 3 * level;
+		int max = Math.min(64, 2 + (4 + level * 10) + 3 * level);
+		if (getEnchantment().isTreasure()) {
+			min = Math.min(64, 2 * min);
+			max = Math.min(64, 2 * max);
+		}
+		return new Integer[]{min, max};
+	}
+	
 	@Override
 	public int compareTo(BookOffer other)
 	{

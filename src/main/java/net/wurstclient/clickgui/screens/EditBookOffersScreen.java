@@ -269,8 +269,10 @@ public final class EditBookOffersScreen extends Screen
 			tr.draw(matrixStack, bookOffer.id(), x + 28, y + 9, 0xa0a0a0);
 			
 			String price;
-			if(bookOffer.price() >= 64)
-				price = "any price";
+			if(bookOffer.price() >= bookOffer.possiblePriceRange()[1])
+				price = String.format("any price (%d)", bookOffer.price());
+			else if(bookOffer.price() < bookOffer.possiblePriceRange()[0])
+				price = String.format("impossible (%d)", bookOffer.price());
 			else
 			{
 				price = "max " + bookOffer.price();

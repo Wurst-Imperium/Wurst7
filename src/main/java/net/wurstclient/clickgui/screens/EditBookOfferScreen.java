@@ -26,6 +26,8 @@ import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.RenderUtils;
 
+import java.util.Optional;
+
 public final class EditBookOfferScreen extends Screen
 {
 	private final Screen prevScreen;
@@ -123,6 +125,18 @@ public final class EditBookOfferScreen extends Screen
 		priceMinusButton.active = false;
 		
 		addDrawableChild(
+				ButtonWidget.builder(Text.literal(">"), b -> Optional.ofNullable(offerToSave)
+								.ifPresent(o -> updatePrice(o.possiblePriceRange()[1], false)))
+						.dimensions(width / 2 + 74, 126, 20, 12).build());
+		pricePlusButton.active = false;
+		
+		addDrawableChild(
+				ButtonWidget.builder(Text.literal("<"), b -> Optional.ofNullable(offerToSave)
+								.ifPresent(o -> updatePrice(o.possiblePriceRange()[0], false)))
+						.dimensions(width / 2 + 50, 126, 20, 12).build());
+		priceMinusButton.active = false;
+
+		addDrawableChild(
 			saveButton = ButtonWidget.builder(Text.literal("Save"), b -> {
 				if(offerToSave == null || !offerToSave.isValid())
 					return;
@@ -195,6 +209,8 @@ public final class EditBookOfferScreen extends Screen
 			String price = "" + offer.price();
 			if(!priceField.getText().equals(price))
 				priceField.setText(price);
+			
+			priceField.setEditableColor(offerToSave.price() < offerToSave.possiblePriceRange()[0] ? 0xff0000 : TextFieldWidget.DEFAULT_EDITABLE_COLOR);
 		}
 	}
 	
@@ -242,9 +258,9 @@ public final class EditBookOfferScreen extends Screen
 			offerToSave != null && offerToSave.level() > 1;
 		
 		pricePlusButton.active =
-			offerToSave != null && offerToSave.price() < 64;
+			offerToSave != null && offerToSave.price() < offerToSave.possiblePriceRange()[1];
 		priceMinusButton.active =
-			offerToSave != null && offerToSave.price() > 1;
+			offerToSave != null && offerToSave.price() > offerToSave.possiblePriceRange()[0];
 		
 		levelField.tick();
 		priceField.tick();
@@ -280,8 +296,10 @@ public final class EditBookOfferScreen extends Screen
 		tr.draw(matrixStack, bookOffer.id(), x + 28, y + 9, 0xa0a0a0);
 		
 		String price;
-		if(bookOffer.price() >= 64)
-			price = "any price";
+		if(bookOffer.price() >= bookOffer.possiblePriceRange()[1])
+			price = String.format("any price (%d)", bookOffer.price());
+		else if(bookOffer.price() < bookOffer.possiblePriceRange()[0])
+			price = String.format("impossible (%d)", bookOffer.price());
 		else
 		{
 			price = "max " + bookOffer.price();
