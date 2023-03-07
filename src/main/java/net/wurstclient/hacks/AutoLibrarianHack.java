@@ -427,12 +427,20 @@ public final class AutoLibrarianHack extends Hack
 			if(enchantmentNbt.isEmpty())
 				continue;
 			
-			NbtList bookNbt =
-				EnchantedBookItem.getEnchantmentNbt(tradeOffer.getSellItem());
+			NbtList bookNbt = EnchantedBookItem.getEnchantmentNbt(stack);
 			String enchantment = bookNbt.getCompound(0).getString("id");
 			int level = bookNbt.getCompound(0).getInt("lvl");
 			int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
-			return new BookOffer(enchantment, level, price);
+			BookOffer bookOffer = new BookOffer(enchantment, level, price);
+			
+			if(!bookOffer.isValid())
+			{
+				System.out.println("Found invalid enchanted book offer.\n"
+					+ "NBT data: " + stack.getNbt());
+				continue;
+			}
+			
+			return bookOffer;
 		}
 		
 		return null;
