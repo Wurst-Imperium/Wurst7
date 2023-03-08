@@ -42,7 +42,7 @@
   "description.wurst.hack.autowalk": "Lässt dich automatisch vorwärts gehen.",
   "description.wurst.hack.basefinder": "Findet Spieler-Basen indem es nach unnatürlichen Blöcken sucht.\nDie gefundenen Blöcke werden dann in der gewählten Farbe hervorgehoben.\nGut geeignet, um Basen auf Faction-Servern zu finden.",
   "description.wurst.hack.blink": "Stoppt alle Bewegungs-Updates während es aktiviert ist.",
-  "description.wurst.hack.boatfly": "Lässt dich mit Booten fliegen.",
+  "description.wurst.hack.boatfly": "Lässt dich mit Booten und anderen Fahrzeugen fliegen.\nDrücke die Sprint-Taste um schneller nach unten zu gelangen.",
   "description.wurst.hack.bonemealaura": "Benutzt automatisch Knochenmehl auf bestimmten Arten von Pflanzen.\nBenutze die Kästchen in den Einstellungen, um die Arten von Pflanzen zu bestimmen.",
   "description.wurst.hack.bowaimbot": "Zielt automatisch mit deinem Bogen oder deiner Armbrust.",
   "description.wurst.hack.buildrandom": "Platziert zufällig Blöcke um dich herum.",
