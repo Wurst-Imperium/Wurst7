@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -43,9 +43,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		
-		KeyBinding sneak = MC.options.sneakKey;
-		sneak.setPressed(((IKeyBinding)sneak).isActallyPressed());
+		((IKeyBinding)MC.options.sneakKey).resetPressedState();
 	}
 	
 	@Override
@@ -55,7 +53,8 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 		if(timer < 10 - twerkSpeed.getValueI())
 			return;
 		
-		MC.options.sneakKey.setPressed(!MC.options.sneakKey.isPressed());
+		KeyBinding sneakKey = MC.options.sneakKey;
+		sneakKey.setPressed(!sneakKey.isPressed());
 		timer = -1;
 	}
 }

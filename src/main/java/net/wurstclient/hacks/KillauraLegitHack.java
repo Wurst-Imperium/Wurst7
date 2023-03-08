@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,13 +21,10 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -40,7 +36,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -54,6 +50,10 @@ public final class KillauraLegitHack extends Hack
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
+	private final SliderSetting rotationSpeed =
+		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
+			ValueDisplay.DEGREES.withSuffix("/s"));
+	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -61,8 +61,10 @@ public final class KillauraLegitHack extends Hack
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final SliderSetting fov =
-		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	private final SliderSetting fov = new SliderSetting("FOV",
+		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
+			+ "360\u00b0 = entities can be attacked all around you.",
+		360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -89,6 +91,8 @@ public final class KillauraLegitHack extends Hack
 			FilterCrystalsSetting.genericCombat(false));
 	
 	private Entity target;
+	private float nextYaw;
+	private float nextPitch;
 	
 	public KillauraLegitHack()
 	{
@@ -97,6 +101,7 @@ public final class KillauraLegitHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(rotationSpeed);
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(damageIndicator);
@@ -108,6 +113,7 @@ public final class KillauraLegitHack extends Hack
 	protected void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
@@ -143,18 +149,9 @@ public final class KillauraLegitHack extends Hack
 		
 		ClientPlayerEntity player = MC.player;
 		
+		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity
-					|| e instanceof ShulkerBulletEntity)
-				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-				.filter(e -> e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
@@ -181,47 +178,36 @@ public final class KillauraLegitHack extends Hack
 	
 	private boolean faceEntityClient(Entity entity)
 	{
-		// get position & rotation
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d lookVec = RotationUtils.getServerLookVec();
+		// get needed rotation
+		Box box = entity.getBoundingBox();
+		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
 		
-		// try to face center of boundingBox
-		Box bb = entity.getBoundingBox();
-		if(faceVectorClient(bb.getCenter()))
+		// turn towards center of boundingBox
+		Rotation next = RotationUtils.slowlyTurnTowards(needed,
+			rotationSpeed.getValueI() / 20F);
+		nextYaw = next.getYaw();
+		nextPitch = next.getPitch();
+		
+		// check if facing center
+		if(RotationUtils.isAlreadyFacing(needed))
 			return true;
 		
 		// if not facing center, check if facing anything in boundingBox
-		return bb
-			.raycast(eyesPos, eyesPos.add(lookVec.multiply(range.getValue())))
-			.isPresent();
-	}
-	
-	private boolean faceVectorClient(Vec3d vec)
-	{
-		Rotation rotation = RotationUtils.getNeededRotations(vec);
-		
-		float oldYaw = MC.player.prevYaw;
-		float oldPitch = MC.player.prevPitch;
-		
-		MC.player.setYaw(limitAngleChange(oldYaw, rotation.getYaw(), 30));
-		MC.player.setPitch(rotation.getPitch());
-		
-		return Math.abs(oldYaw - rotation.getYaw())
-			+ Math.abs(oldPitch - rotation.getPitch()) < 1F;
-	}
-	
-	private float limitAngleChange(float current, float intended,
-		float maxChange)
-	{
-		float change = MathHelper.wrapDegrees(intended - current);
-		change = MathHelper.clamp(change, -maxChange, maxChange);
-		return MathHelper.wrapDegrees(current + change);
+		return RotationUtils.isFacingBox(box, range.getValue());
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(target == null || !damageIndicator.isChecked())
+		if(target == null)
+			return;
+		
+		float oldYaw = MC.player.prevYaw;
+		float oldPitch = MC.player.prevPitch;
+		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
+		MC.player.setPitch(MathHelper.lerp(partialTicks, oldPitch, nextPitch));
+		
+		if(!damageIndicator.isChecked())
 			return;
 		
 		// GL settings

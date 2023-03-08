@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -55,10 +55,10 @@ public enum WurstClient
 {
 	INSTANCE;
 	
-	public static final MinecraftClient MC = MinecraftClient.getInstance();
-	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
+	public static MinecraftClient MC;
+	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.31";
+	public static final String VERSION = "7.32";
 	public static final String MC_VERSION = "1.19";
 	
 	private WurstAnalytics analytics;
@@ -89,6 +89,8 @@ public enum WurstClient
 	{
 		System.out.println("Starting Wurst Client...");
 		
+		MC = MinecraftClient.getInstance();
+		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
