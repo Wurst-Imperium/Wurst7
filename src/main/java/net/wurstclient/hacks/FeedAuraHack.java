@@ -21,7 +21,9 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -36,6 +38,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
@@ -56,6 +59,11 @@ public final class FeedAuraHack extends Hack
 	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
 		"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
 		false);
+	private final CheckboxSetting filterUntamed = new CheckboxSetting(
+		"Filter untamed", "Won't feed untamed animals, if the animal is tameable.", false);
+	private final CheckboxSetting filterHorses = new CheckboxSetting(
+		"Filter horse-like animals", "Won't feed horse-like animals.\n"
+			+ "Recommended due to a bug.", true);
 	
 	private final Random random = new Random();
 	private AnimalEntity target;
@@ -67,6 +75,8 @@ public final class FeedAuraHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(range);
 		addSetting(filterBabies);
+		addSetting(filterUntamed);
+		addSetting(filterHorses);
 	}
 	
 	@Override
@@ -111,6 +121,12 @@ public final class FeedAuraHack extends Hack
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
+		
+		if(filterUntamed.isChecked())
+			stream = stream.filter(e -> !isUntamed(e));
+
+		if(filterHorses.isChecked())
+			stream = stream.filter(e -> !(e instanceof AbstractHorseEntity));
 		
 		// convert targets to list
 		ArrayList<AnimalEntity> targets =
@@ -212,5 +228,16 @@ public final class FeedAuraHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+	}
+	
+	private boolean isUntamed(AnimalEntity e)
+	{
+		if(e instanceof AbstractHorseEntity horse && !horse.isTame())
+			return true;
+
+		if(e instanceof TameableEntity tame && !tame.isTamed())
+			return true;
+
+		return false;
 	}
 }
