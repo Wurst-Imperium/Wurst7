@@ -56,14 +56,19 @@ public final class FeedAuraHack extends Hack
 			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
-		"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
-		false);
-	private final CheckboxSetting filterUntamed = new CheckboxSetting(
-		"Filter untamed", "Won't feed untamed animals, if the animal is tameable.", false);
+	private final FilterBabiesSetting filterBabies =
+		new FilterBabiesSetting("Won't feed baby animals.\n"
+			+ "Saves food, but doesn't speed up baby growth.", true);
+	
+	private final CheckboxSetting filterUntamed =
+		new CheckboxSetting("Filter untamed",
+			"Won't feed tameable animals that haven't been tamed yet.", false);
+	
 	private final CheckboxSetting filterHorses = new CheckboxSetting(
-		"Filter horse-like animals", "Won't feed horse-like animals.\n"
-			+ "Recommended due to a bug.", true);
+		"Filter horse-like animals",
+		"Won't feed horses, llamas, donkeys, etc.\n"
+			+ "Recommended due to Minecraft bug MC-233276, which causes these animals to consume items indefinitely.",
+		true);
 	
 	private final Random random = new Random();
 	private AnimalEntity target;
@@ -124,7 +129,7 @@ public final class FeedAuraHack extends Hack
 		
 		if(filterUntamed.isChecked())
 			stream = stream.filter(e -> !isUntamed(e));
-
+		
 		if(filterHorses.isChecked())
 			stream = stream.filter(e -> !(e instanceof AbstractHorseEntity));
 		
@@ -234,10 +239,10 @@ public final class FeedAuraHack extends Hack
 	{
 		if(e instanceof AbstractHorseEntity horse && !horse.isTame())
 			return true;
-
+		
 		if(e instanceof TameableEntity tame && !tame.isTamed())
 			return true;
-
+		
 		return false;
 	}
 }
