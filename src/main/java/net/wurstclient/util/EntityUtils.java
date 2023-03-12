@@ -15,6 +15,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.wurstclient.WurstClient;
 
@@ -38,4 +39,14 @@ public enum EntityUtils
 			|| e instanceof ShulkerBulletEntity)
 		&& e != MC.player && !(e instanceof FakePlayerEntity)
 		&& !WURST.getFriends().isFriend(e);
+	
+	public static Stream<AnimalEntity> getValidAnimals()
+	{
+		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+			.filter(e -> e instanceof AnimalEntity).map(e -> (AnimalEntity)e)
+			.filter(IS_VALID_ANIMAL);
+	}
+	
+	public static Predicate<AnimalEntity> IS_VALID_ANIMAL =
+		a -> a != null && !a.isRemoved() && a.getHealth() > 0;
 }
