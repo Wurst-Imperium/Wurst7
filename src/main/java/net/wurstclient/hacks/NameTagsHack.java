@@ -22,13 +22,16 @@ public final class NameTagsHack extends Hack
 	private final CheckboxSetting seeThrough = new CheckboxSetting(
 		"See-through mode",
 		"Renders nametags on the see-through text layer. This makes them"
-			+ " easier to read behind walls, but harder to read behind water"
-			+ " and other transparent things.",
-		false);
+			+ " easier to read behind walls.",
+		true);
 	
 	private final CheckboxSetting forceNametags = new CheckboxSetting(
 		"Force nametags",
 		"Forces nametags of all players to be visible, even your own.", false);
+	
+	private final CheckboxSetting forceMobNametags = new CheckboxSetting(
+		"Force mob nametags",
+		"Forces nametags of all mobs to be visible.", false);
 	
 	public NameTagsHack()
 	{
@@ -37,6 +40,7 @@ public final class NameTagsHack extends Hack
 		addSetting(unlimitedRange);
 		addSetting(seeThrough);
 		addSetting(forceNametags);
+		addSetting(forceMobNametags);
 	}
 	
 	public boolean isUnlimitedRange()
@@ -54,6 +58,11 @@ public final class NameTagsHack extends Hack
 		return isEnabled() && forceNametags.isChecked();
 	}
 	
-	// See LivingEntityRendererMixin and
+	public boolean shouldForceMobNametags()
+	{
+		return isEnabled() && forceMobNametags.isChecked();
+	}
+	
+	// See LivingEntityRendererMixin, MobEntityRendererMixin and
 	// EntityRendererMixin.wurstRenderLabelIfPresent()
 }

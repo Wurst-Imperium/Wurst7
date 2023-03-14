@@ -45,6 +45,7 @@
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MiningToolItemMixin",
+    "MobEntityRendererMixin",
     "MouseMixin",
     "MultiplayerScreenMixin",
     "PackScreenMixin",

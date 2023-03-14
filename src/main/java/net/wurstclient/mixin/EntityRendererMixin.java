@@ -97,7 +97,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		// draw background
 		tr.draw(text.asOrderedText(), labelX, labelY, 0x20FFFFFF, false, matrix,
-			vertexConsumers, notSneaky, bgColor, light);
+			vertexConsumers, seeThrough ? false : notSneaky, bgColor, light);
 		
 		// draw text
 		if(notSneaky)
