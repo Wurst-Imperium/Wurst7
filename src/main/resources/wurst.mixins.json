@@ -13,7 +13,6 @@
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
   	"BlockModelRendererMixin",
-  	"ButtonWidgetMixin",
   	"CactusBlockMixin",
   	"CameraMixin",
   	"ChatHudMixin",

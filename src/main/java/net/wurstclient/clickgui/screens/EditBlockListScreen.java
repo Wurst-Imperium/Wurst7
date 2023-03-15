@@ -165,7 +165,7 @@ public final class EditBlockListScreen extends Screen
 	{
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer,
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
@@ -178,7 +178,7 @@ public final class EditBlockListScreen extends Screen
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
-			drawStringWithShadow(matrixStack, client.textRenderer,
+			drawTextWithShadow(matrixStack, client.textRenderer,
 				"block name or ID", 68, height - 50, 0x808080);
 		
 		int border = blockNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;

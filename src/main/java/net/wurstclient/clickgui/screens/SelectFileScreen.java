@@ -168,12 +168,12 @@ public final class SelectFileScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, setting.getName(),
-			width / 2, 12, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			setting.getName(), width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(doneButton.isHovered() && !doneButton.active)
+		if(doneButton.isSelected() && !doneButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
