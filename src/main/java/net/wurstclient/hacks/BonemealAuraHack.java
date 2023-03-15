@@ -185,7 +185,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range + 0.5, 2);
 		int rangeI = (int)Math.ceil(range);
 		
-		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		

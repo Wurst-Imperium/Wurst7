@@ -116,8 +116,8 @@ public final class EditColorScreen extends Screen
 		addSelectableChild(greenValueField);
 		addSelectableChild(blueValueField);
 		
-		setInitialFocus(hexValueField);
-		hexValueField.setTextFieldFocused(true);
+		setFocused(hexValueField);
+		hexValueField.setFocused(true);
 		hexValueField.setSelectionStart(0);
 		hexValueField.setSelectionEnd(6);
 		
@@ -173,7 +173,7 @@ public final class EditColorScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, client.textRenderer,
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
 		
 		// Draw palette

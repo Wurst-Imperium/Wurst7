@@ -135,8 +135,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredText(matrixStack, client.textRenderer, "Remove Keybind",
-			middleX, 32, txtColor);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			"Remove Keybind", middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -182,11 +182,11 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawStringWithShadow(matrixStack, client.textRenderer,
+			drawTextWithShadow(matrixStack, client.textRenderer,
 				key.replace("key.keyboard.", "") + ": "
 					+ keybind.getDescription(),
 				x1 + 1, y1 + 1, txtColor);
-			drawStringWithShadow(matrixStack, client.textRenderer,
+			drawTextWithShadow(matrixStack, client.textRenderer,
 				keybind.getCommand(), x1 + 1,
 				y1 + 1 + client.textRenderer.fontHeight, txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -196,8 +196,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawStringWithShadow(matrixStack, client.textRenderer, line,
-				bgx1 + 2, textY, txtColor);
+			drawTextWithShadow(matrixStack, client.textRenderer, line, bgx1 + 2,
+				textY, txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -232,7 +232,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredText(matrixStack, client.textRenderer,
+			drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
 			GL11.glEnable(GL11.GL_BLEND);

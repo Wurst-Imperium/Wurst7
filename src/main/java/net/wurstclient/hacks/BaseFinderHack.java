@@ -241,11 +241,12 @@ public final class BaseFinderHack extends Hack
 		int startY = MC.world.getTopY() - 1 - modulo * stepSize;
 		int endY = startY - stepSize;
 
-		BlockPos playerPos = new BlockPos(MC.player.getX(), 0, MC.player.getZ());
-
-		boolean inverted = invertList.isChecked();
+		BlockPos playerPos =
+			BlockPos.ofFloored(MC.player.getX(), 0, MC.player.getZ());
+      
+    boolean inverted = invertList.isChecked();
 		int radius = this.radius.getValueI();
-
+    
 		// search matching blocks
 		loop: for (int y = startY; y > endY; y--)
 			for (int x = radius; x > -radius; x--)

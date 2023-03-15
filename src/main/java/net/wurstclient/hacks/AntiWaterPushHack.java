@@ -68,7 +68,8 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	@Override
 	public void onVelocityFromFluid(VelocityFromFluidEvent event)
 	{
-		event.cancel();
+		if(event.getEntity() == MC.player)
+			event.cancel();
 	}
 	
 	@Override

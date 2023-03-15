@@ -9,6 +9,7 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.Entity;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
@@ -19,6 +20,18 @@ public interface VelocityFromFluidListener extends Listener
 	public static class VelocityFromFluidEvent
 		extends CancellableEvent<VelocityFromFluidListener>
 	{
+		private final Entity entity;
+		
+		public VelocityFromFluidEvent(Entity entity)
+		{
+			this.entity = entity;
+		}
+		
+		public Entity getEntity()
+		{
+			return entity;
+		}
+		
 		@Override
 		public void fire(ArrayList<VelocityFromFluidListener> listeners)
 		{

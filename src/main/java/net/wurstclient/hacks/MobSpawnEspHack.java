@@ -30,7 +30,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
@@ -110,7 +110,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		ClientWorld world = MC.world;
 		
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		int chunkX = eyesBlock.getX() >> 4;
 		int chunkZ = eyesBlock.getZ() >> 4;
 		int chunkRange = drawDistance.getSelected().chunkRange;
