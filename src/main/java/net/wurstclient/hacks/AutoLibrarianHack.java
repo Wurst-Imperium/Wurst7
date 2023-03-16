@@ -387,7 +387,7 @@ public final class AutoLibrarianHack extends Hack
 		Box box = villager.getBoundingBox();
 		Vec3d start = RotationUtils.getEyesPos();
 		Vec3d end = box.getCenter();
-		Vec3d hitVec = box.raycast(start, end).get();
+		Vec3d hitVec = box.raycast(start, end).orElse(start);
 		EntityHitResult hitResult = new EntityHitResult(villager, hitVec);
 		
 		// face end vector
@@ -427,12 +427,20 @@ public final class AutoLibrarianHack extends Hack
 			if(enchantmentNbt.isEmpty())
 				continue;
 			
-			NbtList bookNbt =
-				EnchantedBookItem.getEnchantmentNbt(tradeOffer.getSellItem());
+			NbtList bookNbt = EnchantedBookItem.getEnchantmentNbt(stack);
 			String enchantment = bookNbt.getCompound(0).getString("id");
 			int level = bookNbt.getCompound(0).getInt("lvl");
 			int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
-			return new BookOffer(enchantment, level, price);
+			BookOffer bookOffer = new BookOffer(enchantment, level, price);
+			
+			if(!bookOffer.isValid())
+			{
+				System.out.println("Found invalid enchanted book offer.\n"
+					+ "NBT data: " + stack.getNbt());
+				continue;
+			}
+			
+			return bookOffer;
 		}
 		
 		return null;
@@ -483,7 +491,8 @@ public final class AutoLibrarianHack extends Hack
 		double rangeSq = range.getValueSq();
 		
 		Stream<BlockPos> stream = BlockUtils
-			.getAllInBoxStream(new BlockPos(eyesVec), range.getValueCeil())
+			.getAllInBoxStream(BlockPos.ofFloored(eyesVec),
+				range.getValueCeil())
 			.filter(pos -> eyesVec
 				.squaredDistanceTo(Vec3d.ofCenter(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.LECTERN);

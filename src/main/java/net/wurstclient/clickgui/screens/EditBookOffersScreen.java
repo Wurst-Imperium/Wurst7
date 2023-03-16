@@ -184,7 +184,7 @@ public final class EditBookOffersScreen extends Screen
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		drawCenteredText(matrixStack, client.textRenderer,
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 			bookOffers.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		

@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
@@ -20,25 +20,29 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -52,17 +56,21 @@ public final class FeedAuraHack extends Hack
 			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which animal will be fed first.\n"
-			+ "\u00a7lDistance\u00a7r - Feeds the closest animal.\n"
-			+ "\u00a7lAngle\u00a7r - Feeds the animal that requires the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Feeds the weakest animal.",
-		Priority.values(), Priority.ANGLE);
+	private final FilterBabiesSetting filterBabies =
+		new FilterBabiesSetting("Won't feed baby animals.\n"
+			+ "Saves food, but doesn't speed up baby growth.", true);
 	
-	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
-		"Won't feed baby animals.\n" + "Saves food, but slows baby growth.",
-		false);
+	private final CheckboxSetting filterUntamed =
+		new CheckboxSetting("Filter untamed",
+			"Won't feed tameable animals that haven't been tamed yet.", false);
 	
+	private final CheckboxSetting filterHorses = new CheckboxSetting(
+		"Filter horse-like animals",
+		"Won't feed horses, llamas, donkeys, etc.\n"
+			+ "Recommended due to Minecraft bug MC-233276, which causes these animals to consume items indefinitely.",
+		true);
+	
+	private final Random random = new Random();
 	private AnimalEntity target;
 	private AnimalEntity renderTarget;
 	
@@ -71,8 +79,9 @@ public final class FeedAuraHack extends Hack
 		super("FeedAura");
 		setCategory(Category.OTHER);
 		addSetting(range);
-		addSetting(priority);
 		addSetting(filterBabies);
+		addSetting(filterUntamed);
+		addSetting(filterHorses);
 	}
 	
 	@Override
@@ -109,11 +118,8 @@ public final class FeedAuraHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		ItemStack heldStack = player.getInventory().getMainHandStack();
 		
-		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<AnimalEntity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.isRemoved()).filter(e -> e instanceof AnimalEntity)
-			.map(e -> (AnimalEntity)e).filter(e -> e.getHealth() > 0)
+		double rangeSq = range.getValueSq();
+		Stream<AnimalEntity> stream = EntityUtils.getValidAnimals()
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.filter(e -> e.isBreedingItem(heldStack))
 			.filter(AnimalEntity::canEat);
@@ -121,7 +127,20 @@ public final class FeedAuraHack extends Hack
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		if(filterUntamed.isChecked())
+			stream = stream.filter(e -> !isUntamed(e));
+		
+		if(filterHorses.isChecked())
+			stream = stream.filter(e -> !(e instanceof AbstractHorseEntity));
+		
+		// convert targets to list
+		ArrayList<AnimalEntity> targets =
+			stream.collect(Collectors.toCollection(ArrayList::new));
+		
+		// pick a target at random
+		target = targets.isEmpty() ? null
+			: targets.get(random.nextInt(targets.size()));
+		
 		renderTarget = target;
 		if(target == null)
 			return;
@@ -140,7 +159,13 @@ public final class FeedAuraHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Hand hand = Hand.MAIN_HAND;
 		
-		EntityHitResult hitResult = new EntityHitResult(target);
+		// create realistic hit result
+		Box box = target.getBoundingBox();
+		Vec3d start = RotationUtils.getEyesPos();
+		Vec3d end = box.getCenter();
+		Vec3d hitVec = box.raycast(start, end).orElse(start);
+		EntityHitResult hitResult = new EntityHitResult(target, hitVec);
+		
 		ActionResult actionResult =
 			im.interactEntityAtLocation(player, target, hitResult, hand);
 		
@@ -173,27 +198,25 @@ public final class FeedAuraHack extends Hack
 		float p = 1;
 		LivingEntity le = renderTarget;
 		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
-		float red = p * 2F;
-		float green = 2 - red;
+		float green = p * 2F;
+		float red = 2 - green;
 		
 		matrixStack.translate(
-			renderTarget.prevX
-				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks,
-			renderTarget.prevY
-				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
-			renderTarget.prevZ
-				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks);
+			MathHelper.lerp(partialTicks, renderTarget.prevX,
+				renderTarget.getX()),
+			MathHelper.lerp(partialTicks, renderTarget.prevY,
+				renderTarget.getY()),
+			MathHelper.lerp(partialTicks, renderTarget.prevZ,
+				renderTarget.getZ()));
+		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());
 		matrixStack.translate(-0.5, 0, -0.5);
 		
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
+		matrixStack.translate(0.5, 0.5, 0.5);
+		matrixStack.scale(p, p, p);
+		matrixStack.translate(-0.5, -0.5, -0.5);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -212,30 +235,14 @@ public final class FeedAuraHack extends Hack
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
-	private enum Priority
+	private boolean isUntamed(AnimalEntity e)
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		if(e instanceof AbstractHorseEntity horse && !horse.isTame())
+			return true;
 		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+		if(e instanceof TameableEntity tame && !tame.isTamed())
+			return true;
 		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
-		
-		private final String name;
-		private final Comparator<Entity> comparator;
-		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
-		{
-			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
+		return false;
 	}
 }

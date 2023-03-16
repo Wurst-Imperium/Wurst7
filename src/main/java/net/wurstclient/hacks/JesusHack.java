@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -165,7 +165,7 @@ public final class JesusHack extends Hack
 		
 		for(Box bb : blockCollisions)
 		{
-			BlockPos pos = new BlockPos(bb.getCenter());
+			BlockPos pos = BlockPos.ofFloored(bb.getCenter());
 			Material material = BlockUtils.getState(pos).getMaterial();
 			
 			if(material == Material.WATER || material == Material.LAVA)

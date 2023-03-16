@@ -254,14 +254,15 @@ public final class EditBookOfferScreen extends Screen
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackgroundTexture(0);
+		renderBackgroundTexture(matrixStack);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
 		TextRenderer tr = client.textRenderer;
 		String titleText = "Edit Book Offer";
-		drawCenteredText(matrixStack, tr, titleText, width / 2, 12, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, tr, titleText, width / 2, 12,
+			0xffffff);
 		
 		int x = width / 2 - 100;
 		int y = 64;
@@ -297,14 +298,14 @@ public final class EditBookOfferScreen extends Screen
 		
 		matrixStack.translate(width / 2 - 100, 112, 0);
 		
-		drawStringWithShadow(matrixStack, tr, "Level:", 0, 0, 0xf0f0f0);
-		drawStringWithShadow(matrixStack, tr, "Max price:", 0, 16, 0xf0f0f0);
+		drawTextWithShadow(matrixStack, tr, "Level:", 0, 0, 0xf0f0f0);
+		drawTextWithShadow(matrixStack, tr, "Max price:", 0, 16, 0xf0f0f0);
 		
 		if(alreadyAdded && offerToSave != null)
 		{
 			String errorText = offerToSave.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			drawStringWithShadow(matrixStack, tr, errorText, 0, 32, 0xff5555);
+			drawTextWithShadow(matrixStack, tr, errorText, 0, 32, 0xff5555);
 		}
 		
 		matrixStack.pop();
