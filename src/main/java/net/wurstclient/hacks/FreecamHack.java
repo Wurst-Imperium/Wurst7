@@ -228,4 +228,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
+
+	FakePlayerEntity getFreecam(){
+		return isEnabled()? fakePlayer : null;
+	}
 }
