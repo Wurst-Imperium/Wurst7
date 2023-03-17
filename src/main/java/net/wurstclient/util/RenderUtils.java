@@ -934,12 +934,12 @@ public enum RenderUtils
 		
 		matrixStack.scale(-scale, -scale, scale);
 		
-		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		float bgOpacity = MC.options.getTextBackgroundOpacity(0.25f);
 		int bgColor = (int)(bgOpacity * 255.0f) << 24;
-		int h = -MC.textRenderer.getWidth(text) / 2;
-		MC.textRenderer.draw(text, h, 0, color, false, matrix4f, provider, TextLayerType.NORMAL, bgColor, 15728880);
-		MC.textRenderer.draw(text, h, 0, -1, false, matrix4f, provider, TextLayerType.SEE_THROUGH, 0, 15728880);
+		int labelX = -MC.textRenderer.getWidth(text) / 2;
+		MC.textRenderer.draw(text, labelX, 0, color, false, matrix, provider, TextLayerType.NORMAL, bgColor, 15728880);
+		MC.textRenderer.draw(text, labelX, 0, -1, false, matrix, provider, TextLayerType.SEE_THROUGH, 0, 15728880);
 		matrixStack.pop();
 	}
 }
