@@ -23,6 +23,15 @@ import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 @Mixin(TerrainRenderContext.class)
 public class TerrainRenderContextMixin
 {
+	/**
+	 * This is a part of what allows X-Ray to make blocks invisible. It's
+	 * also the part that keeps breaking whenever Fabric API updates their
+	 * rendering code.
+	 *
+	 * <p>
+	 * We could make this optional to stop the game from crashing, but then
+	 * X-Ray would silently stop working and it would be much harder to debug.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "tessellateBlock",
 		cancellable = true,

@@ -38,7 +38,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
@@ -181,7 +181,7 @@ public final class SearchHack extends Hack
 	public void onUpdate()
 	{
 		Block currentBlock = block.getBlock();
-		BlockPos eyesPos = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		
 		ChunkPos center = MC.player.getChunkPos();
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();

@@ -167,7 +167,7 @@ public final class EditItemListScreen extends Screen
 	{
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer,
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
@@ -183,7 +183,7 @@ public final class EditItemListScreen extends Screen
 		{
 			matrixStack.push();
 			matrixStack.translate(0, 0, 300);
-			drawStringWithShadow(matrixStack, client.textRenderer,
+			drawTextWithShadow(matrixStack, client.textRenderer,
 				"item name or ID", 68, height - 50, 0x808080);
 			matrixStack.pop();
 		}

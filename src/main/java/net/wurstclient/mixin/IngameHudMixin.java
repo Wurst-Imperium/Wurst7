@@ -27,8 +27,8 @@ public class IngameHudMixin extends DrawableHelper
 		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
 			remap = false,
-			ordinal = 4),
-		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;F)V"})
+			ordinal = 3),
+		method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V")
 	private void onRender(MatrixStack matrixStack, float partialTicks,
 		CallbackInfo ci)
 	{
@@ -39,11 +39,11 @@ public class IngameHudMixin extends DrawableHelper
 		EventManager.fire(event);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"renderOverlay(Lnet/minecraft/util/Identifier;F)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(Identifier identifier, float scale,
-		CallbackInfo ci)
+	private void onRenderOverlay(MatrixStack matrixStack, Identifier identifier,
+		float f, CallbackInfo ci)
 	{
 		if(identifier == null || identifier.getPath() == null)
 			return;

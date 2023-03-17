@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -92,17 +93,20 @@ public abstract class EntityRendererMixin<T extends Entity>
 		TextRenderer tr = getTextRenderer();
 		float labelX = -tr.getWidth(text) / 2;
 		
-		// use the see-through layer if configured in NameTags
-		boolean seeThrough = nameTags.isSeeThrough();
-		
 		// draw background
-		tr.draw(text.asOrderedText(), labelX, labelY, 0x20FFFFFF, false, matrix,
-			vertexConsumers, seeThrough ? false : notSneaky, bgColor, light);
+		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
+			vertexConsumers,
+			notSneaky && !nameTags.isSeeThrough() ? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL,
+			bgColor, light);
+		
+		// use the see-through layer for text if configured in NameTags
+		TextLayerType textLayer = nameTags.isSeeThrough()
+			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
 		
 		// draw text
 		if(notSneaky)
-			tr.draw(text.asOrderedText(), labelX, labelY, 0xFFFFFFFF, false,
-				matrix, vertexConsumers, seeThrough, 0, light);
+			tr.draw(text, labelX, labelY, 0xFFFFFFFF, false, matrix,
+				vertexConsumers, textLayer, 0, light);
 		
 		matrices.pop();
 	}

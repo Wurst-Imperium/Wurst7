@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.toast.SystemToast;
-import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkData;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
@@ -38,8 +38,8 @@ public abstract class ClientPlayNetworkHandlerMixin
 	@Final
 	private MinecraftClient client;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"sendPacket(Lnet/minecraft/network/Packet;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
 	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
 	{

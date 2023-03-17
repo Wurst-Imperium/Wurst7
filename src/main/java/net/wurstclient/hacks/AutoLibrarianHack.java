@@ -491,7 +491,8 @@ public final class AutoLibrarianHack extends Hack
 		double rangeSq = range.getValueSq();
 		
 		Stream<BlockPos> stream = BlockUtils
-			.getAllInBoxStream(new BlockPos(eyesVec), range.getValueCeil())
+			.getAllInBoxStream(BlockPos.ofFloored(eyesVec),
+				range.getValueCeil())
 			.filter(pos -> eyesVec
 				.squaredDistanceTo(Vec3d.ofCenter(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.LECTERN);
