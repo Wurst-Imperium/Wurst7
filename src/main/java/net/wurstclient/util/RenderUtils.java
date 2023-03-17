@@ -14,24 +14,24 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.NameTagsHack;
 
 public enum RenderUtils
 {
@@ -898,5 +898,48 @@ public enum RenderUtils
 			
 			matrixStack.pop();
 		}
+	}
+	
+	public static void renderTag(MatrixStack matrixStack, Text text, Entity entity, VertexConsumerProvider provider, int color, 
+		float height, int limit, float partialTicks)
+	{
+		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		MinecraftClient MC = MinecraftClient.getInstance();
+		EntityRenderDispatcher dispatcher = MC.getEntityRenderDispatcher();
+		double dist = dispatcher.getSquaredDistanceToCamera(entity);
+		if(dist > limit * limit) 
+			return;
+		matrixStack.push();
+		
+		RenderUtils.applyCameraRotationOnly();
+		Vec3d camPos = RenderUtils.getCameraPos();
+		matrixStack.translate(
+			-camPos.x + entity.prevX
+			+ (entity.getX() - entity.prevX) * partialTicks,
+			-camPos.y + entity.prevY
+			+ (entity.getY() - entity.prevY) * partialTicks + entity.getHeight() + height,
+			-camPos.z + entity.prevZ
+			+ (entity.getZ() - entity.prevZ) * partialTicks);
+		
+		matrixStack.multiply(dispatcher.getRotation());
+		
+		float scale = 0.025F;
+		if(nameTagsHack.isEnabled())
+		{
+			double distance = WurstClient.MC.player.distanceTo(entity);
+			
+			if(distance > 10)
+				scale *= distance / 10;
+		}
+		
+		matrixStack.scale(-scale, -scale, scale);
+		
+		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+		float bgOpacity = MC.options.getTextBackgroundOpacity(0.25f);
+		int bgColor = (int)(bgOpacity * 255.0f) << 24;
+		int h = -MC.textRenderer.getWidth(text) / 2;
+		MC.textRenderer.draw(text, h, 0, color, false, matrix4f, provider, TextLayerType.NORMAL, bgColor, 15728880);
+		MC.textRenderer.draw(text, h, 0, -1, false, matrix4f, provider, TextLayerType.SEE_THROUGH, 0, 15728880);
+		matrixStack.pop();
 	}
 }
