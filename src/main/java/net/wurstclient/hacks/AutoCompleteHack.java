@@ -45,6 +45,7 @@ public final class AutoCompleteHack extends Hack
 	{
 		super("AutoComplete");
 		setCategory(Category.CHAT);
+		suggestionHandler.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
