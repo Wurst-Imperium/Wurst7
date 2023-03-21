@@ -227,9 +227,6 @@ public final class AutoCompleteHack extends Hack
 		// remove newlines
 		completion = completion.replace("\n", " ");
 		
-		// remove leading and trailing whitespace
-		completion = completion.strip();
-		
 		return completion;
 	}
 	
