@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -22,6 +21,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autocomplete.SuggestionHandler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.OpenAiUtils;
 import net.wurstclient.util.json.JsonException;
@@ -32,17 +32,20 @@ import net.wurstclient.util.json.WsonObject;
 public final class AutoCompleteHack extends Hack
 	implements ChatOutputListener, UpdateListener
 {
-	private final ArrayList<String> suggestions = new ArrayList<>();
+	private final SuggestionHandler suggestionHandler = new SuggestionHandler();
+	
+	private String draftMessage;
+	private BiConsumer<SuggestionsBuilder, String> suggestionsUpdater;
+	
 	private Thread apiCallThread;
 	private long lastApiCallTime;
 	private long lastRefreshTime;
-	private String draftMessage;
-	private BiConsumer<SuggestionsBuilder, String> suggestionsUpdater;
 	
 	public AutoCompleteHack()
 	{
 		super("AutoComplete");
 		setCategory(Category.CHAT);
+		suggestionHandler.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
@@ -66,15 +69,14 @@ public final class AutoCompleteHack extends Hack
 	{
 		EVENTS.remove(ChatOutputListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
+		
+		suggestionHandler.clearSuggestions();
 	}
 	
 	@Override
 	public void onSentMessage(ChatOutputEvent event)
 	{
-		synchronized(suggestions)
-		{
-			suggestions.clear();
-		}
+		suggestionHandler.clearSuggestions();
 	}
 	
 	@Override
@@ -105,8 +107,7 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if we already have a suggestion for the current draft message
-		if(suggestions.stream().anyMatch(
-			s -> s.toLowerCase().startsWith(draftMessage.toLowerCase())))
+		if(suggestionHandler.hasEnoughSuggestionFor(draftMessage))
 			return;
 			
 		// copy fields to local variables, in case they change
@@ -124,11 +125,8 @@ public final class AutoCompleteHack extends Hack
 				return;
 			
 			// apply suggestion
-			synchronized(suggestions)
-			{
-				suggestions.add(draftMessage2 + suggestion);
-				setSuggestions(draftMessage2, suggestionsUpdater2);
-			}
+			suggestionHandler.addSuggestion(suggestion, draftMessage2,
+				suggestionsUpdater2);
 		});
 		apiCallThread.setName("AutoComplete API Call");
 		apiCallThread.setPriority(Thread.MIN_PRIORITY);
@@ -142,30 +140,11 @@ public final class AutoCompleteHack extends Hack
 	public void onRefresh(String draftMessage,
 		BiConsumer<SuggestionsBuilder, String> suggestionsUpdater)
 	{
-		synchronized(suggestions)
-		{
-			setSuggestions(draftMessage, suggestionsUpdater);
-		}
+		suggestionHandler.showSuggestions(draftMessage, suggestionsUpdater);
 		
 		this.draftMessage = draftMessage;
 		this.suggestionsUpdater = suggestionsUpdater;
 		lastRefreshTime = System.currentTimeMillis();
-	}
-	
-	private void setSuggestions(String draftMessage,
-		BiConsumer<SuggestionsBuilder, String> suggestionsUpdater)
-	{
-		SuggestionsBuilder builder = new SuggestionsBuilder(draftMessage, 0);
-		String inlineSuggestion = null;
-		
-		for(String s : suggestions)
-			if(s.toLowerCase().startsWith(draftMessage.toLowerCase()))
-			{
-				builder.suggest(s);
-				inlineSuggestion = s;
-			}
-		
-		suggestionsUpdater.accept(builder, inlineSuggestion);
 	}
 	
 	private String completeChatMessage(String draftMessage)
@@ -194,8 +173,10 @@ public final class AutoCompleteHack extends Hack
 	
 	private String buildPrompt(String draftMessage)
 	{
+		// tell the model that it's talking in a Minecraft chat
 		String prompt = "=== Minecraft chat log ===\n";
 		
+		// add chat history
 		List<ChatHudLine.Visible> chatHistory =
 			MC.inGameHud.getChatHud().visibleMessages;
 		for(int i = chatHistory.size() - 1; i >= 0; i--)
@@ -214,6 +195,12 @@ public final class AutoCompleteHack extends Hack
 			prompt += message + "\n";
 		}
 		
+		// if the chat history is empty, add a dummy system message
+		if(chatHistory.isEmpty())
+			prompt += "<System> " + MC.getSession().getUsername()
+				+ " joined the game.\n";
+		
+		// add draft message
 		prompt += "<" + MC.getSession().getUsername() + "> " + draftMessage;
 		
 		return prompt;
@@ -239,9 +226,6 @@ public final class AutoCompleteHack extends Hack
 		
 		// remove newlines
 		completion = completion.replace("\n", " ");
-		
-		// remove leading and trailing whitespace
-		completion = completion.strip();
 		
 		return completion;
 	}
