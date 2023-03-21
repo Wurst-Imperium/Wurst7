@@ -16,12 +16,13 @@ public class SuggestionHandler
 {
 	private final ArrayList<String> suggestions = new ArrayList<>();
 	
-	public boolean hasSuggestionFor(String draftMessage)
+	public boolean hasEnoughSuggestionFor(String draftMessage)
 	{
 		synchronized(suggestions)
 		{
-			return suggestions.stream().anyMatch(
-				s -> s.toLowerCase().startsWith(draftMessage.toLowerCase()));
+			return suggestions.stream().map(String::toLowerCase)
+				.filter(s -> s.startsWith(draftMessage.toLowerCase()))
+				.count() >= 3;
 		}
 	}
 	
@@ -30,7 +31,16 @@ public class SuggestionHandler
 	{
 		synchronized(suggestions)
 		{
-			suggestions.add(draftMessage + suggestion);
+			String completedMessage = draftMessage + suggestion;
+			
+			if(!suggestions.contains(completedMessage))
+			{
+				suggestions.add(completedMessage);
+				
+				if(suggestions.size() > 100)
+					suggestions.remove(0);
+			}
+			
 			showSuggestionsImpl(draftMessage, suggestionsUpdater);
 		}
 	}
@@ -50,12 +60,20 @@ public class SuggestionHandler
 		SuggestionsBuilder builder = new SuggestionsBuilder(draftMessage, 0);
 		String inlineSuggestion = null;
 		
-		for(String s : suggestions)
-			if(s.toLowerCase().startsWith(draftMessage.toLowerCase()))
-			{
-				builder.suggest(s);
-				inlineSuggestion = s;
-			}
+		int shownSuggestions = 0;
+		for(int i = suggestions.size() - 1; i >= 0; i--)
+		{
+			String s = suggestions.get(i);
+			if(!s.toLowerCase().startsWith(draftMessage.toLowerCase()))
+				continue;
+			
+			if(shownSuggestions >= 5)
+				break;
+			
+			builder.suggest(s);
+			inlineSuggestion = s;
+			shownSuggestions++;
+		}
 		
 		suggestionsUpdater.accept(builder, inlineSuggestion);
 	}

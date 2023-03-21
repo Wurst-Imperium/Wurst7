@@ -106,7 +106,7 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if we already have a suggestion for the current draft message
-		if(suggestionHandler.hasSuggestionFor(draftMessage))
+		if(suggestionHandler.hasEnoughSuggestionFor(draftMessage))
 			return;
 			
 		// copy fields to local variables, in case they change
