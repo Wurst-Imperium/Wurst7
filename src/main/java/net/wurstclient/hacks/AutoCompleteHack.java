@@ -173,8 +173,10 @@ public final class AutoCompleteHack extends Hack
 	
 	private String buildPrompt(String draftMessage)
 	{
+		// tell the model that it's talking in a Minecraft chat
 		String prompt = "=== Minecraft chat log ===\n";
 		
+		// add chat history
 		List<ChatHudLine.Visible> chatHistory =
 			MC.inGameHud.getChatHud().visibleMessages;
 		for(int i = chatHistory.size() - 1; i >= 0; i--)
@@ -193,6 +195,12 @@ public final class AutoCompleteHack extends Hack
 			prompt += message + "\n";
 		}
 		
+		// if the chat history is empty, add a dummy system message
+		if(chatHistory.isEmpty())
+			prompt += "<System> " + MC.getSession().getUsername()
+				+ " joined the game.\n";
+		
+		// add draft message
 		prompt += "<" + MC.getSession().getUsername() + "> " + draftMessage;
 		
 		return prompt;
