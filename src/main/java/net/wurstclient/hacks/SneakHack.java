@@ -103,7 +103,8 @@ public final class SneakHack extends Hack
 	}
 	
 	@Override
-	public void onPostMotion() {
+	public void onPostMotion() 
+	{
 
 		if (mode.getSelected() != SneakMode.PACKET)
 			return;
@@ -112,7 +113,8 @@ public final class SneakHack extends Hack
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 	}
 
-	private boolean checkFly(){
+	private boolean checkFly()
+	{
 
 		boolean ground = isOnGround();
 
@@ -136,7 +138,8 @@ public final class SneakHack extends Hack
 		}
 	}
 
-	private boolean isOnGround() {
+	private boolean isOnGround() 
+	{
 		ClientPlayerEntity player = MC.player;
 		ArrayList<BlockState> blocks = new ArrayList<>();
 
@@ -147,7 +150,8 @@ public final class SneakHack extends Hack
 			}
 		}
 
-		for(BlockState block : blocks){
+		for(BlockState block : blocks)
+		{
 			if(block.getMaterial() != Material.AIR){
 				System.out.println(block.getMaterial());
 				return true;
