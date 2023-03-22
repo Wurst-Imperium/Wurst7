@@ -7,23 +7,18 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
-import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.CheckboxSetting;
-import java.util.ArrayList;
+import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"AutoSneaking"})
 public final class SneakHack extends Hack
@@ -33,16 +28,21 @@ public final class SneakHack extends Hack
 		"\u00a7lPacket\u00a7r mode makes it look like you're sneaking without slowing you down.\n"
 			+ "\u00a7lLegit\u00a7r mode actually makes you sneak.",
 		SneakMode.values(), SneakMode.LEGIT);
-		
-	private final CheckboxSetting allowFly = new CheckboxSetting("Allow Fly",
-			"Allows you to fly while sneak is active", false);
+	
+	private final CheckboxSetting offWhileFlying =
+		new CheckboxSetting("Turn off while flying",
+			"Automatically disables Legit Sneak while you are flying or using"
+				+ " Freecam, so that it doesn't force you to fly down.\n\n"
+				+ "Keep in mind that this also means you won't be hidden from"
+				+ " other players while doing these things.",
+			false);
 	
 	public SneakHack()
 	{
 		super("Sneak");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
-		addSetting(allowFly);
+		addSetting(offWhileFlying);
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public final class SneakHack extends Hack
 	{
 		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(PostMotionListener.class, this);
-	
+		
 		switch(mode.getSelected())
 		{
 			case LEGIT:
@@ -80,21 +80,17 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-
-		boolean isFlying = checkFly();
-
 		KeyBinding sneakKey = MC.options.sneakKey;
 		
-		switch(mode.getSelected()) {
+		switch(mode.getSelected())
+		{
 			case LEGIT:
-				if(!isFlying || !allowFly.isChecked())
-				{
-					sneakKey.setPressed(true);
-				}else if(MC.options.jumpKey.isPressed() && allowFly.isChecked()){
-					sneakKey.setPressed(false);
-				}
-				break;
-
+			if(offWhileFlying.isChecked() && isFlying())
+				((IKeyBinding)sneakKey).resetPressedState();
+			else
+				sneakKey.setPressed(true);
+			break;
+			
 			case PACKET:
 			((IKeyBinding)sneakKey).resetPressedState();
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
@@ -106,37 +102,25 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPostMotion()
 	{
-
 		if(mode.getSelected() != SneakMode.PACKET)
 			return;
-
+		
 		sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 		sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 	}
-
-	private boolean checkFly()
+	
+	private boolean isFlying()
 	{
-
-		boolean ground = MC.player.isOnGround();
-
-		ClientPlayerEntity player = MC.player;
-		int height = (int)player.getPos().y - 1;
-		BlockState blockStateBelow = player.world.getBlockState(new BlockPos((int)player.getPos().x, height, (int)player.getPos().z));
-
-		if(player.world.getBlockState(new BlockPos((int)player.getPos().x, height-1, (int)player.getPos().z)).getMaterial() != Material.AIR && !MC.options.jumpKey.isPressed()){
-			MC.options.sneakKey.setPressed(true);
-		}
-
-		if(player.getAbilities().flying){
+		if(MC.player.getAbilities().flying)
 			return true;
-		}else if(blockStateBelow.getMaterial() == Material.AIR && !ground){
+		
+		if(WURST.getHax().flightHack.isEnabled())
 			return true;
-		}else if(MC.options.jumpKey.isPressed()){
+		
+		if(WURST.getHax().freecamHack.isEnabled())
 			return true;
-		}
-		else{
-			return false;
-		}
+		
+		return false;
 	}
 	
 	private void sendSneakPacket(Mode mode)
