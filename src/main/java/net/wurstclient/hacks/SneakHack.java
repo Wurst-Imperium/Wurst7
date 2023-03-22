@@ -59,7 +59,7 @@ public final class SneakHack extends Hack
 	{
 		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(PostMotionListener.class, this);
-		
+	
 		switch(mode.getSelected())
 		{
 			case LEGIT:
