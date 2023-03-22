@@ -95,7 +95,7 @@ public final class SneakHack extends Hack
 				break;
 
 			case PACKET:
-			((IKeyBinding) sneakKey).resetPressedState();
+			((IKeyBinding)sneakKey).resetPressedState();
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;
