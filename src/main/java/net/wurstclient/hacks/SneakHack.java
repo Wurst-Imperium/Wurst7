@@ -102,7 +102,7 @@ public final class SneakHack extends Hack
 	}
 	
 	@Override
-	public void onPostMotion() 
+	public void onPostMotion()
 	{
 
 		if (mode.getSelected() != SneakMode.PACKET)
