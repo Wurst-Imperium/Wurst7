@@ -81,7 +81,8 @@ public final class SneakHack extends Hack
 
 		KeyBinding sneakKey = MC.options.sneakKey;
 
-		switch(mode.getSelected()) {
+		switch(mode.getSelected()) 
+		{
 			case LEGIT:
 				if(!isFlying){
 					sneakKey.setPressed(true);
@@ -94,10 +95,10 @@ public final class SneakHack extends Hack
 				break;
 
 			case PACKET:
-				((IKeyBinding) sneakKey).resetPressedState();
-				sendSneakPacket(Mode.PRESS_SHIFT_KEY);
-				sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
-				break;
+			((IKeyBinding) sneakKey).resetPressedState();
+			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+			break;
 		}
 	}
 	
