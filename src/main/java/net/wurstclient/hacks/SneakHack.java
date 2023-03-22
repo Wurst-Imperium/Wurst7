@@ -105,7 +105,7 @@ public final class SneakHack extends Hack
 	public void onPostMotion()
 	{
 
-		if (mode.getSelected() != SneakMode.PACKET)
+		if(mode.getSelected() != SneakMode.PACKET)
 			return;
 
 	sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
