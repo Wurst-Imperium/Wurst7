@@ -22,7 +22,6 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.EnumSetting;
-
 import java.util.ArrayList;
 
 @SearchTags({"AutoSneaking"})
@@ -80,7 +79,7 @@ public final class SneakHack extends Hack
 		boolean isFlying = checkFly();
 
 		KeyBinding sneakKey = MC.options.sneakKey;
-
+		
 		switch(mode.getSelected()) 
 		{
 			case LEGIT:
