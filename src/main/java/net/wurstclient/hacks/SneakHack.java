@@ -22,6 +22,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import java.util.ArrayList;
 
 @SearchTags({"AutoSneaking"})
@@ -32,12 +33,16 @@ public final class SneakHack extends Hack
 		"\u00a7lPacket\u00a7r mode makes it look like you're sneaking without slowing you down.\n"
 			+ "\u00a7lLegit\u00a7r mode actually makes you sneak.",
 		SneakMode.values(), SneakMode.LEGIT);
+		
+	private final CheckboxSetting allowFly = new CheckboxSetting("Allow Fly",
+			"Allows you to fly while sneak is active", false);
 	
 	public SneakHack()
 	{
 		super("Sneak");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
+		addSetting(allowFly);
 	}
 	
 	@Override
@@ -80,15 +85,12 @@ public final class SneakHack extends Hack
 
 		KeyBinding sneakKey = MC.options.sneakKey;
 		
-		switch(mode.getSelected()) 
-		{
+		switch(mode.getSelected()) {
 			case LEGIT:
-				if(!isFlying){
+				if(!isFlying || !allowFly.isChecked())
+				{
 					sneakKey.setPressed(true);
-				}else if(sneakKey.isPressed() && !isOnGround()){
-					sneakKey.setPressed(true);
-				}
-				else{
+				}else if(MC.options.jumpKey.isPressed() && allowFly.isChecked()){
 					sneakKey.setPressed(false);
 				}
 				break;
@@ -115,7 +117,7 @@ public final class SneakHack extends Hack
 	private boolean checkFly()
 	{
 
-		boolean ground = isOnGround();
+		boolean ground = MC.player.isOnGround();
 
 		ClientPlayerEntity player = MC.player;
 		int height = (int)player.getPos().y - 1;
@@ -135,30 +137,6 @@ public final class SneakHack extends Hack
 		else{
 			return false;
 		}
-	}
-
-	private boolean isOnGround() 
-	{
-		ClientPlayerEntity player = MC.player;
-		ArrayList<BlockState> blocks = new ArrayList<>();
-
-		for(int x = 2; x >= -2; x--){
-			for(int z = 2; z >= -2; z--){
-				BlockPos block = new BlockPos((int)player.getPos().x + x, (int)player.getPos().y-1, (int)player.getPos().z + z);
-				blocks.add(player.world.getBlockState(block));
-			}
-		}
-
-		for(BlockState block : blocks)
-		{
-			if(block.getMaterial() != Material.AIR){
-				System.out.println(block.getMaterial());
-				return true;
-			}
-		}
-
-		return false;
-
 	}
 	
 	private void sendSneakPacket(Mode mode)
