@@ -109,8 +109,8 @@ public final class SneakHack extends Hack
 		if (mode.getSelected() != SneakMode.PACKET)
 			return;
 
-			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
-			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+		sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+		sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 	}
 
 	private boolean checkFly()
