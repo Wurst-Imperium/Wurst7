@@ -34,7 +34,7 @@
   "description.wurst.hack.autopotion": "Automatically throws splash potions of instant health when your health is low.",
   "description.wurst.hack.autoreconnect": "Automatically reconnects when you get kicked from the server.",
   "description.wurst.hack.autorespawn": "Automatically respawns you whenever you die.",
-  "description.wurst.hack.autosign": "Instantly writes whatever text you want on every sign you place. Once activated, you can write normally on the first sign to specify the text for all other signs.",
+  "description.wurst.hack.autosign": "Instantly writes whatever text you want on every sign you place or edit. Once activated, you can write normally on the first sign to specify the text for all other signs.",
   "description.wurst.hack.autosoup": "Automatically eats soup when your health is low.\n\n§lNote:§r This hack ignores hunger and assumes that eating soup directly refills your health. If the server you are playing on is not configured to do that, use AutoEat instead.",
   "description.wurst.hack.autosprint": "Makes you sprint automatically.",
   "description.wurst.hack.autosteal": "Automatically steals everything from all chests and shulker boxes that you open.",
