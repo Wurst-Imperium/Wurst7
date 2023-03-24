@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -60,14 +60,14 @@ public abstract class GameMenuScreenMixin extends Screen
 		int buttonY = -1;
 		int buttonI = -1;
 		
-		for(int i = 0; i < buttons.size(); ++i)
+		for(int i = 0; i < buttons.size(); i++)
 		{
 			ClickableWidget button = buttons.get(i);
 			
 			// insert Wurst button in place of feedback/report row
 			if(isFeedbackButton(button))
 			{
-				buttonY = button.y;
+				buttonY = button.getY();
 				buttonI = i;
 			}
 			
@@ -82,9 +82,11 @@ public abstract class GameMenuScreenMixin extends Screen
 				CrashReport.create(new IllegalStateException(),
 					"Someone deleted the Feedback button!"));
 		
-		wurstOptionsButton = new ButtonWidget(width / 2 - 102, buttonY, 204, 20,
-			Text.literal("            Options"), b -> openWurstOptions());
-		buttons.add(buttonI, wurstOptionsButton);
+		wurstOptionsButton = ButtonWidget
+			.builder(Text.literal("            Options"),
+				b -> openWurstOptions())
+			.dimensions(width / 2 - 102, buttonY, 204, 20).build();
+		buttons.add(wurstOptionsButton);
 	}
 	
 	private boolean isFeedbackButton(ClickableWidget button)
@@ -125,8 +127,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		RenderSystem.setShaderTexture(0, wurstTexture);
 		
-		int x = wurstOptionsButton.x + 34;
-		int y = wurstOptionsButton.y + 2;
+		int x = wurstOptionsButton.getX() + 34;
+		int y = wurstOptionsButton.getY() + 2;
 		int w = 63;
 		int h = 16;
 		int fw = 63;

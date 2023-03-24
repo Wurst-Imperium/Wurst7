@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
@@ -21,10 +19,11 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"trigger bot"})
 public final class TriggerBotHack extends Hack implements UpdateListener
@@ -34,6 +33,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
+		"Attack while blocking",
+		"Whether or not to attack while blocking with a shield / using items.",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
@@ -45,6 +49,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(attackWhileBlocking);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -84,6 +89,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			return;
 		
 		ClientPlayerEntity player = MC.player;
+		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+			return;
 		
 		if(MC.crosshairTarget == null
 			|| !(MC.crosshairTarget instanceof EntityHitResult))
@@ -103,17 +110,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	private boolean isCorrectEntity(Entity entity)
 	{
-		ClientPlayerEntity player = MC.player;
+		Stream<Entity> stream = Stream.of(entity);
+		stream = stream.filter(EntityUtils.IS_ATTACKABLE);
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<Entity> stream = Stream.of(entity).filter(e -> !e.isRemoved())
-			.filter(e -> e instanceof LivingEntity
-				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity)
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e != player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"creative flight", "CreativeFly", "creative fly"})
 public final class CreativeFlightHack extends Hack implements UpdateListener
@@ -33,6 +34,12 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 			30, 5, 80, 1,
 			SliderSetting.ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
+	private final SliderSetting antiKickDistance = new SliderSetting(
+		"Anti-Kick Distance",
+		"How far Anti-Kick should make you fall.\n"
+			+ "Most servers require at least 0.032m to stop you from getting kicked.",
+		0.07, 0.01, 0.2, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
+	
 	private int tickCounter = 0;
 	
 	public CreativeFlightHack()
@@ -41,6 +48,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		setCategory(Category.MOVEMENT);
 		addSetting(antiKick);
 		addSetting(antiKickInterval);
+		addSetting(antiKickDistance);
 	}
 	
 	@Override
@@ -92,10 +100,10 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 					&& !MC.options.jumpKey.isPressed())
 					tickCounter = 3;
 				else
-					setMotionY(-0.07);
+					setMotionY(-antiKickDistance.getValue());
 			}
 			
-			case 1 -> setMotionY(0.07);
+			case 1 -> setMotionY(antiKickDistance.getValue());
 			
 			case 2 -> setMotionY(0);
 			
@@ -119,6 +127,6 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		KeyBinding[] bindings = {MC.options.jumpKey, MC.options.sneakKey};
 		
 		for(KeyBinding binding : bindings)
-			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
+			((IKeyBinding)binding).resetPressedState();
 	}
 }

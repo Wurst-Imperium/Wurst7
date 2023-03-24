@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -53,7 +53,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		BlockPos belowPlayer = new BlockPos(MC.player.getPos()).down();
+		BlockPos belowPlayer = BlockPos.ofFloored(MC.player.getPos()).down();
 		
 		// check if block is already placed
 		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())

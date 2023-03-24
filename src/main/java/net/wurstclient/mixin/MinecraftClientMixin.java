@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,6 +30,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.util.ProfileKeys;
+import net.minecraft.client.util.ProfileKeysImpl;
 import net.minecraft.client.util.Session;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -45,6 +46,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.mixinterface.IWorld;
+import net.wurstclient.other_features.NoTelemetryOtf;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -73,7 +75,7 @@ public abstract class MinecraftClientMixin
 	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
-	private ProfileKeys wurstProfileKeys;
+	private ProfileKeysImpl wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String string_1)
 	{
@@ -146,12 +148,36 @@ public abstract class MinecraftClientMixin
 	@Inject(at = @At("HEAD"),
 		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
 		cancellable = true)
-	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
+	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(ProfileKeys.MISSING);
+		
 		if(wurstProfileKeys == null)
 			return;
 		
 		cir.setReturnValue(wurstProfileKeys);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "isTelemetryEnabledByApi()Z",
+		cancellable = true)
+	private void onIsTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
+	{
+		NoTelemetryOtf noTelemetryOtf =
+			WurstClient.INSTANCE.getOtfs().noTelemetryOtf;
+		cir.setReturnValue(!noTelemetryOtf.isEnabled());
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "isOptionalTelemetryEnabledByApi()Z",
+		cancellable = true)
+	private void onIsOptionalTelemetryEnabledByApi(
+		CallbackInfoReturnable<Boolean> cir)
+	{
+		NoTelemetryOtf noTelemetryOtf =
+			WurstClient.INSTANCE.getOtfs().noTelemetryOtf;
+		cir.setReturnValue(!noTelemetryOtf.isEnabled());
 	}
 	
 	@Override
@@ -205,7 +231,7 @@ public abstract class MinecraftClientMixin
 			wurst_createUserApiService(session.getAccessToken());
 		UUID uuid = wurstSession.getProfile().getId();
 		wurstProfileKeys =
-			new ProfileKeys(userApiService, uuid, runDirectory.toPath());
+			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
 	}
 	
 	private UserApiService wurst_createUserApiService(String accessToken)

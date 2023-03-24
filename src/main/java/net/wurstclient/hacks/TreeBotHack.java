@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,21 +15,21 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
@@ -226,8 +226,7 @@ public final class TreeBotHack extends Hack
 		for(BlockPos pos : blocksInRange)
 			if(breakBlock(pos))
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
-					false);
+				WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 				currentBlock = pos;
 				break;
 			}
@@ -281,7 +280,7 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
@@ -322,7 +321,7 @@ public final class TreeBotHack extends Hack
 		
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		Shader shader = RenderSystem.getShader();
+		ShaderProgram shader = RenderSystem.getShader();
 		
 		tree.getVertexBuffer().bind();
 		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
@@ -459,7 +458,7 @@ public final class TreeBotHack extends Hack
 	{
 		public TreeFinder()
 		{
-			super(new BlockPos(WurstClient.MC.player.getPos()));
+			super(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 		}
 		
 		public TreeFinder(TreeBotPathFinder pathFinder)
@@ -538,7 +537,7 @@ public final class TreeBotHack extends Hack
 	{
 		public AngleFinder()
 		{
-			super(new BlockPos(WurstClient.MC.player.getPos()));
+			super(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 			setThinkSpeed(512);
 			setThinkTime(1);
 		}

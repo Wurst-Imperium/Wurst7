@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,11 +32,11 @@ public class WalkPathProcessor extends PathProcessor
 		// get positions
 		BlockPos pos;
 		if(WurstClient.MC.player.isOnGround())
-			pos = new BlockPos(WurstClient.MC.player.getX(),
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = new BlockPos(WurstClient.MC.player.getPos());
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -45,15 +45,22 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			Text.literal("Open Folder"), b -> openFolder()));
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Reset to Defaults"), b -> askToConfirmReset()));
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Open Folder"), b -> openFolder())
+				.dimensions(8, 8, 100, 20).build());
 		
-		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
-			height - 48, 100, 20, Text.literal("Done"), b -> done()));
-		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			Text.literal("Cancel"), b -> openPrevScreen()));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reset to Defaults"),
+				b -> askToConfirmReset())
+			.dimensions(width - 108, 8, 100, 20).build());
+		
+		doneButton = addDrawableChild(
+			ButtonWidget.builder(Text.literal("Done"), b -> done())
+				.dimensions(width / 2 - 102, height - 48, 100, 20).build());
+		
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Cancel"), b -> openPrevScreen())
+				.dimensions(width / 2 + 2, height - 48, 100, 20).build());
 	}
 	
 	private void openFolder()
@@ -161,12 +168,12 @@ public final class SelectFileScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, setting.getName(),
-			width / 2, 12, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			setting.getName(), width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(doneButton.isHovered() && !doneButton.active)
+		if(doneButton.isSelected() && !doneButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);

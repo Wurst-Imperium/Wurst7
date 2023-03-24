@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoSignHack;
 
-@Mixin(SignEditScreen.class)
-public abstract class SignEditScreenMixin extends Screen
+@Mixin(AbstractSignEditScreen.class)
+public abstract class AbstractSignEditScreenMixin extends Screen
 {
 	@Shadow
 	@Final
 	private String[] text;
 	
-	private SignEditScreenMixin(WurstClient wurst, Text text_1)
+	private AbstractSignEditScreenMixin(WurstClient wurst, Text text_1)
 	{
 		super(text_1);
 	}

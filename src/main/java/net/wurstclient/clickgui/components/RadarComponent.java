@@ -1,11 +1,14 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.clickgui.components;
+
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -22,8 +25,7 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -63,7 +65,7 @@ public final class RadarComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tooltip
 		if(hovering)
@@ -89,8 +91,8 @@ public final class RadarComponent extends Component
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
-			matrixStack.multiply(
-				Vec3f.POSITIVE_Z.getDegreesQuaternion(180 + player.getYaw()));
+			matrixStack.multiply(new Quaternionf().rotationZ(
+				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE));
 		
 		float xa1 = 0;
 		float xa2 = 2;
@@ -125,7 +127,7 @@ public final class RadarComponent extends Component
 		matrix = matrixStack.peek().getPositionMatrix();
 		
 		// points
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);

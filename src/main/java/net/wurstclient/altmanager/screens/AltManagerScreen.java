@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -43,8 +44,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
 import net.wurstclient.mixinterface.IScreen;
@@ -112,35 +113,43 @@ public final class AltManagerScreen extends Screen
 			client.setScreen(screen);
 		}
 		
-		addDrawableChild(useButton = new ButtonWidget(width / 2 - 154,
-			height - 52, 100, 20, Text.literal("Login"), b -> pressLogin()));
+		addDrawableChild(useButton =
+			ButtonWidget.builder(Text.literal("Login"), b -> pressLogin())
+				.dimensions(width / 2 - 154, height - 52, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 50, height - 52, 100, 20,
-			Text.literal("Direct Login"),
-			b -> client.setScreen(new DirectLoginScreen(this))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Direct Login"),
+				b -> client.setScreen(new DirectLoginScreen(this)))
+			.dimensions(width / 2 - 50, height - 52, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 52, 100, 20,
-			Text.literal("Add"),
-			b -> client.setScreen(new AddAltScreen(this, altManager))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Add"),
+				b -> client.setScreen(new AddAltScreen(this, altManager)))
+			.dimensions(width / 2 + 54, height - 52, 100, 20).build());
 		
-		addDrawableChild(
-			starButton = new ButtonWidget(width / 2 - 154, height - 28, 75, 20,
-				Text.literal("Favorite"), b -> pressFavorite()));
+		addDrawableChild(starButton =
+			ButtonWidget.builder(Text.literal("Favorite"), b -> pressFavorite())
+				.dimensions(width / 2 - 154, height - 28, 75, 20).build());
 		
-		addDrawableChild(editButton = new ButtonWidget(width / 2 - 76,
-			height - 28, 74, 20, Text.literal("Edit"), b -> pressEdit()));
+		addDrawableChild(editButton =
+			ButtonWidget.builder(Text.literal("Edit"), b -> pressEdit())
+				.dimensions(width / 2 - 76, height - 28, 74, 20).build());
 		
-		addDrawableChild(deleteButton = new ButtonWidget(width / 2 + 2,
-			height - 28, 74, 20, Text.literal("Delete"), b -> pressDelete()));
+		addDrawableChild(deleteButton =
+			ButtonWidget.builder(Text.literal("Delete"), b -> pressDelete())
+				.dimensions(width / 2 + 2, height - 28, 74, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 80, height - 28, 75, 20,
-			Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
 		
-		addDrawableChild(importButton = new ButtonWidget(8, 8, 50, 20,
-			Text.literal("Import"), b -> pressImportAlts()));
+		addDrawableChild(importButton =
+			ButtonWidget.builder(Text.literal("Import"), b -> pressImportAlts())
+				.dimensions(8, 8, 50, 20).build());
 		
-		addDrawableChild(exportButton = new ButtonWidget(58, 8, 50, 20,
-			Text.literal("Export"), b -> pressExportAlts()));
+		addDrawableChild(exportButton =
+			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
+				.dimensions(58, 8, 50, 20).build());
 	}
 	
 	@Override
@@ -408,7 +417,7 @@ public final class AltManagerScreen extends Screen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
@@ -426,11 +435,11 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		drawCenteredText(matrixStack, textRenderer, "Alt Manager", width / 2, 4,
-			16777215);
-		drawCenteredText(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Alt Manager",
+			width / 2, 4, 16777215);
+		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
-		drawCenteredText(
+		drawCenteredTextWithShadow(
 			matrixStack, textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);
@@ -438,7 +447,7 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL11.GL_BLEND);
 			
@@ -518,7 +527,7 @@ public final class AltManagerScreen extends Screen
 			
 			ClickableWidget button = (ClickableWidget)d;
 			
-			if(!button.isHovered())
+			if(!button.isSelected())
 				continue;
 			
 			if(button != importButton && button != exportButton)
@@ -565,6 +574,8 @@ public final class AltManagerScreen extends Screen
 	{
 		private final List<Alt> list;
 		private int selected = -1;
+		private AltManagerScreen prevScreen;
+		private long lastTime;
 		
 		public ListGui(MinecraftClient minecraft, AltManagerScreen prevScreen,
 			List<Alt> list)
@@ -572,6 +583,7 @@ public final class AltManagerScreen extends Screen
 			super(minecraft, prevScreen.width, prevScreen.height, 36,
 				prevScreen.height - 56, 30);
 			
+			this.prevScreen = prevScreen;
 			this.list = list;
 		}
 		
@@ -607,9 +619,13 @@ public final class AltManagerScreen extends Screen
 		protected boolean selectItem(int index, int button, double mouseX,
 			double mouseY)
 		{
+			if(index == selected && Util.getMeasuringTimeMs() - lastTime < 250)
+				prevScreen.pressLogin();
+			
 			if(index >= 0 && index < list.size())
 				selected = index;
 			
+			lastTime = Util.getMeasuringTimeMs();
 			return true;
 		}
 		
@@ -628,7 +644,7 @@ public final class AltManagerScreen extends Screen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))

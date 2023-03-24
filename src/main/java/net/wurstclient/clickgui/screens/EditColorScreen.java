@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -116,13 +116,13 @@ public final class EditColorScreen extends Screen
 		addSelectableChild(greenValueField);
 		addSelectableChild(blueValueField);
 		
-		setInitialFocus(hexValueField);
-		hexValueField.setTextFieldFocused(true);
+		setFocused(hexValueField);
+		hexValueField.setFocused(true);
 		hexValueField.setSelectionStart(0);
 		hexValueField.setSelectionEnd(6);
 		
-		doneButton = new ButtonWidget(fieldsX, height - 30, 200, 20,
-			Text.literal("Done"), b -> done());
+		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
+			.dimensions(fieldsX, height - 30, 200, 20).build();
 		addDrawableChild(doneButton);
 	}
 	
@@ -173,7 +173,7 @@ public final class EditColorScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, client.textRenderer,
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
 		
 		// Draw palette

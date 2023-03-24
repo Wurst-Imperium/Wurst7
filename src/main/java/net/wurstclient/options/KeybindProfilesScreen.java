@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -45,18 +45,23 @@ public final class KeybindProfilesScreen extends Screen
 		listGui = new ListGui(client, this,
 			WurstClient.INSTANCE.getKeybinds().listProfiles());
 		
-		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			Text.literal("Open Folder"), b -> openFolder()));
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Open Folder"), b -> openFolder())
+				.dimensions(8, 8, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 154, height - 48, 100, 20,
-			Text.literal("New Profile"), b -> client.setScreen(
-				new EnterProfileNameScreen(this, this::newProfile))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("New Profile"),
+				b -> client.setScreen(
+					new EnterProfileNameScreen(this, this::newProfile)))
+			.dimensions(width / 2 - 154, height - 48, 100, 20).build());
 		
-		loadButton = addDrawableChild(new ButtonWidget(width / 2 - 50,
-			height - 48, 100, 20, Text.literal("Load"), b -> loadSelected()));
+		loadButton = addDrawableChild(
+			ButtonWidget.builder(Text.literal("Load"), b -> loadSelected())
+				.dimensions(width / 2 - 50, height - 48, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 + 54, height - 48, 100, 20,
-			Text.literal("Cancel"), b -> openPrevScreen()));
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Cancel"), b -> openPrevScreen())
+				.dimensions(width / 2 + 54, height - 48, 100, 20).build());
 	}
 	
 	private void openFolder()
@@ -171,12 +176,12 @@ public final class KeybindProfilesScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, "Keybind Profiles",
-			width / 2, 12, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			"Keybind Profiles", width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(loadButton.isHovered() && !loadButton.active)
+		if(loadButton.isSelected() && !loadButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);

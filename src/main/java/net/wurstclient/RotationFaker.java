@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -49,29 +49,32 @@ public final class RotationFaker
 	
 	public void faceVectorPacket(Vec3d vec)
 	{
-		RotationUtils.Rotation rotations =
-			RotationUtils.getNeededRotations(vec);
+		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
+		ClientPlayerEntity player = WurstClient.MC.player;
 		
 		fakeRotation = true;
-		serverYaw = rotations.getYaw();
-		serverPitch = rotations.getPitch();
+		serverYaw =
+			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw());
+		serverPitch = needed.getPitch();
 	}
 	
 	public void faceVectorClient(Vec3d vec)
 	{
-		RotationUtils.Rotation rotations =
-			RotationUtils.getNeededRotations(vec);
+		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
 		
-		WurstClient.MC.player.setYaw(rotations.getYaw());
-		WurstClient.MC.player.setPitch(rotations.getPitch());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		player.setYaw(
+			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw()));
+		player.setPitch(needed.getPitch());
 	}
 	
 	public void faceVectorClientIgnorePitch(Vec3d vec)
 	{
-		RotationUtils.Rotation rotations =
-			RotationUtils.getNeededRotations(vec);
+		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
 		
-		WurstClient.MC.player.setYaw(rotations.getYaw());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		WurstClient.MC.player.setYaw(
+			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw()));
 		WurstClient.MC.player.setPitch(0);
 	}
 	

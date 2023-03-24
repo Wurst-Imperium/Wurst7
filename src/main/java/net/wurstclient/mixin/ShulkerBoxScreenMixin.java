@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -49,11 +49,13 @@ public abstract class ShulkerBoxScreenMixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			addDrawableChild(new ButtonWidget(x + backgroundWidth - 108, y + 4,
-				50, 12, Text.literal("Steal"), b -> steal()));
+			addDrawableChild(ButtonWidget
+				.builder(Text.literal("Steal"), b -> steal())
+				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
 			
-			addDrawableChild(new ButtonWidget(x + backgroundWidth - 56, y + 4,
-				50, 12, Text.literal("Store"), b -> store()));
+			addDrawableChild(ButtonWidget
+				.builder(Text.literal("Store"), b -> store())
+				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())

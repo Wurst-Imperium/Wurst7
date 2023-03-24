@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -29,10 +29,13 @@ public final class ForcedChatReportsScreen extends Screen
 	private static final List<String> TRANSLATABLE_DISCONNECT_REASONS =
 		Arrays.asList("multiplayer.disconnect.missing_public_key",
 			"multiplayer.disconnect.invalid_public_key_signature",
-			"multiplayer.disconnect.invalid_public_key");
+			"multiplayer.disconnect.invalid_public_key",
+			"multiplayer.disconnect.unsigned_chat");
 	
 	private static final List<String> LITERAL_DISCONNECT_REASONS =
-		Arrays.asList("An internal error occurred in your connection.");
+		Arrays.asList("An internal error occurred in your connection.",
+			"A secure profile is required to join this server.",
+			"Secure profile expired.", "Secure profile invalid.");
 	
 	private final Screen prevScreen;
 	private final Text reason;
@@ -77,17 +80,19 @@ public final class ForcedChatReportsScreen extends Screen
 		int reconnectY = signaturesY + 24;
 		int backButtonY = reconnectY + 24;
 		
-		addDrawableChild(
-			signatureButton = new ButtonWidget(buttonX, signaturesY, 200, 20,
-				Text.literal(sigButtonMsg.get()), b -> toggleSignatures()));
+		addDrawableChild(signatureButton = ButtonWidget
+			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
+			.dimensions(buttonX, signaturesY, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, reconnectY, 200, 20,
-			Text.literal("Reconnect"),
-			b -> LastServerRememberer.reconnect(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(prevScreen))
+			.dimensions(buttonX, reconnectY, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, backButtonY, 200, 20,
-			Text.translatable("gui.toMenu"),
-			b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.translatable("gui.toMenu"),
+				b -> client.setScreen(prevScreen))
+			.dimensions(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()
@@ -106,8 +111,8 @@ public final class ForcedChatReportsScreen extends Screen
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredText(matrices, textRenderer, title, centerX,
-			titleY, 0xAAAAAA);
+		DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, title,
+			centerX, titleY, 0xAAAAAA);
 		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
 		
 		super.render(matrices, mouseX, mouseY, delta);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -86,21 +86,23 @@ public final class NcrModRequiredScreen extends Screen
 		int reconnectY = signaturesY + 24;
 		int backButtonY = reconnectY + 24;
 		
-		addDrawableChild(
-			signatureButton = new ButtonWidget(buttonX - 48, signaturesY, 148,
-				20, Text.literal(sigButtonMsg.get()), b -> toggleSignatures()));
+		addDrawableChild(signatureButton = ButtonWidget
+			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
+			.dimensions(buttonX - 48, signaturesY, 148, 20).build());
 		
-		addDrawableChild(
-			vsButton = new ButtonWidget(buttonX + 102, signaturesY, 148, 20,
-				Text.literal(vsButtonMsg.get()), b -> toggleVanillaSpoof()));
+		addDrawableChild(vsButton = ButtonWidget
+			.builder(Text.literal(vsButtonMsg.get()), b -> toggleVanillaSpoof())
+			.dimensions(buttonX + 102, signaturesY, 148, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, reconnectY, 200, 20,
-			Text.literal("Reconnect"),
-			b -> LastServerRememberer.reconnect(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(prevScreen))
+			.dimensions(buttonX, reconnectY, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, backButtonY, 200, 20,
-			Text.translatable("gui.toMenu"),
-			b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.translatable("gui.toMenu"),
+				b -> client.setScreen(prevScreen))
+			.dimensions(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()
@@ -125,8 +127,8 @@ public final class NcrModRequiredScreen extends Screen
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredText(matrices, textRenderer, title, centerX,
-			titleY, 0xAAAAAA);
+		DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, title,
+			centerX, titleY, 0xAAAAAA);
 		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
 		
 		super.render(matrices, mouseX, mouseY, delta);

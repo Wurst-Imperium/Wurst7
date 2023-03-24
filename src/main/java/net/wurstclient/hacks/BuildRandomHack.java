@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -109,7 +109,7 @@ public final class BuildRandomHack extends Hack
 		do
 		{
 			// generate random position
-			pos = new BlockPos(MC.player.getPos()).add(
+			pos = BlockPos.ofFloored(MC.player.getPos()).add(
 				random.nextInt(bound) - range, random.nextInt(bound) - range,
 				random.nextInt(bound) - range);
 			attempts++;
@@ -155,7 +155,7 @@ public final class BuildRandomHack extends Hack
 		float green = 2 - red;
 		
 		// draw box
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(matrixStack);
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);

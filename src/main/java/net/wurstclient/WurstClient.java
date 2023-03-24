@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
@@ -43,7 +42,6 @@ import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
-import net.wurstclient.nochatreports.NoChatReportsChannelHandler;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
@@ -55,11 +53,11 @@ public enum WurstClient
 {
 	INSTANCE;
 	
-	public static final MinecraftClient MC = MinecraftClient.getInstance();
-	public static final IMinecraftClient IMC = (IMinecraftClient)MC;
+	public static MinecraftClient MC;
+	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.29";
-	public static final String MC_VERSION = "1.19.2";
+	public static final String VERSION = "7.33";
+	public static final String MC_VERSION = "1.19.4";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -89,6 +87,8 @@ public enum WurstClient
 	{
 		System.out.println("Starting Wurst Client...");
 		
+		MC = MinecraftClient.getInstance();
+		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
@@ -310,9 +310,6 @@ public enum WurstClient
 		{
 			hax.panicHack.setEnabled(true);
 			hax.panicHack.onUpdate();
-			
-			ClientPlayNetworking
-				.unregisterGlobalReceiver(NoChatReportsChannelHandler.CHANNEL);
 		}
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -73,13 +73,14 @@ public class DisconnectedScreenMixin extends Screen
 		int backButtonY =
 			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
 		
-		addDrawableChild(new ButtonWidget(backButtonX, backButtonY + 24, 200,
-			20, Text.literal("Reconnect"),
-			b -> LastServerRememberer.reconnect(parent)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(parent))
+			.dimensions(backButtonX, backButtonY + 24, 200, 20).build());
 		
-		autoReconnectButton = addDrawableChild(
-			new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
-				Text.literal("AutoReconnect"), b -> pressAutoReconnect()));
+		autoReconnectButton = addDrawableChild(ButtonWidget
+			.builder(Text.literal("AutoReconnect"), b -> pressAutoReconnect())
+			.dimensions(backButtonX, backButtonY + 48, 200, 20).build());
 		
 		AutoReconnectHack autoReconnect =
 			WurstClient.INSTANCE.getHax().autoReconnectHack;

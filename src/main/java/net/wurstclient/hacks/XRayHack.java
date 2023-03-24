@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -46,24 +46,24 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
 		"minecraft:crafting_table", "minecraft:deepslate_coal_ore",
 		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
-		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
-		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
-		"minecraft:diamond_block", "minecraft:diamond_ore",
-		"minecraft:dispenser", "minecraft:dropper", "minecraft:emerald_block",
-		"minecraft:emerald_ore", "minecraft:enchanting_table",
-		"minecraft:end_portal", "minecraft:end_portal_frame",
-		"minecraft:ender_chest", "minecraft:furnace", "minecraft:glowstone",
-		"minecraft:gold_block", "minecraft:gold_ore", "minecraft:hopper",
-		"minecraft:iron_block", "minecraft:iron_ore", "minecraft:ladder",
-		"minecraft:lapis_block", "minecraft:lapis_ore", "minecraft:lava",
-		"minecraft:lodestone", "minecraft:mossy_cobblestone",
-		"minecraft:nether_gold_ore", "minecraft:nether_portal",
-		"minecraft:nether_quartz_ore", "minecraft:raw_copper_block",
-		"minecraft:raw_gold_block", "minecraft:raw_iron_block",
-		"minecraft:redstone_block", "minecraft:redstone_ore",
-		"minecraft:repeating_command_block", "minecraft:spawner",
-		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
-		"minecraft:water");
+		"minecraft:deepslate_emerald_ore", "minecraft:deepslate_gold_ore",
+		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
+		"minecraft:deepslate_redstone_ore", "minecraft:diamond_block",
+		"minecraft:diamond_ore", "minecraft:dispenser", "minecraft:dropper",
+		"minecraft:emerald_block", "minecraft:emerald_ore",
+		"minecraft:enchanting_table", "minecraft:end_portal",
+		"minecraft:end_portal_frame", "minecraft:ender_chest",
+		"minecraft:furnace", "minecraft:glowstone", "minecraft:gold_block",
+		"minecraft:gold_ore", "minecraft:hopper", "minecraft:iron_block",
+		"minecraft:iron_ore", "minecraft:ladder", "minecraft:lapis_block",
+		"minecraft:lapis_ore", "minecraft:lava", "minecraft:lodestone",
+		"minecraft:mossy_cobblestone", "minecraft:nether_gold_ore",
+		"minecraft:nether_portal", "minecraft:nether_quartz_ore",
+		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
+		"minecraft:raw_iron_block", "minecraft:redstone_block",
+		"minecraft:redstone_ore", "minecraft:repeating_command_block",
+		"minecraft:spawner", "minecraft:suspicious_sand", "minecraft:tnt",
+		"minecraft:torch", "minecraft:trapped_chest", "minecraft:water");
 	
 	private ArrayList<String> oreNames;
 	private final String warning;

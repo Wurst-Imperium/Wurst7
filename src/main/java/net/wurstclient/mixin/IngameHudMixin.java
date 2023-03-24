@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,10 +24,11 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 public class IngameHudMixin extends DrawableHelper
 {
 	@Inject(
-		at = {@At(value = "INVOKE",
+		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
-			ordinal = 4)},
-		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;F)V"})
+			remap = false,
+			ordinal = 3),
+		method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V")
 	private void onRender(MatrixStack matrixStack, float partialTicks,
 		CallbackInfo ci)
 	{
@@ -38,11 +39,11 @@ public class IngameHudMixin extends DrawableHelper
 		EventManager.fire(event);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"renderOverlay(Lnet/minecraft/util/Identifier;F)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(Identifier identifier, float scale,
-		CallbackInfo ci)
+	private void onRenderOverlay(MatrixStack matrixStack, Identifier identifier,
+		float f, CallbackInfo ci)
 	{
 		if(identifier == null || identifier.getPath() == null)
 			return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -205,9 +205,9 @@ public class CleanUpScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Clean Up", width / 2, 20,
-			16777215);
-		drawCenteredText(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Clean Up",
+			width / 2, 20, 16777215);
+		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		
@@ -225,7 +225,7 @@ public class CleanUpScreen extends Screen
 			
 			ClickableWidget button = (ClickableWidget)d;
 			
-			if(!button.isHovered() || !(button instanceof CleanUpButton))
+			if(!button.isSelected() || !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;
@@ -247,7 +247,7 @@ public class CleanUpScreen extends Screen
 			String tooltip, PressAction pressAction)
 		{
 			super(x, y, 200, 20, Text.literal(messageSupplier.get()),
-				pressAction);
+				pressAction, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())

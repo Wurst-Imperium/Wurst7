@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,10 +18,9 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -97,7 +97,7 @@ public final class PlayerFinderHack extends Hack
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tracer line
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
@@ -158,13 +158,14 @@ public final class PlayerFinderHack extends Hack
 		//
 		// }else
 		if(packet instanceof PlaySoundS2CPacket sound)
-			newPos = new BlockPos(sound.getX(), sound.getY(), sound.getZ());
+			newPos =
+				BlockPos.ofFloored(sound.getX(), sound.getY(), sound.getZ());
 		
 		if(newPos == null)
 			return;
 		
 		// check distance to player
-		BlockPos playerPos = new BlockPos(MC.player.getPos());
+		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
 		if(Math.abs(playerPos.getX() - newPos.getX()) > 256
 			|| Math.abs(playerPos.getZ() - newPos.getZ()) > 256)
 			pos = newPos;

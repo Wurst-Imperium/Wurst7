@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,8 +38,9 @@ public class Window
 	
 	private boolean invisible;
 	
+	private boolean fixedWidth;
 	private int innerHeight;
-	private int maxHeight;
+	private int maxInnerHeight;
 	private int scrollOffset;
 	private boolean scrollingEnabled;
 	
@@ -88,6 +89,9 @@ public class Window
 	
 	public final void setWidth(int width)
 	{
+		if(fixedWidth)
+			return;
+		
 		if(this.width != width)
 			invalidate();
 		
@@ -129,10 +133,10 @@ public class Window
 			childrenHeight += c.getHeight() + 2;
 		childrenHeight += 2;
 		
-		if(childrenHeight > maxHeight + 13 && maxHeight > 0)
+		if(maxInnerHeight > 0 && childrenHeight > maxInnerHeight + 13)
 		{
 			setWidth(Math.max(maxChildWidth + 3, titleBarWidth));
-			setHeight(maxHeight + 13);
+			setHeight(maxInnerHeight + 13);
 			
 		}else
 		{
@@ -160,14 +164,12 @@ public class Window
 		
 		innerHeight = offsetY;
 		
-		if(maxHeight == 0)
+		if(maxInnerHeight == 0 || innerHeight < maxInnerHeight)
 			setHeight(innerHeight + 13);
-		else if(height > maxHeight + 13)
-			setHeight(maxHeight + 13);
-		else if(height < maxHeight + 13)
-			setHeight(Math.min(maxHeight + 13, innerHeight + 13));
+		else
+			setHeight(maxInnerHeight + 13);
 		
-		scrollingEnabled = innerHeight > height - 13;
+		scrollingEnabled = innerHeight + 13 > height;
 		if(scrollingEnabled)
 			cWidth -= 3;
 		
@@ -311,17 +313,35 @@ public class Window
 		this.invisible = invisible;
 	}
 	
+	public final boolean isFixedWidth()
+	{
+		return fixedWidth;
+	}
+	
+	public final void setFixedWidth(boolean fixedWidth)
+	{
+		this.fixedWidth = fixedWidth;
+	}
+	
 	public final int getInnerHeight()
 	{
 		return innerHeight;
 	}
 	
-	public final void setMaxHeight(int maxHeight)
+	public final void setMaxInnerHeight(int maxInnerHeight)
 	{
-		if(this.maxHeight != maxHeight)
+		if(maxInnerHeight < 0)
+			maxInnerHeight = 0;
+		
+		if(this.maxInnerHeight != maxInnerHeight)
 			invalidate();
 		
-		this.maxHeight = maxHeight;
+		this.maxInnerHeight = maxInnerHeight;
+	}
+	
+	public final void setMaxHeight(int maxHeight)
+	{
+		setMaxInnerHeight(maxHeight - 13);
 	}
 	
 	public final int getScrollOffset()

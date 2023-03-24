@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -39,29 +39,37 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
 			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
 		
-		addDrawableChild(
-			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
-				Text.literal("Back"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
+			.build());
+		
+		addDrawableChild(keyButton = ButtonWidget
+			.builder(Text.literal("Zoom Key: " + zoomKeyName),
+				b -> client.setScreen(new PressAKeyScreen(this)))
+			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
+		
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("More"), b -> level.increaseValue())
+			.dimensions(width / 2 - 79, height / 4 + 72 - 16, 50, 20).build());
+		
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Less"), b -> level.decreaseValue())
+			.dimensions(width / 2 - 25, height / 4 + 72 - 16, 50, 20).build());
+		
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Default"),
+				b -> level.setValue(level.getDefaultValue()))
+			.dimensions(width / 2 + 29, height / 4 + 72 - 16, 50, 20).build());
 		
 		addDrawableChild(
-			keyButton = new ButtonWidget(width / 2 - 79, height / 4 + 24 - 16,
-				158, 20, Text.literal("Zoom Key: " + zoomKeyName),
-				b -> client.setScreen(new PressAKeyScreen(this))));
-		
-		addDrawableChild(new ButtonWidget(width / 2 - 79, height / 4 + 72 - 16,
-			50, 20, Text.literal("More"), b -> level.increaseValue()));
-		
-		addDrawableChild(new ButtonWidget(width / 2 - 25, height / 4 + 72 - 16,
-			50, 20, Text.literal("Less"), b -> level.decreaseValue()));
-		
-		addDrawableChild(new ButtonWidget(width / 2 + 29, height / 4 + 72 - 16,
-			50, 20, Text.literal("Default"),
-			b -> level.setValue(level.getDefaultValue())));
-		
-		addDrawableChild(scrollButton =
-			new ButtonWidget(width / 2 - 79, height / 4 + 96 - 16, 158, 20,
-				Text.literal("Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
-				b -> toggleScroll()));
+			scrollButton = ButtonWidget
+				.builder(
+					Text.literal(
+						"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
+					b -> toggleScroll())
+				.dimensions(width / 2 - 79, height / 4 + 96 - 16, 158, 20)
+				.build());
 	}
 	
 	private void toggleScroll()
@@ -93,9 +101,9 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Zoom Manager", width / 2,
-			40, 0xffffff);
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Zoom Manager",
+			width / 2, 40, 0xffffff);
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,
 			height / 4 + 44, 0xcccccc);
 		

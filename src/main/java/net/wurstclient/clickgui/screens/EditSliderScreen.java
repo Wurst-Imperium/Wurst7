@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -50,11 +50,11 @@ public final class EditSliderScreen extends Screen
 		valueField.setSelectionStart(0);
 		
 		addSelectableChild(valueField);
-		setInitialFocus(valueField);
-		valueField.setTextFieldFocused(true);
+		setFocused(valueField);
+		valueField.setFocused(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, Text.literal("Done"),
-			b -> done());
+		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
+			.dimensions(x1, y2, 200, 20).build();
 		addDrawableChild(doneButton);
 	}
 	
@@ -96,8 +96,8 @@ public final class EditSliderScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, client.textRenderer, slider.getName(),
-			width / 2, 20, 0xFFFFFF);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			slider.getName(), width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

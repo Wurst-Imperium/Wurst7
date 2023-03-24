@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,7 +9,9 @@ package net.wurstclient.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -63,5 +65,17 @@ public enum ChatUtils
 	public static void syntaxError(String message)
 	{
 		message(SYNTAX_ERROR_PREFIX + message);
+	}
+	
+	public static String getAsString(ChatHudLine.Visible visible)
+	{
+		return getAsString(visible.content());
+	}
+	
+	public static String getAsString(OrderedText text)
+	{
+		JustGiveMeTheStringVisitor visitor = new JustGiveMeTheStringVisitor();
+		text.accept(visitor);
+		return visitor.toString();
 	}
 }

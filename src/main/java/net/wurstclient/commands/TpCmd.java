@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -68,12 +68,12 @@ public final class TpCmd extends Command
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		return new BlockPos(entity.getPos());
+		return BlockPos.ofFloored(entity.getPos());
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = new BlockPos(MC.player.getPos());
+		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
 		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -32,7 +33,6 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -74,8 +74,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				window.add(c);
 		}
 		
-		window.pack();
 		window.setWidth(308);
+		window.setFixedWidth(true);
+		window.pack();
 	}
 	
 	@Override
@@ -89,9 +90,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		boolean hasHelp = false;// !feature.getHelpPage().isEmpty();
 		if(hasPrimaryAction)
 		{
-			primaryButton = new ButtonWidget(width / 2 - 151, height - 65,
-				hasHelp ? 149 : 302, 18, Text.literal(primaryAction), b -> {
-					
+			primaryButton =
+				ButtonWidget.builder(Text.literal(primaryAction), b -> {
 					TooManyHaxHack tooManyHax =
 						WurstClient.INSTANCE.getHax().tooManyHaxHack;
 					if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
@@ -107,7 +107,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						.setMessage(Text.literal(feature.getPrimaryAction()));
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(feature.getName());
-				});
+				}).dimensions(width / 2 - 151, height - 65, hasHelp ? 149 : 302,
+					18).build();
 			addDrawableChild(primaryButton);
 		}
 		
@@ -324,8 +325,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredText(matrixStack, client.textRenderer, feature.getName(),
-			middleX, 32, txtColor);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			feature.getName(), middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -374,7 +375,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// window background
 			// left & right
@@ -462,7 +463,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredText(matrixStack, client.textRenderer,
+			drawCenteredTextWithShadow(matrixStack, client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
@@ -491,9 +492,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			ClickableWidget button = (ClickableWidget)d;
 			
 			// positions
-			int x1 = button.x;
+			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
-			int y1 = button.y;
+			int y1 = button.getY();
 			int y2 = y1 + 18;
 			
 			// color

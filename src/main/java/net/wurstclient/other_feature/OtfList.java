@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,6 +21,7 @@ public final class OtfList
 	public final CleanUpOtf cleanUpOtf = new CleanUpOtf();
 	public final DisableOtf disableOtf = new DisableOtf();
 	public final HackListOtf hackListOtf = new HackListOtf();
+	public final KeybindManagerOtf keybindManagerOtf = new KeybindManagerOtf();
 	public final LastServerOtf lastServerOtf = new LastServerOtf();
 	public final NoChatReportsOtf noChatReportsOtf = new NoChatReportsOtf();
 	public final NoTelemetryOtf noTelemetryOtf = new NoTelemetryOtf();

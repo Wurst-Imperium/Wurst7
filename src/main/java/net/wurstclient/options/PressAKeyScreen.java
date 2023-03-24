@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,8 +54,8 @@ public class PressAKeyScreen extends Screen
 		float partialTicks)
 	{
 		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Press a key", width / 2,
-			height / 4 + 48, 16777215);
+		drawCenteredTextWithShadow(matrixStack, textRenderer, "Press a key",
+			width / 2, height / 4 + 48, 16777215);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 }

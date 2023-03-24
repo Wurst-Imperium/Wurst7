@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -48,22 +48,24 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
-			Text.literal("Change Key"),
-			b -> client.setScreen(new PressAKeyScreen(this))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Change Key"),
+				b -> client.setScreen(new PressAKeyScreen(this)))
+			.dimensions(width / 2 - 100, 60, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
-			20, Text.literal("Save"), b -> save()));
+		addDrawableChild(ButtonWidget.builder(Text.literal("Save"), b -> save())
+			.dimensions(width / 2 - 100, height / 4 + 72, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
-			20, Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 96, 200, 20).build());
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, Text.literal(""));
 		commandField.setMaxLength(65536);
 		addSelectableChild(commandField);
-		setInitialFocus(commandField);
-		commandField.setTextFieldFocused(true);
+		setFocused(commandField);
+		commandField.setFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -97,14 +99,14 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredText(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
 		
 		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
