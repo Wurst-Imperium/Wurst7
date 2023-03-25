@@ -12,10 +12,14 @@ on:
     branches: [ "master" ]
     paths:
       - '**.java'
+      - 'gradle**'
+      - 'build.gradle'
   pull_request:
     branches: [ "master" ]
     paths:
       - '**.java'
+      - 'gradle**'
+      - 'build.gradle'
 
 permissions:
   contents: read
