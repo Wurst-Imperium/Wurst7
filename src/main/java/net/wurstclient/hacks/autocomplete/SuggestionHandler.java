@@ -18,7 +18,7 @@ import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-public class SuggestionHandler
+public final class SuggestionHandler
 {
 	private final ArrayList<String> suggestions = new ArrayList<>();
 	

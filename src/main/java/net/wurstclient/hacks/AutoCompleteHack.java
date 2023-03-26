@@ -7,33 +7,64 @@
  */
 package net.wurstclient.hacks;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.function.BiConsumer;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autocomplete.MessageCompleter;
+import net.wurstclient.hacks.autocomplete.ModelSettings;
+import net.wurstclient.hacks.autocomplete.OobaboogaMessageCompleter;
+import net.wurstclient.hacks.autocomplete.OpenAiMessageCompleter;
 import net.wurstclient.hacks.autocomplete.SuggestionHandler;
+import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.OpenAiUtils;
-import net.wurstclient.util.json.JsonException;
-import net.wurstclient.util.json.WsonObject;
 
 @SearchTags({"auto complete", "Copilot", "ChatGPT", "chat GPT", "GPT-3", "GPT3",
 	"GPT 3", "OpenAI", "open ai", "ChatAI", "chat AI", "ChatBot", "chat bot"})
 public final class AutoCompleteHack extends Hack
 	implements ChatOutputListener, UpdateListener
 {
+	private final ModelSettings modelSettings = new ModelSettings();
 	private final SuggestionHandler suggestionHandler = new SuggestionHandler();
 	
+	private final EnumSetting<ApiProvider> apiProvider = new EnumSetting<>(
+		"API provider",
+		"\u00a7lOpenAI\u00a7r lets you use models like GPT-3, but requires an"
+			+ " account with API access, costs money to use and sends your chat"
+			+ " history to their servers. The name is a lie - it's closed"
+			+ " source.\n\n"
+			+ "\u00a7loobabooga\u00a7r lets you use models like LLaMA and many"
+			+ " others. It's a true open source alternative to OpenAI that you"
+			+ " can run locally on your own computer. It's free to use and does"
+			+ " not send your chat history to any servers.",
+		ApiProvider.values(), ApiProvider.OOBABOOGA);
+	
+	private enum ApiProvider
+	{
+		OPENAI("OpenAI"),
+		OOBABOOGA("oobabooga");
+		
+		private final String name;
+		
+		private ApiProvider(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
+	private MessageCompleter completer;
 	private String draftMessage;
 	private BiConsumer<SuggestionsBuilder, String> suggestionsUpdater;
 	
@@ -45,19 +76,32 @@ public final class AutoCompleteHack extends Hack
 	{
 		super("AutoComplete");
 		setCategory(Category.CHAT);
+		
+		addSetting(apiProvider);
+		modelSettings.forEach(this::addSetting);
 		suggestionHandler.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		String apiKey = System.getenv("WURST_OPENAI_KEY");
-		if(apiKey == null)
+		switch(apiProvider.getSelected())
 		{
-			ChatUtils.error("API key not found. Please set the"
-				+ " WURST_OPENAI_KEY environment variable and reboot.");
-			setEnabled(false);
-			return;
+			case OPENAI:
+			String apiKey = System.getenv("WURST_OPENAI_KEY");
+			if(apiKey == null)
+			{
+				ChatUtils.error("API key not found. Please set the"
+					+ " WURST_OPENAI_KEY environment variable and reboot.");
+				setEnabled(false);
+				return;
+			}
+			completer = new OpenAiMessageCompleter(modelSettings);
+			break;
+			
+			case OOBABOOGA:
+			completer = new OobaboogaMessageCompleter(modelSettings);
+			break;
 		}
 		
 		EVENTS.add(ChatOutputListener.class, this);
@@ -120,7 +164,7 @@ public final class AutoCompleteHack extends Hack
 		apiCallThread = new Thread(() -> {
 			
 			// get suggestion
-			String suggestion = completeChatMessage(draftMessage2);
+			String suggestion = completer.completeChatMessage(draftMessage2);
 			if(suggestion.isEmpty())
 				return;
 			
@@ -145,89 +189,6 @@ public final class AutoCompleteHack extends Hack
 		this.draftMessage = draftMessage;
 		this.suggestionsUpdater = suggestionsUpdater;
 		lastRefreshTime = System.currentTimeMillis();
-	}
-	
-	private String completeChatMessage(String draftMessage)
-	{
-		// get API key and parameters
-		String apiKey = System.getenv("WURST_OPENAI_KEY");
-		String prompt = buildPrompt(draftMessage);
-		JsonObject params = buildParams(prompt);
-		System.out.println(params);
-		
-		try
-		{
-			// send request
-			WsonObject response = OpenAiUtils.requestCompletion(apiKey, params);
-			System.out.println(response);
-			
-			// read response
-			return extractCompletion(response);
-			
-		}catch(IOException | JsonException e)
-		{
-			e.printStackTrace();
-			return "";
-		}
-	}
-	
-	private String buildPrompt(String draftMessage)
-	{
-		// tell the model that it's talking in a Minecraft chat
-		String prompt = "=== Minecraft chat log ===\n";
-		
-		// add chat history
-		List<ChatHudLine.Visible> chatHistory =
-			MC.inGameHud.getChatHud().visibleMessages;
-		for(int i = chatHistory.size() - 1; i >= 0; i--)
-		{
-			// get message
-			String message = ChatUtils.getAsString(chatHistory.get(i));
-			
-			// filter out Wurst messages so the model won't admit it's hacking
-			if(message.startsWith(ChatUtils.WURST_PREFIX))
-				continue;
-			
-			// give non-player messages a sender to avoid confusing the model
-			if(!message.startsWith("<"))
-				message = "<System> " + message;
-			
-			prompt += message + "\n";
-		}
-		
-		// if the chat history is empty, add a dummy system message
-		if(chatHistory.isEmpty())
-			prompt += "<System> " + MC.getSession().getUsername()
-				+ " joined the game.\n";
-		
-		// add draft message
-		prompt += "<" + MC.getSession().getUsername() + "> " + draftMessage;
-		
-		return prompt;
-	}
-	
-	private JsonObject buildParams(String prompt)
-	{
-		JsonObject params = new JsonObject();
-		params.addProperty("prompt", prompt);
-		params.addProperty("stop", "\n<");
-		params.addProperty("model", "code-davinci-002");
-		params.addProperty("max_tokens", 16);
-		params.addProperty("temperature", 0.7);
-		params.addProperty("frequency_penalty", 0.6);
-		return params;
-	}
-	
-	private String extractCompletion(WsonObject response) throws JsonException
-	{
-		// extract completion from response
-		String completion =
-			response.getArray("choices").getObject(0).getString("text");
-		
-		// remove newlines
-		completion = completion.replace("\n", " ");
-		
-		return completion;
 	}
 	
 	// See ChatInputSuggestorMixin
