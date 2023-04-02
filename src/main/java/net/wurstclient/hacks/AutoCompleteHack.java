@@ -85,23 +85,19 @@ public final class AutoCompleteHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		switch(apiProvider.getSelected())
+		completer = switch(apiProvider.getSelected())
 		{
-			case OPENAI:
-			String apiKey = System.getenv("WURST_OPENAI_KEY");
-			if(apiKey == null)
-			{
-				ChatUtils.error("API key not found. Please set the"
-					+ " WURST_OPENAI_KEY environment variable and reboot.");
-				setEnabled(false);
-				return;
-			}
-			completer = new OpenAiMessageCompleter(modelSettings);
-			break;
-			
-			case OOBABOOGA:
-			completer = new OobaboogaMessageCompleter(modelSettings);
-			break;
+			case OPENAI -> new OpenAiMessageCompleter(modelSettings);
+			case OOBABOOGA -> new OobaboogaMessageCompleter(modelSettings);
+		};
+		
+		if(completer instanceof OpenAiMessageCompleter
+			&& System.getenv("WURST_OPENAI_KEY") == null)
+		{
+			ChatUtils.error("API key not found. Please set the"
+				+ " WURST_OPENAI_KEY environment variable and reboot.");
+			setEnabled(false);
+			return;
 		}
 		
 		EVENTS.add(ChatOutputListener.class, this);
