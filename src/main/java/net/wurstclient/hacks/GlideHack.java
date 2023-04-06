@@ -10,8 +10,7 @@ package net.wurstclient.hacks;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -85,8 +84,8 @@ public final class GlideHack extends Hack
 				.stream(BlockUtils.getAllInBox(min, max).spliterator(), true);
 			
 			// manual collision check, since liquids don't have bounding boxes
-			if(stream.map(BlockUtils::getState).map(BlockState::getMaterial)
-				.anyMatch(Material::isLiquid))
+			if(stream.map(BlockUtils::getBlock)
+				.anyMatch(b -> b instanceof FluidBlock))
 				return;
 		}
 		

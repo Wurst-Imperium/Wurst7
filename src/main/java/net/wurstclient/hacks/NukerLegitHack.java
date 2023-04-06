@@ -20,7 +20,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -150,8 +149,7 @@ public final class NukerLegitHack extends Hack
 		
 		// check pos
 		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-		if(pos == null
-			|| BlockUtils.getState(pos).getMaterial() == Material.AIR)
+		if(pos == null || BlockUtils.getBlock(pos) == Blocks.AIR)
 			return;
 		
 		// set id

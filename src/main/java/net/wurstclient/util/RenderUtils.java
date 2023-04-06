@@ -873,8 +873,8 @@ public enum RenderUtils
 		else
 			matrixStack.scale(0.75F, 0.75F, 0.75F);
 		
-		ItemStack renderStack =
-			stack.isEmpty() ? new ItemStack(Blocks.GRASS_BLOCK) : stack;
+		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
+			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
 		DiffuseLighting.enableGuiDepthLighting();
 		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(matrixStack,
