@@ -42,3 +42,10 @@ jobs:
       uses: gradle/gradle-build-action@v2
     - name: Execute Gradle build
       run: ./gradlew build
+    - name: Prepare build artifacts
+      run: rm build/libs/Wurst-Client-*-sources.jar && mv build/libs/Wurst-Client-*.jar "build/libs/Wurst-Client-${{github.WORKFLOW_SHA}}.jar"
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Wurst-Client nightly-${{github.WORKFLOW_SHA}}
+        path: "build/libs/Wurst-Client-${{github.WORKFLOW_SHA}}.jar"
