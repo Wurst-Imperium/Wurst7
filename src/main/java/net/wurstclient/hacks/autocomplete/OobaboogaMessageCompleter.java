@@ -74,8 +74,11 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 			completion = completion.substring(1);
 		
 		// remove the next message
-		if(completion.contains("\n<"))
-			completion = completion.substring(0, completion.indexOf("\n<"));
+		String stopSequence =
+			modelSettings.stopSequence.getSelected().getSequence();
+		if(completion.contains(stopSequence))
+			completion =
+				completion.substring(0, completion.indexOf(stopSequence));
 		
 		// remove newlines
 		completion = completion.replace("\n", " ");

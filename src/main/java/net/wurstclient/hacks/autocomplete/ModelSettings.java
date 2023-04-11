@@ -120,10 +120,50 @@ public final class ModelSettings
 				+ "Only works with the oobabooga web UI.",
 			1, 0.8, 1.5, 0.01, ValueDisplay.DECIMAL);
 	
+	public final EnumSetting<StopSequence> stopSequence = new EnumSetting<>(
+		"Stop sequence",
+		"Controls how AutoComplete detects the end of a chat message.\n\n"
+			+ "\u00a7lLine Break\u00a7r is the default value and is recommended"
+			+ " for most language models.\n\n"
+			+ "\u00a7lNext Message\u00a7r works better with certain"
+			+ " code-optimized language models, which have a tendency to insert"
+			+ " line breaks in the middle of a chat message.\n\n"
+			+ "\u00a7lNOTE:\u00a7r Due to a limitation in the oobabooga API, the"
+			+ " stop sequence doesn't properly stop locally installed models."
+			+ " Instead, it waits for the model to finish and then cuts off"
+			+ " the rest of the text.",
+		StopSequence.values(), StopSequence.LINE_BREAK);
+	
+	public enum StopSequence
+	{
+		LINE_BREAK("Line Break", "\n"),
+		NEXT_MESSAGE("Next Message", "\n<");
+		
+		private final String name;
+		private final String sequence;
+		
+		private StopSequence(String name, String sequence)
+		{
+			this.name = name;
+			this.sequence = sequence;
+		}
+		
+		public String getSequence()
+		{
+			return sequence;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
 	private final List<Setting> settings =
 		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
 			temperature, topP, presencePenalty, frequencyPenalty,
-			repetitionPenalty, encoderRepetitionPenalty));
+			repetitionPenalty, encoderRepetitionPenalty, stopSequence));
 	
 	public void forEach(Consumer<Setting> action)
 	{

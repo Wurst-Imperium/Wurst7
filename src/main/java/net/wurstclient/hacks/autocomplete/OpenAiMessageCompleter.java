@@ -31,7 +31,8 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	{
 		// build the request parameters
 		JsonObject params = new JsonObject();
-		params.addProperty("stop", "\n<");
+		params.addProperty("stop",
+			modelSettings.stopSequence.getSelected().getSequence());
 		params.addProperty("model",
 			"" + modelSettings.openAiModel.getSelected());
 		params.addProperty("max_tokens", modelSettings.maxTokens.getValueI());
