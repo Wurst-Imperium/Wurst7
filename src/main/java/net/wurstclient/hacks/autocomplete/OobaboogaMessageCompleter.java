@@ -33,6 +33,10 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 		params.addProperty("max_length", modelSettings.maxTokens.getValueI());
 		params.addProperty("temperature", modelSettings.temperature.getValue());
 		params.addProperty("top_p", modelSettings.topP.getValue());
+		params.addProperty("repetition_penalty",
+			modelSettings.repetitionPenalty.getValue());
+		params.addProperty("encoder_repetition_penalty",
+			modelSettings.encoderRepetitionPenalty.getValue());
 		return params;
 	}
 	

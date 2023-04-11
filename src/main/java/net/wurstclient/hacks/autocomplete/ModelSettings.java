@@ -47,7 +47,8 @@ public final class ModelSettings
 				+ " history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat the same word over and over again.",
+				+ " model to repeat the same word over and over again.\n\n"
+				+ "Only works with OpenAI models.",
 			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting frequencyPenalty =
@@ -56,12 +57,29 @@ public final class ModelSettings
 				+ " appears in the chat history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat existing chat messages.",
+				+ " model to repeat existing chat messages.\n\n"
+				+ "Only works with OpenAI models.",
 			0.6, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
-	private final List<Setting> settings =
-		Collections.unmodifiableList(Arrays.asList(maxTokens, temperature, topP,
-			presencePenalty, frequencyPenalty));
+	public final SliderSetting repetitionPenalty =
+		new SliderSetting("Repetition penalty",
+			"Similar to presence penalty, but uses a different algorithm.\n\n"
+				+ "1.0 means no penalty, negative values are not possible and"
+				+ " 1.5 is the maximum value.\n\n"
+				+ "Only works with the oobabooga web UI.",
+			1, 1, 1.5, 0.01, ValueDisplay.DECIMAL);
+	
+	public final SliderSetting encoderRepetitionPenalty =
+		new SliderSetting("Encoder repetition penalty",
+			"Similar to frequency penalty, but uses a different algorithm.\n\n"
+				+ "1.0 means no penalty, 0.8 behaves like a negative value and"
+				+ " 1.5 is the maximum value.\n\n"
+				+ "Only works with the oobabooga web UI.",
+			1, 0.8, 1.5, 0.01, ValueDisplay.DECIMAL);
+	
+	private final List<Setting> settings = Collections.unmodifiableList(
+		Arrays.asList(maxTokens, temperature, topP, presencePenalty,
+			frequencyPenalty, repetitionPenalty, encoderRepetitionPenalty));
 	
 	public void forEach(Consumer<Setting> action)
 	{
