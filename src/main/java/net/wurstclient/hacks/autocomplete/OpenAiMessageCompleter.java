@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.wurstclient.util.json.JsonException;
@@ -28,10 +29,11 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	@Override
 	protected JsonObject buildParams(String prompt)
 	{
+		// build the request parameters
 		JsonObject params = new JsonObject();
-		params.addProperty("prompt", prompt);
 		params.addProperty("stop", "\n<");
-		params.addProperty("model", "code-davinci-002");
+		params.addProperty("model",
+			"" + modelSettings.openAiModel.getSelected());
 		params.addProperty("max_tokens", modelSettings.maxTokens.getValueI());
 		params.addProperty("temperature", modelSettings.temperature.getValue());
 		params.addProperty("top_p", modelSettings.topP.getValue());
@@ -39,6 +41,20 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 			modelSettings.presencePenalty.getValue());
 		params.addProperty("frequency_penalty",
 			modelSettings.frequencyPenalty.getValue());
+		
+		// add the prompt, depending on the model
+		if(modelSettings.openAiModel.getSelected().isChatModel())
+		{
+			JsonArray messages = new JsonArray();
+			JsonObject promptMessage = new JsonObject();
+			promptMessage.addProperty("role", "user");
+			promptMessage.addProperty("content", prompt);
+			messages.add(promptMessage);
+			params.add("messages", messages);
+			
+		}else
+			params.addProperty("prompt", prompt);
+		
 		return params;
 	}
 	
@@ -46,8 +62,12 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	protected WsonObject requestCompletion(JsonObject parameters)
 		throws IOException, JsonException
 	{
+		// get the API URL
+		URL url = modelSettings.openAiModel.getSelected().isChatModel()
+			? new URL("https://api.openai.com/v1/chat/completions")
+			: new URL("https://api.openai.com/v1/completions");
+		
 		// set up the API request
-		URL url = new URL("https://api.openai.com/v1/completions");
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/json");
@@ -70,8 +90,13 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	protected String extractCompletion(WsonObject response) throws JsonException
 	{
 		// extract completion from response
-		String completion =
-			response.getArray("choices").getObject(0).getString("text");
+		String completion;
+		if(modelSettings.openAiModel.getSelected().isChatModel())
+			completion = response.getArray("choices").getObject(0)
+				.getObject("message").getString("content");
+		else
+			completion =
+				response.getArray("choices").getObject(0).getString("text");
 		
 		// remove newlines
 		completion = completion.replace("\n", " ");

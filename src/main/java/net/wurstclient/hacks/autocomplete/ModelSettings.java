@@ -12,12 +12,55 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 public final class ModelSettings
 {
+	public final EnumSetting<OpenAiModel> openAiModel = new EnumSetting<>(
+		"OpenAI model",
+		"The model to use for OpenAI API calls.\n\n"
+			+ "\u00a7lText-Davinci-003\u00a7r (better known as GPT-3) is an"
+			+ " older model that's less censored than ChatGPT, but it's also"
+			+ " 10x more expensive to use.\n\n"
+			+ "\u00a7lGPT-3.5-Turbo\u00a7r (better known as ChatGPT) is"
+			+ " recommended for most use cases, as it's relatively cheap and"
+			+ " powerful.\n\n"
+			+ "\u00a7lGPT-4\u00a7r is more powerful, but only works if OpenAI"
+			+ " has chosen you to be a beta tester. It can be anywhere from"
+			+ " 15x to 60x more expensive than ChatGPT. Probably not worth it.",
+		OpenAiModel.values(), OpenAiModel.GPT_3_5_TURBO);
+	
+	public enum OpenAiModel
+	{
+		TEXT_DAVINCI_003("text-davinci-003", false),
+		GPT_3_5_TURBO("gpt-3.5-turbo", true),
+		GPT_4("gpt-4", true),
+		GPT_4_32K("gpt-4-32k", true);
+		
+		private final String name;
+		private final boolean chat;
+		
+		private OpenAiModel(String name, boolean chat)
+		{
+			this.name = name;
+			this.chat = chat;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+		
+		public boolean isChatModel()
+		{
+			return chat;
+		}
+	}
+	
 	public final SliderSetting maxTokens = new SliderSetting("Max tokens",
 		"The maximum number of tokens that the model can generate.\n\n"
 			+ "Higher values allow the model to predict longer chat messages,"
@@ -77,9 +120,10 @@ public final class ModelSettings
 				+ "Only works with the oobabooga web UI.",
 			1, 0.8, 1.5, 0.01, ValueDisplay.DECIMAL);
 	
-	private final List<Setting> settings = Collections.unmodifiableList(
-		Arrays.asList(maxTokens, temperature, topP, presencePenalty,
-			frequencyPenalty, repetitionPenalty, encoderRepetitionPenalty));
+	private final List<Setting> settings =
+		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
+			temperature, topP, presencePenalty, frequencyPenalty,
+			repetitionPenalty, encoderRepetitionPenalty));
 	
 	public void forEach(Consumer<Setting> action)
 	{
