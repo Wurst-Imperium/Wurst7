@@ -12,10 +12,10 @@ import java.util.function.Consumer;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public final class EnterProfileNameScreen extends Screen
@@ -88,15 +88,15 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		renderBackground(helper);
+		helper.drawCenteredTextWithShadow(client.textRenderer,
 			"Name your new profile", width / 2, 20, 0xFFFFFF);
 		
-		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		valueField.render(helper, mouseX, mouseY, partialTicks);
+		super.render(helper, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

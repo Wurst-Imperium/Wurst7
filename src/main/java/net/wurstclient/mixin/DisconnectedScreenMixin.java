@@ -41,7 +41,7 @@ public class DisconnectedScreenMixin extends Screen
 	private Screen parent;
 	@Shadow
 	@Final
-	private final GridWidget field_44552 = new GridWidget();
+	private final GridWidget grid = new GridWidget();
 	
 	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
@@ -73,17 +73,17 @@ public class DisconnectedScreenMixin extends Screen
 	
 	private void addReconnectButtons()
 	{
-		ButtonWidget reconnectButton = field_44552.add(
+		ButtonWidget reconnectButton = grid.add(
 			ButtonWidget.builder(Text.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(parent)).build(),
-			3, 0, 1, 1, field_44552.copyPositioner().margin(2).marginTop(-6));
+			3, 0, 1, 1, grid.copyPositioner().margin(2).marginTop(-6));
 		
-		autoReconnectButton = field_44552.add(
+		autoReconnectButton = grid.add(
 			ButtonWidget.builder(Text.literal("AutoReconnect"),
 				b -> pressAutoReconnect()).build(),
-			4, 0, 1, 1, field_44552.copyPositioner().margin(2));
+			4, 0, 1, 1, grid.copyPositioner().margin(2));
 		
-		field_44552.refreshPositions();
+		grid.refreshPositions();
 		Stream.of(reconnectButton, autoReconnectButton)
 			.forEach(this::addDrawableChild);
 		

@@ -277,14 +277,13 @@ public class PathFinder
 		return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected boolean canBeSolid(BlockPos pos)
 	{
 		BlockState state = BlockUtils.getState(pos);
-		Material material = state.getMaterial();
 		Block block = state.getBlock();
 		
-		return material.blocksMovement()
-			&& !(block instanceof AbstractSignBlock)
+		return state.method_51366() && !(block instanceof AbstractSignBlock)
 			|| block instanceof LadderBlock
 			|| jesus && (block == Blocks.WATER || block == Blocks.LAVA);
 	}
@@ -299,9 +298,9 @@ public class PathFinder
 			return false;
 		
 		// check if solid
-		Material material = BlockUtils.getState(pos).getMaterial();
-		Block block = BlockUtils.getBlock(pos);
-		if(material.blocksMovement() && !(block instanceof AbstractSignBlock))
+		BlockState state = BlockUtils.getState(pos);
+		Block block = state.getBlock();
+		if(state.method_51366() && !(block instanceof AbstractSignBlock))
 			return false;
 		
 		// check if trapped

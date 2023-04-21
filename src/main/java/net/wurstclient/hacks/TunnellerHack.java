@@ -557,7 +557,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(BlockUtils.getState(pos).isReplaceable())
 				placeBlockSimple(pos);
 			else
 			{
@@ -764,7 +764,7 @@ public final class TunnellerHack extends Hack
 				return false;
 			
 			BlockState state = BlockUtils.getState(nextTorch);
-			if(!state.getMaterial().isReplaceable())
+			if(!state.isReplaceable())
 				return false;
 				
 			// Can't see why canPlaceAt() is deprecated. Still seems to be

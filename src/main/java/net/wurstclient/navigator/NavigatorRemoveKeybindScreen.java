@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -128,15 +129,16 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+	protected void onRender(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = helper.method_51448();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
-			"Remove Keybind", middleX, 32, txtColor);
+		helper.drawCenteredTextWithShadow(client.textRenderer, "Remove Keybind",
+			middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// background
@@ -182,13 +184,12 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawTextWithShadow(matrixStack, client.textRenderer,
+			helper.drawTextWithShadow(client.textRenderer,
 				key.replace("key.keyboard.", "") + ": "
 					+ keybind.getDescription(),
 				x1 + 1, y1 + 1, txtColor);
-			drawTextWithShadow(matrixStack, client.textRenderer,
-				keybind.getCommand(), x1 + 1,
-				y1 + 1 + client.textRenderer.fontHeight, txtColor);
+			helper.drawTextWithShadow(client.textRenderer, keybind.getCommand(),
+				x1 + 1, y1 + 1 + client.textRenderer.fontHeight, txtColor);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -196,7 +197,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			drawTextWithShadow(matrixStack, client.textRenderer, line, bgx1 + 2,
+			helper.drawTextWithShadow(client.textRenderer, line, bgx1 + 2,
 				textY, txtColor);
 			textY += client.textRenderer.fontHeight;
 		}
@@ -232,7 +233,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			helper.drawCenteredTextWithShadow(client.textRenderer,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
 			GL11.glEnable(GL11.GL_BLEND);

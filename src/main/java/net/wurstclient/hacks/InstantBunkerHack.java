@@ -131,7 +131,7 @@ public final class InstantBunkerHack extends Hack
 		if(!building && startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+				if(BlockUtils.getState(pos).isReplaceable()
 					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);

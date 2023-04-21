@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -318,14 +319,15 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+	protected void onRender(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = helper.method_51448();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		helper.drawCenteredTextWithShadow(client.textRenderer,
 			feature.getName(), middleX, 32, txtColor);
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -431,8 +433,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
-			window.getChild(i).render(matrixStack, mouseX - bgx1,
-				mouseY - windowY, partialTicks);
+			window.getChild(i).render(helper, mouseX - bgx1, mouseY - windowY,
+				partialTicks);
 		matrixStack.pop();
 		
 		// buttons
@@ -463,7 +465,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(matrixStack, x1, y1, x2, y2);
 			
 			// text
-			drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			helper.drawCenteredTextWithShadow(client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
@@ -474,8 +476,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			client.textRenderer.draw(matrixStack, line, bgx1 + 2, textY,
-				txtColor);
+			helper.method_51433(client.textRenderer, line, bgx1 + 2, textY,
+				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -517,15 +519,15 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			String buttonText = button.getMessage().getString();
-			client.textRenderer.draw(matrixStack, buttonText,
+			helper.method_51433(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
-				y1 + 5, txtColor);
+				y1 + 5, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
 		// popups & tooltip
-		gui.renderPopups(matrixStack, mouseX, mouseY);
-		gui.renderTooltip(matrixStack, mouseX, mouseY);
+		gui.renderPopups(helper, mouseX, mouseY);
+		gui.renderTooltip(helper, mouseX, mouseY);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);

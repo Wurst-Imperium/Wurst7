@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -73,7 +74,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		setFocused(searchBar);
 		searchBar.setFocused(true);
 		
-		searchBar.method_46421(middleX - 100);
+		searchBar.setX(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	
@@ -227,9 +228,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+	protected void onRender(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = helper.method_51448();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
@@ -242,9 +244,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 		{
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			WurstClient.MC.textRenderer.drawWithShadow(matrixStack, "Search: ",
+			helper.drawTextWithShadow(WurstClient.MC.textRenderer, "Search: ",
 				middleX - 150, 32, txtColor);
-			searchBar.render(matrixStack, mouseX, mouseY, partialTicks);
+			searchBar.render(helper, mouseX, mouseY, partialTicks);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -267,8 +269,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(featureY > height - 40)
 				break;
 			
-			renderFeature(matrixStack, mouseX, mouseY, partialTicks, i,
-				featureX, featureY);
+			renderFeature(helper, mouseX, mouseY, partialTicks, i, featureX,
+				featureY);
 		}
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -277,13 +279,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(tooltip != null)
 		{
 			String[] lines = tooltip.split("\n");
-			TextRenderer fr = client.textRenderer;
+			TextRenderer tr = client.textRenderer;
 			
 			int tw = 0;
-			int th = lines.length * fr.fontHeight;
+			int th = lines.length * tr.fontHeight;
 			for(String line : lines)
 			{
-				int lw = fr.getWidth(line);
+				int lw = tr.getWidth(line);
 				if(lw > tw)
 					tw = lw;
 			}
@@ -327,14 +329,15 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			// text
 			for(int i = 0; i < lines.length; i++)
-				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 2 + i * fr.fontHeight, txtColor);
+				helper.method_51433(tr, lines[i], xt1 + 2,
+					yt1 + 2 + i * tr.fontHeight, txtColor, false);
 		}
 	}
 	
-	private void renderFeature(MatrixStack matrixStack, int mouseX, int mouseY,
+	private void renderFeature(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks, int i, int x, int y)
 	{
+		MatrixStack matrixStack = helper.method_51448();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		int txtColor = gui.getTxtColor();
@@ -472,8 +475,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
-			client.textRenderer.draw(matrixStack, buttonText, area.x + 4,
-				area.y + 4, txtColor);
+			helper.method_51433(client.textRenderer, buttonText, area.x + 4,
+				area.y + 4, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}

@@ -13,12 +13,12 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
@@ -214,41 +214,41 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
+		renderBackground(helper);
 		
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Server Finder",
+		helper.drawCenteredTextWithShadow(textRenderer, "Server Finder",
 			width / 2, 20, 16777215);
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		helper.drawCenteredTextWithShadow(textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
 			10526880);
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		helper.drawCenteredTextWithShadow(textRenderer,
 			"to the IP you type into the field below.", width / 2, 50,
 			10526880);
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		helper.drawCenteredTextWithShadow(textRenderer,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, 10526880);
 		
-		drawTextWithShadow(matrixStack, textRenderer, "Server address:",
+		helper.drawTextWithShadow(textRenderer, "Server address:",
 			width / 2 - 100, height / 4 + 24, 10526880);
-		ipBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		ipBox.render(helper, mouseX, mouseY, partialTicks);
 		
-		drawTextWithShadow(matrixStack, textRenderer, "Max. threads:",
+		helper.drawTextWithShadow(textRenderer, "Max. threads:",
 			width / 2 - 100, height / 4 + 60, 10526880);
-		maxThreadsBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		maxThreadsBox.render(helper, mouseX, mouseY, partialTicks);
 		
-		drawCenteredTextWithShadow(matrixStack, textRenderer, state.toString(),
+		helper.drawCenteredTextWithShadow(textRenderer, state.toString(),
 			width / 2, height / 4 + 73, 10526880);
 		
-		drawTextWithShadow(matrixStack, textRenderer,
+		helper.drawTextWithShadow(textRenderer,
 			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
 			10526880);
-		drawTextWithShadow(matrixStack, textRenderer, "Working: " + working,
+		helper.drawTextWithShadow(textRenderer, "Working: " + working,
 			width / 2 - 100, height / 4 + 94, 10526880);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(helper, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

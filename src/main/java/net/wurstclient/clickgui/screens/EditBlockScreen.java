@@ -12,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -96,17 +97,18 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = helper.method_51448();
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, tr, setting.getName(),
-			width / 2, 20, 0xFFFFFF);
+		renderBackground(helper);
+		helper.drawCenteredTextWithShadow(tr, setting.getName(), width / 2, 20,
+			0xFFFFFF);
 		
-		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		blockField.render(helper, mouseX, mouseY, partialTicks);
+		super.render(helper, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
@@ -118,20 +120,20 @@ public final class EditBlockScreen extends Screen
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		drawTextWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
+		helper.drawTextWithShadow(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
 		
-		fill(matrixStack, 48, -56, 64, -36, border);
-		fill(matrixStack, 49, -55, 64, -37, black);
-		fill(matrixStack, 214, -56, 244, -55, border);
-		fill(matrixStack, 214, -37, 244, -36, border);
-		fill(matrixStack, 244, -56, 246, -36, border);
-		fill(matrixStack, 214, -55, 243, -52, black);
-		fill(matrixStack, 214, -40, 243, -37, black);
-		fill(matrixStack, 215, -55, 216, -37, black);
-		fill(matrixStack, 242, -55, 245, -37, black);
+		helper.fill(48, -56, 64, -36, border);
+		helper.fill(49, -55, 64, -37, black);
+		helper.fill(214, -56, 244, -55, border);
+		helper.fill(214, -37, 244, -36, border);
+		helper.fill(244, -56, 246, -36, border);
+		helper.fill(214, -55, 243, -52, black);
+		helper.fill(214, -40, 243, -37, black);
+		helper.fill(215, -55, 216, -37, black);
+		helper.fill(242, -55, 245, -37, black);
 		
 		matrixStack.pop();
 		
@@ -141,7 +143,7 @@ public final class EditBlockScreen extends Screen
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
 		
-		RenderUtils.drawItem(matrixStack, new ItemStack(blockToAdd),
+		RenderUtils.drawItem(helper, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	

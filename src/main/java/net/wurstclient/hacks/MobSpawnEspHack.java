@@ -279,6 +279,7 @@ public final class MobSpawnEspHack extends Hack
 			this.chunk = chunk;
 		}
 		
+		@SuppressWarnings("deprecation")
 		private void scan()
 		{
 			ClientWorld world = MC.world;
@@ -298,7 +299,7 @@ public final class MobSpawnEspHack extends Hack
 						BlockPos pos = new BlockPos(x, y, z);
 						BlockState state = world.getBlockState(pos);
 						
-						if(state.getMaterial().blocksMovement())
+						if(state.method_51366())
 							continue;
 						if(!state.getFluidState().isEmpty())
 							continue;

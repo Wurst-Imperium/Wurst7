@@ -15,7 +15,6 @@ import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringHelper;
 import net.wurstclient.WurstClient;
@@ -118,20 +117,20 @@ public final class NcrModRequiredScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float delta)
 	{
-		renderBackground(matrices);
+		renderBackground(helper);
 		
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, title,
-			centerX, titleY, 0xAAAAAA);
-		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
+		helper.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
+			0xAAAAAA);
+		reasonFormatted.drawCenterWithShadow(helper, centerX, reasonY);
 		
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(helper, mouseX, mouseY, delta);
 	}
 	
 	@Override

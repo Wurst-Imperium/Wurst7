@@ -16,14 +16,12 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
@@ -167,17 +165,16 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		renderBackground(helper);
+		helper.drawCenteredTextWithShadow(client.textRenderer,
 			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
 		
 		// Draw palette
-		RenderSystem.setShaderTexture(0, paletteIdentifier);
 		int x = paletteX;
 		int y = paletteY;
 		int w = paletteWidth;
@@ -186,22 +183,22 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+		helper.drawTexture(paletteIdentifier, x, y, u, v, w, h, fw, fh);
 		
 		// RGB letters
-		tr.draw(matrixStack, "#", fieldsX - 3 - tr.getWidth("#"), fieldsY + 6,
-			0xF0F0F0);
-		tr.draw(matrixStack, "R:", fieldsX - 3 - tr.getWidth("R:"),
-			fieldsY + 6 + 35, 0xFF0000);
-		tr.draw(matrixStack, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
-			fieldsY + 6 + 35, 0x00FF00);
-		tr.draw(matrixStack, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
-			fieldsY + 6 + 35, 0x0000FF);
+		helper.method_51433(tr, "#", fieldsX - 3 - tr.getWidth("#"),
+			fieldsY + 6, 0xF0F0F0, false);
+		helper.method_51433(tr, "R:", fieldsX - 3 - tr.getWidth("R:"),
+			fieldsY + 6 + 35, 0xFF0000, false);
+		helper.method_51433(tr, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
+			fieldsY + 6 + 35, 0x00FF00, false);
+		helper.method_51433(tr, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
+			fieldsY + 6 + 35, 0x0000FF, false);
 		
-		hexValueField.render(matrixStack, mouseX, mouseY, partialTicks);
-		redValueField.render(matrixStack, mouseX, mouseY, partialTicks);
-		greenValueField.render(matrixStack, mouseX, mouseY, partialTicks);
-		blueValueField.render(matrixStack, mouseX, mouseY, partialTicks);
+		hexValueField.render(helper, mouseX, mouseY, partialTicks);
+		redValueField.render(helper, mouseX, mouseY, partialTicks);
+		greenValueField.render(helper, mouseX, mouseY, partialTicks);
+		blueValueField.render(helper, mouseX, mouseY, partialTicks);
 		
 		// Color preview
 		
@@ -212,15 +209,15 @@ public final class EditColorScreen extends Screen
 		int boxY = fieldsY;
 		
 		// Border
-		fill(matrixStack, boxX - borderSize, boxY - borderSize,
+		helper.fill(boxX - borderSize, boxY - borderSize,
 			boxX + boxWidth + borderSize, boxY + boxHeight + borderSize,
 			0xFFAAAAAA);
 		
 		// Color box
-		fill(matrixStack, boxX, boxY, boxX + boxWidth, boxY + boxHeight,
+		helper.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
 			color.getRGB());
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(helper, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

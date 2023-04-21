@@ -117,7 +117,8 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		if(!(screen instanceof CreativeInventoryScreen))
 			return false;
 		
-		return CreativeInventoryScreen.selectedTab == ItemGroups.SEARCH;
+		return CreativeInventoryScreen.selectedTab == ItemGroups
+			.getSearchGroup();
 	}
 	
 	private boolean hasTextBox(Screen screen)

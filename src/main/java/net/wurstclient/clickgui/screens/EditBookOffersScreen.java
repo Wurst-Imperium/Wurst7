@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -176,19 +177,20 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawableHelper helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = helper.method_51448();
+		listGui.render(helper, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		helper.drawCenteredTextWithShadow(client.textRenderer,
 			bookOffers.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(helper, mouseX, mouseY, partialTicks);
 		
 		matrixStack.pop();
 	}
@@ -248,15 +250,16 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
+		protected void renderItem(DrawableHelper helper, int index, int x,
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
+			MatrixStack matrixStack = helper.method_51448();
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
 			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(matrixStack, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(helper, stack, x + 1, y + 1, true);
 			
 			TextRenderer tr = mc.textRenderer;
 			BookOffer bookOffer = list.get(index);
@@ -264,9 +267,10 @@ public final class EditBookOffersScreen extends Screen
 			
 			Enchantment enchantment = bookOffer.getEnchantment();
 			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
-			tr.draw(matrixStack, name, x + 28, y, nameColor);
+			helper.method_51433(tr, name, x + 28, y, nameColor, false);
 			
-			tr.draw(matrixStack, bookOffer.id(), x + 28, y + 9, 0xa0a0a0);
+			helper.method_51433(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+				false);
 			
 			String price;
 			if(bookOffer.price() >= 64)
@@ -274,11 +278,11 @@ public final class EditBookOffersScreen extends Screen
 			else
 			{
 				price = "max " + bookOffer.price();
-				RenderUtils.drawItem(matrixStack, new ItemStack(Items.EMERALD),
+				RenderUtils.drawItem(helper, new ItemStack(Items.EMERALD),
 					x + 28 + tr.getWidth(price), y + 16, false);
 			}
 			
-			tr.draw(matrixStack, price, x + 28, y + 18, 0xa0a0a0);
+			helper.method_51433(tr, price, x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

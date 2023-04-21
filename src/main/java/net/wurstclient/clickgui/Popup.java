@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawableHelper;
 
 public abstract class Popup
 {
@@ -27,8 +27,7 @@ public abstract class Popup
 	public abstract void handleMouseClick(int mouseX, int mouseY,
 		int mouseButton);
 	
-	public abstract void render(MatrixStack matrixStack, int mouseX,
-		int mouseY);
+	public abstract void render(DrawableHelper helper, int mouseX, int mouseY);
 	
 	public abstract int getDefaultWidth();
 	
