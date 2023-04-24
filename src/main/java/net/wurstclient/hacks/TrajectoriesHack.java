@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
@@ -22,8 +23,12 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.*;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
@@ -221,13 +226,23 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			// apply gravity
 			arrowMotionY -= gravity * 0.1;
 			
-			// check for collision
 			Vec3d lastPos =
 				path.size() > 1 ? path.get(path.size() - 2) : eyesPos;
+			
+			// check for block collision
 			RaycastContext context = new RaycastContext(lastPos, arrowPos,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player);
 			if(MC.world.raycast(context).getType() != HitResult.Type.MISS)
+				break;
+			
+			// check for entity collision
+			Box box = new Box(lastPos, arrowPos);
+			Predicate<Entity> predicate = e -> !e.isSpectator() && e.canHit();
+			double maxDistSq = 64 * 64;
+			EntityHitResult eResult = ProjectileUtil.raycast(MC.player, lastPos,
+				arrowPos, box, predicate, maxDistSq);
+			if(eResult != null && eResult.getType() != HitResult.Type.MISS)
 				break;
 		}
 		
