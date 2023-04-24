@@ -222,7 +222,9 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			arrowMotionY -= gravity * 0.1;
 			
 			// check for collision
-			RaycastContext context = new RaycastContext(eyesPos, arrowPos,
+			Vec3d lastPos =
+				path.size() > 1 ? path.get(path.size() - 2) : eyesPos;
+			RaycastContext context = new RaycastContext(lastPos, arrowPos,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player);
 			if(MC.world.raycast(context).getType() != HitResult.Type.MISS)
