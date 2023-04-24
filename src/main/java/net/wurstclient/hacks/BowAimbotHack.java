@@ -93,6 +93,10 @@ public final class BowAimbotHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		// disable conflicting hacks
+		WURST.getHax().excavatorHack.setEnabled(false);
+		
+		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
