@@ -363,6 +363,7 @@ public final class ExcavatorHack extends Hack
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		tr.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		matrixStack.pop();
