@@ -29,6 +29,7 @@ import net.minecraft.item.*;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
@@ -149,60 +150,24 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		if(stack.isEmpty() || !isThrowable(item))
 			return path;
 		
-		// calculate starting position
-		double arrowPosX = player.lastRenderX
-			+ (player.getX() - player.lastRenderX) * partialTicks
-			- Math.cos(Math.toRadians(player.getYaw())) * 0.16;
-		
-		double arrowPosY = player.lastRenderY
-			+ (player.getY() - player.lastRenderY) * partialTicks
-			+ player.getStandingEyeHeight() - 0.1;
-		
-		double arrowPosZ = player.lastRenderZ
-			+ (player.getZ() - player.lastRenderZ) * partialTicks
-			- Math.sin(Math.toRadians(player.getYaw())) * 0.16;
-		
-		// Motion factor. Arrows go faster than snowballs and all that...
-		double arrowMotionFactor = item instanceof RangedWeaponItem ? 1.0 : 0.4;
-		
+		// prepare yaw and pitch
 		double yaw = Math.toRadians(player.getYaw());
 		double pitch = Math.toRadians(player.getPitch());
 		
+		// calculate starting position
+		double arrowPosX =
+			MathHelper.lerp(partialTicks, player.lastRenderX, player.getX())
+				- Math.cos(yaw) * 0.16;
+		double arrowPosY =
+			MathHelper.lerp(partialTicks, player.lastRenderY, player.getY())
+				+ player.getStandingEyeHeight() - 0.1;
+		double arrowPosZ =
+			MathHelper.lerp(partialTicks, player.lastRenderZ, player.getZ())
+				- Math.sin(yaw) * 0.16;
+		
 		// calculate starting motion
-		double arrowMotionX =
-			-Math.sin(yaw) * Math.cos(pitch) * arrowMotionFactor;
-		double arrowMotionY = -Math.sin(pitch) * arrowMotionFactor;
-		double arrowMotionZ =
-			Math.cos(yaw) * Math.cos(pitch) * arrowMotionFactor;
-		
-		// 3D Pythagorean theorem. Returns the length of the arrowMotion vector.
-		double arrowMotion = Math.sqrt(arrowMotionX * arrowMotionX
-			+ arrowMotionY * arrowMotionY + arrowMotionZ * arrowMotionZ);
-		
-		arrowMotionX /= arrowMotion;
-		arrowMotionY /= arrowMotion;
-		arrowMotionZ /= arrowMotion;
-		
-		// apply bow charge
-		if(item instanceof RangedWeaponItem)
-		{
-			float bowPower = (72000 - player.getItemUseTimeLeft()) / 20.0f;
-			bowPower = (bowPower * bowPower + bowPower * 2.0f) / 3.0f;
-			
-			if(bowPower > 1 || bowPower <= 0.1F)
-				bowPower = 1;
-			
-			bowPower *= 3F;
-			arrowMotionX *= bowPower;
-			arrowMotionY *= bowPower;
-			arrowMotionZ *= bowPower;
-			
-		}else
-		{
-			arrowMotionX *= 1.5;
-			arrowMotionY *= 1.5;
-			arrowMotionZ *= 1.5;
-		}
+		double bowPower = getBowPower(item);
+		Vec3d arrowMotion = getStartingMotion(yaw, pitch, bowPower);
 		
 		double gravity = getProjectileGravity(item);
 		Vec3d eyesPos = RotationUtils.getEyesPos();
@@ -214,17 +179,15 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			path.add(arrowPos);
 			
 			// apply motion
-			arrowPosX += arrowMotionX * 0.1;
-			arrowPosY += arrowMotionY * 0.1;
-			arrowPosZ += arrowMotionZ * 0.1;
+			arrowPosX += arrowMotion.x * 0.1;
+			arrowPosY += arrowMotion.y * 0.1;
+			arrowPosZ += arrowMotion.z * 0.1;
 			
 			// apply air friction
-			arrowMotionX *= 0.999;
-			arrowMotionY *= 0.999;
-			arrowMotionZ *= 0.999;
+			arrowMotion = arrowMotion.multiply(0.999);
 			
 			// apply gravity
-			arrowMotionY -= gravity * 0.1;
+			arrowMotion = arrowMotion.add(0, -gravity * 0.1, 0);
 			
 			Vec3d lastPos =
 				path.size() > 1 ? path.get(path.size() - 2) : eyesPos;
@@ -247,6 +210,35 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		}
 		
 		return path;
+	}
+	
+	private Vec3d getStartingMotion(double yaw, double pitch, double bowPower)
+	{
+		double cosOfPitch = Math.cos(pitch);
+		
+		double arrowMotionX = -Math.sin(yaw) * cosOfPitch;
+		double arrowMotionY = -Math.sin(pitch);
+		double arrowMotionZ = Math.cos(yaw) * cosOfPitch;
+		
+		return new Vec3d(arrowMotionX, arrowMotionY, arrowMotionZ).normalize()
+			.multiply(bowPower);
+	}
+	
+	private double getBowPower(Item item)
+	{
+		// use a static 1.5x for snowballs and such
+		if(!(item instanceof RangedWeaponItem))
+			return 1.5;
+		
+		// calculate bow power
+		float bowPower = (72000 - MC.player.getItemUseTimeLeft()) / 20F;
+		bowPower = bowPower * bowPower + bowPower * 2F;
+		
+		// clamp value if fully charged or not charged at all
+		if(bowPower > 3 || bowPower <= 0.3F)
+			bowPower = 3;
+		
+		return bowPower;
 	}
 	
 	private double getProjectileGravity(Item item)
