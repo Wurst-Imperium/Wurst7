@@ -26,10 +26,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.*;
+import net.minecraft.util.Arm;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
@@ -37,6 +38,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -143,45 +145,43 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		ClientPlayerEntity player = MC.player;
 		ArrayList<Vec3d> path = new ArrayList<>();
 		
+		// find the hand with a throwable item
+		Hand hand = Hand.MAIN_HAND;
 		ItemStack stack = player.getMainHandStack();
-		Item item = stack.getItem();
+		if(!isThrowable(stack))
+		{
+			hand = Hand.OFF_HAND;
+			stack = player.getOffHandStack();
+			
+			// if neither hand has a throwable item, return empty path
+			if(!isThrowable(stack))
+				return path;
+		}
 		
-		// check if item is throwable
-		if(stack.isEmpty() || !isThrowable(item))
-			return path;
+		// calculate item-specific values
+		Item item = stack.getItem();
+		double throwPower = getThrowPower(item);
+		double gravity = getProjectileGravity(item);
 		
 		// prepare yaw and pitch
 		double yaw = Math.toRadians(player.getYaw());
 		double pitch = Math.toRadians(player.getPitch());
 		
 		// calculate starting position
-		double arrowPosX =
-			MathHelper.lerp(partialTicks, player.lastRenderX, player.getX())
-				- Math.cos(yaw) * 0.16;
-		double arrowPosY =
-			MathHelper.lerp(partialTicks, player.lastRenderY, player.getY())
-				+ player.getStandingEyeHeight() - 0.1;
-		double arrowPosZ =
-			MathHelper.lerp(partialTicks, player.lastRenderZ, player.getZ())
-				- Math.sin(yaw) * 0.16;
+		Vec3d arrowPos = EntityUtils.getLerpedPos(player, partialTicks)
+			.add(getHandOffset(hand, yaw));
 		
 		// calculate starting motion
-		double bowPower = getBowPower(item);
-		Vec3d arrowMotion = getStartingMotion(yaw, pitch, bowPower);
+		Vec3d arrowMotion = getStartingMotion(yaw, pitch, throwPower);
 		
-		double gravity = getProjectileGravity(item);
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		
+		// build the path
 		for(int i = 0; i < 1000; i++)
 		{
 			// add to path
-			Vec3d arrowPos = new Vec3d(arrowPosX, arrowPosY, arrowPosZ);
 			path.add(arrowPos);
 			
 			// apply motion
-			arrowPosX += arrowMotion.x * 0.1;
-			arrowPosY += arrowMotion.y * 0.1;
-			arrowPosZ += arrowMotion.z * 0.1;
+			arrowPos = arrowPos.add(arrowMotion.multiply(0.1));
 			
 			// apply air friction
 			arrowMotion = arrowMotion.multiply(0.999);
@@ -189,14 +189,14 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			// apply gravity
 			arrowMotion = arrowMotion.add(0, -gravity * 0.1, 0);
 			
-			Vec3d lastPos =
-				path.size() > 1 ? path.get(path.size() - 2) : eyesPos;
+			Vec3d lastPos = path.size() > 1 ? path.get(path.size() - 2)
+				: RotationUtils.getEyesPos();
 			
 			// check for block collision
-			RaycastContext context = new RaycastContext(lastPos, arrowPos,
+			RaycastContext bContext = new RaycastContext(lastPos, arrowPos,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player);
-			if(MC.world.raycast(context).getType() != HitResult.Type.MISS)
+			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS)
 				break;
 			
 			// check for entity collision
@@ -212,7 +212,22 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		return path;
 	}
 	
-	private Vec3d getStartingMotion(double yaw, double pitch, double bowPower)
+	private Vec3d getHandOffset(Hand hand, double yaw)
+	{
+		Arm mainArm = MC.options.getMainArm().getValue();
+		
+		boolean rightSide = mainArm == Arm.RIGHT && hand == Hand.MAIN_HAND
+			|| mainArm == Arm.LEFT && hand == Hand.OFF_HAND;
+		
+		double sideMultiplier = rightSide ? -1 : 1;
+		double handOffsetX = Math.cos(yaw) * 0.16 * sideMultiplier;
+		double handOffsetY = MC.player.getStandingEyeHeight() - 0.1;
+		double handOffsetZ = Math.sin(yaw) * 0.16 * sideMultiplier;
+		
+		return new Vec3d(handOffsetX, handOffsetY, handOffsetZ);
+	}
+	
+	private Vec3d getStartingMotion(double yaw, double pitch, double throwPower)
 	{
 		double cosOfPitch = Math.cos(pitch);
 		
@@ -221,10 +236,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		double arrowMotionZ = Math.cos(yaw) * cosOfPitch;
 		
 		return new Vec3d(arrowMotionX, arrowMotionY, arrowMotionZ).normalize()
-			.multiply(bowPower);
+			.multiply(throwPower);
 	}
 	
-	private double getBowPower(Item item)
+	private double getThrowPower(Item item)
 	{
 		// use a static 1.5x for snowballs and such
 		if(!(item instanceof RangedWeaponItem))
@@ -243,10 +258,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	
 	private double getProjectileGravity(Item item)
 	{
-		if(item instanceof BowItem || item instanceof CrossbowItem)
+		if(item instanceof RangedWeaponItem)
 			return 0.05;
 		
-		if(item instanceof PotionItem)
+		if(item instanceof ThrowablePotionItem)
 			return 0.4;
 		
 		if(item instanceof FishingRodItem)
@@ -258,13 +273,15 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		return 0.03;
 	}
 	
-	private boolean isThrowable(Item item)
+	public static boolean isThrowable(ItemStack stack)
 	{
-		return item instanceof BowItem || item instanceof CrossbowItem
-			|| item instanceof SnowballItem || item instanceof EggItem
-			|| item instanceof EnderPearlItem
-			|| item instanceof SplashPotionItem
-			|| item instanceof LingeringPotionItem
+		if(stack.isEmpty())
+			return false;
+		
+		Item item = stack.getItem();
+		return item instanceof RangedWeaponItem || item instanceof SnowballItem
+			|| item instanceof EggItem || item instanceof EnderPearlItem
+			|| item instanceof ThrowablePotionItem
 			|| item instanceof FishingRodItem || item instanceof TridentItem;
 	}
 }
