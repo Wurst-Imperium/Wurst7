@@ -283,7 +283,7 @@ public class PathFinder
 		BlockState state = BlockUtils.getState(pos);
 		Block block = state.getBlock();
 		
-		return state.method_51366() && !(block instanceof AbstractSignBlock)
+		return state.blocksMovement() && !(block instanceof AbstractSignBlock)
 			|| block instanceof LadderBlock
 			|| jesus && (block == Blocks.WATER || block == Blocks.LAVA);
 	}
@@ -300,7 +300,7 @@ public class PathFinder
 		// check if solid
 		BlockState state = BlockUtils.getState(pos);
 		Block block = state.getBlock();
-		if(state.method_51366() && !(block instanceof AbstractSignBlock))
+		if(state.blocksMovement() && !(block instanceof AbstractSignBlock))
 			return false;
 		
 		// check if trapped

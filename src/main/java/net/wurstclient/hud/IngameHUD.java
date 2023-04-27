@@ -10,8 +10,7 @@ package net.wurstclient.hud;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -24,7 +23,7 @@ public final class IngameHUD implements GUIRenderListener
 	private TabGui tabGui;
 	
 	@Override
-	public void onRenderGUI(DrawableHelper helper, float partialTicks)
+	public void onRenderGUI(DrawContext helper, float partialTicks)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;

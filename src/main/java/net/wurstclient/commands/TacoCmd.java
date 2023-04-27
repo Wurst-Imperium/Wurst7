@@ -10,8 +10,7 @@ package net.wurstclient.commands;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import net.wurstclient.Category;
@@ -82,7 +81,7 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(DrawableHelper helper, float partialTicks)
+	public void onRenderGUI(DrawContext helper, float partialTicks)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_CULL_FACE);

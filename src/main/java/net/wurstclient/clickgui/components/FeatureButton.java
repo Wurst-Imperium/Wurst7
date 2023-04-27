@@ -16,7 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -96,10 +96,10 @@ public final class FeatureButton extends Component
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = hasSettings ? x2 - 11 : x2;
@@ -290,7 +290,7 @@ public final class FeatureButton extends Component
 		tessellator.draw();
 	}
 	
-	private void drawName(DrawableHelper helper, int x1, int x3, int y1)
+	private void drawName(DrawContext helper, int x1, int x3, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -303,7 +303,7 @@ public final class FeatureButton extends Component
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		helper.method_51433(tr, name, tx, ty, txtColor, false);
+		helper.drawText(tr, name, tx, ty, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

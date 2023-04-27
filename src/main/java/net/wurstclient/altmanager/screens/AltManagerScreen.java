@@ -29,8 +29,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -409,13 +409,13 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
 		listGui.render(helper, mouseX, mouseY, partialTicks);
 		
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -473,7 +473,7 @@ public final class AltManagerScreen extends Screen
 		renderAltTooltip(helper, mouseX, mouseY);
 	}
 	
-	private void renderAltTooltip(DrawableHelper helper, int mouseX, int mouseY)
+	private void renderAltTooltip(DrawContext helper, int mouseX, int mouseY)
 	{
 		if(!listGui.isMouseInList(mouseX, mouseY))
 			return;
@@ -515,10 +515,10 @@ public final class AltManagerScreen extends Screen
 		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
-		helper.method_51434(textRenderer, tooltip, mouseX, mouseY);
+		helper.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawableHelper helper, int mouseX,
+	private void renderButtonTooltip(DrawContext helper, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
@@ -542,7 +542,7 @@ public final class AltManagerScreen extends Screen
 			else
 				addTooltip(tooltip, "window_freeze");
 			
-			helper.method_51434(textRenderer, tooltip, mouseX, mouseY);
+			helper.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -637,12 +637,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawableHelper helper, int id, int x, int y,
+		protected void renderItem(DrawContext helper, int id, int x, int y,
 			int var4, int var5, int var6, float partialTicks)
 		{
 			Alt alt = list.get(id);
 			
-			MatrixStack matrixStack = helper.method_51448();
+			MatrixStack matrixStack = helper.getMatrices();
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -677,15 +677,15 @@ public final class AltManagerScreen extends Screen
 				isSelectedItem(id));
 			
 			// name / email
-			helper.method_51433(client.textRenderer,
+			helper.drawText(client.textRenderer,
 				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
 				false);
-			helper.method_51433(client.textRenderer,
+			helper.drawText(client.textRenderer,
 				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
 				false);
 			
 			String bottomText = getBottomText(alt);
-			helper.method_51433(client.textRenderer, bottomText, x + 31, y + 15,
+			helper.drawText(client.textRenderer, bottomText, x + 31, y + 15,
 				10526880, false);
 		}
 		

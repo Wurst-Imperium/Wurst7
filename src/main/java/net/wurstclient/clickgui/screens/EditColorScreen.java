@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -165,7 +165,7 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		TextRenderer tr = client.textRenderer;
@@ -186,13 +186,13 @@ public final class EditColorScreen extends Screen
 		helper.drawTexture(paletteIdentifier, x, y, u, v, w, h, fw, fh);
 		
 		// RGB letters
-		helper.method_51433(tr, "#", fieldsX - 3 - tr.getWidth("#"),
+		helper.drawText(tr, "#", fieldsX - 3 - tr.getWidth("#"),
 			fieldsY + 6, 0xF0F0F0, false);
-		helper.method_51433(tr, "R:", fieldsX - 3 - tr.getWidth("R:"),
+		helper.drawText(tr, "R:", fieldsX - 3 - tr.getWidth("R:"),
 			fieldsY + 6 + 35, 0xFF0000, false);
-		helper.method_51433(tr, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
+		helper.drawText(tr, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
 			fieldsY + 6 + 35, 0x00FF00, false);
-		helper.method_51433(tr, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
+		helper.drawText(tr, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
 			fieldsY + 6 + 35, 0x0000FF, false);
 		
 		hexValueField.render(helper, mouseX, mouseY, partialTicks);

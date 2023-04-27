@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -177,10 +177,10 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		listGui.render(helper, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
@@ -250,10 +250,10 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawableHelper helper, int index, int x,
+		protected void renderItem(DrawContext helper, int index, int x,
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
-			MatrixStack matrixStack = helper.method_51448();
+			MatrixStack matrixStack = helper.getMatrices();
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
@@ -267,9 +267,9 @@ public final class EditBookOffersScreen extends Screen
 			
 			Enchantment enchantment = bookOffer.getEnchantment();
 			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
-			helper.method_51433(tr, name, x + 28, y, nameColor, false);
+			helper.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			helper.method_51433(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+			helper.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
 				false);
 			
 			String price;
@@ -282,7 +282,7 @@ public final class EditBookOffersScreen extends Screen
 					x + 28 + tr.getWidth(price), y + 16, false);
 			}
 			
-			helper.method_51433(tr, price, x + 28, y + 18, 0xa0a0a0, false);
+			helper.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

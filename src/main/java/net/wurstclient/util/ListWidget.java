@@ -18,8 +18,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
@@ -94,7 +94,7 @@ public abstract class ListWidget extends AbstractParentElement
 	protected void updateItemPosition(int index, int x, int y, float delta)
 	{}
 	
-	protected abstract void renderItem(DrawableHelper helper, int x, int y,
+	protected abstract void renderItem(DrawContext helper, int x, int y,
 		int itemHeight, int mouseX, int mouseY, int i, float f);
 	
 	protected void renderHeader(int x, int y, Tessellator tessellator)
@@ -134,7 +134,7 @@ public abstract class ListWidget extends AbstractParentElement
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float delta)
 	{
 		if(visible)
@@ -145,7 +145,7 @@ public abstract class ListWidget extends AbstractParentElement
 			capYPosition();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShaderTexture(0, Screen.field_44669);
+			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -374,7 +374,7 @@ public abstract class ListWidget extends AbstractParentElement
 		return 220;
 	}
 	
-	protected void renderList(DrawableHelper helper, int i, int j, int k, int l,
+	protected void renderList(DrawContext helper, int i, int j, int k, int l,
 		float f)
 	{
 		int m = getItemCount();
@@ -435,7 +435,7 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShaderTexture(0, Screen.field_44669);
+		RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,

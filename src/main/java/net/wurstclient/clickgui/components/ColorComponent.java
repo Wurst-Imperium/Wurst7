@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -56,10 +56,10 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int y1 = getY();
@@ -157,7 +157,7 @@ public final class ColorComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(DrawableHelper helper, int x1, int x2, int y1)
+	private void drawNameAndValue(DrawContext helper, int x1, int x2, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -165,11 +165,11 @@ public final class ColorComponent extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = MC.textRenderer;
 		
-		helper.method_51433(tr, setting.getName(), x1, y1, txtColor, false);
+		helper.drawText(tr, setting.getName(), x1, y1, txtColor, false);
 		
 		String value = ColorUtils.toHex(setting.getColor());
 		int valueWidth = tr.getWidth(value);
-		helper.method_51433(tr, value, x2 - valueWidth, y1, txtColor, false);
+		helper.drawText(tr, value, x2 - valueWidth, y1, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

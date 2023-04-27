@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -57,7 +57,7 @@ public abstract class AbstractListEditButton extends Component
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -80,7 +80,7 @@ public abstract class AbstractListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -124,8 +124,8 @@ public abstract class AbstractListEditButton extends Component
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = MC.textRenderer;
-		helper.method_51433(tr, getText(), x1, y1 + 2, txtColor, false);
-		helper.method_51433(tr, buttonText, x3 + 2, y1 + 2, txtColor, false);
+		helper.drawText(tr, getText(), x1, y1 + 2, txtColor, false);
+		helper.drawText(tr, buttonText, x3 + 2, y1 + 2, txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

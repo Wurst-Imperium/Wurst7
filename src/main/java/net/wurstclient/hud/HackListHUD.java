@@ -13,7 +13,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
@@ -34,7 +34,7 @@ public final class HackListHUD implements UpdateListener
 		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class, this);
 	}
 	
-	public void render(DrawableHelper helper, float partialTicks)
+	public void render(DrawContext helper, float partialTicks)
 	{
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
@@ -64,14 +64,14 @@ public final class HackListHUD implements UpdateListener
 			drawHackList(helper, partialTicks);
 	}
 	
-	private void drawCounter(DrawableHelper helper)
+	private void drawCounter(DrawContext helper)
 	{
 		long size = activeHax.stream().filter(e -> e.hack.isEnabled()).count();
 		String s = size + " hack" + (size != 1 ? "s" : "") + " active";
 		drawString(helper, s);
 	}
 	
-	private void drawHackList(DrawableHelper helper, float partialTicks)
+	private void drawHackList(DrawContext helper, float partialTicks)
 	{
 		if(otf.isAnimations())
 			for(HackListEntry e : activeHax)
@@ -129,7 +129,7 @@ public final class HackListHUD implements UpdateListener
 		}
 	}
 	
-	private void drawString(DrawableHelper helper, String s)
+	private void drawString(DrawContext helper, String s)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		int posX;
@@ -144,13 +144,13 @@ public final class HackListHUD implements UpdateListener
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		helper.method_51433(tr, s, posX + 1, posY + 1, 0xff000000, false);
-		helper.method_51433(tr, s, posX, posY, textColor | 0xff000000, false);
+		helper.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
+		helper.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
 		
 		posY += 9;
 	}
 	
-	private void drawWithOffset(DrawableHelper helper, HackListEntry e,
+	private void drawWithOffset(DrawContext helper, HackListEntry e,
 		float partialTicks)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
@@ -171,9 +171,9 @@ public final class HackListHUD implements UpdateListener
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		helper.method_51433(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
+		helper.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
 			false);
-		helper.method_51433(tr, s, (int)posX, posY, textColor | alpha, false);
+		helper.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
 		
 		posY += 9;
 	}

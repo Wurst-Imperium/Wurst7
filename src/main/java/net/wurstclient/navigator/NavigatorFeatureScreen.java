@@ -20,9 +20,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -319,10 +318,10 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(DrawableHelper helper, int mouseX, int mouseY,
+	protected void onRender(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -476,7 +475,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			helper.method_51433(client.textRenderer, line, bgx1 + 2, textY,
+			helper.drawText(client.textRenderer, line, bgx1 + 2, textY,
 				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
@@ -519,7 +518,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			String buttonText = button.getMessage().getString();
-			helper.method_51433(client.textRenderer, buttonText,
+			helper.drawText(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
 				y1 + 5, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);

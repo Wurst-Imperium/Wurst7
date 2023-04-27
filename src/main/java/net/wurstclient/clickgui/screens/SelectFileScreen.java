@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -162,7 +162,7 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
@@ -174,7 +174,7 @@ public final class SelectFileScreen extends Screen
 		super.render(helper, mouseX, mouseY, partialTicks);
 		
 		if(doneButton.isSelected() && !doneButton.active)
-			helper.method_51434(textRenderer,
+			helper.drawTooltip(textRenderer,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
 	}
@@ -234,15 +234,15 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawableHelper helper, int index, int x,
+		protected void renderItem(DrawContext helper, int index, int x,
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			TextRenderer tr = mc.textRenderer;
 			
 			Path path = list.get(index);
-			helper.method_51433(tr, "" + path.getFileName(), x + 28, y,
+			helper.drawText(tr, "" + path.getFileName(), x + 28, y,
 				0xf0f0f0, false);
-			helper.method_51433(tr,
+			helper.drawText(tr,
 				"" + client.runDirectory.toPath().relativize(path), x + 28,
 				y + 9, 0xa0a0a0, false);
 		}

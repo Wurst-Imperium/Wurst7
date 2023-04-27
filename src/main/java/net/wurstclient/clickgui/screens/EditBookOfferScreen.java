@@ -10,7 +10,7 @@ package net.wurstclient.clickgui.screens;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -252,10 +252,10 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		renderBackgroundTexture(helper);
 		
 		matrixStack.push();
@@ -280,7 +280,7 @@ public final class EditBookOfferScreen extends Screen
 		int nameColor = enchantment.isCursed() ? 0xff5555 : 0xffffff;
 		helper.drawTextWithShadow(tr, name, x + 28, y, nameColor);
 		
-		helper.method_51433(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0, false);
+		helper.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0, false);
 		
 		String price;
 		if(bookOffer.price() >= 64)
@@ -292,7 +292,7 @@ public final class EditBookOfferScreen extends Screen
 				x + 28 + tr.getWidth(price), y + 16, false);
 		}
 		
-		helper.method_51433(tr, price, x + 28, y + 18, 0xa0a0a0, false);
+		helper.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
 		
 		levelField.render(helper, mouseX, mouseY, partialTicks);
 		priceField.render(helper, mouseX, mouseY, partialTicks);

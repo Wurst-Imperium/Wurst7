@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -74,7 +74,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		setFocused(searchBar);
 		searchBar.setFocused(true);
 		
-		searchBar.setX(middleX - 100);
+		searchBar.method_46421(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	
@@ -228,10 +228,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(DrawableHelper helper, int mouseX, int mouseY,
+	protected void onRender(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
@@ -329,15 +329,15 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			// text
 			for(int i = 0; i < lines.length; i++)
-				helper.method_51433(tr, lines[i], xt1 + 2,
+				helper.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
 		}
 	}
 	
-	private void renderFeature(DrawableHelper helper, int mouseX, int mouseY,
+	private void renderFeature(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks, int i, int x, int y)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		int txtColor = gui.getTxtColor();
@@ -475,7 +475,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
-			helper.method_51433(client.textRenderer, buttonText, area.x + 4,
+			helper.drawText(client.textRenderer, buttonText, area.x + 4,
 				area.y + 4, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);
 		}

@@ -14,8 +14,8 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -201,7 +201,7 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
@@ -215,7 +215,7 @@ public class CleanUpScreen extends Screen
 		renderButtonTooltip(helper, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawableHelper helper, int mouseX,
+	private void renderButtonTooltip(DrawContext helper, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -233,7 +233,7 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			helper.method_51434(textRenderer, cuButton.tooltip, mouseX, mouseY);
+			helper.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}

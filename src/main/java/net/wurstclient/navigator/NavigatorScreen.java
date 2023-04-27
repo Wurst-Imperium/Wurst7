@@ -13,8 +13,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -143,10 +142,10 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(DrawableHelper helper, int mouseX, int mouseY,
+	public final void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -209,7 +208,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(DrawableHelper helper, int mouseX,
+	protected abstract void onRender(DrawContext helper, int mouseX,
 		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)

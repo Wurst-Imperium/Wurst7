@@ -16,7 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Camera;
@@ -864,10 +864,10 @@ public enum RenderUtils
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 	}
 	
-	public static void drawItem(DrawableHelper helper, ItemStack stack, int x,
+	public static void drawItem(DrawContext helper, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
@@ -880,7 +880,7 @@ public enum RenderUtils
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
 		DiffuseLighting.enableGuiDepthLighting();
-		helper.method_51427(renderStack, 0, 0);
+		helper.drawItem(renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
 		matrixStack.pop();
@@ -894,7 +894,7 @@ public enum RenderUtils
 			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			TextRenderer tr = WurstClient.MC.textRenderer;
-			helper.method_51433(tr, "?", 3, 2, 0xf0f0f0, false);
+			helper.drawText(tr, "?", 3, 2, 0xf0f0f0, false);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
 			matrixStack.pop();

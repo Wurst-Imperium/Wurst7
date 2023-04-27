@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IScreen;
@@ -34,7 +34,7 @@ public abstract class ScreenMixin extends AbstractParentElement
 	@Inject(at = @At("HEAD"),
 		method = "renderBackground(Lnet/minecraft/client/gui/DrawableHelper;)V",
 		cancellable = true)
-	public void onRenderBackground(DrawableHelper helper, CallbackInfo ci)
+	public void onRenderBackground(DrawContext helper, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
 			.shouldCancelBackground((Screen)(Object)this))

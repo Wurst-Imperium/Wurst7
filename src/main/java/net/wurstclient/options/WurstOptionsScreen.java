@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -146,7 +146,7 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
@@ -155,7 +155,7 @@ public class WurstOptionsScreen extends Screen
 		renderButtonTooltip(helper, mouseX, mouseY);
 	}
 	
-	private void renderTitles(DrawableHelper helper)
+	private void renderTitles(DrawContext helper)
 	{
 		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
@@ -173,7 +173,7 @@ public class WurstOptionsScreen extends Screen
 			0xcccccc);
 	}
 	
-	private void renderButtonTooltip(DrawableHelper helper, int mouseX,
+	private void renderButtonTooltip(DrawContext helper, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -191,7 +191,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			helper.method_51434(textRenderer, woButton.tooltip, mouseX, mouseY);
+			helper.drawTooltip(textRenderer, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}

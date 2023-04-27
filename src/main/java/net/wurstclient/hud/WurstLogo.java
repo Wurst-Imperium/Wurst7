@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -29,9 +29,9 @@ public final class WurstLogo
 	private static final Identifier texture =
 		new Identifier("wurst", "wurst_128.png");
 	
-	public void render(DrawableHelper helper)
+	public void render(DrawContext helper)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		WurstLogoOtf otf = WurstClient.INSTANCE.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
 			return;
@@ -55,7 +55,7 @@ public final class WurstLogo
 		// draw version string
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		helper.method_51433(tr, version, 74, 8, otf.getTextColor(), false);
+		helper.drawText(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);

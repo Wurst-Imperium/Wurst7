@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.wurstclient.clickgui.ClickGui;
@@ -50,7 +50,7 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		super.render(helper, mouseX, mouseY, partialTicks);

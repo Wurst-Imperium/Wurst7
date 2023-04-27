@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 
 public abstract class Component
 {
@@ -23,7 +23,7 @@ public abstract class Component
 		
 	}
 	
-	public abstract void render(DrawableHelper helper, int mouseX, int mouseY,
+	public abstract void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks);
 	
 	public abstract int getDefaultWidth();

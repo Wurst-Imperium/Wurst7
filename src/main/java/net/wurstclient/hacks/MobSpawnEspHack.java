@@ -299,7 +299,7 @@ public final class MobSpawnEspHack extends Hack
 						BlockPos pos = new BlockPos(x, y, z);
 						BlockState state = world.getBlockState(pos);
 						
-						if(state.method_51366())
+						if(state.blocksMovement())
 							continue;
 						if(!state.getFluidState().isEmpty())
 							continue;

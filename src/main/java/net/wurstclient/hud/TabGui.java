@@ -15,8 +15,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -122,9 +121,9 @@ public final class TabGui implements KeyPressListener
 			}
 	}
 	
-	public void render(DrawableHelper helper, float partialTicks)
+	public void render(DrawContext helper, float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		if(tabGuiOtf.isHidden())
 			return;
 		
@@ -158,7 +157,7 @@ public final class TabGui implements KeyPressListener
 			if(i == selected)
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
-			helper.method_51433(WurstClient.MC.textRenderer, tabName, 2, textY,
+			helper.drawText(WurstClient.MC.textRenderer, tabName, 2, textY,
 				txtColor, false);
 			textY += 10;
 		}
@@ -193,7 +192,7 @@ public final class TabGui implements KeyPressListener
 				if(i == tab.selected)
 					fName = ">" + fName;
 				
-				helper.method_51433(WurstClient.MC.textRenderer, fName, 2,
+				helper.drawText(WurstClient.MC.textRenderer, fName, 2,
 					tabTextY, txtColor, false);
 				tabTextY += 10;
 			}

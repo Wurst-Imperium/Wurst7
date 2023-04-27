@@ -15,8 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -53,7 +52,7 @@ public final class AltRenderer
 		RenderSystem.setShaderTexture(0, loadedSkins.get(name));
 	}
 	
-	private static void drawTexture(DrawableHelper helper, int x, int y,
+	private static void drawTexture(DrawContext helper, int x, int y,
 		float u, float v, int w, int h, int fw, int fh)
 	{
 		int x2 = x + w;
@@ -65,7 +64,7 @@ public final class AltRenderer
 		float vPlusHOverFh = (v + h) / fh;
 		
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -81,7 +80,7 @@ public final class AltRenderer
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
-	public static void drawAltFace(DrawableHelper helper, String name, int x,
+	public static void drawAltFace(DrawContext helper, String name, int x,
 		int y, int w, int h, boolean selected)
 	{
 		try
@@ -116,7 +115,7 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBody(DrawableHelper helper, String name, int x,
+	public static void drawAltBody(DrawContext helper, String name, int x,
 		int y, int width, int height)
 	{
 		try
@@ -247,7 +246,7 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBack(DrawableHelper helper, String name, int x,
+	public static void drawAltBack(DrawContext helper, String name, int x,
 		int y, int width, int height)
 	{
 		try

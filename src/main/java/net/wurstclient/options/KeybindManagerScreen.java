@@ -10,7 +10,7 @@ package net.wurstclient.options;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -163,7 +163,7 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
@@ -222,16 +222,16 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawableHelper helper, int index, int x,
+		protected void renderItem(DrawContext helper, int index, int x,
 			int y, int slotHeight, int mouseX, int mouseY, float partialTicks)
 		{
 			Keybind keybind =
 				WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(index);
 			
-			helper.method_51433(client.textRenderer,
+			helper.drawText(client.textRenderer,
 				"Key: " + keybind.getKey().replace("key.keyboard.", ""), x + 3,
 				y + 3, 0xa0a0a0, false);
-			helper.method_51433(client.textRenderer,
+			helper.drawText(client.textRenderer,
 				"Commands: " + keybind.getCommands(), x + 3, y + 15, 0xa0a0a0,
 				false);
 		}

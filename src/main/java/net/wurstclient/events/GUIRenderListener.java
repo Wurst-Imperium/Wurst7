@@ -8,21 +8,20 @@
 package net.wurstclient.events;
 
 import java.util.ArrayList;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
 
 public interface GUIRenderListener extends Listener
 {
-	public void onRenderGUI(DrawableHelper helper, float partialTicks);
+	public void onRenderGUI(DrawContext helper, float partialTicks);
 	
 	public static class GUIRenderEvent extends Event<GUIRenderListener>
 	{
 		private final float partialTicks;
-		private final DrawableHelper helper;
+		private final DrawContext helper;
 		
-		public GUIRenderEvent(DrawableHelper helper, float partialTicks)
+		public GUIRenderEvent(DrawContext helper, float partialTicks)
 		{
 			this.helper = helper;
 			this.partialTicks = partialTicks;

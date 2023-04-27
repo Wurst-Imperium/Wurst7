@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -70,9 +70,9 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY)
+	public void render(DrawContext helper, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int y1 = getY();
@@ -150,14 +150,14 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		tessellator.draw();
 	}
 	
-	private void drawValueName(DrawableHelper helper, int x1, int yi1,
+	private void drawValueName(DrawContext helper, int x1, int yi1,
 		Enum<?> value)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		helper.method_51433(tr, value.toString(), x1 + 2, yi1 + 2, txtColor,
+		helper.drawText(tr, value.toString(), x1 + 2, yi1 + 2, txtColor,
 			false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

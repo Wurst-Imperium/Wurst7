@@ -17,7 +17,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -170,7 +170,7 @@ public final class KeybindProfilesScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(helper);
@@ -182,7 +182,7 @@ public final class KeybindProfilesScreen extends Screen
 		super.render(helper, mouseX, mouseY, partialTicks);
 		
 		if(loadButton.isSelected() && !loadButton.active)
-			helper.method_51434(textRenderer,
+			helper.drawTooltip(textRenderer,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
 	}
@@ -236,7 +236,7 @@ public final class KeybindProfilesScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawableHelper helper, int index, int x,
+		protected void renderItem(DrawContext helper, int index, int x,
 			int y, int var4, int var5, int var6, float partialTicks)
 		{
 			TextRenderer tr = mc.textRenderer;

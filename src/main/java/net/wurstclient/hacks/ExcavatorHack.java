@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -325,14 +325,14 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawableHelper helper, float partialTicks)
+	public void onRenderGUI(DrawContext helper, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		matrixStack.push();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -365,7 +365,7 @@ public final class ExcavatorHack extends Hack
 		tessellator.draw();
 		
 		// text
-		helper.method_51433(tr, message, 2, 1, 0xffffffff, false);
+		helper.drawText(tr, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
 		

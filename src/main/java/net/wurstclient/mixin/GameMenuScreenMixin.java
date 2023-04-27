@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -112,7 +112,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	@Inject(at = @At("TAIL"),
 		method = "render(Lnet/minecraft/client/gui/DrawableHelper;IIF)V")
-	private void onRender(DrawableHelper helper, int mouseX, int mouseY,
+	private void onRender(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)

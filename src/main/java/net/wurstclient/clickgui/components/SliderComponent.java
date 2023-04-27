@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -76,10 +76,10 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x1 + 2;
@@ -302,7 +302,7 @@ public final class SliderComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(DrawableHelper helper, int x1, int x2, int y1,
+	private void drawNameAndValue(DrawContext helper, int x1, int x2, int y1,
 		boolean renderAsDisabled)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -314,8 +314,8 @@ public final class SliderComponent extends Component
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		helper.method_51433(tr, name, x1, y1 + 2, txtColor, false);
-		helper.method_51433(tr, value, x2 - valueWidth, y1 + 2, txtColor,
+		helper.drawText(tr, name, x1, y1 + 2, txtColor, false);
+		helper.drawText(tr, value, x2 - valueWidth, y1 + 2, txtColor,
 			false);
 		
 		GL11.glEnable(GL11.GL_BLEND);

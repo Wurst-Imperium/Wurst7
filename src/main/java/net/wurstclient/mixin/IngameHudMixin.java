@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
@@ -28,7 +27,7 @@ public class IngameHudMixin
 			remap = false,
 			ordinal = 3),
 		method = "render(Lnet/minecraft/client/gui/DrawableHelper;F)V")
-	private void onRender(DrawableHelper helper, float partialTicks,
+	private void onRender(DrawContext helper, float partialTicks,
 		CallbackInfo ci)
 	{
 		if(WurstClient.MC.options.debugEnabled)
@@ -41,7 +40,7 @@ public class IngameHudMixin
 	@Inject(at = @At("HEAD"),
 		method = "renderOverlay(Lnet/minecraft/client/gui/DrawableHelper;Lnet/minecraft/util/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(DrawableHelper helper, Identifier texture,
+	private void onRenderOverlay(DrawContext helper, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
 		if(texture == null || texture.getPath() == null)

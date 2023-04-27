@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -62,7 +62,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawableHelper helper, int mouseX, int mouseY,
+	public void render(DrawContext helper, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -86,7 +86,7 @@ public final class BlockComponent extends Component
 		
 		ItemStack stack = new ItemStack(setting.getBlock());
 		
-		MatrixStack matrixStack = helper.method_51448();
+		MatrixStack matrixStack = helper.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -121,7 +121,7 @@ public final class BlockComponent extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		helper.method_51433(tr, text, x1, y1 + 2, txtColor, false);
+		helper.drawText(tr, text, x1, y1 + 2, txtColor, false);
 		
 		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
 		modelViewStack.push();
