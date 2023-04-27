@@ -460,7 +460,7 @@ public final class ClickGui
 		}
 	}
 	
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		updateColors();
@@ -494,19 +494,19 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			renderWindow(helper, window, mouseX, mouseY, partialTicks);
+			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
-		renderPopups(helper, mouseX, mouseY);
-		renderTooltip(helper, mouseX, mouseY);
+		renderPopups(context, mouseX, mouseY);
+		renderTooltip(context, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopups(DrawContext helper, int mouseX, int mouseY)
+	public void renderPopups(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -521,15 +521,15 @@ public final class ClickGui
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
-			popup.render(helper, cMouseX, cMouseY);
+			popup.render(context, cMouseX, cMouseY);
 			
 			matrixStack.pop();
 		}
 	}
 	
-	public void renderTooltip(DrawContext helper, int mouseX, int mouseY)
+	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -586,14 +586,14 @@ public final class ClickGui
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for(int i = 0; i < lines.length; i++)
-			helper.drawText(fr, lines[i], xt1 + 2,
-				yt1 + 2 + i * fr.fontHeight, txtColor, false);
+			context.drawText(fr, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		matrixStack.pop();
 	}
 	
-	public void renderPinnedWindows(DrawContext helper, float partialTicks)
+	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -602,7 +602,7 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
-				renderWindow(helper, window, Integer.MIN_VALUE,
+				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
 			
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -626,7 +626,7 @@ public final class ClickGui
 			acColor = clickGui.getAccentColor();
 	}
 	
-	private void renderWindow(DrawContext helper, Window window, int mouseX,
+	private void renderWindow(DrawContext context, Window window, int mouseX,
 		int mouseY, float partialTicks)
 	{
 		int x1 = window.getX();
@@ -635,7 +635,7 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -796,7 +796,7 @@ public final class ClickGui
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y4;
 			for(int i = 0; i < window.countChildren(); i++)
-				window.getChild(i).render(helper, cMouseX, cMouseY,
+				window.getChild(i).render(context, cMouseX, cMouseY,
 					partialTicks);
 			
 			matrixStack.pop();
@@ -892,7 +892,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
 			.getString();
-		helper.drawText(fr, title, x1 + 2, y1 + 3, txtColor, false);
+		context.drawText(fr, title, x1 + 2, y1 + 3, txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

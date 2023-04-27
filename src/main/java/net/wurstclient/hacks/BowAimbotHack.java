@@ -17,6 +17,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
@@ -242,9 +243,9 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext helper, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		if(target == null)
 			return;
 		
@@ -282,7 +283,7 @@ public final class BowAimbotHack extends Hack
 		tessellator.draw();
 		
 		// text
-		helper.drawText(MC.textRenderer, message, 2, 1, 0xffffffff, false);
+		context.drawText(MC.textRenderer, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
 		

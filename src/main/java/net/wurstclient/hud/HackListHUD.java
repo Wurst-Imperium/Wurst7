@@ -34,7 +34,7 @@ public final class HackListHUD implements UpdateListener
 		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class, this);
 	}
 	
-	public void render(DrawContext helper, float partialTicks)
+	public void render(DrawContext context, float partialTicks)
 	{
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
@@ -59,26 +59,26 @@ public final class HackListHUD implements UpdateListener
 		Window sr = WurstClient.MC.getWindow();
 		
 		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
-			drawCounter(helper);
+			drawCounter(context);
 		else
-			drawHackList(helper, partialTicks);
+			drawHackList(context, partialTicks);
 	}
 	
-	private void drawCounter(DrawContext helper)
+	private void drawCounter(DrawContext context)
 	{
 		long size = activeHax.stream().filter(e -> e.hack.isEnabled()).count();
 		String s = size + " hack" + (size != 1 ? "s" : "") + " active";
-		drawString(helper, s);
+		drawString(context, s);
 	}
 	
-	private void drawHackList(DrawContext helper, float partialTicks)
+	private void drawHackList(DrawContext context, float partialTicks)
 	{
 		if(otf.isAnimations())
 			for(HackListEntry e : activeHax)
-				drawWithOffset(helper, e, partialTicks);
+				drawWithOffset(context, e, partialTicks);
 		else
 			for(HackListEntry e : activeHax)
-				drawString(helper, e.hack.getRenderName());
+				drawString(context, e.hack.getRenderName());
 	}
 	
 	public void updateState(Hack hack)
@@ -129,7 +129,7 @@ public final class HackListHUD implements UpdateListener
 		}
 	}
 	
-	private void drawString(DrawContext helper, String s)
+	private void drawString(DrawContext context, String s)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		int posX;
@@ -144,13 +144,13 @@ public final class HackListHUD implements UpdateListener
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		helper.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
-		helper.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
+		context.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
+		context.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
 		
 		posY += 9;
 	}
 	
-	private void drawWithOffset(DrawContext helper, HackListEntry e,
+	private void drawWithOffset(DrawContext context, HackListEntry e,
 		float partialTicks)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
@@ -171,9 +171,9 @@ public final class HackListHUD implements UpdateListener
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		helper.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
+		context.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
 			false);
-		helper.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
+		context.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
 		
 		posY += 9;
 	}

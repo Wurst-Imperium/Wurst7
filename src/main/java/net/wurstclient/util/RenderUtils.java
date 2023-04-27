@@ -864,10 +864,10 @@ public enum RenderUtils
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 	}
 	
-	public static void drawItem(DrawContext helper, ItemStack stack, int x,
+	public static void drawItem(DrawContext context, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
@@ -880,7 +880,7 @@ public enum RenderUtils
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
 		DiffuseLighting.enableGuiDepthLighting();
-		helper.drawItem(renderStack, 0, 0);
+		context.drawItem(renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
 		matrixStack.pop();
@@ -894,7 +894,7 @@ public enum RenderUtils
 			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			TextRenderer tr = WurstClient.MC.textRenderer;
-			helper.drawText(tr, "?", 3, 2, 0xf0f0f0, false);
+			context.drawText(tr, "?", 3, 2, 0xf0f0f0, false);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
 			matrixStack.pop();

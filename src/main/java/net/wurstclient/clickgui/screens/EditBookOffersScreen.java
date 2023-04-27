@@ -177,20 +177,20 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = context.getMatrices();
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		helper.drawCenteredTextWithShadow(client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			bookOffers.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
-		super.render(helper, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.pop();
 	}
@@ -250,16 +250,16 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
-			MatrixStack matrixStack = helper.getMatrices();
+			MatrixStack matrixStack = context.getMatrices();
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
 			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(helper, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
 			TextRenderer tr = mc.textRenderer;
 			BookOffer bookOffer = list.get(index);
@@ -267,9 +267,9 @@ public final class EditBookOffersScreen extends Screen
 			
 			Enchantment enchantment = bookOffer.getEnchantment();
 			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
-			helper.drawText(tr, name, x + 28, y, nameColor, false);
+			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			helper.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
 				false);
 			
 			String price;
@@ -278,11 +278,11 @@ public final class EditBookOffersScreen extends Screen
 			else
 			{
 				price = "max " + bookOffer.price();
-				RenderUtils.drawItem(helper, new ItemStack(Items.EMERALD),
+				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
 					x + 28 + tr.getWidth(price), y + 16, false);
 			}
 			
-			helper.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
+			context.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

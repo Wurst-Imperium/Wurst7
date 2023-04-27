@@ -94,23 +94,23 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
+		renderBackground(context);
 		
-		helper.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		helper.drawTextWithShadow(textRenderer,
+		context.drawTextWithShadow(textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		helper.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
+		context.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
 			width / 2 - 100, 87, 0xa0a0a0);
 		
-		commandField.render(helper, mouseX, mouseY, partialTicks);
-		super.render(helper, mouseX, mouseY, partialTicks);
+		commandField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

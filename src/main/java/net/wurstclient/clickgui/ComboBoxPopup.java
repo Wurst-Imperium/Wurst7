@@ -70,9 +70,9 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY)
+	public void render(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int y1 = getY();
@@ -99,7 +99,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
 			drawValueBackground(matrixStack, x1, x2, yi1, yi2, hValue);
 			
-			drawValueName(helper, x1, yi1, value);
+			drawValueName(context, x1, yi1, value);
 		}
 	}
 	
@@ -150,14 +150,14 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		tessellator.draw();
 	}
 	
-	private void drawValueName(DrawContext helper, int x1, int yi1,
+	private void drawValueName(DrawContext context, int x1, int yi1,
 		Enum<?> value)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		helper.drawText(tr, value.toString(), x1 + 2, yi1 + 2, txtColor,
+		context.drawText(tr, value.toString(), x1 + 2, yi1 + 2, txtColor,
 			false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}

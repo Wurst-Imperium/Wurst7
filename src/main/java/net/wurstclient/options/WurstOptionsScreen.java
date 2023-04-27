@@ -146,34 +146,34 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		renderTitles(helper);
-		super.render(helper, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(helper, mouseX, mouseY);
+		renderBackground(context);
+		renderTitles(context);
+		super.render(context, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderTitles(DrawContext helper)
+	private void renderTitles(DrawContext context)
 	{
 		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		helper.drawCenteredTextWithShadow(tr, "Wurst Options", middleX, y1,
+		context.drawCenteredTextWithShadow(tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		helper.drawCenteredTextWithShadow(tr, "Settings", middleX - 104, y2,
+		context.drawCenteredTextWithShadow(tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		helper.drawCenteredTextWithShadow(tr, "Managers", middleX, y2,
+		context.drawCenteredTextWithShadow(tr, "Managers", middleX, y2,
 			0xcccccc);
-		helper.drawCenteredTextWithShadow(tr, "Links", middleX + 104, y2,
+		context.drawCenteredTextWithShadow(tr, "Links", middleX + 104, y2,
 			0xcccccc);
 	}
 	
-	private void renderButtonTooltip(DrawContext helper, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -191,7 +191,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			helper.drawTooltip(textRenderer, woButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}

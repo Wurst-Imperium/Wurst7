@@ -10,6 +10,7 @@ package net.wurstclient.commands;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
@@ -81,7 +82,7 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext helper, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -100,7 +101,7 @@ public final class TacoCmd extends Command
 		int y = sr.getScaledHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		helper.drawTexture(tacos[ticks / 8], x, y, 0, 0, w, h, w, h);
+		context.drawTexture(tacos[ticks / 8], x, y, 0, 0, w, h, w, h);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);

@@ -111,8 +111,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "render(Lnet/minecraft/client/gui/DrawableHelper;IIF)V")
-	private void onRender(DrawContext helper, int mouseX, int mouseY,
+		method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	private void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
@@ -133,6 +133,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		helper.drawTexture(wurstTexture, x, y, u, v, w, h, fw, fh);
+		context.drawTexture(wurstTexture, x, y, u, v, w, h, fw, fh);
 	}
 }

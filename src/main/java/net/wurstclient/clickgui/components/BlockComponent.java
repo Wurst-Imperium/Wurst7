@@ -62,7 +62,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -86,7 +86,7 @@ public final class BlockComponent extends Component
 		
 		ItemStack stack = new ItemStack(setting.getBlock());
 		
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -121,14 +121,14 @@ public final class BlockComponent extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		helper.drawText(tr, text, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, text, x1, y1 + 2, txtColor, false);
 		
 		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
 		modelViewStack.push();
 		Window parent = getParent();
 		modelViewStack.translate(parent.getX(),
 			parent.getY() + 13 + parent.getScrollOffset(), 0);
-		RenderUtils.drawItem(helper, stack, x3, y1, true);
+		RenderUtils.drawItem(context, stack, x3, y1, true);
 		modelViewStack.pop();
 		RenderSystem.applyModelViewMatrix();
 		

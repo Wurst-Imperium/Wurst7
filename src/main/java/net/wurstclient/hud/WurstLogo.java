@@ -29,9 +29,9 @@ public final class WurstLogo
 	private static final Identifier texture =
 		new Identifier("wurst", "wurst_128.png");
 	
-	public void render(DrawContext helper)
+	public void render(DrawContext context)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		WurstLogoOtf otf = WurstClient.INSTANCE.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
 			return;
@@ -55,12 +55,12 @@ public final class WurstLogo
 		// draw version string
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		helper.drawText(tr, version, 74, 8, otf.getTextColor(), false);
+		context.drawText(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
-		helper.drawTexture(texture, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.drawTexture(texture, 0, 3, 0, 0, 72, 18, 72, 18);
 	}
 	
 	private String getVersionString()

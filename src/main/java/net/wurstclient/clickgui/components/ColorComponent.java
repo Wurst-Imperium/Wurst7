@@ -56,10 +56,10 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int y1 = getY();
@@ -86,7 +86,7 @@ public final class ColorComponent extends Component
 		drawBackground(matrixStack, x1, x2, y1, y3);
 		drawBox(matrixStack, x1, x2, y2, y3, hovering && mouseY >= y3);
 		
-		drawNameAndValue(helper, x1, x2, y1 + 2);
+		drawNameAndValue(context, x1, x2, y1 + 2);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -157,7 +157,7 @@ public final class ColorComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(DrawContext helper, int x1, int x2, int y1)
+	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -165,11 +165,11 @@ public final class ColorComponent extends Component
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = MC.textRenderer;
 		
-		helper.drawText(tr, setting.getName(), x1, y1, txtColor, false);
+		context.drawText(tr, setting.getName(), x1, y1, txtColor, false);
 		
 		String value = ColorUtils.toHex(setting.getColor());
 		int valueWidth = tr.getWidth(value);
-		helper.drawText(tr, value, x2 - valueWidth, y1, txtColor, false);
+		context.drawText(tr, value, x2 - valueWidth, y1, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

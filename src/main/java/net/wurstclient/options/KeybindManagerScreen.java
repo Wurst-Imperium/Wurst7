@@ -163,18 +163,18 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		renderBackground(context);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		helper.drawCenteredTextWithShadow(textRenderer, "Keybind Manager",
+		context.drawCenteredTextWithShadow(textRenderer, "Keybind Manager",
 			width / 2, 8, 0xffffff);
-		helper.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Keybinds: " + listGui.getItemCount(), width / 2, 20, 0xffffff);
 		
-		super.render(helper, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -222,16 +222,16 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int index, int x,
-			int y, int slotHeight, int mouseX, int mouseY, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int slotHeight, int mouseX, int mouseY, float partialTicks)
 		{
 			Keybind keybind =
 				WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(index);
 			
-			helper.drawText(client.textRenderer,
+			context.drawText(client.textRenderer,
 				"Key: " + keybind.getKey().replace("key.keyboard.", ""), x + 3,
 				y + 3, 0xa0a0a0, false);
-			helper.drawText(client.textRenderer,
+			context.drawText(client.textRenderer,
 				"Commands: " + keybind.getCommands(), x + 3, y + 15, 0xa0a0a0,
 				false);
 		}

@@ -94,7 +94,7 @@ public abstract class ListWidget extends AbstractParentElement
 	protected void updateItemPosition(int index, int x, int y, float delta)
 	{}
 	
-	protected abstract void renderItem(DrawContext helper, int x, int y,
+	protected abstract void renderItem(DrawContext context, int x, int y,
 		int itemHeight, int mouseX, int mouseY, int i, float f);
 	
 	protected void renderHeader(int x, int y, Tessellator tessellator)
@@ -134,8 +134,7 @@ public abstract class ListWidget extends AbstractParentElement
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
-		float delta)
+	public void render(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		if(visible)
 		{
@@ -168,7 +167,7 @@ public abstract class ListWidget extends AbstractParentElement
 			if(renderHeader)
 				renderHeader(k, l, tessellator);
 			
-			renderList(helper, k, l, mouseX, mouseY, delta);
+			renderList(context, k, l, mouseX, mouseY, delta);
 			RenderSystem.disableDepthTest();
 			renderHoleBackground(0, top, 255, 255);
 			renderHoleBackground(bottom, height, 255, 255);
@@ -374,7 +373,7 @@ public abstract class ListWidget extends AbstractParentElement
 		return 220;
 	}
 	
-	protected void renderList(DrawContext helper, int i, int j, int k, int l,
+	protected void renderList(DrawContext context, int i, int j, int k, int l,
 		float f)
 	{
 		int m = getItemCount();
@@ -414,7 +413,7 @@ public abstract class ListWidget extends AbstractParentElement
 			}
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			renderItem(helper, n, i, o, p, k, l, f);
+			renderItem(context, n, i, o, p, k, l, f);
 		}
 		
 	}

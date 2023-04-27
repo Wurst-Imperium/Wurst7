@@ -170,19 +170,19 @@ public final class KeybindProfilesScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		renderBackground(context);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		helper.drawCenteredTextWithShadow(client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			"Keybind Profiles", width / 2, 12, 0xffffff);
 		
-		super.render(helper, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		if(loadButton.isSelected() && !loadButton.active)
-			helper.drawTooltip(textRenderer,
+			context.drawTooltip(textRenderer,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
 	}
@@ -236,20 +236,20 @@ public final class KeybindProfilesScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			TextRenderer tr = mc.textRenderer;
 			
 			Path path = list.get(index);
 			// tr.draw(matrixStack, "" + path.getFileName(), x + 28, y,
 			// 0xf0f0f0);
-			helper.drawTextWithShadow(tr, "" + path.getFileName(), x + 28, y,
+			context.drawTextWithShadow(tr, "" + path.getFileName(), x + 28, y,
 				0xf0f0f0);
 			// tr.draw(matrixStack, "" +
 			// client.runDirectory.toPath().relativize(path), x + 28, y + 9,
 			// 0xa0a0a0);
-			helper.drawTextWithShadow(tr,
+			context.drawTextWithShadow(tr,
 				"" + client.runDirectory.toPath().relativize(path), x + 28,
 				y + 9, 0xa0a0a0);
 		}

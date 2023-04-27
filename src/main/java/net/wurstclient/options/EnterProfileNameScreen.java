@@ -88,15 +88,15 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		helper.drawCenteredTextWithShadow(client.textRenderer,
+		renderBackground(context);
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			"Name your new profile", width / 2, 20, 0xFFFFFF);
 		
-		valueField.render(helper, mouseX, mouseY, partialTicks);
-		super.render(helper, mouseX, mouseY, partialTicks);
+		valueField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

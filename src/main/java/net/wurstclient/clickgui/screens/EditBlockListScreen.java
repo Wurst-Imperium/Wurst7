@@ -161,44 +161,44 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = context.getMatrices();
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		helper.drawCenteredTextWithShadow(client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			blockList.getName() + " (" + listGui.getItemCount() + ")",
 			width / 2, 12, 0xffffff);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		blockNameField.render(helper, mouseX, mouseY, partialTicks);
-		super.render(helper, mouseX, mouseY, partialTicks);
+		blockNameField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
-			helper.drawTextWithShadow(client.textRenderer, "block name or ID",
+			context.drawTextWithShadow(client.textRenderer, "block name or ID",
 				68, height - 50, 0x808080);
 		
 		int border = blockNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
 		
-		helper.fill(48, height - 56, 64, height - 36, border);
-		helper.fill(49, height - 55, 64, height - 37, black);
-		helper.fill(214, height - 56, 244, height - 55, border);
-		helper.fill(214, height - 37, 244, height - 36, border);
-		helper.fill(244, height - 56, 246, height - 36, border);
-		helper.fill(214, height - 55, 243, height - 52, black);
-		helper.fill(214, height - 40, 243, height - 37, black);
-		helper.fill(214, height - 55, 216, height - 37, black);
-		helper.fill(242, height - 55, 245, height - 37, black);
+		context.fill(48, height - 56, 64, height - 36, border);
+		context.fill(49, height - 55, 64, height - 37, black);
+		context.fill(214, height - 56, 244, height - 55, border);
+		context.fill(214, height - 37, 244, height - 36, border);
+		context.fill(244, height - 56, 246, height - 36, border);
+		context.fill(214, height - 55, 243, height - 52, black);
+		context.fill(214, height - 40, 243, height - 37, black);
+		context.fill(214, height - 55, 216, height - 37, black);
+		context.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
 		
-		RenderUtils.drawItem(helper,
+		RenderUtils.drawItem(context,
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
 	}
@@ -258,20 +258,20 @@ public final class EditBlockListScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
 			Block block = BlockUtils.getBlockFromName(name);
 			ItemStack stack = new ItemStack(block);
 			TextRenderer tr = mc.textRenderer;
 			
-			RenderUtils.drawItem(helper, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			String displayName = stack.isEmpty() ? "\u00a7ounknown block\u00a7r"
 				: stack.getName().getString();
-			helper.drawText(tr, displayName, x + 28, y, 0xf0f0f0, false);
-			helper.drawText(tr, name, x + 28, y + 9, 0xa0a0a0, false);
-			helper.drawText(tr,
+			context.drawText(tr, displayName, x + 28, y, 0xf0f0f0, false);
+			context.drawText(tr, name, x + 28, y + 9, 0xa0a0a0, false);
+			context.drawText(tr,
 				"ID: " + Block.getRawIdFromState(block.getDefaultState()),
 				x + 28, y + 18, 0xa0a0a0, false);
 		}

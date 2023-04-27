@@ -74,7 +74,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		setFocused(searchBar);
 		searchBar.setFocused(true);
 		
-		searchBar.method_46421(middleX - 100);
+		searchBar.setX(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	
@@ -228,10 +228,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(DrawContext helper, int mouseX, int mouseY,
+	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
@@ -244,9 +244,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 		{
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			helper.drawTextWithShadow(WurstClient.MC.textRenderer, "Search: ",
+			context.drawTextWithShadow(WurstClient.MC.textRenderer, "Search: ",
 				middleX - 150, 32, txtColor);
-			searchBar.render(helper, mouseX, mouseY, partialTicks);
+			searchBar.render(context, mouseX, mouseY, partialTicks);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -269,7 +269,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(featureY > height - 40)
 				break;
 			
-			renderFeature(helper, mouseX, mouseY, partialTicks, i, featureX,
+			renderFeature(context, mouseX, mouseY, partialTicks, i, featureX,
 				featureY);
 		}
 		
@@ -329,15 +329,15 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			// text
 			for(int i = 0; i < lines.length; i++)
-				helper.drawText(tr, lines[i], xt1 + 2,
+				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
 		}
 	}
 	
-	private void renderFeature(DrawContext helper, int mouseX, int mouseY,
+	private void renderFeature(DrawContext context, int mouseX, int mouseY,
 		float partialTicks, int i, int x, int y)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		int txtColor = gui.getTxtColor();
@@ -475,7 +475,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
-			helper.drawText(client.textRenderer, buttonText, area.x + 4,
+			context.drawText(client.textRenderer, buttonText, area.x + 4,
 				area.y + 4, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);
 		}

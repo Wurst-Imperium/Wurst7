@@ -50,10 +50,10 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		super.render(helper, mouseX, mouseY, partialTicks);
-		gui.render(helper, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
+		gui.render(context, mouseX, mouseY, partialTicks);
 	}
 }

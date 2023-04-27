@@ -325,14 +325,14 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext helper, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		matrixStack.push();
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -365,7 +365,7 @@ public final class ExcavatorHack extends Hack
 		tessellator.draw();
 		
 		// text
-		helper.drawText(tr, message, 2, 1, 0xffffffff, false);
+		context.drawText(tr, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
 		

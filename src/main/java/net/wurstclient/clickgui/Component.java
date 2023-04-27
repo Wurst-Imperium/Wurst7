@@ -23,7 +23,7 @@ public abstract class Component
 		
 	}
 	
-	public abstract void render(DrawContext helper, int mouseX, int mouseY,
+	public abstract void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks);
 	
 	public abstract int getDefaultWidth();

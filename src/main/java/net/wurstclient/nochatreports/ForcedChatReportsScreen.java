@@ -101,20 +101,19 @@ public final class ForcedChatReportsScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
-		float delta)
+	public void render(DrawContext context, int mouseX, int mouseY, float delta)
 	{
-		renderBackground(helper);
+		renderBackground(context);
 		
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		helper.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
+		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
 			0xAAAAAA);
-		reasonFormatted.drawCenterWithShadow(helper, centerX, reasonY);
+		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
 		
-		super.render(helper, mouseX, mouseY, delta);
+		super.render(context, mouseX, mouseY, delta);
 	}
 	
 	@Override

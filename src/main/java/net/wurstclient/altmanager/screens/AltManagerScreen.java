@@ -409,13 +409,13 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		renderBackground(context);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -429,19 +429,19 @@ public final class AltManagerScreen extends Screen
 			if(alt == null)
 				return;
 			
-			AltRenderer.drawAltBack(helper, alt.getName(),
+			AltRenderer.drawAltBack(context, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(helper, alt.getName(),
+			AltRenderer.drawAltBody(context, alt.getName(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		helper.drawCenteredTextWithShadow(textRenderer, "Alt Manager",
+		context.drawCenteredTextWithShadow(textRenderer, "Alt Manager",
 			width / 2, 4, 16777215);
-		helper.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
-		helper.drawCenteredTextWithShadow(
+		context.drawCenteredTextWithShadow(
 			textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
 			width / 2, 24, 10526880);
@@ -468,12 +468,12 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(helper, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(helper, mouseX, mouseY);
-		renderAltTooltip(helper, mouseX, mouseY);
+		super.render(context, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(context, mouseX, mouseY);
+		renderAltTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderAltTooltip(DrawContext helper, int mouseX, int mouseY)
+	private void renderAltTooltip(DrawContext context, int mouseX, int mouseY)
 	{
 		if(!listGui.isMouseInList(mouseX, mouseY))
 			return;
@@ -515,10 +515,10 @@ public final class AltManagerScreen extends Screen
 		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
-		helper.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+		context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawContext helper, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)(Object)this).getButtons())
@@ -542,7 +542,7 @@ public final class AltManagerScreen extends Screen
 			else
 				addTooltip(tooltip, "window_freeze");
 			
-			helper.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -637,12 +637,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int id, int x, int y,
+		protected void renderItem(DrawContext context, int id, int x, int y,
 			int var4, int var5, int var6, float partialTicks)
 		{
 			Alt alt = list.get(id);
 			
-			MatrixStack matrixStack = helper.getMatrices();
+			MatrixStack matrixStack = context.getMatrices();
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -673,19 +673,19 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			AltRenderer.drawAltFace(helper, alt.getName(), x + 1, y + 1, 24, 24,
-				isSelectedItem(id));
+			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
+				24, isSelectedItem(id));
 			
 			// name / email
-			helper.drawText(client.textRenderer,
+			context.drawText(client.textRenderer,
 				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
 				false);
-			helper.drawText(client.textRenderer,
+			context.drawText(client.textRenderer,
 				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
 				false);
 			
 			String bottomText = getBottomText(alt);
-			helper.drawText(client.textRenderer, bottomText, x + 31, y + 15,
+			context.drawText(client.textRenderer, bottomText, x + 31, y + 15,
 				10526880, false);
 		}
 		

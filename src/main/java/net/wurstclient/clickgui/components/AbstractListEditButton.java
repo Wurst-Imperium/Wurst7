@@ -57,7 +57,7 @@ public abstract class AbstractListEditButton extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -80,7 +80,7 @@ public abstract class AbstractListEditButton extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -124,8 +124,8 @@ public abstract class AbstractListEditButton extends Component
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer tr = MC.textRenderer;
-		helper.drawText(tr, getText(), x1, y1 + 2, txtColor, false);
-		helper.drawText(tr, buttonText, x3 + 2, y1 + 2, txtColor, false);
+		context.drawText(tr, getText(), x1, y1 + 2, txtColor, false);
+		context.drawText(tr, buttonText, x3 + 2, y1 + 2, txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

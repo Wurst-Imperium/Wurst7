@@ -56,10 +56,10 @@ public final class CheckboxComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x1 + 11;
@@ -82,7 +82,7 @@ public final class CheckboxComponent extends Component
 		if(setting.isChecked())
 			drawCheck(matrixStack, x1, y1, hovering);
 		
-		drawName(helper, x3, y1);
+		drawName(context, x3, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -211,7 +211,7 @@ public final class CheckboxComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawName(DrawContext helper, int x3, int y1)
+	private void drawName(DrawContext context, int x3, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -221,7 +221,7 @@ public final class CheckboxComponent extends Component
 		String name = setting.getName();
 		int tx = x3 + 2;
 		int ty = y1 + 2;
-		helper.drawText(MC.textRenderer, name, tx, ty, txtColor, false);
+		context.drawText(MC.textRenderer, name, tx, ty, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

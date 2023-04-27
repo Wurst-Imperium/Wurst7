@@ -32,9 +32,9 @@ public abstract class ScreenMixin extends AbstractParentElement
 	private List<Drawable> drawables;
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderBackground(Lnet/minecraft/client/gui/DrawableHelper;)V",
+		method = "renderBackground(Lnet/minecraft/client/gui/DrawContext;)V",
 		cancellable = true)
-	public void onRenderBackground(DrawContext helper, CallbackInfo ci)
+	public void onRenderBackground(DrawContext context, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
 			.shouldCancelBackground((Screen)(Object)this))

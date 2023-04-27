@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
@@ -142,10 +143,10 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(DrawContext helper, int mouseX, int mouseY,
+	public final void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -182,7 +183,7 @@ public abstract class NavigatorScreen extends Screen
 				drawDownShadow(matrixStack, x1, y1, x2, y2);
 		}
 		
-		onRender(helper, mouseX, mouseY, partialTicks);
+		onRender(context, mouseX, mouseY, partialTicks);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -208,7 +209,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(DrawContext helper, int mouseX,
+	protected abstract void onRender(DrawContext context, int mouseX,
 		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)

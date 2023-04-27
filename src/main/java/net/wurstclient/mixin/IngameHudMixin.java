@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.util.Identifier;
@@ -26,21 +27,21 @@ public class IngameHudMixin
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
 			remap = false,
 			ordinal = 3),
-		method = "render(Lnet/minecraft/client/gui/DrawableHelper;F)V")
-	private void onRender(DrawContext helper, float partialTicks,
+		method = "render(Lnet/minecraft/client/gui/DrawContext;F)V")
+	private void onRender(DrawContext context, float partialTicks,
 		CallbackInfo ci)
 	{
 		if(WurstClient.MC.options.debugEnabled)
 			return;
 		
-		GUIRenderEvent event = new GUIRenderEvent(helper, partialTicks);
+		GUIRenderEvent event = new GUIRenderEvent(context, partialTicks);
 		EventManager.fire(event);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderOverlay(Lnet/minecraft/client/gui/DrawableHelper;Lnet/minecraft/util/Identifier;F)V",
+		method = "renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(DrawContext helper, Identifier texture,
+	private void onRenderOverlay(DrawContext context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
 		if(texture == null || texture.getPath() == null)

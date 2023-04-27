@@ -96,10 +96,10 @@ public final class FeatureButton extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = hasSettings ? x2 - 11 : x2;
@@ -128,7 +128,7 @@ public final class FeatureButton extends Component
 			drawSettingsArrow(matrixStack, x2, x3, y1, y2, hSettings);
 		}
 		
-		drawName(helper, x1, x3, y1);
+		drawName(context, x1, x3, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -290,7 +290,7 @@ public final class FeatureButton extends Component
 		tessellator.draw();
 	}
 	
-	private void drawName(DrawContext helper, int x1, int x3, int y1)
+	private void drawName(DrawContext context, int x1, int x3, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -303,7 +303,7 @@ public final class FeatureButton extends Component
 		int tx = x1 + (x3 - x1 - nameWidth) / 2;
 		int ty = y1 + 2;
 		
-		helper.drawText(tr, name, tx, ty, txtColor, false);
+		context.drawText(tr, name, tx, ty, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

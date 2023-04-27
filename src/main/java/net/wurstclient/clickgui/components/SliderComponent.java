@@ -76,10 +76,10 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x1 + 2;
@@ -114,7 +114,7 @@ public final class SliderComponent extends Component
 		drawBackground(matrixStack, x1, x2, x3, x4, y1, y2, y4, y5);
 		drawRail(matrixStack, x3, x4, y4, y5, hSlider, renderAsDisabled);
 		drawKnob(matrixStack, x1, x2, y2, y3, hSlider, renderAsDisabled);
-		drawNameAndValue(helper, x1, x2, y1, renderAsDisabled);
+		drawNameAndValue(context, x1, x2, y1, renderAsDisabled);
 	}
 	
 	private void handleDragging(int mouseX, int x3, int x4)
@@ -302,7 +302,7 @@ public final class SliderComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(DrawContext helper, int x1, int x2, int y1,
+	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1,
 		boolean renderAsDisabled)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -314,9 +314,8 @@ public final class SliderComponent extends Component
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		helper.drawText(tr, name, x1, y1 + 2, txtColor, false);
-		helper.drawText(tr, value, x2 - valueWidth, y1 + 2, txtColor,
-			false);
+		context.drawText(tr, name, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, value, x2 - valueWidth, y1 + 2, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

@@ -287,39 +287,39 @@ public final class AddBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
-		listGui.render(helper, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = context.getMatrices();
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
 		TextRenderer tr = client.textRenderer;
 		String titleText = "Available Books (" + listGui.getItemCount() + ")";
-		helper.drawCenteredTextWithShadow(tr, titleText, width / 2, 12,
+		context.drawCenteredTextWithShadow(tr, titleText, width / 2, 12,
 			0xffffff);
 		
-		levelField.render(helper, mouseX, mouseY, partialTicks);
-		priceField.render(helper, mouseX, mouseY, partialTicks);
-		super.render(helper, mouseX, mouseY, partialTicks);
+		levelField.render(context, mouseX, mouseY, partialTicks);
+		priceField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 0, 0);
 		
-		helper.drawTextWithShadow(tr, "Level:", 0, height - 72, 0xf0f0f0);
-		helper.drawTextWithShadow(tr, "Max price:", 0, height - 56, 0xf0f0f0);
+		context.drawTextWithShadow(tr, "Level:", 0, height - 72, 0xf0f0f0);
+		context.drawTextWithShadow(tr, "Max price:", 0, height - 56, 0xf0f0f0);
 		
 		if(alreadyAdded && offerToAdd != null)
 		{
 			String errorText = offerToAdd.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			helper.drawTextWithShadow(tr, errorText, 0, height - 40, 0xff5555);
+			context.drawTextWithShadow(tr, errorText, 0, height - 40, 0xff5555);
 		}
 		
 		matrixStack.pop();
 		
-		RenderUtils.drawItem(helper, new ItemStack(Items.EMERALD),
+		RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
 			width / 2 - 16, height - 58, false);
 	}
 	
@@ -393,16 +393,16 @@ public final class AddBookOfferScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(DrawContext helper, int index, int x,
-			int y, int var4, int mouseX, int mouseY, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int mouseX, int mouseY, float partialTicks)
 		{
-			MatrixStack matrixStack = helper.getMatrices();
+			MatrixStack matrixStack = context.getMatrices();
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
 			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(helper, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
 			TextRenderer tr = mc.textRenderer;
 			BookOffer bookOffer = list.get(index);
@@ -410,14 +410,14 @@ public final class AddBookOfferScreen extends Screen
 			
 			String name = bookOffer.getEnchantmentName();
 			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
-			helper.drawText(tr, name, x + 28, y, nameColor, false);
+			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			helper.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
 				false);
 			
 			int maxLevel = enchantment.getMaxLevel();
 			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
-			helper.drawText(tr, levels, x + 28, y + 18, 0xa0a0a0, false);
+			context.drawText(tr, levels, x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

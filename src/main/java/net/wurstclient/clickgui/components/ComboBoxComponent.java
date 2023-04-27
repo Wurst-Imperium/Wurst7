@@ -103,10 +103,10 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = helper.getMatrices();
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x2 - 11;
@@ -130,7 +130,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		drawSeparator(matrixStack, x3, y1, y2);
 		drawArrow(matrixStack, x2, x3, y1, y2, hBox);
 		
-		drawNameAndValue(helper, x1, x4, y1);
+		drawNameAndValue(context, x1, x4, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -259,7 +259,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(DrawContext helper, int x1, int x4, int y1)
+	private void drawNameAndValue(DrawContext context, int x1, int x4, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -269,8 +269,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
 		
-		helper.drawText(tr, name, x1, y1 + 2, txtColor, false);
-		helper.drawText(tr, value, x4 + 2, y1 + 2, txtColor, false);
+		context.drawText(tr, name, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, value, x4 + 2, y1 + 2, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

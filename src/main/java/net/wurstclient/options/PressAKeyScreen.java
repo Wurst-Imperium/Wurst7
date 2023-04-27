@@ -8,6 +8,7 @@
 package net.wurstclient.options;
 
 import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
@@ -49,12 +50,12 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		helper.drawCenteredTextWithShadow(textRenderer, "Press a key",
+		renderBackground(context);
+		context.drawCenteredTextWithShadow(textRenderer, "Press a key",
 			width / 2, height / 4 + 48, 16777215);
-		super.render(helper, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 	}
 }

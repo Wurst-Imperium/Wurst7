@@ -201,21 +201,21 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext helper, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(helper);
-		helper.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
+		renderBackground(context);
+		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
 			20, 16777215);
-		helper.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		
-		super.render(helper, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(helper, mouseX, mouseY);
+		super.render(context, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawContext helper, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -233,7 +233,7 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			helper.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
