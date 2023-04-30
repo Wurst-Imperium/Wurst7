@@ -43,17 +43,22 @@ import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"ArrowTrajectories", "ArrowPrediction", "aim assist",
-	"arrow trajectories"})
+	"arrow trajectories", "bow trajectories"})
 public final class TrajectoriesHack extends Hack implements RenderListener
 {
 	private final ColorSetting color =
 		new ColorSetting("Color", "Color of the trajectory.", Color.GREEN);
-	
+	private final ColorSetting colorHit =
+		new ColorSetting("Hit Color", "Color of the trajectory if it hits an entity.", Color.RED);
+
+	private boolean hittingEntity = false;
+
 	public TrajectoriesHack()
 	{
 		super("Trajectories");
 		setCategory(Category.RENDER);
 		addSetting(color);
+		addSetting(colorHit);
 	}
 	
 	@Override
@@ -109,7 +114,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
+
 		float[] colorF = color.getColorF();
+		if (hittingEntity)
+			colorF = colorHit.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
 		
 		for(Vec3d point : path)
@@ -126,7 +134,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		double renderX = end.x - camPos.x;
 		double renderY = end.y - camPos.y;
 		double renderZ = end.z - camPos.z;
+
 		float[] colorF = color.getColorF();
+		if (hittingEntity)
+			colorF = colorHit.getColorF();
 		
 		matrixStack.push();
 		matrixStack.translate(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
@@ -196,8 +207,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			RaycastContext bContext = new RaycastContext(lastPos, arrowPos,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player);
-			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS)
+			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS) {
+				hittingEntity = false;
 				break;
+			}
 			
 			// check for entity collision
 			Box box = new Box(lastPos, arrowPos);
@@ -205,8 +218,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			double maxDistSq = 64 * 64;
 			EntityHitResult eResult = ProjectileUtil.raycast(MC.player, lastPos,
 				arrowPos, box, predicate, maxDistSq);
-			if(eResult != null && eResult.getType() != HitResult.Type.MISS)
+			if(eResult != null && eResult.getType() != HitResult.Type.MISS){
+				hittingEntity = true;
 				break;
+			}
 		}
 		
 		return path;
