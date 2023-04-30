@@ -46,19 +46,24 @@ import net.wurstclient.util.RotationUtils;
 	"arrow trajectories", "bow trajectories"})
 public final class TrajectoriesHack extends Hack implements RenderListener
 {
-	private final ColorSetting color =
-		new ColorSetting("Color", "Color of the trajectory.", Color.GREEN);
-	private final ColorSetting colorHit =
-		new ColorSetting("Hit Color", "Color of the trajectory if it hits an entity.", Color.RED);
-
-	private boolean hittingEntity = false;
-
+	private final ColorSetting missColor = new ColorSetting("Miss Color",
+		"Color of the trajectory when it doesn't hit anything.", Color.GRAY);
+	
+	private final ColorSetting entityHitColor =
+		new ColorSetting("Entity Hit Color",
+			"Color of the trajectory when it hits an entity.", Color.RED);
+	
+	private final ColorSetting blockHitColor =
+		new ColorSetting("Block Hit Color",
+			"Color of the trajectory when it hits a block.", Color.GREEN);
+	
 	public TrajectoriesHack()
 	{
 		super("Trajectories");
 		setCategory(Category.RENDER);
-		addSetting(color);
-		addSetting(colorHit);
+		addSetting(missColor);
+		addSetting(entityHitColor);
+		addSetting(blockHitColor);
 	}
 	
 	@Override
@@ -85,15 +90,22 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		RenderUtils.applyCameraRotationOnly();
 		
-		ArrayList<Vec3d> path = getPath(partialTicks);
-		Vec3d camPos = RenderUtils.getCameraPos();
+		Trajectory trajectory = getTrajectory(partialTicks);
+		ArrayList<Vec3d> path = trajectory.path;
 		
-		drawLine(matrixStack, path, camPos);
+		ColorSetting color = switch(trajectory.type)
+		{
+			case MISS -> missColor;
+			case ENTITY -> entityHitColor;
+			case BLOCK -> blockHitColor;
+		};
+		
+		drawLine(matrixStack, path, color);
 		
 		if(!path.isEmpty())
 		{
 			Vec3d end = path.get(path.size() - 1);
-			drawEndOfLine(matrixStack, end, camPos);
+			drawEndOfLine(matrixStack, end, color);
 		}
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -105,8 +117,9 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	}
 	
 	private void drawLine(MatrixStack matrixStack, ArrayList<Vec3d> path,
-		Vec3d camPos)
+		ColorSetting color)
 	{
+		Vec3d camPos = RenderUtils.getCameraPos();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -114,10 +127,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
-
 		float[] colorF = color.getColorF();
-		if (hittingEntity)
-			colorF = colorHit.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
 		
 		for(Vec3d point : path)
@@ -129,15 +139,14 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		tessellator.draw();
 	}
 	
-	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end, Vec3d camPos)
+	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end,
+		ColorSetting color)
 	{
+		Vec3d camPos = RenderUtils.getCameraPos();
 		double renderX = end.x - camPos.x;
 		double renderY = end.y - camPos.y;
 		double renderZ = end.z - camPos.z;
-
 		float[] colorF = color.getColorF();
-		if (hittingEntity)
-			colorF = colorHit.getColorF();
 		
 		matrixStack.push();
 		matrixStack.translate(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
@@ -151,10 +160,14 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		matrixStack.pop();
 	}
 	
-	private ArrayList<Vec3d> getPath(float partialTicks)
+	private record Trajectory(ArrayList<Vec3d> path, HitResult.Type type)
+	{}
+	
+	private Trajectory getTrajectory(float partialTicks)
 	{
 		ClientPlayerEntity player = MC.player;
 		ArrayList<Vec3d> path = new ArrayList<>();
+		HitResult.Type type = HitResult.Type.MISS;
 		
 		// find the hand with a throwable item
 		Hand hand = Hand.MAIN_HAND;
@@ -166,7 +179,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			
 			// if neither hand has a throwable item, return empty path
 			if(!isThrowable(stack))
-				return path;
+				return new Trajectory(path, type);
 		}
 		
 		// calculate item-specific values
@@ -207,8 +220,9 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			RaycastContext bContext = new RaycastContext(lastPos, arrowPos,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player);
-			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS) {
-				hittingEntity = false;
+			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS)
+			{
+				type = HitResult.Type.BLOCK;
 				break;
 			}
 			
@@ -218,13 +232,14 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			double maxDistSq = 64 * 64;
 			EntityHitResult eResult = ProjectileUtil.raycast(MC.player, lastPos,
 				arrowPos, box, predicate, maxDistSq);
-			if(eResult != null && eResult.getType() != HitResult.Type.MISS){
-				hittingEntity = true;
+			if(eResult != null && eResult.getType() != HitResult.Type.MISS)
+			{
+				type = HitResult.Type.ENTITY;
 				break;
 			}
 		}
 		
-		return path;
+		return new Trajectory(path, type);
 	}
 	
 	private Vec3d getHandOffset(Hand hand, double yaw)
