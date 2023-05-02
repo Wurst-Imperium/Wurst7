@@ -86,6 +86,7 @@ public final class HackList implements UpdateListener
 	public final CrystalAuraHack crystalAuraHack = new CrystalAuraHack();
 	public final DerpHack derpHack = new DerpHack();
 	public final DolphinHack dolphinHack = new DolphinHack();
+	public final EmoteHack emoteHack = new EmoteHack();
 	public final ExcavatorHack excavatorHack = new ExcavatorHack();
 	public final ExtraElytraHack extraElytraHack = new ExtraElytraHack();
 	public final FancyChatHack fancyChatHack = new FancyChatHack();
@@ -162,6 +163,7 @@ public final class HackList implements UpdateListener
 	public final SkinDerpHack skinDerpHack = new SkinDerpHack();
 	public final SneakHack sneakHack = new SneakHack();
 	public final SnowShoeHack snowShoeHack = new SnowShoeHack();
+	public final SpambotHack spambotHack = new SpambotHack();
 	public final SpeedHackHack speedHackHack = new SpeedHackHack();
 	public final SpeedNukerHack speedNukerHack = new SpeedNukerHack();
 	public final SpiderHack spiderHack = new SpiderHack();
