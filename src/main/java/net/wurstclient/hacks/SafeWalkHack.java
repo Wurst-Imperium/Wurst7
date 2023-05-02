@@ -15,6 +15,8 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"safe walk"})
 public final class SafeWalkHack extends Hack
@@ -22,6 +24,11 @@ public final class SafeWalkHack extends Hack
 	private final CheckboxSetting sneak =
 		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
 	
+
+	private final SliderSetting maxDistance = new SliderSetting("Maximum Distance to Edge",
+		"How much \"safety\" offset is taken into account?\n\n" + "Good for making your speedbridging look legit.",
+		0.05, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
+
 	private boolean sneaking;
 	
 	public SafeWalkHack()
@@ -29,6 +36,7 @@ public final class SafeWalkHack extends Hack
 		super("SafeWalk");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
+		addSetting(maxDistance);
 	}
 	
 	@Override
@@ -58,6 +66,7 @@ public final class SafeWalkHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Box bb = player.getBoundingBox();
 		float stepHeight = player.stepHeight;
+		float dMaxDistance = maxDistance.getValueF();
 		
 		for(double x = -0.05; x <= 0.05; x += 0.05)
 			for(double z = -0.05; z <= 0.05; z += 0.05)
