@@ -3,15 +3,16 @@
   "id": "wurst",
   "version": "${version}",
 
-  "name": "Wurst Client",
-  "description": "Wurst Wurst Wurst!",
+  "name": "Tea Client",
+  "description": "K-Client v3, based on Wurst",
   "authors": [
-    "Alexander01998"
+    "Alexander01998",
+	"CherrySerenade"
   ],
   "contact": {
-    "homepage": "https://www.wurstclient.net/?utm_source=Wurst+Client&utm_medium=ModMenu&utm_content=Website",
-    "issues": "https://www.wurstclient.net/wurst7issues/",
-    "sources": "https://www.wurstclient.net/wurst7sources/"
+    "homepage": "https://github.com/CherryMods/Tea-Client",
+    "issues": "https://github.com/CherryMods/Tea-Client/issues",
+    "sources": "https://github.com/CherryMods/Tea-Client"
   },
 
   "license": "GPL-3.0-or-later",
