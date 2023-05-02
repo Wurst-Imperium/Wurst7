@@ -20,6 +20,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
@@ -27,6 +28,11 @@ import net.wurstclient.util.BlockUtils;
 public final class GlideHack extends Hack
 	implements UpdateListener, AirStrafingSpeedListener
 {
+	private final CheckboxSetting doSneakFall = new CheckboxSetting("Temporary Disable",
+			"Temporarily disable this hack using your crouch button.\n"
+			+ "Turn off if you want to glide while crouching.",
+			true);
+	
 	private final SliderSetting fallSpeed = new SliderSetting("Fall speed",
 		0.125, 0.005, 0.25, 0.005, ValueDisplay.DECIMAL);
 	
@@ -35,11 +41,11 @@ public final class GlideHack extends Hack
 			5, 0.05, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting minHeight = new SliderSetting("Min height",
-		"Won't glide when you are too close to the ground.", 0, 0, 2, 0.01,
-		ValueDisplay.DECIMAL.withLabel(0, "disabled"));
+		"Won't glide when you are\n" + "too close to the ground.", 0, 0, 2,
+		0.01,
+		v -> v == 0 ? "disabled" : ValueDisplay.DECIMAL.getValueString(v));
 	
-	public GlideHack()
-	{
+	public GlideHack() {
 		super("Glide");
 		
 		setCategory(Category.MOVEMENT);
@@ -49,22 +55,22 @@ public final class GlideHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
-	{
+	public void onEnable() {
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(AirStrafingSpeedListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
-	{
+	public void onDisable() {
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(AirStrafingSpeedListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
-	{
+	public void onUpdate() {
+		if (doSneakFall.isChecked() && MC.player.isSneaking()) //MC.options.keySneak.isPressed())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		Vec3d v = player.getVelocity();
 		
@@ -72,8 +78,7 @@ public final class GlideHack extends Hack
 			|| player.isClimbing() || v.y >= 0)
 			return;
 		
-		if(minHeight.getValue() > 0)
-		{
+		if(minHeight.getValue() > 0) {
 			Box box = player.getBoundingBox();
 			box = box.union(box.offset(0, -minHeight.getValue(), 0));
 			if(!MC.world.isSpaceEmpty(box))
