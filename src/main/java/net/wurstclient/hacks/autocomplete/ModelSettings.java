@@ -127,11 +127,7 @@ public final class ModelSettings
 			+ " for most language models.\n\n"
 			+ "\u00a7lNext Message\u00a7r works better with certain"
 			+ " code-optimized language models, which have a tendency to insert"
-			+ " line breaks in the middle of a chat message.\n\n"
-			+ "\u00a7lNOTE:\u00a7r Due to a limitation in the oobabooga API, the"
-			+ " stop sequence doesn't properly stop locally installed models."
-			+ " Instead, it waits for the model to finish and then cuts off"
-			+ " the rest of the text.",
+			+ " line breaks in the middle of a chat message.",
 		StopSequence.values(), StopSequence.LINE_BREAK);
 	
 	public enum StopSequence
