@@ -14,8 +14,8 @@ import net.wurstclient.command.Command;
 import net.wurstclient.hacks.SpambotHack;
 
 @SearchTags({"spambot", "chatspam", "spammer"})
-public final class SpambotCmd extends Command {
-	public SpambotCmd() {
+public final class SpamCmd extends Command {
+	public SpamCmd() {
 		super("spam", "Sets the message for the Spambot hack to use.\n",
 			".spam <message> \n\n"
 			+ "You can use:\n"
