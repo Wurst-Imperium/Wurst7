@@ -46,6 +46,7 @@ public final class CmdList
 	public final JumpCmd jumpCmd = new JumpCmd();
 	public final LeaveCmd leaveCmd = new LeaveCmd();
 	public final ModifyCmd modifyCmd = new ModifyCmd();
+	public final NameMCCmd nameMCCmd = new NameMCCmd();
 	public final PathCmd pathCmd = new PathCmd();
 	public final PotionCmd potionCmd = new PotionCmd();
 	public final ProtectCmd protectCmd = new ProtectCmd();
@@ -60,6 +61,7 @@ public final class CmdList
 	public final SetModeCmd setModeCmd = new SetModeCmd();
 	public final SetSliderCmd setSliderCmd = new SetSliderCmd();
 	public final SettingsCmd settingsCmd = new SettingsCmd();
+	public final SpamCmd spamCmd = new SpamCmd();
 	public final TacoCmd tacoCmd = new TacoCmd();
 	public final TCmd tCmd = new TCmd();
 	public final TooManyHaxCmd tooManyHaxCmd = new TooManyHaxCmd();
