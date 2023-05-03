@@ -7,25 +7,22 @@
  */
 package net.wurstclient.commands;
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.util.ChatUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public final class NameMCCmd extends Command {
-	private static final String mojangApiUrl =
-			"https://api.mojang.com/users/profiles/minecraft/";
-	private static final String namemcApiUrl =
-			"https://api.mojang.com/users/profiles/minecraft/";
+	private static final String sparkletScraperURL =
+			"https://sparklet.org/api/scrapegoat/namemc?username=";
 	private Gson gson = new Gson();
 	
 	public NameMCCmd() {
@@ -37,25 +34,27 @@ public final class NameMCCmd extends Command {
 		if (args.length < 1) throw new CmdSyntaxError();
 
 		final String target = String.join("", args);
-		final String uuid = playerNameToUUID(target);
-		final ArrayList<String> names; // ...and this is where I realized there is no NameMC API.
-		// at least, not for getting name history.
-	}
 
-	private String playerNameToUUID(String name) throws CmdException {
 		try {
-			return fetchJson(mojangApiUrl + name).get("id").getAsString();
+			final SparkletNameMCResponse query = fetchSparklet(target);
+			ChatUtils.message("Old Usernames:");
+			
+			for (String[] pair : query.nameHistory) {
+				ChatUtils.message(pair[1] + " | " + pair[0]);
+			}
+			
 		} catch (Exception e) {
-			throw new CmdError("Could not query Mojang API...");
+			e.printStackTrace();
+			throw new CmdError("Failed to fetch Sparklet for NameMC info");
 		}
 	}
 	
-	private JsonObject fetchJson(String target) throws Exception {
-		return parseJson(fetch(target));
+	private SparkletNameMCResponse fetchSparklet(String name) throws Exception {
+		return parseRes(fetch(sparkletScraperURL + name));
 	}
 	
-	private JsonObject parseJson(String input) {
-		return gson.fromJson(input, JsonObject.class);
+	private SparkletNameMCResponse parseRes(String input) {
+		return gson.fromJson(input, SparkletNameMCResponse.class);
 	}
 
 	private String fetch(String target) throws Exception {
@@ -74,5 +73,13 @@ public final class NameMCCmd extends Command {
 		in.close();
 
 		return response.toString();
+	}
+	
+
+	private class SparkletNameMCResponse {
+		public String[][] nameHistory;
+
+		// potentially more data here later
+		// we love feature creep! :D <3
 	}
 }
