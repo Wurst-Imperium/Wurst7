@@ -37,11 +37,20 @@ public final class NameMCCmd extends Command {
 
 		try {
 			final SparkletNameMCResponse query = fetchSparklet(target);
-			ChatUtils.message("Old Usernames:");
+			
+			ChatUtils.message(
+					"Currently having issues with CloudFlare anti-bot measures, so you'll " +
+					"have to visit the site manually. The link has been copied to your clipboard."
+			);
+			
+			MC.keyboard.setClipboard(query.nameHistory[0][1]);
+			
+			
+			/*ChatUtils.message("Old Usernames:");
 			
 			for (String[] pair : query.nameHistory) {
 				ChatUtils.message(pair[1] + " | " + pair[0]);
-			}
+			}*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
