@@ -15,7 +15,7 @@ public final class ApiProviderSetting
 	public ApiProviderSetting()
 	{
 		super("API provider",
-			"\u00a7lOpenAI\u00a7r lets you use models like GPT-3, but requires an"
+			"\u00a7lOpenAI\u00a7r lets you use models like ChatGPT, but requires an"
 				+ " account with API access, costs money to use and sends your chat"
 				+ " history to their servers. The name is a lie - it's closed"
 				+ " source.\n\n"
