@@ -28,6 +28,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.*;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -217,12 +218,15 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 				: RotationUtils.getEyesPos();
 			
 			// check for block collision
-			RaycastContext bContext = new RaycastContext(lastPos, arrowPos,
-				RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
-			if(MC.world.raycast(bContext).getType() != HitResult.Type.MISS)
+			BlockHitResult bResult =
+				MC.world.raycast(new RaycastContext(lastPos, arrowPos,
+					RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, MC.player));
+			if(bResult.getType() != HitResult.Type.MISS)
 			{
+				// replace last pos with the collision point
 				type = HitResult.Type.BLOCK;
+				path.set(path.size() - 1, bResult.getPos());
 				break;
 			}
 			
@@ -234,7 +238,9 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 				arrowPos, box, predicate, maxDistSq);
 			if(eResult != null && eResult.getType() != HitResult.Type.MISS)
 			{
+				// replace last pos with the collision point
 				type = HitResult.Type.ENTITY;
+				path.set(path.size() - 1, eResult.getPos());
 				break;
 			}
 		}
