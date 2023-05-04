@@ -9,6 +9,8 @@ package net.wurstclient.commands;
 
 import com.google.gson.Gson;
 
+import net.minecraft.util.Util;
+import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -39,12 +41,11 @@ public final class NameMCCmd extends Command {
 			final SparkletNameMCResponse query = fetchSparklet(target);
 			
 			ChatUtils.message(
-					"Currently having issues with CloudFlare anti-bot measures, so you'll " +
-					"have to visit the site manually. The link has been copied to your clipboard."
+					"Opening profile in the browser..."
 			);
 			
-			MC.keyboard.setClipboard(query.nameHistory[0][1]);
-			
+			String link = query.nameHistory[0][1];
+			Util.getOperatingSystem().open(link);
 			
 			/*ChatUtils.message("Old Usernames:");
 			
