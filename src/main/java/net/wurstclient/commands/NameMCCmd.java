@@ -8,9 +8,9 @@
 package net.wurstclient.commands;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import net.minecraft.util.Util;
-import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -21,14 +21,15 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 
 public final class NameMCCmd extends Command {
-	private static final String sparkletScraperURL =
-			"https://sparklet.org/api/scrapegoat/namemc?username=";
+	private static final String mojangAPI = "https://api.mojang.com/users/profiles/minecraft/";
+	
 	private Gson gson = new Gson();
 	
 	public NameMCCmd() {
-		super("namemc", "Does a lookup on NameMC and prints past names to chat.", ".namemc <username>");
+		super("namemc", "Quickly opens a user's NameMC profile.", ".namemc <username>");
 	}
 
 	@Override
@@ -38,33 +39,32 @@ public final class NameMCCmd extends Command {
 		final String target = String.join("", args);
 
 		try {
-			final SparkletNameMCResponse query = fetchSparklet(target);
+			final String uuid = fetchMojang(target);
 			
 			ChatUtils.message(
 					"Opening profile in the browser..."
 			);
 			
-			String link = query.nameHistory[0][1];
+			String link = "https://namemc.com/profile/" + uuid;
 			Util.getOperatingSystem().open(link);
 			
-			/*ChatUtils.message("Old Usernames:");
-			
-			for (String[] pair : query.nameHistory) {
-				ChatUtils.message(pair[1] + " | " + pair[0]);
-			}*/
-			
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CmdError("Failed to fetch Sparklet for NameMC info");
+			throw new CmdError("Failed to fetch profile");
 		}
 	}
 	
-	private SparkletNameMCResponse fetchSparklet(String name) throws Exception {
-		return parseRes(fetch(sparkletScraperURL + name));
+	private String fetchMojang(String name) throws Exception {
+		return parseRes(fetch(mojangAPI + name));
 	}
 	
-	private SparkletNameMCResponse parseRes(String input) {
-		return gson.fromJson(input, SparkletNameMCResponse.class);
+	private String parseRes(String input) {
+		JsonObject x = gson.fromJson(input, JsonObject.class);
+		
+		if (x.has("id")) {
+			return x.get("id").getAsString();
+		}
+		
+		return null;
 	}
 
 	private String fetch(String target) throws Exception {
@@ -83,13 +83,5 @@ public final class NameMCCmd extends Command {
 		in.close();
 
 		return response.toString();
-	}
-	
-
-	private class SparkletNameMCResponse {
-		public String[][] nameHistory;
-
-		// potentially more data here later
-		// we love feature creep! :D <3
 	}
 }
