@@ -74,10 +74,6 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 		String completion =
 			response.getArray("results").getObject(0).getString("text");
 		
-		// remove the extra character at the start
-		if(!completion.isEmpty())
-			completion = completion.substring(1);
-		
 		// remove newlines
 		completion = completion.replace("\n", " ");
 		

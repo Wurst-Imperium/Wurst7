@@ -61,6 +61,7 @@ public abstract class MessageCompleter
 		// add chat history
 		List<ChatHudLine.Visible> chatHistory =
 			MC.inGameHud.getChatHud().visibleMessages;
+		int messages = 0;
 		for(int i = chatHistory.size() - 1; i >= 0; i--)
 		{
 			// get message
@@ -72,9 +73,18 @@ public abstract class MessageCompleter
 			
 			// give non-player messages a sender to avoid confusing the model
 			if(!message.startsWith("<"))
-				message = "<System> " + message;
+				if(modelSettings.filterServerMessages.isChecked())
+					continue;
+				else
+					message = "<System> " + message;
+				
+			// limit context length to save tokens
+			if(messages >= modelSettings.contextLength.getValueI())
+				break;
 			
+			// add message to prompt
 			prompt += message + "\n";
+			messages++;
 		}
 		
 		// if the chat history is empty, add a dummy system message

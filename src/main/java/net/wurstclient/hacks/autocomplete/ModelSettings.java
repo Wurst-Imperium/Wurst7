@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
@@ -30,7 +31,7 @@ public final class ModelSettings
 			+ " powerful.\n\n"
 			+ "\u00a7lGPT-4\u00a7r is more powerful, but only works if OpenAI"
 			+ " has chosen you to be a beta tester. It can be anywhere from"
-			+ " 15x to 60x more expensive than ChatGPT. Probably not worth it.",
+			+ " 15x to 60x more expensive than ChatGPT.",
 		OpenAiModel.values(), OpenAiModel.GPT_3_5_TURBO);
 	
 	public enum OpenAiModel
@@ -156,10 +157,29 @@ public final class ModelSettings
 		}
 	}
 	
+	public final SliderSetting contextLength = new SliderSetting(
+		"Context length",
+		"Controls how many messages from the chat history are used to generate"
+			+ " predictions.\n\n"
+			+ "Higher values improve the quality of predictions, but also"
+			+ " increase the time it takes to generate them, as well as cost"
+			+ " (for OpenAI API users) or RAM usage (for oobabooga users).",
+		10, 0, 100, 1, ValueDisplay.INTEGER);
+	
+	public final CheckboxSetting filterServerMessages =
+		new CheckboxSetting("Filter server messages",
+			"Only shows player-made chat messages to the model.\n\n"
+				+ "This can help you save tokens and get more out of a low"
+				+ " context length, but it also means that the model will have"
+				+ " no idea about events like players joining, leaving, dying,"
+				+ " etc.",
+			false);
+	
 	private final List<Setting> settings =
 		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
 			temperature, topP, presencePenalty, frequencyPenalty,
-			repetitionPenalty, encoderRepetitionPenalty, stopSequence));
+			repetitionPenalty, encoderRepetitionPenalty, stopSequence,
+			contextLength, filterServerMessages));
 	
 	public void forEach(Consumer<Setting> action)
 	{
