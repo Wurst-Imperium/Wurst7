@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
@@ -94,6 +95,10 @@ public final class BowAimbotHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		// disable conflicting hacks
+		WURST.getHax().excavatorHack.setEnabled(false);
+		
+		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -240,6 +245,7 @@ public final class BowAimbotHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override
@@ -266,9 +272,11 @@ public final class BowAimbotHack extends Hack
 		else
 			message = "Target Locked";
 		
+		TextRenderer tr = MC.textRenderer;
+		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getWidth(message);
+		int msgWidth = tr.getWidth(message);
 		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
@@ -277,12 +285,14 @@ public final class BowAimbotHack extends Hack
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0).next();
 		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
 		bufferBuilder.vertex(matrix, 0, 10, 0).next();
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		context.drawText(MC.textRenderer, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
@@ -290,6 +300,7 @@ public final class BowAimbotHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private enum Priority

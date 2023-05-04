@@ -473,6 +473,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{

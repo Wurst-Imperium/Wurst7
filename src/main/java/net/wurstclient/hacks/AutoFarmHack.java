@@ -111,6 +111,7 @@ public final class AutoFarmHack extends Hack
 		
 		Stream.of(greenBuffer, cyanBuffer, redBuffer).filter(Objects::nonNull)
 			.forEach(VertexBuffer::close);
+		greenBuffer = cyanBuffer = redBuffer = null;
 	}
 	
 	@Override
