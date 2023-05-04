@@ -187,7 +187,7 @@ public final class EmoteHack extends Hack implements ChatOutputListener {
 	});
 
 	public EmoteHack() {
-		super("FancyChat");
+		super("Emojis");
 		setCategory(Category.CHAT);
 	}
 
