@@ -39,7 +39,7 @@ public class Tree implements AutoCloseable
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = new VertexBuffer();
+		vertexBuffer = new VertexBuffer(VertexBuffer.class_8555.STATIC);
 		
 		int regionX = (stump.getX() >> 9) * 512;
 		int regionZ = (stump.getZ() >> 9) * 512;

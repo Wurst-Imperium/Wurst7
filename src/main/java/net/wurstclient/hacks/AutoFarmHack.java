@@ -529,7 +529,7 @@ public final class AutoFarmHack extends Hack
 		if(greenBuffer != null)
 			greenBuffer.close();
 		
-		greenBuffer = new VertexBuffer();
+		greenBuffer = new VertexBuffer(VertexBuffer.class_8555.STATIC);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -552,7 +552,7 @@ public final class AutoFarmHack extends Hack
 		if(cyanBuffer != null)
 			cyanBuffer.close();
 		
-		cyanBuffer = new VertexBuffer();
+		cyanBuffer = new VertexBuffer(VertexBuffer.class_8555.STATIC);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -573,7 +573,7 @@ public final class AutoFarmHack extends Hack
 		if(redBuffer != null)
 			redBuffer.close();
 		
-		redBuffer = new VertexBuffer();
+		redBuffer = new VertexBuffer(VertexBuffer.class_8555.STATIC);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
