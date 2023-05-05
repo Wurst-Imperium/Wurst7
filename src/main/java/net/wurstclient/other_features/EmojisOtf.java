@@ -37,9 +37,23 @@ public final class EmojisOtf extends OtherFeature implements ChatOutputListener 
 	{
 		return active.isChecked();
 	}
+	
+	@Override
+	public String getPrimaryAction()
+	{
+		return isEnabled() ? "Disable" : "Enable";
+	}
+	
+	@Override
+	public void doPrimaryAction()
+	{
+		active.setChecked(!active.isChecked());
+	}
 
 	@Override
 	public void onSentMessage(ChatOutputEvent event) {
+		if (!isEnabled()) return;
+		
 		event.setMessage(replaceEmotes(event.getMessage()));
 	}
 
