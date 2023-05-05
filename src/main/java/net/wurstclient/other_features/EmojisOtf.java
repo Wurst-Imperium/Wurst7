@@ -25,7 +25,7 @@ public final class EmojisOtf extends OtherFeature implements ChatOutputListener 
 
 	public EmojisOtf() {
 		super("Emojis", "Turns stuff like :emoji: into the actual emoji.\n" +
-						"Check the source code for a list of all emojis.");
+						"Check the source code (in Options menu) for a list of all emojis.");
 		
 		addSetting(active);
 		
