@@ -5,19 +5,76 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.hacks;
+package net.wurstclient.other_features;
 
 import java.util.ArrayList;
 
-import net.wurstclient.Category;
+import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
-import net.wurstclient.hack.Hack;
+import net.wurstclient.other_feature.OtherFeature;
+import net.wurstclient.settings.CheckboxSetting;
 
+@DontBlock
 @SearchTags({
 	"emoji", "emote", "unicode", "discord", "twitch"
 })
-public final class EmoteHack extends Hack implements ChatOutputListener {
+public final class EmojisOtf extends OtherFeature implements ChatOutputListener {
+	private final CheckboxSetting active =
+			new CheckboxSetting("Active (replace sent emoji codes)", true);
+
+	public EmojisOtf() {
+		super("Emojis", "Turns stuff like :emoji: into the actual emoji.\n" +
+						"Check the source code for a list of all emojis.");
+		
+		addSetting(active);
+		
+		EVENTS.add(ChatOutputListener.class, this);
+	}
+	
+	@Override
+	public boolean isEnabled()
+	{
+		return active.isChecked();
+	}
+
+	@Override
+	public void onSentMessage(ChatOutputEvent event) {
+		event.setMessage(replaceEmotes(event.getMessage()));
+	}
+
+	private String replaceEmotes(String input) {
+		String res = input;
+		for (Pair<String> pair : EMOJI_TABLE) {
+			res = res.replaceAll(pair.getF(), pair.getS());
+		}
+
+		return res;
+	}
+
+	private static class Pair<T> {
+		private final T first;
+		private final T second;
+
+		public Pair(T f, T s) {
+			first = f;
+			second = s;
+		}
+
+		public T getF() { return first; }
+		public T getS() { return second; }
+
+		public static <T> ArrayList<Pair<T>> intoAL(T[] pairs) {
+			ArrayList<Pair<T>> res = new ArrayList<Pair<T>>();
+
+			for (int i=1; i<pairs.length; i += 2) {
+				res.add(new Pair<T>(pairs[i-1], pairs[i]));
+			}
+
+			return res;
+		}
+	}
+	
 	private static final ArrayList<Pair<String>> EMOJI_TABLE = Pair.intoAL(new String[] {
 		":smile:",			"☺",
 		":frown:",			"☹",
@@ -185,56 +242,4 @@ public final class EmoteHack extends Hack implements ChatOutputListener {
 		":sword:",			"🗡",
 		":pickaxe:",		"⛏️",
 	});
-
-	public EmoteHack() {
-		super("Emojis");
-		setCategory(Category.CHAT);
-	}
-
-	@Override
-	public void onEnable() {
-		EVENTS.add(ChatOutputListener.class, this);
-	}
-
-	@Override
-	public void onDisable() {
-		EVENTS.remove(ChatOutputListener.class, this);
-	}
-
-	@Override
-	public void onSentMessage(ChatOutputEvent event) {
-		event.setMessage(replaceEmotes(event.getMessage()));
-	}
-
-	private String replaceEmotes(String input) {
-		String res = input;
-		for (Pair<String> pair : EMOJI_TABLE) {
-			res = res.replaceAll(pair.getF(), pair.getS());
-		}
-
-		return res;
-	}
-
-	private static class Pair<T> {
-		private final T first;
-		private final T second;
-
-		public Pair(T f, T s) {
-			first = f;
-			second = s;
-		}
-
-		public T getF() { return first; }
-		public T getS() { return second; }
-
-		public static <T> ArrayList<Pair<T>> intoAL(T[] pairs) {
-			ArrayList<Pair<T>> res = new ArrayList<Pair<T>>();
-
-			for (int i=1; i<pairs.length; i += 2) {
-				res.add(new Pair<T>(pairs[i-1], pairs[i]));
-			}
-
-			return res;
-		}
-	}
 }
