@@ -7,48 +7,49 @@
  */
 package net.wurstclient.events;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.Entity;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
-import java.util.ArrayList;
-
 public interface VelocityFromEntityCollisionListener extends Listener
 {
-
-    public void onVelocityFromEntityCollision(VelocityFromEntityCollisionEvent event);
-
-    public static class VelocityFromEntityCollisionEvent
-        extends CancellableEvent<VelocityFromEntityCollisionListener>
-    {
-        private final Entity entity;
-
-        public VelocityFromEntityCollisionEvent(Entity entity)
-        {
-            this.entity = entity;
-        }
-
-        public Entity getEntity()
-        {
-            return entity;
-        }
-
-        @Override
-        public void fire(ArrayList<VelocityFromEntityCollisionListener> listeners)
-        {
-            for (VelocityFromEntityCollisionListener listener : listeners)
-            {
-                listener.onVelocityFromEntityCollision(this);
-
-                if (isCancelled())
-                    break;
-            }
-        }
-
-        @Override
-        public Class<VelocityFromEntityCollisionListener> getListenerType()
-        {
-            return VelocityFromEntityCollisionListener.class;
-        }
-    }
+	public void onVelocityFromEntityCollision(
+		VelocityFromEntityCollisionEvent event);
+	
+	public static class VelocityFromEntityCollisionEvent
+		extends CancellableEvent<VelocityFromEntityCollisionListener>
+	{
+		private final Entity entity;
+		
+		public VelocityFromEntityCollisionEvent(Entity entity)
+		{
+			this.entity = entity;
+		}
+		
+		public Entity getEntity()
+		{
+			return entity;
+		}
+		
+		@Override
+		public void fire(
+			ArrayList<VelocityFromEntityCollisionListener> listeners)
+		{
+			for(VelocityFromEntityCollisionListener listener : listeners)
+			{
+				listener.onVelocityFromEntityCollision(this);
+				
+				if(isCancelled())
+					break;
+			}
+		}
+		
+		@Override
+		public Class<VelocityFromEntityCollisionListener> getListenerType()
+		{
+			return VelocityFromEntityCollisionListener.class;
+		}
+	}
 }
