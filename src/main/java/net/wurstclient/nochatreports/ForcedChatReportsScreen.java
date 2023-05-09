@@ -111,8 +111,8 @@ public final class ForcedChatReportsScreen extends Screen
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredText(matrices, textRenderer, title, centerX,
-			titleY, 0xAAAAAA);
+		DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, title,
+			centerX, titleY, 0xAAAAAA);
 		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
 		
 		super.render(matrices, mouseX, mouseY, delta);

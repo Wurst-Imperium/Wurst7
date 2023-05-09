@@ -152,7 +152,7 @@ public final class NukerHack extends Hack
 		
 		currentBlock = null;
 		Vec3d eyesPos = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		double rangeSq = Math.pow(range.getValue(), 2);
 		int blockRange = (int)Math.ceil(range.getValue());
 		

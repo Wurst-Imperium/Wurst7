@@ -130,7 +130,7 @@ public final class TunnellerHack extends Hack
 		EVENTS.add(RenderListener.class, this);
 		
 		ClientPlayerEntity player = MC.player;
-		start = new BlockPos(player.getPos());
+		start = BlockPos.ofFloored(player.getPos());
 		direction = player.getHorizontalFacing();
 		length = 0;
 		lastTorch = null;
@@ -157,9 +157,14 @@ public final class TunnellerHack extends Hack
 			currentBlock = null;
 		}
 		
-		for(VertexBuffer buffer : vertexBuffers)
-			if(buffer != null)
-				buffer.close();
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			if(vertexBuffers[i] == null)
+				continue;
+			
+			vertexBuffers[i].close();
+			vertexBuffers[i] = null;
+		}
 	}
 	
 	@Override
@@ -364,7 +369,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			int distance = getDistance(player, base);
 			
@@ -379,7 +384,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			BlockPos from = offset(player, size.getSelected().from);
 			BlockPos to = offset(base, size.getSelected().to);
@@ -468,7 +473,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			
 			return getDistance(player, base) > 1;
@@ -492,7 +497,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos from = offsetFloor(player, size.getSelected().from);
 			BlockPos to = offsetFloor(player, size.getSelected().to);
 			
@@ -677,7 +682,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			KeyBinding forward = MC.options.forwardKey;
 			
 			Vec3d diffVec = Vec3d.of(player.subtract(start));
@@ -732,9 +737,12 @@ public final class TunnellerHack extends Hack
 			if(!torches.isChecked())
 			{
 				lastTorch = null;
-				nextTorch = new BlockPos(MC.player.getPos());
+				nextTorch = BlockPos.ofFloored(MC.player.getPos());
 				if(vertexBuffers[4] != null)
+				{
 					vertexBuffers[4].close();
+					vertexBuffers[4] = null;
+				}
 				return false;
 			}
 			
@@ -759,7 +767,7 @@ public final class TunnellerHack extends Hack
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0),
 				vertexBuffers[4]);
 			
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			if(getDistance(player, nextTorch) > 4)
 				return false;
 			

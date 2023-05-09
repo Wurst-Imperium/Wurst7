@@ -858,25 +858,22 @@ public enum RenderUtils
 	public static void drawItem(MatrixStack matrixStack, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-		
-		modelViewStack.push();
-		modelViewStack.translate(x, y, 0);
+		matrixStack.push();
+		matrixStack.translate(x, y, 0);
 		if(large)
-			modelViewStack.scale(1.5F, 1.5F, 1.5F);
+			matrixStack.scale(1.5F, 1.5F, 1.5F);
 		else
-			modelViewStack.scale(0.75F, 0.75F, 0.75F);
+			matrixStack.scale(0.75F, 0.75F, 0.75F);
 		
 		ItemStack renderStack =
 			stack.isEmpty() ? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
 		DiffuseLighting.enableGuiDepthLighting();
-		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
-			0, 0);
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(matrixStack,
+			renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		modelViewStack.pop();
-		RenderSystem.applyModelViewMatrix();
+		matrixStack.pop();
 		
 		if(stack.isEmpty())
 		{
@@ -889,6 +886,7 @@ public enum RenderUtils
 			TextRenderer fr = WurstClient.MC.textRenderer;
 			fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			GL11.glEnable(GL11.GL_BLEND);
 			
 			matrixStack.pop();
 		}

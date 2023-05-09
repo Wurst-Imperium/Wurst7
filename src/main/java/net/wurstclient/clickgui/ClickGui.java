@@ -179,8 +179,8 @@ public final class ClickGui
 				continue;
 			
 			JsonObject jsonWindow = new JsonObject();
-			jsonWindow.addProperty("x", window.getX());
-			jsonWindow.addProperty("y", window.getY());
+			jsonWindow.addProperty("x", window.getActualX());
+			jsonWindow.addProperty("y", window.getActualY());
 			jsonWindow.addProperty("minimized", window.isMinimized());
 			jsonWindow.addProperty("pinned", window.isPinned());
 			json.add(window.getTitle(), jsonWindow);
@@ -581,6 +581,7 @@ public final class ClickGui
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for(int i = 0; i < lines.length; i++)
 			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
 				txtColor);

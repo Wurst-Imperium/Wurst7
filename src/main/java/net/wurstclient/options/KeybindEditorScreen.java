@@ -64,8 +64,8 @@ public final class KeybindEditorScreen extends Screen
 			200, 20, Text.literal(""));
 		commandField.setMaxLength(65536);
 		addSelectableChild(commandField);
-		setInitialFocus(commandField);
-		commandField.setTextFieldFocused(true);
+		setFocused(commandField);
+		commandField.setFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -99,14 +99,14 @@ public final class KeybindEditorScreen extends Screen
 	{
 		renderBackground(matrixStack);
 		
-		drawCenteredText(matrixStack, textRenderer,
+		drawCenteredTextWithShadow(matrixStack, textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		drawStringWithShadow(matrixStack, textRenderer,
+		drawTextWithShadow(matrixStack, textRenderer,
 			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
 		
 		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
