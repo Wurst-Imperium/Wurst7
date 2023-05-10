@@ -207,7 +207,11 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -239,10 +243,6 @@ public final class TunnellerHack extends Hack
 			float p = prevProgress + (progress - prevProgress) * partialTicks;
 			float red = p * 2F;
 			float green = 2 - red;
-			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
 			
 			matrixStack.translate(currentBlock.getX() - regionX,
 				currentBlock.getY(), currentBlock.getZ() - regionZ);

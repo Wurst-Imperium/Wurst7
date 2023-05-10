@@ -105,11 +105,11 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		renderBoxes(matrixStack, partialTicks, regionX, regionZ);
 		

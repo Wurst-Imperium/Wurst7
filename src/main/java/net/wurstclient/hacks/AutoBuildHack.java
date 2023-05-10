@@ -362,11 +362,11 @@ public final class AutoBuildHack extends Hack
 		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		int blocksDrawn = 0;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);

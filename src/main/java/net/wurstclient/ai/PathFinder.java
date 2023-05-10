@@ -563,11 +563,12 @@ public class PathFinder
 		GL11.glDepthMask(false);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		
 		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)

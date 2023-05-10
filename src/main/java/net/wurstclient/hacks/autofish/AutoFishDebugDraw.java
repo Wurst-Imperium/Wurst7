@@ -79,14 +79,13 @@ public final class AutoFishDebugDraw
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
+		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
 		if(bobber != null && validRangeBox != null)
 			drawValidRange(matrixStack, bobber, regionX, regionZ);
 		
