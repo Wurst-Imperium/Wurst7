@@ -20,6 +20,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.TameableEntity;
@@ -198,6 +199,11 @@ public final class FeedAuraHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
+		float p = 1;
+		LivingEntity le = renderTarget;
+		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
+		float green = p * 2F;
+		float red = 2 - green;
 		
 		matrixStack.translate(
 			MathHelper.lerp(partialTicks, renderTarget.prevX,
@@ -212,12 +218,16 @@ public final class FeedAuraHack extends Hack
 			renderTarget.getWidth());
 		matrixStack.translate(-0.5, 0, -0.5);
 		
+		matrixStack.translate(0.5, 0.5, 0.5);
+		matrixStack.scale(p, p, p);
+		matrixStack.translate(-0.5, -0.5, -0.5);
+		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		RenderSystem.setShaderColor(1, 0, 0, 0.25F);
+		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);
 		
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();
