@@ -201,6 +201,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 				.getAdditionalJumpMotion();
 	}
 	
+	/**
+	 * This is the part that makes SafeWalk work.
+	 */
 	@Override
 	protected boolean clipAtLedge()
 	{
@@ -208,6 +211,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
+	/**
+	 * This mixin allows SafeWalk to sneak visibly when the player is
+	 * near a ledge.
+	 */
 	@Override
 	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
 	{

@@ -87,7 +87,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		
 		RenderUtils.applyCameraRotationOnly();
 		
@@ -113,7 +112,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		matrixStack.pop();
 	}
 	

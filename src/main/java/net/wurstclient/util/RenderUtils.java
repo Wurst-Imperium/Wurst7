@@ -77,6 +77,16 @@ public enum RenderUtils
 	}
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack,
+		int regionX, int regionZ)
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
+		matrixStack.translate(regionX - camPos.x, -camPos.y,
+			regionZ - camPos.z);
+	}
+	
+	public static void applyRegionalRenderOffset(MatrixStack matrixStack,
 		Chunk chunk)
 	{
 		applyCameraRotationOnly();
