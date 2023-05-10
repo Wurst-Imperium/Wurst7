@@ -291,8 +291,8 @@ public final class InstantBunkerHack extends Hack
 			BlockPos pos = positions.get(i);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX,
-				pos.getY(), pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -304,6 +304,7 @@ public final class InstantBunkerHack extends Hack
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}

@@ -183,12 +183,15 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			Vec3d end = e.getBoundingBox().getCenter()
 				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
 					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks)).subtract(regionX, 0, regionZ);
+					.multiply(1 - partialTicks))
+				.subtract(regionX, 0, regionZ);
 			
-			bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
-				(float)start.z).next();
-			bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
-				(float)end.z).next();
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.next();
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.next();
 		}
 		tessellator.draw();
 	}

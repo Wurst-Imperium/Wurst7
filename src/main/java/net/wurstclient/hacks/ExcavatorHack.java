@@ -181,8 +181,8 @@ public final class ExcavatorHack extends Hack
 					BlockPos pos = area.blocksList.get(i);
 					
 					matrixStack.push();
-					matrixStack.translate(pos.getX() - regionX,
-						pos.getY(), pos.getZ() - regionZ);
+					matrixStack.translate(pos.getX() - regionX, pos.getY(),
+						pos.getZ() - regionZ);
 					matrixStack.translate(-0.005, -0.005, -0.005);
 					matrixStack.scale(1.01F, 1.01F, 1.01F);
 					
@@ -196,8 +196,8 @@ public final class ExcavatorHack extends Hack
 				}
 			
 			matrixStack.push();
-			matrixStack.translate(area.minX + offset - regionX, area.minY + offset,
-				area.minZ + offset - regionZ);
+			matrixStack.translate(area.minX + offset - regionX,
+				area.minY + offset, area.minZ + offset - regionZ);
 			matrixStack.scale(area.sizeX + scale, area.sizeY + scale,
 				area.sizeZ + scale);
 			
@@ -256,8 +256,8 @@ public final class ExcavatorHack extends Hack
 			
 			// area box
 			matrixStack.push();
-			matrixStack.translate(preview.minX + offset - regionX, preview.minY + offset,
-				preview.minZ + offset - regionZ);
+			matrixStack.translate(preview.minX + offset - regionX,
+				preview.minY + offset, preview.minZ + offset - regionZ);
 			matrixStack.scale(preview.sizeX + scale, preview.sizeY + scale,
 				preview.sizeZ + scale);
 			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
@@ -271,8 +271,8 @@ public final class ExcavatorHack extends Hack
 		if(posLookingAt != null)
 		{
 			matrixStack.push();
-			matrixStack.translate(posLookingAt.getX() - regionX, posLookingAt.getY(),
-				posLookingAt.getZ() - regionZ);
+			matrixStack.translate(posLookingAt.getX() - regionX,
+				posLookingAt.getY(), posLookingAt.getZ() - regionZ);
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -290,8 +290,8 @@ public final class ExcavatorHack extends Hack
 		if(currentBlock != null)
 		{
 			// set position
-			matrixStack.translate(currentBlock.getX() - regionX, currentBlock.getY(),
-				currentBlock.getZ() - regionZ);
+			matrixStack.translate(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			
 			// get progress
 			float progress;

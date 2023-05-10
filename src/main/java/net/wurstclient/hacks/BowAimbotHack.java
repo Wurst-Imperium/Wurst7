@@ -217,8 +217,8 @@ public final class BowAimbotHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		// set position
-		matrixStack.translate(target.getX() - regionX,
-			target.getY(), target.getZ() - regionZ);
+		matrixStack.translate(target.getX() - regionX, target.getY(),
+			target.getZ() - regionZ);
 		
 		// set size
 		float boxWidth = target.getWidth() + 0.1F;

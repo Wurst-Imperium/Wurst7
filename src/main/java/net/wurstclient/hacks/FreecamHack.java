@@ -208,10 +208,10 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		// line
-		Vec3d start = RotationUtils.getClientLookVec().
-			add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
-		Vec3d end = fakePlayer.getBoundingBox().getCenter()
-			.subtract(regionX, 0, regionZ);
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionX, 0,
+			regionZ);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
@@ -230,6 +230,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);

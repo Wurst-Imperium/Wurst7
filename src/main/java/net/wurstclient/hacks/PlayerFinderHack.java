@@ -108,8 +108,8 @@ public final class PlayerFinderHack extends Hack
 			VertexFormats.POSITION);
 		
 		// set start position
-		Vec3d start = RotationUtils.getClientLookVec().
-			add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 		
 		// set end position
 		Vec3d end = Vec3d.ofCenter(pos).subtract(regionX, 0, regionZ);
@@ -141,6 +141,7 @@ public final class PlayerFinderHack extends Hack
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);

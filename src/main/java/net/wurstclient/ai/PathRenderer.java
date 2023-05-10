@@ -98,7 +98,8 @@ public final class PathRenderer
 		tessellator.draw();
 	}
 	
-	public static void renderNode(MatrixStack matrixStack, BlockPos pos, int regionX, int regionZ)
+	public static void renderNode(MatrixStack matrixStack, BlockPos pos,
+		int regionX, int regionZ)
 	{
 		matrixStack.push();
 		
