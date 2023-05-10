@@ -427,7 +427,7 @@ public final class SearchHack extends Hack
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.class_8555.STATIC);
+		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
