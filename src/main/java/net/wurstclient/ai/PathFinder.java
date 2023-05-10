@@ -563,7 +563,11 @@ public class PathFinder
 		GL11.glDepthMask(false);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
@@ -577,7 +581,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(matrixStack, element);
+				PathRenderer.renderNode(matrixStack, element, regionX, regionZ);
 				renderedThings++;
 			}
 			
@@ -593,7 +597,7 @@ public class PathFinder
 					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
 				PathRenderer.renderArrow(matrixStack, entry.getValue(),
-					entry.getKey());
+					entry.getKey(), regionX, regionZ);
 				renderedThings++;
 			}
 		}
@@ -604,7 +608,8 @@ public class PathFinder
 		else
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1),
+				regionX, regionZ);
 		
 		matrixStack.pop();
 		

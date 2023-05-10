@@ -192,7 +192,11 @@ public final class FeedAuraHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -203,11 +207,11 @@ public final class FeedAuraHack extends Hack
 		
 		matrixStack.translate(
 			MathHelper.lerp(partialTicks, renderTarget.prevX,
-				renderTarget.getX()),
+				renderTarget.getX()) - regionX,
 			MathHelper.lerp(partialTicks, renderTarget.prevY,
 				renderTarget.getY()),
 			MathHelper.lerp(partialTicks, renderTarget.prevZ,
-				renderTarget.getZ()));
+				renderTarget.getZ()) - regionZ);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
