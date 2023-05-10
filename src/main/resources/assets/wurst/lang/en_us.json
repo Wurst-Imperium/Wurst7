@@ -128,7 +128,6 @@
   "description.wurst.hack.panic": "Instantly turns off all enabled hacks.\nBe careful with this one!",
   "description.wurst.hack.parkour": "Makes you jump automatically when reaching the edge of a block.\nUseful for parkours and jump'n'runs.",
   "description.wurst.hack.playeresp": "Highlights nearby players.\nESP boxes of friends will appear in blue.",
-  "description.wurst.hack.playerfinder": "Finds far away players during thunderstorms.",
   "description.wurst.hack.portalgui": "Allows you to open GUIs in portals.",
   "description.wurst.hack.potionsaver": "Freezes all potion effects while you are standing still.",
   "description.wurst.hack.prophuntesp": "Allows you to see fake blocks in Prophunt.\nMade for Mineplex Prophunt. Might not work on other servers.",
