@@ -19,18 +19,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
@@ -46,7 +40,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 public final class NukerHack extends Hack
@@ -86,9 +80,8 @@ public final class NukerHack extends Hack
 		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
+	private final OverlayRenderer renderer = new OverlayRenderer();
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
 	
 	public NukerHack()
 	{
@@ -136,6 +129,7 @@ public final class NukerHack extends Hack
 		}
 		
 		prevBlocks.clear();
+		renderer.resetProgress();
 		
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -144,13 +138,13 @@ public final class NukerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		currentBlock = null;
+		
 		// abort if using IDNuker without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		
-		currentBlock = null;
 		Vec3d eyesPos = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
 		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		double rangeSq = Math.pow(range.getValue(), 2);
@@ -186,8 +180,7 @@ public final class NukerHack extends Hack
 				currentBlock = blocks3.get(0);
 			
 			MC.interactionManager.cancelBlockBreaking();
-			progress = 1;
-			prevProgress = 1;
+			renderer.resetProgress();
 			BlockBreaker.breakBlocksWithPacketSpam(blocks3);
 			return;
 		}
@@ -203,18 +196,9 @@ public final class NukerHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 		
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
-		{
-			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
-			
-		}else
-		{
-			progress = 1;
-			prevProgress = 1;
-		}
+			renderer.updateProgress();
+		else
+			renderer.resetProgress();
 	}
 	
 	@Override
@@ -238,50 +222,7 @@ public final class NukerHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(currentBlock == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
-		
-		Box box = new Box(BlockPos.ORIGIN);
-		float p = prevProgress + (progress - prevProgress) * partialTicks;
-		float red = p * 2F;
-		float green = 2 - red;
-		
-		matrixStack.translate(currentBlock.getX() - regionX,
-			currentBlock.getY(), currentBlock.getZ() - regionZ);
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box, matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		renderer.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private enum Mode
