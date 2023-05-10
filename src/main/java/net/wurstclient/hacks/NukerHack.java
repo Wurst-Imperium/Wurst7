@@ -140,6 +140,10 @@ public final class NukerHack extends Hack
 	{
 		currentBlock = null;
 		
+		// abort if user is mining manually
+		if(MC.options.attackKey.isPressed())
+			return;
+		
 		// abort if using IDNuker without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
