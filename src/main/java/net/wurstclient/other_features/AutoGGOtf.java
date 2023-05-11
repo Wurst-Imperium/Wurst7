@@ -60,7 +60,7 @@ public final class AutoGGOtf extends OtherFeature implements ChatInputListener, 
 		if (!isEnabled()) return;
 		String message = event.getComponent().getString();
 		if (message.startsWith(GAME_START_MSG)) {
-			debounce = DEBOUNCE_LENGTH * 50;
+			debounce = DEBOUNCE_LENGTH * 3;
 			return;
 		}
 		
@@ -70,7 +70,7 @@ public final class AutoGGOtf extends OtherFeature implements ChatInputListener, 
 		// or the debounce is not active, 
 		if (lastMessageWasEmpty && message.contains(END_LINE) && !(debounce > 0)) {
 			// send gg and reset debounce
-			MC.getNetworkHandler().sendChatMessage(ggMessage);
+			MC.getNetworkHandler().sendChatMessage("/ac " + ggMessage);
 			debounce = DEBOUNCE_LENGTH;
 		}
 
