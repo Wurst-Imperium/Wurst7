@@ -22,7 +22,7 @@ public final class AutoGGOtf extends OtherFeature implements ChatInputListener, 
 	// that long bar message sent when a game ends
 	private final String END_LINE = "▬".repeat(64);
 	private final String GAME_START_MSG = "The game starts in ";
-	private final int DEBOUNCE_LENGTH = 400;
+	private final int DEBOUNCE_LENGTH = 40;
 	private int debounce = 0;
 	private boolean lastMessageWasEmpty = false;
 
