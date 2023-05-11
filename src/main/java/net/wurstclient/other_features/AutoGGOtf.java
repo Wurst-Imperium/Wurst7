@@ -56,6 +56,7 @@ public final class AutoGGOtf extends OtherFeature implements ChatInputListener, 
 
 	@Override
 	public void onReceivedMessage(ChatInputEvent event) {
+		if (!isEnabled()) return;
 		String message = event.getComponent().getString();
 		
 		boolean currentMessageEmpty = message.trim().equals("");
