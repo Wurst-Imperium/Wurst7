@@ -21,6 +21,7 @@ import net.wurstclient.settings.CheckboxSetting;
 public final class AutoGGOtf extends OtherFeature implements ChatInputListener, UpdateListener {
 	// that long bar message sent when a game ends
 	private final String END_LINE = "▬".repeat(64);
+	private final String GAME_START_MSG = "The game starts in ";
 	private final int DEBOUNCE_LENGTH = 400;
 	private int debounce = 0;
 	private boolean lastMessageWasEmpty = false;
@@ -58,6 +59,10 @@ public final class AutoGGOtf extends OtherFeature implements ChatInputListener, 
 	public void onReceivedMessage(ChatInputEvent event) {
 		if (!isEnabled()) return;
 		String message = event.getComponent().getString();
+		if (message.startsWith(GAME_START_MSG)) {
+			debounce = DEBOUNCE_LENGTH * 50;
+			return;
+		}
 		
 		boolean currentMessageEmpty = message.trim().equals("");
 		
