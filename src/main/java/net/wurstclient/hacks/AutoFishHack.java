@@ -39,7 +39,8 @@ public final class AutoFishHack extends Hack
 	private int castRodTimer;
 	private int reelInTimer;
 	
-	private final AutoFishDebugDraw debugDraw = new AutoFishDebugDraw();
+	private final AutoFishDebugDraw debugDraw =
+		new AutoFishDebugDraw(validRange);
 	private final AutoFishRodSelector rodSelector = new AutoFishRodSelector();
 	
 	private boolean wasOpenWater;
@@ -80,8 +81,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		debugDraw.updateValidRange(validRange.getValue());
-		
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
