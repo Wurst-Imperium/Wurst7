@@ -89,24 +89,28 @@ public enum InventoryUtils
 		int slot = stream.filter(i -> predicate.test(inventory.getStack(i)))
 			.findFirst().orElse(-1);
 		
-		// if no item was found, return false
-		if(slot == -1)
-			return false;
-		
-		selectItem(slot);
-		return true;
+		return selectItem(slot);
 	}
 	
 	/**
-	 * Moves the item in the given slot to {@code inventory.selectedSlot}.
+	 * Moves the item in the given slot to {@code inventory.selectedSlot}. If
+	 * the given slot is negative, this method will do nothing and return
+	 * {@code false}.
 	 *
 	 * @param slot
 	 *            the slot of the item to select
+	 * @return {@code true} if the item was moved. This does not necessarily
+	 *         mean that the item is now in the selected slot, it could still be
+	 *         on its way there.
 	 */
-	public static void selectItem(int slot)
+	public static boolean selectItem(int slot)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		// if the slot is negative, abort and return false
+		if(slot < 0)
+			return false;
 		
 		// if the item is already in the hotbar, just select it
 		if(slot < 9)
@@ -118,5 +122,7 @@ public enum InventoryUtils
 		// otherwise, swap with the currently selected item
 		else
 			im.windowClick_SWAP(slot, inventory.selectedSlot);
+		
+		return true;
 	}
 }
