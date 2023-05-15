@@ -10,8 +10,7 @@ package net.wurstclient.hacks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.item.FishingRodItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.wurstclient.Category;
@@ -27,7 +26,9 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChatUtils;
 
-@SearchTags({"FishBot", "auto fish", "fish bot", "fishing"})
+@SearchTags({"AutoFishing", "auto fishing", "AutoFisher", "auto fisher",
+	"AFKFishBot", "afk fish bot", "AFKFishingBot", "afk fishing bot",
+	"AFKFisherBot", "afk fisher bot"})
 public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
@@ -36,13 +37,13 @@ public final class AutoFishHack extends Hack
 			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
-	private int castRodTimer;
-	private int reelInTimer;
-	
 	private final AutoFishDebugDraw debugDraw =
 		new AutoFishDebugDraw(validRange);
 	private final AutoFishRodSelector rodSelector =
 		new AutoFishRodSelector(this);
+	
+	private int castRodTimer;
+	private int reelInTimer;
 	
 	private boolean wasOpenWater;
 	
@@ -92,6 +93,9 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		// update timers
+		if(castRodTimer > 0)
+			castRodTimer--;
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
@@ -102,27 +106,23 @@ public final class AutoFishHack extends Hack
 			return;
 		}
 		
-		// wait for timer
-		if(castRodTimer > 0)
+		// if not fishing, cast rod
+		if(!isFishing())
 		{
-			castRodTimer--;
+			if(castRodTimer > 0)
+				return;
+			
+			IMC.rightClick();
+			castRodTimer = 15;
+			reelInTimer = 1200;
 			return;
 		}
 		
-		// cast rod
-		ClientPlayerEntity player = MC.player;
-		if(player.fishHook == null || player.fishHook.isRemoved())
-		{
-			rightClick();
-			castRodTimer = 15;
-			reelInTimer = 1200;
-		}
-		
-		// reel in after 60s
+		// otherwise, reel in when it's time
 		if(reelInTimer == 0)
 		{
 			reelInTimer--;
-			rightClick();
+			IMC.rightClick();
 			castRodTimer = 15;
 		}
 	}
@@ -130,10 +130,7 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onReceivedPacket(PacketInputEvent event)
 	{
-		ClientPlayerEntity player = MC.player;
-		if(player == null || player.fishHook == null)
-			return;
-		
+		// check packet type
 		if(!(event.getPacket() instanceof PlaySoundS2CPacket))
 			return;
 		
@@ -143,16 +140,26 @@ public final class AutoFishHack extends Hack
 			.equals(sound.getSound().value()))
 			return;
 		
+		// check if player is fishing
+		if(!isFishing())
+			return;
+		
+		// check if player is holding a fishing rod
+		ClientPlayerEntity player = MC.player;
+		if(!player.getMainHandStack().isOf(Items.FISHING_ROD))
+			return;
+		
 		debugDraw.updateSoundPos(sound);
 		
-		// check position
+		// check sound position
 		FishingBobberEntity bobber = player.fishHook;
 		if(Math.abs(sound.getX() - bobber.getX()) > validRange.getValue()
 			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
 			return;
 		
 		// check open water
-		boolean isOpenWater = isInOpenWater(bobber);
+		boolean isOpenWater = ((IFishingBobberEntity)bobber)
+			.checkOpenWaterAround(bobber.getBlockPos());
 		if(!isOpenWater && wasOpenWater)
 		{
 			ChatUtils.warning("You are currently fishing in shallow water.");
@@ -162,33 +169,23 @@ public final class AutoFishHack extends Hack
 			if(!WURST.getHax().openWaterEspHack.isEnabled())
 				ChatUtils.message("Use OpenWaterESP to find open water.");
 		}
+		wasOpenWater = isOpenWater;
 		
 		// catch fish
-		rightClick();
+		reelInTimer = 0;
 		castRodTimer = 15;
-		wasOpenWater = isOpenWater;
-	}
-	
-	private boolean isInOpenWater(FishingBobberEntity bobber)
-	{
-		return ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
-	}
-	
-	private void rightClick()
-	{
-		// check held item
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
-			return;
-		
-		// right click
-		IMC.rightClick();
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		debugDraw.render(matrixStack, partialTicks);
+	}
+	
+	private boolean isFishing()
+	{
+		ClientPlayerEntity player = MC.player;
+		return player != null && player.fishHook != null
+			&& !player.fishHook.isRemoved();
 	}
 }
