@@ -31,6 +31,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
@@ -85,7 +86,7 @@ public final class AutoFishDebugDraw
 		
 		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
 		if(bobber != null)
-			drawValidRange(matrixStack, bobber, regionX, regionZ);
+			drawValidRange(matrixStack, partialTicks, bobber, regionX, regionZ);
 		
 		if(lastSoundPos != null)
 			drawLastBite(matrixStack, regionX, regionZ);
@@ -98,12 +99,13 @@ public final class AutoFishDebugDraw
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void drawValidRange(MatrixStack matrixStack,
+	private void drawValidRange(MatrixStack matrixStack, float partialTicks,
 		FishingBobberEntity bobber, int regionX, int regionZ)
 	{
 		matrixStack.push();
-		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
-			bobber.getZ() - regionZ);
+		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks);
+		matrixStack.translate(pos.getX() - regionX, pos.getY(),
+			pos.getZ() - regionZ);
 		
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
