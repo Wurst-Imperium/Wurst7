@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks.autofish;
 
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.minecraft.client.MinecraftClient;
@@ -66,8 +67,12 @@ public final class AutoFishRodSelector
 		bestRodValue = getRodValue(selectedStack);
 		bestRodSlot = bestRodValue > -1 ? selectedSlot : -1;
 		
+		// create a stream of all slots that we want to search
+		IntStream stream = IntStream.range(0, 36);
+		stream = IntStream.concat(stream, IntStream.of(40));
+		
 		// search inventory for better rod
-		for(int slot = 0; slot < 36; slot++)
+		for(int slot : stream.toArray())
 		{
 			ItemStack stack = inventory.getStack(slot);
 			int rodValue = getRodValue(stack);
