@@ -118,11 +118,29 @@ public enum InventoryUtils
 		// if there is an empty slot in the hotbar, shift-click the item there
 		// it will be selected in the next tick
 		else if(inventory.getEmptySlot() > -1 && inventory.getEmptySlot() < 9)
-			im.windowClick_QUICK_MOVE(slot);
+			im.windowClick_QUICK_MOVE(toNetworkSlot(slot));
 		// otherwise, swap with the currently selected item
 		else
-			im.windowClick_SWAP(slot, inventory.selectedSlot);
+			im.windowClick_SWAP(toNetworkSlot(slot), inventory.selectedSlot);
 		
 		return true;
+	}
+	
+	private static int toNetworkSlot(int slot)
+	{
+		// hotbar
+		if(slot >= 0 && slot < 9)
+			return slot + 36;
+		
+		// armor
+		if(slot >= 36 && slot < 40)
+			return 44 - slot;
+		
+		// offhand
+		if(slot == 40)
+			return 45;
+		
+		// everything else
+		return slot;
 	}
 }
