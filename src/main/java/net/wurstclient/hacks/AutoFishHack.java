@@ -84,15 +84,6 @@ public final class AutoFishHack extends Hack
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
-		ClientPlayerEntity player = MC.player;
-		
-		if(rodSelector.hasScheduledClick())
-		{
-			rodSelector.doScheduledClick();
-			castRodTimer = 15;
-			return;
-		}
-		
 		rodSelector.updateBestRod();
 		
 		if(!rodSelector.hasARod())
@@ -116,6 +107,7 @@ public final class AutoFishHack extends Hack
 		}
 		
 		// cast rod
+		ClientPlayerEntity player = MC.player;
 		if(player.fishHook == null || player.fishHook.isRemoved())
 		{
 			rightClick();

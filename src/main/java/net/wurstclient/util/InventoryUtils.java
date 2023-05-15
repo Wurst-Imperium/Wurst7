@@ -79,7 +79,6 @@ public enum InventoryUtils
 		int maxInvSlot, boolean takeFromOffhand)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		// create a stream of all slots that we want to search
 		IntStream stream = IntStream.range(0, maxInvSlot);
@@ -94,6 +93,21 @@ public enum InventoryUtils
 		if(slot == -1)
 			return false;
 		
+		selectItem(slot);
+		return true;
+	}
+	
+	/**
+	 * Moves the item in the given slot to {@code inventory.selectedSlot}.
+	 *
+	 * @param slot
+	 *            the slot of the item to select
+	 */
+	public static void selectItem(int slot)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
 		// if the item is already in the hotbar, just select it
 		if(slot < 9)
 			inventory.selectedSlot = slot;
@@ -104,7 +118,5 @@ public enum InventoryUtils
 		// otherwise, swap with the currently selected item
 		else
 			im.windowClick_SWAP(slot, inventory.selectedSlot);
-		
-		return false;
 	}
 }

@@ -14,34 +14,19 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.util.InventoryUtils;
 
 public final class AutoFishRodSelector
 {
 	private static final MinecraftClient MC = WurstClient.MC;
-	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	private int bestRodValue;
 	private int bestRodSlot;
-	
-	private int scheduledWindowClick;
 	
 	public void reset()
 	{
 		bestRodValue = -1;
 		bestRodSlot = -1;
-		scheduledWindowClick = -1;
-	}
-	
-	public boolean hasScheduledClick()
-	{
-		return scheduledWindowClick != -1;
-	}
-	
-	public void doScheduledClick()
-	{
-		IMC.getInteractionManager().windowClick_PICKUP(scheduledWindowClick);
-		scheduledWindowClick = -1;
 	}
 	
 	public void updateBestRod()
@@ -80,32 +65,7 @@ public final class AutoFishRodSelector
 	
 	public void selectBestRod()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		
-		if(bestRodSlot < 9)
-		{
-			inventory.selectedSlot = bestRodSlot;
-			return;
-		}
-		
-		int firstEmptySlot = inventory.getEmptySlot();
-		
-		if(firstEmptySlot != -1)
-		{
-			if(firstEmptySlot >= 9)
-				IMC.getInteractionManager()
-					.windowClick_QUICK_MOVE(36 + inventory.selectedSlot);
-			
-			IMC.getInteractionManager().windowClick_QUICK_MOVE(bestRodSlot);
-			
-		}else
-		{
-			IMC.getInteractionManager().windowClick_PICKUP(bestRodSlot);
-			IMC.getInteractionManager()
-				.windowClick_PICKUP(36 + inventory.selectedSlot);
-			
-			scheduledWindowClick = -bestRodSlot;
-		}
+		InventoryUtils.selectItem(bestRodSlot);
 	}
 	
 	private int getRodValue(ItemStack stack)
