@@ -41,17 +41,28 @@ public final class AutoFishHack extends Hack
 	
 	private final AutoFishDebugDraw debugDraw =
 		new AutoFishDebugDraw(validRange);
-	private final AutoFishRodSelector rodSelector = new AutoFishRodSelector();
+	private final AutoFishRodSelector rodSelector =
+		new AutoFishRodSelector(this);
 	
 	private boolean wasOpenWater;
 	
 	public AutoFishHack()
 	{
 		super("AutoFish");
-		
 		setCategory(Category.OTHER);
+		
 		addSetting(validRange);
 		debugDraw.getSettings().forEach(this::addSetting);
+		rodSelector.getSettings().forEach(this::addSetting);
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		if(!rodSelector.hasARod())
+			return getName() + " [out of rods]";
+		
+		return getName();
 	}
 	
 	@Override
@@ -84,15 +95,7 @@ public final class AutoFishHack extends Hack
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
-		rodSelector.updateBestRod();
-		
-		if(!rodSelector.hasARod())
-		{
-			ChatUtils.message("AutoFish has run out of fishing rods.");
-			setEnabled(false);
-			return;
-		}
-		
+		// select fishing rod
 		if(!rodSelector.isBestRodAlreadySelected())
 		{
 			rodSelector.selectBestRod();

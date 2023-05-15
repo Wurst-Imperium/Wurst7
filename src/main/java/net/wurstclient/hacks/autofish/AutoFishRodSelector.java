@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks.autofish;
 
+import java.util.stream.Stream;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -14,14 +16,34 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.AutoFishHack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.Setting;
+import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.InventoryUtils;
 
 public final class AutoFishRodSelector
 {
 	private static final MinecraftClient MC = WurstClient.MC;
 	
+	private final CheckboxSetting stopWhenOutOfRods = new CheckboxSetting(
+		"Stop when out of rods",
+		"If enabled, AutoFish will turn itself off when it runs out of fishing rods.",
+		false);
+	
+	private final AutoFishHack autoFish;
 	private int bestRodValue;
 	private int bestRodSlot;
+	
+	public AutoFishRodSelector(AutoFishHack autoFish)
+	{
+		this.autoFish = autoFish;
+	}
+	
+	public Stream<Setting> getSettings()
+	{
+		return Stream.of(stopWhenOutOfRods);
+	}
 	
 	public void reset()
 	{
@@ -29,13 +51,18 @@ public final class AutoFishRodSelector
 		bestRodSlot = -1;
 	}
 	
-	public void updateBestRod()
+	public boolean hasARod()
+	{
+		return bestRodSlot != -1;
+	}
+	
+	public boolean isBestRodAlreadySelected()
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		int selectedSlot = inventory.selectedSlot;
 		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
-		// start with selected rod
+		// evaluate selected rod (or lack thereof)
 		bestRodValue = getRodValue(selectedStack);
 		bestRodSlot = bestRodValue > -1 ? selectedSlot : -1;
 		
@@ -51,20 +78,20 @@ public final class AutoFishRodSelector
 				bestRodSlot = slot;
 			}
 		}
-	}
-	
-	public boolean hasARod()
-	{
-		return bestRodSlot != -1;
-	}
-	
-	public boolean isBestRodAlreadySelected()
-	{
-		return bestRodSlot == MC.player.getInventory().selectedSlot;
+		
+		// return true if selected rod is best rod
+		return bestRodSlot == selectedSlot;
 	}
 	
 	public void selectBestRod()
 	{
+		if(bestRodSlot == -1 && stopWhenOutOfRods.isChecked())
+		{
+			ChatUtils.message("AutoFish has run out of fishing rods.");
+			autoFish.setEnabled(false);
+			return;
+		}
+		
 		InventoryUtils.selectItem(bestRodSlot);
 	}
 	
