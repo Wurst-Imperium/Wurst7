@@ -134,7 +134,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * method is done looking at it.
 	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;field_44911:F",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
 		opcode = Opcodes.GETFIELD,
 		ordinal = 1), method = "updateNausea()V")
 	private void afterUpdateNausea(CallbackInfo ci)
