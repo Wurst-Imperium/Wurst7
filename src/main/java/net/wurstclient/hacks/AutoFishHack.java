@@ -21,10 +21,9 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.hacks.autofish.AutoFishRodSelector;
-import net.wurstclient.mixinterface.IFishingBobberEntity;
+import net.wurstclient.hacks.autofish.ShallowWaterWarningCheckbox;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"AutoFishing", "auto fishing", "AutoFisher", "auto fisher",
 	"AFKFishBot", "afk fish bot", "AFKFishingBot", "afk fishing bot",
@@ -51,6 +50,9 @@ public final class AutoFishHack extends Hack
 		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
 		60, 10, 120, 1, ValueDisplay.INTEGER.withSuffix("s"));
 	
+	private final ShallowWaterWarningCheckbox shallowWaterWarning =
+		new ShallowWaterWarningCheckbox();
+	
 	private final AutoFishDebugDraw debugDraw =
 		new AutoFishDebugDraw(validRange);
 	private final AutoFishRodSelector rodSelector =
@@ -58,8 +60,6 @@ public final class AutoFishHack extends Hack
 	
 	private int castRodTimer;
 	private int reelInTimer;
-	
-	private boolean wasOpenWater;
 	
 	public AutoFishHack()
 	{
@@ -72,6 +72,7 @@ public final class AutoFishHack extends Hack
 		addSetting(patience);
 		debugDraw.getSettings().forEach(this::addSetting);
 		rodSelector.getSettings().forEach(this::addSetting);
+		addSetting(shallowWaterWarning);
 	}
 	
 	@Override
@@ -89,10 +90,10 @@ public final class AutoFishHack extends Hack
 		WURST.getHax().airPlaceHack.setEnabled(false);
 		
 		castRodTimer = 0;
-		reelInTimer = -1;
+		reelInTimer = 0;
 		rodSelector.reset();
 		debugDraw.reset();
-		wasOpenWater = true;
+		shallowWaterWarning.reset();
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
@@ -148,11 +149,10 @@ public final class AutoFishHack extends Hack
 	public void onReceivedPacket(PacketInputEvent event)
 	{
 		// check packet type
-		if(!(event.getPacket() instanceof PlaySoundS2CPacket))
+		if(!(event.getPacket() instanceof PlaySoundS2CPacket sound))
 			return;
 		
 		// check sound type
-		PlaySoundS2CPacket sound = (PlaySoundS2CPacket)event.getPacket();
 		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH
 			.equals(sound.getSound().value()))
 			return;
@@ -174,19 +174,7 @@ public final class AutoFishHack extends Hack
 			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
 			return;
 		
-		// check open water
-		boolean isOpenWater = ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
-		if(!isOpenWater && wasOpenWater)
-		{
-			ChatUtils.warning("You are currently fishing in shallow water.");
-			ChatUtils.message(
-				"You can't get any treasure items while fishing like this.");
-			
-			if(!WURST.getHax().openWaterEspHack.isEnabled())
-				ChatUtils.message("Use OpenWaterESP to find open water.");
-		}
-		wasOpenWater = isOpenWater;
+		shallowWaterWarning.checkWaterAround(bobber);
 		
 		// catch fish
 		reelInTimer = catchDelay.getValueI();
