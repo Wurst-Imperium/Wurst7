@@ -34,8 +34,22 @@ public final class AutoFishHack extends Hack
 {
 	private final SliderSetting validRange = new SliderSetting("Valid range",
 		"Any bites that occur outside of this range will be ignored.\n\n"
-			+ "Increase your range if bites are not being detected, decrease it if other people's bites are being detected as yours.",
+			+ "Increase your range if bites are not being detected, decrease it"
+			+ " if other people's bites are being detected as yours.",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
+		"How long AutoFish will wait after a bite before reeling in.", 0, 0, 60,
+		1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+	
+	private final SliderSetting retryDelay = new SliderSetting("Retry delay",
+		"If casting or reeling in the fishing rod fails, this is how long"
+			+ " AutoFish will wait before trying again.",
+		15, 0, 100, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+	
+	private final SliderSetting patience = new SliderSetting("Patience",
+		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
+		60, 10, 120, 1, ValueDisplay.INTEGER.withSuffix("s"));
 	
 	private final AutoFishDebugDraw debugDraw =
 		new AutoFishDebugDraw(validRange);
@@ -53,6 +67,9 @@ public final class AutoFishHack extends Hack
 		setCategory(Category.OTHER);
 		
 		addSetting(validRange);
+		addSetting(catchDelay);
+		addSetting(retryDelay);
+		addSetting(patience);
 		debugDraw.getSettings().forEach(this::addSetting);
 		rodSelector.getSettings().forEach(this::addSetting);
 	}
@@ -113,17 +130,17 @@ public final class AutoFishHack extends Hack
 				return;
 			
 			IMC.rightClick();
-			castRodTimer = 15;
-			reelInTimer = 1200;
+			castRodTimer = retryDelay.getValueI();
+			reelInTimer = 20 * patience.getValueI();
 			return;
 		}
 		
 		// otherwise, reel in when it's time
 		if(reelInTimer == 0)
 		{
-			reelInTimer--;
 			IMC.rightClick();
-			castRodTimer = 15;
+			reelInTimer = retryDelay.getValueI();
+			castRodTimer = retryDelay.getValueI();
 		}
 	}
 	
@@ -172,8 +189,7 @@ public final class AutoFishHack extends Hack
 		wasOpenWater = isOpenWater;
 		
 		// catch fish
-		reelInTimer = 0;
-		castRodTimer = 15;
+		reelInTimer = catchDelay.getValueI();
 	}
 	
 	@Override
