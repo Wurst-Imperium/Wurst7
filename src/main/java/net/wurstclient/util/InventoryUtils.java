@@ -79,7 +79,6 @@ public enum InventoryUtils
 		int maxInvSlot, boolean takeFromOffhand)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		// create a stream of all slots that we want to search
 		IntStream stream = IntStream.range(0, maxInvSlot);
@@ -90,8 +89,27 @@ public enum InventoryUtils
 		int slot = stream.filter(i -> predicate.test(inventory.getStack(i)))
 			.findFirst().orElse(-1);
 		
-		// if no item was found, return false
-		if(slot == -1)
+		return selectItem(slot);
+	}
+	
+	/**
+	 * Moves the item in the given slot to {@code inventory.selectedSlot}. If
+	 * the given slot is negative, this method will do nothing and return
+	 * {@code false}.
+	 *
+	 * @param slot
+	 *            the slot of the item to select
+	 * @return {@code true} if the item was moved. This does not necessarily
+	 *         mean that the item is now in the selected slot, it could still be
+	 *         on its way there.
+	 */
+	public static boolean selectItem(int slot)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		// if the slot is negative, abort and return false
+		if(slot < 0)
 			return false;
 		
 		// if the item is already in the hotbar, just select it
@@ -100,11 +118,29 @@ public enum InventoryUtils
 		// if there is an empty slot in the hotbar, shift-click the item there
 		// it will be selected in the next tick
 		else if(inventory.getEmptySlot() > -1 && inventory.getEmptySlot() < 9)
-			im.windowClick_QUICK_MOVE(slot);
+			im.windowClick_QUICK_MOVE(toNetworkSlot(slot));
 		// otherwise, swap with the currently selected item
 		else
-			im.windowClick_SWAP(slot, inventory.selectedSlot);
+			im.windowClick_SWAP(toNetworkSlot(slot), inventory.selectedSlot);
 		
-		return false;
+		return true;
+	}
+	
+	private static int toNetworkSlot(int slot)
+	{
+		// hotbar
+		if(slot >= 0 && slot < 9)
+			return slot + 36;
+		
+		// armor
+		if(slot >= 36 && slot < 40)
+			return 44 - slot;
+		
+		// offhand
+		if(slot == 40)
+			return 45;
+		
+		// everything else
+		return slot;
 	}
 }

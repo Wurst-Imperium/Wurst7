@@ -120,8 +120,8 @@ public final class AutoFarmHack extends Hack
 		currentBlock = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
 		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		double rangeSq = Math.pow(range.getValue(), 2);
-		int blockRange = (int)Math.ceil(range.getValue());
+		double rangeSq = range.getValueSq();
+		int blockRange = range.getValueCeil();
 		
 		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
