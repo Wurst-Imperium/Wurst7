@@ -49,6 +49,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -66,9 +67,8 @@ public final class AutoFarmHack extends Hack
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
 	
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	private VertexBuffer greenBuffer;
 	private VertexBuffer cyanBuffer;
 	private VertexBuffer redBuffer;
@@ -107,6 +107,7 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		prevBlocks.clear();
+		overlay.resetProgress();
 		busy = false;
 		
 		Stream.of(greenBuffer, cyanBuffer, redBuffer).filter(Objects::nonNull)
@@ -187,9 +188,6 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
-			return;
-		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -232,39 +230,14 @@ public final class AutoFarmHack extends Hack
 			VertexBuffer.unbind();
 		}
 		
-		if(currentBlock != null)
-		{
-			matrixStack.push();
-			
-			Box box = new Box(BlockPos.ORIGIN);
-			float p = prevProgress + (progress - prevProgress) * partialTicks;
-			float red = p * 2F;
-			float green = 2 - red;
-			
-			matrixStack.translate(currentBlock.getX() - regionX,
-				currentBlock.getY(), currentBlock.getZ() - regionZ);
-			if(p < 1)
-			{
-				matrixStack.translate(0.5, 0.5, 0.5);
-				matrixStack.scale(p, p, p);
-				matrixStack.translate(-0.5, -0.5, -0.5);
-			}
-			
-			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box, matrixStack);
-			
-			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box, matrixStack);
-			
-			matrixStack.pop();
-		}
-		
 		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private Stream<BlockPos> getBlockStream(BlockPos center, int range)
@@ -467,23 +440,21 @@ public final class AutoFarmHack extends Hack
 	{
 		if(MC.player.getAbilities().creativeMode)
 		{
-			Stream<BlockPos> stream3 = blocksToHarvest.parallelStream();
+			Stream<BlockPos> stream = blocksToHarvest.parallelStream();
 			for(Set<BlockPos> set : prevBlocks)
-				stream3 = stream3.filter(pos -> !set.contains(pos));
-			List<BlockPos> blocksToHarvest2 =
-				stream3.collect(Collectors.toList());
+				stream = stream.filter(pos -> !set.contains(pos));
+			List<BlockPos> filteredBlocks = stream.collect(Collectors.toList());
 			
-			prevBlocks.addLast(new HashSet<>(blocksToHarvest2));
+			prevBlocks.addLast(new HashSet<>(filteredBlocks));
 			while(prevBlocks.size() > 5)
 				prevBlocks.removeFirst();
 			
-			if(!blocksToHarvest2.isEmpty())
-				currentBlock = blocksToHarvest2.get(0);
+			if(!filteredBlocks.isEmpty())
+				currentBlock = filteredBlocks.get(0);
 			
 			MC.interactionManager.cancelBlockBreaking();
-			progress = 1;
-			prevProgress = 1;
-			BlockBreaker.breakBlocksWithPacketSpam(blocksToHarvest2);
+			overlay.resetProgress();
+			BlockBreaker.breakBlocksWithPacketSpam(filteredBlocks);
 			return;
 		}
 		
@@ -498,18 +469,9 @@ public final class AutoFarmHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 		
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
-		{
-			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
-			
-		}else
-		{
-			progress = 1;
-			prevProgress = 1;
-		}
+			overlay.updateProgress();
+		else
+			overlay.resetProgress();
 	}
 	
 	private void updateVertexBuffers(List<BlockPos> blocksToHarvest,
