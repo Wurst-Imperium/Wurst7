@@ -124,7 +124,8 @@ public final class AutoFarmHack extends Hack
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
-		List<BlockPos> blocks = getBlockStream(eyesBlock, blockRange)
+		List<BlockPos> blocks = BlockUtils
+			.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(BlockUtils::canBeClicked).collect(Collectors.toList());
 		
@@ -175,7 +176,7 @@ public final class AutoFarmHack extends Hack
 	private List<BlockPos> getBlocksToReplant(Vec3d eyesVec, BlockPos eyesBlock,
 		double rangeSq, int blockRange)
 	{
-		return getBlockStream(eyesBlock, blockRange)
+		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(
 				pos -> BlockUtils.getState(pos).getMaterial().isReplaceable())
@@ -238,14 +239,6 @@ public final class AutoFarmHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 		
 		overlay.render(matrixStack, partialTicks, currentBlock);
-	}
-	
-	private Stream<BlockPos> getBlockStream(BlockPos center, int range)
-	{
-		BlockPos min = center.add(-range, -range, -range);
-		BlockPos max = center.add(range, range, range);
-		
-		return BlockUtils.getAllInBox(min, max).stream();
 	}
 	
 	private boolean shouldBeHarvested(BlockPos pos)
