@@ -7,25 +7,18 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.*;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -35,14 +28,13 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -51,7 +43,6 @@ import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
-import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"auto farm", "AutoHarvest", "auto harvest"})
@@ -65,14 +56,11 @@ public final class AutoFarmHack extends Hack
 		new CheckboxSetting("Replant", true);
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
-	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
 	
+	private final AutoFarmRenderer renderer = new AutoFarmRenderer();
 	private final OverlayRenderer overlay = new OverlayRenderer();
-	private VertexBuffer greenBuffer;
-	private VertexBuffer cyanBuffer;
-	private VertexBuffer redBuffer;
 	
 	private boolean busy;
 	
@@ -111,9 +99,7 @@ public final class AutoFarmHack extends Hack
 		overlay.resetProgress();
 		busy = false;
 		
-		Stream.of(greenBuffer, cyanBuffer, redBuffer).filter(Objects::nonNull)
-			.forEach(VertexBuffer::close);
-		greenBuffer = cyanBuffer = redBuffer = null;
+		renderer.reset();
 	}
 	
 	@Override
@@ -162,7 +148,9 @@ public final class AutoFarmHack extends Hack
 			harvest(blocksToHarvest);
 		
 		busy = !blocksToHarvest.isEmpty() || !blocksToReplant.isEmpty();
-		updateVertexBuffers(blocksToHarvest, blocksToReplant);
+		
+		renderer.updateVertexBuffers(blocksToHarvest, plants.keySet(),
+			blocksToReplant);
 	}
 	
 	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
@@ -190,55 +178,7 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
-		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		ShaderProgram shader = RenderSystem.getShader();
-		
-		if(greenBuffer != null)
-		{
-			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-			greenBuffer.bind();
-			greenBuffer.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-		}
-		
-		if(cyanBuffer != null)
-		{
-			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-			cyanBuffer.bind();
-			cyanBuffer.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-		}
-		
-		if(redBuffer != null)
-		{
-			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-			redBuffer.bind();
-			redBuffer.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		
+		renderer.render(matrixStack);
 		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
@@ -425,83 +365,6 @@ public final class AutoFarmHack extends Hack
 			overlay.updateProgress();
 		else
 			overlay.resetProgress();
-	}
-	
-	private void updateVertexBuffers(List<BlockPos> blocksToHarvest,
-		List<BlockPos> blocksToReplant)
-	{
-		if(WurstClient.MC.getBlockEntityRenderDispatcher().camera == null)
-			return;
-		
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		if(greenBuffer != null)
-			greenBuffer.close();
-		
-		greenBuffer = new VertexBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		
-		double boxMin = 1 / 16.0;
-		double boxMax = 15 / 16.0;
-		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
-		
-		for(BlockPos pos : blocksToHarvest)
-		{
-			Box renderBox = box.offset(pos).offset(-regionX, 0, -regionZ);
-			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
-		}
-		
-		BuiltBuffer buffer = bufferBuilder.end();
-		greenBuffer.bind();
-		greenBuffer.upload(buffer);
-		VertexBuffer.unbind();
-		
-		if(cyanBuffer != null)
-			cyanBuffer.close();
-		
-		cyanBuffer = new VertexBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		
-		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-		
-		for(BlockPos pos : plants.keySet())
-		{
-			Box renderNode = node.offset(pos).offset(-regionX, 0, -regionZ);
-			RenderUtils.drawNode(renderNode, bufferBuilder);
-		}
-		
-		buffer = bufferBuilder.end();
-		cyanBuffer.bind();
-		cyanBuffer.upload(buffer);
-		VertexBuffer.unbind();
-		
-		if(redBuffer != null)
-			redBuffer.close();
-		
-		redBuffer = new VertexBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		
-		for(BlockPos pos : blocksToReplant)
-		{
-			Box renderBox = box.offset(pos).offset(-regionX, 0, -regionZ);
-			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
-		}
-		
-		buffer = bufferBuilder.end();
-		redBuffer.bind();
-		redBuffer.upload(buffer);
-		VertexBuffer.unbind();
 	}
 	
 	/**
