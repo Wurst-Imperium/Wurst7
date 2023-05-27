@@ -55,6 +55,18 @@ public final class AutoFarmHack extends Hack
 	private final CheckboxSetting replant =
 		new CheckboxSetting("Replant", true);
 	
+	private final HashMap<Block, Item> seeds = new HashMap<>();
+	{
+		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
+		seeds.put(Blocks.CARROTS, Items.CARROT);
+		seeds.put(Blocks.POTATOES, Items.POTATO);
+		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
+		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
+		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
+		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
+		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
+	}
+	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
 	private BlockPos currentBlock;
@@ -116,7 +128,7 @@ public final class AutoFarmHack extends Hack
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(BlockUtils::canBeClicked).collect(Collectors.toList());
 		
-		registerPlants(blocks);
+		updatePlants(blocks);
 		
 		List<BlockPos> blocksToHarvest = new ArrayList<>();
 		List<BlockPos> blocksToReplant = new ArrayList<>();
@@ -168,22 +180,16 @@ public final class AutoFarmHack extends Hack
 		return busy;
 	}
 	
-	private void registerPlants(List<BlockPos> blocks)
+	private void updatePlants(List<BlockPos> blocks)
 	{
-		HashMap<Block, Item> seeds = new HashMap<>();
-		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
-		seeds.put(Blocks.CARROTS, Items.CARROT);
-		seeds.put(Blocks.POTATOES, Items.POTATO);
-		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
-		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
-		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
-		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
-		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
-		
-		plants.putAll(blocks.parallelStream()
-			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
-			.collect(Collectors.toMap(pos -> pos,
-				pos -> seeds.get(BlockUtils.getBlock(pos)))));
+		for(BlockPos pos : blocks)
+		{
+			Item seed = seeds.get(BlockUtils.getBlock(pos));
+			if(seed == null)
+				continue;
+			
+			plants.put(pos, seed);
+		}
 	}
 	
 	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
@@ -202,26 +208,33 @@ public final class AutoFarmHack extends Hack
 		
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
+		
+		if(block instanceof NetherWartBlock)
+			return state.get(NetherWartBlock.AGE) >= 3;
+		
+		if(block instanceof CocoaBlock)
+			return state.get(CocoaBlock.AGE) >= 2;
+		
 		if(block instanceof GourdBlock)
 			return true;
+		
 		if(block instanceof SugarCaneBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
+		
 		if(block instanceof CactusBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
+		
 		if(block instanceof KelpPlantBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
 				&& !(BlockUtils
 					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
-		if(block instanceof NetherWartBlock)
-			return state.get(NetherWartBlock.AGE) >= 3;
+		
 		if(block instanceof BambooBlock)
 			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
 				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
-		if(block instanceof CocoaBlock)
-			return state.get(CocoaBlock.AGE) >= 2;
 		
 		return false;
 	}
@@ -231,8 +244,7 @@ public final class AutoFarmHack extends Hack
 	{
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(
-				pos -> BlockUtils.getState(pos).getMaterial().isReplaceable())
+			.filter(pos -> BlockUtils.getState(pos).isReplaceable())
 			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
