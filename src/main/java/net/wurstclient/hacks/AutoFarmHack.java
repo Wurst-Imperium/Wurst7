@@ -153,6 +153,39 @@ public final class AutoFarmHack extends Hack
 			blocksToReplant);
 	}
 	
+	@Override
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		renderer.render(matrixStack);
+		overlay.render(matrixStack, partialTicks, currentBlock);
+	}
+	
+	/**
+	 * Returns true if AutoFarm is currently harvesting or replanting something.
+	 */
+	public boolean isBusy()
+	{
+		return busy;
+	}
+	
+	private void registerPlants(List<BlockPos> blocks)
+	{
+		HashMap<Block, Item> seeds = new HashMap<>();
+		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
+		seeds.put(Blocks.CARROTS, Items.CARROT);
+		seeds.put(Blocks.POTATOES, Items.POTATO);
+		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
+		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
+		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
+		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
+		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
+		
+		plants.putAll(blocks.parallelStream()
+			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
+			.collect(Collectors.toMap(pos -> pos,
+				pos -> seeds.get(BlockUtils.getBlock(pos)))));
+	}
+	
 	private List<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
 		List<BlockPos> blocks)
 	{
@@ -160,26 +193,6 @@ public final class AutoFarmHack extends Hack
 			.sorted(Comparator.comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
 			.collect(Collectors.toList());
-	}
-	
-	private List<BlockPos> getBlocksToReplant(Vec3d eyesVec, BlockPos eyesBlock,
-		double rangeSq, int blockRange)
-	{
-		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(
-				pos -> BlockUtils.getState(pos).getMaterial().isReplaceable())
-			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toList());
-	}
-	
-	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		renderer.render(matrixStack);
-		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private boolean shouldBeHarvested(BlockPos pos)
@@ -213,22 +226,17 @@ public final class AutoFarmHack extends Hack
 		return false;
 	}
 	
-	private void registerPlants(List<BlockPos> blocks)
+	private List<BlockPos> getBlocksToReplant(Vec3d eyesVec, BlockPos eyesBlock,
+		double rangeSq, int blockRange)
 	{
-		HashMap<Block, Item> seeds = new HashMap<>();
-		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
-		seeds.put(Blocks.CARROTS, Items.CARROT);
-		seeds.put(Blocks.POTATOES, Items.POTATO);
-		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
-		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
-		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
-		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
-		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
-		
-		plants.putAll(blocks.parallelStream()
-			.filter(pos -> seeds.containsKey(BlockUtils.getBlock(pos)))
-			.collect(Collectors.toMap(pos -> pos,
-				pos -> seeds.get(BlockUtils.getBlock(pos)))));
+		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
+			.filter(
+				pos -> BlockUtils.getState(pos).getMaterial().isReplaceable())
+			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
+			.sorted(Comparator.comparingDouble(
+				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.collect(Collectors.toList());
 	}
 	
 	private boolean canBeReplanted(BlockPos pos)
@@ -365,13 +373,5 @@ public final class AutoFarmHack extends Hack
 			overlay.updateProgress();
 		else
 			overlay.resetProgress();
-	}
-	
-	/**
-	 * Returns true if AutoFarm is currently harvesting or replanting something.
-	 */
-	public boolean isBusy()
-	{
-		return busy;
 	}
 }
