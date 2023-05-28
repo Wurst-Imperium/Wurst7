@@ -30,6 +30,8 @@ public final class HealthTagsHack extends Hack implements RenderListener
 {
 	private final CheckboxSetting mobs = new CheckboxSetting(
 		"Mobs", "Displays health tags above mobs also.", false);
+	private final CheckboxSetting max = new CheckboxSetting(
+		"Display max health for players", false);
 	private final CheckboxSetting round = new CheckboxSetting(
 		"Round health", true);
 	
@@ -40,6 +42,7 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		super("HealthTags");
 		setCategory(Category.RENDER);
 		addSetting(mobs);
+		addSetting(max);
 		addSetting(round);
 	}
 	
@@ -83,9 +86,11 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		
 		String health = round.isChecked() ? Integer.toString((int)entity.getHealth())
 			: DF.format(entity.getHealth());
+		String maxHealth = round.isChecked() ? Integer.toString((int)entity.getMaxHealth())
+			: DF.format(entity.getMaxHealth());
 		
 		MutableText formattedHealth = Text.literal(" ")
-			.append(health).formatted(getColor(entity.getHealth(), entity.getMaxHealth()));
+			.append(max.isChecked() ? health + "/" + maxHealth : health).formatted(getColor(entity.getHealth(), entity.getMaxHealth()));
 		return ((MutableText)nametag).append(formattedHealth);
 	}
 	
