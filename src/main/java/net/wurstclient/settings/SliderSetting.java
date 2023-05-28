@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.SliderComponent;
@@ -64,6 +65,11 @@ public class SliderSetting extends Setting implements SliderLock
 		return MathUtils.clamp(value, usableMin, usableMax);
 	}
 	
+	public final double getValueSq()
+	{
+		return MathHelper.square(getValue());
+	}
+	
 	public final float getValueF()
 	{
 		return (float)getValue();
@@ -72,6 +78,11 @@ public class SliderSetting extends Setting implements SliderLock
 	public final int getValueI()
 	{
 		return (int)getValue();
+	}
+	
+	public final int getValueCeil()
+	{
+		return MathHelper.ceil(getValue());
 	}
 	
 	public final double getDefaultValue()

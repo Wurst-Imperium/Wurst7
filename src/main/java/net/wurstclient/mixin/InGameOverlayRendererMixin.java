@@ -9,7 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
@@ -20,20 +22,17 @@ import net.wurstclient.WurstClient;
 @Mixin(InGameOverlayRenderer.class)
 public class InGameOverlayRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V"},
-		cancellable = true)
-	private static void onRenderFireOverlay(MinecraftClient minecraftClient,
-		MatrixStack matrixStack, CallbackInfo ci)
+	@ModifyConstant(
+		method = "renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
+		constant = @Constant(floatValue = -0.3F))
+	private static float getFireOffset(float orig)
 	{
-		if(WurstClient.INSTANCE.getHax().noFireOverlayHack.isEnabled())
-			ci.cancel();
+		return orig - WurstClient.INSTANCE.getHax().noFireOverlayHack
+			.getOverlayOffset();
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderUnderwaterOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderUnderwaterOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
 		cancellable = true)
 	private static void onRenderUnderwaterOverlay(
 		MinecraftClient minecraftClient, MatrixStack matrixStack,

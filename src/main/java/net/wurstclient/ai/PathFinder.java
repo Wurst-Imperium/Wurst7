@@ -63,11 +63,12 @@ public class PathFinder
 	public PathFinder(BlockPos goal)
 	{
 		if(WurstClient.MC.player.isOnGround())
-			start = new PathPos(new BlockPos(WurstClient.MC.player.getX(),
+			start = new PathPos(BlockPos.ofFloored(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ()));
 		else
-			start = new PathPos(new BlockPos(WurstClient.MC.player.getPos()));
+			start =
+				new PathPos(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);
@@ -556,13 +557,17 @@ public class PathFinder
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		
 		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
@@ -576,7 +581,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(matrixStack, element);
+				PathRenderer.renderNode(matrixStack, element, regionX, regionZ);
 				renderedThings++;
 			}
 			
@@ -592,7 +597,7 @@ public class PathFinder
 					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
 				PathRenderer.renderArrow(matrixStack, entry.getValue(),
-					entry.getKey());
+					entry.getKey(), regionX, regionZ);
 				renderedThings++;
 			}
 		}
@@ -603,14 +608,15 @@ public class PathFinder
 		else
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1),
+				regionX, regionZ);
 		
 		matrixStack.pop();
 		
 		// GL resets
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDepthMask(true);
 	}
 	

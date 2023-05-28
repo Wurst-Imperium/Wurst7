@@ -31,6 +31,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
 import net.wurstclient.events.IsPlayerInLavaListener.IsPlayerInLavaEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
@@ -137,7 +138,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
 	}
-	
+  
 	@Inject(at = {@At("HEAD")},
 		method = {"canSprint()Z"},
 		cancellable = true)
@@ -147,31 +148,18 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cir.setReturnValue(true);
 	}
 	
-	// FIXME
-	// @Inject(at = @At("HEAD"),
-	// method =
-	// "signChatMessage(Lnet/minecraft/network/message/MessageMetadata;Lnet/minecraft/network/message/DecoratedContents;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/MessageSignatureData;",
-	// cancellable = true)
-	// private void onSignChatMessage(MessageMetadata metadata,
-	// DecoratedContents content, LastSeenMessageList lastSeenMessages,
-	// CallbackInfoReturnable<MessageSignatureData> cir)
-	// {
-	// if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-	// cir.setReturnValue(MessageSignatureData.EMPTY);
-	// }
-	//
-	// @Inject(at = @At("HEAD"),
-	// method =
-	// "signArguments(Lnet/minecraft/network/message/MessageMetadata;Lcom/mojang/brigadier/ParseResults;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/LastSeenMessageList;)Lnet/minecraft/network/message/ArgumentSignatureDataMap;",
-	// cancellable = true)
-	// private void onSignArguments(MessageMetadata metadata,
-	// ParseResults<CommandSource> parseResults, @Nullable Text preview,
-	// LastSeenMessageList lastSeenMessages,
-	// CallbackInfoReturnable<ArgumentSignatureDataMap> cir)
-	// {
-	// if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-	// cir.setReturnValue(ArgumentSignatureDataMap.EMPTY);
-	// }
+	/**
+	 * Getter method for what used to be airStrafingSpeed.
+	 * Overridden to allow for the speed to be modified by hacks.
+	 */
+	@Override
+	protected float getOffGroundSpeed()
+	{
+		AirStrafingSpeedEvent event =
+			new AirStrafingSpeedEvent(super.getOffGroundSpeed());
+		EventManager.fire(event);
+		return event.getSpeed();
+	}
 	
 	@Override
 	public void setVelocityClient(double x, double y, double z)
@@ -222,6 +210,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 				.getAdditionalJumpMotion();
 	}
 	
+	/**
+	 * This is the part that makes SafeWalk work.
+	 */
 	@Override
 	protected boolean clipAtLedge()
 	{
@@ -229,6 +220,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
+	/**
+	 * This mixin allows SafeWalk to sneak visibly when the player is
+	 * near a ledge.
+	 */
 	@Override
 	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
 	{

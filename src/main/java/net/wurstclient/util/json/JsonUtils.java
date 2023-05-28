@@ -213,6 +213,38 @@ public enum JsonUtils
 		return json.getAsLong();
 	}
 	
+	public static float getAsFloat(JsonElement json) throws JsonException
+	{
+		if(!isNumber(json))
+			throw new JsonException("Not a number: " + json);
+		
+		return json.getAsFloat();
+	}
+	
+	public static float getAsFloat(JsonElement json, float fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
+		
+		return json.getAsFloat();
+	}
+	
+	public static double getAsDouble(JsonElement json) throws JsonException
+	{
+		if(!isNumber(json))
+			throw new JsonException("Not a number: " + json);
+		
+		return json.getAsDouble();
+	}
+	
+	public static double getAsDouble(JsonElement json, double fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
+		
+		return json.getAsDouble();
+	}
+	
 	public static boolean isString(JsonElement json)
 	{
 		if(json == null || !json.isJsonPrimitive())

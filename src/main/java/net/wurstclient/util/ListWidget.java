@@ -10,6 +10,9 @@ package net.wurstclient.util;
 import java.util.Collections;
 import java.util.List;
 
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -175,7 +178,7 @@ public abstract class ListWidget extends AbstractParentElement
 				GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
 			// RenderSystem.disableAlphaTest();
 			// RenderSystem.shadeModel(7425);
-			RenderSystem.disableTexture();
+			// RenderSystem.disableTexture();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
@@ -244,7 +247,7 @@ public abstract class ListWidget extends AbstractParentElement
 			}
 			
 			renderDecorations(mouseX, mouseY);
-			RenderSystem.enableTexture();
+			// RenderSystem.enableTexture();
 			// RenderSystem.shadeModel(7424);
 			// RenderSystem.enableAlphaTest();
 			RenderSystem.disableBlend();
@@ -389,7 +392,7 @@ public abstract class ListWidget extends AbstractParentElement
 			{
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
-				RenderSystem.disableTexture();
+				// RenderSystem.disableTexture();
 				float g = isFocused() ? 1.0F : 0.5F;
 				RenderSystem.setShaderColor(g, g, g, 1.0F);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -407,15 +410,17 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
 				bufferBuilder.vertex(q + 1, o - 1, 0.0D).next();
 				tessellator.draw();
-				RenderSystem.enableTexture();
+				// RenderSystem.enableTexture();
 			}
 			
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			renderItem(matrixStack, n, i, o, p, k, l, f);
 		}
 		
 	}
 	
-	protected boolean isFocused()
+	@Override
+	public boolean isFocused()
 	{
 		return false;
 	}
@@ -452,5 +457,38 @@ public abstract class ListWidget extends AbstractParentElement
 	public double getScrollAmount()
 	{
 		return scrollAmount;
+	}
+	
+	protected void drawSelectionOutline(MatrixStack matrixStack, int x, int y)
+	{
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		
+		RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y + 28, 0).next();
+		bufferBuilder.vertex(matrix, x - 2, y + 28, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.setShaderColor(0, 0, 0, 1);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 1, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y + 27, 0).next();
+		bufferBuilder.vertex(matrix, x - 1, y + 27, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 }

@@ -13,15 +13,19 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -67,6 +71,16 @@ public enum RenderUtils
 		int regionX = (blockPos.getX() >> 9) * 512;
 		int regionZ = (blockPos.getZ() >> 9) * 512;
 		
+		matrixStack.translate(regionX - camPos.x, -camPos.y,
+			regionZ - camPos.z);
+	}
+	
+	public static void applyRegionalRenderOffset(MatrixStack matrixStack,
+		int regionX, int regionZ)
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
 		matrixStack.translate(regionX - camPos.x, -camPos.y,
 			regionZ - camPos.z);
 	}
@@ -857,5 +871,42 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+	}
+	
+	public static void drawItem(MatrixStack matrixStack, ItemStack stack, int x,
+		int y, boolean large)
+	{
+		matrixStack.push();
+		matrixStack.translate(x, y, 0);
+		if(large)
+			matrixStack.scale(1.5F, 1.5F, 1.5F);
+		else
+			matrixStack.scale(0.75F, 0.75F, 0.75F);
+		
+		ItemStack renderStack =
+			stack.isEmpty() ? new ItemStack(Blocks.GRASS_BLOCK) : stack;
+		
+		DiffuseLighting.enableGuiDepthLighting();
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(matrixStack,
+			renderStack, 0, 0);
+		DiffuseLighting.disableGuiDepthLighting();
+		
+		matrixStack.pop();
+		
+		if(stack.isEmpty())
+		{
+			matrixStack.push();
+			matrixStack.translate(x, y, 0);
+			if(large)
+				matrixStack.scale(2, 2, 2);
+			
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			TextRenderer fr = WurstClient.MC.textRenderer;
+			fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			GL11.glEnable(GL11.GL_BLEND);
+			
+			matrixStack.pop();
+		}
 	}
 }

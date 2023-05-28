@@ -30,7 +30,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
@@ -110,7 +110,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		ClientWorld world = MC.world;
 		
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		int chunkX = eyesBlock.getX() >> 4;
 		int chunkZ = eyesBlock.getZ() >> 4;
 		int chunkRange = drawDistance.getSelected().chunkRange;
@@ -229,7 +229,6 @@ public final class MobSpawnEspHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -260,7 +259,6 @@ public final class MobSpawnEspHack extends Hack
 		if(!depthTest)
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private static class ChunkScanner

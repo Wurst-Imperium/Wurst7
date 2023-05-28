@@ -17,6 +17,7 @@
   "description.wurst.hack.autobuild": "Baut die ausgewählte Vorlage (Template) automatisch.\nPlatziere manuell einen Block, um Bauprozess zu starten.",
   "description.wurst.hack.autodrop": "Lässt ungewollte Items automatisch fallen.",
   "description.wurst.hack.autoleave": "Verlässt automatisch den Server, wenn deine Gesundheit niedrig ist.",
+  "description.wurst.hack.autolibrarian": "Bringt einem Dorfbewohner automatisch bei, ein bestimmtes verzaubertes Buch zu verkaufen. Du kannst damit in kürzester Zeit eine ganze Handelsstation bauen.",
   "description.wurst.hack.autoeat": "Isst automatisch Essen.",
   "description.wurst.setting.autoeat.target_hunger": "Versucht, die Hungerleiste mindestens auf diesem Level zu halten, aber nur wenn es keine Hungerpunkte verschwendet.",
   "description.wurst.setting.autoeat.min_hunger": "Hält die Hungerleiste immer mindestens auf diesem Level, selbst wenn es Hungerpunkte verschwendet.\n6.5 - Kann mit normalem \"Vanilla\"-Essen keine Verschwendung verursachen.\n10.0 - Ignoriert Verschwendung komplett und hält die Hungerleiste einfach immer voll.",

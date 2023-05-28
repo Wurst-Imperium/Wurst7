@@ -176,12 +176,12 @@ public final class KeybindProfilesScreen extends Screen
 		renderBackground(matrixStack);
 		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, "Keybind Profiles",
-			width / 2, 12, 0xffffff);
+		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+			"Keybind Profiles", width / 2, 12, 0xffffff);
 		
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		if(loadButton.isHovered() && !loadButton.active)
+		if(loadButton.isSelected() && !loadButton.active)
 			renderTooltip(matrixStack,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
