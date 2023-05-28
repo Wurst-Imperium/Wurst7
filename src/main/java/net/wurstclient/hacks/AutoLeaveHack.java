@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
@@ -36,6 +39,12 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
 	
+	private final SliderSetting totems = new SliderSetting("Totems",
+		"Effectively disables AutoLeave until the number of totems you have is at or below this value.\n"
+			+ "Drag the slider to the right to turn off this feature.",
+		11, 0, 11, 1, ValueDisplay.INTEGER.withSuffix(" totems")
+			.withLabel(11, "unlimited"));
+	
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
@@ -43,6 +52,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
+		addSetting(totems);
 	}
 	
 	@Override
@@ -79,6 +89,10 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		if(MC.player.getHealth() > health.getValueF() * 2F)
 			return;
 		
+		// check totems
+		if(totems.getValueI() != 11 && countTotems(MC.player.getInventory()) > totems.getValueI())
+			return;
+		
 		// leave server
 		switch(mode.getSelected())
 		{
@@ -104,6 +118,21 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		// disable
 		setEnabled(false);
+	}
+	
+	private int countTotems(PlayerInventory inventory)
+	{
+		int totems = 0;
+		
+		for(int slot = 0; slot <= 36; slot++)
+			if(inventory.getStack(slot).getItem() == Items.TOTEM_OF_UNDYING)
+				totems++;
+		
+		ItemStack offhandStack = inventory.getStack(40);
+		if(offhandStack.getItem() == Items.TOTEM_OF_UNDYING)
+			totems++;
+		
+		return totems;
 	}
 	
 	public static enum Mode
