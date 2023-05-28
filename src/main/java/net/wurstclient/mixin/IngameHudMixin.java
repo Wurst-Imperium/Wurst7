@@ -56,4 +56,15 @@ public class IngameHudMixin extends DrawableHelper
 		
 		ci.cancel();
 	}
+
+	@Inject(at = @At("HEAD"),
+		method = "renderPortalOverlay(Lnet/minecraft/client/util/math/MatrixStack;F)V",
+		cancellable = true)
+	private void onRenderPortalOverlay(MatrixStack matrixStack, float nauseaStrength, CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.getHax().noPortalOverlayHack.isEnabled())
+			return;
+
+		ci.cancel();
+	}
 }
