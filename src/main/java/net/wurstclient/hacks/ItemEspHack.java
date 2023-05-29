@@ -171,7 +171,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		Vec3d start = RotationUtils.getClientLookVec()
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,

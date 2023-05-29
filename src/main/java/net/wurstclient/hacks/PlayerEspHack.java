@@ -143,7 +143,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
@@ -176,7 +176,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -189,7 +189,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION_COLOR);
 		
-		Vec3d start = RotationUtils.getClientLookVec()
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 		
 		for(PlayerEntity e : players)

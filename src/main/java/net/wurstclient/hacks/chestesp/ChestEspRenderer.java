@@ -37,7 +37,7 @@ public final class ChestEspRenderer
 	private final int regionZ;
 	private final Vec3d start;
 	
-	public ChestEspRenderer(MatrixStack matrixStack)
+	public ChestEspRenderer(MatrixStack matrixStack, float partialTicks)
 	{
 		this.matrixStack = matrixStack;
 		
@@ -45,7 +45,7 @@ public final class ChestEspRenderer
 		regionX = (camPos.getX() >> 9) * 512;
 		regionZ = (camPos.getZ() >> 9) * 512;
 		
-		start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos())
+		start = RotationUtils.getClientLookVec(partialTicks).add(RenderUtils.getCameraPos())
 			.subtract(regionX, 0, regionZ);
 	}
 	
