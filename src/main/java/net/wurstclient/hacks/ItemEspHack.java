@@ -123,7 +123,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
@@ -158,7 +158,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
