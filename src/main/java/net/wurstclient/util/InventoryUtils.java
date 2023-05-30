@@ -25,6 +25,63 @@ public enum InventoryUtils
 	private static final MinecraftClient MC = WurstClient.MC;
 	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
+	public static int indexOf(Item item)
+	{
+		return indexOf(stack -> stack.isOf(item), 36, false);
+	}
+	
+	public static int indexOf(Item item, int maxInvSlot)
+	{
+		return indexOf(stack -> stack.isOf(item), maxInvSlot, false);
+	}
+	
+	public static int indexOf(Item item, int maxInvSlot, boolean includeOffhand)
+	{
+		return indexOf(stack -> stack.isOf(item), maxInvSlot, includeOffhand);
+	}
+	
+	public static int indexOf(Predicate<ItemStack> predicate)
+	{
+		return indexOf(predicate, 36, false);
+	}
+	
+	public static int indexOf(Predicate<ItemStack> predicate, int maxInvSlot)
+	{
+		return indexOf(predicate, maxInvSlot, false);
+	}
+	
+	/**
+	 * Searches the player's inventory from slot 0 to {@code maxInvSlot-1} for
+	 * the first item that matches the given predicate and returns its slot, or
+	 * -1 if no such item was found.
+	 *
+	 * @param predicate
+	 *            checks if an item is the one you want
+	 * @param maxInvSlot
+	 *            the maximum slot to search (exclusive), usually 9 for the
+	 *            hotbar or 36 for the whole inventory
+	 * @param includeOffhand
+	 *            also search the offhand (slot 40), even if maxInvSlot is lower
+	 * @return
+	 *         the slot of the item, or -1 if no such item was found
+	 */
+	public static int indexOf(Predicate<ItemStack> predicate, int maxInvSlot,
+		boolean includeOffhand)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		
+		// create a stream of all slots that we want to search
+		IntStream stream = IntStream.range(0, maxInvSlot);
+		if(includeOffhand)
+			stream = IntStream.concat(stream, IntStream.of(40));
+		
+		// find the slot of the item we want
+		int slot = stream.filter(i -> predicate.test(inventory.getStack(i)))
+			.findFirst().orElse(-1);
+		
+		return slot;
+	}
+	
 	public static boolean selectItem(Item item)
 	{
 		return selectItem(stack -> stack.isOf(item), 36, false);
@@ -78,18 +135,7 @@ public enum InventoryUtils
 	public static boolean selectItem(Predicate<ItemStack> predicate,
 		int maxInvSlot, boolean takeFromOffhand)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		
-		// create a stream of all slots that we want to search
-		IntStream stream = IntStream.range(0, maxInvSlot);
-		if(takeFromOffhand)
-			stream = IntStream.concat(stream, IntStream.of(40));
-		
-		// find the slot of the item we want
-		int slot = stream.filter(i -> predicate.test(inventory.getStack(i)))
-			.findFirst().orElse(-1);
-		
-		return selectItem(slot);
+		return selectItem(indexOf(predicate, maxInvSlot, takeFromOffhand));
 	}
 	
 	/**
