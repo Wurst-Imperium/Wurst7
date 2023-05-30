@@ -16,6 +16,7 @@
   	"CactusBlockMixin",
   	"CameraMixin",
   	"ChatHudMixin",
+  	"ChatInputSuggestorMixin",
   	"ChatScreenMixin",
   	"ChunkOcclusionGraphBuilderMixin",
   	"ClientConnectionMixin",

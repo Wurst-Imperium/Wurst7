@@ -25,7 +25,6 @@ import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.RenderUtils;
@@ -121,14 +120,7 @@ public final class BlockComponent extends Component
 		String text = setting.getName() + ":";
 		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
 		
-		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-		modelViewStack.push();
-		Window parent = getParent();
-		modelViewStack.translate(parent.getX(),
-			parent.getY() + 13 + parent.getScrollOffset(), 0);
 		RenderUtils.drawItem(matrixStack, stack, x3, y1, true);
-		modelViewStack.pop();
-		RenderSystem.applyModelViewMatrix();
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}
