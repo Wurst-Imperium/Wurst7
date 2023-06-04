@@ -68,7 +68,7 @@
   "description.wurst.hack.extraelytra": "Macht die Elytren einfacher zu benutzen.",
   "description.wurst.hack.fancychat": "Ersetzt ASCII-Zeichen in gesendeten Chat-Nachrichten durch schickere Unicode-Zeichen. Kann auch benutzt werden, um Schimpfwortfilter auf einigen Servern zu umgehen.\nFunktioniert nicht auf Servern, die Unicode-Zeichen blockieren.",
   "description.wurst.hack.fastbreak": "Lässt dich Blöcke schneller abbauen.\nTipp: Das funktioniert auch mit Nuker.",
-  "description.wurst.hack.fastladder": "Lässt dich auf Leitern schneller nach oben klettern.",
+  "description.wurst.hack.fastladder": "Lässt dich auf Leitern und Ranken schneller nach oben klettern.",
   "description.wurst.hack.fastplace": "Lässt dich Blöcke 5-mal schneller platzieren.\nTipp: Das kann auch andere Hacks wie AutoBuild beschleunigen.",
   "description.wurst.hack.feedaura": "Füttert automatisch die Tiere um dich herum.",
   "description.wurst.hack.fightbot": "Ein Bot, der automatisch durch die Gegend läuft und alles killt.\nGut für MobArena.",
