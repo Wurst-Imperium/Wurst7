@@ -28,13 +28,13 @@
   "accessWidener" : "wurst.accesswidener",
 
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": ">=0.51.0",
-    "minecraft": ">=1.18.2-alpha.22.6.a",
+    "fabricloader": ">=0.14.9",
+    "fabric-api": ">=0.59.0",
+    "minecraft": "~1.18.2-alpha.22.6.a",
     "java": ">=17"
   },
   "suggests": {
-    "flamingo": "*"
+    "mo_glass": "*"
   },
   "breaks": {
     "wi_zoom": "*",

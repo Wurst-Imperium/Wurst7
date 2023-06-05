@@ -84,6 +84,8 @@
   "description.wurst.setting.invwalk.allow_clickgui": "Ermöglicht dir, herumzulaufen während Wursts ClickGUI offen ist.",
   "description.wurst.setting.invwalk.allow_other": "Ermöglicht dir, herumzulaufen während andere In-Game-Fenster offen sind (z.B. Kisten, Pferde, Dorfbewohner-Handel), es sei denn das Fenster hat ein Textfeld.",
   "description.wurst.hack.killaura": "Greift automatisch Mobs und Spieler um dich herum an.",
+  "description.wurst.hack.newchunks": "Markiert neu generierte Chunks in deiner Umgebung.",
+  "description.wurst.hack.nolevitation": "Verhindert den Levitations-Effekt, wenn du von einem Shulker getroffen wirst.\n\n§c§lWARNUNG:§r Wenn du das aktivierst, während der Levitations-Effekt bereits aktiv ist, fällst du runter!",
   "description.wurst.hack.snowshoe": "Ermöglicht dir, auf Pulverschnee zu laufen.",
   "description.wurst.setting.generic.attack_speed": "Angriffsgeschwindigkeit in Klicks pro Sekunde.\n0 = Geschwindigkeit passt sich dynamisch an deine Abklingzeit an.",
   "description.wurst.setting.generic.pause_attack_on_containers": "Greift nicht an wenn ein Behälter (Kiste, Trichter, usw.) geöffnet ist.\nNützlich für Minigame-Server die ein Kisten-ähnliches Inventar als Menü anzeigen.",

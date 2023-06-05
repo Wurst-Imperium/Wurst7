@@ -58,7 +58,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 		int i)
 	{
-		double d = this.dispatcher.getSquaredDistanceToCamera(entity);
+		double d = dispatcher.getSquaredDistanceToCamera(entity);
 		
 		if(d > 4096)
 			return;
@@ -71,7 +71,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		matrixStack.push();
 		matrixStack.translate(0.0D, f, 0.0D);
-		matrixStack.multiply(this.dispatcher.getRotation());
+		matrixStack.multiply(dispatcher.getRotation());
 		
 		float scale = 0.025F;
 		if(nameTagsHack.isEnabled())
