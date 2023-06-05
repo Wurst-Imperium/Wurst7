@@ -11,15 +11,27 @@ import net.wurstclient.Category;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"auto reconnect", "AutoRejoin", "auto rejoin"})
 @DontBlock
 public final class AutoReconnectHack extends Hack
 {
+	private final SliderSetting waitTime =
+		new SliderSetting("Wait time", "Time before reconnecting in seconds.",
+			5, 0, 60, 0.5, ValueDisplay.DECIMAL.withSuffix("s"));
+	
 	public AutoReconnectHack()
 	{
 		super("AutoReconnect");
 		setCategory(Category.OTHER);
+		addSetting(waitTime);
+	}
+	
+	public int getWaitTicks()
+	{
+		return (int)(waitTime.getValue() * 20);
 	}
 	
 	// See DisconnectedScreenMixin
