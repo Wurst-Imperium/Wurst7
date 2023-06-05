@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -140,11 +140,18 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
+	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec,
+		Hand hand)
+	{
+		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
+		interactBlock(client.player, client.world, hand, hitResult);
+		interactItem(client.player, client.world, hand);
+	}
+	
+	@Override
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
 	{
-		interactBlock(client.player, client.world, Hand.MAIN_HAND,
-			new BlockHitResult(hitVec, side, pos, false));
-		interactItem(client.player, client.world, Hand.MAIN_HAND);
+		rightClickBlock(pos, side, hitVec, Hand.MAIN_HAND);
 	}
 	
 	@Override

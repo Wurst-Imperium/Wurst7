@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -54,7 +54,8 @@ public abstract class ScreenMixin extends AbstractParentElement
 		cancellable = true)
 	public void onRenderBackground(MatrixStack matrices, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noBackgroundHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().noBackgroundHack
+			.shouldCancelBackground((Screen)(Object)this))
 			ci.cancel();
 	}
 	
