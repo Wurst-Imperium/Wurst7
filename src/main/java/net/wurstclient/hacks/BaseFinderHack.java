@@ -35,6 +35,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
 
@@ -93,7 +94,7 @@ public final class BaseFinderHack extends Hack
 	private ArrayList<String> blockNames;
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
-	private final ArrayList<int[]> vertices = new ArrayList<>();
+	private ArrayList<int[]> vertices = new ArrayList<>();
 	private VertexBuffer vertexBuffer;
 	
 	private int messageTimer = 0;
@@ -276,61 +277,6 @@ public final class BaseFinderHack extends Hack
 		counter = matchingBlocks.size();
 		
 		// calculate vertices
-		vertices.clear();
-		for(BlockPos pos : matchingBlocks)
-		{
-			if(!matchingBlocks.contains(pos.down()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 1, 0, 0);
-				addVertex(pos, 1, 0, 1);
-				addVertex(pos, 0, 0, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.up()))
-			{
-				addVertex(pos, 0, 1, 0);
-				addVertex(pos, 0, 1, 1);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 1, 1, 0);
-			}
-			
-			if(!matchingBlocks.contains(pos.north()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 0, 1, 0);
-				addVertex(pos, 1, 1, 0);
-				addVertex(pos, 1, 0, 0);
-			}
-			
-			if(!matchingBlocks.contains(pos.east()))
-			{
-				addVertex(pos, 1, 0, 0);
-				addVertex(pos, 1, 1, 0);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 1, 0, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.south()))
-			{
-				addVertex(pos, 0, 0, 1);
-				addVertex(pos, 1, 0, 1);
-				addVertex(pos, 1, 1, 1);
-				addVertex(pos, 0, 1, 1);
-			}
-			
-			if(!matchingBlocks.contains(pos.west()))
-			{
-				addVertex(pos, 0, 0, 0);
-				addVertex(pos, 0, 0, 1);
-				addVertex(pos, 0, 1, 1);
-				addVertex(pos, 0, 1, 0);
-			}
-		}
-	}
-	
-	private void addVertex(BlockPos pos, int x, int y, int z)
-	{
-		vertices.add(new int[]{pos.getX() + x, pos.getY() + y, pos.getZ() + z});
+		vertices = BlockVertexCompiler.compile(matchingBlocks);
 	}
 }

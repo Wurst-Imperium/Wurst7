@@ -139,7 +139,7 @@ public final class Version implements Comparable<Version>
 	
 	public String getChangelogLink()
 	{
-		String version = major + "-" + minor;
+		String version = major + "-" + minor + "-" + patch;
 		
 		if(isPreRelease())
 			version += "pre" + preRelease;

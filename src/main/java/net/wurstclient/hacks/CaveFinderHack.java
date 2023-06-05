@@ -447,7 +447,7 @@ public final class CaveFinderHack extends Hack
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
 		Callable<ArrayList<int[]>> task =
-			BlockVertexCompiler.createTask(matchingBlocks, regionX, regionZ);
+			() -> BlockVertexCompiler.compile(matchingBlocks, regionX, regionZ);
 		
 		compileVerticesTask = pool2.submit(task);
 	}
