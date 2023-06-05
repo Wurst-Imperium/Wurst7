@@ -901,7 +901,7 @@ public enum RenderUtils
 	}
 	
 	public static void renderTag(MatrixStack matrixStack, Text text, Entity entity, VertexConsumerProvider provider, int color, 
-		float height, int limit, float partialTicks)
+		double height, int limit, float partialTicks)
 	{
 		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
 		MinecraftClient MC = MinecraftClient.getInstance();
