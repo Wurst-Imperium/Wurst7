@@ -171,8 +171,8 @@ public final class ClickGui
 				continue;
 			
 			JsonObject jsonWindow = new JsonObject();
-			jsonWindow.addProperty("x", window.getX());
-			jsonWindow.addProperty("y", window.getY());
+			jsonWindow.addProperty("x", window.getActualX());
+			jsonWindow.addProperty("y", window.getActualY());
 			jsonWindow.addProperty("minimized", window.isMinimized());
 			jsonWindow.addProperty("pinned", window.isPinned());
 			json.add(window.getTitle(), jsonWindow);

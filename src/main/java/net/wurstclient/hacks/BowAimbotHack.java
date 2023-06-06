@@ -15,6 +15,7 @@ import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -85,6 +86,10 @@ public final class BowAimbotHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		// disable conflicting hacks
+		WURST.getHax().excavatorHack.setEnabled(false);
+		
+		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -232,6 +237,7 @@ public final class BowAimbotHack extends Hack
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
 	@Override
@@ -254,9 +260,11 @@ public final class BowAimbotHack extends Hack
 		else
 			message = "Target Locked";
 		
+		TextRenderer tr = MC.textRenderer;
+		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getWidth(message);
+		int msgWidth = tr.getWidth(message);
 		GL11.glTranslated(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
@@ -280,6 +288,7 @@ public final class BowAimbotHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
 	private enum Priority

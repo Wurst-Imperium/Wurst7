@@ -463,6 +463,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// text
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		glColor4f(1, 1, 1, 1);
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{

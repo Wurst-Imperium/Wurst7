@@ -3,3 +3,4 @@ accessible	field	net/minecraft/client/gl/VertexBuffer	vertexCount	I
 accessible	field	net/minecraft/client/render/BufferBuilder	drawMode	I
 accessible	field	net/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket	changePosition	Z
 accessible	field	net/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket	changeLook	Z
+accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;

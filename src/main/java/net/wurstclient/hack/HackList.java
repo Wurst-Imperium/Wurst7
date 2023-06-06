@@ -42,6 +42,7 @@ public final class HackList implements UpdateListener
 	public final ArrowDmgHack arrowDmgHack = new ArrowDmgHack();
 	public final AutoArmorHack autoArmorHack = new AutoArmorHack();
 	public final AutoBuildHack autoBuildHack = new AutoBuildHack();
+	public final AutoCompleteHack autoCompleteHack = new AutoCompleteHack();
 	public final AutoDropHack autoDropHack = new AutoDropHack();
 	public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
 	public final AutoLibrarianHack autoLibrarianHack = new AutoLibrarianHack();

@@ -9,7 +9,9 @@ package net.wurstclient.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -63,5 +65,17 @@ public enum ChatUtils
 	public static void syntaxError(String message)
 	{
 		message(SYNTAX_ERROR_PREFIX + message);
+	}
+	
+	public static String getAsString(ChatHudLine<OrderedText> visible)
+	{
+		return getAsString(visible.getText());
+	}
+	
+	public static String getAsString(OrderedText text)
+	{
+		JustGiveMeTheStringVisitor visitor = new JustGiveMeTheStringVisitor();
+		text.accept(visitor);
+		return visitor.toString();
 	}
 }
