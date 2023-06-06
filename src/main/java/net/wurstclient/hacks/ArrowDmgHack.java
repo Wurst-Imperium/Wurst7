@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,7 +26,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 {
 	private final SliderSetting packets = new SliderSetting("Packets",
-		"description.wurst.setting.arrowdmg.packets", 200, 2, 2000, 2,
+		"description.wurst.setting.arrowdmg.packets", 200, 2, 7000, 20,
 		ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting yeetTridents =

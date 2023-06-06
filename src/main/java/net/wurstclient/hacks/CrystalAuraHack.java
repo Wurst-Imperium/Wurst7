@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -99,6 +99,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	public void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().killauraHack.setEnabled(false);

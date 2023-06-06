@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -57,12 +57,12 @@ public final class SpeedNukerHack extends Hack
 			+ "air = won't break anything", "minecraft:air", true);
 	
 	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
-		"Prevents changing the ID by clicking on blocks or restarting Nuker.",
+		"Prevents changing the ID by clicking on blocks or restarting SpeedNuker.",
 		false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
 		"MultiID List", "The types of blocks to break in MultiID mode.",
-		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
+		"minecraft:ancient_debris", "minecraft:bone_block",
 		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
 		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
 		"minecraft:lapis_ore", "minecraft:nether_gold_ore",

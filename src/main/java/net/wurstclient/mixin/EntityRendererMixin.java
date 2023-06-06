@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,18 +33,19 @@ public abstract class EntityRendererMixin<T extends Entity>
 	@Final
 	protected EntityRenderDispatcher dispatcher;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 		cancellable = true)
 	private void onRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 		int i, CallbackInfo ci)
 	{
+		// add HealthTags info
 		if(entity instanceof LivingEntity)
 			text = WurstClient.INSTANCE.getHax().healthTagsHack
 				.addHealth((LivingEntity)entity, text);
 		
+		// do NameTags adjustments
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
 			vertexConsumerProvider, i);
 		ci.cancel();
@@ -55,50 +56,55 @@ public abstract class EntityRendererMixin<T extends Entity>
 	 * an infinite loop. Also makes it easier to modify.
 	 */
 	protected void wurstRenderLabelIfPresent(T entity, Text text,
-		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-		int i)
+		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
 	{
-		double d = this.dispatcher.getSquaredDistanceToCamera(entity);
+		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
-		if(d > 4096)
+		// disable distance limit if configured in NameTags
+		double distanceSq = dispatcher.getSquaredDistanceToCamera(entity);
+		if(distanceSq > 4096 && !nameTags.isUnlimitedRange())
 			return;
 		
-		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		// disable sneaking changes if NameTags is enabled
+		boolean notSneaky = !entity.isSneaky() || nameTags.isEnabled();
 		
-		boolean bl = !entity.isSneaky() || nameTagsHack.isEnabled();
-		float f = entity.getHeight() + 0.5F;
-		int j = "deadmau5".equals(text.getString()) ? -10 : 0;
+		float matrixY = entity.getHeight() + 0.5F;
+		int labelY = "deadmau5".equals(text.getString()) ? -10 : 0;
 		
-		matrixStack.push();
-		matrixStack.translate(0.0D, f, 0.0D);
-		matrixStack.multiply(this.dispatcher.getRotation());
+		matrices.push();
+		matrices.translate(0, matrixY, 0);
+		matrices.multiply(dispatcher.getRotation());
 		
+		// adjust scale if NameTags is enabled
 		float scale = 0.025F;
-		if(nameTagsHack.isEnabled())
+		if(nameTags.isEnabled())
 		{
 			double distance = WurstClient.MC.player.distanceTo(entity);
-			
 			if(distance > 10)
 				scale *= distance / 10;
 		}
+		matrices.scale(-scale, -scale, scale);
 		
-		matrixStack.scale(-scale, -scale, scale);
+		Matrix4f matrix = matrices.peek().getModel();
+		float bgOpacity =
+			WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
+		int bgColor = (int)(bgOpacity * 255F) << 24;
+		TextRenderer tr = getFontRenderer();
+		float labelX = -tr.getWidth(text) / 2;
 		
-		Matrix4f matrix4f = matrixStack.peek().getModel();
-		float g = WurstClient.MC.options.getTextBackgroundOpacity(0.25F);
-		int k = (int)(g * 255.0F) << 24;
+		// use the see-through layer if configured in NameTags
+		boolean seeThrough = nameTags.isSeeThrough();
 		
-		TextRenderer textRenderer = this.getFontRenderer();
-		float h = -textRenderer.getWidth(text) / 2;
+		// draw background
+		tr.draw(text.asOrderedText(), labelX, labelY, 0x20FFFFFF, false, matrix,
+			vertexConsumers, notSneaky, bgColor, light);
 		
-		textRenderer.draw(text.asOrderedText(), h, j, 553648127, false,
-			matrix4f, vertexConsumerProvider, bl, k, i);
+		// draw text
+		if(notSneaky)
+			tr.draw(text.asOrderedText(), labelX, labelY, 0xFFFFFFFF, false,
+				matrix, vertexConsumers, seeThrough, 0, light);
 		
-		if(bl)
-			textRenderer.draw(text.asOrderedText(), h, j, -1, false, matrix4f,
-				vertexConsumerProvider, false, 0, i);
-		
-		matrixStack.pop();
+		matrices.pop();
 	}
 	
 	@Shadow

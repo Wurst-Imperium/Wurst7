@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,8 @@ package net.wurstclient.util;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,6 +25,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 
 public abstract class ListWidget extends AbstractParentElement
 	implements Drawable
@@ -439,5 +442,37 @@ public abstract class ListWidget extends AbstractParentElement
 	public double getScrollAmount()
 	{
 		return scrollAmount;
+	}
+	
+	protected void drawSelectionOutline(MatrixStack matrixStack, int x, int y)
+	{
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glEnable(GL11.GL_BLEND);
+		
+		Matrix4f matrix = matrixStack.peek().getModel();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
+		RenderSystem.color4f(0.5F, 0.5F, 0.5F, 1);
+		bufferBuilder.begin(7, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y - 2, 0).next();
+		bufferBuilder.vertex(matrix, x + 218, y + 28, 0).next();
+		bufferBuilder.vertex(matrix, x - 2, y + 28, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.color4f(0, 0, 0, 1);
+		bufferBuilder.begin(7, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x - 1, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y - 1, 0).next();
+		bufferBuilder.vertex(matrix, x + 217, y + 27, 0).next();
+		bufferBuilder.vertex(matrix, x - 1, y + 27, 0).next();
+		tessellator.draw();
+		
+		RenderSystem.color4f(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 }

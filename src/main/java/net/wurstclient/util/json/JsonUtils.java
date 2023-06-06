@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -222,6 +222,38 @@ public enum JsonUtils
 			return fallback;
 		
 		return json.getAsLong();
+	}
+	
+	public static float getAsFloat(JsonElement json) throws JsonException
+	{
+		if(!isNumber(json))
+			throw new JsonException("Not a number: " + json);
+		
+		return json.getAsFloat();
+	}
+	
+	public static float getAsFloat(JsonElement json, float fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
+		
+		return json.getAsFloat();
+	}
+	
+	public static double getAsDouble(JsonElement json) throws JsonException
+	{
+		if(!isNumber(json))
+			throw new JsonException("Not a number: " + json);
+		
+		return json.getAsDouble();
+	}
+	
+	public static double getAsDouble(JsonElement json, double fallback)
+	{
+		if(!isNumber(json))
+			return fallback;
+		
+		return json.getAsDouble();
 	}
 	
 	public static boolean isString(JsonElement json)

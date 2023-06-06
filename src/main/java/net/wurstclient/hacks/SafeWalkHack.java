@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -69,12 +69,12 @@ public final class SafeWalkHack extends Hack
 	
 	private void setSneaking(boolean sneaking)
 	{
-		IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
+		KeyBinding sneakKey = MC.options.keySneak;
 		
 		if(sneaking)
-			((KeyBinding)sneakKey).setPressed(true);
+			sneakKey.setPressed(true);
 		else
-			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
+			((IKeyBinding)sneakKey).resetPressedState();
 		
 		this.sneaking = sneaking;
 	}

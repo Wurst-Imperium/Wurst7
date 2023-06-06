@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,13 +16,12 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
-import net.wurstclient.WurstClient;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class EditBlockScreen extends Screen
 {
@@ -136,10 +135,16 @@ public final class EditBlockScreen extends Screen
 		fill(matrixStack, 215, -55, 216, -37, black);
 		fill(matrixStack, 242, -55, 245, -37, black);
 		
-		Block blockToAdd = BlockUtils.getBlockFromName(blockField.getText());
-		renderIcon(matrixStack, new ItemStack(blockToAdd), 52, -52, false);
-		
 		GL11.glPopMatrix();
+		
+		String nameOrId = blockField.getText();
+		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
+		
+		if(blockToAdd == null)
+			blockToAdd = Blocks.AIR;
+		
+		RenderUtils.drawItem(matrixStack, new ItemStack(blockToAdd),
+			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	
 	@Override
@@ -152,44 +157,5 @@ public final class EditBlockScreen extends Screen
 	public boolean shouldCloseOnEsc()
 	{
 		return false;
-	}
-	
-	private void renderIcon(MatrixStack matrixStack, ItemStack stack, int x,
-		int y, boolean large)
-	{
-		GL11.glPushMatrix();
-		
-		GL11.glTranslated(x, y, 0);
-		double scale = large ? 1.5 : 0.75;
-		GL11.glScaled(scale, scale, scale);
-		
-		DiffuseLighting.enable();
-		ItemStack grass = new ItemStack(Blocks.GRASS_BLOCK);
-		ItemStack renderStack = !stack.isEmpty() ? stack : grass;
-		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
-			0, 0);
-		DiffuseLighting.disable();
-		
-		GL11.glPopMatrix();
-		
-		if(stack.isEmpty())
-			renderQuestionMark(matrixStack, x, y, large);
-	}
-	
-	private void renderQuestionMark(MatrixStack matrixStack, int x, int y,
-		boolean large)
-	{
-		GL11.glPushMatrix();
-		
-		GL11.glTranslated(x, y, 0);
-		if(large)
-			GL11.glScaled(2, 2, 2);
-		
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		TextRenderer tr = WurstClient.MC.textRenderer;
-		tr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		
-		GL11.glPopMatrix();
 	}
 }

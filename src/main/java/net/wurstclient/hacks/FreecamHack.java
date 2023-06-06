@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -77,7 +77,7 @@ public final class FreecamHack extends Hack
 			gs.keyRight, gs.keyJump, gs.keySneak};
 		
 		for(KeyBinding binding : bindings)
-			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
+			((IKeyBinding)binding).resetPressedState();
 		
 		playerBox = GL11.glGenLists(1);
 		GL11.glNewList(playerBox, GL11.GL_COMPILE);

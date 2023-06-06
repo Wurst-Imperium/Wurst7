@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,6 +38,15 @@ public final class ClickGuiHack extends Hack
 	private final SliderSetting ttOpacity = new SliderSetting("Tooltip opacity",
 		0.75, 0.15, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
+	private final SliderSetting maxHeight = new SliderSetting("Max height",
+		"Maximum window height\n" + "0 = no limit", 200, 0, 1000, 50,
+		ValueDisplay.INTEGER);
+	
+	private final SliderSetting maxSettingsHeight =
+		new SliderSetting("Max settings height",
+			"Maximum height for settings windows\n" + "0 = no limit", 200, 0,
+			1000, 50, ValueDisplay.INTEGER);
+	
 	public ClickGuiHack()
 	{
 		super("ClickGUI");
@@ -46,6 +55,8 @@ public final class ClickGuiHack extends Hack
 		addSetting(txtColor);
 		addSetting(opacity);
 		addSetting(ttOpacity);
+		addSetting(maxHeight);
+		addSetting(maxSettingsHeight);
 	}
 	
 	@Override
@@ -78,5 +89,15 @@ public final class ClickGuiHack extends Hack
 	public float getTooltipOpacity()
 	{
 		return ttOpacity.getValueF();
+	}
+	
+	public int getMaxHeight()
+	{
+		return maxHeight.getValueI();
+	}
+	
+	public int getMaxSettingsHeight()
+	{
+		return maxSettingsHeight.getValueI();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,11 +23,11 @@ import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 @Mixin(TerrainRenderContext.class)
 public class TerrainRenderContextMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"tesselateBlock"},
+	@Inject(at = @At("HEAD"),
+		method = "tesselateBlock",
 		cancellable = true,
 		remap = false)
-	private void tesselateBlock(BlockState blockState, BlockPos blockPos,
+	private void pnTesselateBlock(BlockState blockState, BlockPos blockPos,
 		final BakedModel model, MatrixStack matrixStack,
 		CallbackInfoReturnable<Boolean> cir)
 	{

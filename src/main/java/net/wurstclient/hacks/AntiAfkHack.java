@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -67,10 +67,8 @@ public final class AntiAfkHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		MC.options.keyForward.setPressed(
-			((IKeyBinding)MC.options.keyForward).isActallyPressed());
-		MC.options.keyJump
-			.setPressed(((IKeyBinding)MC.options.keyJump).isActallyPressed());
+		((IKeyBinding)MC.options.keyForward).resetPressedState();
+		((IKeyBinding)MC.options.keyJump).resetPressedState();
 		
 		pathFinder = null;
 		processor = null;

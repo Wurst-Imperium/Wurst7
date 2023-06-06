@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -117,6 +117,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
 		
+		// TODO: Why does this use 0.5 instead of
+		// FullBright's defaultGamma setting?
 		if(!WURST.getHax().fullbrightHack.isEnabled())
 			MC.options.gamma = 0.5F;
 	}

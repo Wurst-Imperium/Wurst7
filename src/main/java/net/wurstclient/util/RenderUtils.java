@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,8 +9,15 @@ package net.wurstclient.util;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.block.Blocks;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -344,5 +351,41 @@ public enum RenderUtils
 		GL11.glEnd();
 		
 		GL11.glPopMatrix();
+	}
+	
+	public static void drawItem(MatrixStack matrixStack, ItemStack stack, int x,
+		int y, boolean large)
+	{
+		RenderSystem.pushMatrix();
+		RenderSystem.translated(x, y, 0);
+		if(large)
+			RenderSystem.scaled(1.5F, 1.5F, 1.5F);
+		else
+			RenderSystem.scaled(0.75F, 0.75F, 0.75F);
+		
+		ItemStack renderStack =
+			stack.isEmpty() ? new ItemStack(Blocks.GRASS_BLOCK) : stack;
+		
+		DiffuseLighting.enableGuiDepthLighting();
+		WurstClient.MC.getItemRenderer().renderInGuiWithOverrides(renderStack,
+			0, 0);
+		DiffuseLighting.disableGuiDepthLighting();
+		
+		RenderSystem.popMatrix();
+		
+		if(stack.isEmpty())
+		{
+			RenderSystem.pushMatrix();
+			RenderSystem.translated(x, y, 0);
+			if(large)
+				RenderSystem.scaled(2, 2, 2);
+			
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			TextRenderer fr = WurstClient.MC.textRenderer;
+			fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			
+			RenderSystem.popMatrix();
+		}
 	}
 }
