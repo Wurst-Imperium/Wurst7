@@ -900,8 +900,8 @@ public enum RenderUtils
 		}
 	}
 	
-	public static void renderTag(MatrixStack matrixStack, Text text, Entity entity, VertexConsumerProvider provider, int color, 
-		double height, int limit, float partialTicks)
+	public static void renderTag(MatrixStack matrixStack, Text text, Entity entity,
+		VertexConsumerProvider provider, int color, double height, int limit, float partialTicks)
 	{
 		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
 		MinecraftClient MC = MinecraftClient.getInstance();
@@ -926,7 +926,7 @@ public enum RenderUtils
 		float scale = 0.025F;
 		if(nameTagsHack.isEnabled())
 		{
-			double distance = WurstClient.MC.player.distanceTo(entity);
+			double distance = MC.player.distanceTo(entity);
 			
 			if(distance > 10)
 				scale *= distance / 10;
