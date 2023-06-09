@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
@@ -146,34 +146,34 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		renderTitles(matrixStack);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		renderBackground(context);
+		renderTitles(context);
+		super.render(context, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderTitles(MatrixStack matrixStack)
+	private void renderTitles(DrawContext context)
 	{
 		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredTextWithShadow(matrixStack, tr, "Wurst Options", middleX,
-			y1, 0xffffff);
+		context.drawCenteredTextWithShadow(tr, "Wurst Options", middleX, y1,
+			0xffffff);
 		
-		drawCenteredTextWithShadow(matrixStack, tr, "Settings", middleX - 104,
-			y2, 0xcccccc);
-		drawCenteredTextWithShadow(matrixStack, tr, "Managers", middleX, y2,
+		context.drawCenteredTextWithShadow(tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredTextWithShadow(matrixStack, tr, "Links", middleX + 104, y2,
+		context.drawCenteredTextWithShadow(tr, "Managers", middleX, y2,
+			0xcccccc);
+		context.drawCenteredTextWithShadow(tr, "Links", middleX + 104, y2,
 			0xcccccc);
 	}
 	
-	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -191,7 +191,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}

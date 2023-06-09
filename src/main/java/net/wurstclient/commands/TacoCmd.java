@@ -11,9 +11,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.wurstclient.Category;
 import net.wurstclient.command.CmdException;
@@ -83,7 +82,7 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -97,13 +96,12 @@ public final class TacoCmd extends Command
 		}else
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		RenderSystem.setShaderTexture(0, tacos[ticks / 8]);
 		Window sr = MC.getWindow();
 		int x = sr.getScaledWidth() / 2 - 32 + 76;
 		int y = sr.getScaledHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, w, h, w, h);
+		context.drawTexture(tacos[ticks / 8], x, y, 0, 0, w, h, w, h);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);

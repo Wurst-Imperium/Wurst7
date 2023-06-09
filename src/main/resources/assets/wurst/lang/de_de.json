@@ -34,7 +34,7 @@
   "description.wurst.hack.autopotion": "Benutzt automatisch Wurftränke der Heilung, wenn deine Gesundheit niedrig ist.",
   "description.wurst.hack.autoreconnect": "Verbindet dich automatisch wieder, wenn du vom Server gekickt wirst.",
   "description.wurst.hack.autorespawn": "Respawnt dich automatisch, wenn du stirbst.",
-  "description.wurst.hack.autosign": "Schreibt einen beliebigen Text automatisch auf jedes Schild, das du platzierst.\n\nNachdem du diesen Hack aktivierst, kannst du auf ein Schild ganz normal schreiben. Der Text von diesem Schild wird dann gespeichert und auf alle Schilder kopiert, die du danach platzierst.",
+  "description.wurst.hack.autosign": "Schreibt einen beliebigen Text automatisch auf jedes Schild, das du platzierst oder bearbeitest.\n\nNachdem du diesen Hack aktivierst, kannst du auf ein Schild ganz normal schreiben. Der Text von diesem Schild wird dann gespeichert und auf alle Schilder kopiert, die du danach platzierst.",
   "description.wurst.hack.autosoup": "Isst automatisch Pilzsuppe, wenn deine Gesundheit niedrig ist.\n\n§lAchtung:§r Dieser Hack ignoriert das Hunger-System und tut so als ob Pilzsuppe direkt deine Gesundheit auffüllt. Wenn der Server auf dem du spielst das nicht so macht, solltest du stattdessen AutoEat benutzen.",
   "description.wurst.hack.autosprint": "Lässt dich automatisch sprinten.",
   "description.wurst.hack.autosteal": "Klaut automatisch alle Items aus allen Kisten und Shulkerboxen, die du öffnest.",

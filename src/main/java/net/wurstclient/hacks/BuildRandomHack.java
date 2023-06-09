@@ -169,7 +169,7 @@ public final class BuildRandomHack extends Hack
 	
 	private boolean tryToPlaceBlock(boolean legitMode, BlockPos pos)
 	{
-		if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
+		if(!BlockUtils.getState(pos).isReplaceable())
 			return false;
 		
 		if(legitMode)

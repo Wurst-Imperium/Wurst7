@@ -122,7 +122,7 @@ public final class AutoFarmRenderer
 		if(greenBuffer != null)
 			greenBuffer.close();
 		
-		greenBuffer = new VertexBuffer();
+		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -144,7 +144,7 @@ public final class AutoFarmRenderer
 		if(cyanBuffer != null)
 			cyanBuffer.close();
 		
-		cyanBuffer = new VertexBuffer();
+		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -166,7 +166,7 @@ public final class AutoFarmRenderer
 		if(redBuffer != null)
 			redBuffer.close();
 		
-		redBuffer = new VertexBuffer();
+		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		

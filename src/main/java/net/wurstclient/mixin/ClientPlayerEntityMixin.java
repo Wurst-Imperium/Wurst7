@@ -83,29 +83,28 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		return player.isUsingItem();
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
+	@Inject(at = @At("HEAD"), method = "sendMovementPackets()V")
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
+	@Inject(at = @At("TAIL"), method = "sendMovementPackets()V")
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
 		EventManager.fire(event);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"isAutoJumpEnabled()Z"},
+	@Inject(at = @At("HEAD"),
+		method = "isAutoJumpEnabled()Z",
 		cancellable = true)
 	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
@@ -113,10 +112,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cir.setReturnValue(false);
 	}
 	
+	/**
+	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
+	 * to null to prevent the updateNausea() method from closing it.
+	 */
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = {"updateNausea()V"})
+		ordinal = 0), method = "updateNausea()V")
 	private void beforeUpdateNausea(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
@@ -126,10 +129,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		client.currentScreen = null;
 	}
 	
+	/**
+	 * This mixin restores the current screen as soon as the updateNausea()
+	 * method is done looking at it.
+	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = {"updateNausea()V"})
+		ordinal = 1), method = "updateNausea()V")
 	private void afterUpdateNausea(CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)

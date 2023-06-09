@@ -112,8 +112,8 @@ public final class ChestEspRenderer
 	public static void prepareBuffers()
 	{
 		closeBuffers();
-		solidBox = new VertexBuffer();
-		outlinedBox = new VertexBuffer();
+		solidBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		outlinedBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		RenderUtils.drawSolidBox(box, solidBox);

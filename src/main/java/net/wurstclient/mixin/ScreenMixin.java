@@ -17,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IScreen;
 
@@ -31,11 +31,10 @@ public abstract class ScreenMixin extends AbstractParentElement
 	@Final
 	private List<Drawable> drawables;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "renderBackground(Lnet/minecraft/client/gui/DrawContext;)V",
 		cancellable = true)
-	public void onRenderBackground(MatrixStack matrices, CallbackInfo ci)
+	public void onRenderBackground(DrawContext context, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
 			.shouldCancelBackground((Screen)(Object)this))
