@@ -21,7 +21,6 @@ public class PlayerEntityMixin
 	{
 		if(!WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintAttack())
 			entity.setVelocity(velocity);
-		
 	}
 	
 	@Redirect(at = @At(value = "INVOKE",
