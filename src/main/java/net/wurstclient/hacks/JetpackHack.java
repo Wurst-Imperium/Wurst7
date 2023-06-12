@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.lang.Math;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -22,7 +24,11 @@ public final class JetpackHack extends Hack implements UpdateListener
 	public final SliderSetting verticalSpeed = new SliderSetting(
 		"Vertical Speed",
 		"The default 0.42 is vanilla jump speed",
-		0.42, 0.05, 4, 0.01, ValueDisplay.DECIMAL);
+		0.42, 0.05, 2, 0.01, ValueDisplay.DECIMAL);
+	public final SliderSetting horizontalSpeed = new SliderSetting(
+		"Horizontal Speed",
+		"The default 0.2 is vanilla jump horizontal speed",
+		0.2, 0, 4, 0.05, ValueDisplay.DECIMAL);
 
 	public JetpackHack()
 	{
@@ -30,6 +36,7 @@ public final class JetpackHack extends Hack implements UpdateListener
 		
 		setCategory(Category.MOVEMENT);
 		addSetting(verticalSpeed);
+		addSetting(horizontalSpeed);
 	}
 	
 	@Override
@@ -54,8 +61,16 @@ public final class JetpackHack extends Hack implements UpdateListener
 
 		Vec3d velocity = player.getVelocity();
 		
-		if((player.isFallFlying() || velocity.y != 0) && MC.options.jumpKey.isPressed())
-			player.setVelocity(velocity.x, verticalSpeed.getValue(),
-				velocity.z);
+		if((player.isFallFlying() || velocity.y != 0) && MC.options.jumpKey.isPressed()) {
+			if (MC.options.sprintKey.isPressed()) {
+				double yaw = -Math.toRadians(player.getYaw()) - (Math.PI/2);
+				double velx = velocity.x + ((float)Math.cos(yaw) * horizontalSpeed.getValue());
+				double velz = velocity.z - ((float)Math.sin(yaw) * horizontalSpeed.getValue());
+				player.setVelocity(velx, verticalSpeed.getValue(), velz);
+			} else {
+				player.setVelocity(velocity.x, verticalSpeed.getValue(), velocity.z);
+			}
+			
+		}
 	}
 }
