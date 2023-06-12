@@ -30,6 +30,8 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
@@ -41,8 +43,13 @@ public final class AutoFishDebugDraw
 	private final ColorSetting ddColor = new ColorSetting("DD color",
 		"Color of the debug draw, if enabled.", Color.RED);
 	
+	private final SliderSetting validRange;
 	private Vec3d lastSoundPos;
-	private Box validRangeBox;
+	
+	public AutoFishDebugDraw(SliderSetting validRange)
+	{
+		this.validRange = validRange;
+	}
 	
 	public Stream<Setting> getSettings()
 	{
@@ -52,13 +59,6 @@ public final class AutoFishDebugDraw
 	public void reset()
 	{
 		lastSoundPos = null;
-		validRangeBox = null;
-	}
-	
-	public void updateValidRange(double validRange)
-	{
-		validRangeBox = new Box(-validRange, -1 / 16.0, -validRange, validRange,
-			1 / 16.0, validRange);
 	}
 	
 	public void updateSoundPos(PlaySoundS2CPacket sound)
@@ -85,8 +85,8 @@ public final class AutoFishDebugDraw
 		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
-		if(bobber != null && validRangeBox != null)
-			drawValidRange(matrixStack, bobber, regionX, regionZ);
+		if(bobber != null)
+			drawValidRange(matrixStack, partialTicks, bobber, regionX, regionZ);
 		
 		if(lastSoundPos != null)
 			drawLastBite(matrixStack, regionX, regionZ);
@@ -99,17 +99,20 @@ public final class AutoFishDebugDraw
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void drawValidRange(MatrixStack matrixStack,
+	private void drawValidRange(MatrixStack matrixStack, float partialTicks,
 		FishingBobberEntity bobber, int regionX, int regionZ)
 	{
 		matrixStack.push();
-		matrixStack.translate(bobber.getX() - regionX, bobber.getY(),
-			bobber.getZ() - regionZ);
+		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks);
+		matrixStack.translate(pos.getX() - regionX, pos.getY(),
+			pos.getZ() - regionZ);
 		
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
-		RenderUtils.drawOutlinedBox(validRangeBox, matrixStack);
+		double vr = validRange.getValue();
+		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr);
+		RenderUtils.drawOutlinedBox(vrBox, matrixStack);
 		
 		matrixStack.pop();
 	}
