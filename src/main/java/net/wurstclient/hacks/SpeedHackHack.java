@@ -12,14 +12,28 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"speed hack"})
 public final class SpeedHackHack extends Hack implements UpdateListener
 {
+	public final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
+		"\u00a7lSimple\u00a7r mode increases all kinds of movements you do.\n\n"
+			+ "\u00a7lMicroJump\u00a7r mode makes you do many small jumps.\n"
+			+ "May help with some anticheat plugins, but only works while on ground.\n\n",
+		Mode.values(), Mode.SIMPLE);
+
+	public final SliderSetting speed = new SliderSetting(
+	"Horizontal Speed", 0.66, 0.4, 5, 0.01, ValueDisplay.DECIMAL);
+
 	public SpeedHackHack()
 	{
 		super("SpeedHack");
 		setCategory(Category.MOVEMENT);
+		addSetting(speed);
+		addSetting(mode);
 	}
 	
 	@Override
@@ -42,27 +56,56 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 			|| MC.player.forwardSpeed == 0 && MC.player.sidewaysSpeed == 0)
 			return;
 		
-		// activate sprint if walking forward
-		if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision)
-			MC.player.setSprinting(true);
-		
-		// activate mini jump if on ground
+		double maxSpeed = speed.getValue();
+		Vec3d v = MC.player.getVelocity();
+
+		// only use SpeedHack when on ground
 		if(!MC.player.isOnGround())
 			return;
+
+		if (mode.getSelected() == Mode.MICROJUMP) {
+			// activate sprint if walking forward
+			if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision && 
+				mode.getSelected() == Mode.MICROJUMP)
+				MC.player.setSprinting(true);
+					
+			double multiplier = maxSpeed / 0.66 * 1.8;
+
+			MC.player.setVelocity(v.x * multiplier, v.y + 0.1, v.z * multiplier);
 		
-		Vec3d v = MC.player.getVelocity();
-		MC.player.setVelocity(v.x * 1.8, v.y + 0.1, v.z * 1.8);
+			v = MC.player.getVelocity();
+		} else {
+			double multiplier = maxSpeed / 0.66 * 1.8;
+
+			MC.player.setVelocity(v.x * multiplier, v.y, v.z * multiplier);
 		
-		v = MC.player.getVelocity();
+			v = MC.player.getVelocity();
+		}
+		// limit movement speed
 		double currentSpeed = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.z, 2));
-		
-		// limit speed to highest value that works on NoCheat+ version
-		// 3.13.0-BETA-sMD5NET-b878
-		// UPDATE: Patched in NoCheat+ version 3.13.2-SNAPSHOT-sMD5NET-b888
-		double maxSpeed = 0.66F;
-		
 		if(currentSpeed > maxSpeed)
 			MC.player.setVelocity(v.x / currentSpeed * maxSpeed, v.y,
 				v.z / currentSpeed * maxSpeed);
 	}
+
+
+	public static enum Mode
+	{
+		SIMPLE("Simple"),
+		MICROJUMP("MicroJump");
+		
+		private final String name;
+
+		private Mode(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+
 }
