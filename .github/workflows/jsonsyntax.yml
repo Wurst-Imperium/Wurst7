@@ -2,7 +2,6 @@ name: JSON syntax
 
 on:
   push:
-    branches: [ "master" ]
     paths:
       - '**.json'
   pull_request:
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: json-syntax-check
+      - name: Check JSON syntax
         uses: limitusus/json-syntax-check@v2
         with:
           pattern: "\\.json$"
