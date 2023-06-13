@@ -21,9 +21,6 @@ on:
       - 'gradle**'
       - 'build.gradle'
 
-permissions:
-  contents: read
-
 jobs:
   build:
 
