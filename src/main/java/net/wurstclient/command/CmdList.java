@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.commands.*;
+import net.wurstclient.other_features.PingCmd;
 
 public final class CmdList
 {
@@ -51,6 +52,7 @@ public final class CmdList
 	public final ProtectCmd protectCmd = new ProtectCmd();
 	public final RenameCmd renameCmd = new RenameCmd();
 	public final RepairCmd repairCmd = new RepairCmd();
+	public final PingCmd pingCmd = new PingCmd();
 	public final RvCmd rvCmd = new RvCmd();
 	public final SvCmd svCmd = new SvCmd();
 	public final SayCmd sayCmd = new SayCmd();
