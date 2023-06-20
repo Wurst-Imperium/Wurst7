@@ -92,13 +92,12 @@ public final class ExcavatorHack extends Hack
 	public void onEnable()
 	{
 		// disable conflicting hacks
-		// TODO:
-		// WURST.getHax().bowAimbotMod.setEnabled(false);
-		// WURST.getHax().templateToolMod.setEnabled(false);
 		WURST.getHax().autoMineHack.setEnabled(false);
+		WURST.getHax().bowAimbotHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
+		// WURST.getHax().templateToolHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		step = Step.START_POS;
@@ -321,6 +320,7 @@ public final class ExcavatorHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override
@@ -363,6 +363,7 @@ public final class ExcavatorHack extends Hack
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		tr.draw(matrixStack, message, 2, 1, 0xffffffff);
 		
 		matrixStack.pop();
@@ -370,6 +371,7 @@ public final class ExcavatorHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	public void enableWithArea(BlockPos pos1, BlockPos pos2)

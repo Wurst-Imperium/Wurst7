@@ -5,3 +5,4 @@ accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	L
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
 accessible	method	net/minecraft/client/gui/widget/GridWidget	wrappedWidgets	()Ljava/util/List;
+accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;

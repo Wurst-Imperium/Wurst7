@@ -157,9 +157,14 @@ public final class TunnellerHack extends Hack
 			currentBlock = null;
 		}
 		
-		for(VertexBuffer buffer : vertexBuffers)
-			if(buffer != null)
-				buffer.close();
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			if(vertexBuffers[i] == null)
+				continue;
+			
+			vertexBuffers[i].close();
+			vertexBuffers[i] = null;
+		}
 	}
 	
 	@Override
@@ -734,7 +739,10 @@ public final class TunnellerHack extends Hack
 				lastTorch = null;
 				nextTorch = new BlockPos(MC.player.getPos());
 				if(vertexBuffers[4] != null)
+				{
 					vertexBuffers[4].close();
+					vertexBuffers[4] = null;
+				}
 				return false;
 			}
 			

@@ -62,7 +62,29 @@ public class Window
 		this.title = title;
 	}
 	
+	/**
+	 * Returns the X position of the window, adjusted to fit inside the screen.
+	 */
 	public final int getX()
+	{
+		// prevent window from going off the right side of the screen
+		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
+		if(x > mcWindow.getScaledWidth() - 1)
+			return mcWindow.getScaledWidth() - 1;
+		
+		// prevent window from going off the left side of the screen
+		if(x <= -width)
+			return -width + 1;
+		
+		return x;
+	}
+	
+	/**
+	 * Returns the actual X position of the window, without any adjustments.
+	 * This should only be used for saving the window's position to the config
+	 * file.
+	 */
+	public final int getActualX()
 	{
 		return x;
 	}
@@ -72,7 +94,29 @@ public class Window
 		this.x = x;
 	}
 	
+	/**
+	 * Returns the Y position of the window, adjusted to fit inside the screen.
+	 */
 	public final int getY()
+	{
+		// prevent window from going off the bottom of the screen
+		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
+		if(y > mcWindow.getScaledHeight() - 1)
+			return mcWindow.getScaledHeight() - 1;
+		
+		// prevent window from going off the top of the screen
+		if(y <= -12)
+			return -12;
+		
+		return y;
+	}
+	
+	/**
+	 * Returns the actual Y position of the window, without any adjustments.
+	 * This should only be used for saving the window's position to the config
+	 * file.
+	 */
+	public final int getActualY()
 	{
 		return y;
 	}
@@ -226,8 +270,8 @@ public class Window
 	public final void startDragging(int mouseX, int mouseY)
 	{
 		dragging = true;
-		dragOffsetX = x - mouseX;
-		dragOffsetY = y - mouseY;
+		dragOffsetX = getX() - mouseX;
+		dragOffsetY = getY() - mouseY;
 	}
 	
 	public final void dragTo(int mouseX, int mouseY)

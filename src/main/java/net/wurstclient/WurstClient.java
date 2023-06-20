@@ -180,6 +180,12 @@ public enum WurstClient
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
 			return IMC.getLanguageManager().getEnglish().get(key);
+			
+		// This extra check is necessary because I18n.translate() doesn't
+		// always return the key when the translation is missing. If the key
+		// contains a '%', it will return "Format Error: key" instead.
+		if(!I18n.hasTranslation(key))
+			return key;
 		
 		return I18n.translate(key);
 	}

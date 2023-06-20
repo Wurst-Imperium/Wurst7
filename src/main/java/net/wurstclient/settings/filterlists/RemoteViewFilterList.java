@@ -55,6 +55,8 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(new FilterGolemsSetting(
 			"Won't view iron golems, snow golems and shulkers.", true));
 		
+		builder.add(new FilterAllaysSetting("Won't view allays.", true));
+		
 		builder.add(new FilterInvisibleSetting("Won't view invisible entities.",
 			false));
 		
