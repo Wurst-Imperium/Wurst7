@@ -14,14 +14,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +37,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"LegitNuker", "nuker legit", "legit nuker"})
@@ -82,6 +77,7 @@ public final class NukerLegitHack extends Hack
 		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
 		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
+	private final OverlayRenderer renderer = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
 	public NukerLegitHack()
@@ -128,6 +124,7 @@ public final class NukerLegitHack extends Hack
 		
 		// resets
 		MC.options.attackKey.setPressed(false);
+		renderer.resetProgress();
 		currentBlock = null;
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -161,11 +158,14 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		currentBlock = null;
+		
 		// abort if using IDNuker without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
+		{
+			renderer.resetProgress();
 			return;
-		
-		currentBlock = null;
+		}
 		
 		// get valid blocks
 		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
@@ -185,7 +185,12 @@ public final class NukerLegitHack extends Hack
 		
 		// reset if no block was found
 		if(currentBlock == null)
+		{
 			MC.options.attackKey.setPressed(false);
+			renderer.resetProgress();
+		}
+		
+		renderer.updateProgress();
 	}
 	
 	private ArrayList<BlockPos> getValidBlocks(double range,
@@ -279,62 +284,7 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(currentBlock == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		// set position
-		matrixStack.translate(currentBlock.getX() - regionX,
-			currentBlock.getY(), currentBlock.getZ() - regionZ);
-		
-		// get progress
-		float progress;
-		if(BlockUtils.getHardness(currentBlock) < 1)
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-		else
-			progress = 1;
-		
-		// set size
-		if(progress < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(progress, progress, progress);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
-		// get color
-		float red = progress * 2F;
-		float green = 2 - red;
-		
-		// draw box
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(matrixStack);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		renderer.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private enum Mode
