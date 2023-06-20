@@ -16,6 +16,7 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -66,15 +67,17 @@ public enum BlockBreaker
 			return null;
 		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d relCenter = shape.getBoundingBox().getCenter();
-		Vec3d center = Vec3d.of(pos).add(relCenter);
+		Box box = shape.getBoundingBox();
+		Vec3d halfSize = new Vec3d(box.maxX - box.minX, box.maxY - box.minY,
+			box.maxZ - box.minZ).multiply(0.5);
+		Vec3d center = Vec3d.of(pos).add(box.getCenter());
 		
 		Vec3d[] hitVecs = new Vec3d[sides.length];
 		for(int i = 0; i < sides.length; i++)
 		{
 			Vec3i dirVec = sides[i].getVector();
-			Vec3d relHitVec = new Vec3d(relCenter.x * dirVec.getX(),
-				relCenter.y * dirVec.getY(), relCenter.z * dirVec.getZ());
+			Vec3d relHitVec = new Vec3d(halfSize.x * dirVec.getX(),
+				halfSize.y * dirVec.getY(), halfSize.z * dirVec.getZ());
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
