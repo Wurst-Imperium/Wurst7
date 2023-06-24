@@ -118,6 +118,7 @@
   "description.wurst.hack.nolevitation": "Disables the levitation effect when you get hit by a Shulker.\n\n§c§lWARNING:§r You will fall if you activate this while the levitation effect is already active!",
   "description.wurst.hack.nooverlay": "Blocks the overlays of water and lava.",
   "description.wurst.hack.nopumpkin": "Blocks the overlay when wearing a pumpkin on your head.",
+  "description.wurst.hack.noshieldoverlay": "Lowers the shield so it covers less of your screen.",
   "description.wurst.hack.noslowdown": "Cancels slowness effects caused by honey, soul sand and using items.",
   "description.wurst.hack.noweather": "Allows you to alter the client-side weather, time and moon phase.",
   "description.wurst.hack.noweb": "Prevents you from getting slowed down by cobwebs.",
