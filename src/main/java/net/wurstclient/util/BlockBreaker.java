@@ -33,8 +33,13 @@ public enum BlockBreaker
 	
 	public static boolean breakOneBlock(BlockPos pos)
 	{
+		return breakOneBlock(pos, false);
+	}
+	
+	public static boolean breakOneBlock(BlockPos pos, boolean checkLOS)
+	{
 		BlockBreakingParams params = getBlockBreakingParams(pos);
-		if(params == null)
+		if(params == null || (checkLOS && !params.lineOfSight))
 			return false;
 		
 		// face block

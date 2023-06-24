@@ -13,7 +13,11 @@ import java.util.stream.Stream;
 
 import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.registry.tag.BlockTags;
@@ -27,6 +31,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
+import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -48,6 +53,28 @@ public final class AutoFarmHack extends Hack
 	private final CheckboxSetting replant =
 		new CheckboxSetting("Replant", true);
 	
+	private final CheckboxSetting harvestFirst = new CheckboxSetting(
+		"Harvest first", "Harvest all crops first before replanting.",
+		false);
+	
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight",
+		"Makes sure that you don't reach through walls when breaking or replanting.",
+		false);
+	
+	private final CheckboxSetting fortune = new CheckboxSetting(
+		"Choose fortune tool",
+		"Chooses a fortune tool to harvest crops.",
+		false);
+	
+	private final CheckboxSetting silkTouch = new CheckboxSetting(
+		"Choose silk touch tool",
+		"Chooses a silk touch tool to harvest melons. Axes will be prioritized.",
+		false);
+	
+	private final BlockListSetting excluded = new BlockListSetting("Excluded Crops",
+		"List of crops that will not be harvested.");
+	
 	private final HashMap<Block, Item> seeds = new HashMap<>();
 	{
 		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
@@ -58,6 +85,16 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
 		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
+	}
+	
+	private final HashSet<Block> fortuneBlocks = new HashSet<>();
+	{
+		fortuneBlocks.add(Blocks.WHEAT);
+		fortuneBlocks.add(Blocks.CARROTS);
+		fortuneBlocks.add(Blocks.POTATOES);
+		fortuneBlocks.add(Blocks.BEETROOTS);
+		fortuneBlocks.add(Blocks.NETHER_WART);
+		fortuneBlocks.add(Blocks.MELON);
 	}
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
@@ -76,6 +113,11 @@ public final class AutoFarmHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(replant);
+		addSetting(harvestFirst);
+		addSetting(checkLOS);
+		addSetting(fortune);
+		addSetting(silkTouch);
+		addSetting(excluded);
 	}
 	
 	@Override
@@ -141,11 +183,15 @@ public final class AutoFarmHack extends Hack
 					getBlocksToReplant(eyesVec, eyesBlock, rangeSq, blockRange);
 		}
 		
-		// first, try to replant
-		boolean replanting = replant(blocksToReplant);
+		// replant and harvest
+		if(harvestFirst.isChecked())
+			harvest(blocksToHarvest);
 		
-		// if we can't replant, harvest instead
-		if(!replanting)
+		boolean replanting = false;
+		if(currentlyHarvesting == null)
+			replanting = replant(blocksToReplant);
+		
+		if(!harvestFirst.isChecked() && !replanting)
 			harvest(blocksToHarvest);
 		
 		// upate busy state
@@ -196,6 +242,9 @@ public final class AutoFarmHack extends Hack
 	{
 		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
+		
+		if(Collections.binarySearch(excluded.getBlockNames(), BlockUtils.getName(pos)) >= 0)
+			return false;
 		
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
@@ -294,6 +343,9 @@ public final class AutoFarmHack extends Hack
 				if(params == null || params.distanceSq() > range.getValueSq())
 					continue;
 				
+				if(checkLOS.isChecked() && !params.lineOfSight())
+					continue;
+				
 				// face block
 				WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 				
@@ -353,11 +405,47 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		for(BlockPos pos : blocksToHarvest)
-			if(BlockBreaker.breakOneBlock(pos))
+		{
+			boolean findSilkTouch = silkTouch.isChecked() && BlockUtils.getBlock(pos) == Blocks.MELON;
+			boolean findFortune = fortune.isChecked() && fortuneBlocks.contains(BlockUtils.getBlock(pos));
+			ItemStack held = MC.player.getMainHandStack();
+			if(findSilkTouch)
+			{
+				if(EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, held) == 0
+					|| !(held.getItem() instanceof AxeItem))
+				{
+					int slot = InventoryUtils.indexOf(stack -> stack.getItem() instanceof AxeItem 
+						&& EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
+					if(slot == -1)
+						slot = InventoryUtils.indexOf(stack -> EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
+					InventoryUtils.selectItem(slot);
+				}
+			}else if(findFortune)
+			{
+				int[] slots = InventoryUtils.indicesOf(stack -> EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0
+					&& EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack) > 0, 36, false);
+				
+				int selected = -1;
+				int level = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, held) > 0 ? 0
+					: EnchantmentHelper.getLevel(Enchantments.FORTUNE, held);
+				for(int slot : slots)
+				{
+					int curLevel = EnchantmentHelper.getLevel(Enchantments.FORTUNE,
+						MC.player.getInventory().getStack(slot));
+					if(curLevel > level)
+					{
+						selected = slot;
+						level = curLevel;
+					}
+				}
+				InventoryUtils.selectItem(selected);
+			}
+			if(BlockBreaker.breakOneBlock(pos, checkLOS.isChecked()))
 			{
 				currentlyHarvesting = pos;
 				break;
 			}
+		}
 		
 		if(currentlyHarvesting == null)
 			MC.interactionManager.cancelBlockBreaking();
