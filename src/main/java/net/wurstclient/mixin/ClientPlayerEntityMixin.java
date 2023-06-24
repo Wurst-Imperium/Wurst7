@@ -47,6 +47,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
 	@Shadow
+	private float mountJumpStrength;
+	@Shadow
 	private float lastYaw;
 	@Shadow
 	private float lastPitch;
@@ -81,6 +83,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return player.isUsingItem();
+	}
+	
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getMountJumpStrength()F",
+		ordinal = 0), method = "tickMovement()V")
+	private void setHorseJump(CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().vehicleHack.forceHighestJump())
+			mountJumpStrength = 1;
 	}
 	
 	@Inject(at = @At("HEAD"), method = "sendMovementPackets()V")
