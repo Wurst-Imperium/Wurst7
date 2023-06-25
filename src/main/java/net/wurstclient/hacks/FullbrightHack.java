@@ -167,6 +167,16 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		return nightVisionStrength;
 	}
 	
+	public boolean isGammaOption()
+	{
+		return method.getSelected() == Method.GAMMA;
+	}
+	
+	public double getDefaultGamma()
+	{
+		return defaultGamma.getValue();
+	}
+	
 	private static enum Method
 	{
 		GAMMA("Gamma"),
