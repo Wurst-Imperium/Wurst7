@@ -15,7 +15,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class TimerHack extends Hack
 {
 	private final SliderSetting speed =
-		new SliderSetting("Speed", 2, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
+		new SliderSetting("Speed", 2, 0.1, 200, 0.1, ValueDisplay.DECIMAL);
 	
 	public TimerHack()
 	{
