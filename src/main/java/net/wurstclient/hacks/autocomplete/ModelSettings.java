@@ -66,10 +66,7 @@ public final class ModelSettings
 		"The maximum number of tokens that the model can generate.\n\n"
 			+ "Higher values allow the model to predict longer chat messages,"
 			+ " but also increase the time it takes to generate predictions.\n\n"
-			+ "The default value of 16 is fine for most use cases.\n\n"
-			+ "When using an API that doesn't support stop sequences (like the"
-			+ " oobabooga web UI), higher values will result in a lot of wasted"
-			+ " time and tokens.",
+			+ "The default value of 16 is fine for most use cases.",
 		16, 1, 100, 1, ValueDisplay.INTEGER);
 	
 	public final SliderSetting temperature = new SliderSetting("Temperature",

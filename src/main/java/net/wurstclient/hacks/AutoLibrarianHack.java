@@ -48,15 +48,9 @@ import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
-import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.InventoryUtils;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"auto librarian", "AutoVillager", "auto villager",
 	"VillagerTrainer", "villager trainer", "LibrarianTrainer",
@@ -101,6 +95,7 @@ public final class AutoLibrarianHack extends Hack
 			+ "Can be adjusted from 0 (off) to 100.",
 		1, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	private final HashSet<VillagerEntity> experiencedVillagers =
 		new HashSet<>();
 	
@@ -109,8 +104,6 @@ public final class AutoLibrarianHack extends Hack
 	
 	private boolean placingJobSite;
 	private boolean breakingJobSite;
-	private float progress;
-	private float prevProgress;
 	
 	public AutoLibrarianHack()
 	{
@@ -145,8 +138,7 @@ public final class AutoLibrarianHack extends Hack
 			breakingJobSite = false;
 		}
 		
-		progress = 0;
-		prevProgress = 0;
+		overlay.resetProgress();
 		villager = null;
 		jobSite = null;
 		placingJobSite = false;
@@ -290,19 +282,7 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.getSelected().swing(Hand.MAIN_HAND);
 		
 		// update progress
-		if(MC.player.abilities.creativeMode
-			|| BlockUtils.getHardness(jobSite) >= 1)
-		{
-			progress = 1;
-			prevProgress = 1;
-			return;
-		}
-		
-		prevProgress = progress;
-		progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-		
-		if(progress < prevProgress)
-			prevProgress = progress;
+		overlay.updateProgress();
 	}
 	
 	private void placeJobSite()
@@ -550,33 +530,6 @@ public final class AutoLibrarianHack extends Hack
 			RenderUtils.drawCrossBox(box);
 		}
 		
-		if(breakingJobSite && jobSite != null)
-		{
-			GL11.glPushMatrix();
-			
-			Box box = new Box(BlockPos.ORIGIN);
-			float p = prevProgress + (progress - prevProgress) * partialTicks;
-			float red = p * 2F;
-			float green = 2 - red;
-			
-			GL11.glTranslated(jobSite.getX() - regionX, jobSite.getY(),
-				jobSite.getZ() - regionZ);
-			if(p < 1)
-			{
-				GL11.glTranslated(0.5, 0.5, 0.5);
-				GL11.glScaled(p, p, p);
-				GL11.glTranslated(-0.5, -0.5, -0.5);
-			}
-			
-			GL11.glColor4f(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box);
-			
-			GL11.glColor4f(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box);
-			
-			GL11.glPopMatrix();
-		}
-		
 		GL11.glPopMatrix();
 		
 		// GL resets
@@ -584,5 +537,8 @@ public final class AutoLibrarianHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		if(breakingJobSite)
+			overlay.render(partialTicks, jobSite);
 	}
 }
