@@ -73,9 +73,8 @@ public final class OverlayRenderer
 			pos.getZ() - regionZ);
 		
 		// get interpolated progress
-		boolean breaksInstantly = (MC.player.abilities.creativeMode
-			|| BlockUtils.getHardness(pos) >= 1)
-			&& BlockUtils.canBeClicked(pos);
+		boolean breaksInstantly = MC.player.abilities.creativeMode
+			|| BlockUtils.getHardness(pos) >= 1;
 		float p = breaksInstantly ? 1
 			: MathHelper.lerp(partialTicks, prevProgress, progress);
 		

@@ -13,6 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
@@ -164,6 +165,39 @@ public enum RenderUtils
 		GL11.glEnd();
 	}
 	
+	public static void drawSolidBox(Box bb, BufferBuilder bufferBuilder)
+	{
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+	}
+	
 	public static void drawOutlinedBox()
 	{
 		drawOutlinedBox(DEFAULT_BOX);
@@ -208,6 +242,45 @@ public enum RenderUtils
 		GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
 		GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
 		GL11.glEnd();
+	}
+	
+	public static void drawOutlinedBox(Box bb, BufferBuilder bufferBuilder)
+	{
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
 	}
 	
 	public static void drawCrossBox()
@@ -256,6 +329,45 @@ public enum RenderUtils
 		GL11.glEnd();
 	}
 	
+	public static void drawCrossBox(Box bb, BufferBuilder bufferBuilder)
+	{
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.maxY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.maxY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.minZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, bb.minY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, bb.minY, bb.minZ).next();
+	}
+	
 	public static void drawNode(Box bb)
 	{
 		double midX = (bb.minX + bb.maxX) / 2;
@@ -297,6 +409,49 @@ public enum RenderUtils
 		
 		GL11.glVertex3d(midX, bb.minY, midZ);
 		GL11.glVertex3d(midX, midY, bb.maxZ);
+	}
+	
+	public static void drawNode(Box bb, BufferBuilder bufferBuilder)
+	{
+		double midX = (bb.minX + bb.maxX) / 2;
+		double midY = (bb.minY + bb.maxY) / 2;
+		double midZ = (bb.minZ + bb.maxZ) / 2;
+		
+		bufferBuilder.vertex(midX, midY, bb.maxZ).next();
+		bufferBuilder.vertex(bb.minX, midY, midZ).next();
+		
+		bufferBuilder.vertex(bb.minX, midY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.minZ).next();
+		
+		bufferBuilder.vertex(midX, midY, bb.minZ).next();
+		bufferBuilder.vertex(bb.maxX, midY, midZ).next();
+		
+		bufferBuilder.vertex(bb.maxX, midY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(midX, bb.maxY, midZ).next();
+		bufferBuilder.vertex(bb.maxX, midY, midZ).next();
+		
+		bufferBuilder.vertex(midX, bb.maxY, midZ).next();
+		bufferBuilder.vertex(bb.minX, midY, midZ).next();
+		
+		bufferBuilder.vertex(midX, bb.maxY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.minZ).next();
+		
+		bufferBuilder.vertex(midX, bb.maxY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.maxZ).next();
+		
+		bufferBuilder.vertex(midX, bb.minY, midZ).next();
+		bufferBuilder.vertex(bb.maxX, midY, midZ).next();
+		
+		bufferBuilder.vertex(midX, bb.minY, midZ).next();
+		bufferBuilder.vertex(bb.minX, midY, midZ).next();
+		
+		bufferBuilder.vertex(midX, bb.minY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.minZ).next();
+		
+		bufferBuilder.vertex(midX, bb.minY, midZ).next();
+		bufferBuilder.vertex(midX, midY, bb.maxZ).next();
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to)
