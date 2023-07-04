@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
@@ -49,7 +50,6 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -57,7 +57,11 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
@@ -77,7 +81,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 				continue;
 			
 			GL11.glPushMatrix();
-			GL11.glTranslated(entity.getX(), entity.getY(), entity.getZ());
+			GL11.glTranslated(entity.getX() - regionX, entity.getY(),
+				entity.getZ() - regionZ);
 			
 			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX);
 			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX);
@@ -92,6 +97,5 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

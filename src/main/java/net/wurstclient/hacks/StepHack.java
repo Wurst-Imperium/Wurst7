@@ -87,7 +87,7 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
-		double stepHeight = -1;
+		double stepHeight = Double.NEGATIVE_INFINITY;
 		
 		ArrayList<Box> blockCollisions = MC.world
 			.getBlockCollisions(player, box).map(VoxelShape::getBoundingBox)

@@ -352,7 +352,6 @@ public final class AutoBuildHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2F);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -360,11 +359,11 @@ public final class AutoBuildHack extends Hack
 		GL11.glColor4f(0F, 0F, 0F, 0.5F);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		int blocksDrawn = 0;
 		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
@@ -396,7 +395,6 @@ public final class AutoBuildHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	

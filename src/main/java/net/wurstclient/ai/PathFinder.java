@@ -549,14 +549,18 @@ public class PathFinder
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(false);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
+		
 		GL11.glTranslated(0.5, 0.5, 0.5);
 		
 		if(debugMode)
@@ -571,7 +575,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(element);
+				PathRenderer.renderNode(element, regionX, regionZ);
 				renderedThings++;
 			}
 			
@@ -587,7 +591,8 @@ public class PathFinder
 				else
 					GL11.glColor4f(1, 0, 0, 0.75F);
 				
-				PathRenderer.renderArrow(entry.getValue(), entry.getKey());
+				PathRenderer.renderArrow(entry.getValue(), entry.getKey(),
+					regionX, regionZ);
 				renderedThings++;
 			}
 		}
@@ -603,7 +608,8 @@ public class PathFinder
 			GL11.glColor4f(0, 1, 0, 0.75F);
 		}
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(path.get(i), path.get(i + 1), regionX,
+				regionZ);
 		
 		GL11.glPopMatrix();
 		
@@ -612,7 +618,6 @@ public class PathFinder
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glDepthMask(true);
 	}
 	

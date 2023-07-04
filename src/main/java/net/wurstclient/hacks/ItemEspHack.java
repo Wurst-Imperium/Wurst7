@@ -105,16 +105,15 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	{
 		// GL settings
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		renderBoxes(partialTicks, regionX, regionZ);
 		
@@ -128,7 +127,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void renderBoxes(double partialTicks, int regionX, int regionZ)
@@ -167,8 +165,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		float[] colorF = color.getColorF();
 		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
 		
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
 		
 		GL11.glBegin(GL11.GL_LINES);
 		for(ItemEntity e : items)
@@ -176,10 +174,11 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			Vec3d end = e.getBoundingBox().getCenter()
 				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
 					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks));
+					.multiply(1 - partialTicks))
+				.subtract(regionX, 0, regionZ);
 			
-			GL11.glVertex3d(start.x - regionX, start.y, start.z - regionZ);
-			GL11.glVertex3d(end.x - regionX, end.y, end.z - regionZ);
+			GL11.glVertex3d(start.x, start.y, start.z);
+			GL11.glVertex3d(end.x, end.y, end.z);
 		}
 		GL11.glEnd();
 	}

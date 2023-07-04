@@ -124,7 +124,6 @@
   "description.wurst.hack.panic": "使用しているすべてのハックを瞬時にOFFにする。\n誤操作に注意！",
   "description.wurst.hack.parkour": "ブロックの端に到達した際に自動でジャンプする。\nパルクールなどに有用。",
   "description.wurst.hack.playeresp": "付近のプレイヤーをハイライト表示する。\nフレンドのESPボックスは青色で表示される。",
-  "description.wurst.hack.playerfinder": "雷雨時に遠くにいるプレイヤーを見つける。",
   "description.wurst.hack.portalgui": "ネザーポータルの中にいてもメニューを開けるようになる。",
   "description.wurst.hack.potionsaver": "静止中にすべてのポーションの効果を停止させる。",
   "description.wurst.hack.prophuntesp": "Prophuntで偽物のブロックを見破ることができる。\nMineplexサーバーのミニゲーム「Prophunt」用。他サーバーでは動作しない可能性あり。",

@@ -15,12 +15,20 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"safe walk"})
 public final class SafeWalkHack extends Hack
 {
 	private final CheckboxSetting sneak =
 		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
+	
+	private final SliderSetting edgeDistance = new SliderSetting(
+		"Sneak edge distance",
+		"How close SafeWalk will let you get to the edge before sneaking.\n\n"
+			+ "This setting is only used when \"Sneak at edges\" is enabled.",
+		0.05, 0.05, 0.25, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
 	
 	private boolean sneaking;
 	
@@ -29,6 +37,7 @@ public final class SafeWalkHack extends Hack
 		super("SafeWalk");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
+		addSetting(edgeDistance);
 	}
 	
 	@Override
@@ -47,7 +56,9 @@ public final class SafeWalkHack extends Hack
 	
 	public void onClipAtLedge(boolean clipping)
 	{
-		if(!isEnabled() || !sneak.isChecked() || !MC.player.isOnGround())
+		ClientPlayerEntity player = MC.player;
+		
+		if(!isEnabled() || !sneak.isChecked() || !player.isOnGround())
 		{
 			if(sneaking)
 				setSneaking(false);
@@ -55,15 +66,13 @@ public final class SafeWalkHack extends Hack
 			return;
 		}
 		
-		ClientPlayerEntity player = MC.player;
-		Box bb = player.getBoundingBox();
-		float stepHeight = player.stepHeight;
+		Box box = player.getBoundingBox();
+		Box adjustedBox = box.stretch(0, -player.stepHeight, 0)
+			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
-		for(double x = -0.05; x <= 0.05; x += 0.05)
-			for(double z = -0.05; z <= 0.05; z += 0.05)
-				if(MC.world.isSpaceEmpty(player, bb.offset(x, -stepHeight, z)))
-					clipping = true;
-				
+		if(MC.world.isSpaceEmpty(player, adjustedBox))
+			clipping = true;
+		
 		setSneaking(clipping);
 	}
 	
@@ -78,4 +87,6 @@ public final class SafeWalkHack extends Hack
 		
 		this.sneaking = sneaking;
 	}
+	
+	// See ClientPlayerEntityMixin
 }

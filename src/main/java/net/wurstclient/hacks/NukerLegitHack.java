@@ -14,8 +14,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
@@ -38,7 +36,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"LegitNuker", "nuker legit", "legit nuker"})
@@ -72,6 +70,7 @@ public final class NukerLegitHack extends Hack
 		"minecraft:lapis_ore", "minecraft:nether_gold_ore",
 		"minecraft:nether_quartz_ore", "minecraft:redstone_ore");
 	
+	private final OverlayRenderer renderer = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
 	public NukerLegitHack()
@@ -118,6 +117,7 @@ public final class NukerLegitHack extends Hack
 		
 		// resets
 		MC.options.keyAttack.setPressed(false);
+		renderer.resetProgress();
 		currentBlock = null;
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -151,11 +151,14 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		currentBlock = null;
+		
 		// abort if using IDNuker without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
+		{
+			renderer.resetProgress();
 			return;
-		
-		currentBlock = null;
+		}
 		
 		// get valid blocks
 		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
@@ -175,7 +178,12 @@ public final class NukerLegitHack extends Hack
 		
 		// reset if no block was found
 		if(currentBlock == null)
+		{
 			MC.options.keyAttack.setPressed(false);
+			renderer.resetProgress();
+		}
+		
+		renderer.updateProgress();
 	}
 	
 	private ArrayList<BlockPos> getValidBlocks(double range,
@@ -269,62 +277,7 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public void onRender(float partialTicks)
 	{
-		if(currentBlock == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glLineWidth(2);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		
-		GL11.glPushMatrix();
-		RenderUtils.applyRegionalRenderOffset();
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		// set position
-		GL11.glTranslated(currentBlock.getX() - regionX, currentBlock.getY(),
-			currentBlock.getZ() - regionZ);
-		
-		// get progress
-		float progress;
-		if(BlockUtils.getHardness(currentBlock) < 1)
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-		else
-			progress = 1;
-		
-		// set size
-		if(progress < 1)
-		{
-			GL11.glTranslated(0.5, 0.5, 0.5);
-			GL11.glScaled(progress, progress, progress);
-			GL11.glTranslated(-0.5, -0.5, -0.5);
-		}
-		
-		// get color
-		float red = progress * 2F;
-		float green = 2 - red;
-		
-		// draw box
-		GL11.glColor4f(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox();
-		GL11.glColor4f(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox();
-		
-		GL11.glPopMatrix();
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		renderer.render(partialTicks, currentBlock);
 	}
 	
 	private enum Mode

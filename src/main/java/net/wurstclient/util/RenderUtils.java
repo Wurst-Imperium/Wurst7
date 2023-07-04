@@ -66,6 +66,14 @@ public enum RenderUtils
 		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
 	}
 	
+	public static void applyRegionalRenderOffset(int regionX, int regionZ)
+	{
+		applyCameraRotationOnly();
+		
+		Vec3d camPos = getCameraPos();
+		GL11.glTranslated(regionX - camPos.x, -camPos.y, regionZ - camPos.z);
+	}
+	
 	public static void applyRegionalRenderOffset(Chunk chunk)
 	{
 		applyCameraRotationOnly();

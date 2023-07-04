@@ -187,7 +187,6 @@ public final class TunnellerHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -195,7 +194,11 @@ public final class TunnellerHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		for(int displayList : displayLists)
 			GL11.glCallList(displayList);
@@ -206,8 +209,8 @@ public final class TunnellerHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			GL11.glTranslated(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
 			{
 				GL11.glTranslated(0.5, 0.5, 0.5);
@@ -229,24 +232,33 @@ public final class TunnellerHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void updateCyanList()
 	{
 		GL11.glNewList(displayLists[0], GL11.GL_COMPILE);
 		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		
 		GL11.glPushMatrix();
-		GL11.glTranslated(start.getX(), start.getY(), start.getZ());
 		GL11.glTranslated(0.5, 0.5, 0.5);
 		
+		Vec3d offset = Vec3d.ofCenter(start).subtract(regionX, 0, regionZ);
+		
+		Box nodeBox =
+			new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25).offset(offset);
 		GL11.glColor4f(0, 1, 1, 0.5F);
 		GL11.glBegin(GL11.GL_LINES);
-		RenderUtils.drawNode(new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25));
+		RenderUtils.drawNode(nodeBox);
 		GL11.glEnd();
 		
-		RenderUtils.drawArrow(Vec3d.of(direction.getVector()).multiply(0.25),
-			Vec3d.of(direction.getVector()).multiply(Math.max(0.5, length)));
+		Vec3d arrowStart =
+			Vec3d.of(direction.getVector()).multiply(0.25).add(offset);
+		Vec3d arowEnd = Vec3d.of(direction.getVector())
+			.multiply(Math.max(0.5, length)).add(offset);
+		RenderUtils.drawArrow(arrowStart, arowEnd);
 		
 		GL11.glPopMatrix();
 		GL11.glEndList();
@@ -342,7 +354,14 @@ public final class TunnellerHack extends Hack
 			getAllInBox(from, to).forEach(blocks::add);
 			
 			GL11.glNewList(displayLists[1], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
 			GL11.glColor4f(0, 1, 0, 0.5F);
 			
 			currentBlock = null;
@@ -358,10 +377,7 @@ public final class TunnellerHack extends Hack
 				if(currentBlock == null)
 					currentBlock = pos;
 				
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
+				RenderUtils.drawOutlinedBox(box.offset(pos));
 			}
 			
 			GL11.glEndList();
@@ -443,15 +459,17 @@ public final class TunnellerHack extends Hack
 					blocks.add(pos);
 				
 			GL11.glNewList(displayLists[2], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
 			GL11.glColor4f(1, 1, 0, 0.5F);
 			for(BlockPos pos : blocks)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
+				RenderUtils.drawOutlinedBox(box.offset(pos));
 			GL11.glEndList();
 			
 			return !blocks.isEmpty();
@@ -575,15 +593,19 @@ public final class TunnellerHack extends Hack
 			ChatUtils.error("The tunnel is flooded, cannot continue.");
 			
 			GL11.glNewList(displayLists[3], GL11.GL_COMPILE);
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9);
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
+				-regionZ);
+			
 			GL11.glColor4f(1, 0, 0, 0.5F);
+			
 			for(BlockPos pos : liquids)
-			{
-				GL11.glPushMatrix();
-				GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
-				RenderUtils.drawOutlinedBox(box);
-				GL11.glPopMatrix();
-			}
+				RenderUtils.drawOutlinedBox(box.offset(pos));
+			
 			GL11.glEndList();
 			return true;
 		}
@@ -659,8 +681,14 @@ public final class TunnellerHack extends Hack
 					size.getSelected().torchDistance);
 			
 			GL11.glNewList(displayLists[4], GL11.GL_COMPILE);
+			
+			BlockPos camPos = RenderUtils.getCameraBlockPos();
+			int regionX = (camPos.getX() >> 9) * 512;
+			int regionZ = (camPos.getZ() >> 9) * 512;
+			
 			GL11.glColor4f(1, 1, 0, 0.5F);
-			Vec3d torchVec = Vec3d.ofBottomCenter(nextTorch);
+			Vec3d torchVec =
+				Vec3d.ofBottomCenter(nextTorch).subtract(regionX, 0, regionZ);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0));
 			GL11.glEndList();
 			

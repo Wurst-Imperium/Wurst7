@@ -183,7 +183,6 @@ public final class FeedAuraHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -191,7 +190,11 @@ public final class FeedAuraHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -202,11 +205,11 @@ public final class FeedAuraHack extends Hack
 		
 		GL11.glTranslated(
 			MathHelper.lerp(partialTicks, renderTarget.prevX,
-				renderTarget.getX()),
+				renderTarget.getX()) - regionX,
 			MathHelper.lerp(partialTicks, renderTarget.prevY,
 				renderTarget.getY()),
 			MathHelper.lerp(partialTicks, renderTarget.prevZ,
-				renderTarget.getZ()));
+				renderTarget.getZ()) - regionZ);
 		
 		GL11.glTranslated(0, 0.05, 0);
 		GL11.glScaled(renderTarget.getWidth(), renderTarget.getHeight(),
@@ -230,7 +233,6 @@ public final class FeedAuraHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private boolean isUntamed(AnimalEntity e)

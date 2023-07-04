@@ -15,6 +15,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -176,31 +177,35 @@ public final class FreecamHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		float[] colorF = color.getColorF();
 		GL11.glColor4f(colorF[0], colorF[1], colorF[2], 0.5F);
 		
 		// box
 		GL11.glPushMatrix();
-		GL11.glTranslated(fakePlayer.getX(), fakePlayer.getY(),
-			fakePlayer.getZ());
+		GL11.glTranslated(fakePlayer.getX() - regionX, fakePlayer.getY(),
+			fakePlayer.getZ() - regionZ);
 		GL11.glScaled(fakePlayer.getWidth() + 0.1, fakePlayer.getHeight() + 0.1,
 			fakePlayer.getWidth() + 0.1);
 		GL11.glCallList(playerBox);
 		GL11.glPopMatrix();
 		
 		// line
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
-		Vec3d end = fakePlayer.getBoundingBox().getCenter();
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionX, 0,
+			regionZ);
 		
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glVertex3d(start.x, start.y, start.z);
@@ -210,9 +215,9 @@ public final class FreecamHack extends Hack
 		GL11.glPopMatrix();
 		
 		// GL resets
+		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

@@ -124,7 +124,6 @@
   "description.wurst.hack.panic": "Natychmiast wyłącza wszystkie włączone hacki.\nBądź z tym ostrożny!",
   "description.wurst.hack.parkour": "Sprawia, że skaczesz automatycznie po dotarciu do krawędzi bloku.\nPrzydatne do parkourów i jump'n'runów.",
   "description.wurst.hack.playeresp": "Podświetla pobliskich graczy.\nKontenery ESP znajomych pojawią się na niebiesko.",
-  "description.wurst.hack.playerfinder": "Znajduje odległych graczy podczas burzy.",
   "description.wurst.hack.portalgui": "Umożliwia otwieranie GUI w portalach.",
   "description.wurst.hack.potionsaver": "Wstrzymuje wszystkie efekty mikstur, gdy stoisz w miejscu.",
   "description.wurst.hack.prophuntesp": "Pozwala zobaczyć fałszywe bloki w Prophuntcie.\nStworzony dla Prophunta Mineplex'a. Może nie działać na innych serwerach.",

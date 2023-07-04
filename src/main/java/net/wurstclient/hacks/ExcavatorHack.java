@@ -146,7 +146,6 @@ public final class ExcavatorHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glLineWidth(2F);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -154,7 +153,11 @@ public final class ExcavatorHack extends Hack
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
 		GL11.glPushMatrix();
-		RenderUtils.applyRenderOffset();
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(regionX, regionZ);
 		
 		// area
 		if(area != null)
@@ -169,7 +172,8 @@ public final class ExcavatorHack extends Hack
 					BlockPos pos = area.blocksList.get(i);
 					
 					GL11.glPushMatrix();
-					GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+					GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+						pos.getZ() - regionZ);
 					GL11.glTranslated(-0.005, -0.005, -0.005);
 					GL11.glScaled(1.01, 1.01, 1.01);
 					
@@ -183,8 +187,8 @@ public final class ExcavatorHack extends Hack
 				}
 			
 			GL11.glPushMatrix();
-			GL11.glTranslated(area.minX + offset, area.minY + offset,
-				area.minZ + offset);
+			GL11.glTranslated(area.minX + offset - regionX, area.minY + offset,
+				area.minZ + offset - regionZ);
 			GL11.glScaled(area.sizeX + scale, area.sizeY + scale,
 				area.sizeZ + scale);
 			
@@ -221,7 +225,8 @@ public final class ExcavatorHack extends Hack
 				continue;
 			
 			GL11.glPushMatrix();
-			GL11.glTranslated(pos.getX(), pos.getY(), pos.getZ());
+			GL11.glTranslated(pos.getX() - regionX, pos.getY(),
+				pos.getZ() - regionZ);
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
@@ -242,8 +247,8 @@ public final class ExcavatorHack extends Hack
 			
 			// area box
 			GL11.glPushMatrix();
-			GL11.glTranslated(preview.minX + offset, preview.minY + offset,
-				preview.minZ + offset);
+			GL11.glTranslated(preview.minX + offset - regionX,
+				preview.minY + offset, preview.minZ + offset - regionZ);
 			GL11.glScaled(preview.sizeX + scale, preview.sizeY + scale,
 				preview.sizeZ + scale);
 			GL11.glColor4f(0F, 0F, 0F, 0.5F);
@@ -257,8 +262,8 @@ public final class ExcavatorHack extends Hack
 		if(posLookingAt != null)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslated(posLookingAt.getX(), posLookingAt.getY(),
-				posLookingAt.getZ());
+			GL11.glTranslated(posLookingAt.getX() - regionX,
+				posLookingAt.getY(), posLookingAt.getZ() - regionZ);
 			GL11.glTranslated(offset, offset, offset);
 			GL11.glScaled(scale, scale, scale);
 			
@@ -275,8 +280,8 @@ public final class ExcavatorHack extends Hack
 		if(currentBlock != null)
 		{
 			// set position
-			GL11.glTranslated(currentBlock.getX(), currentBlock.getY(),
-				currentBlock.getZ());
+			GL11.glTranslated(currentBlock.getX() - regionX,
+				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			
 			// get progress
 			float progress;
@@ -311,7 +316,6 @@ public final class ExcavatorHack extends Hack
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
