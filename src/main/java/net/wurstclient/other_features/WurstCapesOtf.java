@@ -16,6 +16,6 @@ public final class WurstCapesOtf extends OtherFeature
 	public WurstCapesOtf()
 	{
 		super("WurstCapes",
-			"Wurst has its own capes! Only Wurst users can see them.");
+			"Wurst has it's own capes! Only Wurst users can see them.");
 	}
 }
