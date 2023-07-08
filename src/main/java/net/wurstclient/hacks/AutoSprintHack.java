@@ -12,14 +12,21 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto sprint"})
 public final class AutoSprintHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting OmniSprint = new CheckboxSetting(
+			"Omni-Sprint",
+			"Allows you to sprint in all directions.",
+			false);
+	
 	public AutoSprintHack()
 	{
 		super("AutoSprint");
 		setCategory(Category.MOVEMENT);
+		addSetting(OmniSprint);
 	}
 	
 	@Override
@@ -46,6 +53,9 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 			return;
 		
 		if(player.forwardSpeed > 0)
+			player.setSprinting(true);
+		
+		if(OmniSprint.isChecked() && player.forwardSpeed < 0)
 			player.setSprinting(true);
 	}
 }
