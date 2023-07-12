@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -57,6 +56,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected MinecraftClient client;
 	
 	private Screen tempCurrentScreen;
+	private boolean hideNextItemUse;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
 		GameProfile profile)
@@ -72,15 +72,46 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
-	@Redirect(at = @At(value = "INVOKE",
+	/**
+	 * This mixin runs just before the tickMovement() method calls
+	 * isUsingItem(), so that the onIsUsingItem() mixin knows which
+	 * call to intercept.
+	 */
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
 		ordinal = 0), method = "tickMovement()V")
-	private boolean wurstIsUsingItem(ClientPlayerEntity player)
+	private void onTickMovementItemUse(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
-			return false;
+			hideNextItemUse = true;
+	}
+	
+	/**
+	 * Pretends that the player is not using an item when instructed to do so by
+	 * the onTickMovement() mixin.
+	 */
+	@Inject(at = @At("HEAD"), method = "isUsingItem()Z", cancellable = true)
+	private void onIsUsingItem(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(!hideNextItemUse)
+			return;
 		
-		return player.isUsingItem();
+		cir.setReturnValue(false);
+		hideNextItemUse = false;
+	}
+	
+	/**
+	 * This mixin is injected into a random field access later in the
+	 * tickMovement() method to ensure that hideNextItemUse is always reset
+	 * after the item use slowdown calculation.
+	 */
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksToNextAutojump:I",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0), method = "tickMovement()V")
+	private void afterIsUsingItem(CallbackInfo ci)
+	{
+		hideNextItemUse = false;
 	}
 	
 	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})

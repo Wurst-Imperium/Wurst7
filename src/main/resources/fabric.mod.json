@@ -45,6 +45,7 @@
     "modmenu": {
       "links": {
         "Wiki": "https://wurst.wiki/?utm_source=Wurst+Client&utm_medium=ModMenu&utm_content=Wiki",
+        "Forum": "https://wurstforum.net/?utm_source=Wurst+Client&utm_medium=ModMenu&utm_content=Forum",
         "Donate": "https://www.wurstclient.net/donate/?utm_source=Wurst+Client&utm_medium=ModMenu&utm_content=Donate"
       }
     }
