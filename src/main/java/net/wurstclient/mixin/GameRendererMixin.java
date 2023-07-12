@@ -37,6 +37,10 @@ public abstract class GameRendererMixin
 {
 	private boolean cancelNextBobView;
 	
+	/**
+	 * Fires the CameraTransformViewBobbingEvent event and records whether the
+	 * next view-bobbing call should be cancelled.
+	 */
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
 		ordinal = 0),
@@ -53,6 +57,10 @@ public abstract class GameRendererMixin
 			cancelNextBobView = true;
 	}
 	
+	/**
+	 * Cancels the view-bobbing call if requested by the last
+	 * CameraTransformViewBobbingEvent.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
 		cancellable = true)
@@ -66,9 +74,14 @@ public abstract class GameRendererMixin
 		cancelNextBobView = false;
 	}
 	
+	/**
+	 * This mixin is injected into a random method call later in the
+	 * renderWorld() method to ensure that cancelNextBobView is always reset
+	 * after the view-bobbing call.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V")
-	private void renderHand(MatrixStack matrices, Camera camera,
+	private void onRenderHand(MatrixStack matrices, Camera camera,
 		float tickDelta, CallbackInfo ci)
 	{
 		cancelNextBobView = false;
