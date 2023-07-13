@@ -427,7 +427,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean isReplaceable(BlockPos pos)
 	{
-		return BlockUtils.getState(pos).getMaterial().isReplaceable();
+		return BlockUtils.getState(pos).isReplaceable();
 	}
 	
 	private boolean hasClickableNeighbor(BlockPos pos)
@@ -442,7 +442,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private boolean isClickableNeighbor(BlockPos pos)
 	{
 		return BlockUtils.canBeClicked(pos)
-			&& !BlockUtils.getState(pos).getMaterial().isReplaceable();
+			&& !BlockUtils.getState(pos).isReplaceable();
 	}
 	
 	private boolean isChargedAnchor(BlockPos pos)

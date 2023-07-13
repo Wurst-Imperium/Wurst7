@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -58,6 +57,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected MinecraftClient client;
 	
 	private Screen tempCurrentScreen;
+	private boolean hideNextItemUse;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
 		GameProfile profile)
@@ -73,43 +73,72 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
-	@Redirect(at = @At(value = "INVOKE",
+	/**
+	 * This mixin runs just before the tickMovement() method calls
+	 * isUsingItem(), so that the onIsUsingItem() mixin knows which
+	 * call to intercept.
+	 */
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
 		ordinal = 0), method = "tickMovement()V")
-	private boolean wurstIsUsingItem(ClientPlayerEntity player)
+	private void onTickMovementItemUse(CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness())
-			return false;
-		
-		if(WurstClient.INSTANCE.getHax().noSlowdownHack.noNonBlockingItemSlowness())
-			return player.getActiveItem().getUseAction() == UseAction.BLOCK;
-		
-		return player.isUsingItem();
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness()
+			|| (WurstClient.INSTANCE.getHax().noSlowdownHack.noNonBlockingItemSlowness()
+				&& ((ClientPlayerEntity)(Object)this).getActiveItem().getUseAction() != UseAction.BLOCK))
+			hideNextItemUse = true;
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"sendMovementPackets()V"})
+	/**
+	 * Pretends that the player is not using an item when instructed to do so by
+	 * the onTickMovement() mixin.
+	 */
+	@Inject(at = @At("HEAD"), method = "isUsingItem()Z", cancellable = true)
+	private void onIsUsingItem(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(!hideNextItemUse)
+			return;
+		
+		cir.setReturnValue(false);
+		hideNextItemUse = false;
+	}
+	
+	/**
+	 * This mixin is injected into a random field access later in the
+	 * tickMovement() method to ensure that hideNextItemUse is always reset
+	 * after the item use slowdown calculation.
+	 */
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksToNextAutojump:I",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0), method = "tickMovement()V")
+	private void afterIsUsingItem(CallbackInfo ci)
+	{
+		hideNextItemUse = false;
+	}
+	
+	@Inject(at = @At("HEAD"), method = "sendMovementPackets()V")
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"sendMovementPackets()V"})
+	@Inject(at = @At("TAIL"), method = "sendMovementPackets()V")
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
 		PlayerMoveEvent event = new PlayerMoveEvent(this);
 		EventManager.fire(event);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"isAutoJumpEnabled()Z"},
+	@Inject(at = @At("HEAD"),
+		method = "isAutoJumpEnabled()Z",
 		cancellable = true)
 	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
@@ -117,10 +146,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			cir.setReturnValue(false);
 	}
 	
+	/**
+	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
+	 * to null to prevent the updateNausea() method from closing it.
+	 */
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = {"updateNausea()V"})
+		ordinal = 0), method = "updateNausea()V")
 	private void beforeUpdateNausea(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
@@ -130,10 +163,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		client.currentScreen = null;
 	}
 	
+	/**
+	 * This mixin restores the current screen as soon as the updateNausea()
+	 * method is done looking at it.
+	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nextNauseaStrength:F",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = {"updateNausea()V"})
+		ordinal = 1), method = "updateNausea()V")
 	private void afterUpdateNausea(CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
@@ -205,6 +242,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 				.getAdditionalJumpMotion();
 	}
 	
+	/**
+	 * This is the part that makes SafeWalk work.
+	 */
 	@Override
 	protected boolean clipAtLedge()
 	{
@@ -212,6 +252,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
+	/**
+	 * This mixin allows SafeWalk to sneak visibly when the player is
+	 * near a ledge.
+	 */
 	@Override
 	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
 	{

@@ -157,9 +157,14 @@ public final class TunnellerHack extends Hack
 			currentBlock = null;
 		}
 		
-		for(VertexBuffer buffer : vertexBuffers)
-			if(buffer != null)
-				buffer.close();
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			if(vertexBuffers[i] == null)
+				continue;
+			
+			vertexBuffers[i].close();
+			vertexBuffers[i] = null;
+		}
 	}
 	
 	@Override
@@ -197,12 +202,15 @@ public final class TunnellerHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -235,10 +243,6 @@ public final class TunnellerHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
-			
 			matrixStack.translate(currentBlock.getX() - regionX,
 				currentBlock.getY(), currentBlock.getZ() - regionZ);
 			if(p < 1)
@@ -261,7 +265,6 @@ public final class TunnellerHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void updateCyanBuffer()
@@ -269,7 +272,7 @@ public final class TunnellerHack extends Hack
 		if(vertexBuffers[0] != null)
 			vertexBuffers[0].close();
 		
-		vertexBuffers[0] = new VertexBuffer();
+		vertexBuffers[0] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
@@ -390,7 +393,7 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[1] != null)
 				vertexBuffers[1].close();
 			
-			vertexBuffers[1] = new VertexBuffer();
+			vertexBuffers[1] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
 			BlockPos camPos = RenderUtils.getCameraBlockPos();
 			int regionX = (camPos.getX() >> 9) * 512;
@@ -504,7 +507,7 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[2] != null)
 				vertexBuffers[2].close();
 			
-			vertexBuffers[2] = new VertexBuffer();
+			vertexBuffers[2] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
 			BlockPos camPos = RenderUtils.getCameraBlockPos();
 			int regionX = (camPos.getX() >> 9) * 512;
@@ -557,7 +560,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(BlockUtils.getState(pos).isReplaceable())
 				placeBlockSimple(pos);
 			else
 			{
@@ -649,7 +652,7 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[3] != null)
 				vertexBuffers[3].close();
 			
-			vertexBuffers[3] = new VertexBuffer();
+			vertexBuffers[3] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
 			BlockPos camPos = RenderUtils.getCameraBlockPos();
 			int regionX = (camPos.getX() >> 9) * 512;
@@ -734,7 +737,10 @@ public final class TunnellerHack extends Hack
 				lastTorch = null;
 				nextTorch = BlockPos.ofFloored(MC.player.getPos());
 				if(vertexBuffers[4] != null)
+				{
 					vertexBuffers[4].close();
+					vertexBuffers[4] = null;
+				}
 				return false;
 			}
 			
@@ -748,7 +754,7 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[4] != null)
 				vertexBuffers[4].close();
 			
-			vertexBuffers[4] = new VertexBuffer();
+			vertexBuffers[4] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
 			BlockPos camPos = RenderUtils.getCameraBlockPos();
 			int regionX = (camPos.getX() >> 9) * 512;
@@ -764,7 +770,7 @@ public final class TunnellerHack extends Hack
 				return false;
 			
 			BlockState state = BlockUtils.getState(nextTorch);
-			if(!state.getMaterial().isReplaceable())
+			if(!state.isReplaceable())
 				return false;
 				
 			// Can't see why canPlaceAt() is deprecated. Still seems to be

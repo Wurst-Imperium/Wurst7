@@ -211,7 +211,7 @@ public final class AutoBuildHack extends Hack
 			BlockPos pos = itr.next();
 			BlockState state = BlockUtils.getState(pos);
 			
-			if(!state.getMaterial().isReplaceable())
+			if(!state.isReplaceable())
 				itr.remove();
 		}
 	}
@@ -237,7 +237,7 @@ public final class AutoBuildHack extends Hack
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor)
-				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
+				|| BlockUtils.getState(neighbor).isReplaceable())
 				continue;
 			
 			Vec3d dirVec = Vec3d.of(side.getVector());
@@ -313,7 +313,7 @@ public final class AutoBuildHack extends Hack
 		
 		for(BlockPos pos : remainingBlocks)
 		{
-			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			Vec3d posVec = Vec3d.ofCenter(pos);
@@ -357,16 +357,15 @@ public final class AutoBuildHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		int blocksDrawn = 0;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
@@ -374,7 +373,7 @@ public final class AutoBuildHack extends Hack
 			&& blocksDrawn < 1024;)
 		{
 			BlockPos pos = itr.next();
-			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			matrixStack.push();
@@ -398,7 +397,6 @@ public final class AutoBuildHack extends Hack
 		
 		// GL resets
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	

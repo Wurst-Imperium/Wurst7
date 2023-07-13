@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -162,20 +163,21 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = context.getMatrices();
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		itemNameField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
@@ -183,27 +185,28 @@ public final class EditItemListScreen extends Screen
 		{
 			matrixStack.push();
 			matrixStack.translate(0, 0, 300);
-			drawTextWithShadow(matrixStack, client.textRenderer,
-				"item name or ID", 68, height - 50, 0x808080);
+			context.drawTextWithShadow(client.textRenderer, "item name or ID",
+				68, height - 50, 0x808080);
 			matrixStack.pop();
 		}
 		
 		int border = itemNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, border);
-		fill(matrixStack, 49, height - 55, 64, height - 37, black);
-		fill(matrixStack, 214, height - 56, 244, height - 55, border);
-		fill(matrixStack, 214, height - 37, 244, height - 36, border);
-		fill(matrixStack, 244, height - 56, 246, height - 36, border);
-		fill(matrixStack, 214, height - 55, 243, height - 52, black);
-		fill(matrixStack, 214, height - 40, 243, height - 37, black);
-		fill(matrixStack, 215, height - 55, 216, height - 37, black);
-		fill(matrixStack, 242, height - 55, 245, height - 37, black);
+		context.fill(48, height - 56, 64, height - 36, border);
+		context.fill(49, height - 55, 64, height - 37, black);
+		context.fill(214, height - 56, 244, height - 55, border);
+		context.fill(214, height - 37, 244, height - 36, border);
+		context.fill(244, height - 56, 246, height - 36, border);
+		context.fill(214, height - 55, 243, height - 52, black);
+		context.fill(214, height - 40, 243, height - 37, black);
+		context.fill(215, height - 55, 216, height - 37, black);
+		context.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
 		
-		RenderUtils.drawItem(matrixStack, new ItemStack(itemToAdd),
+		RenderUtils.drawItem(context,
+			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 	}
 	
@@ -262,21 +265,21 @@ public final class EditItemListScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
 			Item item = Registries.ITEM.get(new Identifier(name));
 			ItemStack stack = new ItemStack(item);
-			TextRenderer fr = mc.textRenderer;
+			TextRenderer tr = mc.textRenderer;
 			
-			RenderUtils.drawItem(matrixStack, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			String displayName = stack.isEmpty() ? "\u00a7ounknown item\u00a7r"
 				: stack.getName().getString();
-			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
-			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registries.ITEM.getRawId(item),
-				x + 28, y + 18, 0xa0a0a0);
+			context.drawText(tr, displayName, x + 28, y, 0xf0f0f0, false);
+			context.drawText(tr, name, x + 28, y + 9, 0xa0a0a0, false);
+			context.drawText(tr, "ID: " + Registries.ITEM.getRawId(item),
+				x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

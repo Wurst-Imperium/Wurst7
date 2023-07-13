@@ -229,7 +229,6 @@ public final class MobSpawnEspHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -260,7 +259,6 @@ public final class MobSpawnEspHack extends Hack
 		if(!depthTest)
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private static class ChunkScanner
@@ -279,6 +277,7 @@ public final class MobSpawnEspHack extends Hack
 			this.chunk = chunk;
 		}
 		
+		@SuppressWarnings("deprecation")
 		private void scan()
 		{
 			ClientWorld world = MC.world;
@@ -298,7 +297,7 @@ public final class MobSpawnEspHack extends Hack
 						BlockPos pos = new BlockPos(x, y, z);
 						BlockState state = world.getBlockState(pos);
 						
-						if(state.getMaterial().blocksMovement())
+						if(state.blocksMovement())
 							continue;
 						if(!state.getFluidState().isEmpty())
 							continue;
@@ -336,7 +335,7 @@ public final class MobSpawnEspHack extends Hack
 			if(vertexBuffer != null)
 				vertexBuffer.close();
 			
-			vertexBuffer = new VertexBuffer();
+			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			

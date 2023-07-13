@@ -7,49 +7,62 @@
  */
 package net.wurstclient.hacks;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiConsumer;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autocomplete.ApiProviderSetting;
+import net.wurstclient.hacks.autocomplete.MessageCompleter;
+import net.wurstclient.hacks.autocomplete.ModelSettings;
+import net.wurstclient.hacks.autocomplete.OobaboogaMessageCompleter;
+import net.wurstclient.hacks.autocomplete.OpenAiMessageCompleter;
+import net.wurstclient.hacks.autocomplete.SuggestionHandler;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.OpenAiUtils;
-import net.wurstclient.util.json.JsonException;
-import net.wurstclient.util.json.WsonObject;
 
 @SearchTags({"auto complete", "Copilot", "ChatGPT", "chat GPT", "GPT-3", "GPT3",
 	"GPT 3", "OpenAI", "open ai", "ChatAI", "chat AI", "ChatBot", "chat bot"})
 public final class AutoCompleteHack extends Hack
 	implements ChatOutputListener, UpdateListener
 {
-	private final ArrayList<String> suggestions = new ArrayList<>();
+	private final ModelSettings modelSettings = new ModelSettings();
+	private final SuggestionHandler suggestionHandler = new SuggestionHandler();
+	private final ApiProviderSetting apiProvider = new ApiProviderSetting();
+	
+	private MessageCompleter completer;
+	private String draftMessage;
+	private BiConsumer<SuggestionsBuilder, String> suggestionsUpdater;
+	
 	private Thread apiCallThread;
 	private long lastApiCallTime;
 	private long lastRefreshTime;
-	private String draftMessage;
-	private BiConsumer<SuggestionsBuilder, String> suggestionsUpdater;
 	
 	public AutoCompleteHack()
 	{
 		super("AutoComplete");
 		setCategory(Category.CHAT);
+		
+		addSetting(apiProvider);
+		modelSettings.forEach(this::addSetting);
+		suggestionHandler.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		String apiKey = System.getenv("WURST_OPENAI_KEY");
-		if(apiKey == null)
+		completer = switch(apiProvider.getSelected())
+		{
+			case OPENAI -> new OpenAiMessageCompleter(modelSettings);
+			case OOBABOOGA -> new OobaboogaMessageCompleter(modelSettings);
+		};
+		
+		if(completer instanceof OpenAiMessageCompleter
+			&& System.getenv("WURST_OPENAI_KEY") == null)
 		{
 			ChatUtils.error("API key not found. Please set the"
 				+ " WURST_OPENAI_KEY environment variable and reboot.");
@@ -66,15 +79,14 @@ public final class AutoCompleteHack extends Hack
 	{
 		EVENTS.remove(ChatOutputListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
+		
+		suggestionHandler.clearSuggestions();
 	}
 	
 	@Override
 	public void onSentMessage(ChatOutputEvent event)
 	{
-		synchronized(suggestions)
-		{
-			suggestions.clear();
-		}
+		suggestionHandler.clearSuggestions();
 	}
 	
 	@Override
@@ -105,8 +117,7 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if we already have a suggestion for the current draft message
-		if(suggestions.stream().anyMatch(
-			s -> s.toLowerCase().startsWith(draftMessage.toLowerCase())))
+		if(suggestionHandler.hasEnoughSuggestionFor(draftMessage))
 			return;
 			
 		// copy fields to local variables, in case they change
@@ -119,16 +130,13 @@ public final class AutoCompleteHack extends Hack
 		apiCallThread = new Thread(() -> {
 			
 			// get suggestion
-			String suggestion = completeChatMessage(draftMessage2);
+			String suggestion = completer.completeChatMessage(draftMessage2);
 			if(suggestion.isEmpty())
 				return;
 			
 			// apply suggestion
-			synchronized(suggestions)
-			{
-				suggestions.add(draftMessage2 + suggestion);
-				setSuggestions(draftMessage2, suggestionsUpdater2);
-			}
+			suggestionHandler.addSuggestion(suggestion, draftMessage2,
+				suggestionsUpdater2);
 		});
 		apiCallThread.setName("AutoComplete API Call");
 		apiCallThread.setPriority(Thread.MIN_PRIORITY);
@@ -142,108 +150,11 @@ public final class AutoCompleteHack extends Hack
 	public void onRefresh(String draftMessage,
 		BiConsumer<SuggestionsBuilder, String> suggestionsUpdater)
 	{
-		synchronized(suggestions)
-		{
-			setSuggestions(draftMessage, suggestionsUpdater);
-		}
+		suggestionHandler.showSuggestions(draftMessage, suggestionsUpdater);
 		
 		this.draftMessage = draftMessage;
 		this.suggestionsUpdater = suggestionsUpdater;
 		lastRefreshTime = System.currentTimeMillis();
-	}
-	
-	private void setSuggestions(String draftMessage,
-		BiConsumer<SuggestionsBuilder, String> suggestionsUpdater)
-	{
-		SuggestionsBuilder builder = new SuggestionsBuilder(draftMessage, 0);
-		String inlineSuggestion = null;
-		
-		for(String s : suggestions)
-			if(s.toLowerCase().startsWith(draftMessage.toLowerCase()))
-			{
-				builder.suggest(s);
-				inlineSuggestion = s;
-			}
-		
-		suggestionsUpdater.accept(builder, inlineSuggestion);
-	}
-	
-	private String completeChatMessage(String draftMessage)
-	{
-		// get API key and parameters
-		String apiKey = System.getenv("WURST_OPENAI_KEY");
-		String prompt = buildPrompt(draftMessage);
-		JsonObject params = buildParams(prompt);
-		System.out.println(params);
-		
-		try
-		{
-			// send request
-			WsonObject response = OpenAiUtils.requestCompletion(apiKey, params);
-			System.out.println(response);
-			
-			// read response
-			return extractCompletion(response);
-			
-		}catch(IOException | JsonException e)
-		{
-			e.printStackTrace();
-			return "";
-		}
-	}
-	
-	private String buildPrompt(String draftMessage)
-	{
-		String prompt = "=== Minecraft chat log ===\n";
-		
-		List<ChatHudLine.Visible> chatHistory =
-			MC.inGameHud.getChatHud().visibleMessages;
-		for(int i = chatHistory.size() - 1; i >= 0; i--)
-		{
-			// get message
-			String message = ChatUtils.getAsString(chatHistory.get(i));
-			
-			// filter out Wurst messages so the model won't admit it's hacking
-			if(message.startsWith(ChatUtils.WURST_PREFIX))
-				continue;
-			
-			// give non-player messages a sender to avoid confusing the model
-			if(!message.startsWith("<"))
-				message = "<System> " + message;
-			
-			prompt += message + "\n";
-		}
-		
-		prompt += "<" + MC.getSession().getUsername() + "> " + draftMessage;
-		
-		return prompt;
-	}
-	
-	private JsonObject buildParams(String prompt)
-	{
-		JsonObject params = new JsonObject();
-		params.addProperty("prompt", prompt);
-		params.addProperty("stop", "\n<");
-		params.addProperty("model", "code-davinci-002");
-		params.addProperty("max_tokens", 16);
-		params.addProperty("temperature", 0.7);
-		params.addProperty("frequency_penalty", 0.6);
-		return params;
-	}
-	
-	private String extractCompletion(WsonObject response) throws JsonException
-	{
-		// extract completion from response
-		String completion =
-			response.getArray("choices").getObject(0).getString("text");
-		
-		// remove newlines
-		completion = completion.replace("\n", " ");
-		
-		// remove leading and trailing whitespace
-		completion = completion.strip();
-		
-		return completion;
 	}
 	
 	// See ChatInputSuggestorMixin

@@ -62,8 +62,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
 		"minecraft:raw_iron_block", "minecraft:redstone_block",
 		"minecraft:redstone_ore", "minecraft:repeating_command_block",
-		"minecraft:spawner", "minecraft:suspicious_sand", "minecraft:tnt",
-		"minecraft:torch", "minecraft:trapped_chest", "minecraft:water");
+		"minecraft:spawner", "minecraft:suspicious_gravel",
+		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
+		"minecraft:trapped_chest", "minecraft:water");
 	
 	private ArrayList<String> oreNames;
 	private final String warning;

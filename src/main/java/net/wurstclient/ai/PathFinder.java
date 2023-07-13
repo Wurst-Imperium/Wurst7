@@ -19,6 +19,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.LavaFluid;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
@@ -197,15 +200,13 @@ public class PathFinder
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
 				|| canSafelyStandOn(south) || canSafelyStandOn(west))
-			&& (divingAllowed || BlockUtils.getState(up.up())
-				.getMaterial() != Material.WATER))
+			&& (divingAllowed || BlockUtils.getBlock(up.up()) != Blocks.WATER))
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
 		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down)
 			&& canGoAbove(down.down()) && (flying || canFallBelow(pos))
-			&& (divingAllowed
-				|| BlockUtils.getState(pos).getMaterial() != Material.WATER))
+			&& (divingAllowed || BlockUtils.getBlock(pos) != Blocks.WATER))
 			neighbors.add(new PathPos(down));
 		
 		return neighbors;
@@ -247,8 +248,7 @@ public class PathFinder
 		if(!canGoAbove(pos.down()))
 			return false;
 		
-		if(!divingAllowed
-			&& BlockUtils.getState(up).getMaterial() == Material.WATER)
+		if(!divingAllowed && BlockUtils.getBlock(up) == Blocks.WATER)
 			return false;
 		
 		return true;
@@ -266,8 +266,7 @@ public class PathFinder
 		if(!canGoAbove(pos.down()))
 			return false;
 		
-		if(!divingAllowed
-			&& BlockUtils.getState(up).getMaterial() == Material.WATER)
+		if(!divingAllowed && BlockUtils.getBlock(up) == Blocks.WATER)
 			return false;
 		
 		return true;
@@ -278,16 +277,15 @@ public class PathFinder
 		return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected boolean canBeSolid(BlockPos pos)
 	{
 		BlockState state = BlockUtils.getState(pos);
-		Material material = state.getMaterial();
 		Block block = state.getBlock();
 		
-		return material.blocksMovement()
-			&& !(block instanceof AbstractSignBlock)
-			|| block instanceof LadderBlock || jesus
-				&& (material == Material.WATER || material == Material.LAVA);
+		return state.blocksMovement() && !(block instanceof AbstractSignBlock)
+			|| block instanceof LadderBlock
+			|| jesus && (block == Blocks.WATER || block == Blocks.LAVA);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -300,9 +298,9 @@ public class PathFinder
 			return false;
 		
 		// check if solid
-		Material material = BlockUtils.getState(pos).getMaterial();
-		Block block = BlockUtils.getBlock(pos);
-		if(material.blocksMovement() && !(block instanceof AbstractSignBlock))
+		BlockState state = BlockUtils.getState(pos);
+		Block block = state.getBlock();
+		if(state.blocksMovement() && !(block instanceof AbstractSignBlock))
 			return false;
 		
 		// check if trapped
@@ -312,7 +310,7 @@ public class PathFinder
 		
 		// check if safe
 		if(!invulnerable
-			&& (material == Material.LAVA || material == Material.FIRE))
+			&& (block == Blocks.LAVA || block instanceof AbstractFireBlock))
 			return false;
 		
 		return true;
@@ -332,13 +330,14 @@ public class PathFinder
 	private boolean canSafelyStandOn(BlockPos pos)
 	{
 		// check if solid
-		Material material = BlockUtils.getState(pos).getMaterial();
 		if(!canBeSolid(pos))
 			return false;
 		
 		// check if safe
-		if(!invulnerable
-			&& (material == Material.CACTUS || material == Material.LAVA))
+		BlockState state = BlockUtils.getState(pos);
+		Fluid fluid = state.getFluidState().getFluid();
+		if(!invulnerable && (state.getBlock() instanceof CactusBlock
+			|| fluid instanceof LavaFluid))
 			return false;
 		
 		return true;
@@ -381,7 +380,7 @@ public class PathFinder
 			// check if block resets fall damage
 			Block prevBlock = BlockUtils.getBlock(prevPos);
 			BlockState prevState = BlockUtils.getState(prevPos);
-			if(prevState.getMaterial() == Material.WATER
+			if(prevState.getFluidState().getFluid() instanceof WaterFluid
 				|| prevBlock instanceof LadderBlock
 				|| prevBlock instanceof VineBlock
 				|| prevBlock instanceof CobwebBlock)
@@ -395,8 +394,8 @@ public class PathFinder
 	
 	private boolean canFlyAt(BlockPos pos)
 	{
-		return flying || !noWaterSlowdown
-			&& BlockUtils.getState(pos).getMaterial() == Material.WATER;
+		return flying
+			|| !noWaterSlowdown && BlockUtils.getBlock(pos) == Blocks.WATER;
 	}
 	
 	private boolean canClimbUpAt(BlockPos pos)
@@ -422,7 +421,7 @@ public class PathFinder
 	{
 		// check feet
 		Block blockFeet = BlockUtils.getBlock(pos);
-		if(BlockUtils.getState(pos).getMaterial().isLiquid()
+		if(BlockUtils.getBlock(pos) instanceof FluidBlock
 			|| blockFeet instanceof LadderBlock
 			|| blockFeet instanceof VineBlock
 			|| blockFeet instanceof CobwebBlock)
@@ -430,7 +429,7 @@ public class PathFinder
 		
 		// check head
 		Block blockHead = BlockUtils.getBlock(pos.up());
-		if(BlockUtils.getState(pos.up()).getMaterial().isLiquid()
+		if(BlockUtils.getBlock(pos.up()) instanceof FluidBlock
 			|| blockHead instanceof CobwebBlock)
 			return true;
 		
@@ -445,12 +444,12 @@ public class PathFinder
 		for(int i = 0; i < positions.length; i++)
 		{
 			BlockPos pos = positions[i];
-			Material material = BlockUtils.getState(pos).getMaterial();
+			Block block = BlockUtils.getBlock(pos);
 			
 			// liquids
-			if(material == Material.WATER && !noWaterSlowdown)
+			if(block == Blocks.WATER && !noWaterSlowdown)
 				costs[i] *= 1.3164437838225804F;
-			else if(material == Material.LAVA)
+			else if(block == Blocks.LAVA)
 				costs[i] *= 4.539515393656079F;
 			
 			// soul sand
@@ -557,13 +556,17 @@ public class PathFinder
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		BlockPos camPos = RenderUtils.getCameraBlockPos();
+		int regionX = (camPos.getX() >> 9) * 512;
+		int regionZ = (camPos.getZ() >> 9) * 512;
+		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		
 		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
@@ -577,7 +580,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(matrixStack, element);
+				PathRenderer.renderNode(matrixStack, element, regionX, regionZ);
 				renderedThings++;
 			}
 			
@@ -593,7 +596,7 @@ public class PathFinder
 					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
 				PathRenderer.renderArrow(matrixStack, entry.getValue(),
-					entry.getKey());
+					entry.getKey(), regionX, regionZ);
 				renderedThings++;
 			}
 		}
@@ -604,7 +607,8 @@ public class PathFinder
 		else
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1));
+			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1),
+				regionX, regionZ);
 		
 		matrixStack.pop();
 		
@@ -612,7 +616,6 @@ public class PathFinder
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glDepthMask(true);
 	}
 	

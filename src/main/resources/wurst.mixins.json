@@ -8,6 +8,7 @@
   "client": [
   	"AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
+    "AllowedAddressResolverMixin",
     "ArmorItemMixin",
     "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
@@ -23,7 +24,6 @@
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
-    "ContainerScreen54Mixin",
     "CreativeInventoryScreenMixin",
     "CustomPayloadC2SPacketAccessor",
     "DeathScreenMixin",
@@ -36,6 +36,7 @@
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",
+    "GenericContainerScreenMixin",
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
