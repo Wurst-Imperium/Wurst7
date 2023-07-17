@@ -17,6 +17,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.TextFieldSetting;
 
 public final class ModelSettings
 {
@@ -172,11 +173,28 @@ public final class ModelSettings
 				+ " etc.",
 			false);
 	
+	public final TextFieldSetting openaiChatEndpoint = new TextFieldSetting(
+		"OpenAI chat endpoint", "Endpoint for OpenAI's chat completion API.",
+		"https://api.openai.com/v1/chat/completions");
+	
+	public final TextFieldSetting openaiLegacyEndpoint =
+		new TextFieldSetting("OpenAI legacy endpoint",
+			"Endpoint for OpenAI's legacy completion API.",
+			"https://api.openai.com/v1/completions");
+	
+	public final TextFieldSetting oobaboogaEndpoint =
+		new TextFieldSetting("Oobabooga endpoint",
+			"Endpoint for your Oobabooga web UI instance.\n"
+				+ "Remember to start the Oobabooga server with the"
+				+ " \u00a7e--extensions api\u00a7r flag.",
+			"http://127.0.0.1:5000/api/v1/generate");
+	
 	private final List<Setting> settings =
 		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
 			temperature, topP, presencePenalty, frequencyPenalty,
 			repetitionPenalty, encoderRepetitionPenalty, stopSequence,
-			contextLength, filterServerMessages));
+			contextLength, filterServerMessages, openaiChatEndpoint,
+			openaiLegacyEndpoint, oobaboogaEndpoint));
 	
 	public void forEach(Consumer<Setting> action)
 	{
