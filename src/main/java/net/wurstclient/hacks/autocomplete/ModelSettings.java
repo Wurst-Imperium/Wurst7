@@ -37,10 +37,26 @@ public final class ModelSettings
 	
 	public enum OpenAiModel
 	{
-		TEXT_DAVINCI_003("text-davinci-003", false),
 		GPT_3_5_TURBO("gpt-3.5-turbo", true),
+		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
+		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
+		GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", true),
+		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
 		GPT_4("gpt-4", true),
-		GPT_4_32K("gpt-4-32k", true);
+		GPT_4_0613("gpt-4-0613", true),
+		GPT_4_0314("gpt-4-0314", true),
+		GPT_4_32K("gpt-4-32k", true),
+		GPT_4_32K_0613("gpt-4-32k-0613", true),
+		TEXT_DAVINCI_003("text-davinci-003", false),
+		TEXT_DAVINCI_002("text-davinci-002", false),
+		TEXT_DAVINCI_001("text-davinci-001", false),
+		DAVINCI("davinci", false),
+		TEXT_CURIE_001("text-curie-001", false),
+		CURIE("curie", false),
+		TEXT_BABBAGE_001("text-babbage-001", false),
+		BABBAGE("babbage", false),
+		TEXT_ADA_001("text-ada-001", false),
+		ADA("ada", false);
 		
 		private final String name;
 		private final boolean chat;
