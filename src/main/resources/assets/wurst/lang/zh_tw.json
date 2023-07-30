@@ -9,6 +9,7 @@
   "description.wurst.hack.antispam": "預防存在的重複刷屏，改為用計數器顯示。",
   "description.wurst.hack.antiwaterpush": "防止你被水流推動。",
   "description.wurst.hack.antiwobble": "關閉因反胃和傳送門引起的搖晃效果。",
+  "description.wurst.hack.automusic": "自动使用音符盒演奏midi乐曲。",
   "description.wurst.hack.arrowdmg": "大幅增加箭的傷害，但也會消耗大量飢餓值並降低準確性。\n\n不適用於弩，並且似乎已在紙質服務器上進行了修補。",
   "description.wurst.setting.arrowdmg.packets": "要發送的數據包數量。\n更多數據包 = 更高的傷害。",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "啟用後，三叉戟飛得更遠。 似乎不會影響傷害或激流。\n\n§c§l警告：§r 啟用此選項很容易丟失三叉戟！",

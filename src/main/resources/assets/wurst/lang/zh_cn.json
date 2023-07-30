@@ -8,6 +8,7 @@
   "description.wurst.hack.antiknockback": "保护你不被其他生物或玩家推动和用剑击退。",
   "description.wurst.hack.antispam": "将重复的刷屏改为计数器显示。",
   "description.wurst.hack.antiwaterpush": "防止你被水流推动。",
+  "description.wurst.hack.automusic": "自动使用音符盒演奏midi乐曲。",
   "description.wurst.hack.antiwobble": "禁用由反胃和传送门动画引起的视觉扭曲。",
   "description.wurst.hack.arrowdmg": "大幅增加箭的伤害，但也会消耗大量饥饿值并降低准确性。\n\n不适用于弩，并且似乎已在Paper类服务器上修复。",
   "description.wurst.setting.arrowdmg.packets": "发送数据包的数量。\n更多的数据包意味着更高的伤害。",
