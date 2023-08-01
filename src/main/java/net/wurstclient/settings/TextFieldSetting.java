@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
@@ -126,6 +127,17 @@ public final class TextFieldSetting extends Setting
 	public JsonElement toJson()
 	{
 		return new JsonPrimitive(value);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "TextField");
+		json.addProperty("defaultValue", defaultValue);
+		return json;
 	}
 	
 	@Override
