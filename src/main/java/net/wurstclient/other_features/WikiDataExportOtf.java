@@ -63,11 +63,13 @@ public final class WikiDataExportOtf extends OtherFeature
 		JsonObject json = new JsonObject();
 		json.addProperty("name", hack.getName());
 		json.addProperty("descriptionKey", hack.getDescriptionKey());
+		json.addProperty("type", "Hack");
 		Category category = hack.getCategory();
 		if(category != null)
 			json.addProperty("category", category.getName());
 		json.addProperty("keybind", getDefaultKeybind(hack));
 		json.addProperty("stateSaved", hack.isStateSaved());
+		json.addProperty("class", hack.getClass().getName());
 		
 		JsonArray settings = new JsonArray();
 		for(Setting setting : hack.getSettings().values())
