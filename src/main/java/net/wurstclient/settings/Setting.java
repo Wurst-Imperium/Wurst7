@@ -7,18 +7,15 @@
  */
 package net.wurstclient.settings;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import com.google.gson.JsonElement;
 
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.keybinds.PossibleKeybind;
+import net.wurstclient.util.ChatUtils;
 
 public abstract class Setting
 {
@@ -43,14 +40,7 @@ public abstract class Setting
 	
 	public final String getWrappedDescription(int width)
 	{
-		List<StringVisitable> lines = WurstClient.MC.textRenderer
-			.getTextHandler().wrapLines(getDescription(), width, Style.EMPTY);
-		
-		StringJoiner joiner = new StringJoiner("\n");
-		lines.stream().map(StringVisitable::getString)
-			.forEach(s -> joiner.add(s));
-		
-		return joiner.toString();
+		return ChatUtils.wrapText(getDescription(), width);
 	}
 	
 	public abstract Component getComponent();
