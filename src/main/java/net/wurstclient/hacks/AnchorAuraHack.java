@@ -36,7 +36,6 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -46,6 +45,7 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
 
@@ -186,7 +186,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		if(!selectItem(item -> item != Items.GLOWSTONE))
+		InventoryUtils.selectItem(Items.GLOWSTONE,
+			takeItemsFrom.getSelected().maxInvSlot);
+		if(!MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
 		boolean shouldSwing = false;
@@ -204,7 +206,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		if(!selectItem(item -> item == Items.GLOWSTONE))
+		InventoryUtils.selectItem(Items.GLOWSTONE,
+			takeItemsFrom.getSelected().maxInvSlot);
+		if(!MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
 		boolean shouldSwing = false;
@@ -215,39 +219,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			
 		if(shouldSwing)
 			MC.player.swingHand(Hand.MAIN_HAND);
-	}
-	
-	private boolean selectItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			if(slot < 9)
-				inventory.selectedSlot = slot;
-			else if(inventory.getEmptySlot() < 9)
-				im.windowClick_QUICK_MOVE(slot);
-			else if(inventory.getEmptySlot() != -1)
-			{
-				im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
-				im.windowClick_QUICK_MOVE(slot);
-			}else
-			{
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-				im.windowClick_PICKUP(slot);
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-			}
-			
-			return true;
-		}
-		
-		return false;
 	}
 	
 	private boolean hasItem(Predicate<Item> item)
@@ -337,7 +308,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
-			if(!selectItem(item -> item == Items.RESPAWN_ANCHOR))
+			InventoryUtils.selectItem(Items.RESPAWN_ANCHOR,
+				takeItemsFrom.getSelected().maxInvSlot);
+			if(!MC.player.isHolding(Items.RESPAWN_ANCHOR))
 				return false;
 			
 			faceBlocks.getSelected().face(hitVec);
