@@ -30,6 +30,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
@@ -278,7 +279,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private boolean placeAnchor(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
@@ -328,19 +329,15 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private ArrayList<BlockPos> getNearbyAnchors()
 	{
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeD = range.getValue();
-		int rangeI = (int)Math.ceil(rangeD);
-		double rangeSq = Math.pow(rangeD + 0.5, 2);
-		
 		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
+		int rangeI = range.getValueCeil();
+		double rangeSq = MathHelper.square(range.getValue() + 0.5);
 		
 		Comparator<BlockPos> furthestFromPlayer =
 			Comparator.<BlockPos> comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))).reversed();
 		
-		return BlockUtils.getAllInBoxStream(min, max)
+		return BlockUtils.getAllInBoxStream(center, rangeI)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.RESPAWN_ANCHOR)
 			.sorted(furthestFromPlayer)
@@ -349,7 +346,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<Entity> getNearbyTargets()
 	{
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		
 		Comparator<Entity> furthestFromPlayer = Comparator
 			.<Entity> comparingDouble(e -> MC.player.squaredDistanceTo(e))
@@ -374,15 +371,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
 	{
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeD = range.getValue();
-		double rangeSq = Math.pow(rangeD + 0.5, 2);
-		int rangeI = 2;
+		double rangeSq = MathHelper.square(range.getValue() + 0.5);
 		
 		BlockPos center = target.getBlockPos();
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		Box targetBB = target.getBoundingBox();
+		int rangeI = 2;
 		
+		Box targetBB = target.getBoundingBox();
 		Vec3d targetEyesVec =
 			target.getPos().add(0, target.getEyeHeight(target.getPose()), 0);
 		
@@ -390,7 +384,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			Comparator.<BlockPos> comparingDouble(
 				pos -> targetEyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)));
 		
-		return BlockUtils.getAllInBoxStream(min, max)
+		return BlockUtils.getAllInBoxStream(center, rangeI)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(this::isReplaceable).filter(this::hasClickableNeighbor)
 			.filter(pos -> !targetBB.intersects(new Box(pos)))
