@@ -420,14 +420,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean isChargedAnchor(BlockPos pos)
 	{
-		try
-		{
-			return BlockUtils.getState(pos).get(RespawnAnchorBlock.CHARGES) > 0;
-			
-		}catch(IllegalArgumentException e)
-		{
-			return false;
-		}
+		return BlockUtils.getState(pos).getOrEmpty(RespawnAnchorBlock.CHARGES)
+			.orElse(0) > 0;
 	}
 	
 	private boolean isSneaking()
