@@ -24,7 +24,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -150,9 +149,12 @@ public class WurstOptionsScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		renderTitles(context);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
 		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
@@ -177,7 +179,7 @@ public class WurstOptionsScreen extends Screen
 	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;

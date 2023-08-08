@@ -14,6 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -116,11 +117,12 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -152,8 +154,6 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void tick()
 	{
-		itemNameField.tick();
-		
 		itemToAdd = ItemUtils
 			.getItemFromNameOrID(itemNameField.getText().toLowerCase());
 		addButton.active = itemToAdd != null;
@@ -177,8 +177,11 @@ public final class EditItemListScreen extends Screen
 		matrixStack.translate(0, 0, 300);
 		
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
 		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
@@ -208,6 +211,8 @@ public final class EditItemListScreen extends Screen
 		RenderUtils.drawItem(context,
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
+		
+		matrixStack.pop();
 	}
 	
 	@Override

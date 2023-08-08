@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -114,11 +115,12 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -150,8 +152,6 @@ public final class EditBlockListScreen extends Screen
 	@Override
 	public void tick()
 	{
-		blockNameField.tick();
-		
 		String nameOrId = blockNameField.getText();
 		blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		addButton.active = blockToAdd != null;
@@ -175,8 +175,11 @@ public final class EditBlockListScreen extends Screen
 		matrixStack.translate(0, 0, 300);
 		
 		blockNameField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
 		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
@@ -201,6 +204,8 @@ public final class EditBlockListScreen extends Screen
 		RenderUtils.drawItem(context,
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
+		
+		matrixStack.pop();
 	}
 	
 	@Override

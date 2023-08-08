@@ -7,13 +7,11 @@
  */
 package net.wurstclient.other_features;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.util.Identifier;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
-import net.wurstclient.mixin.CustomPayloadC2SPacketAccessor;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -41,23 +39,25 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!spoof.isChecked())
 			return;
 		
-		if(!(event.getPacket() instanceof CustomPayloadC2SPacketAccessor))
+		if(!(event.getPacket() instanceof CustomPayloadC2SPacket packet))
 			return;
 		
-		CustomPayloadC2SPacketAccessor packet =
-			(CustomPayloadC2SPacketAccessor)event.getPacket();
+		Identifier channel = packet.payload().id();
 		
-		if(packet.getChannel().getNamespace().equals("minecraft")
-			&& packet.getChannel().getPath().equals("register"))
+		if(channel.getNamespace().equals("minecraft")
+			&& channel.getPath().equals("register"))
 			event.cancel();
+			
+		// Apparently the Minecraft client no longer sends its brand to the
+		// server as of 23w31a
 		
-		if(packet.getChannel().getNamespace().equals("minecraft")
-			&& packet.getChannel().getPath().equals("brand"))
-			event.setPacket(new CustomPayloadC2SPacket(
-				CustomPayloadC2SPacket.BRAND,
-				new PacketByteBuf(Unpooled.buffer()).writeString("vanilla")));
+		// if(packet.getChannel().getNamespace().equals("minecraft")
+		// && packet.getChannel().getPath().equals("brand"))
+		// event.setPacket(new CustomPayloadC2SPacket(
+		// CustomPayloadC2SPacket.BRAND,
+		// new PacketByteBuf(Unpooled.buffer()).writeString("vanilla")));
 		
-		if(packet.getChannel().getNamespace().equals("fabric"))
+		if(channel.getNamespace().equals("fabric"))
 			event.cancel();
 	}
 	

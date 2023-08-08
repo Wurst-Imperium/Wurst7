@@ -8,6 +8,7 @@
 package net.wurstclient.options;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
@@ -100,14 +101,15 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(textRenderer, "Zoom Manager",
 			width / 2, 40, 0xffffff);
 		context.drawTextWithShadow(textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,
 			height / 4 + 44, 0xcccccc);
 		
-		super.render(context, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

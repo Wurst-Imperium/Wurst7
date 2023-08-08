@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -91,24 +92,20 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		blockField.tick();
-	}
-	
-	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		MatrixStack matrixStack = context.getMatrices();
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(tr, setting.getName(), width / 2, 20,
 			0xFFFFFF);
 		
 		blockField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 100, 115, 0);

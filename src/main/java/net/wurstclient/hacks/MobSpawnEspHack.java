@@ -200,7 +200,8 @@ public final class MobSpawnEspHack extends Hack
 			chunk = world.getChunk(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-			chunk = world.getChunk(chunkData.getChunkX(), chunkData.getChunkZ());
+			chunk =
+				world.getChunk(chunkData.getChunkX(), chunkData.getChunkZ());
 		else
 			return;
 		

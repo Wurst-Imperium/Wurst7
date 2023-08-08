@@ -898,13 +898,13 @@ public enum RenderUtils
 		if(stack.isEmpty())
 		{
 			matrixStack.push();
-			matrixStack.translate(x, y, 0);
+			matrixStack.translate(x, y, 200);
 			if(large)
 				matrixStack.scale(2, 2, 2);
 			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			TextRenderer tr = WurstClient.MC.textRenderer;
-			context.drawText(tr, "?", 3, 2, 0xf0f0f0, false);
+			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
 			matrixStack.pop();

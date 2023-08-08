@@ -25,6 +25,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.DefaultSkinHelper;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
@@ -41,13 +42,12 @@ public final class AltRenderer
 		
 		if(loadedSkins.get(name) == null)
 		{
-			UUID uuid =
-				Uuids.getUuidFromProfile(new GameProfile((UUID)null, name));
+			UUID uuid = Uuids.getOfflinePlayerUuid(name);
 			
 			PlayerListEntry entry =
 				new PlayerListEntry(new GameProfile(uuid, name), false);
 			
-			loadedSkins.put(name, entry.getSkinTexture());
+			loadedSkins.put(name, entry.getSkinTextures().texture());
 		}
 		
 		RenderSystem.setShaderTexture(0, loadedSkins.get(name));
@@ -123,8 +123,9 @@ public final class AltRenderer
 		{
 			bindSkinTexture(name);
 			
-			boolean slim = DefaultSkinHelper
-				.getModel(Uuids.getOfflinePlayerUuid(name)).equals("slim");
+			boolean slim =
+				DefaultSkinHelper.getTexture(Uuids.getOfflinePlayerUuid(name))
+					.model() == SkinTextures.Model.SLIM;
 			
 			GL11.glEnable(GL11.GL_BLEND);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -254,8 +255,9 @@ public final class AltRenderer
 		{
 			bindSkinTexture(name);
 			
-			boolean slim = DefaultSkinHelper
-				.getModel(Uuids.getOfflinePlayerUuid(name)).equals("slim");
+			boolean slim =
+				DefaultSkinHelper.getTexture(Uuids.getOfflinePlayerUuid(name))
+					.model() == SkinTextures.Model.SLIM;
 			
 			GL11.glEnable(GL11.GL_BLEND);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
