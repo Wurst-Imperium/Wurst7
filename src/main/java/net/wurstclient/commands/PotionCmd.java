@@ -103,7 +103,7 @@ public final class PotionCmd extends Command
 		{
 			NbtCompound tag = new NbtCompound();
 			
-			int id = StatusEffect.getRawId(effect.getEffectType());
+			int id = Registries.STATUS_EFFECT.getRawId(effect.getEffectType());
 			tag.putInt("Id", id);
 			tag.putInt("Amplifier", effect.getAmplifier());
 			tag.putInt("Duration", effect.getDuration());
@@ -127,7 +127,8 @@ public final class PotionCmd extends Command
 		NbtList newEffects = new NbtList();
 		for(StatusEffectInstance oldEffect : oldEffects)
 		{
-			int oldId = StatusEffect.getRawId(oldEffect.getEffectType());
+			int oldId =
+				Registries.STATUS_EFFECT.getRawId(oldEffect.getEffectType());
 			
 			if(oldId == id)
 				continue;
@@ -157,7 +158,7 @@ public final class PotionCmd extends Command
 				Identifier identifier = new Identifier(input);
 				StatusEffect effect = Registries.STATUS_EFFECT.get(identifier);
 				
-				id = StatusEffect.getRawId(effect);
+				id = Registries.STATUS_EFFECT.getRawId(effect);
 				
 			}catch(InvalidIdentifierException e)
 			{
