@@ -38,9 +38,9 @@ public abstract class BlockModelRendererMixin
 		VertexConsumer vertexConsumer, boolean cull, Random random, long seed,
 		int overlay, CallbackInfo ci)
 	{
-		TesselateBlockEvent event = new TesselateBlockEvent(state);
+		TesselateBlockEvent event = new TesselateBlockEvent(state, pos);
 		EventManager.fire(event);
-		
+
 		if(event.isCancelled())
 		{
 			ci.cancel();
@@ -50,7 +50,7 @@ public abstract class BlockModelRendererMixin
 		if(!cull)
 			return;
 		
-		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event2 = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event2);
 		if(!Boolean.TRUE.equals(event2.isRendered()))
 			return;

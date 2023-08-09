@@ -34,7 +34,7 @@ public class SodiumBlockOcclusionCacheMixin
 		Direction facing, CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideListener.ShouldDrawSideEvent event =
-			new ShouldDrawSideListener.ShouldDrawSideEvent(state);
+			new ShouldDrawSideListener.ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

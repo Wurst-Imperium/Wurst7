@@ -10,6 +10,7 @@ package net.wurstclient.events;
 import java.util.ArrayList;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
@@ -21,17 +22,23 @@ public interface TesselateBlockListener extends Listener
 		extends CancellableEvent<TesselateBlockListener>
 	{
 		private final BlockState state;
+		private final BlockPos pos;
 		
-		public TesselateBlockEvent(BlockState state)
+		public TesselateBlockEvent(BlockState state, BlockPos pos)
 		{
 			this.state = state;
+			this.pos = pos;
 		}
 		
 		public BlockState getState()
 		{
 			return state;
 		}
-		
+
+		public BlockPos getPos() {
+			return pos;
+		}
+
 		@Override
 		public void fire(ArrayList<TesselateBlockListener> listeners)
 		{

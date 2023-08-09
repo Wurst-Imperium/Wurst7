@@ -17,7 +17,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
@@ -30,6 +32,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
@@ -65,7 +68,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:spawner", "minecraft:suspicious_gravel",
 		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
 		"minecraft:trapped_chest", "minecraft:water");
-	
+
+	private final CheckboxSetting antiXrayBypass = new CheckboxSetting("Anti-XRay Bypass", "Show only blocks exposed to air", false);
+
 	private ArrayList<String> oreNames;
 	private final String warning;
 	
@@ -77,6 +82,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		super("X-Ray");
 		setCategory(Category.RENDER);
 		addSetting(ores);
+		addSetting(antiXrayBypass);
 		
 		List<String> mods = FabricLoader.getInstance().getAllMods().stream()
 			.map(ModContainer::getMetadata).map(ModMetadata::getId)
@@ -160,20 +166,21 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(isVisible(event.getState().getBlock()));
+		event.setRendered(isVisible(event.getState().getBlock(), event.getPos()));
 	}
 	
 	@Override
 	public void onTesselateBlock(TesselateBlockEvent event)
 	{
-		if(!isVisible(event.getState().getBlock()))
+		if(!isVisible(event.getState().getBlock(), event.getPos()))
 			event.cancel();
 	}
 	
 	@Override
 	public void onRenderBlockEntity(RenderBlockEntityEvent event)
 	{
-		if(!isVisible(BlockUtils.getBlock(event.getBlockEntity().getPos())))
+		BlockPos pos = event.getBlockEntity().getPos();
+		if(!isVisible(BlockUtils.getBlock(pos), pos))
 			event.cancel();
 	}
 	
@@ -182,10 +189,21 @@ public final class XRayHack extends Hack implements UpdateListener,
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
-	private boolean isVisible(Block block)
+	private boolean isVisible(Block block, BlockPos pos)
 	{
 		String name = BlockUtils.getName(block);
 		int index = Collections.binarySearch(oreNames, name);
-		return index >= 0;
+		boolean visible = index >= 0;
+
+		if (visible && antiXrayBypass.isChecked()) {
+			return BlockUtils.getBlock(pos.up()).getDefaultState().isAir()
+					|| BlockUtils.getBlock(pos.down()).getDefaultState().isAir()
+					|| BlockUtils.getBlock(pos.east()).getDefaultState().isAir()
+					|| BlockUtils.getBlock(pos.west()).getDefaultState().isAir()
+					|| BlockUtils.getBlock(pos.north()).getDefaultState().isAir()
+					|| BlockUtils.getBlock(pos.south()).getDefaultState().isAir();
+		}
+
+		return visible;
 	}
 }
