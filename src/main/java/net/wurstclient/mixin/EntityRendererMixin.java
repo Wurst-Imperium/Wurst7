@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.entity.ItemEntity;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,6 +27,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin<T extends Entity>
@@ -110,7 +112,29 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		matrices.pop();
 	}
-	
+
+	/**
+	 * Forces the nametag to be rendered if configured in NameTags.
+	 */
+	@Inject(at = @At("HEAD"),
+			method = "hasLabel(Lnet/minecraft/entity/Entity;)Z",
+			cancellable = true)
+	private void shouldForceLabel(Entity e,
+								  CallbackInfoReturnable<Boolean> cir)
+	{
+		if (e instanceof ItemEntity
+				&& WurstClient.INSTANCE.getHax().itemEspHack.shouldRenderItemInfo())
+		{
+			cir.setReturnValue(true);
+		}
+		// return true immediately after the distance check
+		//if(WurstClient.INSTANCE.getHax().nameTagsHack.shouldForceNametags())
+		// e.getDisplayName()
+	}
+
+
+
+
 	@Shadow
 	public TextRenderer getTextRenderer()
 	{

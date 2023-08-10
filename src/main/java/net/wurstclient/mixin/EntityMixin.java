@@ -7,6 +7,10 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.text.Text;
+import net.wurstclient.WurstClient;
+import net.wurstclient.util.ColorUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, CommandOutput
@@ -51,5 +56,19 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 		
 		if(event.isCancelled())
 			ci.cancel();
+	}
+
+	@Inject(at = @At("HEAD"),
+			method = "getDisplayName()Lnet/minecraft/text/Text;",
+			cancellable = true)
+	private void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
+		if ((Object)this instanceof ItemEntity
+				&& WurstClient.INSTANCE.getHax().itemEspHack.shouldRenderItemInfo())
+		{
+			ItemEntity itemEntity = (ItemEntity) ((Object)this);
+			float seconds = ((6000 - itemEntity.getItemAge()) / 20.f);
+			cir.setReturnValue(Text.of(String.format("Despawns in %.02f", seconds)));
+		}
+		//cir.setReturnValue();
 	}
 }

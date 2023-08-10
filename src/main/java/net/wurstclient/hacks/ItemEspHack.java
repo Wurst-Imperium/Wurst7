@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import net.wurstclient.settings.CheckboxSetting;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -41,6 +42,18 @@ import net.wurstclient.util.RotationUtils;
 public final class ItemEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
+	/*
+	 * I don't know where to put this
+	 * 	https://github.com/Wurst-Imperium/Wurst7/issues/638
+	 * Item-despawn timers and other data can be displayed
+	 *	as part of the entity item nametag
+	 * Nametags hack has similar functionality to these proposals,
+	 * 	forcibly making the item name visible, but ItemEntityRenderer::hasLabel
+	 *
+	 * Entity::setCustomNameVisible achieves the same thing, perhaps
+	 * 	inject Entity::isCustomNameVisible to return true?
+	 */
+
 	private final EnumSetting<Style> style =
 		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	
@@ -53,7 +66,13 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		"Items will be highlighted in this color.", Color.YELLOW);
 	
 	private final ArrayList<ItemEntity> items = new ArrayList<>();
-	
+
+	private final CheckboxSetting renderItemInfo = new CheckboxSetting("Show status", "Show status of item such as despawn time", false);
+
+	public boolean shouldRenderItemInfo() {
+		return renderItemInfo.isChecked();
+	}
+
 	public ItemEspHack()
 	{
 		super("ItemESP");
@@ -62,6 +81,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(color);
+		addSetting(renderItemInfo);
 	}
 	
 	@Override
