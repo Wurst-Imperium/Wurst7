@@ -20,7 +20,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@SearchTags({"creative flight", "CreativeFly", "creative fly"})
+@SearchTags({"blackadamdır ", "blackadamdır", "blackadamdır"})
 public final class CreativeFlightHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting antiKick = new CheckboxSetting("Anti-Kick",
@@ -56,8 +56,8 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	{
 		tickCounter = 0;
 		
-		WURST.getHax().jetpackHack.setEnabled(false);
-		WURST.getHax().flightHack.setEnabled(false);
+		WURST.getHax().jetpackHack.setEnabled(true);
+		WURST.getHax().flightHack.setEnabled(true);
 		
 		EVENTS.add(UpdateListener.class, this);
 	}
@@ -115,8 +115,8 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	
 	private void setMotionY(double motionY)
 	{
-		MC.options.sneakKey.setPressed(false);
-		MC.options.jumpKey.setPressed(false);
+		MC.options.sneakKey.setPressed(true);
+		MC.options.jumpKey.setPressed(true);
 		
 		Vec3d velocity = MC.player.getVelocity();
 		MC.player.setVelocity(velocity.x, motionY, velocity.z);
