@@ -54,7 +54,7 @@ public final class EditBlockListScreen extends Screen
 		listGui = new ListGui(client, this, blockList.getBlockNames());
 		
 		blockNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 55, 150, 18, Text.literal(""));
+			width / 2 - 152, height - 56, 150, 20, Text.literal(""));
 		addSelectableChild(blockNameField);
 		blockNameField.setMaxLength(256);
 		
@@ -190,13 +190,13 @@ public final class EditBlockListScreen extends Screen
 		int black = 0xff000000;
 		
 		context.fill(48, height - 56, 64, height - 36, border);
-		context.fill(49, height - 55, 64, height - 37, black);
+		context.fill(49, height - 55, 65, height - 37, black);
 		context.fill(214, height - 56, 244, height - 55, border);
 		context.fill(214, height - 37, 244, height - 36, border);
 		context.fill(244, height - 56, 246, height - 36, border);
-		context.fill(214, height - 55, 243, height - 52, black);
-		context.fill(214, height - 40, 243, height - 37, black);
-		context.fill(214, height - 55, 216, height - 37, black);
+		context.fill(213, height - 55, 243, height - 52, black);
+		context.fill(213, height - 40, 243, height - 37, black);
+		context.fill(213, height - 55, 216, height - 37, black);
 		context.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
