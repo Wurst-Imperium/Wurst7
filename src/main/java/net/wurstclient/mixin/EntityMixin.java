@@ -62,13 +62,31 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 			method = "getDisplayName()Lnet/minecraft/text/Text;",
 			cancellable = true)
 	private void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
+		//noinspection ConstantValue
 		if ((Object)this instanceof ItemEntity
 				&& WurstClient.INSTANCE.getHax().itemEspHack.shouldRenderItemInfo())
 		{
 			ItemEntity itemEntity = (ItemEntity) ((Object)this);
-			float seconds = ((6000 - itemEntity.getItemAge()) / 20.f);
-			cir.setReturnValue(Text.of(String.format("Despawns in %.02f", seconds)));
+			int itemAgeRemaining = (6000 - itemEntity.getItemAge()) / 20;
+
+			// There is a problem with this
+			//	TimerHack (or any other client-side delta manipulation) interferes
+			//	Single player world instances cause item ages to be inaccurate to
+			//	the locally started server instance
+			// Single Player worlds start an internal server (MC.server) that is separate from the client MC.world
+			//	In the serverworld, the item age works as expected, however, item age (with TimerHack enabled)
+			//		is not accurate
+
+			// 1.19 hex-colors could easily be used
+			//	like a gradient from green->yellow->orange->red
+
+			String text = String.format("\u00a7%s%ds",
+					itemAgeRemaining < 15 ? "4" : itemAgeRemaining < 60 ? ("c") : itemAgeRemaining < 180 ? "6" : "2",
+					itemAgeRemaining);
+
+			cir.setReturnValue(Text.of(text));
+
+			//cir.setReturnValue(Text.of(String.format("age: %.01fs, itemAge: %.01f", ageSeconds, itemAgeSeconds)));
 		}
-		//cir.setReturnValue();
 	}
 }
