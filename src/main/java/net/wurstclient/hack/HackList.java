@@ -51,6 +51,7 @@ public final class HackList implements UpdateListener
 	public final AutoEatHack autoEatHack = new AutoEatHack();
 	public final AutoFarmHack autoFarmHack = new AutoFarmHack();
 	public final AutoFishHack autoFishHack = new AutoFishHack();
+	public final AutoHomeHack autoHomeHack = new AutoHomeHack();
 	public final AutoMineHack autoMineHack = new AutoMineHack();
 	public final AutoPotionHack autoPotionHack = new AutoPotionHack();
 	public final AutoReconnectHack autoReconnectHack = new AutoReconnectHack();
@@ -180,6 +181,7 @@ public final class HackList implements UpdateListener
 	public final TrueSightHack trueSightHack = new TrueSightHack();
 	public final TunnellerHack tunnellerHack = new TunnellerHack();
 	public final XRayHack xRayHack = new XRayHack();
+	
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>(String::compareToIgnoreCase);
