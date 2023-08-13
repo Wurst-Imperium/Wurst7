@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,7 +23,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -39,6 +37,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.FacingSetting;
+import net.wurstclient.settings.FacingSetting.Facing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.AnchorAuraFilterList;
@@ -48,7 +48,6 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"anchor aura", "CrystalAura", "crystal aura"})
 public final class AnchorAuraHack extends Hack implements UpdateListener
@@ -63,11 +62,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			+ "When disabled, AnchorAura will only charge and detonate manually placed anchors.",
 		true);
 	
-	private final EnumSetting<FaceBlocks> faceBlocks = new EnumSetting<>(
-		"Face anchors",
-		"Whether or not AnchorAura should face the correct direction when placing and right-clicking respawn anchors.\n\n"
-			+ "Slower but can help with anti-cheat plugins.",
-		FaceBlocks.values(), FaceBlocks.OFF);
+	private final FacingSetting faceBlocks =
+		FacingSetting.withPacketSpam("Face anchors",
+			"Whether or not AnchorAura should face the correct direction when"
+				+ " placing and right-clicking respawn anchors.\n\n"
+				+ "Slower but can help with anti-cheat plugins.",
+			Facing.OFF);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
@@ -421,45 +421,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private boolean isSneaking()
 	{
 		return MC.player.isSneaking() || WURST.getHax().sneakHack.isEnabled();
-	}
-	
-	private enum FaceBlocks
-	{
-		OFF("Off", v -> {}),
-		
-		SERVER("Server-side",
-			v -> WURST.getRotationFaker().faceVectorPacket(v)),
-		
-		CLIENT("Client-side",
-			v -> WURST.getRotationFaker().faceVectorClient(v)),
-		
-		SPAM("Packet spam", v -> {
-			Rotation rotation = RotationUtils.getNeededRotations(v);
-			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
-			MC.player.networkHandler.sendPacket(packet);
-		});
-		
-		private String name;
-		private Consumer<Vec3d> face;
-		
-		private FaceBlocks(String name, Consumer<Vec3d> face)
-		{
-			this.name = name;
-			this.face = face;
-		}
-		
-		public void face(Vec3d v)
-		{
-			face.accept(v);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 	
 	private enum TakeItemsFrom

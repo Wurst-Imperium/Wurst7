@@ -63,7 +63,7 @@ public final class BuildRandomHack extends Hack
 			"Ensure that BuildRandom won't try to place blocks behind walls.",
 			false);
 	
-	private final FacingSetting facing = new FacingSetting(
+	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
 		"How BuildRandom should face the randomly placed blocks.\n\n"
 			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
 			+ " detected by anti-cheat plugins.\n\n"
