@@ -187,9 +187,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		InventoryUtils.selectItem(Items.GLOWSTONE,
+		InventoryUtils.selectItem(stack -> !stack.isOf(Items.GLOWSTONE),
 			takeItemsFrom.getSelected().maxInvSlot);
-		if(!MC.player.isHolding(Items.GLOWSTONE))
+		if(MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
 		boolean shouldSwing = false;
