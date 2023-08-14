@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -20,9 +19,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
@@ -35,7 +31,6 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.FacingSetting;
@@ -46,6 +41,7 @@ import net.wurstclient.settings.filterlists.CrystalAuraFilterList;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"crystal aura"})
@@ -129,8 +125,11 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(!autoPlace.isChecked()
-			|| !hasItem(item -> item == Items.END_CRYSTAL))
+		if(!autoPlace.isChecked())
+			return;
+		
+		if(InventoryUtils.indexOf(Items.END_CRYSTAL,
+			takeItemsFrom.getSelected().maxInvSlot) == -1)
 			return;
 		
 		ArrayList<Entity> targets = getNearbyTargets();
@@ -175,56 +174,6 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			MC.player.swingHand(Hand.MAIN_HAND);
 	}
 	
-	private boolean selectItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			if(slot < 9)
-				inventory.selectedSlot = slot;
-			else if(inventory.getEmptySlot() < 9)
-				im.windowClick_QUICK_MOVE(slot);
-			else if(inventory.getEmptySlot() != -1)
-			{
-				im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
-				im.windowClick_QUICK_MOVE(slot);
-			}else
-			{
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-				im.windowClick_PICKUP(slot);
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean hasItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
 	private boolean placeCrystal(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
@@ -258,7 +207,9 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
-			if(!selectItem(item -> item == Items.END_CRYSTAL))
+			InventoryUtils.selectItem(Items.END_CRYSTAL,
+				takeItemsFrom.getSelected().maxInvSlot);
+			if(!MC.player.isHolding(Items.END_CRYSTAL))
 				return false;
 			
 			faceBlocks.getSelected().face(hitVec);

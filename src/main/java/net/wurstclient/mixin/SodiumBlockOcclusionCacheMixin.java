@@ -22,7 +22,7 @@ import net.wurstclient.events.ShouldDrawSideListener;
 
 @Pseudo
 @Mixin(
-	targets = "me.jellysquid.mods.sodium.client.render.occlusion.BlockOcclusionCache",
+	targets = "me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache",
 	remap = false)
 public class SodiumBlockOcclusionCacheMixin
 {
