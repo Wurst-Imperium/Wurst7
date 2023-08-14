@@ -7,9 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
@@ -41,6 +39,22 @@ public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
 {
+	//private static final Set<Block> EXPOSED_NEIGHBOUR_BLOCKS = new HashSet<>(Arrays.asList(
+	//		Blocks.AIR,
+	//		Blocks.CAVE_AIR,
+	//		Blocks.WATER,
+	//		Blocks.LAVA,
+	//		Blocks.VINE, // deep dark?
+	//		Blocks.CAVE_VINES,
+	//		Blocks.POINTED_DRIPSTONE,
+	//		Blocks.BIG_DRIPLEAF_STEM,
+	//		Blocks.BIG_DRIPLEAF,
+	//		Blocks.SMALL_DRIPLEAF,
+	//		Blocks.IRON_BARS, // stronghold?
+	//		Blocks.IRON_DOOR,
+	//		Blocks.OAK_FENCE // mineshaft?
+	//));
+
 	private final BlockListSetting ores = new BlockListSetting("Ores", "",
 		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
 		"minecraft:bone_block", "minecraft:bookshelf",
@@ -69,9 +83,30 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
 		"minecraft:trapped_chest", "minecraft:water");
 
-	private final CheckboxSetting antiXrayBypass = new CheckboxSetting("Anti-XRay Bypass", "Show only blocks exposed to air", false);
-
 	private ArrayList<String> oreNames;
+
+	private final BlockListSetting exposedBlocks = new BlockListSetting("Exposed", "Blocks to filter as exposed",
+			"minecraft:air",
+			"minecraft:big_dripleaf",
+			"minecraft:big_dripleaf_stem",
+			"minecraft:big_pointed_dripstone",
+			"minecraft:cave_air",
+			"minecraft:cave_vines",
+			"minecraft:iron_bars",
+			"minecraft:iron_door",
+			"minecraft:lava",
+			"minecraft:oak_fence",
+			"minecraft:pointed_dripstone",
+			"minecraft:small_dripleaf",
+			"minecraft:vine",
+			"minecraft:water");
+
+	private ArrayList<String> exposedNames;
+
+	private final CheckboxSetting showExposed = new CheckboxSetting("Show exposed", "Only show ores touching visible blocks.\nUseful for dealing with anti-xray plugins.\nReenable this hack if nothing appears changed.", false);
+
+	// TODO does anyone use optifine anymore?
+	// 		closed source + alternatives like sodium = why
 	private final String warning;
 	
 	private final String renderName =
@@ -82,7 +117,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		super("X-Ray");
 		setCategory(Category.RENDER);
 		addSetting(ores);
-		addSetting(antiXrayBypass);
+		addSetting(exposedBlocks);
+		addSetting(showExposed);
 		
 		List<String> mods = FabricLoader.getInstance().getAllMods().stream()
 			.map(ModContainer::getMetadata).map(ModMetadata::getId)
@@ -105,7 +141,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onEnable()
 	{
+		// TODO BlockList already contains an ArrayList, why not just use that?
 		oreNames = new ArrayList<>(ores.getBlockNames());
+		exposedNames = new ArrayList<>(exposedBlocks.getBlockNames());
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
@@ -129,7 +167,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(TesselateBlockListener.class, this);
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		MC.worldRenderer.reload();
-		
+
 		@SuppressWarnings("unchecked")
 		ISimpleOption<Double> gammaOption =
 			(ISimpleOption<Double>)(Object)MC.options.getGamma();
@@ -188,20 +226,27 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
-	
+
 	private boolean isVisible(Block block, BlockPos pos)
 	{
 		String name = BlockUtils.getName(block);
 		int index = Collections.binarySearch(oreNames, name);
 		boolean visible = index >= 0;
 
-		if (visible && antiXrayBypass.isChecked()) {
-			return BlockUtils.getBlock(pos.up()).getDefaultState().isAir()
-					|| BlockUtils.getBlock(pos.down()).getDefaultState().isAir()
-					|| BlockUtils.getBlock(pos.east()).getDefaultState().isAir()
-					|| BlockUtils.getBlock(pos.west()).getDefaultState().isAir()
-					|| BlockUtils.getBlock(pos.north()).getDefaultState().isAir()
-					|| BlockUtils.getBlock(pos.south()).getDefaultState().isAir();
+		if (visible && showExposed.isChecked()) {
+			return Collections.binarySearch(exposedNames, BlockUtils.getName(pos.up())) >= 0
+					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.down())) >= 0
+					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.east())) >= 0
+					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.west())) >= 0
+					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.north())) >= 0
+					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.south())) >= 0;
+
+			//return EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.up()))
+			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.down()))
+			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.east()))
+			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.west()))
+			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.north()))
+			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.south()));
 		}
 
 		return visible;
