@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -19,9 +18,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
@@ -132,8 +128,10 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			return;
 		}
 		
+		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
+		
 		if(!unchargedAnchors.isEmpty()
-			&& hasItem(item -> item == Items.GLOWSTONE))
+			&& InventoryUtils.indexOf(Items.GLOWSTONE, maxInvSlot) >= 0)
 		{
 			charge(unchargedAnchors);
 			// TODO: option to wait until next tick?
@@ -142,13 +140,14 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(!autoPlace.isChecked()
-			|| !hasItem(item -> item == Items.RESPAWN_ANCHOR))
+			|| InventoryUtils.indexOf(Items.RESPAWN_ANCHOR, maxInvSlot) == -1)
 			return;
 		
 		ArrayList<Entity> targets = getNearbyTargets();
 		ArrayList<BlockPos> newAnchors = placeAnchorsNear(targets);
 		
-		if(!newAnchors.isEmpty() && hasItem(item -> item == Items.GLOWSTONE))
+		if(!newAnchors.isEmpty()
+			&& InventoryUtils.indexOf(Items.GLOWSTONE, maxInvSlot) >= 0)
 		{
 			// TODO: option to wait until next tick?
 			charge(newAnchors);
@@ -220,23 +219,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			
 		if(shouldSwing)
 			MC.player.swingHand(Hand.MAIN_HAND);
-	}
-	
-	private boolean hasItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			return true;
-		}
-		
-		return false;
 	}
 	
 	private boolean rightClickBlock(BlockPos pos)
