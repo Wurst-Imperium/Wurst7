@@ -85,25 +85,25 @@ public final class XRayHack extends Hack implements UpdateListener,
 
 	private ArrayList<String> oreNames;
 
-	private final BlockListSetting exposedBlocks = new BlockListSetting("Exposed", "Blocks to filter as exposed",
-			"minecraft:air",
-			"minecraft:big_dripleaf",
-			"minecraft:big_dripleaf_stem",
-			"minecraft:big_pointed_dripstone",
-			"minecraft:cave_air",
-			"minecraft:cave_vines",
-			"minecraft:iron_bars",
-			"minecraft:iron_door",
-			"minecraft:lava",
-			"minecraft:oak_fence",
-			"minecraft:pointed_dripstone",
-			"minecraft:small_dripleaf",
-			"minecraft:vine",
-			"minecraft:water");
+	//private final BlockListSetting exposedBlocks = new BlockListSetting("Exposed", "Blocks to filter as exposed",
+	//		"minecraft:air",
+	//		"minecraft:big_dripleaf",
+	//		"minecraft:big_dripleaf_stem",
+	//		"minecraft:big_pointed_dripstone",
+	//		"minecraft:cave_air",
+	//		"minecraft:cave_vines",
+	//		"minecraft:iron_bars",
+	//		"minecraft:iron_door",
+	//		"minecraft:lava",
+	//		"minecraft:oak_fence",
+	//		"minecraft:pointed_dripstone",
+	//		"minecraft:small_dripleaf",
+	//		"minecraft:vine",
+	//		"minecraft:water");
 
-	private ArrayList<String> exposedNames;
+	//private ArrayList<String> exposedNames;
 
-	private final CheckboxSetting showExposed = new CheckboxSetting("Show exposed", "Only show ores touching visible blocks.\nUseful for dealing with anti-xray plugins.\nReenable this hack if nothing appears changed.", false);
+	private final CheckboxSetting showExposed = new CheckboxSetting("Show exposed", "Only show exposed ores touching air/water/lava.\nUseful for servers utilizing anti-X-Ray.\nReenable this hack if nothing appears changed.", false);
 
 	// TODO does anyone use optifine anymore?
 	// 		closed source + alternatives like sodium = why
@@ -117,7 +117,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		super("X-Ray");
 		setCategory(Category.RENDER);
 		addSetting(ores);
-		addSetting(exposedBlocks);
+		//addSetting(exposedBlocks);
 		addSetting(showExposed);
 		
 		List<String> mods = FabricLoader.getInstance().getAllMods().stream()
@@ -143,7 +143,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		// TODO BlockList already contains an ArrayList, why not just use that?
 		oreNames = new ArrayList<>(ores.getBlockNames());
-		exposedNames = new ArrayList<>(exposedBlocks.getBlockNames());
+		//exposedNames = new ArrayList<>(exposedBlocks.getBlockNames());
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
@@ -234,12 +234,22 @@ public final class XRayHack extends Hack implements UpdateListener,
 		boolean visible = index >= 0;
 
 		if (visible && showExposed.isChecked()) {
-			return Collections.binarySearch(exposedNames, BlockUtils.getName(pos.up())) >= 0
-					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.down())) >= 0
-					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.east())) >= 0
-					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.west())) >= 0
-					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.north())) >= 0
-					|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.south())) >= 0;
+			// TODO this only considers blocks with no hitbox
+			//		shouldnt blocks like fences, vines be considered exposed?
+			//		this works for most cases so its probably redundant...
+			return !BlockUtils.canBeClicked(pos.up())
+					|| !BlockUtils.canBeClicked(pos.down())
+					|| !BlockUtils.canBeClicked(pos.east())
+					|| !BlockUtils.canBeClicked(pos.west())
+					|| !BlockUtils.canBeClicked(pos.north())
+					|| !BlockUtils.canBeClicked(pos.south());
+
+			//return Collections.binarySearch(exposedNames, BlockUtils.getName(pos.up())) >= 0
+			//		|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.down())) >= 0
+			//		|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.east())) >= 0
+			//		|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.west())) >= 0
+			//		|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.north())) >= 0
+			//		|| Collections.binarySearch(exposedNames, BlockUtils.getName(pos.south())) >= 0;
 
 			//return EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.up()))
 			//		|| EXPOSED_NEIGHBOUR_BLOCKS.contains(BlockUtils.getBlock(pos.down()))
