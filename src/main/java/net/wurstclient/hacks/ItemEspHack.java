@@ -70,7 +70,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	private final CheckboxSetting renderItemInfo = new CheckboxSetting("Show status", "Show status of item such as despawn time", false);
 
 	public boolean shouldRenderItemInfo() {
-		return renderItemInfo.isChecked();
+		return isEnabled() && renderItemInfo.isChecked();
 	}
 
 	public ItemEspHack()

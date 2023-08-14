@@ -80,6 +80,8 @@ public abstract class EntityMixin implements Nameable, CommandOutput
 			// 1.19 hex-colors could easily be used
 			//	like a gradient from green->yellow->orange->red
 
+			// Maybe show the distance away?
+			//	Not sure what other information to provide
 			String text = String.format("\u00a7%s%ds",
 					itemAgeRemaining < 15 ? "4" : itemAgeRemaining < 60 ? ("c") : itemAgeRemaining < 180 ? "6" : "2",
 					itemAgeRemaining);
