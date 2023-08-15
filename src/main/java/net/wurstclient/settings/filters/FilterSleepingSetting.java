@@ -8,6 +8,7 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 
 public final class FilterSleepingSetting extends EntityFilterCheckbox
@@ -22,8 +23,8 @@ public final class FilterSleepingSetting extends EntityFilterCheckbox
 	{
 		if(!(e instanceof PlayerEntity))
 			return true;
-		
-		return !((PlayerEntity)e).isSleeping();
+
+		return e.getPose() != EntityPose.SLEEPING && !((PlayerEntity)e).isSleeping();
 	}
 	
 	public static FilterSleepingSetting genericCombat(boolean checked)
