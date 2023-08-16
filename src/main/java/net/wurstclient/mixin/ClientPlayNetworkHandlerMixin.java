@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.fluid.FluidState;
+import net.minecraft.network.packet.c2s.play.ResourcePackStatusC2SPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,10 +22,6 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkData;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ServerMetadataS2CPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -37,7 +36,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 	@Shadow
 	@Final
 	private MinecraftClient client;
-	
+
 	@Inject(at = @At("HEAD"),
 		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
@@ -101,4 +100,21 @@ public abstract class ClientPlayNetworkHandlerMixin
 			(pos, state) -> WurstClient.INSTANCE.getHax().newChunksHack
 				.afterUpdateBlock(pos));
 	}
+
+	@Inject(at = @At("HEAD"),
+			method = "onResourcePackSend(Lnet/minecraft/network/packet/s2c/play/ResourcePackSendS2CPacket;)V",
+			cancellable = true)
+	private void onOnResourcePackSend(ResourcePackSendS2CPacket packet,
+									  CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.getOtfs().spoofResourcePackOtf.isEnabled())
+			return;
+
+		this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.ACCEPTED);
+
+		ci.cancel();
+	}
+
+	@Shadow
+	protected abstract void sendResourcePackStatus(ResourcePackStatusC2SPacket.Status packet);
 }

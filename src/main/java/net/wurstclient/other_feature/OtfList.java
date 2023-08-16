@@ -27,6 +27,7 @@ public final class OtfList
 	public final NoTelemetryOtf noTelemetryOtf = new NoTelemetryOtf();
 	public final ReconnectOtf reconnectOtf = new ReconnectOtf();
 	public final ServerFinderOtf serverFinderOtf = new ServerFinderOtf();
+	public final SpoofResourcePackOtf spoofResourcePackOtf = new SpoofResourcePackOtf();
 	public final TabGuiOtf tabGuiOtf = new TabGuiOtf();
 	public final TranslationsOtf translationsOtf = new TranslationsOtf();
 	public final VanillaSpoofOtf vanillaSpoofOtf = new VanillaSpoofOtf();
