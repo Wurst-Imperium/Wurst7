@@ -9,26 +9,40 @@ package net.wurstclient.settings;
 
 import java.util.function.Consumer;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.RotationUtils.Rotation;
 
 public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
 {
-	protected static final WurstClient WURST = WurstClient.INSTANCE;
+	private static final WurstClient WURST = WurstClient.INSTANCE;
+	private static final MinecraftClient MC = WurstClient.MC;
 	
-	public FacingSetting(String description)
+	private FacingSetting(String name, String description, Facing[] values,
+		Facing selected)
 	{
-		super("Facing", description, Facing.values(), Facing.SERVER);
+		super(name, description, values, selected);
 	}
 	
-	public FacingSetting(String description, Facing selected)
+	public static FacingSetting withoutPacketSpam(String description)
 	{
-		super("Facing", description, Facing.values(), selected);
+		return withoutPacketSpam("Facing", description, Facing.SERVER);
 	}
 	
-	public FacingSetting(String name, String description, Facing selected)
+	public static FacingSetting withoutPacketSpam(String name,
+		String description, Facing selected)
 	{
-		super(name, description, Facing.values(), selected);
+		Facing[] values = {Facing.OFF, Facing.SERVER, Facing.CLIENT};
+		return new FacingSetting(name, description, values, selected);
+	}
+	
+	public static FacingSetting withPacketSpam(String name, String description,
+		Facing selected)
+	{
+		return new FacingSetting(name, description, Facing.values(), selected);
 	}
 	
 	public enum Facing
@@ -39,7 +53,15 @@ public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
 			v -> WURST.getRotationFaker().faceVectorPacket(v)),
 		
 		CLIENT("Client-side",
-			v -> WURST.getRotationFaker().faceVectorClient(v));
+			v -> WURST.getRotationFaker().faceVectorClient(v)),
+		
+		SPAM("Packet spam", v -> {
+			Rotation rotation = RotationUtils.getNeededRotations(v);
+			PlayerMoveC2SPacket.LookAndOnGround packet =
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
+					rotation.getPitch(), MC.player.isOnGround());
+			MC.player.networkHandler.sendPacket(packet);
+		});
 		
 		private String name;
 		private Consumer<Vec3d> face;
