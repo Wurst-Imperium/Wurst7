@@ -35,11 +35,12 @@ public interface ShouldDrawSideListener extends Listener
 		{
 			return state;
 		}
-
-		public BlockPos getPos() {
+		
+		public BlockPos getPos()
+		{
 			return pos;
 		}
-
+		
 		public Boolean isRendered()
 		{
 			return rendered;

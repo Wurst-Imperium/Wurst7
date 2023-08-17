@@ -33,8 +33,6 @@ import net.wurstclient.util.json.WsonArray;
 
 public final class BlockListSetting extends Setting
 {
-	// TODO blocks which cannot be visually represented as items default to 'unknown',
-	//		ie water, air, lava, nether_portal, end_portal, ...
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	

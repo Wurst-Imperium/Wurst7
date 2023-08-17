@@ -23,9 +23,8 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(FluidRenderer.class)
 public class FluidRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z"},
+	@Inject(at = @At("HEAD"),
+		method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z",
 		cancellable = true)
 	private static void onIsSideCovered(BlockView blockView, BlockPos blockPos,
 		Direction direction, float maxDeviation, BlockState blockState,

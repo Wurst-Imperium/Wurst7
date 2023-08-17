@@ -34,11 +34,12 @@ public interface TesselateBlockListener extends Listener
 		{
 			return state;
 		}
-
-		public BlockPos getPos() {
+		
+		public BlockPos getPos()
+		{
 			return pos;
 		}
-
+		
 		@Override
 		public void fire(ArrayList<TesselateBlockListener> listeners)
 		{

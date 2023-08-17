@@ -28,7 +28,7 @@ import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 @Mixin(BlockModelRenderer.class)
 public abstract class BlockModelRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
+	@Inject(at = @At("HEAD"),
 		method = {
 			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
 			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V"},
@@ -40,7 +40,7 @@ public abstract class BlockModelRendererMixin
 	{
 		TesselateBlockEvent event = new TesselateBlockEvent(state, pos);
 		EventManager.fire(event);
-
+		
 		if(event.isCancelled())
 		{
 			ci.cancel();
