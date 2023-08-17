@@ -134,9 +134,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("RETURN"),
-		method = "method_53462()Lcom/mojang/authlib/GameProfile;",
+		method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
 		cancellable = true)
-	public void onMethod_53462(CallbackInfoReturnable<GameProfile> cir)
+	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
 		if(wurstSession == null)
 			return;
