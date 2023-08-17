@@ -26,15 +26,15 @@ import net.wurstclient.events.ShouldDrawSideListener;
 	remap = false)
 public class SodiumBlockOcclusionCacheMixin
 {
-	@Inject(method = "shouldDrawSide",
-		at = @At("HEAD"),
+	@Inject(at = @At("HEAD"),
+		method = "shouldDrawSide",
 		cancellable = true,
 		remap = false)
 	public void shouldDrawSide(BlockState state, BlockView view, BlockPos pos,
 		Direction facing, CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideListener.ShouldDrawSideEvent event =
-			new ShouldDrawSideListener.ShouldDrawSideEvent(state);
+			new ShouldDrawSideListener.ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
