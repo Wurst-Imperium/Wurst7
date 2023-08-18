@@ -7,12 +7,15 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
@@ -22,6 +25,10 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 @Mixin(InGameHud.class)
 public class IngameHudMixin
 {
+	@Shadow
+	@Final
+	private DebugHud debugHud;
+	
 	@Inject(
 		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
@@ -31,7 +38,7 @@ public class IngameHudMixin
 	private void onRender(DrawContext context, float partialTicks,
 		CallbackInfo ci)
 	{
-		if(WurstClient.MC.options.debugEnabled)
+		if(debugHud.method_53536())
 			return;
 		
 		GUIRenderEvent event = new GUIRenderEvent(context, partialTicks);

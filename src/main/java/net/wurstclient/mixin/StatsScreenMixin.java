@@ -21,7 +21,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IScreen;
 
 @Mixin(StatsScreen.class)
 public abstract class StatsScreenMixin extends Screen implements StatsListener
@@ -31,7 +30,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"createButtons()V"})
+	@Inject(at = @At("TAIL"), method = "createButtons()V")
 	private void onCreateButtons(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
@@ -44,7 +43,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		updateWurstButtonText(toggleWurstButton);
 		addDrawableChild(toggleWurstButton);
 		
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;

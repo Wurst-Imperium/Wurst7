@@ -44,7 +44,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -340,20 +339,17 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		setColorToBackground();
 		drawQuads(matrixStack, bgx1, bgy1, bgx2,
-			Math.max(bgy1,
-				Math.min(bgy2
-					- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
-					bgy1 + scroll + windowComponentY)));
+			Math.max(bgy1, Math.min(bgy2 - (drawables.isEmpty() ? 0 : 24),
+				bgy1 + scroll + windowComponentY)));
 		drawQuads(matrixStack, bgx1,
-			Math.max(bgy1, Math.min(bgy2
-				- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
+			Math.max(bgy1, Math.min(bgy2 - (drawables.isEmpty() ? 0 : 24),
 				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24));
+			bgy2 - (drawables.isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
@@ -487,7 +483,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(Drawable d : ((IScreen)(Object)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;

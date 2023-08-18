@@ -49,7 +49,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
@@ -181,10 +180,12 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double d, double e, double amount)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(d, e, amount);
-		return super.mouseScrolled(d, e, amount);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -412,7 +413,7 @@ public final class AltManagerScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		MatrixStack matrixStack = context.getMatrices();
@@ -468,7 +469,9 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(context, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
 		renderButtonTooltip(context, mouseX, mouseY);
 		renderAltTooltip(context, mouseX, mouseY);
 	}
@@ -521,7 +524,7 @@ public final class AltManagerScreen extends Screen
 	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)(Object)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;

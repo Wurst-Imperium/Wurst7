@@ -26,7 +26,6 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorRemoveKeybindScreen extends NavigatorScreen
@@ -149,7 +148,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		
 		// scissor box
 		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
+			bgy2 - (drawables.isEmpty() ? 0 : 24));
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -208,7 +207,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;

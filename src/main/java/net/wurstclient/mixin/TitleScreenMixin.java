@@ -22,7 +22,6 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.screens.AltManagerScreen;
-import net.wurstclient.mixinterface.IScreen;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
@@ -35,13 +34,13 @@ public abstract class TitleScreenMixin extends Screen
 		super(text_1);
 	}
 	
-	@Inject(at = {@At("RETURN")}, method = {"init()V"})
+	@Inject(at = @At("RETURN"), method = "init()V")
 	private void onInitWidgetsNormal(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(Drawable d : drawables)
 		{
 			if(!(d instanceof ClickableWidget))
 				continue;
@@ -69,7 +68,7 @@ public abstract class TitleScreenMixin extends Screen
 			.dimensions(width / 2 + 2, realmsButton.getY(), 98, 20).build());
 	}
 	
-	@Inject(at = {@At("RETURN")}, method = {"tick()V"})
+	@Inject(at = @At("RETURN"), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
 		if(realmsButton == null || altsButton == null)

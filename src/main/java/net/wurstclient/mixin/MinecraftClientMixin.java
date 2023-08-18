@@ -10,16 +10,15 @@ package net.wurstclient.mixin;
 import java.io.File;
 import java.util.UUID;
 
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -82,9 +81,9 @@ public abstract class MinecraftClientMixin
 		super(string_1);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
+	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+		ordinal = 0), method = "doAttack()Z", cancellable = true)
 	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
@@ -94,9 +93,12 @@ public abstract class MinecraftClientMixin
 			cir.setReturnValue(false);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
-		ordinal = 0)}, method = {"doItemUse()V"}, cancellable = true)
+	@Inject(
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
+			ordinal = 0),
+		method = "doItemUse()V",
+		cancellable = true)
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
@@ -106,7 +108,7 @@ public abstract class MinecraftClientMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"doItemPick()V"})
+	@Inject(at = @At("HEAD"), method = "doItemPick()V")
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -121,7 +123,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {"getSession()Lnet/minecraft/client/util/Session;"},
+		method = "getSession()Lnet/minecraft/client/util/Session;",
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
 	{
@@ -131,22 +133,23 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(wurstSession);
 	}
 	
-	@Redirect(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0),
-		method = {
-			"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
-	private Session getSessionForSessionProperties(MinecraftClient mc)
+	@Inject(at = @At("RETURN"),
+		method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
+		cancellable = true)
+	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
-		if(wurstSession != null)
-			return wurstSession;
+		if(wurstSession == null)
+			return;
 		
-		return session;
+		GameProfile oldProfile = cir.getReturnValue();
+		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
+			wurstSession.getUsername());
+		newProfile.getProperties().putAll(oldProfile.getProperties());
+		cir.setReturnValue(newProfile);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
+		method = "getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;",
 		cancellable = true)
 	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
@@ -229,7 +232,7 @@ public abstract class MinecraftClientMixin
 		
 		UserApiService userApiService =
 			wurst_createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getProfile().getId();
+		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
 			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
 	}
