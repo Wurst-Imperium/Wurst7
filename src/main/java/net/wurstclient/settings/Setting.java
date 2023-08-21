@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -43,11 +44,27 @@ public abstract class Setting
 		return ChatUtils.wrapText(getDescription(), width);
 	}
 	
+	public final String getDescriptionKey()
+	{
+		return description;
+	}
+	
 	public abstract Component getComponent();
 	
 	public abstract void fromJson(JsonElement json);
 	
 	public abstract JsonElement toJson();
+	
+	/**
+	 * Exports this setting's data to a {@link JsonObject} for use in the
+	 * Wurst Wiki. Must always specify the following properties:
+	 * <ul>
+	 * <li>name
+	 * <li>descriptionKey
+	 * <li>type
+	 * </ul>
+	 */
+	public abstract JsonObject exportWikiData();
 	
 	public void update()
 	{

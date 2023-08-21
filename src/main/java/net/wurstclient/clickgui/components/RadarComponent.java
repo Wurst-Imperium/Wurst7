@@ -159,7 +159,9 @@ public final class RadarComponent extends Component
 				continue;
 			
 			int color;
-			if(e instanceof PlayerEntity)
+			if(WurstClient.INSTANCE.getFriends().isFriend(e))
+				color = 0x0000FF;
+			else if(e instanceof PlayerEntity)
 				color = 0xFF0000;
 			else if(e instanceof Monster)
 				color = 0xFF8000;
