@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-@SearchTags("mass tpa here")
-public class MassTpaHerehack extends Hack
+@SearchTags("mass tpahere")
+public class MassTpaHereHack extends Hack
     implements UpdateListener, ChatInputListener {
     private final Random random = new Random();
     private final ArrayList<String> players = new ArrayList<>();
@@ -22,7 +22,7 @@ public class MassTpaHerehack extends Hack
     private int index;
     private int timer;
 
-    public MassTpaHerehack()
+    public MassTpaHereHack()
     {
         super("MassTPAHERE");
         setCategory(Category.CHAT);
@@ -100,12 +100,6 @@ public class MassTpaHerehack extends Hack
             ChatUtils.error("This server doesn't have TPAHERE.");
             setEnabled(false);
 
-        }else if(message.contains("accepted") && message.contains("request")
-                || message.contains("akzeptiert") && message.contains("anfrage"))
-        {
-            event.cancel();
-            ChatUtils.message("Someone accepted your TPAHERE request. Stopping.");
-            setEnabled(false);
         }
     }
 }
