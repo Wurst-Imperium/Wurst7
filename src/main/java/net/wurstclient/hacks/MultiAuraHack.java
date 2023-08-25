@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
@@ -21,6 +22,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -42,7 +44,12 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(false);
-	
+
+	private final CheckboxSetting handSwing = new CheckboxSetting(
+			"HandSwing",
+			"description.wurst.hack.multiaura.handSwing",false
+	);
+
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
 	
@@ -55,7 +62,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(speed);
 		addSetting(fov);
 		addSetting(pauseOnContainers);
-		
+		addSetting(handSwing);
+
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -126,8 +134,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
-		
-		player.swingHand(Hand.MAIN_HAND);
+
+		if (handSwing.isChecked())
+			player.swingHand(Hand.MAIN_HAND);
 		speed.resetTimer();
 	}
 }

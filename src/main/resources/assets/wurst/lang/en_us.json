@@ -105,6 +105,7 @@
   "description.wurst.hack.mobesp": "Highlights nearby mobs.",
   "description.wurst.hack.mobspawnesp": "Highlights areas where mobs can spawn.\n§eyellow§r - mobs can spawn at night\n§cred§r - mobs can always spawn",
   "description.wurst.hack.multiaura": "Faster Killaura that attacks multiple entities at once.",
+  "description.wurst.hack.multiaura.handSwing": "Hide movement in your hands during an attack.",
   "description.wurst.hack.nameprotect": "Hides all player names.",
   "description.wurst.hack.nametags": "Changes the scale of the nametags so you can always read them. Also allows you to see the nametags of sneaking players.",
   "description.wurst.hack.navigator": "A searchable GUI that learns your preferences over time.",
