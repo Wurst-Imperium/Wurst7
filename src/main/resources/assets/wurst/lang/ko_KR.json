@@ -29,7 +29,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "김치는 무해한 '배고픔' 효과를 적용시킵니다.\n위급한 상황에서 사용 가능하고 유용합니다.",
   "description.wurst.setting.autoeat.allow_poison": "독성 음식은 시간 경과에 따라 피해를 입힙니다.\n권장하지 않습니다.",
   "description.wurst.setting.autoeat.allow_chorus": "엔더 열매를 먹으면 무작위 위치로 순간이동됩니다.\n권장하지 않습니다.",
-  "description.wurst.hack.autofarm": "곡물, 당근, 감자, 비트, 호박, 수박, 선인장, 사탕수수, 대나무, 네더 와트, 코코아 열매에 대해 자동으로 작물을 수확하고 재심합니다.",
+  "description.wurst.hack.autofarm": "곡물, 당근, 감자, 비트, 호박, 수박, 선인장, 사탕수수, 켈프, 대나무, 네더 와트, 코코아 열매에 대해 자동으로 작물을 수확하고 재심합니다.",
   "description.wurst.hack.autofish": "최고의 낚싯대를 사용하여 자동으로 물고기를 잡습니다. 물고기를 잡는 동안 더 좋은 낚싯대를 발견하면 자동으로 전환됩니다.",
   "description.wurst.hack.automine": "시선을 정한 블록을 자동으로 채굴합니다.",
   "description.wurst.hack.autopotion": "체력이 낮을 때 즉시 회복 물약을 자동으로 던집니다.",
