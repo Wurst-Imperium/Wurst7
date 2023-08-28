@@ -148,7 +148,7 @@
   "description.wurst.hack.spider": "거미처럼 벽을 타고 올라갈 수 있게 해줍니다.",
   "description.wurst.hack.step": "전체 블록을 올라갈 수 있게 해줍니다.",
   "description.wurst.hack.throw": "아이템을 여러 번 사용합니다. 매우 많은 양으로 눈덩이와 달걀을 던지거나 몹을 소환하고 마인카트를 놓는 등의 작업에 사용할 수 있습니다.\n\n이로 인해 많은 랙이 발생하거나 서버가 충돌할 수 있습니다.",
-  "description.wurst.hack.tillaura": "자동으로 흙, 잔디 등을 경작지로 변환합니다. Killaura와 혼동하지 마세요.",
+  "description.wurst.hack.tillaura": "자동으로 흙, 잔디 등을 경작지로 변환합니다.\nKillaura와 혼동하지 마세요.",
   "description.wurst.hack.timer": "거의 모든 것의 속도를 변경합니다.",
   "description.wurst.hack.tired": "2015년 4월 Alexander와 비슷한 모습으로 보입니다.\n다른 플레이어에게만 보입니다.",
   "description.wurst.hack.toomanyhax": "원치 않는 기능을 차단합니다.\n잘못된 해킹을 우연히 활성화하여 밴을 당하는 것을 방지할 수 있습니다.\n'조금만 해킹하려는' 사람들을 위한 기능입니다.\n\n§6.toomanyhax§r 명령을 사용하여 어떤 기능을 차단할지 선택할 수 있습니다.\n자세한 내용은 §6.help toomanyhax§r를 입력하세요.",
