@@ -57,7 +57,7 @@
   "description.wurst.hack.cavefinder": "선택한 색상으로 동굴을 강조하여 찾도록 도와줍니다.",
   "description.wurst.hack.chattranslator": "구글 번역을 이용하여 수신된 채팅 메시지를 번역합니다.",
   "description.wurst.hack.chestesp": "주변의 상자를 강조합니다.",
-  "description.wurst.hack.clickaura": "클릭할 때 가장 가까운 유효한 엔티티를 자동으로 공격합니다.\n\n§c§l경고:§r ClickAura는 KillAura보다 더욱 의심스러워 보이며, 플러그인에 탐지되기 쉽습니다. 대신 Killaura나 TriggerBot을 사용하는 것이 좋습니다.",
+  "description.wurst.hack.clickaura": "클릭할 때 가장 가까운 유효한 엔티티를 자동으로 공격합니다.\n\n§c§l경고:§r ClickAura는 Killaura보다 더욱 의심스러워 보이며, 플러그인에 탐지되기 쉽습니다. 대신 Killaura나 TriggerBot을 사용하는 것이 좋습니다.",
   "description.wurst.hack.clickgui": "윈도우 기반 ClickGUI.",
   "description.wurst.hack.crashchest": "인벤토리에 여러 개의 복사본이 있는 경우 사실상 서버에서 사용 제한이 걸린 상자를 생성합니다. §c§l경고:§r §c이것은 되돌릴 수 없습니다. 신중하게 사용하세요!§r\n\n대신 상자에 복사본이 배치되면, 상자를 여는 모든 플레이어가 서버에서 강제 퇴장당합니다(한 번만).",
   "description.wurst.hack.creativeflight": "크리에이티브 모드와 같이 비행할 수 있습니다.\n\n§c§l경고:§r NoFall을 사용하지 않으면 낙하 대미지를 입을 수 있습니다.",
