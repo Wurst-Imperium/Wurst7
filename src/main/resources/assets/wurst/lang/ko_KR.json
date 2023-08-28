@@ -160,7 +160,7 @@
   "description.wurst.hack.truesight": "투명한 개체를 볼 수 있게 해줍니다.",
   "description.wurst.hack.tunneller": "터널을 자동으로 파줍니다.\n\n§c§l주의:§r 이 봇은 용암 및 기타 위험을 피하려고 노력하지만, 죽지 않을 보장은 없습니다. 잃어도 괜찮은 장비를 가지고 보내세요.",
   "description.wurst.hack.x-ray": "벽을 통해 광물을 볼 수 있게 해줍니다.",
-  "description.wurst.other_feature.nochatreports": "1.19 버전부터 채팅 메시지에 첨부되는 암호화 서명을 비활성화합니다.\n\n§c§l주의: §c채팅에 서명을 첨부하여 메시지를 보내면 계정이 신고되어 멀티플레이어에서 글로벌 밴 처리될 수 있습니다!§r\n\n채팅에서 무해한 내용을 말한다고 해도, 서명된 메시지는 가짜 채팅 신고를 생성하여 계정이 불공정하게 밴 처리되는 경우가 있을 수 있습니다.\n\n채팅 서명을 다시 활성화하여 채팅을 하려면 계정이 아닌 대체 계정에서 플레이하는 것을 고려하세요.",
+  "description.wurst.other_feature.nochatreports": "1.19 버전부터 채팅 메시지에 첨부되는 암호화 서명을 비활성화합니다.\n\n§c§l주의: §c채팅에 §c서명을 §c첨부하여 §c메시지를 §c보내면 §c계정이 §c신고되어 §c멀티플레이어에서 §c글로벌 §c밴 §c처리될 §c수 §c있습니다!§r\n\n채팅에서 무해한 내용을 말한다고 해도, 서명된 메시지는 가짜 채팅 신고를 생성하여 계정이 불공정하게 밴 처리되는 경우가 있을 수 있습니다.\n\n채팅 서명을 다시 활성화하여 채팅을 하려면 계정이 아닌 대체 계정에서 플레이하는 것을 고려하세요.",
   "button.wurst.nochatreports.disable_signatures": "서명 비활성화",
   "button.wurst.nochatreports.re-enable_signatures": "서명 활성화",
   "description.wurst.setting.generic.attack_speed": "클릭 당 공격 속도입니다.\n0 = 공격 대기 시간에 맞춰 속도를 동적으로 조절합니다.",
