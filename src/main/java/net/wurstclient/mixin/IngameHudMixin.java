@@ -38,7 +38,7 @@ public class IngameHudMixin
 	private void onRender(DrawContext context, float partialTicks,
 		CallbackInfo ci)
 	{
-		if(debugHud.method_53536())
+		if(debugHud.shouldShowDebugHud())
 			return;
 		
 		GUIRenderEvent event = new GUIRenderEvent(context, partialTicks);
