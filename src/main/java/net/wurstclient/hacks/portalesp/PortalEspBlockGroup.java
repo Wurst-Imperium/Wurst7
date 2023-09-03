@@ -28,7 +28,8 @@ public final class PortalEspBlockGroup
 	private final ColorSetting color;
 	private final CheckboxSetting enabled;
 	
-	public PortalEspBlockGroup(Block block, ColorSetting color, CheckboxSetting enabled)
+	public PortalEspBlockGroup(Block block, ColorSetting color,
+		CheckboxSetting enabled)
 	{
 		this.block = block;
 		this.color = Objects.requireNonNull(color);

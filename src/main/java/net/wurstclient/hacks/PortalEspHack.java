@@ -8,15 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -60,12 +52,11 @@ import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-public final class PortalEspHack extends Hack
-	implements UpdateListener, PacketInputListener,
-		CameraTransformViewBobbingListener, RenderListener
+public final class PortalEspHack extends Hack implements UpdateListener,
+	PacketInputListener, CameraTransformViewBobbingListener, RenderListener
 {
-	private final EnumSetting<PortalEspStyle> style =
-		new EnumSetting<>("Style", PortalEspStyle.values(), PortalEspStyle.BOXES);
+	private final EnumSetting<PortalEspStyle> style = new EnumSetting<>("Style",
+		PortalEspStyle.values(), PortalEspStyle.BOXES);
 	
 	private final PortalEspBlockGroup netherPortal = new PortalEspBlockGroup(
 		BlockUtils.getBlockFromName("minecraft:nether_portal"),
@@ -91,16 +82,16 @@ public final class PortalEspHack extends Hack
 			"End gateways will be highlighted in this color.", Color.YELLOW),
 		new CheckboxSetting("Include end gateways", true));
 	
-	private final List<PortalEspBlockGroup> groups = Arrays.asList(netherPortal,
-			endPortal, endPortalFrame, endGateway);
+	private final List<PortalEspBlockGroup> groups =
+		Arrays.asList(netherPortal, endPortal, endPortalFrame, endGateway);
 	
 	private final EnumSetting<SearchArea> area = new EnumSetting<>("Area",
 		"The area around the player to search in.\n"
 			+ "Higher values require a faster computer.",
 		SearchArea.values(), SearchArea.D11);
 	
-	
-	private final HashMap<ChunkPos, ChunkSearcherMulti> searchers = new HashMap<>();
+	private final HashMap<ChunkPos, ChunkSearcherMulti> searchers =
+		new HashMap<>();
 	private final Set<Chunk> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService pool1;
@@ -176,9 +167,9 @@ public final class PortalEspHack extends Hack
 			
 			chunk = world.getChunk(changedBlocks.get(0));
 			
-		}else if(packet instanceof ChunkDataS2CPacket chunkData) {
+		}else if(packet instanceof ChunkDataS2CPacket chunkData)
 			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-		} else
+		else
 			return;
 		
 		chunksToUpdate.add(chunk);
@@ -195,9 +186,9 @@ public final class PortalEspHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ArrayList<Block> currentBlockList = groups.parallelStream()
-			.map(group -> group.getBlock())
-			.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Block> currentBlockList =
+			groups.parallelStream().map(PortalEspBlockGroup::getBlock)
+				.collect(Collectors.toCollection(ArrayList::new));
 		
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		ChunkPos center = MC.player.getChunkPos();
@@ -256,8 +247,8 @@ public final class PortalEspHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(ChunkPos center, ArrayList<Block> blockList,
-		int dimensionId)
+	private void addSearchersInRange(ChunkPos center,
+		ArrayList<Block> blockList, int dimensionId)
 	{
 		ArrayList<Chunk> chunksInRange =
 			area.getSelected().getChunksInRange(center);
@@ -277,17 +268,19 @@ public final class PortalEspHack extends Hack
 		{
 			ChunkPos searcherPos = searcher.getChunk().getPos();
 			int searcherDimensionId = searcher.getDimensionId();
-			if(area.getSelected().isInRange(searcherPos, center) && searcherDimensionId == dimensionId)
+			if(area.getSelected().isInRange(searcherPos, center)
+				&& searcherDimensionId == dimensionId)
 				continue;
 			
 			removeSearcher(searcher);
 		}
 	}
 	
-	private void replaceSearchersWithDifferences(ArrayList<Block> currentBlockList,
-		int dimensionId)
+	private void replaceSearchersWithDifferences(
+		ArrayList<Block> currentBlockList, int dimensionId)
 	{
-		for(ChunkSearcherMulti oldSearcher : new ArrayList<>(searchers.values()))
+		for(ChunkSearcherMulti oldSearcher : new ArrayList<>(
+			searchers.values()))
 		{
 			if(currentBlockList.equals(oldSearcher.getBlockList()))
 				continue;
@@ -297,8 +290,8 @@ public final class PortalEspHack extends Hack
 		}
 	}
 	
-	private void replaceSearchersWithChunkUpdate(ArrayList<Block> currentBlockList,
-		int dimensionId)
+	private void replaceSearchersWithChunkUpdate(
+		ArrayList<Block> currentBlockList, int dimensionId)
 	{
 		synchronized(chunksToUpdate)
 		{
@@ -320,9 +313,11 @@ public final class PortalEspHack extends Hack
 		}
 	}
 	
-	private void addSearcher(Chunk chunk, ArrayList<Block> blockList, int dimensionId)
+	private void addSearcher(Chunk chunk, ArrayList<Block> blockList,
+		int dimensionId)
 	{
-		ChunkSearcherMulti searcher = new ChunkSearcherMulti(chunk, blockList, dimensionId);
+		ChunkSearcherMulti searcher =
+			new ChunkSearcherMulti(chunk, blockList, dimensionId);
 		searchers.put(chunk.getPos(), searcher);
 		searcher.startSearching(pool1);
 	}
@@ -355,12 +350,12 @@ public final class PortalEspHack extends Hack
 	
 	private void startGetMatchingBlocksTask(BlockPos eyesPos)
 	{
-		Callable<ArrayList<Result>> task = () -> searchers.values()
-			.parallelStream()
-			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-			.sorted(Comparator
-				.comparingInt(result -> eyesPos.getManhattanDistance(result.getPos())))
-			.collect(Collectors.toCollection(ArrayList::new));
+		Callable<ArrayList<Result>> task =
+			() -> searchers.values().parallelStream()
+				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+				.sorted(Comparator.comparingInt(
+					result -> eyesPos.getManhattanDistance(result.getPos())))
+				.collect(Collectors.toCollection(ArrayList::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}
@@ -382,7 +377,8 @@ public final class PortalEspHack extends Hack
 		
 		for(Result result : results)
 			groups.parallelStream()
-				.filter(group -> group.getBlock().getClass() == result.getBlock().getClass())
+				.filter(group -> group.getBlock().getClass() == result
+					.getBlock().getClass())
 				.forEach(group -> group.add(result.getPos()));
 		
 		return results;

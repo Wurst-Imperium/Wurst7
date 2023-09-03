@@ -31,7 +31,8 @@ public final class ChunkSearcherMulti
 	private ChunkSearcherMulti.Status status = Status.IDLE;
 	private Future<?> future;
 	
-	public ChunkSearcherMulti(Chunk chunk, ArrayList<Block> blockList, int dimensionId)
+	public ChunkSearcherMulti(Chunk chunk, ArrayList<Block> blockList,
+		int dimensionId)
 	{
 		this.chunk = chunk;
 		this.blockList = blockList;
@@ -72,7 +73,7 @@ public final class ChunkSearcherMulti
 					
 					BlockPos pos = new BlockPos(x, y, z);
 					Block block = BlockUtils.getBlock(pos);
-					if(!this.blockList.contains(block))
+					if(!blockList.contains(block))
 						continue;
 					
 					Result posWithType = new Result(block, pos);
@@ -137,7 +138,8 @@ public final class ChunkSearcherMulti
 		DONE;
 	}
 	
-	public class Result {
+	public static class Result
+	{
 		private Block block;
 		private BlockPos pos;
 		
