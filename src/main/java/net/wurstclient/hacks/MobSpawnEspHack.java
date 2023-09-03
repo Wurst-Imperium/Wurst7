@@ -277,6 +277,7 @@ public final class MobSpawnEspHack extends Hack
 			this.chunk = chunk;
 		}
 		
+		@SuppressWarnings("deprecation")
 		private void scan()
 		{
 			ClientWorld world = MC.world;
@@ -296,7 +297,7 @@ public final class MobSpawnEspHack extends Hack
 						BlockPos pos = new BlockPos(x, y, z);
 						BlockState state = world.getBlockState(pos);
 						
-						if(state.getMaterial().blocksMovement())
+						if(state.blocksMovement())
 							continue;
 						if(!state.getFluidState().isEmpty())
 							continue;
@@ -334,7 +335,7 @@ public final class MobSpawnEspHack extends Hack
 			if(vertexBuffer != null)
 				vertexBuffer.close();
 			
-			vertexBuffer = new VertexBuffer();
+			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			

@@ -32,6 +32,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksHack extends Hack
@@ -184,7 +185,7 @@ public final class NewChunksHack extends Hack
 		int minY = chunk.getBottomY();
 		int minZ = chunkPos.getStartZ();
 		int maxX = chunkPos.getEndX();
-		int maxY = chunk.getHighestNonEmptySectionYOffset() + 16;
+		int maxY = ChunkUtils.getHighestNonEmptySectionYOffset(chunk) + 16;
 		int maxZ = chunkPos.getEndZ();
 		
 		for(int x = minX; x <= maxX; x++)

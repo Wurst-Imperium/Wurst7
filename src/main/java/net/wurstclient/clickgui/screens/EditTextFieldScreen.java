@@ -15,23 +15,21 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.MathUtils;
+import net.wurstclient.settings.TextFieldSetting;
 
-public final class EditSliderScreen extends Screen
+public final class EditTextFieldScreen extends Screen
 {
 	private final Screen prevScreen;
-	private final SliderSetting slider;
+	private final TextFieldSetting setting;
 	
 	private TextFieldWidget valueField;
 	private ButtonWidget doneButton;
 	
-	public EditSliderScreen(Screen prevScreen, SliderSetting slider)
+	public EditTextFieldScreen(Screen prevScreen, TextFieldSetting setting)
 	{
 		super(Text.literal(""));
 		this.prevScreen = prevScreen;
-		this.slider = slider;
+		this.setting = setting;
 	}
 	
 	@Override
@@ -42,11 +40,10 @@ public final class EditSliderScreen extends Screen
 		int y2 = height / 3 * 2;
 		
 		TextRenderer tr = client.textRenderer;
-		ValueDisplay vd = ValueDisplay.DECIMAL;
-		String valueString = vd.getValueString(slider.getValue());
 		
 		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
-		valueField.setText(valueString);
+		valueField.setMaxLength(Integer.MAX_VALUE);
+		valueField.setText(setting.getValue());
 		valueField.setSelectionStart(0);
 		
 		addSelectableChild(valueField);
@@ -61,9 +58,7 @@ public final class EditSliderScreen extends Screen
 	private void done()
 	{
 		String value = valueField.getText();
-		
-		if(MathUtils.isDouble(value))
-			slider.setValue(Double.parseDouble(value));
+		setting.setValue(value);
 		
 		client.setScreen(prevScreen);
 	}
@@ -97,7 +92,7 @@ public final class EditSliderScreen extends Screen
 	{
 		renderBackground(context);
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			slider.getName(), width / 2, 20, 0xFFFFFF);
+			setting.getName(), width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
 		super.render(context, mouseX, mouseY, partialTicks);

@@ -58,7 +58,7 @@ public enum BlockPlacer
 		// if there is a replaceable block at the position, we need to place
 		// against the block itself instead of a neighbor
 		if(BlockUtils.canBeClicked(pos)
-			&& BlockUtils.getState(pos).getMaterial().isReplaceable())
+			&& BlockUtils.getState(pos).isReplaceable())
 		{
 			// the parameters for this happen to be the same as for breaking
 			// the block, so we can just use BlockBreaker to get them
@@ -85,7 +85,7 @@ public enum BlockPlacer
 			VoxelShape shape = state.getOutlineShape(MC.world, neighbor);
 			
 			// if neighbor has no shape or is replaceable, it can't be used
-			if(shape.isEmpty() || state.getMaterial().isReplaceable())
+			if(shape.isEmpty() || state.isReplaceable())
 				continue;
 			
 			Box box = shape.getBoundingBox();

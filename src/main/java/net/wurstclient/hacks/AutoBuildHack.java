@@ -211,7 +211,7 @@ public final class AutoBuildHack extends Hack
 			BlockPos pos = itr.next();
 			BlockState state = BlockUtils.getState(pos);
 			
-			if(!state.getMaterial().isReplaceable())
+			if(!state.isReplaceable())
 				itr.remove();
 		}
 	}
@@ -237,7 +237,7 @@ public final class AutoBuildHack extends Hack
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor)
-				|| BlockUtils.getState(neighbor).getMaterial().isReplaceable())
+				|| BlockUtils.getState(neighbor).isReplaceable())
 				continue;
 			
 			Vec3d dirVec = Vec3d.of(side.getVector());
@@ -313,7 +313,7 @@ public final class AutoBuildHack extends Hack
 		
 		for(BlockPos pos : remainingBlocks)
 		{
-			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			Vec3d posVec = Vec3d.ofCenter(pos);
@@ -373,7 +373,7 @@ public final class AutoBuildHack extends Hack
 			&& blocksDrawn < 1024;)
 		{
 			BlockPos pos = itr.next();
-			if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			matrixStack.push();

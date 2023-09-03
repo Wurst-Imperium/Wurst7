@@ -10,13 +10,20 @@ package net.wurstclient.altmanager;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -46,7 +53,35 @@ public final class AltRenderer
 		RenderSystem.setShaderTexture(0, loadedSkins.get(name));
 	}
 	
-	public static void drawAltFace(MatrixStack matrixStack, String name, int x,
+	private static void drawTexture(DrawContext context, int x, int y, float u,
+		float v, int w, int h, int fw, int fh)
+	{
+		int x2 = x + w;
+		int y2 = y + h;
+		int z = 0;
+		float uOverFw = u / fw;
+		float uPlusWOverFw = (u + w) / fw;
+		float vOverFh = v / fh;
+		float vPlusHOverFh = (v + h) / fh;
+		
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+		MatrixStack matrixStack = context.getMatrices();
+		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh)
+			.next();
+		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh)
+			.next();
+		bufferBuilder.vertex(matrix4f, x2, y2, z)
+			.texture(uPlusWOverFw, vPlusHOverFh).next();
+		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh)
+			.next();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+	}
+	
+	public static void drawAltFace(DrawContext context, String name, int x,
 		int y, int w, int h, boolean selected)
 	{
 		try
@@ -64,14 +99,14 @@ public final class AltRenderer
 			int fh = 192;
 			float u = 24;
 			float v = 24;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			fw = 192;
 			fh = 192;
 			u = 120;
 			v = 24;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			GL11.glDisable(GL11.GL_BLEND);
 			
@@ -81,7 +116,7 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBody(MatrixStack matrixStack, String name, int x,
+	public static void drawAltBody(DrawContext context, String name, int x,
 		int y, int width, int height)
 	{
 		try
@@ -103,7 +138,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4;
 			float v = height / 4;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			x = x + 0;
@@ -112,7 +147,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 5;
 			v = height / 4;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Chest
 			x = x + 0;
@@ -121,7 +156,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Jacket
 			x = x + 0;
@@ -130,7 +165,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -139,7 +174,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -148,7 +183,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -157,7 +192,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -166,7 +201,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -175,7 +210,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -184,7 +219,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -193,7 +228,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -202,7 +237,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			GL11.glDisable(GL11.GL_BLEND);
 			
@@ -212,7 +247,7 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBack(MatrixStack matrixStack, String name, int x,
+	public static void drawAltBack(DrawContext context, String name, int x,
 		int y, int width, int height)
 	{
 		try
@@ -234,7 +269,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4 * 3;
 			float v = height / 4;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			x = x + 0;
@@ -243,7 +278,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 7;
 			v = height / 4;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Chest
 			x = x + 0;
@@ -252,7 +287,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Jacket
 			x = x + 0;
@@ -261,7 +296,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -270,7 +305,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -279,7 +314,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -288,7 +323,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -297,7 +332,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -306,7 +341,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -315,7 +350,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -324,7 +359,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -333,7 +368,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			DrawableHelper.drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
+			drawTexture(context, x, y, u, v, w, h, fw, fh);
 			
 			GL11.glDisable(GL11.GL_BLEND);
 			

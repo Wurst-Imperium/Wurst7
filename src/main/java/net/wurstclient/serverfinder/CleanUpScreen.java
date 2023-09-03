@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -21,7 +22,6 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.mixinterface.IScreen;
@@ -201,21 +201,21 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Clean Up",
-			width / 2, 20, 16777215);
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		renderBackground(context);
+		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
+			20, 16777215);
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		super.render(context, mouseX, mouseY, partialTicks);
+		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
 		for(Drawable d : ((IScreen)this).getButtons())
@@ -233,7 +233,7 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, cuButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}

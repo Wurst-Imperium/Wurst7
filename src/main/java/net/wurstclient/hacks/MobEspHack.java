@@ -75,7 +75,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		mobBox = new VertexBuffer();
+		mobBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
 		RenderUtils.drawOutlinedBox(bb, mobBox);
 	}

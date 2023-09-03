@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -252,8 +253,9 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		if(target == null)
 			return;
 		
@@ -295,7 +297,7 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
+		context.drawText(MC.textRenderer, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
 		

@@ -7,10 +7,10 @@
  */
 package net.wurstclient.options;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -94,23 +94,23 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
+		renderBackground(context);
 		
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		drawTextWithShadow(matrixStack, textRenderer,
+		context.drawTextWithShadow(textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		drawTextWithShadow(matrixStack, textRenderer,
-			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
+		context.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
+			width / 2 - 100, 87, 0xa0a0a0);
 		
-		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		commandField.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

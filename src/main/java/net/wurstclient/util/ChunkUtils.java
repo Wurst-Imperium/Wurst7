@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.wurstclient.WurstClient;
 
@@ -62,4 +64,21 @@ public enum ChunkUtils
 		return stream;
 	}
 	
+	/**
+	 * Returns the y-coordinate of the highest non-empty section in the chunk.
+	 *
+	 * <p>
+	 * This is a re-implementation of
+	 * {@link Chunk#getHighestNonEmptySectionYOffset()}, which has been
+	 * deprecated and marked for removal in 23w17a with no apparent replacement
+	 * provided by Mojang.
+	 */
+	public static int getHighestNonEmptySectionYOffset(Chunk chunk)
+	{
+		int i = chunk.getHighestNonEmptySection();
+		if(i == -1)
+			return chunk.getBottomY();
+		
+		return ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
+	}
 }
