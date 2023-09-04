@@ -36,6 +36,8 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.settings.EspStyleSetting.EspStyle;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
@@ -47,8 +49,8 @@ import net.wurstclient.util.RotationUtils;
 public final class PlayerEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	private final EnumSetting<Style> style =
-		new EnumSetting<>("Style", Style.values(), Style.LINES_AND_BOXES);
+	private final EspStyleSetting style =
+		new EspStyleSetting(EspStyle.LINES_AND_BOXES);
 	
 	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
@@ -109,7 +111,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().lines)
+		if(style.getSelected().hasLines())
 			event.cancel();
 	}
 	
@@ -129,10 +131,10 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
 		
 		// draw boxes
-		if(style.getSelected().boxes)
+		if(style.getSelected().hasBoxes())
 			renderBoxes(matrixStack, partialTicks, regionX, regionZ);
 		
-		if(style.getSelected().lines)
+		if(style.getSelected().hasLines())
 			renderTracers(matrixStack, partialTicks, regionX, regionZ);
 		
 		matrixStack.pop();
@@ -226,30 +228,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 		
 		tessellator.draw();
-	}
-	
-	private enum Style
-	{
-		BOXES("Boxes only", true, false),
-		LINES("Lines only", false, true),
-		LINES_AND_BOXES("Lines and boxes", true, true);
-		
-		private final String name;
-		private final boolean boxes;
-		private final boolean lines;
-		
-		private Style(String name, boolean boxes, boolean lines)
-		{
-			this.name = name;
-			this.boxes = boxes;
-			this.lines = lines;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 	
 	private enum BoxSize
