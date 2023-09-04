@@ -40,10 +40,9 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.portalesp.PortalEspBlockGroup;
 import net.wurstclient.hacks.portalesp.PortalEspRenderer;
-import net.wurstclient.hacks.portalesp.SearchArea;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChunkSearcherMulti;
@@ -84,10 +83,9 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	private final List<PortalEspBlockGroup> groups =
 		Arrays.asList(netherPortal, endPortal, endPortalFrame, endGateway);
 	
-	private final EnumSetting<SearchArea> area = new EnumSetting<>("Area",
+	private final ChunkAreaSetting area = new ChunkAreaSetting("Area",
 		"The area around the player to search in.\n"
-			+ "Higher values require a faster computer.",
-		SearchArea.values(), SearchArea.D11);
+			+ "Higher values require a faster computer.");
 	
 	private final HashMap<ChunkPos, ChunkSearcherMulti> searchers =
 		new HashMap<>();
@@ -190,11 +188,10 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 				.collect(Collectors.toCollection(ArrayList::new));
 		
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		ChunkPos center = MC.player.getChunkPos();
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
-		addSearchersInRange(center, currentBlockList, dimensionId);
-		removeSearchersOutOfRange(center, dimensionId);
+		addSearchersInRange(currentBlockList, dimensionId);
+		removeSearchersOutOfRange(dimensionId);
 		replaceSearchersWithDifferences(currentBlockList, dimensionId);
 		replaceSearchersWithChunkUpdate(currentBlockList, dimensionId);
 		
@@ -246,13 +243,10 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(ChunkPos center,
-		ArrayList<Block> blockList, int dimensionId)
+	private void addSearchersInRange(ArrayList<Block> blockList,
+		int dimensionId)
 	{
-		ArrayList<Chunk> chunksInRange =
-			area.getSelected().getChunksInRange(center);
-		
-		for(Chunk chunk : chunksInRange)
+		for(Chunk chunk : area.getSelected().getChunksInRange())
 		{
 			if(searchers.containsKey(chunk.getPos()))
 				continue;
@@ -261,13 +255,13 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void removeSearchersOutOfRange(ChunkPos center, int dimensionId)
+	private void removeSearchersOutOfRange(int dimensionId)
 	{
 		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
 		{
 			ChunkPos searcherPos = searcher.getChunk().getPos();
 			int searcherDimensionId = searcher.getDimensionId();
-			if(area.getSelected().isInRange(searcherPos, center)
+			if(area.getSelected().isInRange(searcherPos)
 				&& searcherDimensionId == dimensionId)
 				continue;
 			
