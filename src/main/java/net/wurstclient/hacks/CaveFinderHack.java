@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -47,18 +48,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
@@ -70,10 +69,9 @@ import net.wurstclient.util.RotationUtils;
 public final class CaveFinderHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final EnumSetting<Area> area = new EnumSetting<>("Area",
+	private final ChunkAreaSetting area = new ChunkAreaSetting("Area",
 		"The area around the player to search in.\n"
-			+ "Higher values require a faster computer.",
-		Area.values(), Area.D11);
+			+ "Higher values require a faster computer.");
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"The maximum number of blocks to display.\n"
@@ -181,17 +179,14 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		Block currentBlock = BlockUtils.getBlockFromName("minecraft:cave_air");
+		Block blockToFind = Blocks.CAVE_AIR;
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		
-		ChunkPos center = getPlayerChunkPos(eyesPos);
-		int range = area.getSelected().chunkRange;
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
-		addSearchersInRange(center, range, currentBlock, dimensionId);
-		removeSearchersOutOfRange(center, range);
-		replaceSearchersWithDifferences(currentBlock, dimensionId);
-		replaceSearchersWithChunkUpdate(currentBlock, dimensionId);
+		addSearchersInRange(blockToFind, dimensionId);
+		removeSearchersOutOfRange();
+		replaceSearchersWithDifferences(blockToFind, dimensionId);
+		replaceSearchersWithChunkUpdate(blockToFind, dimensionId);
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -255,19 +250,9 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private ChunkPos getPlayerChunkPos(BlockPos eyesPos)
+	private void addSearchersInRange(Block block, int dimensionId)
 	{
-		int chunkX = eyesPos.getX() >> 4;
-		int chunkZ = eyesPos.getZ() >> 4;
-		return MC.world.getChunk(chunkX, chunkZ).getPos();
-	}
-	
-	private void addSearchersInRange(ChunkPos center, int chunkRange,
-		Block block, int dimensionId)
-	{
-		ArrayList<Chunk> chunksInRange = getChunksInRange(center, chunkRange);
-		
-		for(Chunk chunk : chunksInRange)
+		for(Chunk chunk : area.getSelected().getChunksInRange())
 		{
 			if(searchers.containsKey(chunk))
 				continue;
@@ -276,31 +261,12 @@ public final class CaveFinderHack extends Hack
 		}
 	}
 	
-	private ArrayList<Chunk> getChunksInRange(ChunkPos center, int chunkRange)
-	{
-		ArrayList<Chunk> chunksInRange = new ArrayList<>();
-		
-		for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
-			for(int z = center.z - chunkRange; z <= center.z + chunkRange; z++)
-			{
-				Chunk chunk = MC.world.getChunk(x, z);
-				if(chunk instanceof EmptyChunk)
-					continue;
-				
-				chunksInRange.add(chunk);
-			}
-		
-		return chunksInRange;
-	}
-	
-	private void removeSearchersOutOfRange(ChunkPos center, int chunkRange)
+	private void removeSearchersOutOfRange()
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
 			ChunkPos searcherPos = searcher.getChunk().getPos();
-			
-			if(Math.abs(searcherPos.x - center.x) <= chunkRange
-				&& Math.abs(searcherPos.z - center.z) <= chunkRange)
+			if(area.getSelected().isInRange(searcherPos))
 				continue;
 			
 			removeSearcher(searcher);
@@ -488,41 +454,6 @@ public final class CaveFinderHack extends Hack
 		}catch(InterruptedException | ExecutionException e)
 		{
 			throw new RuntimeException(e);
-		}
-	}
-	
-	private enum Area
-	{
-		D3("3x3 chunks", 1),
-		D5("5x5 chunks", 2),
-		D7("7x7 chunks", 3),
-		D9("9x9 chunks", 4),
-		D11("11x11 chunks", 5),
-		D13("13x13 chunks", 6),
-		D15("15x15 chunks", 7),
-		D17("17x17 chunks", 8),
-		D19("19x19 chunks", 9),
-		D21("21x21 chunks", 10),
-		D23("23x23 chunks", 11),
-		D25("25x25 chunks", 12),
-		D27("27x27 chunks", 13),
-		D29("29x29 chunks", 14),
-		D31("31x31 chunks", 15),
-		D33("33x33 chunks", 16);
-		
-		private final String name;
-		private final int chunkRange;
-		
-		private Area(String name, int chunkRange)
-		{
-			this.name = name;
-			this.chunkRange = chunkRange;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
 		}
 	}
 }

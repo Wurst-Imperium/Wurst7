@@ -35,6 +35,7 @@ import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
@@ -44,20 +45,21 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.ChunkAreaSetting;
+import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
 	"LightLevelOverlay", "light level overlay"})
 public final class MobSpawnEspHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final EnumSetting<DrawDistance> drawDistance = new EnumSetting<>(
-		"Draw distance", DrawDistance.values(), DrawDistance.D9);
+	private final ChunkAreaSetting drawDistance =
+		new ChunkAreaSetting("Draw distance", "", ChunkArea.A9);
 	
 	private final SliderSetting loadingSpeed = new SliderSetting(
 		"Loading speed", 1, 1, 5, 1, ValueDisplay.INTEGER.withSuffix("x"));
@@ -108,20 +110,10 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ClientWorld world = MC.world;
+		ChunkArea area = drawDistance.getSelected();
 		
-		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		int chunkX = eyesBlock.getX() >> 4;
-		int chunkZ = eyesBlock.getZ() >> 4;
-		int chunkRange = drawDistance.getSelected().chunkRange;
-		
-		ArrayList<Chunk> chunks = new ArrayList<>();
-		for(int x = chunkX - chunkRange; x <= chunkX + chunkRange; x++)
-			for(int z = chunkZ - chunkRange; z <= chunkZ + chunkRange; z++)
-				chunks.add(world.getChunk(x, z));
-			
 		// create & start scanners for new chunks
-		for(Chunk chunk : chunks)
+		for(Chunk chunk : area.getChunksInRange())
 		{
 			if(scanners.containsKey(chunk))
 				continue;
@@ -134,8 +126,7 @@ public final class MobSpawnEspHack extends Hack
 		// remove old scanners that are out of range
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
-			if(Math.abs(scanner.chunk.getPos().x - chunkX) <= chunkRange
-				&& Math.abs(scanner.chunk.getPos().z - chunkZ) <= chunkRange)
+			if(area.isInRange(scanner.chunk.getPos()))
 				continue;
 			
 			if(!scanner.doneCompiling)
@@ -151,9 +142,9 @@ public final class MobSpawnEspHack extends Hack
 		}
 		
 		// generate vertex buffers
-		Comparator<ChunkScanner> c =
-			Comparator.comparingInt(s -> Math.abs(s.chunk.getPos().x - chunkX)
-				+ Math.abs(s.chunk.getPos().z - chunkZ));
+		ChunkPos center = MC.player.getChunkPos();
+		Comparator<ChunkScanner> c = Comparator.comparingInt(
+			s -> ChunkUtils.getManhattanDistance(center, s.chunk.getPos()));
 		List<ChunkScanner> sortedScanners = scanners.values().stream()
 			.filter(s -> s.doneScanning).filter(s -> !s.doneCompiling).sorted(c)
 			.limit(loadingSpeed.getValueI()).collect(Collectors.toList());
@@ -223,15 +214,14 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// Avoid inconsistent GL state if setting changed mid-onRender
-		boolean depthTest = this.depthTest.isChecked();
-		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		
+		boolean depthTest = this.depthTest.isChecked();
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_CULL_FACE);
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -254,10 +244,11 @@ public final class MobSpawnEspHack extends Hack
 			matrixStack.pop();
 		}
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 		if(!depthTest)
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
+		
+		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
@@ -394,37 +385,6 @@ public final class MobSpawnEspHack extends Hack
 			
 			doneScanning = false;
 			doneCompiling = false;
-		}
-	}
-	
-	private enum DrawDistance
-	{
-		D3("3x3 chunks", 1),
-		D5("5x5 chunks", 2),
-		D7("7x7 chunks", 3),
-		D9("9x9 chunks", 4),
-		D11("11x11 chunks", 5),
-		D13("13x13 chunks", 6),
-		D15("15x15 chunks", 7),
-		D17("17x17 chunks", 8),
-		D19("19x19 chunks", 9),
-		D21("21x21 chunks", 10),
-		D23("23x23 chunks", 11),
-		D25("25x25 chunks", 12);
-		
-		private final String name;
-		private final int chunkRange;
-		
-		private DrawDistance(String name, int chunkRange)
-		{
-			this.name = name;
-			this.chunkRange = chunkRange;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
 		}
 	}
 }
