@@ -50,9 +50,8 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hacks.search.SearchArea;
 import net.wurstclient.settings.BlockSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
@@ -68,10 +67,9 @@ public final class SearchHack extends Hack
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore", false);
 	
-	private final EnumSetting<SearchArea> area = new EnumSetting<>("Area",
+	private final ChunkAreaSetting area = new ChunkAreaSetting("Area",
 		"The area around the player to search in.\n"
-			+ "Higher values require a faster computer.",
-		SearchArea.values(), SearchArea.D11);
+			+ "Higher values require a faster computer.");
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
 		"The maximum number of blocks to display.\n"
@@ -182,12 +180,10 @@ public final class SearchHack extends Hack
 	{
 		Block currentBlock = block.getBlock();
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		
-		ChunkPos center = MC.player.getChunkPos();
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
-		addSearchersInRange(center, currentBlock, dimensionId);
-		removeSearchersOutOfRange(center);
+		addSearchersInRange(currentBlock, dimensionId);
+		removeSearchersOutOfRange();
 		replaceSearchersWithDifferences(currentBlock, dimensionId);
 		replaceSearchersWithChunkUpdate(currentBlock, dimensionId);
 		
@@ -247,13 +243,9 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(ChunkPos center, Block block,
-		int dimensionId)
+	private void addSearchersInRange(Block block, int dimensionId)
 	{
-		ArrayList<Chunk> chunksInRange =
-			area.getSelected().getChunksInRange(center);
-		
-		for(Chunk chunk : chunksInRange)
+		for(Chunk chunk : area.getSelected().getChunksInRange())
 		{
 			if(searchers.containsKey(chunk))
 				continue;
@@ -262,12 +254,12 @@ public final class SearchHack extends Hack
 		}
 	}
 	
-	private void removeSearchersOutOfRange(ChunkPos center)
+	private void removeSearchersOutOfRange()
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
 			ChunkPos searcherPos = searcher.getChunk().getPos();
-			if(area.getSelected().isInRange(searcherPos, center))
+			if(area.getSelected().isInRange(searcherPos))
 				continue;
 			
 			removeSearcher(searcher);

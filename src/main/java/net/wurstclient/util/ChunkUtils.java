@@ -30,6 +30,11 @@ public enum ChunkUtils
 			.flatMap(chunk -> chunk.getBlockEntities().values().stream());
 	}
 	
+	public static int getManhattanDistance(ChunkPos a, ChunkPos b)
+	{
+		return Math.abs(a.x - b.x) + Math.abs(a.z - b.z);
+	}
+	
 	public static Stream<WorldChunk> getLoadedChunks()
 	{
 		int radius = Math.max(2, MC.options.getClampedViewDistance()) + 3;
