@@ -40,11 +40,11 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.portalesp.PortalEspBlockGroup;
 import net.wurstclient.hacks.portalesp.PortalEspRenderer;
-import net.wurstclient.hacks.portalesp.PortalEspStyle;
 import net.wurstclient.hacks.portalesp.SearchArea;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChunkSearcherMulti;
 import net.wurstclient.util.ChunkSearcherMulti.Result;
@@ -55,8 +55,7 @@ import net.wurstclient.util.RotationUtils;
 public final class PortalEspHack extends Hack implements UpdateListener,
 	PacketInputListener, CameraTransformViewBobbingListener, RenderListener
 {
-	private final EnumSetting<PortalEspStyle> style = new EnumSetting<>("Style",
-		PortalEspStyle.values(), PortalEspStyle.BOXES);
+	private final EspStyleSetting style = new EspStyleSetting();
 	
 	private final PortalEspBlockGroup netherPortal = new PortalEspBlockGroup(
 		BlockUtils.getBlockFromName("minecraft:nether_portal"),
