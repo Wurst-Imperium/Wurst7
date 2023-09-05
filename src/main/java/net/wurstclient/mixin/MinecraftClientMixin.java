@@ -123,7 +123,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getSession()Lnet/minecraft/client/util/Session;",
+		method = "getSession()Lnet/minecraft/client/session/Session;",
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
 	{
@@ -149,7 +149,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;",
+		method = "getProfileKeys()Lnet/minecraft/client/session/ProfileKeys;",
 		cancellable = true)
 	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{

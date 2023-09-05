@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.client.session.telemetry.TelemetryManager;
 import net.minecraft.client.session.telemetry.TelemetrySender;
 import net.wurstclient.WurstClient;
@@ -19,7 +20,7 @@ import net.wurstclient.WurstClient;
 public class TelemetryManagerMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "getSender()Lnet/minecraft/client/util/telemetry/TelemetrySender;",
+		method = "getSender()Lnet/minecraft/client/session/telemetry/TelemetrySender;",
 		cancellable = true)
 	private void onGetSender(CallbackInfoReturnable<TelemetrySender> cir)
 	{
