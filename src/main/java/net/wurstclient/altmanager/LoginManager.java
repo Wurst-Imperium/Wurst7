@@ -8,8 +8,7 @@
 package net.wurstclient.altmanager;
 
 import java.util.Optional;
-
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.Session;
 import net.minecraft.util.Uuids;
 import net.wurstclient.WurstClient;
 

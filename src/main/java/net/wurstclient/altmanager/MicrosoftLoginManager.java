@@ -29,8 +29,7 @@ import java.util.stream.Collectors;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.Session;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
