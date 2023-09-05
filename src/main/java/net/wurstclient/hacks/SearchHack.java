@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -372,17 +371,7 @@ public final class SearchHack extends Hack
 	
 	private HashSet<BlockPos> getMatchingBlocksFromTask()
 	{
-		HashSet<BlockPos> matchingBlocks = new HashSet<>();
-		
-		try
-		{
-			matchingBlocks = getMatchingBlocksTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
+		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
 		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
 		if(matchingBlocks.size() < maxBlocks)
@@ -414,39 +403,24 @@ public final class SearchHack extends Hack
 	
 	private void setBufferFromTask()
 	{
-		ArrayList<int[]> vertices = getVerticesFromTask();
-		
-		if(vertexBuffer != null)
-			vertexBuffer.close();
-		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		
-		for(int[] vertex : vertices)
+		for(int[] vertex : compileVerticesTask.join())
 			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
 		
 		BuiltBuffer buffer = bufferBuilder.end();
 		
+		if(vertexBuffer != null)
+			vertexBuffer.close();
+		
+		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;
-	}
-	
-	private ArrayList<int[]> getVerticesFromTask()
-	{
-		try
-		{
-			return compileVerticesTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 }
