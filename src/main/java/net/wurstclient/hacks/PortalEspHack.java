@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -353,27 +352,14 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		getMatchingBlocksTask = pool2.submit(task);
 	}
 	
-	private ArrayList<Result> getMatchingBlocksFromTask()
+	private void getMatchingBlocksFromTask()
 	{
 		groups.forEach(PortalEspBlockGroup::clear);
 		
-		ArrayList<Result> results = new ArrayList<>();
-		
-		try
-		{
-			results = getMatchingBlocksTask.get();
-			
-		}catch(InterruptedException | ExecutionException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
-		for(Result result : results)
+		for(Result result : getMatchingBlocksTask.join())
 			groups.parallelStream()
 				.filter(group -> group.getBlock().getClass() == result
 					.getBlock().getClass())
 				.forEach(group -> group.add(result.getPos()));
-		
-		return results;
 	}
 }
