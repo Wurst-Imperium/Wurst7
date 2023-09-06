@@ -20,10 +20,8 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
@@ -88,7 +86,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	
 	private final HashMap<ChunkPos, ChunkSearcherMulti> searchers =
 		new HashMap<>();
-	private final Set<Chunk> chunksToUpdate =
+	private final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService pool1;
 	
@@ -141,34 +139,26 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onReceivedPacket(PacketInputEvent event)
 	{
-		ClientPlayerEntity player = MC.player;
-		ClientWorld world = MC.world;
-		if(player == null || world == null)
-			return;
-		
 		Packet<?> packet = event.getPacket();
-		Chunk chunk;
+		ChunkPos chunkPos;
 		
 		if(packet instanceof BlockUpdateS2CPacket change)
-		{
-			BlockPos pos = change.getPos();
-			chunk = world.getChunk(pos);
-			
-		}else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
+			chunkPos = new ChunkPos(change.getPos());
+		else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
 		{
 			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
 			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
 			if(changedBlocks.isEmpty())
 				return;
 			
-			chunk = world.getChunk(changedBlocks.get(0));
+			chunkPos = new ChunkPos(changedBlocks.get(0));
 			
 		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
+			chunkPos = new ChunkPos(chunkData.getX(), chunkData.getZ());
 		else
 			return;
 		
-		chunksToUpdate.add(chunk);
+		chunksToUpdate.add(chunkPos);
 	}
 	
 	@Override
@@ -285,23 +275,25 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	private void replaceSearchersWithChunkUpdate(
 		ArrayList<Block> currentBlockList, int dimensionId)
 	{
+		// get the chunks to update and remove them from the set
+		ChunkPos[] chunks;
 		synchronized(chunksToUpdate)
 		{
-			if(chunksToUpdate.isEmpty())
-				return;
+			chunks = chunksToUpdate.toArray(ChunkPos[]::new);
+			chunksToUpdate.clear();
+		}
+		
+		// update the chunks separately so the synchronization
+		// doesn't have to wait for that
+		for(ChunkPos chunkPos : chunks)
+		{
+			ChunkSearcherMulti oldSearcher = searchers.get(chunkPos);
+			if(oldSearcher == null)
+				continue;
 			
-			for(Iterator<Chunk> itr = chunksToUpdate.iterator(); itr.hasNext();)
-			{
-				Chunk chunk = itr.next();
-				itr.remove();
-				
-				ChunkSearcherMulti oldSearcher = searchers.get(chunk.getPos());
-				if(oldSearcher == null)
-					continue;
-				
-				removeSearcher(oldSearcher);
-				addSearcher(chunk, currentBlockList, dimensionId);
-			}
+			removeSearcher(oldSearcher);
+			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
+			addSearcher(chunk, currentBlockList, dimensionId);
 		}
 	}
 	
