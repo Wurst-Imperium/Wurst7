@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -282,23 +281,24 @@ public final class SearchHack extends Hack
 	private void replaceSearchersWithChunkUpdate(Block currentBlock,
 		int dimensionId)
 	{
+		// get the chunks to update and remove them from the set
+		Chunk[] chunks;
 		synchronized(chunksToUpdate)
 		{
-			if(chunksToUpdate.isEmpty())
-				return;
+			chunks = chunksToUpdate.toArray(Chunk[]::new);
+			chunksToUpdate.clear();
+		}
+		
+		// update the chunks separately so the synchronization
+		// doesn't have to wait for that
+		for(Chunk chunk : chunks)
+		{
+			ChunkSearcher oldSearcher = searchers.get(chunk);
+			if(oldSearcher == null)
+				continue;
 			
-			for(Iterator<Chunk> itr = chunksToUpdate.iterator(); itr.hasNext();)
-			{
-				Chunk chunk = itr.next();
-				
-				ChunkSearcher oldSearcher = searchers.get(chunk);
-				if(oldSearcher == null)
-					continue;
-				
-				removeSearcher(oldSearcher);
-				addSearcher(chunk, currentBlock, dimensionId);
-				itr.remove();
-			}
+			removeSearcher(oldSearcher);
+			addSearcher(chunk, currentBlock, dimensionId);
 		}
 	}
 	
