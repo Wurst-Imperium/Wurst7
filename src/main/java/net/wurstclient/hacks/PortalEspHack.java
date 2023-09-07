@@ -22,10 +22,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
@@ -44,6 +40,7 @@ import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChunkSearcherMulti;
 import net.wurstclient.util.ChunkSearcherMulti.Result;
+import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -139,26 +136,10 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onReceivedPacket(PacketInputEvent event)
 	{
-		Packet<?> packet = event.getPacket();
-		ChunkPos chunkPos;
+		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
 		
-		if(packet instanceof BlockUpdateS2CPacket change)
-			chunkPos = new ChunkPos(change.getPos());
-		else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
-		{
-			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
-			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
-			if(changedBlocks.isEmpty())
-				return;
-			
-			chunkPos = new ChunkPos(changedBlocks.get(0));
-			
-		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-			chunkPos = new ChunkPos(chunkData.getX(), chunkData.getZ());
-		else
-			return;
-		
-		chunksToUpdate.add(chunkPos);
+		if(chunkPos != null)
+			chunksToUpdate.add(chunkPos);
 	}
 	
 	@Override
