@@ -20,7 +20,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
@@ -30,10 +29,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.LightType;
@@ -168,36 +163,17 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onReceivedPacket(PacketInputEvent event)
 	{
-		ClientPlayerEntity player = MC.player;
 		ClientWorld world = MC.world;
-		if(player == null || world == null)
+		if(MC.player == null || world == null)
 			return;
 		
-		Packet<?> packet = event.getPacket();
-		Chunk chunk;
-		
-		if(packet instanceof BlockUpdateS2CPacket change)
-		{
-			BlockPos pos = change.getPos();
-			chunk = world.getChunk(pos);
-			
-		}else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
-		{
-			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
-			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
-			if(changedBlocks.isEmpty())
-				return;
-			
-			chunk = world.getChunk(changedBlocks.get(0));
-			
-		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-			chunk = world.getChunk(chunkData.getX(), chunkData.getZ());
-		else
+		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
+		if(chunkPos == null)
 			return;
 		
 		ArrayList<Chunk> chunks = new ArrayList<>();
-		for(int x = chunk.getPos().x - 1; x <= chunk.getPos().x + 1; x++)
-			for(int z = chunk.getPos().z - 1; z <= chunk.getPos().z + 1; z++)
+		for(int x = chunkPos.x - 1; x <= chunkPos.x + 1; x++)
+			for(int z = chunkPos.z - 1; z <= chunkPos.z + 1; z++)
 				chunks.add(world.getChunk(x, z));
 			
 		for(Chunk chunk2 : chunks)
