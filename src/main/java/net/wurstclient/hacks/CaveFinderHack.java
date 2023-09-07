@@ -36,10 +36,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -57,6 +53,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.ChunkSearcher;
+import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -142,26 +139,10 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onReceivedPacket(PacketInputEvent event)
 	{
-		Packet<?> packet = event.getPacket();
-		ChunkPos chunkPos;
+		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
 		
-		if(packet instanceof BlockUpdateS2CPacket change)
-			chunkPos = new ChunkPos(change.getPos());
-		else if(packet instanceof ChunkDeltaUpdateS2CPacket change)
-		{
-			ArrayList<BlockPos> changedBlocks = new ArrayList<>();
-			change.visitUpdates((pos, state) -> changedBlocks.add(pos));
-			if(changedBlocks.isEmpty())
-				return;
-			
-			chunkPos = new ChunkPos(changedBlocks.get(0));
-			
-		}else if(packet instanceof ChunkDataS2CPacket chunkData)
-			chunkPos = new ChunkPos(chunkData.getX(), chunkData.getZ());
-		else
-			return;
-		
-		chunksToUpdate.add(chunkPos);
+		if(chunkPos != null)
+			chunksToUpdate.add(chunkPos);
 	}
 	
 	@Override
