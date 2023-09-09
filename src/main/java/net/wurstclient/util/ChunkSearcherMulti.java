@@ -110,6 +110,11 @@ public final class ChunkSearcherMulti
 		return chunk;
 	}
 	
+	public ChunkPos getPos()
+	{
+		return chunk.getPos();
+	}
+	
 	public ArrayList<Block> getBlockList()
 	{
 		return blockList;

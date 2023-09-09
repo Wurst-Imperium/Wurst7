@@ -216,7 +216,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	private void addSearchersInRange(ArrayList<Block> blockList,
 		int dimensionId)
 	{
-		for(Chunk chunk : area.getSelected().getChunksInRange())
+		for(Chunk chunk : area.getChunksInRange())
 		{
 			if(searchers.containsKey(chunk.getPos()))
 				continue;
@@ -229,9 +229,8 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	{
 		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
 		{
-			ChunkPos searcherPos = searcher.getChunk().getPos();
 			int searcherDimensionId = searcher.getDimensionId();
-			if(area.getSelected().isInRange(searcherPos)
+			if(area.isInRange(searcher.getPos())
 				&& searcherDimensionId == dimensionId)
 				continue;
 			
@@ -291,7 +290,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	{
 		stopPool2Tasks();
 		
-		searchers.remove(searcher.getChunk().getPos());
+		searchers.remove(searcher.getPos());
 		searcher.cancelSearching();
 	}
 	
