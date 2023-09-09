@@ -335,14 +335,13 @@ public final class CaveFinderHack extends Hack
 	
 	private void startGetMatchingBlocksTask(BlockPos eyesPos)
 	{
-		int maxBlocks = (int)Math.pow(10, limit.getValueI());
-		
-		Callable<HashSet<BlockPos>> task = () -> searchers.values()
-			.parallelStream()
-			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-			.sorted(Comparator
-				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
+		Callable<HashSet<BlockPos>> task =
+			() -> searchers.values().parallelStream()
+				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+				.sorted(Comparator
+					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+				.limit(limit.getValueLog())
+				.collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}
@@ -350,9 +349,8 @@ public final class CaveFinderHack extends Hack
 	private HashSet<BlockPos> getMatchingBlocksFromTask()
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
-		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		if(matchingBlocks.size() < maxBlocks)
+		if(matchingBlocks.size() < limit.getValueLog())
 			notify = true;
 		else if(notify)
 		{
