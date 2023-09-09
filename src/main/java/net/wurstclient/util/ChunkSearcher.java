@@ -108,6 +108,11 @@ public final class ChunkSearcher
 		return chunk;
 	}
 	
+	public ChunkPos getPos()
+	{
+		return chunk.getPos();
+	}
+	
 	public Block getBlock()
 	{
 		return block;

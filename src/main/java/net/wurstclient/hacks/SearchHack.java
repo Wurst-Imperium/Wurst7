@@ -227,8 +227,7 @@ public final class SearchHack extends Hack
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
-			ChunkPos searcherPos = searcher.getChunk().getPos();
-			if(area.getSelected().isInRange(searcherPos))
+			if(area.getSelected().isInRange(searcher.getPos()))
 				continue;
 			
 			removeSearcher(searcher);
@@ -287,7 +286,7 @@ public final class SearchHack extends Hack
 	{
 		stopPool2Tasks();
 		
-		searchers.remove(searcher.getChunk().getPos());
+		searchers.remove(searcher.getPos());
 		searcher.cancelSearching();
 	}
 	
