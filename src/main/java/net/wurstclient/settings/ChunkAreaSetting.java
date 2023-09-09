@@ -30,6 +30,16 @@ public final class ChunkAreaSetting
 		super(name, description, ChunkArea.values(), selected);
 	}
 	
+	public ArrayList<Chunk> getChunksInRange()
+	{
+		return getSelected().getChunksInRange();
+	}
+	
+	public boolean isInRange(ChunkPos pos)
+	{
+		return getSelected().isInRange(pos);
+	}
+	
 	public enum ChunkArea
 	{
 		A3("3x3 chunks", 1),

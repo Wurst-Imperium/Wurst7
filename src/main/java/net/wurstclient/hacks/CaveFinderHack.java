@@ -81,7 +81,7 @@ public final class CaveFinderHack extends Hack
 	private int prevLimit;
 	private boolean notify;
 	
-	private final HashMap<Chunk, ChunkSearcher> searchers = new HashMap<>();
+	private final HashMap<ChunkPos, ChunkSearcher> searchers = new HashMap<>();
 	private final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService pool1;
@@ -221,9 +221,9 @@ public final class CaveFinderHack extends Hack
 	
 	private void addSearchersInRange(Block block, int dimensionId)
 	{
-		for(Chunk chunk : area.getSelected().getChunksInRange())
+		for(Chunk chunk : area.getChunksInRange())
 		{
-			if(searchers.containsKey(chunk))
+			if(searchers.containsKey(chunk.getPos()))
 				continue;
 			
 			addSearcher(chunk, block, dimensionId);
@@ -234,8 +234,7 @@ public final class CaveFinderHack extends Hack
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
-			ChunkPos searcherPos = searcher.getChunk().getPos();
-			if(area.getSelected().isInRange(searcherPos))
+			if(area.isInRange(searcher.getPos()))
 				continue;
 			
 			removeSearcher(searcher);
@@ -271,13 +270,12 @@ public final class CaveFinderHack extends Hack
 		// doesn't have to wait for that
 		for(ChunkPos chunkPos : chunks)
 		{
-			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			
-			ChunkSearcher oldSearcher = searchers.get(chunk);
+			ChunkSearcher oldSearcher = searchers.get(chunkPos);
 			if(oldSearcher == null)
 				continue;
 			
 			removeSearcher(oldSearcher);
+			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
 			addSearcher(chunk, currentBlock, dimensionId);
 		}
 	}
@@ -287,7 +285,7 @@ public final class CaveFinderHack extends Hack
 		stopPool2Tasks();
 		
 		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
-		searchers.put(chunk, searcher);
+		searchers.put(chunk.getPos(), searcher);
 		searcher.startSearching(pool1);
 	}
 	
@@ -295,7 +293,7 @@ public final class CaveFinderHack extends Hack
 	{
 		stopPool2Tasks();
 		
-		searchers.remove(searcher.getChunk());
+		searchers.remove(searcher.getPos());
 		searcher.cancelSearching();
 	}
 	
@@ -337,14 +335,13 @@ public final class CaveFinderHack extends Hack
 	
 	private void startGetMatchingBlocksTask(BlockPos eyesPos)
 	{
-		int maxBlocks = (int)Math.pow(10, limit.getValueI());
-		
-		Callable<HashSet<BlockPos>> task = () -> searchers.values()
-			.parallelStream()
-			.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-			.sorted(Comparator
-				.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-			.limit(maxBlocks).collect(Collectors.toCollection(HashSet::new));
+		Callable<HashSet<BlockPos>> task =
+			() -> searchers.values().parallelStream()
+				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
+				.sorted(Comparator
+					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
+				.limit(limit.getValueLog())
+				.collect(Collectors.toCollection(HashSet::new));
 		
 		getMatchingBlocksTask = pool2.submit(task);
 	}
@@ -352,9 +349,8 @@ public final class CaveFinderHack extends Hack
 	private HashSet<BlockPos> getMatchingBlocksFromTask()
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
-		int maxBlocks = (int)Math.pow(10, limit.getValueI());
 		
-		if(matchingBlocks.size() < maxBlocks)
+		if(matchingBlocks.size() < limit.getValueLog())
 			notify = true;
 		else if(notify)
 		{
