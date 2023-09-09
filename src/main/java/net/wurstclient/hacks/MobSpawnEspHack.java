@@ -62,7 +62,7 @@ public final class MobSpawnEspHack extends Hack
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);
 	
-	private final HashMap<Chunk, ChunkScanner> scanners = new HashMap<>();
+	private final HashMap<ChunkPos, ChunkScanner> scanners = new HashMap<>();
 	private ExecutorService pool;
 	
 	public MobSpawnEspHack()
@@ -96,7 +96,7 @@ public final class MobSpawnEspHack extends Hack
 			if(scanner.vertexBuffer != null)
 				scanner.vertexBuffer.close();
 			
-			scanners.remove(scanner.chunk);
+			scanners.remove(scanner.chunk.getPos());
 		}
 		
 		pool.shutdownNow();
@@ -110,11 +110,12 @@ public final class MobSpawnEspHack extends Hack
 		// create & start scanners for new chunks
 		for(Chunk chunk : area.getChunksInRange())
 		{
-			if(scanners.containsKey(chunk))
+			ChunkPos chunkPos = chunk.getPos();
+			if(scanners.containsKey(chunkPos))
 				continue;
 			
 			ChunkScanner scanner = new ChunkScanner(chunk);
-			scanners.put(chunk, scanner);
+			scanners.put(chunkPos, scanner);
 			scanner.future = pool.submit(() -> scanner.scan());
 		}
 		
@@ -133,7 +134,7 @@ public final class MobSpawnEspHack extends Hack
 			if(scanner.future != null)
 				scanner.future.cancel(true);
 			
-			scanners.remove(scanner.chunk);
+			scanners.remove(scanner.chunk.getPos());
 		}
 		
 		// generate vertex buffers
@@ -167,18 +168,18 @@ public final class MobSpawnEspHack extends Hack
 		if(MC.player == null || world == null)
 			return;
 		
-		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
-		if(chunkPos == null)
+		ChunkPos center = ChunkUtils.getAffectedChunk(event.getPacket());
+		if(center == null)
 			return;
 		
-		ArrayList<Chunk> chunks = new ArrayList<>();
-		for(int x = chunkPos.x - 1; x <= chunkPos.x + 1; x++)
-			for(int z = chunkPos.z - 1; z <= chunkPos.z + 1; z++)
-				chunks.add(world.getChunk(x, z));
+		ArrayList<ChunkPos> chunks = new ArrayList<>();
+		for(int x = center.x - 1; x <= center.x + 1; x++)
+			for(int z = center.z - 1; z <= center.z + 1; z++)
+				chunks.add(new ChunkPos(x, z));
 			
-		for(Chunk chunk2 : chunks)
+		for(ChunkPos chunkPos : chunks)
 		{
-			ChunkScanner scanner = scanners.get(chunk2);
+			ChunkScanner scanner = scanners.get(chunkPos);
 			if(scanner == null)
 				return;
 			
