@@ -8,11 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
@@ -23,7 +26,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.Category;
@@ -43,7 +45,6 @@ import net.wurstclient.util.ChunkSearcherMulti.Result;
 import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 public final class PortalEspHack extends Hack implements UpdateListener,
 	PacketInputListener, CameraTransformViewBobbingListener, RenderListener
@@ -85,10 +86,9 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		new HashMap<>();
 	private final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
-	private ExecutorService pool1;
+	private ExecutorService threadPool;
 	
-	private ForkJoinPool pool2;
-	private ForkJoinTask<ArrayList<Result>> getMatchingBlocksTask;
+	private boolean groupsUpToDate;
 	
 	public PortalEspHack()
 	{
@@ -104,8 +104,8 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onEnable()
 	{
-		pool1 = MinPriorityThreadFactory.newFixedThreadPool();
-		pool2 = new ForkJoinPool();
+		threadPool = MinPriorityThreadFactory.newFixedThreadPool();
+		groupsUpToDate = false;
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
@@ -123,12 +123,8 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		stopPool2Tasks();
-		pool1.shutdownNow();
-		pool2.shutdownNow();
-		
+		threadPool.shutdownNow();
 		chunksToUpdate.clear();
-		
 		groups.forEach(PortalEspBlockGroup::clear);
 		PortalEspRenderer.closeBuffers();
 	}
@@ -153,28 +149,22 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		ArrayList<Block> currentBlockList =
-			groups.parallelStream().map(PortalEspBlockGroup::getBlock)
+		ArrayList<Block> blockList =
+			groups.stream().map(PortalEspBlockGroup::getBlock)
 				.collect(Collectors.toCollection(ArrayList::new));
 		
-		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
-		addSearchersInRange(currentBlockList, dimensionId);
+		addSearchersInRange(blockList, dimensionId);
 		removeSearchersOutOfRange(dimensionId);
-		replaceSearchersWithDifferences(currentBlockList, dimensionId);
-		replaceSearchersWithChunkUpdate(currentBlockList, dimensionId);
+		replaceSearchersWithDifferences(blockList, dimensionId);
+		replaceSearchersWithChunkUpdate(blockList, dimensionId);
 		
 		if(!areAllChunkSearchersDone())
 			return;
 		
-		if(getMatchingBlocksTask == null)
-			startGetMatchingBlocksTask(eyesPos);
-		
-		if(!getMatchingBlocksTask.isDone())
-			return;
-		
-		getMatchingBlocksFromTask();
+		if(!groupsUpToDate)
+			updateGroupBoxes();
 	}
 	
 	@Override
@@ -280,27 +270,18 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	private void addSearcher(Chunk chunk, ArrayList<Block> blockList,
 		int dimensionId)
 	{
+		groupsUpToDate = false;
 		ChunkSearcherMulti searcher =
 			new ChunkSearcherMulti(chunk, blockList, dimensionId);
 		searchers.put(chunk.getPos(), searcher);
-		searcher.startSearching(pool1);
+		searcher.startSearching(threadPool);
 	}
 	
 	private void removeSearcher(ChunkSearcherMulti searcher)
 	{
-		stopPool2Tasks();
-		
+		groupsUpToDate = false;
 		searchers.remove(searcher.getPos());
 		searcher.cancelSearching();
-	}
-	
-	private void stopPool2Tasks()
-	{
-		if(getMatchingBlocksTask != null)
-		{
-			getMatchingBlocksTask.cancel(true);
-			getMatchingBlocksTask = null;
-		}
 	}
 	
 	private boolean areAllChunkSearchersDone()
@@ -312,26 +293,23 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		return true;
 	}
 	
-	private void startGetMatchingBlocksTask(BlockPos eyesPos)
-	{
-		Callable<ArrayList<Result>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator.comparingInt(
-					result -> eyesPos.getManhattanDistance(result.getPos())))
-				.collect(Collectors.toCollection(ArrayList::new));
-		
-		getMatchingBlocksTask = pool2.submit(task);
-	}
-	
-	private void getMatchingBlocksFromTask()
+	private void updateGroupBoxes()
 	{
 		groups.forEach(PortalEspBlockGroup::clear);
+		searchers.values().stream()
+			.flatMap(ChunkSearcherMulti::getMatchingBlocks)
+			.forEachOrdered(this::addToGroupBoxes);
 		
-		for(Result result : getMatchingBlocksTask.join())
-			groups.parallelStream()
-				.filter(group -> group.getBlock().getClass() == result
-					.getBlock().getClass())
-				.forEach(group -> group.add(result.getPos()));
+		groupsUpToDate = true;
+	}
+	
+	private void addToGroupBoxes(Result result)
+	{
+		for(PortalEspBlockGroup group : groups)
+			if(result.getBlock() == group.getBlock())
+			{
+				group.add(result.getPos());
+				break;
+			}
 	}
 }

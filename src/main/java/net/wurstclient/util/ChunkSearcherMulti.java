@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
@@ -125,9 +126,9 @@ public final class ChunkSearcherMulti
 		return dimensionId;
 	}
 	
-	public ArrayList<Result> getMatchingBlocks()
+	public Stream<Result> getMatchingBlocks()
 	{
-		return matchingBlocks;
+		return matchingBlocks.stream();
 	}
 	
 	public ChunkSearcherMulti.Status getStatus()
