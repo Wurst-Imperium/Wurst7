@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +38,6 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChunkSearcherMulti;
 import net.wurstclient.util.ChunkSearcherMulti.Result;
 import net.wurstclient.util.ChunkUtils;
@@ -50,26 +50,26 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 {
 	private final EspStyleSetting style = new EspStyleSetting();
 	
-	private final PortalEspBlockGroup netherPortal = new PortalEspBlockGroup(
-		BlockUtils.getBlockFromName("minecraft:nether_portal"),
-		new ColorSetting("Nether portal color",
-			"Nether portals will be highlighted in this color.", Color.RED),
-		new CheckboxSetting("Include nether portals", true));
+	private final PortalEspBlockGroup netherPortal =
+		new PortalEspBlockGroup(Blocks.NETHER_PORTAL,
+			new ColorSetting("Nether portal color",
+				"Nether portals will be highlighted in this color.", Color.RED),
+			new CheckboxSetting("Include nether portals", true));
 	
-	private final PortalEspBlockGroup endPortal = new PortalEspBlockGroup(
-		BlockUtils.getBlockFromName("minecraft:end_portal"),
-		new ColorSetting("End portal color",
-			"End portals will be highlighted in this color.", Color.GREEN),
-		new CheckboxSetting("Include end portals", true));
+	private final PortalEspBlockGroup endPortal =
+		new PortalEspBlockGroup(Blocks.END_PORTAL,
+			new ColorSetting("End portal color",
+				"End portals will be highlighted in this color.", Color.GREEN),
+			new CheckboxSetting("Include end portals", true));
 	
 	private final PortalEspBlockGroup endPortalFrame = new PortalEspBlockGroup(
-		BlockUtils.getBlockFromName("minecraft:end_portal_frame"),
+		Blocks.END_PORTAL_FRAME,
 		new ColorSetting("End portal frame color",
 			"End portal frames will be highlighted in this color.", Color.BLUE),
 		new CheckboxSetting("Include end portal frames", true));
 	
 	private final PortalEspBlockGroup endGateway = new PortalEspBlockGroup(
-		BlockUtils.getBlockFromName("minecraft:end_gateway"),
+		Blocks.END_GATEWAY,
 		new ColorSetting("End gateway color",
 			"End gateways will be highlighted in this color.", Color.YELLOW),
 		new CheckboxSetting("Include end gateways", true));
