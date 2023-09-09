@@ -105,10 +105,8 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ChunkArea area = drawDistance.getSelected();
-		
 		// create & start scanners for new chunks
-		for(Chunk chunk : area.getChunksInRange())
+		for(Chunk chunk : drawDistance.getChunksInRange())
 		{
 			ChunkPos chunkPos = chunk.getPos();
 			if(scanners.containsKey(chunkPos))
@@ -122,7 +120,7 @@ public final class MobSpawnEspHack extends Hack
 		// remove old scanners that are out of range
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
-			if(area.isInRange(scanner.chunk.getPos()))
+			if(drawDistance.isInRange(scanner.chunk.getPos()))
 				continue;
 			
 			if(!scanner.doneCompiling)

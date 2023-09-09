@@ -214,7 +214,7 @@ public final class SearchHack extends Hack
 	
 	private void addSearchersInRange(Block block, int dimensionId)
 	{
-		for(Chunk chunk : area.getSelected().getChunksInRange())
+		for(Chunk chunk : area.getChunksInRange())
 		{
 			if(searchers.containsKey(chunk.getPos()))
 				continue;
@@ -227,7 +227,7 @@ public final class SearchHack extends Hack
 	{
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
-			if(area.getSelected().isInRange(searcher.getPos()))
+			if(area.isInRange(searcher.getPos()))
 				continue;
 			
 			removeSearcher(searcher);
