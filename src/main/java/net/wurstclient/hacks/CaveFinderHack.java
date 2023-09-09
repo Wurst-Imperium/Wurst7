@@ -14,7 +14,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -84,9 +83,9 @@ public final class CaveFinderHack extends Hack
 	private final HashMap<ChunkPos, ChunkSearcher> searchers = new HashMap<>();
 	private final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
-	private ExecutorService pool1;
+	private ExecutorService threadPool;
 	
-	private ForkJoinPool pool2;
+	private ForkJoinPool forkJoinPool;
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
@@ -109,8 +108,8 @@ public final class CaveFinderHack extends Hack
 		prevLimit = limit.getValueI();
 		notify = true;
 		
-		pool1 = MinPriorityThreadFactory.newFixedThreadPool();
-		pool2 = new ForkJoinPool();
+		threadPool = MinPriorityThreadFactory.newFixedThreadPool();
+		forkJoinPool = new ForkJoinPool();
 		
 		bufferUpToDate = false;
 		
@@ -126,9 +125,9 @@ public final class CaveFinderHack extends Hack
 		EVENTS.remove(PacketInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		stopPool2Tasks();
-		pool1.shutdownNow();
-		pool2.shutdownNow();
+		stopBuildingBuffer();
+		threadPool.shutdownNow();
+		forkJoinPool.shutdownNow();
 		
 		if(vertexBuffer != null)
 			vertexBuffer.close();
@@ -149,7 +148,6 @@ public final class CaveFinderHack extends Hack
 	public void onUpdate()
 	{
 		Block blockToFind = Blocks.CAVE_AIR;
-		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
 		
 		addSearchersInRange(blockToFind, dimensionId);
@@ -163,7 +161,7 @@ public final class CaveFinderHack extends Hack
 		checkIfLimitChanged();
 		
 		if(getMatchingBlocksTask == null)
-			startGetMatchingBlocksTask(eyesPos);
+			startGetMatchingBlocksTask();
 		
 		if(!getMatchingBlocksTask.isDone())
 			return;
@@ -282,22 +280,22 @@ public final class CaveFinderHack extends Hack
 	
 	private void addSearcher(Chunk chunk, Block block, int dimensionId)
 	{
-		stopPool2Tasks();
+		stopBuildingBuffer();
 		
 		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
 		searchers.put(chunk.getPos(), searcher);
-		searcher.startSearching(pool1);
+		searcher.startSearching(threadPool);
 	}
 	
 	private void removeSearcher(ChunkSearcher searcher)
 	{
-		stopPool2Tasks();
+		stopBuildingBuffer();
 		
 		searchers.remove(searcher.getPos());
 		searcher.cancelSearching();
 	}
 	
-	private void stopPool2Tasks()
+	private void stopBuildingBuffer()
 	{
 		if(getMatchingBlocksTask != null)
 		{
@@ -327,26 +325,25 @@ public final class CaveFinderHack extends Hack
 	{
 		if(limit.getValueI() != prevLimit)
 		{
-			stopPool2Tasks();
+			stopBuildingBuffer();
 			notify = true;
 			prevLimit = limit.getValueI();
 		}
 	}
 	
-	private void startGetMatchingBlocksTask(BlockPos eyesPos)
+	private void startGetMatchingBlocksTask()
 	{
-		Callable<HashSet<BlockPos>> task =
-			() -> searchers.values().parallelStream()
-				.flatMap(searcher -> searcher.getMatchingBlocks().stream())
-				.sorted(Comparator
-					.comparingInt(pos -> eyesPos.getManhattanDistance(pos)))
-				.limit(limit.getValueLog())
-				.collect(Collectors.toCollection(HashSet::new));
+		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
+		Comparator<BlockPos> comparator =
+			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
 		
-		getMatchingBlocksTask = pool2.submit(task);
+		getMatchingBlocksTask = forkJoinPool.submit(() -> searchers.values()
+			.parallelStream().flatMap(ChunkSearcher::getMatchingBlocks)
+			.sorted(comparator).limit(limit.getValueLog())
+			.collect(Collectors.toCollection(HashSet::new)));
 	}
 	
-	private HashSet<BlockPos> getMatchingBlocksFromTask()
+	private void startCompileVerticesTask()
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
 		
@@ -360,21 +357,12 @@ public final class CaveFinderHack extends Hack
 			notify = false;
 		}
 		
-		return matchingBlocks;
-	}
-	
-	private void startCompileVerticesTask()
-	{
-		HashSet<BlockPos> matchingBlocks = getMatchingBlocksFromTask();
-		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
 		
-		Callable<ArrayList<int[]>> task =
-			() -> BlockVertexCompiler.compile(matchingBlocks, regionX, regionZ);
-		
-		compileVerticesTask = pool2.submit(task);
+		compileVerticesTask = forkJoinPool.submit(() -> BlockVertexCompiler
+			.compile(matchingBlocks, regionX, regionZ));
 	}
 	
 	private void setBufferFromTask()
