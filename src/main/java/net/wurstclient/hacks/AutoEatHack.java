@@ -36,11 +36,11 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto eat", "AutoFood", "auto food", "AutoFeeder", "auto feeder",
 	"AutoFeeding", "auto feeding", "AutoSoup", "auto soup"})
@@ -190,7 +190,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			
 		}else
 		{
-			moveFoodToHotbar(foodSlot);
+			InventoryUtils.selectItem(foodSlot);
 			return;
 		}
 		
@@ -242,26 +242,6 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		}
 		
 		return bestSlot;
-	}
-	
-	private void moveFoodToHotbar(int foodSlot)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		
-		if(inventory.getEmptySlot() < 9)
-			im.windowClick_QUICK_MOVE(foodSlot);
-		else if(inventory.getEmptySlot() != -1)
-		{
-			im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
-			im.windowClick_QUICK_MOVE(foodSlot);
-			
-		}else
-		{
-			im.windowClick_PICKUP(inventory.selectedSlot + 36);
-			im.windowClick_PICKUP(foodSlot);
-			im.windowClick_PICKUP(inventory.selectedSlot + 36);
-		}
 	}
 	
 	private boolean shouldEat()

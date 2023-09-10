@@ -17,6 +17,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -87,6 +88,7 @@ public final class NewChunksHack extends Hack
 		new NewChunksReasonsRenderer(drawDistance);
 	
 	private ChunkPos lastRegion;
+	private DimensionType lastDimension;
 	
 	public NewChunksHack()
 	{
@@ -109,12 +111,18 @@ public final class NewChunksHack extends Hack
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		reset();
+	}
+	
+	private void reset()
+	{
 		oldChunks.clear();
 		newChunks.clear();
 		dontCheckAgain.clear();
 		oldChunkReasons.clear();
 		newChunkReasons.clear();
 		lastRegion = null;
+		lastDimension = MC.world.getDimension();
 	}
 	
 	@Override
@@ -237,6 +245,9 @@ public final class NewChunksHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		if(MC.world.getDimension() != lastDimension)
+			reset();
+		
 		BlockPos camPos = RenderUtils.getCameraBlockPos();
 		int regionX = (camPos.getX() >> 9) * 512;
 		int regionZ = (camPos.getZ() >> 9) * 512;
