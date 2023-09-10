@@ -18,6 +18,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.WurstClient;
 
 /**
@@ -27,17 +28,17 @@ public final class ChunkSearcherMulti
 {
 	private final Chunk chunk;
 	private final ArrayList<Block> blockList;
-	private final int dimensionId;
+	private final DimensionType dimension;
 	private final ArrayList<Result> matchingBlocks = new ArrayList<>();
 	private ChunkSearcherMulti.Status status = Status.IDLE;
 	private Future<?> future;
 	
 	public ChunkSearcherMulti(Chunk chunk, ArrayList<Block> blockList,
-		int dimensionId)
+		DimensionType dimension)
 	{
 		this.chunk = chunk;
 		this.blockList = blockList;
-		this.dimensionId = dimensionId;
+		this.dimension = dimension;
 	}
 	
 	public void startSearching(ExecutorService pool)
@@ -121,9 +122,9 @@ public final class ChunkSearcherMulti
 		return blockList;
 	}
 	
-	public int getDimensionId()
+	public DimensionType getDimension()
 	{
-		return dimensionId;
+		return dimension;
 	}
 	
 	public Stream<Result> getMatchingBlocks()

@@ -28,6 +28,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.PacketInputListener;
@@ -153,12 +154,12 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			groups.stream().map(PortalEspBlockGroup::getBlock)
 				.collect(Collectors.toCollection(ArrayList::new));
 		
-		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
+		DimensionType dimension = MC.world.getDimension();
 		
-		addSearchersInRange(blockList, dimensionId);
-		removeSearchersOutOfRange(dimensionId);
-		replaceSearchersWithDifferences(blockList, dimensionId);
-		replaceSearchersWithChunkUpdate(blockList, dimensionId);
+		addSearchersInRange(blockList, dimension);
+		removeSearchersOutOfRange(dimension);
+		replaceSearchersWithDifferences(blockList, dimension);
+		replaceSearchersWithChunkUpdate(blockList, dimension);
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -204,24 +205,23 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void addSearchersInRange(ArrayList<Block> blockList,
-		int dimensionId)
+		DimensionType dimension)
 	{
 		for(Chunk chunk : area.getChunksInRange())
 		{
 			if(searchers.containsKey(chunk.getPos()))
 				continue;
 			
-			addSearcher(chunk, blockList, dimensionId);
+			addSearcher(chunk, blockList, dimension);
 		}
 	}
 	
-	private void removeSearchersOutOfRange(int dimensionId)
+	private void removeSearchersOutOfRange(DimensionType dimension)
 	{
 		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
 		{
-			int searcherDimensionId = searcher.getDimensionId();
 			if(area.isInRange(searcher.getPos())
-				&& searcherDimensionId == dimensionId)
+				&& searcher.getDimension() == dimension)
 				continue;
 			
 			removeSearcher(searcher);
@@ -229,7 +229,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void replaceSearchersWithDifferences(
-		ArrayList<Block> currentBlockList, int dimensionId)
+		ArrayList<Block> currentBlockList, DimensionType dimension)
 	{
 		for(ChunkSearcherMulti oldSearcher : new ArrayList<>(
 			searchers.values()))
@@ -238,12 +238,12 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 				continue;
 			
 			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.getChunk(), currentBlockList, dimensionId);
+			addSearcher(oldSearcher.getChunk(), currentBlockList, dimension);
 		}
 	}
 	
 	private void replaceSearchersWithChunkUpdate(
-		ArrayList<Block> currentBlockList, int dimensionId)
+		ArrayList<Block> currentBlockList, DimensionType dimension)
 	{
 		// get the chunks to update and remove them from the set
 		ChunkPos[] chunks;
@@ -263,16 +263,16 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			
 			removeSearcher(oldSearcher);
 			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			addSearcher(chunk, currentBlockList, dimensionId);
+			addSearcher(chunk, currentBlockList, dimension);
 		}
 	}
 	
 	private void addSearcher(Chunk chunk, ArrayList<Block> blockList,
-		int dimensionId)
+		DimensionType dimension)
 	{
 		groupsUpToDate = false;
 		ChunkSearcherMulti searcher =
-			new ChunkSearcherMulti(chunk, blockList, dimensionId);
+			new ChunkSearcherMulti(chunk, blockList, dimension);
 		searchers.put(chunk.getPos(), searcher);
 		searcher.startSearching(threadPool);
 	}
