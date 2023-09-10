@@ -36,6 +36,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
@@ -147,12 +148,12 @@ public final class SearchHack extends Hack
 	public void onUpdate()
 	{
 		Block currentBlock = block.getBlock();
-		int dimensionId = MC.world.getRegistryKey().toString().hashCode();
+		DimensionType dimension = MC.world.getDimension();
 		
-		addSearchersInRange(currentBlock, dimensionId);
+		addSearchersInRange(currentBlock, dimension);
 		removeSearchersOutOfRange();
-		replaceSearchersWithDifferences(currentBlock, dimensionId);
-		replaceSearchersWithChunkUpdate(currentBlock, dimensionId);
+		replaceSearchersWithDifferences(currentBlock, dimension);
+		replaceSearchersWithChunkUpdate(currentBlock, dimension);
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -210,14 +211,14 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(Block block, int dimensionId)
+	private void addSearchersInRange(Block block, DimensionType dimension)
 	{
 		for(Chunk chunk : area.getChunksInRange())
 		{
 			if(searchers.containsKey(chunk.getPos()))
 				continue;
 			
-			addSearcher(chunk, block, dimensionId);
+			addSearcher(chunk, block, dimension);
 		}
 	}
 	
@@ -233,21 +234,21 @@ public final class SearchHack extends Hack
 	}
 	
 	private void replaceSearchersWithDifferences(Block currentBlock,
-		int dimensionId)
+		DimensionType dimension)
 	{
 		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
 		{
 			if(currentBlock.equals(oldSearcher.getBlock())
-				&& dimensionId == oldSearcher.getDimensionId())
+				&& dimension == oldSearcher.getDimension())
 				continue;
 			
 			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.getChunk(), currentBlock, dimensionId);
+			addSearcher(oldSearcher.getChunk(), currentBlock, dimension);
 		}
 	}
 	
 	private void replaceSearchersWithChunkUpdate(Block currentBlock,
-		int dimensionId)
+		DimensionType dimension)
 	{
 		// get the chunks to update and remove them from the set
 		ChunkPos[] chunks;
@@ -267,15 +268,15 @@ public final class SearchHack extends Hack
 			
 			removeSearcher(oldSearcher);
 			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			addSearcher(chunk, currentBlock, dimensionId);
+			addSearcher(chunk, currentBlock, dimension);
 		}
 	}
 	
-	private void addSearcher(Chunk chunk, Block block, int dimensionId)
+	private void addSearcher(Chunk chunk, Block block, DimensionType dimension)
 	{
 		stopBuildingBuffer();
 		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimensionId);
+		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimension);
 		searchers.put(chunk.getPos(), searcher);
 		searcher.startSearching(threadPool);
 	}

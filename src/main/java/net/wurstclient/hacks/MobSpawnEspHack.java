@@ -33,6 +33,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -105,6 +106,8 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		DimensionType dimension = MC.world.getDimension();
+		
 		// create & start scanners for new chunks
 		for(Chunk chunk : drawDistance.getChunksInRange())
 		{
@@ -112,7 +115,7 @@ public final class MobSpawnEspHack extends Hack
 			if(scanners.containsKey(chunkPos))
 				continue;
 			
-			ChunkScanner scanner = new ChunkScanner(chunk);
+			ChunkScanner scanner = new ChunkScanner(chunk, dimension);
 			scanners.put(chunkPos, scanner);
 			scanner.future = pool.submit(() -> scanner.scan());
 		}
@@ -120,7 +123,8 @@ public final class MobSpawnEspHack extends Hack
 		// remove old scanners that are out of range
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
-			if(drawDistance.isInRange(scanner.chunk.getPos()))
+			if(drawDistance.isInRange(scanner.chunk.getPos())
+				&& dimension == scanner.dimension)
 				continue;
 			
 			if(!scanner.doneCompiling)
@@ -231,6 +235,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		public Future<?> future;
 		private final Chunk chunk;
+		private final DimensionType dimension;
 		private final Set<BlockPos> red = new HashSet<>();
 		private final Set<BlockPos> yellow = new HashSet<>();
 		private VertexBuffer vertexBuffer;
@@ -238,9 +243,10 @@ public final class MobSpawnEspHack extends Hack
 		private boolean doneScanning;
 		private boolean doneCompiling;
 		
-		public ChunkScanner(Chunk chunk)
+		public ChunkScanner(Chunk chunk, DimensionType dimension)
 		{
 			this.chunk = chunk;
+			this.dimension = dimension;
 		}
 		
 		@SuppressWarnings("deprecation")
