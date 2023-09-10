@@ -29,19 +29,19 @@ public final class LookCmd extends Command
 		if(!args[0].equalsIgnoreCase("skip"))
 		{
 			if(!MathUtils.isDouble(args[0]))
-				throw new CmdSyntaxError("Yaw is not an integer!");
+				throw new CmdSyntaxError("Yaw is not a number!");
 			float yaw = Float.parseFloat(args[0]);
 			if(Math.abs(yaw) > 180)
-				throw new CmdSyntaxError("Invaild yaw!");
+				throw new CmdSyntaxError("Invalid yaw!");
 			MC.player.setYaw(yaw);
 		}
 		if(!args[1].equalsIgnoreCase("skip"))
 		{
 			if(!MathUtils.isDouble(args[1]))
-				throw new CmdSyntaxError("Pitch is not an integer!");
+				throw new CmdSyntaxError("Pitch is not a number!");
 			float pitch = Float.parseFloat(args[1]);
 			if(Math.abs(pitch) > 90)
-				throw new CmdSyntaxError("Invaild pitch!");
+				throw new CmdSyntaxError("Invalid pitch!");
 			MC.player.setPitch(pitch);
 		}
 	}
