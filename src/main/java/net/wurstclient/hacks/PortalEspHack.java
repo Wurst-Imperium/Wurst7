@@ -155,11 +155,47 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 				.collect(Collectors.toCollection(ArrayList::new));
 		
 		DimensionType dimension = MC.world.getDimension();
+		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
 		
-		addSearchersInRange(blockList, dimension);
-		removeSearchersOutOfRange(dimension);
-		replaceSearchersWithDifferences(blockList, dimension);
-		replaceSearchersWithChunkUpdate(blockList, dimension);
+		// remove outdated ChunkSearchers
+		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
+		{
+			boolean remove = false;
+			ChunkPos searcherPos = searcher.getPos();
+			
+			// wrong dimension
+			if(dimension != searcher.getDimension())
+				remove = true;
+			
+			// out of range
+			else if(!area.isInRange(searcherPos))
+				remove = true;
+			
+			// chunk update
+			else if(chunkUpdates.contains(searcherPos))
+				remove = true;
+			
+			if(remove)
+			{
+				groupsUpToDate = false;
+				searchers.remove(searcherPos);
+				searcher.cancelSearching();
+			}
+		}
+		
+		// add new ChunkSearchers
+		for(Chunk chunk : area.getChunksInRange())
+		{
+			ChunkPos chunkPos = chunk.getPos();
+			if(searchers.containsKey(chunkPos))
+				continue;
+			
+			groupsUpToDate = false;
+			ChunkSearcherMulti searcher =
+				new ChunkSearcherMulti(chunk, blockList, dimension);
+			searchers.put(chunkPos, searcher);
+			searcher.startSearching(threadPool);
+		}
 		
 		if(!areAllChunkSearchersDone())
 			return;
@@ -204,84 +240,14 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(ArrayList<Block> blockList,
-		DimensionType dimension)
+	private HashSet<ChunkPos> clearChunksToUpdate()
 	{
-		for(Chunk chunk : area.getChunksInRange())
-		{
-			if(searchers.containsKey(chunk.getPos()))
-				continue;
-			
-			addSearcher(chunk, blockList, dimension);
-		}
-	}
-	
-	private void removeSearchersOutOfRange(DimensionType dimension)
-	{
-		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
-		{
-			if(area.isInRange(searcher.getPos())
-				&& searcher.getDimension() == dimension)
-				continue;
-			
-			removeSearcher(searcher);
-		}
-	}
-	
-	private void replaceSearchersWithDifferences(
-		ArrayList<Block> currentBlockList, DimensionType dimension)
-	{
-		for(ChunkSearcherMulti oldSearcher : new ArrayList<>(
-			searchers.values()))
-		{
-			if(currentBlockList.equals(oldSearcher.getBlockList()))
-				continue;
-			
-			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.getChunk(), currentBlockList, dimension);
-		}
-	}
-	
-	private void replaceSearchersWithChunkUpdate(
-		ArrayList<Block> currentBlockList, DimensionType dimension)
-	{
-		// get the chunks to update and remove them from the set
-		ChunkPos[] chunks;
 		synchronized(chunksToUpdate)
 		{
-			chunks = chunksToUpdate.toArray(ChunkPos[]::new);
+			HashSet<ChunkPos> chunks = new HashSet<>(chunksToUpdate);
 			chunksToUpdate.clear();
+			return chunks;
 		}
-		
-		// update the chunks separately so the synchronization
-		// doesn't have to wait for that
-		for(ChunkPos chunkPos : chunks)
-		{
-			ChunkSearcherMulti oldSearcher = searchers.get(chunkPos);
-			if(oldSearcher == null)
-				continue;
-			
-			removeSearcher(oldSearcher);
-			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			addSearcher(chunk, currentBlockList, dimension);
-		}
-	}
-	
-	private void addSearcher(Chunk chunk, ArrayList<Block> blockList,
-		DimensionType dimension)
-	{
-		groupsUpToDate = false;
-		ChunkSearcherMulti searcher =
-			new ChunkSearcherMulti(chunk, blockList, dimension);
-		searchers.put(chunk.getPos(), searcher);
-		searcher.startSearching(threadPool);
-	}
-	
-	private void removeSearcher(ChunkSearcherMulti searcher)
-	{
-		groupsUpToDate = false;
-		searchers.remove(searcher.getPos());
-		searcher.cancelSearching();
 	}
 	
 	private boolean areAllChunkSearchersDone()
