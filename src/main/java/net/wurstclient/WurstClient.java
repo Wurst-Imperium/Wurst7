@@ -145,9 +145,19 @@ public enum WurstClient
 		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
-		Path encFolder =
-			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+		Path encFolder;
+		String xdg_data_home;
+		if ((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null)
+		{
+			encFolder = Paths.get(xdg_data_home, "WurstClient")
 				.normalize();
+		}
+		else 
+		{
+			encFolder = Paths.get(System.getProperty("user.home", ".Wurst encryption"))
+				.normalize();
+		}
+
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
