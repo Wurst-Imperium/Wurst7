@@ -94,9 +94,7 @@ public final class MobSpawnEspHack extends Hack
 		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
-			if(scanner.vertexBuffer != null)
-				scanner.vertexBuffer.close();
-			
+			scanner.reset();
 			scanners.remove(scanner.chunk.getPos());
 		}
 		
@@ -108,6 +106,17 @@ public final class MobSpawnEspHack extends Hack
 	{
 		DimensionType dimension = MC.world.getDimension();
 		
+		// remove old scanners that are out of range
+		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
+		{
+			if(drawDistance.isInRange(scanner.chunk.getPos())
+				&& dimension == scanner.dimension)
+				continue;
+			
+			scanner.reset();
+			scanners.remove(scanner.chunk.getPos());
+		}
+		
 		// create & start scanners for new chunks
 		for(Chunk chunk : drawDistance.getChunksInRange())
 		{
@@ -118,25 +127,6 @@ public final class MobSpawnEspHack extends Hack
 			ChunkScanner scanner = new ChunkScanner(chunk, dimension);
 			scanners.put(chunkPos, scanner);
 			scanner.future = pool.submit(() -> scanner.scan());
-		}
-		
-		// remove old scanners that are out of range
-		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
-		{
-			if(drawDistance.isInRange(scanner.chunk.getPos())
-				&& dimension == scanner.dimension)
-				continue;
-			
-			if(!scanner.doneCompiling)
-				continue;
-			
-			if(scanner.vertexBuffer != null)
-				scanner.vertexBuffer.close();
-			
-			if(scanner.future != null)
-				scanner.future.cancel(true);
-			
-			scanners.remove(scanner.chunk.getPos());
 		}
 		
 		// generate vertex buffers
