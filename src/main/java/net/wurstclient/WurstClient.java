@@ -147,7 +147,7 @@ public enum WurstClient
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder;
 		String xdg_data_home;
-		if ((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null)
+		if ((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null && !xdg_data_home.isEmpty())
 		{
 			encFolder = Paths.get(xdg_data_home, "WurstClient")
 				.normalize();
