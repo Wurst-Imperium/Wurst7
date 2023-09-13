@@ -48,6 +48,7 @@ import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
+import net.wurstclient.altmanager.Encryption;
 
 public enum WurstClient
 {
@@ -145,17 +146,22 @@ public enum WurstClient
 		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
+		Path oldEncFolder = Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+					.normalize(); 
 		Path encFolder;
 		String xdg_data_home;
 		if ((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null && !xdg_data_home.isEmpty())
 		{
 			encFolder = Paths.get(xdg_data_home, "WurstClient")
 				.normalize();
+			if (!Files.exists(encFolder) && Files.exists(oldEncFolder))
+			{
+				Encryption.migrateEncryptionFolder(oldEncFolder, encFolder);
+			}
 		}
 		else 
 		{
-			encFolder = Paths.get(System.getProperty("user.home", ".Wurst encryption"))
-				.normalize();
+			encFolder = oldEncFolder;
 		}
 
 		altManager = new AltManager(altsFile, encFolder);

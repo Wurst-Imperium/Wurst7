@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -97,6 +98,26 @@ public final class Encryption
 			StandardOpenOption.CREATE);
 		
 		return encFolder;
+	}
+
+	public static void migrateEncryptionFolder(Path oldEncFolder, Path newEncFolder)
+	{
+		String readmeText = "Wurst encryption files have been moved to " + newEncFolder.normalize().toString() + " to comply with XDG base directory, you may safely remove this directory.\r\n";
+		if (!Files.exists(newEncFolder) && Files.exists(oldEncFolder))
+		{
+			try
+			{
+				Files.createDirectories(newEncFolder);
+				Files.move(oldEncFolder, newEncFolder, StandardCopyOption.REPLACE_EXISTING);
+				Files.createDirectories(oldEncFolder);
+				Files.write(oldEncFolder.resolve("README_MIGRATION.txt"), readmeText.getBytes("UTF-8"), StandardOpenOption.CREATE);
+			}
+			catch (IOException e){}
+
+		}
+
+
+
 	}
 	
 	public byte[] decrypt(byte[] bytes)
