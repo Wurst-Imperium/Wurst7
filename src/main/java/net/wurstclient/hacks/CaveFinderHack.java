@@ -24,7 +24,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
@@ -148,18 +147,65 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		Block blockToFind = Blocks.CAVE_AIR;
 		DimensionType dimension = MC.world.getDimension();
+		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
+		boolean searchersChanged = false;
 		
-		addSearchersInRange(blockToFind, dimension);
-		removeSearchersOutOfRange();
-		replaceSearchersWithDifferences(blockToFind, dimension);
-		replaceSearchersWithChunkUpdate(blockToFind, dimension);
+		// remove outdated ChunkSearchers
+		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
+		{
+			boolean remove = false;
+			ChunkPos searcherPos = searcher.getPos();
+			
+			// wrong dimension
+			if(dimension != searcher.getDimension())
+				remove = true;
+			
+			// out of range
+			else if(!area.isInRange(searcherPos))
+				remove = true;
+			
+			// chunk update
+			else if(chunkUpdates.contains(searcherPos))
+				remove = true;
+			
+			if(remove)
+			{
+				searchers.remove(searcherPos);
+				searcher.cancelSearching();
+				searchersChanged = true;
+			}
+		}
+		
+		// add new ChunkSearchers
+		for(Chunk chunk : area.getChunksInRange())
+		{
+			ChunkPos chunkPos = chunk.getPos();
+			if(searchers.containsKey(chunkPos))
+				continue;
+			
+			ChunkSearcher searcher =
+				new ChunkSearcher(chunk, Blocks.CAVE_AIR, dimension);
+			searchers.put(chunkPos, searcher);
+			searcher.startSearching(threadPool);
+			searchersChanged = true;
+		}
+		
+		if(searchersChanged)
+			stopBuildingBuffer();
 		
 		if(!areAllChunkSearchersDone())
 			return;
 		
-		checkIfLimitChanged();
+		// check if limit has changed
+		if(limit.getValueI() != prevLimit)
+		{
+			stopBuildingBuffer();
+			prevLimit = limit.getValueI();
+			notify = true;
+		}
+		
+		// build the buffer
 		
 		if(getMatchingBlocksTask == null)
 			startGetMatchingBlocksTask();
@@ -218,82 +264,14 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(Block block, DimensionType dimension)
+	private HashSet<ChunkPos> clearChunksToUpdate()
 	{
-		for(Chunk chunk : area.getChunksInRange())
-		{
-			if(searchers.containsKey(chunk.getPos()))
-				continue;
-			
-			addSearcher(chunk, block, dimension);
-		}
-	}
-	
-	private void removeSearchersOutOfRange()
-	{
-		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
-		{
-			if(area.isInRange(searcher.getPos()))
-				continue;
-			
-			removeSearcher(searcher);
-		}
-	}
-	
-	private void replaceSearchersWithDifferences(Block currentBlock,
-		DimensionType dimension)
-	{
-		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
-		{
-			if(currentBlock.equals(oldSearcher.getBlock())
-				&& dimension == oldSearcher.getDimension())
-				continue;
-			
-			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.getChunk(), currentBlock, dimension);
-		}
-	}
-	
-	private void replaceSearchersWithChunkUpdate(Block currentBlock,
-		DimensionType dimension)
-	{
-		// get the chunks to update and remove them from the set
-		ChunkPos[] chunks;
 		synchronized(chunksToUpdate)
 		{
-			chunks = chunksToUpdate.toArray(ChunkPos[]::new);
+			HashSet<ChunkPos> chunks = new HashSet<>(chunksToUpdate);
 			chunksToUpdate.clear();
+			return chunks;
 		}
-		
-		// update the chunks separately so the synchronization
-		// doesn't have to wait for that
-		for(ChunkPos chunkPos : chunks)
-		{
-			ChunkSearcher oldSearcher = searchers.get(chunkPos);
-			if(oldSearcher == null)
-				continue;
-			
-			removeSearcher(oldSearcher);
-			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			addSearcher(chunk, currentBlock, dimension);
-		}
-	}
-	
-	private void addSearcher(Chunk chunk, Block block, DimensionType dimension)
-	{
-		stopBuildingBuffer();
-		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimension);
-		searchers.put(chunk.getPos(), searcher);
-		searcher.startSearching(threadPool);
-	}
-	
-	private void removeSearcher(ChunkSearcher searcher)
-	{
-		stopBuildingBuffer();
-		
-		searchers.remove(searcher.getPos());
-		searcher.cancelSearching();
 	}
 	
 	private void stopBuildingBuffer()
@@ -320,16 +298,6 @@ public final class CaveFinderHack extends Hack
 				return false;
 			
 		return true;
-	}
-	
-	private void checkIfLimitChanged()
-	{
-		if(limit.getValueI() != prevLimit)
-		{
-			stopBuildingBuffer();
-			notify = true;
-			prevLimit = limit.getValueI();
-		}
 	}
 	
 	private void startGetMatchingBlocksTask()

@@ -149,16 +149,68 @@ public final class SearchHack extends Hack
 	{
 		Block currentBlock = block.getBlock();
 		DimensionType dimension = MC.world.getDimension();
+		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
+		boolean searchersChanged = false;
 		
-		addSearchersInRange(currentBlock, dimension);
-		removeSearchersOutOfRange();
-		replaceSearchersWithDifferences(currentBlock, dimension);
-		replaceSearchersWithChunkUpdate(currentBlock, dimension);
+		// remove outdated ChunkSearchers
+		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
+		{
+			boolean remove = false;
+			ChunkPos searcherPos = searcher.getPos();
+			
+			// wrong block
+			if(currentBlock != searcher.getBlock())
+				remove = true;
+			
+			// wrong dimension
+			else if(dimension != searcher.getDimension())
+				remove = true;
+			
+			// out of range
+			else if(!area.isInRange(searcherPos))
+				remove = true;
+			
+			// chunk update
+			else if(chunkUpdates.contains(searcherPos))
+				remove = true;
+			
+			if(remove)
+			{
+				searchers.remove(searcherPos);
+				searcher.cancelSearching();
+				searchersChanged = true;
+			}
+		}
+		
+		// add new ChunkSearchers
+		for(Chunk chunk : area.getChunksInRange())
+		{
+			ChunkPos chunkPos = chunk.getPos();
+			if(searchers.containsKey(chunkPos))
+				continue;
+			
+			ChunkSearcher searcher =
+				new ChunkSearcher(chunk, currentBlock, dimension);
+			searchers.put(chunkPos, searcher);
+			searcher.startSearching(threadPool);
+			searchersChanged = true;
+		}
+		
+		if(searchersChanged)
+			stopBuildingBuffer();
 		
 		if(!areAllChunkSearchersDone())
 			return;
 		
-		checkIfLimitChanged();
+		// check if limit has changed
+		if(limit.getValueI() != prevLimit)
+		{
+			stopBuildingBuffer();
+			prevLimit = limit.getValueI();
+			notify = true;
+		}
+		
+		// build the buffer
 		
 		if(getMatchingBlocksTask == null)
 			startGetMatchingBlocksTask();
@@ -211,97 +263,25 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void addSearchersInRange(Block block, DimensionType dimension)
+	private HashSet<ChunkPos> clearChunksToUpdate()
 	{
-		for(Chunk chunk : area.getChunksInRange())
-		{
-			if(searchers.containsKey(chunk.getPos()))
-				continue;
-			
-			addSearcher(chunk, block, dimension);
-		}
-	}
-	
-	private void removeSearchersOutOfRange()
-	{
-		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
-		{
-			if(area.isInRange(searcher.getPos()))
-				continue;
-			
-			removeSearcher(searcher);
-		}
-	}
-	
-	private void replaceSearchersWithDifferences(Block currentBlock,
-		DimensionType dimension)
-	{
-		for(ChunkSearcher oldSearcher : new ArrayList<>(searchers.values()))
-		{
-			if(currentBlock.equals(oldSearcher.getBlock())
-				&& dimension == oldSearcher.getDimension())
-				continue;
-			
-			removeSearcher(oldSearcher);
-			addSearcher(oldSearcher.getChunk(), currentBlock, dimension);
-		}
-	}
-	
-	private void replaceSearchersWithChunkUpdate(Block currentBlock,
-		DimensionType dimension)
-	{
-		// get the chunks to update and remove them from the set
-		ChunkPos[] chunks;
 		synchronized(chunksToUpdate)
 		{
-			chunks = chunksToUpdate.toArray(ChunkPos[]::new);
+			HashSet<ChunkPos> chunks = new HashSet<>(chunksToUpdate);
 			chunksToUpdate.clear();
+			return chunks;
 		}
-		
-		// update the chunks separately so the synchronization
-		// doesn't have to wait for that
-		for(ChunkPos chunkPos : chunks)
-		{
-			ChunkSearcher oldSearcher = searchers.get(chunkPos);
-			if(oldSearcher == null)
-				continue;
-			
-			removeSearcher(oldSearcher);
-			Chunk chunk = MC.world.getChunk(chunkPos.x, chunkPos.z);
-			addSearcher(chunk, currentBlock, dimension);
-		}
-	}
-	
-	private void addSearcher(Chunk chunk, Block block, DimensionType dimension)
-	{
-		stopBuildingBuffer();
-		
-		ChunkSearcher searcher = new ChunkSearcher(chunk, block, dimension);
-		searchers.put(chunk.getPos(), searcher);
-		searcher.startSearching(threadPool);
-	}
-	
-	private void removeSearcher(ChunkSearcher searcher)
-	{
-		stopBuildingBuffer();
-		
-		searchers.remove(searcher.getPos());
-		searcher.cancelSearching();
 	}
 	
 	private void stopBuildingBuffer()
 	{
 		if(getMatchingBlocksTask != null)
-		{
 			getMatchingBlocksTask.cancel(true);
-			getMatchingBlocksTask = null;
-		}
+		getMatchingBlocksTask = null;
 		
 		if(compileVerticesTask != null)
-		{
 			compileVerticesTask.cancel(true);
-			compileVerticesTask = null;
-		}
+		compileVerticesTask = null;
 		
 		bufferUpToDate = false;
 	}
@@ -313,16 +293,6 @@ public final class SearchHack extends Hack
 				return false;
 			
 		return true;
-	}
-	
-	private void checkIfLimitChanged()
-	{
-		if(limit.getValueI() != prevLimit)
-		{
-			stopBuildingBuffer();
-			notify = true;
-			prevLimit = limit.getValueI();
-		}
 	}
 	
 	private void startGetMatchingBlocksTask()
