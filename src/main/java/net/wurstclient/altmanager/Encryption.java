@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.File;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
@@ -109,8 +110,16 @@ public final class Encryption
 		try
 		{
 			Files.createDirectories(newEncFolder);
-			Files.move(oldEncFolder, newEncFolder,
-				StandardCopyOption.REPLACE_EXISTING);
+			Path newEncFolderFileDestinationPath;
+			File oldEncFolderFiles[] = oldEncFolder.toFile().listFiles();
+			for (int i = 0; i < oldEncFolderFiles.length; i++)
+			{
+				newEncFolderFileDestinationPath = newEncFolder.resolve(oldEncFolderFiles[i].getName());
+				Files.copy(oldEncFolderFiles[i].toPath(), newEncFolderFileDestinationPath);
+				oldEncFolderFiles[i].delete();
+			}
+			Files.deleteIfExists(oldEncFolder);
+
 		}catch(IOException e)
 		{
 			System.out.println("Failed to migrate encryption folder!");
