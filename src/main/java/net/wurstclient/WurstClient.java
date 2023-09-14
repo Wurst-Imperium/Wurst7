@@ -155,7 +155,7 @@ public enum WurstClient
 			&& !xdg_data_home.isEmpty())
 		{
 			encFolder = Paths.get(xdg_data_home, "WurstClient").normalize();
-			if(!Files.exists(encFolder) && Files.exists(oldEncFolder))
+			if(!Files.exists(encFolder) && Files.isDirectory(oldEncFolder))
 				Encryption.migrateEncryptionFolder(oldEncFolder, encFolder);
 		}else
 			encFolder = oldEncFolder;

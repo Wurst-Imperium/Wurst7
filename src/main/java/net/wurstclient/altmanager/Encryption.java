@@ -106,19 +106,11 @@ public final class Encryption
 		System.out.println("Migrating encryption folder from " + oldEncFolder
 			+ " to " + newEncFolder);
 		
-		String readmeText = "Wurst encryption files have been moved to "
-			+ newEncFolder.normalize().toString()
-			+ " to comply with XDG base directory, you may safely remove this directory.\r\n";
-		
 		try
 		{
 			Files.createDirectories(newEncFolder);
 			Files.move(oldEncFolder, newEncFolder,
 				StandardCopyOption.REPLACE_EXISTING);
-			Files.createDirectories(oldEncFolder);
-			Files.write(oldEncFolder.resolve("README_MIGRATION.txt"),
-				readmeText.getBytes("UTF-8"), StandardOpenOption.CREATE);
-				
 		}catch(IOException e)
 		{
 			System.out.println("Failed to migrate encryption folder!");
