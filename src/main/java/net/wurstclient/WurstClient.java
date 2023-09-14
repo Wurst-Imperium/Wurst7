@@ -23,6 +23,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.altmanager.AltManager;
+import net.wurstclient.altmanager.Encryption;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
@@ -48,7 +49,6 @@ import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
-import net.wurstclient.altmanager.Encryption;
 
 public enum WurstClient
 {
@@ -146,24 +146,20 @@ public enum WurstClient
 		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
-		Path oldEncFolder = Paths.get(System.getProperty("user.home"), ".Wurst encryption")
-					.normalize(); 
+		Path oldEncFolder =
+			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
+				.normalize();
 		Path encFolder;
 		String xdg_data_home;
-		if ((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null && !xdg_data_home.isEmpty())
+		if((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null
+			&& !xdg_data_home.isEmpty())
 		{
-			encFolder = Paths.get(xdg_data_home, "WurstClient")
-				.normalize();
-			if (!Files.exists(encFolder) && Files.exists(oldEncFolder))
-			{
+			encFolder = Paths.get(xdg_data_home, "WurstClient").normalize();
+			if(!Files.exists(encFolder) && Files.exists(oldEncFolder))
 				Encryption.migrateEncryptionFolder(oldEncFolder, encFolder);
-			}
-		}
-		else 
-		{
+		}else
 			encFolder = oldEncFolder;
-		}
-
+		
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
