@@ -10,7 +10,6 @@ package net.wurstclient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -146,21 +145,7 @@ public enum WurstClient
 		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
-		
-		String userHome = System.getProperty("user.home");
-		String xdgDataHome = System.getenv("XDG_DATA_HOME");
-		String encFolderName = ".Wurst encryption";
-		
-		Path homeEncFolder = Paths.get(userHome, encFolderName).normalize();
-		Path encFolder = homeEncFolder;
-		if(xdgDataHome != null && !xdgDataHome.isEmpty())
-		{
-			encFolder = Paths.get(xdgDataHome, encFolderName).normalize();
-			
-			if(!Files.exists(encFolder) && Files.isDirectory(homeEncFolder))
-				Encryption.migrateEncryptionFolder(homeEncFolder, encFolder);
-		}
-		
+		Path encFolder = Encryption.chooseEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,

@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -97,6 +98,25 @@ public final class Encryption
 			+ "In other words, YOUR ALT LIST WILL BE DELETED.";
 		Files.write(readme, readmeText.getBytes("UTF-8"),
 			StandardOpenOption.CREATE);
+		
+		return encFolder;
+	}
+	
+	public static Path chooseEncryptionFolder()
+	{
+		String userHome = System.getProperty("user.home");
+		String xdgDataHome = System.getenv("XDG_DATA_HOME");
+		String encFolderName = ".Wurst encryption";
+		
+		Path homeEncFolder = Paths.get(userHome, encFolderName).normalize();
+		Path encFolder = homeEncFolder;
+		if(xdgDataHome != null && !xdgDataHome.isEmpty())
+		{
+			encFolder = Paths.get(xdgDataHome, encFolderName).normalize();
+			
+			if(!Files.exists(encFolder) && Files.isDirectory(homeEncFolder))
+				migrateEncryptionFolder(homeEncFolder, encFolder);
+		}
 		
 		return encFolder;
 	}
