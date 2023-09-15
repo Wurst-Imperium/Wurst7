@@ -8,14 +8,13 @@
 package net.wurstclient.altmanager;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.File;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -112,14 +111,16 @@ public final class Encryption
 			Files.createDirectories(newEncFolder);
 			Path newEncFolderFileDestinationPath;
 			File oldEncFolderFiles[] = oldEncFolder.toFile().listFiles();
-			for (int i = 0; i < oldEncFolderFiles.length; i++)
+			for(File oldEncFolderFile : oldEncFolderFiles)
 			{
-				newEncFolderFileDestinationPath = newEncFolder.resolve(oldEncFolderFiles[i].getName());
-				Files.copy(oldEncFolderFiles[i].toPath(), newEncFolderFileDestinationPath);
-				oldEncFolderFiles[i].delete();
+				newEncFolderFileDestinationPath =
+					newEncFolder.resolve(oldEncFolderFile.getName());
+				Files.copy(oldEncFolderFile.toPath(),
+					newEncFolderFileDestinationPath);
+				oldEncFolderFile.delete();
 			}
 			Files.deleteIfExists(oldEncFolder);
-
+			
 		}catch(IOException e)
 		{
 			System.out.println("Failed to migrate encryption folder!");
