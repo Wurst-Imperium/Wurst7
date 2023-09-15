@@ -35,6 +35,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -123,7 +124,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
@@ -132,10 +133,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		{
 			matrixStack.push();
 			
-			matrixStack.translate(
-				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
-				e.prevY + (e.getY() - e.prevY) * partialTicks,
-				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
+			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
+				.subtract(regionX, 0, regionZ);
+			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
 			if(style.getSelected().hasBoxes())
 			{
@@ -158,7 +158,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
@@ -178,10 +178,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			VertexFormats.POSITION);
 		for(ItemEntity e : items)
 		{
-			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(new Vec3d(e.getX(), e.getY(), e.getZ())
-					.subtract(e.prevX, e.prevY, e.prevZ)
-					.multiply(1 - partialTicks))
+			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionX, 0, regionZ);
 			
 			bufferBuilder
