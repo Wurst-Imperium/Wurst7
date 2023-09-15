@@ -40,6 +40,7 @@ import com.google.gson.JsonParser;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
@@ -123,8 +124,12 @@ public final class Encryption
 			
 		}catch(IOException e)
 		{
-			System.out.println("Failed to migrate encryption folder!");
-			e.printStackTrace();
+			CrashReport report =
+				CrashReport.create(e, "Migrating Wurst encryption folder");
+			CrashReportSection section = report.addElement("Migration");
+			section.add("Old path", oldFolder);
+			section.add("New path", newFolder);
+			throw new CrashException(report);
 		}
 	}
 	
