@@ -25,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -231,16 +232,9 @@ public final class KillauraLegitHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		if(target.isAlive())
-			matrixStack.translate(
-				target.prevX + (target.getX() - target.prevX) * partialTicks
-					- regionX,
-				target.prevY + (target.getY() - target.prevY) * partialTicks,
-				target.prevZ + (target.getZ() - target.prevZ) * partialTicks
-					- regionZ);
-		else
-			matrixStack.translate(target.getX() - regionX, target.getY(),
-				target.getZ() - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(target, partialTicks)
+			.subtract(regionX, 0, regionZ);
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),

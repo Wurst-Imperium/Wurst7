@@ -41,6 +41,7 @@ import net.wurstclient.settings.EspStyleSetting.EspStyle;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -145,7 +146,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, double partialTicks,
+	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
@@ -154,10 +155,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		{
 			matrixStack.push();
 			
-			matrixStack.translate(
-				e.prevX + (e.getX() - e.prevX) * partialTicks - regionX,
-				e.prevY + (e.getY() - e.prevY) * partialTicks,
-				e.prevZ + (e.getZ() - e.prevZ) * partialTicks - regionZ);
+			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
+				.subtract(regionX, 0, regionZ);
+			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
 			matrixStack.scale(e.getWidth() + extraSize,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
@@ -178,7 +178,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, double partialTicks,
+	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		int regionX, int regionZ)
 	{
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -196,11 +196,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		for(PlayerEntity e : players)
 		{
-			Vec3d interpolationOffset = new Vec3d(e.getX(), e.getY(), e.getZ())
-				.subtract(e.prevX, e.prevY, e.prevZ).multiply(1 - partialTicks);
-			
-			Vec3d end = e.getBoundingBox().getCenter()
-				.subtract(interpolationOffset).subtract(regionX, 0, regionZ);
+			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
+				.subtract(regionX, 0, regionZ);
 			
 			float r, g, b;
 			

@@ -30,7 +30,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -204,13 +203,9 @@ public final class FeedAuraHack extends Hack
 		float green = p * 2F;
 		float red = 2 - green;
 		
-		matrixStack.translate(
-			MathHelper.lerp(partialTicks, renderTarget.prevX,
-				renderTarget.getX()) - regionX,
-			MathHelper.lerp(partialTicks, renderTarget.prevY,
-				renderTarget.getY()),
-			MathHelper.lerp(partialTicks, renderTarget.prevZ,
-				renderTarget.getZ()) - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(regionX, 0, regionZ);
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
