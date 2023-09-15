@@ -100,26 +100,24 @@ public final class Encryption
 		return encFolder;
 	}
 	
-	public static void migrateEncryptionFolder(Path oldEncFolder,
-		Path newEncFolder)
+	public static void migrateEncryptionFolder(Path oldFolder, Path newFolder)
 	{
-		System.out.println("Migrating encryption folder from " + oldEncFolder
-			+ " to " + newEncFolder);
+		System.out.println("Migrating encryption folder from " + oldFolder
+			+ " to " + newFolder);
 		
 		try
 		{
-			Files.createDirectories(newEncFolder);
-			Path newEncFolderFileDestinationPath;
-			File oldEncFolderFiles[] = oldEncFolder.toFile().listFiles();
-			for(File oldEncFolderFile : oldEncFolderFiles)
+			Files.createDirectories(newFolder);
+			File[] oldFiles = oldFolder.toFile().listFiles();
+			
+			for(File oldFile : oldFiles)
 			{
-				newEncFolderFileDestinationPath =
-					newEncFolder.resolve(oldEncFolderFile.getName());
-				Files.copy(oldEncFolderFile.toPath(),
-					newEncFolderFileDestinationPath);
-				oldEncFolderFile.delete();
+				Path fileDestination = newFolder.resolve(oldFile.getName());
+				Files.copy(oldFile.toPath(), fileDestination);
+				oldFile.delete();
 			}
-			Files.deleteIfExists(oldEncFolder);
+			
+			Files.deleteIfExists(oldFolder);
 			
 		}catch(IOException e)
 		{

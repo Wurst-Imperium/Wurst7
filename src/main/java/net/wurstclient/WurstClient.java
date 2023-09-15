@@ -146,20 +146,20 @@ public enum WurstClient
 		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
-		Path oldEncFolder =
-			Paths.get(System.getProperty("user.home"), ".Wurst encryption")
-				.normalize();
-		Path encFolder;
-		String xdg_data_home;
-		if((xdg_data_home = System.getenv("XDG_DATA_HOME")) != null
-			&& !xdg_data_home.isEmpty())
+		
+		String userHome = System.getProperty("user.home");
+		String xdgDataHome = System.getenv("XDG_DATA_HOME");
+		String encFolderName = ".Wurst encryption";
+		
+		Path homeEncFolder = Paths.get(userHome, encFolderName).normalize();
+		Path encFolder = homeEncFolder;
+		if(xdgDataHome != null && !xdgDataHome.isEmpty())
 		{
-			encFolder =
-				Paths.get(xdg_data_home, ".Wurst encryption").normalize();
-			if(!Files.exists(encFolder) && Files.isDirectory(oldEncFolder))
-				Encryption.migrateEncryptionFolder(oldEncFolder, encFolder);
-		}else
-			encFolder = oldEncFolder;
+			encFolder = Paths.get(xdgDataHome, encFolderName).normalize();
+			
+			if(!Files.exists(encFolder) && Files.isDirectory(homeEncFolder))
+				Encryption.migrateEncryptionFolder(homeEncFolder, encFolder);
+		}
 		
 		altManager = new AltManager(altsFile, encFolder);
 		
