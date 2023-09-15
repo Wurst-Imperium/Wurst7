@@ -108,14 +108,16 @@ public final class Encryption
 		try
 		{
 			Files.createDirectories(newFolder);
-			File[] oldFiles = oldFolder.toFile().listFiles();
 			
+			File[] oldFiles = oldFolder.toFile().listFiles();
 			for(File oldFile : oldFiles)
 			{
 				Path fileDestination = newFolder.resolve(oldFile.getName());
 				Files.copy(oldFile.toPath(), fileDestination);
-				oldFile.delete();
 			}
+			
+			for(File oldFile : oldFiles)
+				oldFile.delete();
 			
 			Files.deleteIfExists(oldFolder);
 			
