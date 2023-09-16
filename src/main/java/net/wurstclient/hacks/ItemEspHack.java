@@ -23,7 +23,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -36,6 +35,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -106,15 +106,13 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		renderBoxes(matrixStack, partialTicks, regionX, regionZ);
+		renderBoxes(matrixStack, partialTicks, region);
 		
 		if(style.getSelected().hasLines())
-			renderTracers(matrixStack, partialTicks, regionX, regionZ);
+			renderTracers(matrixStack, partialTicks, region);
 		
 		matrixStack.pop();
 		
@@ -125,7 +123,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
 		
@@ -134,7 +132,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			matrixStack.push();
 			
 			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(regionX, 0, regionZ);
+				.subtract(region.toVec3d());
 			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
 			if(style.getSelected().hasBoxes())
@@ -159,7 +157,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -171,15 +169,16 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
+		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec()
-			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		for(ItemEntity e : items)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-				.subtract(regionX, 0, regionZ);
+				.subtract(regionVec);
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)

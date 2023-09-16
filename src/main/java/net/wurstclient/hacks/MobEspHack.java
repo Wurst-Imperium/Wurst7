@@ -26,7 +26,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -40,6 +39,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -126,16 +126,14 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		if(style.getSelected().hasBoxes())
-			renderBoxes(matrixStack, partialTicks, regionX, regionZ);
+			renderBoxes(matrixStack, partialTicks, region);
 		
 		if(style.getSelected().hasLines())
-			renderTracers(matrixStack, partialTicks, regionX, regionZ);
+			renderTracers(matrixStack, partialTicks, region);
 		
 		matrixStack.pop();
 		
@@ -146,7 +144,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		float extraSize = boxSize.getSelected().extraSize;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
@@ -156,7 +154,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			matrixStack.push();
 			
 			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(regionX, 0, regionZ);
+				.subtract(region.toVec3d());
 			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
 			matrixStack.scale(e.getWidth() + extraSize,
@@ -177,7 +175,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	}
 	
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -189,13 +187,14 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION_COLOR);
 		
+		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec()
-			.add(RenderUtils.getCameraPos()).subtract(regionX, 0, regionZ);
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
 		for(MobEntity e : mobs)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-				.subtract(regionX, 0, regionZ);
+				.subtract(regionVec);
 			
 			float f = MC.player.distanceTo(e) / 20F;
 			float r = MathHelper.clamp(2 - f, 0, 1);

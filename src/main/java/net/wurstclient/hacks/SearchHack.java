@@ -46,13 +46,7 @@ import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.BlockVertexCompiler;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkUtils;
-import net.wurstclient.util.MinPriorityThreadFactory;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.*;
 
 public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
@@ -321,12 +315,9 @@ public final class SearchHack extends Hack
 			notify = false;
 		}
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		compileVerticesTask = forkJoinPool.submit(() -> BlockVertexCompiler
-			.compile(matchingBlocks, regionX, regionZ));
+		RegionPos region = RenderUtils.getCameraRegion();
+		compileVerticesTask = forkJoinPool
+			.submit(() -> BlockVertexCompiler.compile(matchingBlocks, region));
 	}
 	
 	private void setBufferFromTask()
