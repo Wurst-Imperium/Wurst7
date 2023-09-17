@@ -292,7 +292,7 @@ public final class MobSpawnEspHack extends Hack
 		
 		private void compileBuffer()
 		{
-			RegionPos region = RenderUtils.getCameraRegion();
+			RegionPos region = RegionPos.of(chunk.getPos());
 			
 			if(vertexBuffer != null)
 				vertexBuffer.close();
