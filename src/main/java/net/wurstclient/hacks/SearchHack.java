@@ -46,13 +46,7 @@ import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.BlockVertexCompiler;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkUtils;
-import net.wurstclient.util.MinPriorityThreadFactory;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.*;
 
 public final class SearchHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
@@ -81,6 +75,7 @@ public final class SearchHack extends Hack
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
 	private VertexBuffer vertexBuffer;
+	private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
 	
 	public SearchHack()
@@ -127,10 +122,9 @@ public final class SearchHack extends Hack
 		forkJoinPool.shutdownNow();
 		
 		if(vertexBuffer != null)
-		{
 			vertexBuffer.close();
-			vertexBuffer = null;
-		}
+		vertexBuffer = null;
+		bufferRegion = null;
 		
 		chunksToUpdate.clear();
 	}
@@ -231,6 +225,9 @@ public final class SearchHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		if(vertexBuffer == null || bufferRegion == null)
+			return;
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -238,22 +235,19 @@ public final class SearchHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
 		float[] rainbow = RenderUtils.getRainbowColor();
 		RenderSystem.setShaderColor(rainbow[0], rainbow[1], rainbow[2], 0.5F);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		if(vertexBuffer != null)
-		{
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			ShaderProgram shader = RenderSystem.getShader();
-			vertexBuffer.bind();
-			vertexBuffer.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-		}
+		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+		ShaderProgram shader = RenderSystem.getShader();
+		vertexBuffer.bind();
+		vertexBuffer.draw(viewMatrix, projMatrix, shader);
+		VertexBuffer.unbind();
 		
 		matrixStack.pop();
 		
@@ -321,12 +315,8 @@ public final class SearchHack extends Hack
 			notify = false;
 		}
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		compileVerticesTask = forkJoinPool.submit(() -> BlockVertexCompiler
-			.compile(matchingBlocks, regionX, regionZ));
+		compileVerticesTask = forkJoinPool
+			.submit(() -> BlockVertexCompiler.compile(matchingBlocks));
 	}
 	
 	private void setBufferFromTask()
@@ -336,8 +326,10 @@ public final class SearchHack extends Hack
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		
+		RegionPos region = RenderUtils.getCameraRegion();
 		for(int[] vertex : compileVerticesTask.join())
-			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
+			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+				vertex[2] - region.z()).next();
 		
 		BuiltBuffer buffer = bufferBuilder.end();
 		
@@ -350,5 +342,6 @@ public final class SearchHack extends Hack
 		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;
+		bufferRegion = region;
 	}
 }

@@ -523,27 +523,25 @@ public final class AutoLibrarianHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		Vec3d regionOffset = region.negate().toVec3d();
 		
 		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		
 		if(villager != null)
 			RenderUtils.drawOutlinedBox(
-				villager.getBoundingBox().offset(-regionX, 0, -regionZ),
-				matrixStack);
+				villager.getBoundingBox().offset(regionOffset), matrixStack);
 		
 		if(jobSite != null)
-			RenderUtils.drawOutlinedBox(
-				new Box(jobSite).offset(-regionX, 0, -regionZ), matrixStack);
+			RenderUtils.drawOutlinedBox(new Box(jobSite).offset(regionOffset),
+				matrixStack);
 		
 		RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 		
 		for(VillagerEntity villager : experiencedVillagers)
 		{
-			Box box = villager.getBoundingBox().offset(-regionX, 0, -regionZ);
+			Box box = villager.getBoundingBox().offset(regionOffset);
 			RenderUtils.drawOutlinedBox(box, matrixStack);
 			RenderUtils.drawCrossBox(box, matrixStack);
 		}

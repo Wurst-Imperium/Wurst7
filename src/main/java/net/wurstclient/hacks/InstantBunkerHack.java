@@ -260,20 +260,18 @@ public final class InstantBunkerHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		BlockPos regionOffset =
+			RenderUtils.getCameraRegion().negate().toBlockPos();
 		
 		// green box
 		{
 			GL11.glDepthMask(false);
 			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-			BlockPos pos = positions.get(blockIndex);
+			BlockPos pos = positions.get(blockIndex).add(regionOffset);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -287,11 +285,10 @@ public final class InstantBunkerHack extends Hack
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(int i = blockIndex; i < positions.size(); i++)
 		{
-			BlockPos pos = positions.get(i);
+			BlockPos pos = positions.get(i).add(regionOffset);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			

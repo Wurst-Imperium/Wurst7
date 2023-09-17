@@ -47,6 +47,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -161,10 +162,8 @@ public final class ExcavatorHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -178,26 +177,26 @@ public final class ExcavatorHack extends Hack
 				for(int i = Math.max(0, area.blocksList.size()
 					- area.scanSpeed); i < area.blocksList.size(); i++)
 				{
-					BlockPos pos = area.blocksList.get(i);
+					BlockPos pos =
+						area.blocksList.get(i).subtract(region.toBlockPos());
 					
 					matrixStack.push();
-					matrixStack.translate(pos.getX() - regionX, pos.getY(),
-						pos.getZ() - regionZ);
+					matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 					matrixStack.translate(-0.005, -0.005, -0.005);
 					matrixStack.scale(1.01F, 1.01F, 1.01F);
 					
-					RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
+					RenderSystem.setShaderColor(0, 1, 0, 0.15F);
 					RenderUtils.drawSolidBox(matrixStack);
 					
-					RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
+					RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 					RenderUtils.drawOutlinedBox(matrixStack);
 					
 					matrixStack.pop();
 				}
 			
 			matrixStack.push();
-			matrixStack.translate(area.minX + offset - regionX,
-				area.minY + offset, area.minZ + offset - regionZ);
+			matrixStack.translate(area.minX + offset - region.x(),
+				area.minY + offset, area.minZ + offset - region.z());
 			matrixStack.scale(area.sizeX + scale, area.sizeY + scale,
 				area.sizeZ + scale);
 			
@@ -234,8 +233,8 @@ public final class ExcavatorHack extends Hack
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX() - region.x(), pos.getY(),
+				pos.getZ() - region.z());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -256,8 +255,8 @@ public final class ExcavatorHack extends Hack
 			
 			// area box
 			matrixStack.push();
-			matrixStack.translate(preview.minX + offset - regionX,
-				preview.minY + offset, preview.minZ + offset - regionZ);
+			matrixStack.translate(preview.minX + offset - region.x(),
+				preview.minY + offset, preview.minZ + offset - region.z());
 			matrixStack.scale(preview.sizeX + scale, preview.sizeY + scale,
 				preview.sizeZ + scale);
 			RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
@@ -271,8 +270,8 @@ public final class ExcavatorHack extends Hack
 		if(posLookingAt != null)
 		{
 			matrixStack.push();
-			matrixStack.translate(posLookingAt.getX() - regionX,
-				posLookingAt.getY(), posLookingAt.getZ() - regionZ);
+			matrixStack.translate(posLookingAt.getX() - region.x(),
+				posLookingAt.getY(), posLookingAt.getZ() - region.z());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -290,8 +289,8 @@ public final class ExcavatorHack extends Hack
 		if(currentBlock != null)
 		{
 			// set position
-			matrixStack.translate(currentBlock.getX() - regionX,
-				currentBlock.getY(), currentBlock.getZ() - regionZ);
+			matrixStack.translate(currentBlock.getX() - region.x(),
+				currentBlock.getY(), currentBlock.getZ() - region.z());
 			
 			// get progress
 			float progress;
