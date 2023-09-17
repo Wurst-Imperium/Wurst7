@@ -157,6 +157,10 @@ public final class BaseFinderHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		RegionPos region = RenderUtils.getCameraRegion();
+		if(!region.equals(lastRegion))
+			onUpdate();
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -164,7 +168,7 @@ public final class BaseFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);

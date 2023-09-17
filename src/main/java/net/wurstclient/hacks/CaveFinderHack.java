@@ -84,6 +84,7 @@ public final class CaveFinderHack extends Hack
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
 	private VertexBuffer vertexBuffer;
+	private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
 	
 	public CaveFinderHack()
@@ -125,6 +126,8 @@ public final class CaveFinderHack extends Hack
 		
 		if(vertexBuffer != null)
 			vertexBuffer.close();
+		vertexBuffer = null;
+		bufferRegion = null;
 		
 		chunksToUpdate.clear();
 	}
@@ -220,6 +223,9 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		if(vertexBuffer == null || bufferRegion == null)
+			return;
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -227,7 +233,7 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
 		// generate rainbow color
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -240,15 +246,12 @@ public final class CaveFinderHack extends Hack
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		if(vertexBuffer != null)
-		{
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			ShaderProgram shader = RenderSystem.getShader();
-			vertexBuffer.bind();
-			vertexBuffer.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-		}
+		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+		ShaderProgram shader = RenderSystem.getShader();
+		vertexBuffer.bind();
+		vertexBuffer.draw(viewMatrix, projMatrix, shader);
+		VertexBuffer.unbind();
 		
 		matrixStack.pop();
 		
@@ -320,9 +323,8 @@ public final class CaveFinderHack extends Hack
 			notify = false;
 		}
 		
-		RegionPos region = RenderUtils.getCameraRegion();
 		compileVerticesTask = forkJoinPool
-			.submit(() -> BlockVertexCompiler.compile(matchingBlocks, region));
+			.submit(() -> BlockVertexCompiler.compile(matchingBlocks));
 	}
 	
 	private void setBufferFromTask()
@@ -332,8 +334,10 @@ public final class CaveFinderHack extends Hack
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		
+		RegionPos region = RenderUtils.getCameraRegion();
 		for(int[] vertex : compileVerticesTask.join())
-			bufferBuilder.vertex(vertex[0], vertex[1], vertex[2]).next();
+			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+				vertex[2] - region.z()).next();
 		
 		BuiltBuffer buffer = bufferBuilder.end();
 		
@@ -346,5 +350,6 @@ public final class CaveFinderHack extends Hack
 		VertexBuffer.unbind();
 		
 		bufferUpToDate = true;
+		bufferRegion = region;
 	}
 }
