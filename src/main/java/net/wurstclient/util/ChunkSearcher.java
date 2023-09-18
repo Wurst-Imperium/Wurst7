@@ -22,10 +22,12 @@ import net.minecraft.world.dimension.DimensionType;
 
 /**
  * Searches the given {@link Chunk} for blocks matching the given query.
- * Intended to be used in a thread pool to efficiently search large areas.
  */
 public final class ChunkSearcher
 {
+	private static final ExecutorService BACKGROUND_THREAD_POOL =
+		MinPriorityThreadFactory.newFixedThreadPool();
+	
 	private final BiPredicate<BlockPos, BlockState> query;
 	private final Chunk chunk;
 	private final DimensionType dimension;
@@ -46,12 +48,13 @@ public final class ChunkSearcher
 		this.dimension = dimension;
 	}
 	
-	public void start(ExecutorService pool)
+	public void start()
 	{
 		if(future != null || interrupted)
 			throw new IllegalStateException();
 		
-		future = CompletableFuture.supplyAsync(this::searchNow, pool);
+		future = CompletableFuture.supplyAsync(this::searchNow,
+			BACKGROUND_THREAD_POOL);
 	}
 	
 	private ArrayList<Result> searchNow()
@@ -109,11 +112,6 @@ public final class ChunkSearcher
 			return Stream.empty();
 		
 		return future.join().stream();
-	}
-	
-	public Stream<BlockPos> getMatchingPositions()
-	{
-		return getMatches().map(Result::pos);
 	}
 	
 	public boolean isDone()
