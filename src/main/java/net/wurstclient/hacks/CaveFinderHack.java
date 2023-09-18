@@ -228,10 +228,10 @@ public final class CaveFinderHack extends Hack
 		Comparator<BlockPos> comparator =
 			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
 		
-		getMatchingBlocksTask = forkJoinPool.submit(
-			() -> coordinator.getMatches().map(ChunkSearcher.Result::pos)
-				.sorted(comparator).limit(limit.getValueLog())
-				.collect(Collectors.toCollection(HashSet::new)));
+		getMatchingBlocksTask = forkJoinPool.submit(() -> coordinator
+			.getMatches().parallel().map(ChunkSearcher.Result::pos)
+			.sorted(comparator).limit(limit.getValueLog())
+			.collect(Collectors.toCollection(HashSet::new)));
 	}
 	
 	private void startCompileVerticesTask()

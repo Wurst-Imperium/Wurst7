@@ -119,8 +119,7 @@ public final class ChunkSearcherCoordinator implements PacketInputListener
 	
 	public Stream<Result> getMatches()
 	{
-		return searchers.values().parallelStream()
-			.flatMap(ChunkSearcher::getMatches);
+		return searchers.values().stream().flatMap(ChunkSearcher::getMatches);
 	}
 	
 	public void setTargetBlock(Block block)
