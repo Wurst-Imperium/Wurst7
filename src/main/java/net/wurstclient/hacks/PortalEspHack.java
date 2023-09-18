@@ -16,16 +16,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
+import java.util.function.BiPredicate;
 
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
@@ -41,8 +42,8 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.ChunkSearcherMulti;
-import net.wurstclient.util.ChunkSearcherMulti.Result;
+import net.wurstclient.util.ChunkSearcher;
+import net.wurstclient.util.ChunkSearcher.Result;
 import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RenderUtils;
@@ -83,8 +84,13 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		"The area around the player to search in.\n"
 			+ "Higher values require a faster computer.");
 	
-	private final HashMap<ChunkPos, ChunkSearcherMulti> searchers =
-		new HashMap<>();
+	private final HashMap<ChunkPos, ChunkSearcher> searchers = new HashMap<>();
+	private final BiPredicate<BlockPos, BlockState> query =
+		(pos, state) -> state.getBlock() == Blocks.NETHER_PORTAL
+			|| state.getBlock() == Blocks.END_PORTAL
+			|| state.getBlock() == Blocks.END_PORTAL_FRAME
+			|| state.getBlock() == Blocks.END_GATEWAY;
+	
 	private final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	private ExecutorService threadPool;
@@ -150,15 +156,11 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		ArrayList<Block> blockList =
-			groups.stream().map(PortalEspBlockGroup::getBlock)
-				.collect(Collectors.toCollection(ArrayList::new));
-		
 		DimensionType dimension = MC.world.getDimension();
 		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
 		
 		// remove outdated ChunkSearchers
-		for(ChunkSearcherMulti searcher : new ArrayList<>(searchers.values()))
+		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
 		{
 			boolean remove = false;
 			ChunkPos searcherPos = searcher.getPos();
@@ -177,9 +179,9 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			
 			if(remove)
 			{
-				groupsUpToDate = false;
 				searchers.remove(searcherPos);
-				searcher.cancelSearching();
+				searcher.cancel();
+				groupsUpToDate = false;
 			}
 		}
 		
@@ -190,14 +192,13 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			if(searchers.containsKey(chunkPos))
 				continue;
 			
-			groupsUpToDate = false;
-			ChunkSearcherMulti searcher =
-				new ChunkSearcherMulti(chunk, blockList, dimension);
+			ChunkSearcher searcher = new ChunkSearcher(query, chunk, dimension);
 			searchers.put(chunkPos, searcher);
-			searcher.startSearching(threadPool);
+			searcher.start(threadPool);
+			groupsUpToDate = false;
 		}
 		
-		if(!areAllChunkSearchersDone())
+		if(!searchers.values().stream().allMatch(ChunkSearcher::isDone))
 			return;
 		
 		if(!groupsUpToDate)
@@ -250,20 +251,10 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private boolean areAllChunkSearchersDone()
-	{
-		for(ChunkSearcherMulti searcher : searchers.values())
-			if(searcher.getStatus() != ChunkSearcherMulti.Status.DONE)
-				return false;
-			
-		return true;
-	}
-	
 	private void updateGroupBoxes()
 	{
 		groups.forEach(PortalEspBlockGroup::clear);
-		searchers.values().stream()
-			.flatMap(ChunkSearcherMulti::getMatchingBlocks)
+		searchers.values().stream().flatMap(ChunkSearcher::getMatches)
 			.forEachOrdered(this::addToGroupBoxes);
 		
 		groupsUpToDate = true;
@@ -272,9 +263,9 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	private void addToGroupBoxes(Result result)
 	{
 		for(PortalEspBlockGroup group : groups)
-			if(result.getBlock() == group.getBlock())
+			if(result.state().getBlock() == group.getBlock())
 			{
-				group.add(result.getPos());
+				group.add(result.pos());
 				break;
 			}
 	}
