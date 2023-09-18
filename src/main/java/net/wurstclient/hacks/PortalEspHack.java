@@ -136,7 +136,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		if(searchersChanged)
 			groupsUpToDate = false;
 		
-		if(coordinator.isDone() && !groupsUpToDate)
+		if(!groupsUpToDate && coordinator.isDone())
 			updateGroupBoxes();
 	}
 	
