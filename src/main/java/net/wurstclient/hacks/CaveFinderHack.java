@@ -9,12 +9,8 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
@@ -35,10 +31,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -49,11 +42,17 @@ import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.*;
+import net.wurstclient.util.BlockVertexCompiler;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.ChunkSearcher;
+import net.wurstclient.util.ChunkSearcherCoordinator;
+import net.wurstclient.util.RegionPos;
+import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"cave finder"})
 public final class CaveFinderHack extends Hack
-	implements UpdateListener, PacketInputListener, RenderListener
+	implements UpdateListener, RenderListener
 {
 	private final ChunkAreaSetting area = new ChunkAreaSetting("Area",
 		"The area around the player to search in.\n"
@@ -74,10 +73,9 @@ public final class CaveFinderHack extends Hack
 	private int prevLimit;
 	private boolean notify;
 	
-	private final HashMap<ChunkPos, ChunkSearcher> searchers = new HashMap<>();
-	private final Set<ChunkPos> chunksToUpdate =
-		Collections.synchronizedSet(new HashSet<>());
-	private ExecutorService threadPool;
+	private final ChunkSearcherCoordinator coordinator =
+		new ChunkSearcherCoordinator(
+			(pos, state) -> state.getBlock() == Blocks.CAVE_AIR, area);
 	
 	private ForkJoinPool forkJoinPool;
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
@@ -103,13 +101,12 @@ public final class CaveFinderHack extends Hack
 		prevLimit = limit.getValueI();
 		notify = true;
 		
-		threadPool = MinPriorityThreadFactory.newFixedThreadPool();
 		forkJoinPool = new ForkJoinPool();
 		
 		bufferUpToDate = false;
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PacketInputListener.class, this);
+		EVENTS.add(PacketInputListener.class, coordinator);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -117,81 +114,28 @@ public final class CaveFinderHack extends Hack
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PacketInputListener.class, this);
+		EVENTS.remove(PacketInputListener.class, coordinator);
 		EVENTS.remove(RenderListener.class, this);
 		
 		stopBuildingBuffer();
-		threadPool.shutdownNow();
+		coordinator.reset();
 		forkJoinPool.shutdownNow();
 		
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		vertexBuffer = null;
 		bufferRegion = null;
-		
-		chunksToUpdate.clear();
-	}
-	
-	@Override
-	public void onReceivedPacket(PacketInputEvent event)
-	{
-		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
-		
-		if(chunkPos != null)
-			chunksToUpdate.add(chunkPos);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		DimensionType dimension = MC.world.getDimension();
-		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
-		boolean searchersChanged = false;
-		
-		// remove outdated ChunkSearchers
-		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
-		{
-			boolean remove = false;
-			ChunkPos searcherPos = searcher.getPos();
-			
-			// wrong dimension
-			if(dimension != searcher.getDimension())
-				remove = true;
-			
-			// out of range
-			else if(!area.isInRange(searcherPos))
-				remove = true;
-			
-			// chunk update
-			else if(chunkUpdates.contains(searcherPos))
-				remove = true;
-			
-			if(remove)
-			{
-				searchers.remove(searcherPos);
-				searcher.cancel();
-				searchersChanged = true;
-			}
-		}
-		
-		// add new ChunkSearchers
-		for(Chunk chunk : area.getChunksInRange())
-		{
-			ChunkPos chunkPos = chunk.getPos();
-			if(searchers.containsKey(chunkPos))
-				continue;
-			
-			ChunkSearcher searcher =
-				new ChunkSearcher(Blocks.CAVE_AIR, chunk, dimension);
-			searchers.put(chunkPos, searcher);
-			searcher.start(threadPool);
-			searchersChanged = true;
-		}
+		boolean searchersChanged = coordinator.update();
 		
 		if(searchersChanged)
 			stopBuildingBuffer();
 		
-		if(!searchers.values().stream().allMatch(ChunkSearcher::isDone))
+		if(!coordinator.isDone())
 			return;
 		
 		// check if limit has changed
@@ -261,16 +205,6 @@ public final class CaveFinderHack extends Hack
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	private HashSet<ChunkPos> clearChunksToUpdate()
-	{
-		synchronized(chunksToUpdate)
-		{
-			HashSet<ChunkPos> chunks = new HashSet<>(chunksToUpdate);
-			chunksToUpdate.clear();
-			return chunks;
-		}
-	}
-	
 	private void stopBuildingBuffer()
 	{
 		if(getMatchingBlocksTask != null)
@@ -294,10 +228,10 @@ public final class CaveFinderHack extends Hack
 		Comparator<BlockPos> comparator =
 			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
 		
-		getMatchingBlocksTask = forkJoinPool.submit(() -> searchers.values()
-			.parallelStream().flatMap(ChunkSearcher::getMatchingPositions)
-			.sorted(comparator).limit(limit.getValueLog())
-			.collect(Collectors.toCollection(HashSet::new)));
+		getMatchingBlocksTask = forkJoinPool.submit(
+			() -> coordinator.getMatches().map(ChunkSearcher.Result::pos)
+				.sorted(comparator).limit(limit.getValueLog())
+				.collect(Collectors.toCollection(HashSet::new)));
 	}
 	
 	private void startCompileVerticesTask()
