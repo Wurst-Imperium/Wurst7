@@ -41,6 +41,7 @@ import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.DefaultAutoBuildTemplates;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -362,10 +363,8 @@ public final class AutoBuildHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		int blocksDrawn = 0;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
@@ -377,8 +376,8 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX() - region.x(), pos.getY(),
+				pos.getZ() - region.z());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			

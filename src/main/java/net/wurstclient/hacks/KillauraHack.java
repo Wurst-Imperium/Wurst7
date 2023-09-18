@@ -40,6 +40,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -204,10 +205,8 @@ public final class KillauraHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -216,19 +215,9 @@ public final class KillauraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		if(renderTarget.isAlive())
-			matrixStack.translate(
-				renderTarget.prevX
-					+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
-					- regionX,
-				renderTarget.prevY
-					+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
-				renderTarget.prevZ
-					+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
-					- regionZ);
-		else
-			matrixStack.translate(renderTarget.getX() - regionX,
-				renderTarget.getY(), renderTarget.getZ() - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),

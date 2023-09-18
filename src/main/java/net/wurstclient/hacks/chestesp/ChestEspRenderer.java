@@ -24,6 +24,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -33,20 +34,15 @@ public final class ChestEspRenderer
 	private static VertexBuffer outlinedBox;
 	
 	private final MatrixStack matrixStack;
-	private final int regionX;
-	private final int regionZ;
+	private final RegionPos region;
 	private final Vec3d start;
 	
 	public ChestEspRenderer(MatrixStack matrixStack)
 	{
 		this.matrixStack = matrixStack;
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		regionX = (camPos.getX() >> 9) * 512;
-		regionZ = (camPos.getZ() >> 9) * 512;
-		
+		region = RenderUtils.getCameraRegion();
 		start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos())
-			.subtract(regionX, 0, regionZ);
+			.subtract(region.toVec3d());
 	}
 	
 	public void renderBoxes(ChestEspGroup group)
@@ -57,8 +53,8 @@ public final class ChestEspRenderer
 		{
 			matrixStack.push();
 			
-			matrixStack.translate(box.minX - regionX, box.minY,
-				box.minZ - regionZ);
+			matrixStack.translate(box.minX - region.x(), box.minY,
+				box.minZ - region.z());
 			
 			matrixStack.scale((float)(box.maxX - box.minX),
 				(float)(box.maxY - box.minY), (float)(box.maxZ - box.minZ));
@@ -95,7 +91,7 @@ public final class ChestEspRenderer
 		
 		for(Box box : group.getBoxes())
 		{
-			Vec3d end = box.getCenter().subtract(regionX, 0, regionZ);
+			Vec3d end = box.getCenter().subtract(region.toVec3d());
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)

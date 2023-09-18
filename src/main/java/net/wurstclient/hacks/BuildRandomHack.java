@@ -32,6 +32,7 @@ import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -236,14 +237,12 @@ public final class BuildRandomHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		// set position
-		matrixStack.translate(lastPos.getX() - regionX, lastPos.getY(),
-			lastPos.getZ() - regionZ);
+		matrixStack.translate(lastPos.getX() - region.x(), lastPos.getY(),
+			lastPos.getZ() - region.z());
 		
 		// get color
 		float red = partialTicks * 2F;

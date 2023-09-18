@@ -28,12 +28,10 @@ public class MinPriorityThreadFactory implements ThreadFactory
 	@Override
 	public Thread newThread(Runnable r)
 	{
-		Thread t = new Thread(group, r,
-			namePrefix + threadNumber.getAndIncrement(), 0);
-		if(t.isDaemon())
-			t.setDaemon(false);
-		if(t.getPriority() != Thread.MIN_PRIORITY)
-			t.setPriority(Thread.MIN_PRIORITY);
+		String name = namePrefix + threadNumber.getAndIncrement();
+		Thread t = new Thread(group, r, name);
+		t.setDaemon(true);
+		t.setPriority(Thread.MIN_PRIORITY);
 		return t;
 	}
 	
