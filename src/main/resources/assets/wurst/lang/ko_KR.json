@@ -20,6 +20,7 @@
   "description.wurst.hack.autodrop": "원하지 않는 아이템을 자동으로 버립니다.",
   "description.wurst.hack.autoleave": "체력이 낮을 때 자동으로 서버에서 나갑니다.",
   "description.wurst.hack.autolibrarian": "특정 인챈트된 책을 판매하는 서적상으로 마을 주민을 자동으로 훈련합니다. 이 해킹을 사용하면 전체 거래 기구를 짧은 시간 내에 설정할 수 있습니다.",
+  "description.wurst.hack.autoeat": "음식을 필요할때 자동으로 섭취합니다.",
   "description.wurst.setting.autoeat.target_hunger": "배고픔 게이지를 이 수준 이상으로 유지하려고 하지만 배고픔 점수를 낭비하지 않습니다.",
   "description.wurst.setting.autoeat.min_hunger": "항상 이 수준 이상으로 배고픔 게이지를 유지하되, 음식 점수를 낭비하더라도 상관하지 않습니다.\n6.5 - 바닐라 음식 아이템으로는 낭비를 일으키지 않습니다.\n10.0 - 낭비를 무시하고 배고픔 게이지를 항상 가득 채웁니다.",
   "description.wurst.setting.autoeat.injured_hunger": "부상당했을 때 이 수준 이상으로 배고픔 게이지를 채우며 음식 점수를 낭비하더라도 상관하지 않습니다.\n10.0 - 가장 빠른 회복\n9.0 - 가장 느린 회복\n<9.0 - 회복 없음\n<3.5 - 달리기 금지",
