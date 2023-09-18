@@ -169,7 +169,7 @@ public final class CaveFinderHack extends Hack
 			if(remove)
 			{
 				searchers.remove(searcherPos);
-				searcher.cancelSearching();
+				searcher.cancel();
 				searchersChanged = true;
 			}
 		}
@@ -182,16 +182,16 @@ public final class CaveFinderHack extends Hack
 				continue;
 			
 			ChunkSearcher searcher =
-				new ChunkSearcher(chunk, Blocks.CAVE_AIR, dimension);
+				new ChunkSearcher(Blocks.CAVE_AIR, chunk, dimension);
 			searchers.put(chunkPos, searcher);
-			searcher.startSearching(threadPool);
+			searcher.start(threadPool);
 			searchersChanged = true;
 		}
 		
 		if(searchersChanged)
 			stopBuildingBuffer();
 		
-		if(!areAllChunkSearchersDone())
+		if(!searchers.values().stream().allMatch(ChunkSearcher::isDone))
 			return;
 		
 		// check if limit has changed
@@ -288,15 +288,6 @@ public final class CaveFinderHack extends Hack
 		bufferUpToDate = false;
 	}
 	
-	private boolean areAllChunkSearchersDone()
-	{
-		for(ChunkSearcher searcher : searchers.values())
-			if(searcher.getStatus() != ChunkSearcher.Status.DONE)
-				return false;
-			
-		return true;
-	}
-	
 	private void startGetMatchingBlocksTask()
 	{
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
@@ -304,7 +295,7 @@ public final class CaveFinderHack extends Hack
 			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
 		
 		getMatchingBlocksTask = forkJoinPool.submit(() -> searchers.values()
-			.parallelStream().flatMap(ChunkSearcher::getMatchingBlocks)
+			.parallelStream().flatMap(ChunkSearcher::getMatchingPositions)
 			.sorted(comparator).limit(limit.getValueLog())
 			.collect(Collectors.toCollection(HashSet::new)));
 	}

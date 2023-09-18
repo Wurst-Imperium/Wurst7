@@ -53,6 +53,7 @@ public final class SearchHack extends Hack
 {
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore", false);
+	private Block lastBlock;
 	
 	private final ChunkAreaSetting area = new ChunkAreaSetting("Area",
 		"The area around the player to search in.\n"
@@ -97,6 +98,7 @@ public final class SearchHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		lastBlock = block.getBlock();
 		prevLimit = limit.getValueI();
 		notify = true;
 		
@@ -141,10 +143,19 @@ public final class SearchHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		Block currentBlock = block.getBlock();
 		DimensionType dimension = MC.world.getDimension();
 		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
 		boolean searchersChanged = false;
+		
+		// clear ChunkSearchers if block has changed
+		Block currentBlock = block.getBlock();
+		if(currentBlock != lastBlock)
+		{
+			searchers.values().forEach(ChunkSearcher::cancel);
+			searchers.clear();
+			lastBlock = currentBlock;
+			searchersChanged = true;
+		}
 		
 		// remove outdated ChunkSearchers
 		for(ChunkSearcher searcher : new ArrayList<>(searchers.values()))
@@ -152,12 +163,8 @@ public final class SearchHack extends Hack
 			boolean remove = false;
 			ChunkPos searcherPos = searcher.getPos();
 			
-			// wrong block
-			if(currentBlock != searcher.getBlock())
-				remove = true;
-			
 			// wrong dimension
-			else if(dimension != searcher.getDimension())
+			if(dimension != searcher.getDimension())
 				remove = true;
 			
 			// out of range
@@ -171,7 +178,7 @@ public final class SearchHack extends Hack
 			if(remove)
 			{
 				searchers.remove(searcherPos);
-				searcher.cancelSearching();
+				searcher.cancel();
 				searchersChanged = true;
 			}
 		}
@@ -184,16 +191,16 @@ public final class SearchHack extends Hack
 				continue;
 			
 			ChunkSearcher searcher =
-				new ChunkSearcher(chunk, currentBlock, dimension);
+				new ChunkSearcher(currentBlock, chunk, dimension);
 			searchers.put(chunkPos, searcher);
-			searcher.startSearching(threadPool);
+			searcher.start(threadPool);
 			searchersChanged = true;
 		}
 		
 		if(searchersChanged)
 			stopBuildingBuffer();
 		
-		if(!areAllChunkSearchersDone())
+		if(!searchers.values().stream().allMatch(ChunkSearcher::isDone))
 			return;
 		
 		// check if limit has changed
@@ -280,15 +287,6 @@ public final class SearchHack extends Hack
 		bufferUpToDate = false;
 	}
 	
-	private boolean areAllChunkSearchersDone()
-	{
-		for(ChunkSearcher searcher : searchers.values())
-			if(searcher.getStatus() != ChunkSearcher.Status.DONE)
-				return false;
-			
-		return true;
-	}
-	
 	private void startGetMatchingBlocksTask()
 	{
 		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
@@ -296,7 +294,7 @@ public final class SearchHack extends Hack
 			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
 		
 		getMatchingBlocksTask = forkJoinPool.submit(() -> searchers.values()
-			.parallelStream().flatMap(ChunkSearcher::getMatchingBlocks)
+			.parallelStream().flatMap(ChunkSearcher::getMatchingPositions)
 			.sorted(comparator).limit(limit.getValueLog())
 			.collect(Collectors.toCollection(HashSet::new)));
 	}
