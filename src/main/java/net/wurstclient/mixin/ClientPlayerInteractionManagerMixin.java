@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,6 +36,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.hacks.ReachHack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -42,45 +44,41 @@ public abstract class ClientPlayerInteractionManagerMixin
 	implements IClientPlayerInteractionManager
 {
 	@Shadow
+	@Final
 	private MinecraftClient client;
 	@Shadow
 	private float currentBreakingProgress;
 	@Shadow
 	private boolean breakingBlock;
-	
-	/**
-	 * blockHitDelay
-	 */
 	@Shadow
 	private int blockBreakingCooldown;
 	
-	@Inject(at = {@At(value = "INVOKE",
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
-		ordinal = 0)},
-		method = {
-			"updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"})
-	private void onPlayerDamageBlock(BlockPos blockPos_1, Direction direction_1,
+		ordinal = 0),
+		method = "updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z")
+	private void onPlayerDamageBlock(BlockPos pos, Direction direction,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		BlockBreakingProgressEvent event =
-			new BlockBreakingProgressEvent(blockPos_1, direction_1);
-		EventManager.fire(event);
+		EventManager.fire(new BlockBreakingProgressEvent(pos, direction));
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"getReachDistance()F"},
+	@Inject(at = @At("HEAD"),
+		method = "getReachDistance()F",
 		cancellable = true)
 	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
+		if(hax == null)
 			return;
 		
-		ci.setReturnValue(hax.reachHack.getReachDistance());
+		ReachHack reach = hax.reachHack;
+		if(reach.isEnabled())
+			ci.setReturnValue(reach.getReachDistance());
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"hasExtendedReach()Z"},
+	@Inject(at = @At("HEAD"),
+		method = "hasExtendedReach()Z",
 		cancellable = true)
 	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
 	{
@@ -91,7 +89,7 @@ public abstract class ClientPlayerInteractionManagerMixin
 		cir.setReturnValue(true);
 	}
 	
-	@Inject(at = {@At("HEAD")},
+	@Inject(at = @At("HEAD"),
 		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
@@ -185,15 +183,13 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Shadow
-	public abstract ActionResult interactBlock(
-		ClientPlayerEntity clientPlayerEntity_1, Hand hand_1,
-		BlockHitResult blockHitResult_1);
+	public abstract ActionResult interactBlock(ClientPlayerEntity player,
+		Hand hand, BlockHitResult hitResult);
 	
 	@Shadow
-	public abstract ActionResult interactItem(PlayerEntity playerEntity_1,
-		Hand hand_1);
+	public abstract ActionResult interactItem(PlayerEntity player, Hand hand);
 	
 	@Shadow
-	public abstract void clickSlot(int syncId, int slotId, int clickData,
-		SlotActionType actionType, PlayerEntity playerEntity);
+	public abstract void clickSlot(int syncId, int slotId, int button,
+		SlotActionType actionType, PlayerEntity player);
 }

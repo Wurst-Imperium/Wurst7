@@ -37,7 +37,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 @Mixin(PlayerSkinProvider.class)
-public class PlayerSkinProviderMixin
+public abstract class PlayerSkinProviderMixin
 {
 	@Shadow
 	@Final
@@ -157,10 +157,7 @@ public class PlayerSkinProviderMixin
 	}
 	
 	@Shadow
-	public Identifier loadSkin(MinecraftProfileTexture profileTexture,
+	public abstract Identifier loadSkin(MinecraftProfileTexture profileTexture,
 		Type type,
-		@Nullable PlayerSkinProvider.SkinTextureAvailableCallback callback)
-	{
-		return null;
-	}
+		@Nullable PlayerSkinProvider.SkinTextureAvailableCallback callback);
 }

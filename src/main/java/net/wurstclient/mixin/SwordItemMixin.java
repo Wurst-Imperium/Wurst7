@@ -27,10 +27,6 @@ public class SwordItemMixin extends ToolItem implements ISwordItem
 {
 	@Shadow
 	@Final
-	protected float attackDamage;
-	
-	@Shadow
-	@Final
 	private Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 	
 	private SwordItemMixin(WurstClient wurst, ToolMaterial material,

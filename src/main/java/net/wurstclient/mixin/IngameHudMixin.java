@@ -28,14 +28,12 @@ public class IngameHudMixin
 			remap = false,
 			ordinal = 3),
 		method = "render(Lnet/minecraft/client/gui/DrawContext;F)V")
-	private void onRender(DrawContext context, float partialTicks,
-		CallbackInfo ci)
+	private void onRender(DrawContext context, float tickDelta, CallbackInfo ci)
 	{
 		if(WurstClient.MC.options.debugEnabled)
 			return;
 		
-		GUIRenderEvent event = new GUIRenderEvent(context, partialTicks);
-		EventManager.fire(event);
+		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -44,15 +42,11 @@ public class IngameHudMixin
 	private void onRenderOverlay(DrawContext context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
-		if(texture == null || texture.getPath() == null)
+		if(texture == null
+			|| !"textures/misc/pumpkinblur.png".equals(texture.getPath()))
 			return;
 		
-		if(!texture.getPath().equals("textures/misc/pumpkinblur.png"))
-			return;
-		
-		if(!WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
-			return;
-		
-		ci.cancel();
+		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+			ci.cancel();
 	}
 }

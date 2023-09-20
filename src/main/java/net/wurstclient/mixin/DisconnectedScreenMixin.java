@@ -41,14 +41,14 @@ public class DisconnectedScreenMixin extends Screen
 	private Screen parent;
 	@Shadow
 	@Final
-	private final GridWidget grid = new GridWidget();
+	private GridWidget grid;
 	
 	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())

@@ -50,6 +50,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Shadow
 	private float lastPitch;
 	@Shadow
+	@Final
 	private ClientPlayNetworkHandler networkHandler;
 	@Shadow
 	@Final
@@ -130,8 +131,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
-		PlayerMoveEvent event = new PlayerMoveEvent(this);
-		EventManager.fire(event);
+		EventManager.fire(new PlayerMoveEvent(this));
 	}
 	
 	@Inject(at = @At("HEAD"),

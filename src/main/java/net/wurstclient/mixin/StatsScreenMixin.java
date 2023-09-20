@@ -26,12 +26,12 @@ import net.wurstclient.mixinterface.IScreen;
 @Mixin(StatsScreen.class)
 public abstract class StatsScreenMixin extends Screen implements StatsListener
 {
-	private StatsScreenMixin(WurstClient wurst, Text text_1)
+	private StatsScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"createButtons()V"})
+	@Inject(at = @At("TAIL"), method = "createButtons()V")
 	private void onCreateButtons(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())

@@ -33,24 +33,12 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	
 	private ButtonWidget lastServerButton;
 	
-	private MultiplayerScreenMixin(WurstClient wurst, Text text_1)
+	private MultiplayerScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Override
-	public MultiplayerServerListWidget getServerListSelector()
-	{
-		return serverListWidget;
-	}
-	
-	@Override
-	public void connectToServer(ServerInfo server)
-	{
-		connect(server);
-	}
-	
-	@Inject(at = {@At("TAIL")}, method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -76,8 +64,8 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 			.dimensions(width / 2 + 154 + 4, height - 28, 100, 20).build());
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
-	public void onTick(CallbackInfo ci)
+	@Inject(at = @At("TAIL"), method = "tick()V")
+	private void onTick(CallbackInfo ci)
 	{
 		if(lastServerButton == null)
 			return;
@@ -85,11 +73,23 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"connect(Lnet/minecraft/client/network/ServerInfo;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "connect(Lnet/minecraft/client/network/ServerInfo;)V")
 	private void onConnect(ServerInfo entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
+	}
+	
+	@Override
+	public MultiplayerServerListWidget getServerListSelector()
+	{
+		return serverListWidget;
+	}
+	
+	@Override
+	public void connectToServer(ServerInfo server)
+	{
+		connect(server);
 	}
 	
 	@Shadow

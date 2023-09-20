@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener;
+import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 @Pseudo
 @Mixin(targets = {
@@ -31,11 +31,10 @@ public class SodiumBlockOcclusionCacheMixin
 		method = "shouldDrawSide",
 		cancellable = true,
 		remap = false)
-	public void shouldDrawSide(BlockState state, BlockView view, BlockPos pos,
-		Direction facing, CallbackInfoReturnable<Boolean> cir)
+	public void shouldDrawSide(BlockState state, BlockView world, BlockPos pos,
+		Direction side, CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideListener.ShouldDrawSideEvent event =
-			new ShouldDrawSideListener.ShouldDrawSideEvent(state, pos);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

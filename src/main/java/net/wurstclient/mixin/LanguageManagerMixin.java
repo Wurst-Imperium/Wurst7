@@ -26,8 +26,8 @@ public abstract class LanguageManagerMixin
 {
 	private TranslationStorage english;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"reload(Lnet/minecraft/resource/ResourceManager;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "reload(Lnet/minecraft/resource/ResourceManager;)V")
 	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
 		english = TranslationStorage.load(manager, Lists.newArrayList("en_us"),
