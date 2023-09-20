@@ -13,9 +13,9 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -24,7 +24,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
-import net.wurstclient.mixinterface.IScreen;
 
 public class CleanUpScreen extends Screen
 {
@@ -218,13 +217,8 @@ public class CleanUpScreen extends Screen
 	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
 			if(!button.isSelected() || !(button instanceof CleanUpButton))
 				continue;
 			

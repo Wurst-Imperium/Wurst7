@@ -28,9 +28,9 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -49,7 +49,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
@@ -521,13 +520,8 @@ public final class AltManagerScreen extends Screen
 	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)(Object)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
 			if(!button.isSelected())
 				continue;
 			
