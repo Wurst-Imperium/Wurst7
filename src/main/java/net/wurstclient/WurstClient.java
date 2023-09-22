@@ -149,7 +149,7 @@ public enum WurstClient
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, "Zoom");
+			GLFW.GLFW_KEY_V, KeyBinding.MISC_CATEGORY);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
