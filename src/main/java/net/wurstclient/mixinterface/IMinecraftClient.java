@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.Session;
 
 public interface IMinecraftClient
 {

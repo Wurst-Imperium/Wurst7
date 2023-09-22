@@ -45,7 +45,7 @@ public final class MassTpaHack extends Hack
 		timer = -1;
 		
 		players.clear();
-		String playerName = MC.getSession().getProfile().getName();
+		String playerName = MC.getSession().getUsername();
 		
 		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
 		{

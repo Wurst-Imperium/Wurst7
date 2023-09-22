@@ -10,16 +10,15 @@ package net.wurstclient.mixin;
 import java.io.File;
 import java.util.UUID;
 
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -29,9 +28,9 @@ import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.resource.language.LanguageManager;
-import net.minecraft.client.util.ProfileKeys;
-import net.minecraft.client.util.ProfileKeysImpl;
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.ProfileKeys;
+import net.minecraft.client.session.ProfileKeysImpl;
+import net.minecraft.client.session.Session;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -121,7 +120,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getSession()Lnet/minecraft/client/util/Session;",
+		method = "getSession()Lnet/minecraft/client/session/Session;",
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
 	{
@@ -129,18 +128,23 @@ public abstract class MinecraftClientMixin
 			cir.setReturnValue(wurstSession);
 	}
 	
-	@Redirect(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0),
-		method = "getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;")
-	private Session getSessionForSessionProperties(MinecraftClient mc)
+	@Inject(at = @At("RETURN"),
+		method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
+		cancellable = true)
+	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
-		return wurstSession != null ? wurstSession : session;
+		if(wurstSession == null)
+			return;
+		
+		GameProfile oldProfile = cir.getReturnValue();
+		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
+			wurstSession.getUsername());
+		newProfile.getProperties().putAll(oldProfile.getProperties());
+		cir.setReturnValue(newProfile);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;",
+		method = "getProfileKeys()Lnet/minecraft/client/session/ProfileKeys;",
 		cancellable = true)
 	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
@@ -221,7 +225,7 @@ public abstract class MinecraftClientMixin
 		
 		UserApiService userApiService =
 			wurst_createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getProfile().getId();
+		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
 			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
 	}
