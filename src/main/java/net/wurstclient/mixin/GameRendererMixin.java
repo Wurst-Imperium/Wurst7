@@ -20,7 +20,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.resource.SynchronousResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -32,8 +31,7 @@ import net.wurstclient.hacks.FullbrightHack;
 import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
-public abstract class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloader, IGameRenderer
+public abstract class GameRendererMixin implements AutoCloseable, IGameRenderer
 {
 	private boolean cancelNextBobView;
 	
