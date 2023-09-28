@@ -131,7 +131,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
-		EventManager.fire(new PlayerMoveEvent(this));
+		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -279,12 +279,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
-	}
-	
-	@Override
-	public void setNoClip(boolean noClip)
-	{
-		this.noClip = noClip;
 	}
 	
 	@Override
