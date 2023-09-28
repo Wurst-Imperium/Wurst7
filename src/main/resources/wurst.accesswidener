@@ -6,6 +6,8 @@ accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/Lis
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
+accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastPitch	F
+accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYaw	F
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	stepHeight	F
 accessible	field	net/minecraft/item/ArmorItem	toughness	F

@@ -46,10 +46,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
 	@Shadow
-	private float lastYaw;
-	@Shadow
-	private float lastPitch;
-	@Shadow
 	@Final
 	private ClientPlayNetworkHandler networkHandler;
 	@Shadow
@@ -279,18 +275,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
-	}
-	
-	@Override
-	public float getLastYaw()
-	{
-		return lastYaw;
-	}
-	
-	@Override
-	public float getLastPitch()
-	{
-		return lastPitch;
 	}
 	
 	@Override

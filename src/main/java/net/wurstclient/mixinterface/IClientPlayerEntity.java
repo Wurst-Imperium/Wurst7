@@ -11,10 +11,6 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IClientPlayerEntity
 {
-	public float getLastYaw();
-	
-	public float getLastPitch();
-	
 	public void setMovementMultiplier(Vec3d movementMultiplier);
 	
 	public boolean isTouchingWaterBypass();
