@@ -21,7 +21,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
@@ -45,9 +44,6 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
-	@Shadow
-	@Final
-	private ClientPlayNetworkHandler networkHandler;
 	@Shadow
 	@Final
 	protected MinecraftClient client;
@@ -275,11 +271,5 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
-	}
-	
-	@Override
-	public void setMovementMultiplier(Vec3d movementMultiplier)
-	{
-		this.movementMultiplier = movementMultiplier;
 	}
 }

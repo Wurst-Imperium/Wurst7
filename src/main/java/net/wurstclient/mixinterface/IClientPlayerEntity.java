@@ -7,11 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.util.math.Vec3d;
-
 public interface IClientPlayerEntity
 {
-	public void setMovementMultiplier(Vec3d movementMultiplier);
-	
 	public boolean isTouchingWaterBypass();
 }
