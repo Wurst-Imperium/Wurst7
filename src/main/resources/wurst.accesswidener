@@ -8,4 +8,5 @@ accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePa
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	stepHeight	F
+accessible	field	net/minecraft/item/ArmorItem	toughness	F
 accessible	field	net/minecraft/network/packet/s2c/play/ChunkDeltaUpdateS2CPacket	sectionPos	Lnet/minecraft/util/math/ChunkSectionPos;

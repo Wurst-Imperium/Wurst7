@@ -9,7 +9,6 @@
   	"AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
     "AllowedAddressResolverMixin",
-    "ArmorItemMixin",
     "BackgroundRendererMixin",
   	"BlockEntityRenderDispatcherMixin",
   	"BlockMixin",
