@@ -1,11 +1,11 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
 accessible	class	net/minecraft/client/texture/PlayerSkinProvider$Textures
-accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
-accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
-accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
-accessible	field	net/minecraft/network/packet/s2c/play/ChunkDeltaUpdateS2CPacket	sectionPos	Lnet/minecraft/util/math/ChunkSectionPos;
-accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
-accessible	field	net/minecraft/entity/Entity	stepHeight	F
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
+accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
+accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
+accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
+accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
+accessible	field	net/minecraft/entity/Entity	stepHeight	F
+accessible	field	net/minecraft/network/packet/s2c/play/ChunkDeltaUpdateS2CPacket	sectionPos	Lnet/minecraft/util/math/ChunkSectionPos;
