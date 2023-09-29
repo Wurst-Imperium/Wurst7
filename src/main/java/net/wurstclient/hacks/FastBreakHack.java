@@ -18,7 +18,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -91,9 +90,7 @@ public final class FastBreakHack extends Hack
 		if(legitMode.isChecked())
 			return;
 		
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		
-		if(im.getCurrentBreakingProgress() >= 1)
+		if(MC.interactionManager.currentBreakingProgress >= 1)
 			return;
 		
 		BlockPos blockPos = event.getBlockPos();
@@ -108,6 +105,7 @@ public final class FastBreakHack extends Hack
 		
 		Action action = PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK;
 		Direction direction = event.getDirection();
-		im.sendPlayerActionC2SPacket(action, blockPos, direction);
+		IMC.getInteractionManager().sendPlayerActionC2SPacket(action, blockPos,
+			direction);
 	}
 }

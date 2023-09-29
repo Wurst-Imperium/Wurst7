@@ -452,7 +452,7 @@ public final class TunnellerHack extends Hack
 			}
 			
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;

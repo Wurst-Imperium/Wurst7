@@ -238,7 +238,7 @@ public final class TreeBotHack extends Hack
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
 		{
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;

@@ -47,8 +47,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Final
 	private MinecraftClient client;
 	@Shadow
-	private float currentBreakingProgress;
-	@Shadow
 	private boolean breakingBlock;
 	@Shadow
 	private int blockBreakingCooldown;
@@ -94,12 +92,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
-	}
-	
-	@Override
-	public float getCurrentBreakingProgress()
-	{
-		return currentBreakingProgress;
 	}
 	
 	@Override

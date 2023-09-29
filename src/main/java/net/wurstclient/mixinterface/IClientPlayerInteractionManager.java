@@ -16,8 +16,6 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IClientPlayerInteractionManager
 {
-	public float getCurrentBreakingProgress();
-	
 	public void setBreakingBlock(boolean breakingBlock);
 	
 	public void windowClick_PICKUP(int slot);
