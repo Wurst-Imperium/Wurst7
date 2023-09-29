@@ -213,10 +213,16 @@ public final class BuildRandomHack extends Hack
 			// if ActionResult.PASS and hand is not empty, call interactItem()
 			if(!MC.player.getStackInHand(hand).isEmpty())
 			{
+				// use item and return true if successful
 				ActionResult itemResult =
 					MC.interactionManager.interactItem(MC.player, hand);
-				if(itemResult.isAccepted() && itemResult.shouldSwingHand())
-					swingHand.getSelected().swing(hand);
+				if(itemResult.isAccepted())
+				{
+					if(itemResult.shouldSwingHand())
+						swingHand.getSelected().swing(hand);
+					
+					return true;
+				}
 			}
 		}
 		
