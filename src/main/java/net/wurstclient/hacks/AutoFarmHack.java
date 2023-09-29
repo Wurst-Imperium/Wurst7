@@ -95,7 +95,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentlyHarvesting != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentlyHarvesting = null;
 		}

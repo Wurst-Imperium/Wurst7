@@ -154,7 +154,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		if(breakingJobSite)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			breakingJobSite = false;
 		}

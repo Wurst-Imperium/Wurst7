@@ -8,6 +8,7 @@ accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePa
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
 accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastPitch	F
 accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYaw	F
+accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	breakingBlock	Z
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	currentBreakingProgress	F
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	movementMultiplier	Lnet/minecraft/util/math/Vec3d;

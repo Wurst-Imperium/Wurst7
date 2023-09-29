@@ -120,7 +120,7 @@ public final class TreeBotHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}

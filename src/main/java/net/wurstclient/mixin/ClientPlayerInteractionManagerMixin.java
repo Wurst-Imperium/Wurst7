@@ -47,8 +47,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Final
 	private MinecraftClient client;
 	@Shadow
-	private boolean breakingBlock;
-	@Shadow
 	private int blockBreakingCooldown;
 	
 	@Inject(at = @At(value = "INVOKE",
@@ -92,12 +90,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
-	}
-	
-	@Override
-	public void setBreakingBlock(boolean breakingBlock)
-	{
-		this.breakingBlock = breakingBlock;
 	}
 	
 	@Override
