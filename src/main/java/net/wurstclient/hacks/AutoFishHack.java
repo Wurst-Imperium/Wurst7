@@ -95,8 +95,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().airPlaceHack.setEnabled(false);
-		
 		castRodTimer = 0;
 		reelInTimer = 0;
 		rodSelector.reset();
