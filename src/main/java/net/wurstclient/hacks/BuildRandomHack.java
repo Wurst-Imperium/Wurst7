@@ -16,8 +16,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -32,6 +30,7 @@ import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -192,40 +191,8 @@ public final class BuildRandomHack extends Hack
 		facing.getSelected().face(params.hitVec());
 		lastPos = pos;
 		
-		// right-click the block in the same way vanilla Minecraft would
-		for(Hand hand : Hand.values())
-		{
-			// place block and return true if successful
-			ActionResult blockResult = MC.interactionManager
-				.interactBlock(MC.player, hand, params.toHitResult());
-			if(blockResult.isAccepted())
-			{
-				if(blockResult.shouldSwingHand())
-					swingHand.getSelected().swing(hand);
-				
-				return true;
-			}
-			
-			// return on ActionResult.FAIL without trying the other hand
-			if(blockResult == ActionResult.FAIL)
-				return true;
-			
-			// if ActionResult.PASS and hand is not empty, call interactItem()
-			if(!MC.player.getStackInHand(hand).isEmpty())
-			{
-				// use item and return true if successful
-				ActionResult itemResult =
-					MC.interactionManager.interactItem(MC.player, hand);
-				if(itemResult.isAccepted())
-				{
-					if(itemResult.shouldSwingHand())
-						swingHand.getSelected().swing(hand);
-					
-					return true;
-				}
-			}
-		}
-		
+		InteractionSimulator.rightClickBlock(params.toHitResult(),
+			swingHand.getSelected());
 		return true;
 	}
 	
