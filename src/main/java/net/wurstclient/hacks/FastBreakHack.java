@@ -81,7 +81,7 @@ public final class FastBreakHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		IMC.getInteractionManager().setBlockHitDelay(0);
+		MC.interactionManager.blockBreakingCooldown = 0;
 	}
 	
 	@Override

@@ -33,6 +33,4 @@ public interface IClientPlayerInteractionManager
 	
 	public void sendPlayerInteractBlockPacket(Hand hand,
 		BlockHitResult blockHitResult);
-	
-	public void setBlockHitDelay(int delay);
 }

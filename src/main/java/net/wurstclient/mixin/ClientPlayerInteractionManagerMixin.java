@@ -46,8 +46,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	@Final
 	private MinecraftClient client;
-	@Shadow
-	private int blockBreakingCooldown;
 	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
@@ -145,12 +143,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		sendSequencedPacket(client.world,
 			i -> new PlayerInteractBlockC2SPacket(hand, blockHitResult, i));
-	}
-	
-	@Override
-	public void setBlockHitDelay(int delay)
-	{
-		blockBreakingCooldown = delay;
 	}
 	
 	@Shadow
