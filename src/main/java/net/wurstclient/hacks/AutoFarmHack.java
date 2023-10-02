@@ -266,7 +266,7 @@ public final class AutoFarmHack extends Hack
 	private boolean replant(List<BlockPos> blocksToReplant)
 	{
 		// check cooldown
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return false;
 		
 		// check if already holding one of the seeds needed for blocksToReplant
@@ -307,7 +307,7 @@ public final class AutoFarmHack extends Hack
 						.sendPacket(new HandSwingC2SPacket(hand));
 				
 				// reset cooldown
-				IMC.setItemUseCooldown(4);
+				MC.itemUseCooldown = 4;
 				return true;
 			}
 		}

@@ -100,7 +100,7 @@ public final class InstantBunkerHack extends Hack
 			// initialize building process
 			blockIndex = 0;
 			building = true;
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 		}
 		
 		startTimer = 2;
@@ -240,7 +240,7 @@ public final class InstantBunkerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		// reset timer
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	@Override

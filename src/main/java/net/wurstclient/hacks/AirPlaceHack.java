@@ -52,7 +52,7 @@ public final class AirPlaceHack extends Hack implements RightClickListener
 		if(!(hitResult instanceof BlockHitResult blockHitResult))
 			return;
 		
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 		if(MC.player.isRiding())
 			return;
 		

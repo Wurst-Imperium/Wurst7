@@ -54,8 +54,6 @@ public abstract class MinecraftClientMixin
 	@Final
 	public File runDirectory;
 	@Shadow
-	private int itemUseCooldown;
-	@Shadow
 	public ClientPlayerInteractionManager interactionManager;
 	@Shadow
 	@Final
@@ -174,18 +172,6 @@ public abstract class MinecraftClientMixin
 	{
 		cir.setReturnValue(
 			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
-	}
-	
-	@Override
-	public int getItemUseCooldown()
-	{
-		return itemUseCooldown;
-	}
-	
-	@Override
-	public void setItemUseCooldown(int itemUseCooldown)
-	{
-		this.itemUseCooldown = itemUseCooldown;
 	}
 	
 	@Override
