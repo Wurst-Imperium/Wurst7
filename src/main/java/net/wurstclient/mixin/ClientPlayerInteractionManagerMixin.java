@@ -123,18 +123,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
-	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec,
-		Hand hand)
-	{
-		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
-		interactBlock(client.player, hand, hitResult);
-		interactItem(client.player, hand);
-	}
-	
-	@Override
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
 	{
-		rightClickBlock(pos, side, hitVec, Hand.MAIN_HAND);
+		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
+		Hand hand = Hand.MAIN_HAND;
+		interactBlock(client.player, hand, hitResult);
+		interactItem(client.player, hand);
 	}
 	
 	@Override
