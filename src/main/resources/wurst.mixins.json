@@ -31,7 +31,6 @@
     "DisconnectedScreenMixin",
     "EntityMixin",
     "EntityRendererMixin",
-    "FishingBobberEntityMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",

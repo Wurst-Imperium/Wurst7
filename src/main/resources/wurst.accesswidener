@@ -1,6 +1,7 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
 accessible	class	net/minecraft/client/texture/PlayerSkinProvider$Textures
+accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
