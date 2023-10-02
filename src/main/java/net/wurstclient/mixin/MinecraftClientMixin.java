@@ -177,12 +177,6 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public void rightClick()
-	{
-		doItemUse();
-	}
-	
-	@Override
 	public int getItemUseCooldown()
 	{
 		return itemUseCooldown;
@@ -241,11 +235,5 @@ public abstract class MinecraftClientMixin
 			e.printStackTrace();
 			return UserApiService.OFFLINE;
 		}
-	}
-	
-	@Shadow
-	private void doItemUse()
-	{
-		
 	}
 }
