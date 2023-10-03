@@ -147,14 +147,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			if(item instanceof SwordItem)
 				return ((ISwordItem)item).fuckMcAfee();
 			if(item instanceof MiningToolItem)
-				return ((IMiningToolItem)item).fuckMcAfee2();
+				return ((IMiningToolItem)item).fuckMcAfee();
 			break;
 			
 			case DAMAGE:
-			if(item instanceof SwordItem)
-				return ((SwordItem)item).getAttackDamage();
-			if(item instanceof MiningToolItem)
-				return ((IMiningToolItem)item).fuckMcAfee1();
+			if(item instanceof SwordItem sItem)
+				return sItem.getAttackDamage();
+			if(item instanceof MiningToolItem mtItem)
+				return mtItem.getAttackDamage();
 			break;
 		}
 		

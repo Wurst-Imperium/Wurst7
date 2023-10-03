@@ -19,16 +19,14 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.Vanishable;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMiningToolItem;
 
 @Mixin(MiningToolItem.class)
-public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
+public class MiningToolItemMixin extends ToolItem
+	implements Vanishable, IMiningToolItem
 {
-	@Shadow
-	@Final
-	protected float attackDamage;
-	
 	@Shadow
 	@Final
 	private Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
@@ -40,13 +38,7 @@ public class MiningToolItemMixin extends ToolItem implements IMiningToolItem
 	}
 	
 	@Override
-	public float fuckMcAfee1()
-	{
-		return attackDamage;
-	}
-	
-	@Override
-	public float fuckMcAfee2()
+	public float fuckMcAfee()
 	{
 		return (float)attributeModifiers
 			.get(EntityAttributes.GENERIC_ATTACK_SPEED).iterator().next()
