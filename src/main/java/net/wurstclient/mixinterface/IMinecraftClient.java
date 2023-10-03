@@ -13,8 +13,6 @@ public interface IMinecraftClient
 {
 	public IClientPlayerInteractionManager getInteractionManager();
 	
-	public ILanguageManager getLanguageManager();
-	
 	public IClientPlayerEntity getPlayer();
 	
 	public IWorld getWorld();
