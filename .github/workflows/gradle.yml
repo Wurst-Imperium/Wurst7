@@ -38,4 +38,4 @@ jobs:
       with:
         vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
         files: |
-          build/libs/.+jar$
+          ./build/libs/*.jar
