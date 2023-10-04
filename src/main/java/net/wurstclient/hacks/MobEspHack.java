@@ -25,7 +25,8 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -37,7 +38,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.settings.filters.FilterInvisibleSetting;
+import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filterlists.MobEspFilterList;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -54,10 +56,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
 		BoxSize.values(), BoxSize.FANCY);
 	
-	private final FilterInvisibleSetting filterInvisible =
-		new FilterInvisibleSetting("Won't show invisible mobs.", false);
+	private final EntityFilterList entityFilters = MobEspFilterList.create();
 	
-	private final ArrayList<MobEntity> mobs = new ArrayList<>();
+	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
 	
 	public MobEspHack()
@@ -66,7 +67,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);
-		addSetting(filterInvisible);
+		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -97,13 +98,13 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{
 		mobs.clear();
 		
-		Stream<MobEntity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof MobEntity).map(e -> (MobEntity)e)
-				.filter(e -> !e.isRemoved() && e.getHealth() > 0);
+		Stream<LivingEntity> stream = StreamSupport
+			.stream(MC.world.getEntities().spliterator(), false)
+			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
+			.filter(e -> !(e instanceof PlayerEntity))
+			.filter(e -> !e.isRemoved() && e.getHealth() > 0);
 		
-		if(filterInvisible.isChecked())
-			stream = stream.filter(filterInvisible);
+		stream = entityFilters.applyTo(stream);
 		
 		mobs.addAll(stream.collect(Collectors.toList()));
 	}
@@ -149,7 +150,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		float extraSize = boxSize.getSelected().extraSize;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		for(MobEntity e : mobs)
+		for(LivingEntity e : mobs)
 		{
 			matrixStack.push();
 			
@@ -163,11 +164,11 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			float f = MC.player.distanceTo(e) / 20F;
 			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			ShaderProgram shader = RenderSystem.getShader();
-			Matrix4f matrix4f = RenderSystem.getProjectionMatrix();
 			mobBox.bind();
-			mobBox.draw(matrixStack.peek().getPositionMatrix(), matrix4f,
-				shader);
+			mobBox.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 			
 			matrixStack.pop();
@@ -191,7 +192,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		Vec3d start = RotationUtils.getClientLookVec()
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
-		for(MobEntity e : mobs)
+		for(LivingEntity e : mobs)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
@@ -210,7 +211,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		}
 		
 		tessellator.draw();
-		
 	}
 	
 	private enum BoxSize
