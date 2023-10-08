@@ -93,7 +93,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			event.cancel();
 	}
 	
@@ -110,7 +110,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		
 		renderBoxes(matrixStack, partialTicks, region);
 		
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			renderTracers(matrixStack, partialTicks, region);
 		
 		matrixStack.pop();
@@ -134,7 +134,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				.subtract(region.toVec3d());
 			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
-			if(style.getSelected().hasBoxes())
+			if(style.hasBoxes())
 			{
 				matrixStack.push();
 				matrixStack.scale(e.getWidth() + extraSize,
