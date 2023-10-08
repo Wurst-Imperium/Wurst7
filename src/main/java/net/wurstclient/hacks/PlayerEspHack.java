@@ -34,7 +34,7 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.EspStyleSetting.EspStyle;
 import net.wurstclient.settings.filterlists.EntityFilterList;
@@ -53,10 +53,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final EspStyleSetting style =
 		new EspStyleSetting(EspStyle.LINES_AND_BOXES);
 	
-	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
+	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
-		BoxSize.values(), BoxSize.FANCY);
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
 	private final EntityFilterList entityFilters = new EntityFilterList(
 		new FilterSleepingSetting("Won't show sleeping players.", false),
@@ -147,7 +146,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
-		float extraSize = boxSize.getSelected().extraSize;
+		float extraSize = boxSize.getExtraSize();
 		
 		for(PlayerEntity e : players)
 		{
@@ -224,26 +223,5 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 		
 		tessellator.draw();
-	}
-	
-	private enum BoxSize
-	{
-		ACCURATE("Accurate", 0),
-		FANCY("Fancy", 0.1F);
-		
-		private final String name;
-		private final float extraSize;
-		
-		private BoxSize(String name, float extraSize)
-		{
-			this.name = name;
-			this.extraSize = extraSize;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
