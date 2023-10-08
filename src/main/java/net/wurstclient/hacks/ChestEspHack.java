@@ -192,7 +192,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			event.cancel();
 	}
 	
@@ -213,14 +213,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		
 		ChestEspRenderer espRenderer = new ChestEspRenderer(matrixStack);
 		
-		if(style.getSelected().hasBoxes())
+		if(style.hasBoxes())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderBoxes);
 		}
 		
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)

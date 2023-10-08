@@ -36,7 +36,7 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filterlists.MobEspFilterList;
@@ -51,10 +51,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 {
 	private final EspStyleSetting style = new EspStyleSetting();
 	
-	private final EnumSetting<BoxSize> boxSize = new EnumSetting<>("Box size",
+	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.",
-		BoxSize.values(), BoxSize.FANCY);
+			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
 	private final EntityFilterList entityFilters = MobEspFilterList.create();
 	
@@ -113,7 +112,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			event.cancel();
 	}
 	
@@ -130,10 +129,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		if(style.getSelected().hasBoxes())
+		if(style.hasBoxes())
 			renderBoxes(matrixStack, partialTicks, region);
 		
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			renderTracers(matrixStack, partialTicks, region);
 		
 		matrixStack.pop();
@@ -147,7 +146,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
-		float extraSize = boxSize.getSelected().extraSize;
+		float extraSize = boxSize.getExtraSize();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		for(LivingEntity e : mobs)
@@ -211,26 +210,5 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		}
 		
 		tessellator.draw();
-	}
-	
-	private enum BoxSize
-	{
-		ACCURATE("Accurate", 0),
-		FANCY("Fancy", 0.1F);
-		
-		private final String name;
-		private final float extraSize;
-		
-		private BoxSize(String name, float extraSize)
-		{
-			this.name = name;
-			this.extraSize = extraSize;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
