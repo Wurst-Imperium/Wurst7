@@ -34,6 +34,8 @@ public final class MobEspFilterList extends EntityFilterList
 		builder.add(
 			new FilterAnimalsSetting("Won't show pigs, cows, etc.", false));
 		
+		builder.add(FilterBatsSetting.genericVision(false));
+		
 		builder.add(new FilterPetsSetting(
 			"Won't show tamed wolves, tamed horses, etc.", false));
 		

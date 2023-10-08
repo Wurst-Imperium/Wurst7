@@ -60,6 +60,7 @@ public class EntityFilterList
 			FilterEndermenSetting.genericCombat(false),
 			FilterAnimalsSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
+			FilterBatsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
 			FilterTradersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),

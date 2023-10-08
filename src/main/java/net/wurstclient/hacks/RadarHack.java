@@ -28,6 +28,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterAnimalsSetting;
+import net.wurstclient.settings.filters.FilterBatsSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterMonstersSetting;
 import net.wurstclient.settings.filters.FilterPlayersSetting;
@@ -50,6 +51,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		new FilterSleepingSetting("Won't show sleeping players.", false),
 		new FilterMonstersSetting("Won't show zombies, creepers, etc.", false),
 		new FilterAnimalsSetting("Won't show pigs, cows, etc.", false),
+		FilterBatsSetting.genericVision(true),
 		new FilterInvisibleSetting("Won't show invisible entities.", false));
 	
 	public RadarHack()

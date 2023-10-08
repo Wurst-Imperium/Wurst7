@@ -40,6 +40,10 @@ public final class CrystalAuraFilterList extends EntityFilterList
 				+ damageWarning,
 			true));
 		
+		builder.add(new FilterBatsSetting("Won't target bats and any other"
+			+ " \"ambient\" mobs when auto-placing crystals." + damageWarning,
+			true));
+		
 		builder.add(new FilterTradersSetting(
 			"Won't target villagers, wandering traders, etc. when auto-placing crystals."
 				+ damageWarning,

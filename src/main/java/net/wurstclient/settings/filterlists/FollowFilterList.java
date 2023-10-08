@@ -47,6 +47,9 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterBabiesSetting(
 			"Won't follow baby pigs, baby villagers, etc.", true));
 		
+		builder.add(new FilterBatsSetting("Won't follow bats and any other"
+			+ " \"ambient\" mobs that might be added by mods.", true));
+		
 		builder.add(new FilterPetsSetting(
 			"Won't follow tamed wolves, tamed horses, etc.", true));
 		
