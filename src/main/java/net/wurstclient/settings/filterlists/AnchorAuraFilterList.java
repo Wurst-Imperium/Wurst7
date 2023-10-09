@@ -35,9 +35,9 @@ public final class AnchorAuraFilterList extends EntityFilterList
 				+ damageWarning,
 			true));
 		
-		builder.add(new FilterAnimalsSetting(
-			"Won't target pigs, cows, etc. when auto-placing anchors."
-				+ damageWarning,
+		builder.add(new FilterPassiveSetting("Won't target animals like pigs"
+			+ " and cows, ambient mobs like bats, and water mobs like fish,"
+			+ " squid and dolphins when auto-placing anchors." + damageWarning,
 			true));
 		
 		builder.add(new FilterBatsSetting("Won't target bats and any other"

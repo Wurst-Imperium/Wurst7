@@ -31,8 +31,7 @@ public final class MobEspFilterList extends EntityFilterList
 		
 		builder.add(new FilterEndermenSetting("Won't show endermen.", false));
 		
-		builder.add(
-			new FilterAnimalsSetting("Won't show pigs, cows, etc.", false));
+		builder.add(FilterPassiveSetting.genericVision(false));
 		
 		builder.add(FilterBatsSetting.genericVision(false));
 		

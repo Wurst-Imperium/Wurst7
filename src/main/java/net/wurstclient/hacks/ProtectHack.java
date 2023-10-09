@@ -55,7 +55,7 @@ public final class ProtectHack extends Hack
 			FilterMonstersSetting.genericCombat(false),
 			FilterPigmenSetting.genericCombat(false),
 			FilterEndermenSetting.genericCombat(false),
-			FilterAnimalsSetting.genericCombat(false),
+			FilterPassiveSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
 			FilterBatsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),

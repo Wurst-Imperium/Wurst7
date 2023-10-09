@@ -27,10 +27,10 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.settings.filters.FilterAnimalsSetting;
 import net.wurstclient.settings.filters.FilterBatsSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterMonstersSetting;
+import net.wurstclient.settings.filters.FilterPassiveSetting;
 import net.wurstclient.settings.filters.FilterPlayersSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.FakePlayerEntity;
@@ -50,7 +50,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),
 			FilterSleepingSetting.genericVision(false),
 			FilterMonstersSetting.genericVision(false),
-			FilterAnimalsSetting.genericVision(false),
+			FilterPassiveSetting.genericVision(false),
 			FilterBatsSetting.genericVision(true),
 			FilterInvisibleSetting.genericVision(false));
 	

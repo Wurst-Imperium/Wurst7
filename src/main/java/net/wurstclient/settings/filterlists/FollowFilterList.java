@@ -41,8 +41,9 @@ public final class FollowFilterList extends EntityFilterList
 		
 		builder.add(new FilterEndermenSetting("Won't follow endermen.", true));
 		
-		builder.add(
-			new FilterAnimalsSetting("Won't follow pigs, cows, etc.", true));
+		builder.add(new FilterPassiveSetting("Won't follow animals like pigs"
+			+ " and cows, ambient mobs like bats, and water mobs like"
+			+ " fish, squid and dolphins.", true));
 		
 		builder.add(new FilterBabiesSetting(
 			"Won't follow baby pigs, baby villagers, etc.", true));
