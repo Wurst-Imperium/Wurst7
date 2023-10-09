@@ -99,7 +99,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		Stream<LivingEntity> stream = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), false)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
+			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
 			.filter(e -> !(e instanceof PlayerEntity))
 			.filter(e -> !e.isRemoved() && e.getHealth() > 0);
 		

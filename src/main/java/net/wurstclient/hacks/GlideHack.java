@@ -85,7 +85,7 @@ public final class GlideHack extends Hack
 			
 			// manual collision check, since liquids don't have bounding boxes
 			if(stream.map(BlockUtils::getBlock)
-				.anyMatch(b -> b instanceof FluidBlock))
+				.anyMatch(FluidBlock.class::isInstance))
 				return;
 		}
 		

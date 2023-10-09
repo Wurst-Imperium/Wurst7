@@ -807,7 +807,7 @@ public final class TunnellerHack extends Hack
 			// check for nearby falling blocks
 			return StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof FallingBlockEntity)
+				.filter(FallingBlockEntity.class::isInstance)
 				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
 		}
 		
