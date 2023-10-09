@@ -22,36 +22,17 @@ public final class MobEspFilterList extends EntityFilterList
 	public static MobEspFilterList create()
 	{
 		ArrayList<EntityFilter> builder = new ArrayList<>();
-		
-		builder.add(new FilterMonstersSetting(
-			"Won't show zombies, creepers, etc.", false));
-		
-		builder
-			.add(new FilterPigmenSetting("Won't show zombie pigmen.", false));
-		
-		builder.add(new FilterEndermenSetting("Won't show endermen.", false));
-		
+		builder.add(FilterMonstersSetting.genericVision(false));
+		builder.add(FilterPigmenSetting.genericVision(false));
+		builder.add(FilterEndermenSetting.genericVision(false));
 		builder.add(FilterPassiveSetting.genericVision(false));
-		
 		builder.add(FilterBatsSetting.genericVision(false));
-		
-		builder.add(new FilterPetsSetting(
-			"Won't show tamed wolves, tamed horses, etc.", false));
-		
-		builder.add(new FilterTradersSetting(
-			"Won't show villagers, wandering traders, etc.", false));
-		
-		builder.add(new FilterGolemsSetting(
-			"Won't show iron golems, snow golems and shulkers.", false));
-		
-		builder.add(new FilterAllaysSetting("Won't show allays.", false));
-		
-		builder.add(
-			new FilterInvisibleSetting("Won't show invisible mobs.", false));
-		
-		builder.add(
-			new FilterArmorStandsSetting("Won't show armor stands.", true));
-		
+		builder.add(FilterPetsSetting.genericVision(false));
+		builder.add(FilterTradersSetting.genericVision(false));
+		builder.add(FilterGolemsSetting.genericVision(false));
+		builder.add(FilterAllaysSetting.genericVision(false));
+		builder.add(FilterInvisibleSetting.genericVision(false));
+		builder.add(FilterArmorStandsSetting.genericVision(true));
 		return new MobEspFilterList(builder);
 	}
 }
