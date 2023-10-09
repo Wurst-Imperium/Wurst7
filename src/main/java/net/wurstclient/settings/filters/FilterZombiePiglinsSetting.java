@@ -10,11 +10,11 @@ package net.wurstclient.settings.filters;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 
-public final class FilterPigmenSetting extends EntityFilterCheckbox
+public final class FilterZombiePiglinsSetting extends EntityFilterCheckbox
 {
-	public FilterPigmenSetting(String description, boolean checked)
+	public FilterZombiePiglinsSetting(String description, boolean checked)
 	{
-		super("Filter pigmen", description, checked);
+		super("Filter zombie piglins", description, checked);
 	}
 	
 	@Override
@@ -23,13 +23,15 @@ public final class FilterPigmenSetting extends EntityFilterCheckbox
 		return !(e instanceof ZombifiedPiglinEntity);
 	}
 	
-	public static FilterPigmenSetting genericCombat(boolean checked)
+	public static FilterZombiePiglinsSetting genericCombat(boolean checked)
 	{
-		return new FilterPigmenSetting("Won't attack zombie pigmen.", checked);
+		return new FilterZombiePiglinsSetting("Won't attack zombified piglins.",
+			checked);
 	}
 	
-	public static FilterPigmenSetting genericVision(boolean checked)
+	public static FilterZombiePiglinsSetting genericVision(boolean checked)
 	{
-		return new FilterPigmenSetting("Won't show zombie pigmen.", checked);
+		return new FilterZombiePiglinsSetting("Won't show zombified piglins.",
+			checked);
 	}
 }

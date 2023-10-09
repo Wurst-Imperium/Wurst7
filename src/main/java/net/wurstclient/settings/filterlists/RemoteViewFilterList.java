@@ -36,7 +36,8 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(new FilterMonstersSetting(
 			"Won't view zombies, creepers, etc.", true));
 		
-		builder.add(new FilterPigmenSetting("Won't view zombie pigmen.", true));
+		builder.add(new FilterZombiePiglinsSetting(
+			"Won't view zombified piglins.", true));
 		
 		builder.add(new FilterEndermenSetting("Won't view endermen.", true));
 		

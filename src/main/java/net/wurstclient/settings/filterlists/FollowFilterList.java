@@ -36,8 +36,8 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterMonstersSetting(
 			"Won't follow zombies, creepers, etc.", true));
 		
-		builder
-			.add(new FilterPigmenSetting("Won't follow zombie pigmen.", true));
+		builder.add(new FilterZombiePiglinsSetting(
+			"Won't follow zombified piglins.", true));
 		
 		builder.add(new FilterEndermenSetting("Won't follow endermen.", true));
 		
