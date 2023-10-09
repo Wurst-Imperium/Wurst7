@@ -452,7 +452,7 @@ public final class AutoLibrarianHack extends Hack
 		Stream<VillagerEntity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof VillagerEntity)
+				.filter(VillagerEntity.class::isInstance)
 				.map(e -> (VillagerEntity)e).filter(e -> e.getHealth() > 0)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e.getVillagerData()

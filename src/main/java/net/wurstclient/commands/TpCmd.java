@@ -67,7 +67,7 @@ public final class TpCmd extends Command
 	{
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
+			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
 			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
