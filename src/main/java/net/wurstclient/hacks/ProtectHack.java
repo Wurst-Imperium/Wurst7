@@ -53,7 +53,8 @@ public final class ProtectHack extends Hack
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterMonstersSetting.genericCombat(false),
-			FilterZombiePiglinsSetting.genericCombat(false),
+			FilterZombiePiglinsSetting
+				.genericCombat(FilterZombiePiglinsSetting.Mode.OFF),
 			FilterEndermenSetting.genericCombat(false),
 			FilterPassiveSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
