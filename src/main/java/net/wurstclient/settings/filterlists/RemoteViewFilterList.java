@@ -39,7 +39,8 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(FilterZombiePiglinsSetting
 			.onOffOnly("Won't view zombified piglins.", true));
 		
-		builder.add(new FilterEndermenSetting("Won't view endermen.", true));
+		builder
+			.add(FilterEndermenSetting.onOffOnly("Won't view endermen.", true));
 		
 		builder.add(new FilterPassiveSetting("Won't view animals like pigs and"
 			+ " cows, ambient mobs like bats, and water mobs like fish, squid"
