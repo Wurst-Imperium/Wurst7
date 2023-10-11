@@ -57,6 +57,7 @@ public final class AimAssistHack extends Hack
 			FilterPetsSetting.genericCombat(true),
 			FilterTradersSetting.genericCombat(true),
 			FilterGolemsSetting.genericCombat(false),
+			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
 			FilterShulkerBulletSetting.genericCombat(false),

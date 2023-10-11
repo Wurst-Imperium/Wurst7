@@ -89,6 +89,7 @@ public final class KillauraLegitHack extends Hack
 			FilterPetsSetting.genericCombat(false),
 			FilterTradersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),

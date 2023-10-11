@@ -66,6 +66,7 @@ public class EntityFilterList
 			FilterPetsSetting.genericCombat(false),
 			FilterTradersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(false),
 			FilterNamedSetting.genericCombat(false),

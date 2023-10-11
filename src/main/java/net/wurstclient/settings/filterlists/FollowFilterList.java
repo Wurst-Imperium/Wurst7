@@ -59,7 +59,9 @@ public final class FollowFilterList extends EntityFilterList
 			"Won't follow villagers, wandering traders, etc.", true));
 		
 		builder.add(new FilterGolemsSetting(
-			"Won't follow iron golems, snow golems and shulkers.", true));
+			"Won't follow iron golems and snow golems.", true));
+		
+		builder.add(new FilterShulkersSetting("Won't follow shulkers.", true));
 		
 		builder.add(new FilterAllaysSetting("Won't follow allays.", true));
 		

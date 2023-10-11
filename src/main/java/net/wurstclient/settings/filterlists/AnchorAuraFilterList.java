@@ -48,10 +48,11 @@ public final class AnchorAuraFilterList extends EntityFilterList
 				+ damageWarning,
 			true));
 		
-		builder.add(new FilterGolemsSetting(
-			"Won't target iron golems, snow golems and shulkers when auto-placing anchors."
-				+ damageWarning,
-			true));
+		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
+			+ " golems when auto-placing anchors." + damageWarning, true));
+		
+		builder.add(new FilterShulkersSetting("Won't target shulkers when"
+			+ " auto-placing anchors." + damageWarning, true));
 		
 		builder.add(new FilterAllaysSetting(
 			"Won't target allays when auto-placing anchors." + damageWarning,
