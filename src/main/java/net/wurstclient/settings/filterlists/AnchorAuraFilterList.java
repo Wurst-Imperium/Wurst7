@@ -43,9 +43,8 @@ public final class AnchorAuraFilterList extends EntityFilterList
 			+ " \"ambient\" mobs when auto-placing anchors." + damageWarning,
 			true));
 		
-		builder.add(new FilterTradersSetting(
-			"Won't target villagers, wandering traders, etc. when auto-placing anchors."
-				+ damageWarning,
+		builder.add(new FilterTradersSetting("Won't target villagers and"
+			+ " wandering traders when auto-placing anchors." + damageWarning,
 			true));
 		
 		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"

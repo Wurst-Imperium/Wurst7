@@ -43,9 +43,8 @@ public final class CrystalAuraFilterList extends EntityFilterList
 			+ " \"ambient\" mobs when auto-placing crystals." + damageWarning,
 			true));
 		
-		builder.add(new FilterTradersSetting(
-			"Won't target villagers, wandering traders, etc. when auto-placing crystals."
-				+ damageWarning,
+		builder.add(new FilterTradersSetting("Won't target villagers and"
+			+ " wandering traders when auto-placing crystals." + damageWarning,
 			true));
 		
 		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"

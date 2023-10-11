@@ -56,7 +56,7 @@ public final class RemoteViewFilterList extends EntityFilterList
 			"Won't view tamed wolves, tamed horses, etc.", true));
 		
 		builder.add(new FilterTradersSetting(
-			"Won't view villagers, wandering traders, etc.", true));
+			"Won't view villagers and wandering traders.", true));
 		
 		builder.add(new FilterGolemsSetting(
 			"Won't view iron golems and snow golems.", true));
