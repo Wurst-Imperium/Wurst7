@@ -7,44 +7,33 @@
  */
 package net.wurstclient.settings.filters;
 
-import java.util.function.Predicate;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.wurstclient.settings.EnumSetting;
-import net.wurstclient.settings.Setting;
-import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
 
 public final class FilterZombiePiglinsSetting
-	extends EnumSetting<FilterZombiePiglinsSetting.Mode> implements EntityFilter
+	extends AttackDetectingEntityFilter
 {
-	private FilterZombiePiglinsSetting(String description, Mode[] values,
-		Mode selected)
+	private FilterZombiePiglinsSetting(String description, Mode selected,
+		boolean checked)
 	{
-		super("Filter zombie piglins", description, values, selected);
+		super("Filter zombie piglins", description, selected, checked);
 	}
 	
 	public FilterZombiePiglinsSetting(String description, Mode selected)
 	{
-		this(description, Mode.values(), selected);
+		this(description, selected, false);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	public boolean onTest(Entity e)
 	{
-		return getSelected().predicate.test(e);
+		return !(e instanceof ZombifiedPiglinEntity);
 	}
 	
 	@Override
-	public boolean isFilterEnabled()
+	public boolean ifCalmTest(Entity e)
 	{
-		return getSelected() != Mode.OFF;
-	}
-	
-	@Override
-	public Setting getSetting()
-	{
-		return this;
+		return !(e instanceof ZombifiedPiglinEntity zpe) || zpe.isAttacking();
 	}
 	
 	public static FilterZombiePiglinsSetting genericCombat(Mode selected)
@@ -72,34 +61,6 @@ public final class FilterZombiePiglinsSetting
 	public static FilterZombiePiglinsSetting onOffOnly(String description,
 		boolean onByDefault)
 	{
-		Mode[] values = {Mode.ON, Mode.OFF};
-		Mode selected = onByDefault ? Mode.ON : Mode.OFF;
-		return new FilterZombiePiglinsSetting(description, values, selected);
-	}
-	
-	public enum Mode
-	{
-		ON("On", e -> !(e instanceof ZombifiedPiglinEntity)),
-		
-		IF_CALM("If calm",
-			e -> !(e instanceof ZombifiedPiglinEntity zpe)
-				|| zpe.isAttacking()),
-		
-		OFF("Off", e -> true);
-		
-		private final String name;
-		private final Predicate<Entity> predicate;
-		
-		private Mode(String name, Predicate<Entity> predicate)
-		{
-			this.name = name;
-			this.predicate = predicate;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
+		return new FilterZombiePiglinsSetting(description, null, onByDefault);
 	}
 }
