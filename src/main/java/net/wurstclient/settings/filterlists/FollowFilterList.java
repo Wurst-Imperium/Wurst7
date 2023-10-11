@@ -33,8 +33,8 @@ public final class FollowFilterList extends EntityFilterList
 			"Won't follow players that are at least the given distance above ground.",
 			0));
 		
-		builder.add(new FilterMonstersSetting(
-			"Won't follow zombies, creepers, etc.", true));
+		builder.add(new FilterHostileSetting(
+			"Won't follow hostile mobs like zombies and creepers.", true));
 		
 		builder.add(FilterZombiePiglinsSetting
 			.onOffOnly("Won't follow zombified piglins.", true));

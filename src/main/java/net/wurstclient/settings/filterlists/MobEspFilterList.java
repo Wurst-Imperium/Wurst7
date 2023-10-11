@@ -22,7 +22,7 @@ public final class MobEspFilterList extends EntityFilterList
 	public static MobEspFilterList create()
 	{
 		ArrayList<EntityFilter> builder = new ArrayList<>();
-		builder.add(FilterMonstersSetting.genericVision(false));
+		builder.add(FilterHostileSetting.genericVision(false));
 		builder.add(FilterZombiePiglinsSetting
 			.genericVision(AttackDetectingEntityFilter.Mode.OFF));
 		builder.add(FilterEndermenSetting

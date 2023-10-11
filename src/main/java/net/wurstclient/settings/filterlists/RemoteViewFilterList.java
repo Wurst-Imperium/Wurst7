@@ -33,8 +33,8 @@ public final class RemoteViewFilterList extends EntityFilterList
 			"Won't view players that are at least the given distance above ground.",
 			0));
 		
-		builder.add(new FilterMonstersSetting(
-			"Won't view zombies, creepers, etc.", true));
+		builder.add(new FilterHostileSetting(
+			"Won't view hostile mobs like zombies and creepers.", true));
 		
 		builder.add(FilterZombiePiglinsSetting
 			.onOffOnly("Won't view zombified piglins.", true));

@@ -78,7 +78,7 @@ public final class KillauraLegitHack extends Hack
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
-			FilterMonstersSetting.genericCombat(false),
+			FilterHostileSetting.genericCombat(false),
 			FilterZombiePiglinsSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterEndermenSetting

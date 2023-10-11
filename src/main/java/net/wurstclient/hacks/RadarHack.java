@@ -28,8 +28,8 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterBatsSetting;
+import net.wurstclient.settings.filters.FilterHostileSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
-import net.wurstclient.settings.filters.FilterMonstersSetting;
 import net.wurstclient.settings.filters.FilterPassiveSetting;
 import net.wurstclient.settings.filters.FilterPlayersSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
@@ -49,7 +49,7 @@ public final class RadarHack extends Hack implements UpdateListener
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),
 			FilterSleepingSetting.genericVision(false),
-			FilterMonstersSetting.genericVision(false),
+			FilterHostileSetting.genericVision(false),
 			FilterPassiveSetting.genericVision(false),
 			FilterBatsSetting.genericVision(true),
 			FilterInvisibleSetting.genericVision(false));

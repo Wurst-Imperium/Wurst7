@@ -46,7 +46,7 @@ public final class AimAssistHack extends Hack
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
-			FilterMonstersSetting.genericCombat(false),
+			FilterHostileSetting.genericCombat(false),
 			FilterZombiePiglinsSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterEndermenSetting
