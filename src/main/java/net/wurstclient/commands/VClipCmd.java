@@ -16,6 +16,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.MathUtils;
+import net.wurstclient.WurstClient;
 
 public final class VClipCmd extends Command
 {
@@ -108,5 +109,10 @@ public final class VClipCmd extends Command
 	{
 		ClientPlayerEntity p = MC.player;
 		p.setPosition(p.getX(), p.getY() + height, p.getZ());
+		if(WurstClient.INSTANCE.getHax().jesusHack.isEnabled())
+		{
+			while(WurstClient.INSTANCE.getHax().jesusHack.isOverLiquid())
+				p.setPosition(p.getX(), p.getY() + 1, p.getZ());
+		}
 	}
 }
