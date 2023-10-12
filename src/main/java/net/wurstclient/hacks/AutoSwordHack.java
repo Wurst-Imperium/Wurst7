@@ -199,10 +199,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	}
 	private boolean isCorrectEntity(Entity entity)
 	{
-		Stream<Entity> stream = Stream.of(entity);
+		try (Stream<Entity> stream = Stream.of(entity)) {
 		stream = stream.filter(EntityUtils.IS_ATTACKABLE);
-		
 		return stream.findFirst().isPresent();
+		}
 	}
 }
 
