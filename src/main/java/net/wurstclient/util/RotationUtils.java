@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.RotationFaker;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 public enum RotationUtils
 {
@@ -90,9 +89,9 @@ public enum RotationUtils
 	{
 		Rotation needed = getNeededRotations(vec);
 		
-		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
-		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
-		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
+		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
 		
 		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw);
 		float diffPitch =
@@ -106,9 +105,9 @@ public enum RotationUtils
 		float yaw = MathHelper.wrapDegrees(rotation.getYaw());
 		float pitch = MathHelper.wrapDegrees(rotation.getPitch());
 		
-		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
-		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
-		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
+		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
 		
 		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - yaw);
 		float diffPitch = MathHelper.wrapDegrees(lastReportedPitch - pitch);

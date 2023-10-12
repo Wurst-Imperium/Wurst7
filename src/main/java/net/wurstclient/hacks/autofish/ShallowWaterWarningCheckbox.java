@@ -9,7 +9,6 @@ package net.wurstclient.hacks.autofish;
 
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IFishingBobberEntity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 
@@ -32,10 +31,7 @@ public class ShallowWaterWarningCheckbox extends CheckboxSetting
 	
 	public void checkWaterAround(FishingBobberEntity bobber)
 	{
-		boolean isOpenWater = ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
-		
-		if(isOpenWater)
+		if(bobber.isOpenOrWaterAround(bobber.getBlockPos()))
 		{
 			hasAlreadyWarned = false;
 			return;

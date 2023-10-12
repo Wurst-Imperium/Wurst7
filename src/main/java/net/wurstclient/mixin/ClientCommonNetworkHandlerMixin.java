@@ -12,20 +12,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.chunk.ChunkOcclusionDataBuilder;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.network.ClientCommonNetworkHandler;
+import net.minecraft.network.listener.ClientCommonPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.SetOpaqueCubeListener.SetOpaqueCubeEvent;
+import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
-@Mixin(ChunkOcclusionDataBuilder.class)
-public class ChunkOcclusionGraphBuilderMixin
+@Mixin(ClientCommonNetworkHandler.class)
+public abstract class ClientCommonNetworkHandlerMixin
+	implements ClientCommonPacketListener
 {
 	@Inject(at = @At("HEAD"),
-		method = "markClosed(Lnet/minecraft/util/math/BlockPos;)V",
+		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
-	private void onMarkClosed(BlockPos pos, CallbackInfo ci)
+	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
 	{
-		SetOpaqueCubeEvent event = new SetOpaqueCubeEvent();
+		PacketOutputEvent event = new PacketOutputEvent(packet);
 		EventManager.fire(event);
 		
 		if(event.isCancelled())

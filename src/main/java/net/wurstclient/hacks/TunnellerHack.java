@@ -153,7 +153,7 @@ public final class TunnellerHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
@@ -452,7 +452,7 @@ public final class TunnellerHack extends Hack
 			}
 			
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;
@@ -807,7 +807,7 @@ public final class TunnellerHack extends Hack
 			// check for nearby falling blocks
 			return StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof FallingBlockEntity)
+				.filter(FallingBlockEntity.class::isInstance)
 				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
 		}
 		
@@ -877,7 +877,7 @@ public final class TunnellerHack extends Hack
 			return;
 		
 		// check timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// place block
@@ -889,7 +889,7 @@ public final class TunnellerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		// reset timer
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private boolean breakBlock(BlockPos pos)

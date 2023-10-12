@@ -38,7 +38,7 @@ public final class OverlayRenderer
 	public void updateProgress()
 	{
 		prevProgress = progress;
-		progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+		progress = MC.interactionManager.currentBreakingProgress;
 		
 		if(progress < prevProgress)
 			prevProgress = progress;

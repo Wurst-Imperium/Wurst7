@@ -234,7 +234,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			.reversed();
 		
 		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof EndCrystalEntity)
+			.filter(EndCrystalEntity.class::isInstance)
 			.filter(e -> !e.isRemoved())
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.sorted(furthestFromPlayer)

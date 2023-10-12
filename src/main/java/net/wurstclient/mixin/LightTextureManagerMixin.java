@@ -18,8 +18,8 @@ import net.wurstclient.WurstClient;
 @Mixin(LightmapTextureManager.class)
 public class LightTextureManagerMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"getDarknessFactor(F)F"},
+	@Inject(at = @At("HEAD"),
+		method = "getDarknessFactor(F)F",
 		cancellable = true)
 	private void onGetDarknessFactor(float delta,
 		CallbackInfoReturnable<Float> ci)
