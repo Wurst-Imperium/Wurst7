@@ -36,9 +36,6 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(new FilterHostileSetting(
 			"Won't view hostile mobs like zombies and creepers.", true));
 		
-		builder.add(FilterZombiePiglinsSetting
-			.onOffOnly("Won't view zombified piglins.", true));
-		
 		builder
 			.add(FilterEndermenSetting.onOffOnly("Won't view endermen.", true));
 		
@@ -63,6 +60,12 @@ public final class RemoteViewFilterList extends EntityFilterList
 		
 		builder.add(new FilterGolemsSetting(
 			"Won't view iron golems and snow golems.", true));
+		
+		builder
+			.add(FilterPiglinsSetting.onOffOnly("Won't view piglins.", true));
+		
+		builder.add(FilterZombiePiglinsSetting
+			.onOffOnly("Won't view zombified piglins.", true));
 		
 		builder.add(new FilterShulkersSetting("Won't view shulkers.", true));
 		

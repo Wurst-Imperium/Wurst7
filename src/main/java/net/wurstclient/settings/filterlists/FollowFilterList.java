@@ -36,9 +36,6 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterHostileSetting(
 			"Won't follow hostile mobs like zombies and creepers.", true));
 		
-		builder.add(FilterZombiePiglinsSetting
-			.onOffOnly("Won't follow zombified piglins.", true));
-		
 		builder.add(
 			FilterEndermenSetting.onOffOnly("Won't follow endermen.", true));
 		
@@ -63,6 +60,12 @@ public final class FollowFilterList extends EntityFilterList
 		
 		builder.add(new FilterGolemsSetting(
 			"Won't follow iron golems and snow golems.", true));
+		
+		builder
+			.add(FilterPiglinsSetting.onOffOnly("Won't follow piglins.", true));
+		
+		builder.add(FilterZombiePiglinsSetting
+			.onOffOnly("Won't follow zombified piglins.", true));
 		
 		builder.add(new FilterShulkersSetting("Won't follow shulkers.", true));
 		

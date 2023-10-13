@@ -53,6 +53,14 @@ public final class CrystalAuraFilterList extends EntityFilterList
 		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
 			+ " golems when auto-placing crystals." + damageWarning, true));
 		
+		builder.add(new FilterPiglinsSetting("Won't target piglins when"
+			+ " auto-placing crystals." + damageWarning,
+			AttackDetectingEntityFilter.Mode.ON));
+		
+		builder.add(new FilterZombiePiglinsSetting("Won't target"
+			+ " zombified piglins when auto-placing crystals." + damageWarning,
+			AttackDetectingEntityFilter.Mode.ON));
+		
 		builder.add(new FilterShulkersSetting("Won't target shulkers when"
 			+ " auto-placing crystals." + damageWarning, true));
 		
