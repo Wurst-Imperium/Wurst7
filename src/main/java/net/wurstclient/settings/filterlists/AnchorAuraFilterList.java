@@ -47,6 +47,9 @@ public final class AnchorAuraFilterList extends EntityFilterList
 			+ " wandering traders when auto-placing anchors." + damageWarning,
 			true));
 		
+		builder.add(new FilterZombieVillagersSetting("Won't target zombified"
+			+ " villagers when auto-placing anchors." + damageWarning, true));
+		
 		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
 			+ " golems when auto-placing anchors." + damageWarning, true));
 		

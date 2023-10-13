@@ -58,6 +58,9 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(new FilterVillagersSetting(
 			"Won't view villagers and wandering traders.", true));
 		
+		builder.add(new FilterZombieVillagersSetting(
+			"Won't view zombified villagers.", true));
+		
 		builder.add(new FilterGolemsSetting(
 			"Won't view iron golems and snow golems.", true));
 		

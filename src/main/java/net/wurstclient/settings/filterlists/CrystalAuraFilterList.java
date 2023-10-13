@@ -47,6 +47,9 @@ public final class CrystalAuraFilterList extends EntityFilterList
 			+ " wandering traders when auto-placing crystals." + damageWarning,
 			true));
 		
+		builder.add(new FilterZombieVillagersSetting("Won't target zombified"
+			+ " villagers when auto-placing crystals." + damageWarning, true));
+		
 		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
 			+ " golems when auto-placing crystals." + damageWarning, true));
 		

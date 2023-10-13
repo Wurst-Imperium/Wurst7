@@ -58,6 +58,9 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterVillagersSetting(
 			"Won't follow villagers and wandering traders.", true));
 		
+		builder.add(new FilterZombieVillagersSetting(
+			"Won't follow zombified villagers.", true));
+		
 		builder.add(new FilterGolemsSetting(
 			"Won't follow iron golems and snow golems.", true));
 		
