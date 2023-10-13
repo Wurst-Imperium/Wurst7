@@ -12,13 +12,10 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext;
-import net.wurstclient.WurstClient;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -79,7 +76,7 @@ public enum TreeBotUtils
 			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
+			linesOfSight[i] = BlockUtils.hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
 		Direction side = null;
@@ -103,15 +100,5 @@ public enum TreeBotUtils
 		
 		// will be null if no LOS was found
 		return side;
-	}
-	
-	private static boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, WurstClient.MC.player);
-		
-		return WurstClient.MC.world.raycast(context)
-			.getType() == HitResult.Type.MISS;
 	}
 }
