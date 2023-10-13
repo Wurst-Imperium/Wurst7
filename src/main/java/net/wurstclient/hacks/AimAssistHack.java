@@ -17,8 +17,8 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.Category;
 import net.minecraft.world.RaycastContext;
+import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -46,12 +46,9 @@ public final class AimAssistHack extends Hack
 			+ "360\u00b0 = aims at entities all around you.",
 		120, 30, 360, 10, ValueDisplay.DEGREES);
 	
-	private final CheckboxSetting checkLOS =
-		new CheckboxSetting("Check line of sight",
-			"Ensures that you don't reach through blocks when attacking.\n\n"
-				+ "Slower but can help with anti-cheat plugins.",
-			false);
-
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight", "Won't aim at entities behind blocks.", true);
+	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
@@ -136,10 +133,9 @@ public final class AimAssistHack extends Hack
 		if(target == null)
 			return;
 		
-		
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d hitVec = target.getBoundingBox().getCenter();
-				if(checkLOS.isChecked() && MC.world
+		if(checkLOS.isChecked() && MC.world
 			.raycast(new RaycastContext(eyesPos, hitVec,
 				RaycastContext.ShapeType.COLLIDER,
 				RaycastContext.FluidHandling.NONE, MC.player))
