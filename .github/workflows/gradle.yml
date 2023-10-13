@@ -34,6 +34,7 @@ jobs:
     - name: Execute Gradle build
       run: ./gradlew build
     - name: VirusTotal scan
+      if: github.event_name == 'push'
       uses: crazy-max/ghaction-virustotal@v4
       with:
         vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
