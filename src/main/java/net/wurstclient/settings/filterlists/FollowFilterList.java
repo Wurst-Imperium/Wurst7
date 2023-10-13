@@ -55,7 +55,7 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterPetsSetting(
 			"Won't follow tamed wolves, tamed horses, etc.", true));
 		
-		builder.add(new FilterTradersSetting(
+		builder.add(new FilterVillagersSetting(
 			"Won't follow villagers and wandering traders.", true));
 		
 		builder.add(new FilterGolemsSetting(

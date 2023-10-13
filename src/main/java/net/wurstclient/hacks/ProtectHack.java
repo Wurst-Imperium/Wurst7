@@ -61,7 +61,7 @@ public final class ProtectHack extends Hack
 			FilterBabiesSetting.genericCombat(false),
 			FilterBatsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
-			FilterTradersSetting.genericCombat(false),
+			FilterVillagersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
 			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),
