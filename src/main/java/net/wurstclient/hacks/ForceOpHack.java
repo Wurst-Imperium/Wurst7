@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -172,7 +172,8 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			return;
 		}
 		
-		MC.player.sendChatMessage("/login " + MC.getSession().getUsername());
+		MC.getNetworkHandler()
+			.sendChatCommand("login " + MC.getSession().getUsername());
 		lastPW = 0;
 		sendIndexToDialog();
 		
@@ -202,7 +203,8 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			while(!sent)
 				try
 				{
-					MC.player.sendChatMessage("/login " + passwords[i]);
+					MC.getNetworkHandler()
+						.sendChatCommand("login " + passwords[i]);
 					sent = true;
 					
 				}catch(Exception e)

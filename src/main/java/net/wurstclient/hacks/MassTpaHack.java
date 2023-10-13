@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -45,7 +45,7 @@ public final class MassTpaHack extends Hack
 		timer = -1;
 		
 		players.clear();
-		String playerName = MC.getSession().getProfile().getName();
+		String playerName = MC.getSession().getUsername();
 		
 		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
 		{
@@ -92,7 +92,7 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 		
-		MC.player.sendChatMessage("/tpa " + players.get(index));
+		MC.getNetworkHandler().sendChatCommand("tpa " + players.get(index));
 		index++;
 		timer = 20;
 	}

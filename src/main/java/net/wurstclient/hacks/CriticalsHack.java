@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,10 +21,8 @@ import net.wurstclient.settings.EnumSetting;
 public final class CriticalsHack extends Hack implements LeftClickListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lPacket\u00a7r mode sends packets to server without actually\n"
-			+ "moving you at all.\n\n"
-			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to\n"
-			+ "get a critical hit.\n\n"
+		"\u00a7lPacket\u00a7r mode sends packets to server without actually moving you at all.\n\n"
+			+ "\u00a7lMini Jump\u00a7r mode does a tiny jump that is just enough to get a critical hit.\n\n"
 			+ "\u00a7lFull Jump\u00a7r mode makes you jump normally.",
 		Mode.values(), Mode.PACKET);
 	

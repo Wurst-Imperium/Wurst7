@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,19 +7,11 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.Session;
 
 public interface IMinecraftClient
 {
-	public void rightClick();
-	
-	public void setItemUseCooldown(int itemUseCooldown);
-	
 	public IClientPlayerInteractionManager getInteractionManager();
-	
-	public ILanguageManager getLanguageManager();
-	
-	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();
 	

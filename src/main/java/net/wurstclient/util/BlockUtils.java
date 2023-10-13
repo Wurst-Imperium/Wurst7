@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,11 +14,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.wurstclient.WurstClient;
@@ -51,18 +51,52 @@ public enum BlockUtils
 	
 	public static String getName(Block block)
 	{
-		return Registry.BLOCK.getId(block).toString();
+		return Registries.BLOCK.getId(block).toString();
 	}
 	
+	/**
+	 * @param name
+	 *            a String containing the block's name ({@link Identifier})
+	 * @return the requested block, or <code>minecraft:air</code> if the block
+	 *         doesn't exist.
+	 */
 	public static Block getBlockFromName(String name)
 	{
 		try
 		{
-			return Registry.BLOCK.get(new Identifier(name));
+			return Registries.BLOCK.get(new Identifier(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
 			return Blocks.AIR;
+		}
+	}
+	
+	/**
+	 * @param nameOrId
+	 *            a String containing the block's name ({@link Identifier}) or
+	 *            numeric ID.
+	 * @return the requested block, or null if the block doesn't exist.
+	 */
+	public static Block getBlockFromNameOrID(String nameOrId)
+	{
+		if(MathUtils.isInteger(nameOrId))
+		{
+			BlockState state = Block.STATE_IDS.get(Integer.parseInt(nameOrId));
+			if(state == null)
+				return null;
+			
+			return state.getBlock();
+		}
+		
+		try
+		{
+			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
+				.orElse(null);
+			
+		}catch(InvalidIdentifierException e)
+		{
+			return null;
 		}
 	}
 	
@@ -86,6 +120,11 @@ public enum BlockUtils
 		return getOutlineShape(pos) != VoxelShapes.empty();
 	}
 	
+	public static boolean isOpaqueFullCube(BlockPos pos)
+	{
+		return getState(pos).isOpaqueFullCube(MC.world, pos);
+	}
+	
 	public static ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)
 	{
 		ArrayList<BlockPos> blocks = new ArrayList<>();
@@ -101,6 +140,12 @@ public enum BlockUtils
 					blocks.add(new BlockPos(x, y, z));
 				
 		return blocks;
+	}
+	
+	public static ArrayList<BlockPos> getAllInBox(BlockPos center, int range)
+	{
+		return getAllInBox(center.add(-range, -range, -range),
+			center.add(range, range, range));
 	}
 	
 	public static Stream<BlockPos> getAllInBoxStream(BlockPos from, BlockPos to)
@@ -140,5 +185,11 @@ public enum BlockUtils
 			* (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
 		
 		return stream.limit(limit);
+	}
+	
+	public static Stream<BlockPos> getAllInBoxStream(BlockPos center, int range)
+	{
+		return getAllInBoxStream(center.add(-range, -range, -range),
+			center.add(range, range, range));
 	}
 }

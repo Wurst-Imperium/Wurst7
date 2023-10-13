@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,11 +16,12 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.ListWidget;
@@ -35,15 +36,9 @@ public final class SelectFileScreen extends Screen
 	
 	public SelectFileScreen(Screen prevScreen, FileSetting blockList)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		setting = blockList;
-	}
-	
-	@Override
-	public boolean isPauseScreen()
-	{
-		return false;
 	}
 	
 	@Override
@@ -51,15 +46,22 @@ public final class SelectFileScreen extends Screen
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
 		
-		addDrawableChild(new ButtonWidget(8, 8, 100, 20,
-			new LiteralText("Open Folder"), b -> openFolder()));
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			new LiteralText("Reset to Defaults"), b -> askToConfirmReset()));
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Open Folder"), b -> openFolder())
+				.dimensions(8, 8, 100, 20).build());
 		
-		doneButton = addDrawableChild(new ButtonWidget(width / 2 - 102,
-			height - 48, 100, 20, new LiteralText("Done"), b -> done()));
-		addDrawableChild(new ButtonWidget(width / 2 + 2, height - 48, 100, 20,
-			new LiteralText("Cancel"), b -> openPrevScreen()));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reset to Defaults"),
+				b -> askToConfirmReset())
+			.dimensions(width - 108, 8, 100, 20).build());
+		
+		doneButton = addDrawableChild(
+			ButtonWidget.builder(Text.literal("Done"), b -> done())
+				.dimensions(width / 2 - 102, height - 48, 100, 20).build());
+		
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Cancel"), b -> openPrevScreen())
+				.dimensions(width / 2 + 2, height - 48, 100, 20).build());
 	}
 	
 	private void openFolder()
@@ -86,10 +88,10 @@ public final class SelectFileScreen extends Screen
 	
 	private void askToConfirmReset()
 	{
-		LiteralText title = new LiteralText("Reset Folder");
+		Text title = Text.literal("Reset Folder");
 		
-		LiteralText message = new LiteralText(
-			"This will empty the '" + setting.getFolder().getFileName()
+		Text message = Text
+			.literal("This will empty the '" + setting.getFolder().getFileName()
 				+ "' folder and then re-generate the default files.\n"
 				+ "Are you sure you want to do this?");
 		
@@ -135,11 +137,12 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -161,21 +164,34 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer, setting.getName(),
-			width / 2, 12, 0xffffff);
+		context.drawCenteredTextWithShadow(client.textRenderer,
+			setting.getName(), width / 2, 12, 0xffffff);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		if(doneButton.isHovered() && !doneButton.active)
-			renderTooltip(matrixStack,
-				Arrays.asList(new LiteralText("You must first select a file.")),
+		if(doneButton.isSelected() && !doneButton.active)
+			context.drawTooltip(textRenderer,
+				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
+	}
+	
+	@Override
+	public boolean shouldPause()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean shouldCloseOnEsc()
+	{
+		return false;
 	}
 	
 	private static class ListGui extends ListWidget
@@ -221,16 +237,17 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
-			TextRenderer fr = mc.textRenderer;
+			TextRenderer tr = mc.textRenderer;
 			
 			Path path = list.get(index);
-			fr.draw(matrixStack, "" + path.getFileName(), x + 28, y, 0xf0f0f0);
-			fr.draw(matrixStack,
+			context.drawText(tr, "" + path.getFileName(), x + 28, y, 0xf0f0f0,
+				false);
+			context.drawText(tr,
 				"" + client.runDirectory.toPath().relativize(path), x + 28,
-				y + 9, 0xa0a0a0);
+				y + 9, 0xa0a0a0, false);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,8 +13,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -34,7 +34,7 @@ public final class HackListHUD implements UpdateListener
 		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class, this);
 	}
 	
-	public void render(MatrixStack matrixStack, float partialTicks)
+	public void render(DrawContext context, float partialTicks)
 	{
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
@@ -59,26 +59,26 @@ public final class HackListHUD implements UpdateListener
 		Window sr = WurstClient.MC.getWindow();
 		
 		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
-			drawCounter(matrixStack);
+			drawCounter(context);
 		else
-			drawHackList(matrixStack, partialTicks);
+			drawHackList(context, partialTicks);
 	}
 	
-	private void drawCounter(MatrixStack matrixStack)
+	private void drawCounter(DrawContext context)
 	{
 		long size = activeHax.stream().filter(e -> e.hack.isEnabled()).count();
 		String s = size + " hack" + (size != 1 ? "s" : "") + " active";
-		drawString(matrixStack, s);
+		drawString(context, s);
 	}
 	
-	private void drawHackList(MatrixStack matrixStack, float partialTicks)
+	private void drawHackList(DrawContext context, float partialTicks)
 	{
 		if(otf.isAnimations())
 			for(HackListEntry e : activeHax)
-				drawWithOffset(matrixStack, e, partialTicks);
+				drawWithOffset(context, e, partialTicks);
 		else
 			for(HackListEntry e : activeHax)
-				drawString(matrixStack, e.hack.getRenderName());
+				drawString(context, e.hack.getRenderName());
 	}
 	
 	public void updateState(Hack hack)
@@ -129,7 +129,7 @@ public final class HackListHUD implements UpdateListener
 		}
 	}
 	
-	private void drawString(MatrixStack matrixStack, String s)
+	private void drawString(DrawContext context, String s)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
 		int posX;
@@ -144,13 +144,13 @@ public final class HackListHUD implements UpdateListener
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		tr.draw(matrixStack, s, posX + 1, posY + 1, 0xff000000);
-		tr.draw(matrixStack, s, posX, posY, textColor | 0xff000000);
+		context.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
+		context.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
 		
 		posY += 9;
 	}
 	
-	private void drawWithOffset(MatrixStack matrixStack, HackListEntry e,
+	private void drawWithOffset(DrawContext context, HackListEntry e,
 		float partialTicks)
 	{
 		TextRenderer tr = WurstClient.MC.textRenderer;
@@ -171,8 +171,9 @@ public final class HackListHUD implements UpdateListener
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		tr.draw(matrixStack, s, posX + 1, posY + 1, 0x04000000 | alpha);
-		tr.draw(matrixStack, s, posX, posY, textColor | alpha);
+		context.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
+			false);
+		context.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
 		
 		posY += 9;
 	}

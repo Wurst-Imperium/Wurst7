@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,23 +26,22 @@ import net.wurstclient.hack.HackList;
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z"},
+	@Inject(at = @At("HEAD"),
+		method = "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z",
 		cancellable = true)
 	private static void onShouldDrawSide(BlockState state, BlockView world,
 		BlockPos pos, Direction direction, BlockPos blockPos,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
 			cir.setReturnValue(event.isRendered());
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"getVelocityMultiplier()F"},
+	@Inject(at = @At("HEAD"),
+		method = "getVelocityMultiplier()F",
 		cancellable = true)
 	private void onGetVelocityMultiplier(CallbackInfoReturnable<Float> cir)
 	{

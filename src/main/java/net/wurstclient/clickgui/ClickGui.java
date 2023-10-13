@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
@@ -27,21 +28,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.components.FeatureButton;
 import net.wurstclient.hacks.ClickGuiHack;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.json.JsonUtils;
 
 public final class ClickGui
@@ -58,6 +59,8 @@ public final class ClickGui
 	private int txtColor;
 	private float opacity;
 	private float ttOpacity;
+	private int maxHeight;
+	private int maxSettingsHeight;
 	
 	private String tooltip = "";
 	
@@ -90,6 +93,7 @@ public final class ClickGui
 		Window uiSettings = new Window("UI Settings");
 		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().keybindManagerOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
@@ -176,8 +180,8 @@ public final class ClickGui
 				continue;
 			
 			JsonObject jsonWindow = new JsonObject();
-			jsonWindow.addProperty("x", window.getX());
-			jsonWindow.addProperty("y", window.getY());
+			jsonWindow.addProperty("x", window.getActualX());
+			jsonWindow.addProperty("y", window.getActualY());
 			jsonWindow.addProperty("minimized", window.isMinimized());
 			jsonWindow.addProperty("pinned", window.isPinned());
 			json.add(window.getTitle(), jsonWindow);
@@ -456,7 +460,7 @@ public final class ClickGui
 		}
 	}
 	
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		updateColors();
@@ -490,18 +494,19 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
+			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
-		renderPopups(matrixStack, mouseX, mouseY);
-		renderTooltip(matrixStack, mouseX, mouseY);
+		renderPopups(context, mouseX, mouseY);
+		renderTooltip(context, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopups(MatrixStack matrixStack, int mouseX, int mouseY)
+	public void renderPopups(DrawContext context, int mouseX, int mouseY)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -516,16 +521,17 @@ public final class ClickGui
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
-			popup.render(matrixStack, cMouseX, cMouseY);
+			popup.render(context, cMouseX, cMouseY);
 			
 			matrixStack.pop();
 		}
 	}
 	
-	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		MatrixStack matrixStack = context.getMatrices();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		if(tooltip.isEmpty())
 			return;
@@ -551,8 +557,9 @@ public final class ClickGui
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -563,8 +570,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -575,19 +581,19 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
 		bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
 		bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for(int i = 0; i < lines.length; i++)
-			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
-				txtColor);
+			context.drawText(fr, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		matrixStack.pop();
 	}
 	
-	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
+	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -596,7 +602,7 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
-				renderWindow(matrixStack, window, Integer.MIN_VALUE,
+				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
 			
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -611,20 +617,17 @@ public final class ClickGui
 		ttOpacity = clickGui.getTooltipOpacity();
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
+		maxHeight = clickGui.getMaxHeight();
+		maxSettingsHeight = clickGui.getMaxSettingsHeight();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
-		{
-			float x = System.currentTimeMillis() % 2000 / 1000F;
-			acColor[0] = 0.5F + 0.5F * (float)Math.sin(x * Math.PI);
-			acColor[1] = 0.5F + 0.5F * (float)Math.sin((x + 4F / 3F) * Math.PI);
-			acColor[2] = 0.5F + 0.5F * (float)Math.sin((x + 8F / 3F) * Math.PI);
-			
-		}else
+			acColor = RenderUtils.getRainbowColor();
+		else
 			acColor = clickGui.getAccentColor();
 	}
 	
-	private void renderWindow(MatrixStack matrixStack, Window window,
-		int mouseX, int mouseY, float partialTicks)
+	private void renderWindow(DrawContext context, Window window, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		int x1 = window.getX();
 		int y1 = window.getY();
@@ -632,9 +635,11 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -644,7 +649,8 @@ public final class ClickGui
 		
 		if(!window.isMinimized())
 		{
-			window.setMaxHeight(187);
+			window.setMaxHeight(window instanceof SettingsWindow
+				? maxSettingsHeight : maxHeight);
 			window.validate();
 			
 			// scrollbar
@@ -685,8 +691,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs1, ys2, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys2, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
-				bufferBuilder.end();
-				BufferRenderer.draw(bufferBuilder);
+				tessellator.draw();
 				
 				boolean hovering = mouseX >= xs1 && mouseY >= ys3
 					&& mouseX < xs2 && mouseY < ys4;
@@ -701,8 +706,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs1, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
-				bufferBuilder.end();
-				BufferRenderer.draw(bufferBuilder);
+				tessellator.draw();
 				
 				// outline
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
@@ -715,8 +719,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs2, ys4, 0).next();
 				bufferBuilder.vertex(matrix, xs2, ys3, 0).next();
 				bufferBuilder.vertex(matrix, xs1, ys3, 0).next();
-				bufferBuilder.end();
-				BufferRenderer.draw(bufferBuilder);
+				tessellator.draw();
 			}
 			
 			int x3 = x1 + 2;
@@ -739,8 +742,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x5, y2, 0).next();
 			bufferBuilder.vertex(matrix, x4, y2, 0).next();
 			bufferBuilder.vertex(matrix, x4, y3, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
@@ -788,20 +790,22 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
 			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
 			
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			// render children
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y4;
 			for(int i = 0; i < window.countChildren(); i++)
-				window.getChild(i).render(matrixStack, cMouseX, cMouseY,
+				window.getChild(i).render(context, cMouseX, cMouseY,
 					partialTicks);
 			
 			matrixStack.pop();
 			matrix = matrixStack.peek().getPositionMatrix();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
+		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -813,8 +817,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		if(!window.isMinimized())
 		{
@@ -823,8 +826,7 @@ public final class ClickGui
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0).next();
 			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 		}
 		
 		// title bar buttons
@@ -832,7 +834,6 @@ public final class ClickGui
 		int y4 = y1 + 2;
 		int y5 = y3 - 2;
 		boolean hoveringY = mouseY >= y4 && mouseY < y5;
-		
 		if(window.isClosable())
 		{
 			x3 -= 11;
@@ -874,8 +875,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x3, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y3, 0).next();
 		bufferBuilder.vertex(matrix, x2, y5, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// title bar background
 		// behind title
@@ -885,16 +885,14 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y3, 0).next();
 		bufferBuilder.vertex(matrix, x3, y3, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// window title
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		TextRenderer fr = MC.textRenderer;
-		String title =
-			fr.trimToWidth(new LiteralText(window.getTitle()), x3 - x1)
-				.getString();
-		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
+		String title = fr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
+			.getString();
+		context.drawText(fr, title, x1 + 2, y1 + 3, txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -904,8 +902,9 @@ public final class ClickGui
 		int x3 = x2 + 2;
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -916,8 +915,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// background between buttons
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
@@ -928,8 +926,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// button outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -940,8 +937,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void renderMinimizeButton(MatrixStack matrixStack, int x1, int y1,
@@ -950,7 +946,8 @@ public final class ClickGui
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		float xa1 = x1 + 1;
 		float xa2 = (x1 + x2) / 2.0F;
@@ -977,8 +974,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -988,8 +984,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void renderPinButton(MatrixStack matrixStack, int x1, int y1,
@@ -999,7 +994,8 @@ public final class ClickGui
 		float h = hovering ? 1 : 0.85F;
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		if(pinned)
 		{
@@ -1023,8 +1019,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float xn1 = x1 + 3.5F;
 			float xn2 = x2 - 3.5F;
@@ -1039,8 +1034,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn2, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn2, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -1051,8 +1045,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk2, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk2, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
@@ -1060,8 +1053,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk2, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
@@ -1099,8 +1091,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk6, yk6, 0).next();
 			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			float xn1 = x1 + 3;
 			float xn2 = x1 + 4;
@@ -1116,8 +1107,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 			bufferBuilder.vertex(matrix, xn2, yn2, 0).next();
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -1128,8 +1118,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk3, yk3, 0).next();
 			bufferBuilder.vertex(matrix, xk4, yk4, 0).next();
 			bufferBuilder.vertex(matrix, xk1, yk1, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
@@ -1137,8 +1126,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk3, yk7, 0).next();
 			bufferBuilder.vertex(matrix, xk7, yk4, 0).next();
 			bufferBuilder.vertex(matrix, xk5, yk5, 0).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			tessellator.draw();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 				VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
@@ -1146,8 +1134,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xn3, yn3, 0).next();
 			bufferBuilder.vertex(matrix, xn1, yn1, 0).next();
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private void renderCloseButton(MatrixStack matrixStack, int x1, int y1,
@@ -1156,7 +1143,8 @@ public final class ClickGui
 		renderTitleBarButton(matrixStack, x1, y1, x2, y2, hovering);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		float xc1 = x1 + 2;
 		float xc2 = x1 + 3;
@@ -1189,8 +1177,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
 		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
 		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -1208,8 +1195,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc2, yc4, 0).next();
 		bufferBuilder.vertex(matrix, xc1, yc3, 0).next();
 		bufferBuilder.vertex(matrix, xc5, yc6, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	public float[] getBgColor()

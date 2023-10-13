@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,11 +32,11 @@ public class WalkPathProcessor extends PathProcessor
 		// get positions
 		BlockPos pos;
 		if(WurstClient.MC.player.isOnGround())
-			pos = new BlockPos(WurstClient.MC.player.getX(),
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = new BlockPos(WurstClient.MC.player.getPos());
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		
@@ -87,17 +87,17 @@ public class WalkPathProcessor extends PathProcessor
 				&& (WurstClient.MC.player.isTouchingWater()
 					|| WurstClient.MC.player.isInLava()
 					|| WURST.getHax().jesusHack.isOverLiquid()))
-				MC.options.keySneak.setPressed(true);
+				MC.options.sneakKey.setPressed(true);
 		}
 		
 		// horizontal movement
 		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
 		{
-			MC.options.keyForward.setPressed(true);
+			MC.options.forwardKey.setPressed(true);
 			
 			if(index > 0 && path.get(index - 1).isJumping()
 				|| pos.getY() < nextPos.getY())
-				MC.options.keyJump.setPressed(true);
+				MC.options.jumpKey.setPressed(true);
 			
 			// vertical movement
 		}else if(pos.getY() != nextPos.getY())
@@ -112,7 +112,7 @@ public class WalkPathProcessor extends PathProcessor
 					WURST.getRotationFaker().faceVectorClientIgnorePitch(
 						BlockUtils.getBoundingBox(pos).getCenter());
 					
-					MC.options.keyForward.setPressed(true);
+					MC.options.forwardKey.setPressed(true);
 					
 				}else
 				{
@@ -122,7 +122,7 @@ public class WalkPathProcessor extends PathProcessor
 						index++;
 					
 					// jump up
-					MC.options.keyJump.setPressed(true);
+					MC.options.jumpKey.setPressed(true);
 				}
 				
 				// go down
@@ -135,7 +135,7 @@ public class WalkPathProcessor extends PathProcessor
 				
 				// walk off the edge
 				if(WurstClient.MC.player.isOnGround())
-					MC.options.keyForward.setPressed(true);
+					MC.options.forwardKey.setPressed(true);
 			}
 	}
 }

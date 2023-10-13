@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -56,7 +56,7 @@ public final class AntiAfkHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		start = new BlockPos(MC.player.getPos());
+		start = BlockPos.ofFloored(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
 		creativeFlying = MC.player.getAbilities().flying;
@@ -71,10 +71,8 @@ public final class AntiAfkHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		MC.options.keyForward.setPressed(
-			((IKeyBinding)MC.options.keyForward).isActallyPressed());
-		MC.options.keyJump
-			.setPressed(((IKeyBinding)MC.options.keyJump).isActallyPressed());
+		((IKeyBinding)MC.options.forwardKey).resetPressedState();
+		((IKeyBinding)MC.options.jumpKey).resetPressedState();
 		
 		pathFinder = null;
 		processor = null;
@@ -100,7 +98,7 @@ public final class AntiAfkHack extends Hack
 			{
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
-					MC.options.keyJump.setPressed(MC.player.isTouchingWater());
+					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
@@ -156,12 +154,12 @@ public final class AntiAfkHack extends Hack
 			
 			// walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
-				MC.options.keyForward.setPressed(true);
+				MC.options.forwardKey.setPressed(true);
 			else
-				MC.options.keyForward.setPressed(false);
+				MC.options.forwardKey.setPressed(false);
 			
 			// swim up
-			MC.options.keyJump.setPressed(MC.player.isTouchingWater());
+			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 			
 			// update timer
 			if(timer > 0)
@@ -176,7 +174,7 @@ public final class AntiAfkHack extends Hack
 			return;
 		
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 			pathCmd.isDepthTest());
 	}

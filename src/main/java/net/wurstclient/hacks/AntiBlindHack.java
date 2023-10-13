@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,10 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness"})
+@SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness",
+	"AntiDarkness", "NoDarkness", "anti darkness", "no darkness",
+	"AntiWardenEffect", "anti warden effect", "NoWardenEffect",
+	"no warden effect"})
 public final class AntiBlindHack extends Hack
 {
 	public AntiBlindHack()
@@ -19,4 +22,6 @@ public final class AntiBlindHack extends Hack
 		super("AntiBlind");
 		setCategory(Category.RENDER);
 	}
+	
+	// See BackgroundRendererMixin, LightTextureManagerMixin, WorldRendererMixin
 }

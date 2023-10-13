@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,9 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -21,11 +23,8 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
-import net.wurstclient.mixinterface.IScreen;
 
 public class CleanUpScreen extends Screen
 {
@@ -41,7 +40,7 @@ public class CleanUpScreen extends Screen
 	
 	public CleanUpScreen(MultiplayerScreen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
@@ -202,31 +201,28 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Clean Up", width / 2, 20,
-			16777215);
-		drawCenteredText(matrixStack, textRenderer,
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
+			20, 16777215);
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
 			10526880);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
-			if(!button.isHovered() || !(button instanceof CleanUpButton))
+			if(!button.isSelected() || !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;
@@ -234,7 +230,7 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, cuButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -247,8 +243,8 @@ public class CleanUpScreen extends Screen
 		public CleanUpButton(int x, int y, Supplier<String> messageSupplier,
 			String tooltip, PressAction pressAction)
 		{
-			super(x, y, 200, 20, new LiteralText(messageSupplier.get()),
-				pressAction);
+			super(x, y, 200, 20, Text.literal(messageSupplier.get()),
+				pressAction, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
@@ -257,9 +253,9 @@ public class CleanUpScreen extends Screen
 			{
 				String[] lines = tooltip.split("\n");
 				
-				LiteralText[] lines2 = new LiteralText[lines.length];
+				Text[] lines2 = new Text[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = new LiteralText(lines[i]);
+					lines2[i] = Text.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -269,7 +265,7 @@ public class CleanUpScreen extends Screen
 		public void onPress()
 		{
 			super.onPress();
-			setMessage(new LiteralText(messageSupplier.get()));
+			setMessage(Text.literal(messageSupplier.get()));
 		}
 	}
 }

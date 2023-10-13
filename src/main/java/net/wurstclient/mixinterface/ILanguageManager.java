@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,8 +8,15 @@
 package net.wurstclient.mixinterface;
 
 import net.minecraft.client.resource.language.TranslationStorage;
+import net.wurstclient.WurstClient;
 
 public interface ILanguageManager
 {
-	public TranslationStorage getEnglish();
+	public TranslationStorage wurst_getEnglish();
+	
+	public static TranslationStorage getEnglish()
+	{
+		return ((ILanguageManager)WurstClient.MC.getLanguageManager())
+			.wurst_getEnglish();
+	}
 }

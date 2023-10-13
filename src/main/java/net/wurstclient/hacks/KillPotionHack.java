@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -107,20 +107,20 @@ public final class KillPotionHack extends Hack
 			ItemStack stack = new ItemStack(item);
 			
 			NbtCompound effect = new NbtCompound();
-			effect.putInt("Amplifier", 125);
-			effect.putInt("Duration", 2000);
-			effect.putInt("Id", 6);
+			effect.putInt("amplifier", 125);
+			effect.putInt("duration", 2000);
+			effect.putString("id", "instant_health");
 			
 			NbtList effects = new NbtList();
 			effects.add(effect);
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("custom_potion_effects", effects);
 			stack.setNbt(nbt);
 			
 			String name =
 				"\u00a7f" + itemName + " of \u00a74\u00a7lINSTANT DEATH";
-			stack.setCustomName(new LiteralText(name));
+			stack.setCustomName(Text.literal(name));
 			
 			return stack;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,16 +7,25 @@
  */
 package net.wurstclient.commands;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.ChatInputListener;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 
 public final class AnnoyCmd extends Command implements ChatInputListener
 {
+	private final CheckboxSetting rcMode = new CheckboxSetting("RC mode",
+		"Remote control mode. Re-enables a bug that allows .annoy to run Wurst"
+			+ " commands. Not recommended for security reasons, but until we have a"
+			+ " proper remote control feature, this is at least better than nothing.",
+		false);
+	
 	private boolean enabled;
 	private String target;
 	
@@ -24,6 +33,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	{
 		super("annoy", "Annoys a player by repeating everything they say.",
 			".annoy <player>", "Turn off: .annoy");
+		addSetting(rcMode);
 	}
 	
 	@Override
@@ -96,7 +106,12 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	private void repeat(String message, String prefix)
 	{
 		int beginIndex = message.indexOf(prefix) + prefix.length();
-		String repeated = message.substring(beginIndex);
-		MC.player.sendChatMessage(repeated);
+		String repeated = message.substring(beginIndex).trim();
+		repeated = StringUtils.normalizeSpace(repeated);
+		
+		if(rcMode.isChecked() && repeated.startsWith("."))
+			WURST.getCmdProcessor().process(repeated.substring(1));
+		else
+			MC.getNetworkHandler().sendChatMessage(repeated);
 	}
 }

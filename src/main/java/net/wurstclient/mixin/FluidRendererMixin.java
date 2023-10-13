@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,16 +23,15 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(FluidRenderer.class)
 public class FluidRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Z"},
+	@Inject(at = @At("HEAD"),
+		method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z",
 		cancellable = true)
-	private static void onIsSideCovered(BlockView blockView_1,
-		BlockPos blockPos_1, Direction direction_1, float float_1,
+	private static void onIsSideCovered(BlockView world, BlockPos pos,
+		Direction side, float maxDeviation, BlockState neighboringBlockState,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		BlockState state = blockView_1.getBlockState(blockPos_1);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		BlockState state = world.getBlockState(pos);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

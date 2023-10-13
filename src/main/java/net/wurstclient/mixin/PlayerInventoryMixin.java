@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,12 +18,11 @@ import net.wurstclient.WurstClient;
 @Mixin(PlayerInventory.class)
 public class PlayerInventoryMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"scrollInHotbar(D)V"},
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "scrollInHotbar(D)V", cancellable = true)
 	private void onScrollInHotbar(double scrollAmount, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getZoomKey().isPressed())
+		if(WurstClient.INSTANCE.getOtfs().zoomOtf
+			.shouldPreventHotbarScrolling())
 			ci.cancel();
 	}
 }

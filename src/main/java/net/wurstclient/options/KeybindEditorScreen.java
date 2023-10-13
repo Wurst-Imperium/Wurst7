@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,11 +7,12 @@
  */
 package net.wurstclient.options;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 public final class KeybindEditorScreen extends Screen
@@ -27,7 +28,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		
 		key = "NONE";
@@ -37,7 +38,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen, String key, String commands)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		
 		this.key = key;
@@ -48,22 +49,24 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(new ButtonWidget(width / 2 - 100, 60, 200, 20,
-			new LiteralText("Change Key"),
-			b -> client.setScreen(new PressAKeyScreen(this))));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Change Key"),
+				b -> client.setScreen(new PressAKeyScreen(this)))
+			.dimensions(width / 2 - 100, 60, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 72, 200,
-			20, new LiteralText("Save"), b -> save()));
+		addDrawableChild(ButtonWidget.builder(Text.literal("Save"), b -> save())
+			.dimensions(width / 2 - 100, height / 4 + 72, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96, 200,
-			20, new LiteralText("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 96, 200, 20).build());
 		
 		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, new LiteralText(""));
+			200, 20, Text.literal(""));
 		commandField.setMaxLength(65536);
 		addSelectableChild(commandField);
-		setInitialFocus(commandField);
-		commandField.setTextFieldFocused(true);
+		setFocused(commandField);
+		commandField.setFocused(true);
 		
 		if(oldCommands != null)
 			commandField.setText(oldCommands);
@@ -86,29 +89,31 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		commandField.tick();
-	}
-	
-	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		drawStringWithShadow(matrixStack, textRenderer,
+		context.drawTextWithShadow(textRenderer,
 			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
-		drawStringWithShadow(matrixStack, textRenderer,
-			"Commands (separated by ';')", width / 2 - 100, 87, 0xa0a0a0);
+		context.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
+			width / 2 - 100, 87, 0xa0a0a0);
 		
-		commandField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		commandField.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+	}
+	
+	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
 	}
 	
 	@Override

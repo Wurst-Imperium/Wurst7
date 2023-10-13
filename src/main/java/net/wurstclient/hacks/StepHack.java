@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,8 +25,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class StepHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lSimple\u00a7r mode can step up multiple\n"
-			+ "blocks (enables Height slider).\n"
+		"\u00a7lSimple\u00a7r mode can step up multiple blocks (enables Height slider).\n"
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.LEGIT);
 	
@@ -88,7 +87,7 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
-		double stepHeight = -1;
+		double stepHeight = Double.NEGATIVE_INFINITY;
 		
 		ArrayList<Box> blockCollisions =
 			IMC.getWorld().getBlockCollisionsStream(player, box)

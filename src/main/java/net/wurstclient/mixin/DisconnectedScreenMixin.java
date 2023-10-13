@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.mixin;
+
+import java.util.stream.Stream;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,51 +19,79 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
+import net.wurstclient.nochatreports.ForcedChatReportsScreen;
+import net.wurstclient.nochatreports.NcrModRequiredScreen;
 import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(DisconnectedScreen.class)
 public class DisconnectedScreenMixin extends Screen
 {
 	private int autoReconnectTimer;
-	
 	private ButtonWidget autoReconnectButton;
 	
 	@Shadow
 	@Final
-	private Screen parent;
-	
+	private Text reason;
 	@Shadow
-	private int reasonHeight;
+	@Final
+	private Screen parent;
+	@Shadow
+	@Final
+	private DirectionalLayoutWidget grid;
 	
-	private DisconnectedScreenMixin(WurstClient wurst, Text text_1)
+	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		int backButtonX = width / 2 - 100;
-		int backButtonY =
-			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
+		System.out.println("Disconnected: " + reason);
 		
-		addDrawableChild(new ButtonWidget(backButtonX, backButtonY + 24, 200,
-			20, new LiteralText("Reconnect"),
-			b -> LastServerRememberer.reconnect(parent)));
+		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
+		{
+			client.setScreen(new ForcedChatReportsScreen(parent));
+			return;
+		}
 		
-		autoReconnectButton = addDrawableChild(
-			new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
-				new LiteralText("AutoReconnect"), b -> pressAutoReconnect()));
+		if(NcrModRequiredScreen.isCausedByLackOfNCR(reason))
+		{
+			client.setScreen(new NcrModRequiredScreen(parent));
+			return;
+		}
 		
-		if(WurstClient.INSTANCE.getHax().autoReconnectHack.isEnabled())
-			autoReconnectTimer = 100;
+		addReconnectButtons();
+	}
+	
+	private void addReconnectButtons()
+	{
+		ButtonWidget reconnectButton = grid.add(
+			ButtonWidget.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(parent)).build(),
+			grid.copyPositioner().margin(2).marginTop(-6));
+		
+		autoReconnectButton = grid.add(
+			ButtonWidget.builder(Text.literal("AutoReconnect"),
+				b -> pressAutoReconnect()).build(),
+			grid.copyPositioner().margin(2));
+		
+		grid.refreshPositions();
+		Stream.of(reconnectButton, autoReconnectButton)
+			.forEach(this::addDrawableChild);
+		
+		AutoReconnectHack autoReconnect =
+			WurstClient.INSTANCE.getHax().autoReconnectHack;
+		
+		if(autoReconnect.isEnabled())
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	private void pressAutoReconnect()
@@ -72,22 +102,25 @@ public class DisconnectedScreenMixin extends Screen
 		autoReconnect.setEnabled(!autoReconnect.isEnabled());
 		
 		if(autoReconnect.isEnabled())
-			autoReconnectTimer = 100;
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	@Override
 	public void tick()
 	{
+		if(!WurstClient.INSTANCE.isEnabled() || autoReconnectButton == null)
+			return;
+		
 		AutoReconnectHack autoReconnect =
 			WurstClient.INSTANCE.getHax().autoReconnectHack;
 		
 		if(!autoReconnect.isEnabled())
 		{
-			autoReconnectButton.setMessage(new LiteralText("AutoReconnect"));
+			autoReconnectButton.setMessage(Text.literal("AutoReconnect"));
 			return;
 		}
 		
-		autoReconnectButton.setMessage(new LiteralText("AutoReconnect ("
+		autoReconnectButton.setMessage(Text.literal("AutoReconnect ("
 			+ (int)Math.ceil(autoReconnectTimer / 20.0) + ")"));
 		
 		if(autoReconnectTimer > 0)

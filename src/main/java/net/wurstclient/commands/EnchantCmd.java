@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,7 @@ package net.wurstclient.commands;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -52,7 +52,7 @@ public final class EnchantCmd extends Command
 	
 	private void enchant(ItemStack stack)
 	{
-		for(Enchantment enchantment : Registry.ENCHANTMENT)
+		for(Enchantment enchantment : Registries.ENCHANTMENT)
 		{
 			if(enchantment == Enchantments.SILK_TOUCH)
 				continue;

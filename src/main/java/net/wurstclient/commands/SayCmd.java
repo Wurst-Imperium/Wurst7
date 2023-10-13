@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,6 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -30,7 +29,9 @@ public final class SayCmd extends Command
 			throw new CmdSyntaxError();
 		
 		String message = String.join(" ", args);
-		ChatMessageC2SPacket packet = new ChatMessageC2SPacket(message);
-		MC.getNetworkHandler().sendPacket(packet);
+		if(message.startsWith("/"))
+			MC.getNetworkHandler().sendChatCommand(message.substring(1));
+		else
+			MC.getNetworkHandler().sendChatMessage(message);
 	}
 }

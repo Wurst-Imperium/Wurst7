@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.client.network.MultiplayerServerListPinger;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.network.ServerInfo.ServerType;
 
 public class WurstServerPinger
 {
@@ -27,7 +28,7 @@ public class WurstServerPinger
 	
 	public void ping(String ip, int port)
 	{
-		server = new ServerInfo("", ip + ":" + port, false);
+		server = new ServerInfo("", ip + ":" + port, ServerType.OTHER);
 		
 		new Thread(() -> pingInCurrentThread(ip, port),
 			"Wurst Server Pinger #" + threadNumber.incrementAndGet()).start();

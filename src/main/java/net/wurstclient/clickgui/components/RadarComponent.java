@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,11 +7,14 @@
  */
 package net.wurstclient.clickgui.components;
 
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -23,12 +26,13 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.hacks.RadarHack;
+import net.wurstclient.util.EntityUtils;
 
 public final class RadarComponent extends Component
 {
@@ -42,7 +46,7 @@ public final class RadarComponent extends Component
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -61,9 +65,11 @@ public final class RadarComponent extends Component
 			&& mouseY < y2 && mouseY >= -scroll
 			&& mouseY < getParent().getHeight() - 13 - scroll;
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tooltip
 		if(hovering)
@@ -78,8 +84,7 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		float middleX = (x1 + x2) / 2.0F;
 		float middleY = (y1 + y2) / 2.0F;
@@ -90,8 +95,8 @@ public final class RadarComponent extends Component
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		if(!hack.isRotateEnabled())
-			matrixStack.multiply(
-				Vec3f.POSITIVE_Z.getDegreesQuaternion(180 + player.getYaw()));
+			matrixStack.multiply(new Quaternionf().rotationZ(
+				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE));
 		
 		float xa1 = 0;
 		float xa2 = 2;
@@ -109,8 +114,7 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
@@ -121,27 +125,22 @@ public final class RadarComponent extends Component
 		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
 		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
 		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		matrixStack.pop();
 		matrix = matrixStack.peek().getPositionMatrix();
+		Vec3d lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);
 		
 		// points
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		for(Entity e : hack.getEntities())
 		{
-			double diffX =
-				e.lastRenderX + (e.getX() - e.lastRenderX) * partialTicks
-					- (player.lastRenderX
-						+ (player.getX() - player.lastRenderX) * partialTicks);
-			double diffZ =
-				e.lastRenderZ + (e.getZ() - e.lastRenderZ) * partialTicks
-					- (player.lastRenderZ
-						+ (player.getZ() - player.lastRenderZ) * partialTicks);
+			Vec3d lerpedEntityPos = EntityUtils.getLerpedPos(e, partialTicks);
+			double diffX = lerpedEntityPos.x - lerpedPlayerPos.x;
+			double diffZ = lerpedEntityPos.z - lerpedPlayerPos.z;
 			double distance = Math.sqrt(diffX * diffX + diffZ * diffZ)
 				* (getWidth() * 0.5 / hack.getRadius());
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));
@@ -158,7 +157,9 @@ public final class RadarComponent extends Component
 				continue;
 			
 			int color;
-			if(e instanceof PlayerEntity)
+			if(WurstClient.INSTANCE.getFriends().isFriend(e))
+				color = 0x0000FF;
+			else if(e instanceof PlayerEntity)
 				color = 0xFF0000;
 			else if(e instanceof Monster)
 				color = 0xFF8000;
@@ -189,8 +190,7 @@ public final class RadarComponent extends Component
 					middleY + (float)renderY + 0.5F, 0)
 				.color(red, green, blue, alpha).next();
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	@Override

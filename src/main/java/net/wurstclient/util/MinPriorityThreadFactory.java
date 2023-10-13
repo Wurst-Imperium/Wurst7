@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -28,12 +28,10 @@ public class MinPriorityThreadFactory implements ThreadFactory
 	@Override
 	public Thread newThread(Runnable r)
 	{
-		Thread t = new Thread(group, r,
-			namePrefix + threadNumber.getAndIncrement(), 0);
-		if(t.isDaemon())
-			t.setDaemon(false);
-		if(t.getPriority() != Thread.MIN_PRIORITY)
-			t.setPriority(Thread.MIN_PRIORITY);
+		String name = namePrefix + threadNumber.getAndIncrement();
+		Thread t = new Thread(group, r, name);
+		t.setDaemon(true);
+		t.setPriority(Thread.MIN_PRIORITY);
 		return t;
 	}
 	

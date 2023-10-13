@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,20 +15,21 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
@@ -47,6 +48,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.treebot.Tree;
 import net.wurstclient.treebot.TreeBotUtils;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -118,7 +120,7 @@ public final class TreeBotHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
@@ -225,8 +227,7 @@ public final class TreeBotHack extends Hack
 		for(BlockPos pos : blocksInRange)
 			if(breakBlock(pos))
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
-					false);
+				WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 				currentBlock = pos;
 				break;
 			}
@@ -237,7 +238,7 @@ public final class TreeBotHack extends Hack
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
 		{
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;
@@ -280,7 +281,7 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
@@ -294,7 +295,6 @@ public final class TreeBotHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
@@ -308,7 +308,6 @@ public final class TreeBotHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void drawTree(MatrixStack matrixStack)
@@ -321,9 +320,11 @@ public final class TreeBotHack extends Hack
 		
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		Shader shader = RenderSystem.getShader();
+		ShaderProgram shader = RenderSystem.getShader();
 		
-		tree.getVertexBuffer().setShader(viewMatrix, projMatrix, shader);
+		tree.getVertexBuffer().bind();
+		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
+		VertexBuffer.unbind();
 		
 		matrixStack.pop();
 	}
@@ -332,19 +333,16 @@ public final class TreeBotHack extends Hack
 	{
 		matrixStack.push();
 		
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		matrixStack.translate(currentBlock.getX() - regionX,
-			currentBlock.getY(), currentBlock.getZ() - regionZ);
+		matrixStack.translate(currentBlock.getX() - region.x(),
+			currentBlock.getY(), currentBlock.getZ() - region.z());
 		if(p < 1)
 		{
 			matrixStack.translate(0.5, 0.5, 0.5);
@@ -456,7 +454,7 @@ public final class TreeBotHack extends Hack
 	{
 		public TreeFinder()
 		{
-			super(new BlockPos(WurstClient.MC.player.getPos()));
+			super(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 		}
 		
 		public TreeFinder(TreeBotPathFinder pathFinder)
@@ -535,7 +533,7 @@ public final class TreeBotHack extends Hack
 	{
 		public AngleFinder()
 		{
-			super(new BlockPos(WurstClient.MC.player.getPos()));
+			super(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
 			setThinkSpeed(512);
 			setThinkTime(1);
 		}

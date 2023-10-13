@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,13 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
@@ -25,7 +25,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -35,16 +34,17 @@ public class WurstOptionsScreen extends Screen
 	
 	public WurstOptionsScreen(Screen prevScreen)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
 	@Override
 	public void init()
 	{
-		addDrawableChild(
-			new ButtonWidget(width / 2 - 100, height / 4 + 144 - 16, 200, 20,
-				new LiteralText("Back"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
+			.build());
 		
 		addSettingButtons();
 		addManagerButtons();
@@ -121,60 +121,68 @@ public class WurstOptionsScreen extends Screen
 		OperatingSystem os = Util.getOperatingSystem();
 		
 		new WurstOptionsButton(54, 24, () -> "Official Website",
-			"WurstClient.net", b -> os.open("https://www.wurstclient.net/"));
+			"WurstClient.net", b -> os.open(
+				"https://www.wurstclient.net/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Official+Website"));
 		
-		new WurstOptionsButton(54, 48, () -> "Wurst Wiki",
-			"Wiki.WurstClient.net",
-			b -> os.open("https://wiki.wurstclient.net/"));
+		new WurstOptionsButton(54, 48, () -> "Wurst Wiki", "Wurst.Wiki",
+			b -> os.open(
+				"https://wurst.wiki/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Wurst+Wiki"));
 		
-		new WurstOptionsButton(54, 72, () -> "Twitter", "@Wurst_Imperium",
-			b -> os.open("https://twitter.com/Wurst_Imperium"));
+		new WurstOptionsButton(54, 72, () -> "WurstForum", "WurstForum.net",
+			b -> os.open(
+				"https://wurstforum.net/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=WurstForum"));
 		
-		new WurstOptionsButton(54, 96, () -> "Reddit", "r/WurstClient",
-			b -> os.open("https://www.reddit.com/r/WurstClient/"));
+		new WurstOptionsButton(54, 96, () -> "Twitter", "@Wurst_Imperium",
+			b -> os.open("https://www.wurstclient.net/twitter/"));
 		
 		new WurstOptionsButton(54, 120, () -> "Donate",
-			"paypal.me/WurstImperium",
-			b -> os.open("https://www.wurstclient.net/donate/"));
+			"WurstClient.net/donate", b -> os.open(
+				"https://www.wurstclient.net/donate/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Donate"));
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
-		float partialTicks)
+	public void close()
 	{
-		renderBackground(matrixStack);
-		renderTitles(matrixStack);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		renderButtonTooltip(matrixStack, mouseX, mouseY);
+		client.setScreen(prevScreen);
 	}
 	
-	private void renderTitles(MatrixStack matrixStack)
+	@Override
+	public void render(DrawContext context, int mouseX, int mouseY,
+		float partialTicks)
+	{
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		renderTitles(context);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		renderButtonTooltip(context, mouseX, mouseY);
+	}
+	
+	private void renderTitles(DrawContext context)
 	{
 		TextRenderer tr = client.textRenderer;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		drawCenteredText(matrixStack, tr, "Wurst Options", middleX, y1,
+		context.drawCenteredTextWithShadow(tr, "Wurst Options", middleX, y1,
 			0xffffff);
 		
-		drawCenteredText(matrixStack, tr, "Settings", middleX - 104, y2,
+		context.drawCenteredTextWithShadow(tr, "Settings", middleX - 104, y2,
 			0xcccccc);
-		drawCenteredText(matrixStack, tr, "Managers", middleX, y2, 0xcccccc);
-		drawCenteredText(matrixStack, tr, "Links", middleX + 104, y2, 0xcccccc);
+		context.drawCenteredTextWithShadow(tr, "Managers", middleX, y2,
+			0xcccccc);
+		context.drawCenteredTextWithShadow(tr, "Links", middleX + 104, y2,
+			0xcccccc);
 	}
 	
-	private void renderButtonTooltip(MatrixStack matrixStack, int mouseX,
+	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
-			if(!button.isHovered() || !(button instanceof WurstOptionsButton))
+			if(!button.isSelected() || !(button instanceof WurstOptionsButton))
 				continue;
 			
 			WurstOptionsButton woButton = (WurstOptionsButton)button;
@@ -182,7 +190,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			renderTooltip(matrixStack, woButton.tooltip, mouseX, mouseY);
+			context.drawTooltip(textRenderer, woButton.tooltip, mouseX, mouseY);
 			break;
 		}
 	}
@@ -198,7 +206,8 @@ public class WurstOptionsScreen extends Screen
 		{
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
-				new LiteralText(messageSupplier.get()), pressAction);
+				Text.literal(messageSupplier.get()), pressAction,
+				ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 			
 			this.messageSupplier = messageSupplier;
 			
@@ -208,9 +217,9 @@ public class WurstOptionsScreen extends Screen
 			{
 				String[] lines = tooltip.split("\n");
 				
-				LiteralText[] lines2 = new LiteralText[lines.length];
+				Text[] lines2 = new Text[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = new LiteralText(lines[i]);
+					lines2[i] = Text.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -222,7 +231,7 @@ public class WurstOptionsScreen extends Screen
 		public void onPress()
 		{
 			super.onPress();
-			setMessage(new LiteralText(messageSupplier.get()));
+			setMessage(Text.literal(messageSupplier.get()));
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,10 +17,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
@@ -28,7 +28,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IArmorItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -38,23 +37,19 @@ public final class AutoArmorHack extends Hack
 	implements UpdateListener, PacketOutputListener
 {
 	private final CheckboxSetting useEnchantments = new CheckboxSetting(
-		"Use enchantments", "Whether or not to consider the Protection\n"
-			+ "enchantment when calculating armor strength.",
+		"Use enchantments",
+		"Whether or not to consider the Protection enchantment when calculating armor strength.",
 		true);
 	
 	private final CheckboxSetting swapWhileMoving = new CheckboxSetting(
 		"Swap while moving",
-		"Whether or not to swap armor pieces\n"
-			+ "while the player is moving.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r" + " This would not be possible\n"
-			+ "without cheats. It may raise suspicion.",
+		"Whether or not to swap armor pieces while the player is moving.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r This would not be possible without cheats. It may raise suspicion.",
 		false);
 	
-	private final SliderSetting delay =
-		new SliderSetting("Delay",
-			"Amount of ticks to wait before swapping\n"
-				+ "the next piece of armor.",
-			2, 0, 20, 1, ValueDisplay.INTEGER);
+	private final SliderSetting delay = new SliderSetting("Delay",
+		"Amount of ticks to wait before swapping the next piece of armor.", 2,
+		0, 20, 1, ValueDisplay.INTEGER);
 	
 	private int timer;
 	
@@ -180,9 +175,8 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)((IArmorItem)item).getToughness();
-		int armorType =
-			item.getMaterial().getProtectionAmount(EquipmentSlot.LEGS);
+		int armorToughness = (int)item.toughness;
+		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
@@ -190,7 +184,8 @@ public final class AutoArmorHack extends Hack
 			int prtLvl = EnchantmentHelper.getLevel(protection, stack);
 			
 			ClientPlayerEntity player = MC.player;
-			DamageSource dmgSource = DamageSource.player(player);
+			DamageSource dmgSource =
+				player.getDamageSources().playerAttack(player);
 			prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
 		}
 		

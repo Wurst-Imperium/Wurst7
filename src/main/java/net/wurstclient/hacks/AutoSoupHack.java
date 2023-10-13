@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -31,8 +31,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoSoupHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Eats a soup when your health\n"
-			+ "reaches this value or falls below it.",
+		"Eats a soup when your health reaches this value or falls below it.",
 		6.5, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL);
 	
 	private int oldSlot = -1;
@@ -105,7 +104,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			MC.player.getInventory().selectedSlot = soupInHotbar;
 			
 			// eat soup
-			MC.options.keyUse.setPressed(true);
+			MC.options.useKey.setPressed(true);
 			IMC.getInteractionManager().rightClickItem();
 			
 			return;
@@ -180,7 +179,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return;
 		
 		// stop eating
-		MC.options.keyUse.setPressed(false);
+		MC.options.useKey.setPressed(false);
 		
 		// reset slot
 		MC.player.getInventory().selectedSlot = oldSlot;
