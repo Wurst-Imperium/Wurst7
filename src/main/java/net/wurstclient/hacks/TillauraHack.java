@@ -19,13 +19,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.RaycastContext.ShapeType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -165,7 +161,8 @@ public final class TillauraHack extends Hack implements UpdateListener
 			if(distanceSqHitVec >= distanceSqPosVec)
 				continue;
 			
-			if(checkLOS.isChecked() && !hasLineOfSight(eyesPos, hitVec))
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -201,7 +198,8 @@ public final class TillauraHack extends Hack implements UpdateListener
 			if(distanceSqHitVec >= distanceSqPosVec)
 				continue;
 			
-			if(checkLOS.isChecked() && !hasLineOfSight(eyesPos, hitVec))
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
@@ -209,16 +207,5 @@ public final class TillauraHack extends Hack implements UpdateListener
 		}
 		
 		return false;
-	}
-	
-	private boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		ShapeType type = RaycastContext.ShapeType.COLLIDER;
-		FluidHandling fluid = RaycastContext.FluidHandling.NONE;
-		
-		RaycastContext context =
-			new RaycastContext(from, to, type, fluid, MC.player);
-		
-		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
 	}
 }
