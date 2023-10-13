@@ -1,4 +1,4 @@
-name: "Close stale issues / pull requests"
+name: "Close stale issues and pull requests"
 on:
   schedule:
     - cron: "30 1 * * *"
@@ -17,6 +17,14 @@ jobs:
             - There is not enough demand
             - They are no longer relevant
             - There are not enough details
+          stale-pr-message: |
+            This pull request has been open for a while with no recent activity. If you're still working on this or waiting for a review, please add a comment or commit within the next 7 days to keep it open. Otherwise, the pull request will be automatically closed to free up time for other tasks.
+            
+            Pull requests should be closed if:
+            - They have been superseded by another pull request
+            - They are out of scope or don't align with the project
+            - They have become obsolete due to other changes
+            - They have bugs or conflicts that won't be resolved
           days-before-stale: 60
           days-before-close: 7
           stale-issue-label: "status:stale"
