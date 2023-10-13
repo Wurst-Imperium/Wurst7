@@ -13,12 +13,16 @@ import java.util.stream.Stream;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
@@ -41,6 +45,9 @@ public final class AimAssistHack extends Hack
 		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
 			+ "360\u00b0 = aims at entities all around you.",
 		120, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight", "Won't aim at entities behind blocks.", true);
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
@@ -76,6 +83,7 @@ public final class AimAssistHack extends Hack
 		addSetting(range);
 		addSetting(rotationSpeed);
 		addSetting(fov);
+		addSetting(checkLOS);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -130,6 +138,17 @@ public final class AimAssistHack extends Hack
 		if(target == null)
 			return;
 		
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3d hitVec = target.getBoundingBox().getCenter();
+		if(checkLOS.isChecked() && MC.world
+			.raycast(new RaycastContext(eyesPos, hitVec,
+				RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player))
+			.getType() != HitResult.Type.MISS)
+		{
+			target = null;
+			return;
+		}
 		WURST.getHax().autoSwordHack.setSlot();
 		faceEntityClient(target);
 	}
