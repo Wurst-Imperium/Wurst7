@@ -34,6 +34,10 @@ public final class AnchorAuraFilterList extends EntityFilterList
 			+ " zombies and creepers when auto-placing anchors."
 			+ damageWarning, true));
 		
+		builder.add(new FilterNeutralSetting("Won't target neutral mobs like"
+			+ " endermen and wolves when auto-placing anchors." + damageWarning,
+			AttackDetectingEntityFilter.Mode.ON));
+		
 		builder.add(new FilterPassiveSetting("Won't target animals like pigs"
 			+ " and cows, ambient mobs like bats, and water mobs like fish,"
 			+ " squid and dolphins when auto-placing anchors." + damageWarning,

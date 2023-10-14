@@ -79,7 +79,7 @@ public final class KillauraLegitHack extends Hack
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
 			FilterHostileSetting.genericCombat(false),
-			FilterEndermenSetting
+			FilterNeutralSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
@@ -91,6 +91,8 @@ public final class KillauraLegitHack extends Hack
 			FilterPiglinsSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),

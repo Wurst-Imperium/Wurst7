@@ -53,7 +53,7 @@ public final class AimAssistHack extends Hack
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterHostileSetting.genericCombat(false),
-			FilterEndermenSetting
+			FilterNeutralSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericCombat(true),
 			FilterBabiesSetting.genericCombat(true),
@@ -65,6 +65,8 @@ public final class AimAssistHack extends Hack
 			FilterPiglinsSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),

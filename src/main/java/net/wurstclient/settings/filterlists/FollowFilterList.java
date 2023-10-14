@@ -36,8 +36,8 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(new FilterHostileSetting(
 			"Won't follow hostile mobs like zombies and creepers.", true));
 		
-		builder.add(
-			FilterEndermenSetting.onOffOnly("Won't follow endermen.", true));
+		builder.add(FilterNeutralSetting.onOffOnly(
+			"Won't follow neutral mobs like endermen and wolves.", true));
 		
 		builder.add(new FilterPassiveSetting("Won't follow animals like pigs"
 			+ " and cows, ambient mobs like bats, and water mobs like"
@@ -66,6 +66,9 @@ public final class FollowFilterList extends EntityFilterList
 		
 		builder.add(FilterZombiePiglinsSetting
 			.onOffOnly("Won't follow zombified piglins.", true));
+		
+		builder.add(
+			FilterEndermenSetting.onOffOnly("Won't follow endermen.", true));
 		
 		builder.add(new FilterShulkersSetting("Won't follow shulkers.", true));
 		

@@ -34,6 +34,10 @@ public final class CrystalAuraFilterList extends EntityFilterList
 			+ " zombies and creepers when auto-placing crystals."
 			+ damageWarning, true));
 		
+		builder.add(new FilterNeutralSetting("Won't target neutral mobs like"
+			+ " endermen and wolves when auto-placing crystals."
+			+ damageWarning, AttackDetectingEntityFilter.Mode.ON));
+		
 		builder.add(new FilterPassiveSetting("Won't target animals like pigs"
 			+ " and cows, ambient mobs like bats, and water mobs like fish,"
 			+ " squid and dolphins when auto-placing crystals." + damageWarning,
