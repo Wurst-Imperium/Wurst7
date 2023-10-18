@@ -31,4 +31,9 @@ public final class FilterAnimalsSetting extends EntityFilterCheckbox
 		return new FilterAnimalsSetting("Won't attack pigs, cows, etc.",
 			checked);
 	}
+	
+	public static FilterAnimalsSetting genericVision(boolean checked)
+	{
+		return new FilterAnimalsSetting("Won't show pigs, cows, etc.", checked);
+	}
 }

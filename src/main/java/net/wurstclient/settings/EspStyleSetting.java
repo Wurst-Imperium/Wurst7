@@ -24,6 +24,16 @@ public final class EspStyleSetting extends EnumSetting<EspStyleSetting.EspStyle>
 		super(name, description, EspStyle.values(), selected);
 	}
 	
+	public boolean hasBoxes()
+	{
+		return getSelected().boxes;
+	}
+	
+	public boolean hasLines()
+	{
+		return getSelected().lines;
+	}
+	
 	public enum EspStyle
 	{
 		BOXES("Boxes only", true, false),

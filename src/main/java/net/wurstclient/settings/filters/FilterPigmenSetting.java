@@ -27,4 +27,9 @@ public final class FilterPigmenSetting extends EntityFilterCheckbox
 	{
 		return new FilterPigmenSetting("Won't attack zombie pigmen.", checked);
 	}
+	
+	public static FilterPigmenSetting genericVision(boolean checked)
+	{
+		return new FilterPigmenSetting("Won't show zombie pigmen.", checked);
+	}
 }
