@@ -11,7 +11,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v4
+      - uses: actions/stale@v8
         with:
           stale-issue-message: |
             This issue has been open for a while with no recent activity. If this issue is still important to you, please add a comment within the next 7 days to keep it open. Otherwise, the issue will be automatically closed to free up time for other tasks.
