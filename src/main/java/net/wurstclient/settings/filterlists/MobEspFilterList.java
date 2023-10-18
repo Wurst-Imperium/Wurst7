@@ -26,6 +26,7 @@ public final class MobEspFilterList extends EntityFilterList
 		builder.add(FilterNeutralSetting
 			.genericVision(AttackDetectingEntityFilter.Mode.OFF));
 		builder.add(FilterPassiveSetting.genericVision(false));
+		builder.add(FilterPassiveWaterSetting.genericVision(false));
 		builder.add(FilterBatsSetting.genericVision(false));
 		builder.add(FilterPetsSetting.genericVision(false));
 		builder.add(FilterVillagersSetting.genericVision(false));

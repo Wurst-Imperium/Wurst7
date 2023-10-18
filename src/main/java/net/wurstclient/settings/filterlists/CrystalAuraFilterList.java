@@ -43,6 +43,10 @@ public final class CrystalAuraFilterList extends EntityFilterList
 			+ " squid and dolphins when auto-placing crystals." + damageWarning,
 			true));
 		
+		builder.add(new FilterPassiveWaterSetting("Won't target passive water"
+			+ " mobs like fish, squid, dolphins and axolotls when auto-placing"
+			+ " crystals." + damageWarning, true));
+		
 		builder.add(new FilterBatsSetting("Won't target bats and any other"
 			+ " \"ambient\" mobs when auto-placing crystals." + damageWarning,
 			true));

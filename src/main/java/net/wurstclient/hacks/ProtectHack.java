@@ -56,6 +56,7 @@ public final class ProtectHack extends Hack
 			FilterNeutralSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
 			FilterBatsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),

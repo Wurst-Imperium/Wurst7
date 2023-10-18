@@ -43,6 +43,9 @@ public final class FollowFilterList extends EntityFilterList
 			+ " and cows, ambient mobs like bats, and water mobs like"
 			+ " fish, squid and dolphins.", true));
 		
+		builder.add(new FilterPassiveWaterSetting("Won't follow passive water"
+			+ " mobs like fish, squid, dolphins and axolotls.", true));
+		
 		builder.add(new FilterBabiesSetting(
 			"Won't follow baby pigs, baby villagers, etc.", true));
 		

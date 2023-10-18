@@ -43,6 +43,9 @@ public final class RemoteViewFilterList extends EntityFilterList
 			+ " cows, ambient mobs like bats, and water mobs like fish, squid"
 			+ " and dolphins.", true));
 		
+		builder.add(new FilterPassiveWaterSetting("Won't view passive water"
+			+ " mobs like fish, squid, dolphins and axolotls.", true));
+		
 		builder.add(new FilterBabiesSetting(
 			"Won't view baby pigs, baby villagers, etc.", true));
 		

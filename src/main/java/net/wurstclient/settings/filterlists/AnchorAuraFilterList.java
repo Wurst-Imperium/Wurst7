@@ -43,6 +43,10 @@ public final class AnchorAuraFilterList extends EntityFilterList
 			+ " squid and dolphins when auto-placing anchors." + damageWarning,
 			true));
 		
+		builder.add(new FilterPassiveWaterSetting("Won't target passive water"
+			+ " mobs like fish, squid, dolphins and axolotls when auto-placing"
+			+ " anchors." + damageWarning, true));
+		
 		builder.add(new FilterBatsSetting("Won't target bats and any other"
 			+ " \"ambient\" mobs when auto-placing anchors." + damageWarning,
 			true));

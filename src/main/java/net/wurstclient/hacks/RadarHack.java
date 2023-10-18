@@ -31,6 +31,7 @@ import net.wurstclient.settings.filters.FilterBatsSetting;
 import net.wurstclient.settings.filters.FilterHostileSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterPassiveSetting;
+import net.wurstclient.settings.filters.FilterPassiveWaterSetting;
 import net.wurstclient.settings.filters.FilterPlayersSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.FakePlayerEntity;
@@ -51,6 +52,7 @@ public final class RadarHack extends Hack implements UpdateListener
 			FilterSleepingSetting.genericVision(false),
 			FilterHostileSetting.genericVision(false),
 			FilterPassiveSetting.genericVision(false),
+			FilterPassiveWaterSetting.genericVision(false),
 			FilterBatsSetting.genericVision(true),
 			FilterInvisibleSetting.genericVision(false));
 	

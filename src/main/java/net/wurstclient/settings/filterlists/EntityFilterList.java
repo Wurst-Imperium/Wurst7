@@ -59,6 +59,7 @@ public class EntityFilterList
 			FilterNeutralSetting
 				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
 			FilterBatsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
