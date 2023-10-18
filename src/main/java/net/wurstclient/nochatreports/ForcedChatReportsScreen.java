@@ -10,6 +10,7 @@ package net.wurstclient.nochatreports;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
