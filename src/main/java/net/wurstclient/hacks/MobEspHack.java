@@ -39,7 +39,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.settings.filterlists.MobEspFilterList;
+import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -55,7 +55,28 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
-	private final EntityFilterList entityFilters = MobEspFilterList.create();
+	private final EntityFilterList entityFilters =
+		new EntityFilterList(FilterHostileSetting.genericVision(false),
+			FilterNeutralSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericVision(false),
+			FilterPassiveWaterSetting.genericVision(false),
+			FilterBatsSetting.genericVision(false),
+			FilterSlimesSetting.genericVision(false),
+			FilterPetsSetting.genericVision(false),
+			FilterVillagersSetting.genericVision(false),
+			FilterZombieVillagersSetting.genericVision(false),
+			FilterGolemsSetting.genericVision(false),
+			FilterPiglinsSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericVision(false),
+			FilterAllaysSetting.genericVision(false),
+			FilterInvisibleSetting.genericVision(false),
+			FilterArmorStandsSetting.genericVision(true));
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
