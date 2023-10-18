@@ -59,6 +59,7 @@ public final class AimAssistHack extends Hack
 			FilterPassiveWaterSetting.genericCombat(true),
 			FilterBabiesSetting.genericCombat(true),
 			FilterBatsSetting.genericCombat(true),
+			FilterSlimesSetting.genericCombat(true),
 			FilterPetsSetting.genericCombat(true),
 			FilterVillagersSetting.genericCombat(true),
 			FilterZombieVillagersSetting.genericCombat(true),
