@@ -21,10 +21,10 @@ public final class FilterSleepingSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		if(!(e instanceof PlayerEntity))
+		if(!(e instanceof PlayerEntity pe))
 			return true;
-
-		return e.getPose() != EntityPose.SLEEPING && !((PlayerEntity)e).isSleeping();
+		
+		return !pe.isSleeping() && pe.getPose() != EntityPose.SLEEPING;
 	}
 	
 	public static FilterSleepingSetting genericCombat(boolean checked)
