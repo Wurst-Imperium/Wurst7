@@ -8,8 +8,15 @@
 package net.wurstclient.mixinterface;
 
 import net.minecraft.client.resource.language.TranslationStorage;
+import net.wurstclient.WurstClient;
 
 public interface ILanguageManager
 {
-	public TranslationStorage getEnglish();
+	public TranslationStorage wurst_getEnglish();
+	
+	public static TranslationStorage getEnglish()
+	{
+		return ((ILanguageManager)WurstClient.MC.getLanguageManager())
+			.wurst_getEnglish();
+	}
 }

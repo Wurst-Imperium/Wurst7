@@ -530,7 +530,6 @@ public final class ClickGui
 	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
 		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
@@ -558,6 +557,7 @@ public final class ClickGui
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		

@@ -10,6 +10,7 @@ package net.wurstclient.mixin;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,8 +31,10 @@ import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 public class ChatHudMixin
 {
 	@Shadow
+	@Final
 	private List<ChatHudLine.Visible> visibleMessages;
 	@Shadow
+	@Final
 	private MinecraftClient client;
 	
 	@Inject(at = @At("HEAD"),
@@ -53,9 +56,11 @@ public class ChatHudMixin
 		message = event.getComponent();
 		indicator = WurstClient.INSTANCE.getOtfs().noChatReportsOtf
 			.modifyIndicator(message, signature, indicator);
+		
 		shadow$logChatMessage(message, indicator);
 		shadow$addMessage(message, signature, client.inGameHud.getTicks(),
 			indicator, false);
+		
 		ci.cancel();
 	}
 	

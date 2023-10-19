@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -86,21 +87,17 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		valueField.tick();
-	}
-	
-	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			slider.getName(), width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

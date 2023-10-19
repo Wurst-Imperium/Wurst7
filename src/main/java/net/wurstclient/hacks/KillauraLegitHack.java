@@ -25,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -37,6 +38,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -76,14 +78,25 @@ public final class KillauraLegitHack extends Hack
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
-			FilterMonstersSetting.genericCombat(false),
-			FilterPigmenSetting.genericCombat(false),
-			FilterEndermenSetting.genericCombat(false),
-			FilterAnimalsSetting.genericCombat(false),
+			FilterHostileSetting.genericCombat(false),
+			FilterNeutralSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
+			FilterBatsSetting.genericCombat(false),
+			FilterSlimesSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
-			FilterTradersSetting.genericCombat(false),
+			FilterVillagersSetting.genericCombat(false),
+			FilterZombieVillagersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterPiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
@@ -219,10 +232,8 @@ public final class KillauraLegitHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -231,16 +242,9 @@ public final class KillauraLegitHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		if(target.isAlive())
-			matrixStack.translate(
-				target.prevX + (target.getX() - target.prevX) * partialTicks
-					- regionX,
-				target.prevY + (target.getY() - target.prevY) * partialTicks,
-				target.prevZ + (target.getZ() - target.prevZ) * partialTicks
-					- regionZ);
-		else
-			matrixStack.translate(target.getX() - regionX, target.getY(),
-				target.getZ() - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(target, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),

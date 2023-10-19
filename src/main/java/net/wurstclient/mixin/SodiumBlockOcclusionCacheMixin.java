@@ -18,23 +18,23 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener;
+import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 @Pseudo
-@Mixin(
-	targets = "me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache",
+@Mixin(targets = {
+	"me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache",
+	"me.jellysquid.mods.sodium.client.render.occlusion.BlockOcclusionCache"},
 	remap = false)
 public class SodiumBlockOcclusionCacheMixin
 {
-	@Inject(method = "shouldDrawSide",
-		at = @At("HEAD"),
+	@Inject(at = @At("HEAD"),
+		method = "shouldDrawSide",
 		cancellable = true,
 		remap = false)
-	public void shouldDrawSide(BlockState state, BlockView view, BlockPos pos,
-		Direction facing, CallbackInfoReturnable<Boolean> cir)
+	public void shouldDrawSide(BlockState state, BlockView world, BlockPos pos,
+		Direction side, CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideListener.ShouldDrawSideEvent event =
-			new ShouldDrawSideListener.ShouldDrawSideEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

@@ -150,7 +150,7 @@ public final class FollowHack extends Hack
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)

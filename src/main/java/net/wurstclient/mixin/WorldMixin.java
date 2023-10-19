@@ -28,10 +28,11 @@ import net.wurstclient.mixinterface.IWorld;
 @Mixin(World.class)
 public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"getRainGradient(F)F"},
+	@Inject(at = @At("HEAD"),
+		method = "getRainGradient(F)F",
 		cancellable = true)
-	private void onGetRainGradient(float f, CallbackInfoReturnable<Float> cir)
+	private void onGetRainGradient(float delta,
+		CallbackInfoReturnable<Float> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
@@ -40,12 +41,10 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	@Override
 	public float getSkyAngle(float tickDelta)
 	{
-		NoWeatherHack noWeatherHack =
-			WurstClient.INSTANCE.getHax().noWeatherHack;
+		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
-		long timeOfDay =
-			noWeatherHack.isTimeChanged() ? noWeatherHack.getChangedTime()
-				: getLevelProperties().getTimeOfDay();
+		long timeOfDay = noWeather.isTimeChanged() ? noWeather.getChangedTime()
+			: getLevelProperties().getTimeOfDay();
 		
 		return getDimension().getSkyAngle(timeOfDay);
 	}
@@ -53,11 +52,10 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	@Override
 	public int getMoonPhase()
 	{
-		NoWeatherHack noWeatherHack =
-			WurstClient.INSTANCE.getHax().noWeatherHack;
+		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
-		if(noWeatherHack.isMoonPhaseChanged())
-			return noWeatherHack.getChangedMoonPhase();
+		if(noWeather.isMoonPhaseChanged())
+			return noWeather.getChangedMoonPhase();
 		
 		return getDimension().getMoonPhase(getLunarTime());
 	}

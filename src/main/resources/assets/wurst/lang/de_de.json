@@ -136,5 +136,6 @@
   "button.wurst.nochatreports.signatures_status": "Signaturen: ",
   "description.wurst.nochatreports.message_is_reportable": "Diese Nachricht hat eine gültige Signatur und kann daher für betrügerische Chat-Reports missbraucht werden.",
   "gui.wurst.generic.allcaps_blocked": "BLOCKIERT",
-  "gui.wurst.generic.allcaps_allowed": "ERLAUBT"
+  "gui.wurst.generic.allcaps_allowed": "ERLAUBT",
+  "key.wurst.zoom": "Zoom"
 }
