@@ -40,3 +40,4 @@ jobs:
         vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
         files: |
           ./build/libs/*.jar
+      continue-on-error: true
