@@ -23,17 +23,17 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 
 @Mixin(ChatScreen.class)
-public class ChatScreenMixin extends Screen
+public abstract class ChatScreenMixin extends Screen
 {
 	@Shadow
 	protected TextFieldWidget chatField;
 	
-	private ChatScreenMixin(WurstClient wurst, Text text)
+	private ChatScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	protected void onInit(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().infiniChatHack.isEnabled())
@@ -75,8 +75,5 @@ public class ChatScreenMixin extends Screen
 	}
 	
 	@Shadow
-	public String normalize(String chatText)
-	{
-		return null;
-	}
+	public abstract String normalize(String chatText);
 }

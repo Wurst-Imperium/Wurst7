@@ -107,15 +107,15 @@ public final class KillPotionHack extends Hack
 			ItemStack stack = new ItemStack(item);
 			
 			NbtCompound effect = new NbtCompound();
-			effect.putInt("Amplifier", 125);
-			effect.putInt("Duration", 2000);
-			effect.putInt("Id", 6);
+			effect.putInt("amplifier", 125);
+			effect.putInt("duration", 2000);
+			effect.putString("id", "instant_health");
 			
 			NbtList effects = new NbtList();
 			effects.add(effect);
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("custom_potion_effects", effects);
 			stack.setNbt(nbt);
 			
 			String name =

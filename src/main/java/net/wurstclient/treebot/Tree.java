@@ -19,6 +19,8 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public class Tree implements AutoCloseable
@@ -41,24 +43,21 @@ public class Tree implements AutoCloseable
 		
 		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
-		int regionX = (stump.getX() >> 9) * 512;
-		int regionZ = (stump.getZ() >> 9) * 512;
-		
 		double boxMin = 1 / 16.0;
 		double boxMax = 15 / 16.0;
-		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
+		Vec3d regionOffset = RegionPos.of(stump).negate().toVec3d();
+		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax)
+			.offset(regionOffset);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
-		RenderUtils.drawCrossBox(
-			box.offset(stump).offset(-regionX, 0, -regionZ), bufferBuilder);
+		RenderUtils.drawCrossBox(box.offset(stump), bufferBuilder);
 		
 		for(BlockPos log : logs)
-			RenderUtils.drawOutlinedBox(
-				box.offset(log).offset(-regionX, 0, -regionZ), bufferBuilder);
+			RenderUtils.drawOutlinedBox(box.offset(log), bufferBuilder);
 		
 		BuiltBuffer buffer = bufferBuilder.end();
 		vertexBuffer.bind();

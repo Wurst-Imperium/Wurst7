@@ -36,11 +36,10 @@ public class TerrainRenderContextMixin
 		method = "tessellateBlock",
 		cancellable = true,
 		remap = false)
-	private void onTessellateBlock(BlockState blockState, BlockPos blockPos,
+	private void onTessellateBlock(BlockState state, BlockPos pos,
 		final BakedModel model, MatrixStack matrixStack, CallbackInfo ci)
 	{
-		TesselateBlockEvent event =
-			new TesselateBlockEvent(blockState, blockPos);
+		TesselateBlockEvent event = new TesselateBlockEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isCancelled())

@@ -189,8 +189,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		searchBar.tick();
-		
 		String newText = searchBar.getText();
 		if(clickTimer == -1 && !newText.equals(lastSearchText))
 		{

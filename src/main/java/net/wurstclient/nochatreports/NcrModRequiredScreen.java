@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -117,9 +118,10 @@ public final class NcrModRequiredScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY, float delta)
+	public void render(DrawContext context, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
@@ -129,7 +131,8 @@ public final class NcrModRequiredScreen extends Screen
 			0xAAAAAA);
 		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
 		
-		super.render(context, mouseX, mouseY, delta);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

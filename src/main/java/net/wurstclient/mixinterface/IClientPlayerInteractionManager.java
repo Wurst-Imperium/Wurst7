@@ -16,10 +16,6 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IClientPlayerInteractionManager
 {
-	public float getCurrentBreakingProgress();
-	
-	public void setBreakingBlock(boolean breakingBlock);
-	
 	public void windowClick_PICKUP(int slot);
 	
 	public void windowClick_QUICK_MOVE(int slot);
@@ -30,9 +26,6 @@ public interface IClientPlayerInteractionManager
 	
 	public void rightClickItem();
 	
-	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec,
-		Hand hand);
-	
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec);
 	
 	public void sendPlayerActionC2SPacket(PlayerActionC2SPacket.Action action,
@@ -40,6 +33,4 @@ public interface IClientPlayerInteractionManager
 	
 	public void sendPlayerInteractBlockPacket(Hand hand,
 		BlockHitResult blockHitResult);
-	
-	public void setBlockHitDelay(int delay);
 }
