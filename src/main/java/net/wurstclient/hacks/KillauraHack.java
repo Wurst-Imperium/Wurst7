@@ -21,11 +21,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -39,7 +37,9 @@ import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -160,13 +160,8 @@ public final class KillauraHack extends Hack
 		
 		WURST.getHax().autoSwordHack.setSlot();
 		
-		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Vec3d hitVec = target.getBoundingBox().getCenter();
-		if(checkLOS.isChecked() && MC.world
-			.raycast(new RaycastContext(eyesPos, hitVec,
-				RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player))
-			.getType() != HitResult.Type.MISS)
+		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
 		{
 			target = null;
 			return;
@@ -204,10 +199,8 @@ public final class KillauraHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -216,19 +209,9 @@ public final class KillauraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		if(renderTarget.isAlive())
-			matrixStack.translate(
-				renderTarget.prevX
-					+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
-					- regionX,
-				renderTarget.prevY
-					+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
-				renderTarget.prevZ
-					+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
-					- regionZ);
-		else
-			matrixStack.translate(renderTarget.getX() - regionX,
-				renderTarget.getY(), renderTarget.getZ() - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),

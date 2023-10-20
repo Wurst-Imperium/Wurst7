@@ -45,12 +45,12 @@ public final class RadarHack extends Hack implements UpdateListener
 	private final CheckboxSetting rotate =
 		new CheckboxSetting("Rotate with player", true);
 	
-	private final EntityFilterList entityFilters = new EntityFilterList(
-		new FilterPlayersSetting("Won't show other players.", false),
-		new FilterSleepingSetting("Won't show sleeping players.", false),
-		new FilterMonstersSetting("Won't show zombies, creepers, etc.", false),
-		new FilterAnimalsSetting("Won't show pigs, cows, etc.", false),
-		new FilterInvisibleSetting("Won't show invisible entities.", false));
+	private final EntityFilterList entityFilters =
+		new EntityFilterList(FilterPlayersSetting.genericVision(false),
+			FilterSleepingSetting.genericVision(false),
+			FilterMonstersSetting.genericVision(false),
+			FilterAnimalsSetting.genericVision(false),
+			FilterInvisibleSetting.genericVision(false));
 	
 	public RadarHack()
 	{
@@ -92,7 +92,7 @@ public final class RadarHack extends Hack implements UpdateListener
 			StreamSupport.stream(world.getEntities().spliterator(), true)
 				.filter(e -> !e.isRemoved() && e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(e -> ((LivingEntity)e).getHealth() > 0);
 		
 		stream = entityFilters.applyTo(stream);

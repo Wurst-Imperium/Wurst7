@@ -13,6 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -106,15 +107,18 @@ public final class TrollPotionHack extends Hack
 			NbtList effects = new NbtList();
 			for(int i = 1; i <= 23; i++)
 			{
+				String id = Registries.STATUS_EFFECT.getEntry(i).get().getKey()
+					.get().getValue().toString();
+				
 				NbtCompound effect = new NbtCompound();
-				effect.putInt("Amplifier", Integer.MAX_VALUE);
-				effect.putInt("Duration", Integer.MAX_VALUE);
-				effect.putInt("Id", i);
+				effect.putInt("amplifier", Integer.MAX_VALUE);
+				effect.putInt("duration", Integer.MAX_VALUE);
+				effect.putString("id", id);
 				effects.add(effect);
 			}
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("custom_potion_effects", effects);
 			stack.setNbt(nbt);
 			
 			String name = "\u00a7f" + itemName + " of Trolling";

@@ -100,7 +100,7 @@ public final class InstantBunkerHack extends Hack
 			// initialize building process
 			blockIndex = 0;
 			building = true;
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 		}
 		
 		startTimer = 2;
@@ -131,7 +131,7 @@ public final class InstantBunkerHack extends Hack
 		if(!building && startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+				if(BlockUtils.getState(pos).isReplaceable()
 					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
@@ -240,7 +240,7 @@ public final class InstantBunkerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		// reset timer
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	@Override
@@ -260,20 +260,18 @@ public final class InstantBunkerHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		BlockPos regionOffset =
+			RenderUtils.getCameraRegion().negate().toBlockPos();
 		
 		// green box
 		{
 			GL11.glDepthMask(false);
 			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-			BlockPos pos = positions.get(blockIndex);
+			BlockPos pos = positions.get(blockIndex).add(regionOffset);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
@@ -287,11 +285,10 @@ public final class InstantBunkerHack extends Hack
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(int i = blockIndex; i < positions.size(); i++)
 		{
-			BlockPos pos = positions.get(i);
+			BlockPos pos = positions.get(i).add(regionOffset);
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			

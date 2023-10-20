@@ -183,5 +183,6 @@
   "button.wurst.nochatreports.signatures_status": "Подписи: ",
   "description.wurst.nochatreports.message_is_reportable": "Это сообщение имеет действительную подпись и поэтому уязвимо для заведомо ложных чат-репортов.",
   "gui.wurst.generic.allcaps_blocked": "ЗАБЛОКИРОВАНО",
-  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО"
+  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО",
+  "key.wurst.zoom": "Приблизить"
 }

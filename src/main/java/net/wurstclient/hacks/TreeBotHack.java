@@ -48,6 +48,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.treebot.Tree;
 import net.wurstclient.treebot.TreeBotUtils;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -119,7 +120,7 @@ public final class TreeBotHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
@@ -237,7 +238,7 @@ public final class TreeBotHack extends Hack
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
 		{
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;
@@ -332,18 +333,16 @@ public final class TreeBotHack extends Hack
 	{
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = prevProgress + (progress - prevProgress) * partialTicks;
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		matrixStack.translate(currentBlock.getX() - regionX,
-			currentBlock.getY(), currentBlock.getZ() - regionZ);
+		matrixStack.translate(currentBlock.getX() - region.x(),
+			currentBlock.getY(), currentBlock.getZ() - region.z());
 		if(p < 1)
 		{
 			matrixStack.translate(0.5, 0.5, 0.5);

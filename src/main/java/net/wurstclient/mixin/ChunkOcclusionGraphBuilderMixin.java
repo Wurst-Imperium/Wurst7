@@ -20,8 +20,8 @@ import net.wurstclient.events.SetOpaqueCubeListener.SetOpaqueCubeEvent;
 @Mixin(ChunkOcclusionDataBuilder.class)
 public class ChunkOcclusionGraphBuilderMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"markClosed(Lnet/minecraft/util/math/BlockPos;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "markClosed(Lnet/minecraft/util/math/BlockPos;)V",
 		cancellable = true)
 	private void onMarkClosed(BlockPos pos, CallbackInfo ci)
 	{
