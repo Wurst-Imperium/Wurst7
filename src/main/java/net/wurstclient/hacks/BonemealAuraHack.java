@@ -18,11 +18,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -94,7 +92,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// wait for right click timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// get valid blocks
@@ -244,11 +242,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 				continue;
 			
 			// check line of sight
-			if(MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(!BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -257,7 +251,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			// place block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			
 			return true;
 		}

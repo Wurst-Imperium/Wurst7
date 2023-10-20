@@ -367,7 +367,7 @@ public final class AutoLibrarianHack extends Hack
 	
 	private void openTradeScreen()
 	{
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		ClientPlayerInteractionManager im = MC.interactionManager;
@@ -404,13 +404,13 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.getSelected().swing(hand);
 		
 		// set cooldown
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private void closeTradeScreen()
 	{
 		MC.player.closeHandledScreen();
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private BookOffer findEnchantedBookOffer(TradeOfferList tradeOffers)
@@ -452,7 +452,7 @@ public final class AutoLibrarianHack extends Hack
 		Stream<VillagerEntity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof VillagerEntity)
+				.filter(VillagerEntity.class::isInstance)
 				.map(e -> (VillagerEntity)e).filter(e -> e.getHealth() > 0)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e.getVillagerData()

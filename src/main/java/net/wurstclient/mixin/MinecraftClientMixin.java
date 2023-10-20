@@ -27,7 +27,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.ProfileKeysImpl;
 import net.minecraft.client.session.Session;
@@ -41,7 +40,6 @@ import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
-import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.mixinterface.IWorld;
 
@@ -54,19 +52,11 @@ public abstract class MinecraftClientMixin
 	@Final
 	public File runDirectory;
 	@Shadow
-	private int itemUseCooldown;
-	@Shadow
 	public ClientPlayerInteractionManager interactionManager;
-	@Shadow
-	@Final
-	private LanguageManager languageManager;
 	@Shadow
 	public ClientPlayerEntity player;
 	@Shadow
 	public ClientWorld world;
-	@Shadow
-	@Final
-	private Session session;
 	@Shadow
 	@Final
 	private YggdrasilAuthenticationService authenticationService;
@@ -177,24 +167,6 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public void rightClick()
-	{
-		doItemUse();
-	}
-	
-	@Override
-	public int getItemUseCooldown()
-	{
-		return itemUseCooldown;
-	}
-	
-	@Override
-	public void setItemUseCooldown(int itemUseCooldown)
-	{
-		this.itemUseCooldown = itemUseCooldown;
-	}
-	
-	@Override
 	public IClientPlayerEntity getPlayer()
 	{
 		return (IClientPlayerEntity)player;
@@ -210,12 +182,6 @@ public abstract class MinecraftClientMixin
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
-	}
-	
-	@Override
-	public ILanguageManager getLanguageManager()
-	{
-		return (ILanguageManager)languageManager;
 	}
 	
 	@Override
@@ -241,11 +207,5 @@ public abstract class MinecraftClientMixin
 			e.printStackTrace();
 			return UserApiService.OFFLINE;
 		}
-	}
-	
-	@Shadow
-	private void doItemUse()
-	{
-		
 	}
 }

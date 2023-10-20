@@ -123,9 +123,9 @@ public final class AltRenderer
 		{
 			bindSkinTexture(name);
 			
-			boolean slim =
-				DefaultSkinHelper.getTexture(Uuids.getOfflinePlayerUuid(name))
-					.model() == SkinTextures.Model.SLIM;
+			boolean slim = DefaultSkinHelper
+				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
+				.model() == SkinTextures.Model.SLIM;
 			
 			GL11.glEnable(GL11.GL_BLEND);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -255,9 +255,9 @@ public final class AltRenderer
 		{
 			bindSkinTexture(name);
 			
-			boolean slim =
-				DefaultSkinHelper.getTexture(Uuids.getOfflinePlayerUuid(name))
-					.model() == SkinTextures.Model.SLIM;
+			boolean slim = DefaultSkinHelper
+				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
+				.model() == SkinTextures.Model.SLIM;
 			
 			GL11.glEnable(GL11.GL_BLEND);
 			RenderSystem.setShaderColor(1, 1, 1, 1);

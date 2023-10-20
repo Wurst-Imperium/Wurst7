@@ -9,7 +9,6 @@ package net.wurstclient.mixin;
 
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -20,7 +19,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -28,10 +26,9 @@ import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransform
 import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
 import net.wurstclient.hacks.FullbrightHack;
-import net.wurstclient.mixinterface.IGameRenderer;
 
 @Mixin(GameRenderer.class)
-public abstract class GameRendererMixin implements AutoCloseable, IGameRenderer
+public abstract class GameRendererMixin implements AutoCloseable
 {
 	private boolean cancelNextBobView;
 	
@@ -151,17 +148,5 @@ public abstract class GameRendererMixin implements AutoCloseable, IGameRenderer
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();
-	}
-	
-	@Override
-	public void loadWurstShader(Identifier id)
-	{
-		loadPostProcessor(id);
-	}
-	
-	@Shadow
-	private void loadPostProcessor(Identifier id)
-	{
-		
 	}
 }
