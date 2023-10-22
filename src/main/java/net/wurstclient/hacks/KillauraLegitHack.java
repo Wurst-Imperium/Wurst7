@@ -37,6 +37,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -78,14 +79,25 @@ public final class KillauraLegitHack extends Hack
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
-			FilterMonstersSetting.genericCombat(false),
-			FilterPigmenSetting.genericCombat(false),
-			FilterEndermenSetting.genericCombat(false),
-			FilterAnimalsSetting.genericCombat(false),
+			FilterHostileSetting.genericCombat(false),
+			FilterNeutralSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
+			FilterBatsSetting.genericCombat(false),
+			FilterSlimesSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
-			FilterTradersSetting.genericCombat(false),
+			FilterVillagersSetting.genericCombat(false),
+			FilterZombieVillagersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterPiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericCombat(false),
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
@@ -167,6 +179,13 @@ public final class KillauraLegitHack extends Hack
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot();
+		
+		// check line of sight
+		if(!BlockUtils.hasLineOfSight(target.getBoundingBox().getCenter()))
+		{
+			target = null;
+			return;
+		}
 		
 		// face entity
 		if(!faceEntityClient(target))
