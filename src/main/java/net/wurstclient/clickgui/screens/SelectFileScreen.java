@@ -16,10 +16,11 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
@@ -136,11 +137,12 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -162,19 +164,20 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredTextWithShadow(matrixStack, client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			setting.getName(), width / 2, 12, 0xffffff);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		if(doneButton.isSelected() && !doneButton.active)
-			renderTooltip(matrixStack,
+			context.drawTooltip(textRenderer,
 				Arrays.asList(Text.literal("You must first select a file.")),
 				mouseX, mouseY);
 	}
@@ -234,16 +237,17 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
-			TextRenderer fr = mc.textRenderer;
+			TextRenderer tr = mc.textRenderer;
 			
 			Path path = list.get(index);
-			fr.draw(matrixStack, "" + path.getFileName(), x + 28, y, 0xf0f0f0);
-			fr.draw(matrixStack,
+			context.drawText(tr, "" + path.getFileName(), x + 28, y, 0xf0f0f0,
+				false);
+			context.drawText(tr,
 				"" + client.runDirectory.toPath().relativize(path), x + 28,
-				y + 9, 0xa0a0a0);
+				y + 9, 0xa0a0a0, false);
 		}
 	}
 }

@@ -7,11 +7,12 @@
  */
 package net.wurstclient.options;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.ZoomOtf;
@@ -33,11 +34,11 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	@Override
 	public void init()
 	{
-		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
+		WurstClient wurst = WurstClient.INSTANCE;
+		ZoomOtf zoom = wurst.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
-		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
-			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
+		Text zoomKeyName = wurst.getZoomKey().getBoundKeyLocalizedText();
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
@@ -45,7 +46,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.build());
 		
 		addDrawableChild(keyButton = ButtonWidget
-			.builder(Text.literal("Zoom Key: " + zoomKeyName),
+			.builder(Text.literal("Zoom Key: ").append(zoomKeyName),
 				b -> client.setScreen(new PressAKeyScreen(this)))
 			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
 		
@@ -94,20 +95,21 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Zoom Manager",
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		context.drawCenteredTextWithShadow(textRenderer, "Zoom Manager",
 			width / 2, 40, 0xffffff);
-		drawTextWithShadow(matrixStack, textRenderer,
+		context.drawTextWithShadow(textRenderer,
 			"Zoom Level: " + level.getValueString(), width / 2 - 75,
 			height / 4 + 44, 0xcccccc);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

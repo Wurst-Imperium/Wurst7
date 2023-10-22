@@ -28,4 +28,10 @@ public final class FilterTradersSetting extends EntityFilterCheckbox
 		return new FilterTradersSetting(
 			"Won't attack villagers, wandering traders, etc.", checked);
 	}
+	
+	public static FilterTradersSetting genericVision(boolean checked)
+	{
+		return new FilterTradersSetting(
+			"Won't show villagers, wandering traders, etc.", checked);
+	}
 }

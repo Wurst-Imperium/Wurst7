@@ -25,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -37,6 +38,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -84,6 +86,7 @@ public final class KillauraLegitHack extends Hack
 			FilterPetsSetting.genericCombat(false),
 			FilterTradersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
 			FilterShulkerBulletSetting.genericCombat(false),
@@ -213,16 +216,13 @@ public final class KillauraLegitHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -231,16 +231,9 @@ public final class KillauraLegitHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		if(target.isAlive())
-			matrixStack.translate(
-				target.prevX + (target.getX() - target.prevX) * partialTicks
-					- regionX,
-				target.prevY + (target.getY() - target.prevY) * partialTicks,
-				target.prevZ + (target.getZ() - target.prevZ) * partialTicks
-					- regionZ);
-		else
-			matrixStack.translate(target.getX() - regionX, target.getY(),
-				target.getZ() - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(target, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(target.getWidth(), target.getHeight(),
@@ -268,7 +261,6 @@ public final class KillauraLegitHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private enum Priority

@@ -30,7 +30,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -43,6 +42,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -187,12 +187,13 @@ public final class FeedAuraHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -201,13 +202,9 @@ public final class FeedAuraHack extends Hack
 		float green = p * 2F;
 		float red = 2 - green;
 		
-		matrixStack.translate(
-			MathHelper.lerp(partialTicks, renderTarget.prevX,
-				renderTarget.getX()),
-			MathHelper.lerp(partialTicks, renderTarget.prevY,
-				renderTarget.getY()),
-			MathHelper.lerp(partialTicks, renderTarget.prevZ,
-				renderTarget.getZ()));
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
@@ -232,7 +229,6 @@ public final class FeedAuraHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private boolean isUntamed(AnimalEntity e)

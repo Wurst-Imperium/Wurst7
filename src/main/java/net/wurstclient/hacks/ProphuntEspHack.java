@@ -20,6 +20,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"prophunt esp"})
@@ -52,12 +53,13 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
@@ -77,7 +79,8 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(entity.getX(), entity.getY(), entity.getZ());
+			matrixStack.translate(entity.getX() - region.x(), entity.getY(),
+				entity.getZ() - region.z());
 			
 			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX, matrixStack);
 			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX, matrixStack);
@@ -91,6 +94,5 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

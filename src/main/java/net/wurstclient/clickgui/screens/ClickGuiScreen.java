@@ -7,8 +7,9 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.clickgui.ClickGui;
 
@@ -43,17 +44,21 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		gui.handleMouseScroll(mouseX, mouseY, delta);
-		return super.mouseScrolled(mouseX, mouseY, delta);
+		gui.handleMouseScroll(mouseX, mouseY, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		gui.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		gui.render(context, mouseX, mouseY, partialTicks);
 	}
 }

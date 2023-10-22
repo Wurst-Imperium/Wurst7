@@ -37,6 +37,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -183,19 +184,20 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
 		// box
 		matrixStack.push();
-		matrixStack.translate(fakePlayer.getX(), fakePlayer.getY(),
-			fakePlayer.getZ());
+		matrixStack.translate(fakePlayer.getX() - region.x(), fakePlayer.getY(),
+			fakePlayer.getZ() - region.z());
 		matrixStack.scale(fakePlayer.getWidth() + 0.1F,
 			fakePlayer.getHeight() + 0.1F, fakePlayer.getWidth() + 0.1F);
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
@@ -203,9 +205,10 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		// line
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
-		Vec3d end = fakePlayer.getBoundingBox().getCenter();
+		Vec3d regionVec = region.toVec3d();
+		Vec3d start = RotationUtils.getClientLookVec()
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
+		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionVec);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
@@ -224,8 +227,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

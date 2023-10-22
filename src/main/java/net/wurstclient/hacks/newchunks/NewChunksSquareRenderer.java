@@ -20,6 +20,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
@@ -39,10 +40,8 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 	private void renderChunks(List<ChunkPos> chunks, int drawDistance,
 		BufferBuilder bufferBuilder)
 	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		ChunkPos camChunkPos = new ChunkPos(camPos);
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		ChunkPos camChunkPos = new ChunkPos(RenderUtils.getCameraBlockPos());
+		RegionPos region = RegionPos.of(camChunkPos);
 		
 		for(ChunkPos chunkPos : chunks)
 		{
@@ -50,7 +49,7 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 				continue;
 			
 			BlockPos blockPos =
-				chunkPos.getBlockPos(0, 0, 0).add(-regionX, 0, -regionZ);
+				chunkPos.getBlockPos(-region.x(), 0, -region.z());
 			float x1 = blockPos.getX() + 0.5F;
 			float x2 = x1 + 15;
 			float z1 = blockPos.getZ() + 0.5F;
