@@ -27,4 +27,10 @@ public final class FilterInvisibleSetting extends EntityFilterCheckbox
 		return new FilterInvisibleSetting("Won't attack invisible entities.",
 			checked);
 	}
+	
+	public static FilterInvisibleSetting genericVision(boolean checked)
+	{
+		return new FilterInvisibleSetting("Won't show invisible entities.",
+			checked);
+	}
 }

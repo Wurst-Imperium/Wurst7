@@ -7,10 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.stream.Stream;
-
 import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -64,10 +61,7 @@ public final class ParkourHack extends Hack implements UpdateListener
 		Box adjustedBox = box.stretch(0, -minDepth.getValue(), 0)
 			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
-		Stream<VoxelShape> blockCollisions =
-			IMC.getWorld().getBlockCollisionsStream(MC.player, adjustedBox);
-		
-		if(blockCollisions.findAny().isPresent())
+		if(!MC.world.isSpaceEmpty(MC.player, adjustedBox))
 			return;
 		
 		MC.player.jump();

@@ -10,10 +10,11 @@ package net.wurstclient.options;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.Keybind;
@@ -121,11 +122,12 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -163,18 +165,19 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredTextWithShadow(matrixStack, textRenderer, "Keybind Manager",
+		context.drawCenteredTextWithShadow(textRenderer, "Keybind Manager",
 			width / 2, 8, 0xffffff);
-		drawCenteredTextWithShadow(matrixStack, textRenderer,
+		context.drawCenteredTextWithShadow(textRenderer,
 			"Keybinds: " + listGui.getItemCount(), width / 2, 20, 0xffffff);
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -222,17 +225,18 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int slotHeight, int mouseX, int mouseY, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int slotHeight, int mouseX, int mouseY, float partialTicks)
 		{
 			Keybind keybind =
 				WurstClient.INSTANCE.getKeybinds().getAllKeybinds().get(index);
 			
-			client.textRenderer.draw(matrixStack,
+			context.drawText(client.textRenderer,
 				"Key: " + keybind.getKey().replace("key.keyboard.", ""), x + 3,
-				y + 3, 0xa0a0a0);
-			client.textRenderer.draw(matrixStack,
-				"Commands: " + keybind.getCommands(), x + 3, y + 15, 0xa0a0a0);
+				y + 3, 0xa0a0a0, false);
+			context.drawText(client.textRenderer,
+				"Commands: " + keybind.getCommands(), x + 3, y + 15, 0xa0a0a0,
+				false);
 		}
 	}
 }

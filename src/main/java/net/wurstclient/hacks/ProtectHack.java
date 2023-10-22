@@ -60,6 +60,7 @@ public final class ProtectHack extends Hack
 			FilterPetsSetting.genericCombat(false),
 			FilterTradersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(false),
 			FilterNamedSetting.genericCombat(false),
 			FilterShulkerBulletSetting.genericCombat(false),
@@ -118,7 +119,7 @@ public final class ProtectHack extends Hack
 		{
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)

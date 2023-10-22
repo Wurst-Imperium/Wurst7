@@ -43,23 +43,17 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
-import net.wurstclient.hacks.autolibrarian.FacingSetting;
-import net.wurstclient.hacks.autolibrarian.SwingHandSetting;
 import net.wurstclient.hacks.autolibrarian.UpdateBooksSetting;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
-import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.InventoryUtils;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"auto librarian", "AutoVillager", "auto villager",
 	"VillagerTrainer", "villager trainer", "LibrarianTrainer",
@@ -95,8 +89,26 @@ public final class AutoLibrarianHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FacingSetting facing = new FacingSetting();
-	private final SwingHandSetting swingHand = new SwingHandSetting();
+	private final FacingSetting facing = FacingSetting
+		.withoutPacketSpam("How to face the villager and job site.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't face the villager at all. Will be"
+			+ " detected by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Face the villager on the"
+			+ " server-side, while still letting you move the camera freely on"
+			+ " the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Face the villager by moving your"
+			+ " camera on the client-side. This is the most legit option, but"
+			+ " can be disorienting to look at.");
+	
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting("How to swing your hand when interacting with the"
+			+ " villager and job site.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
+			+ " by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
+			+ " without playing the animation on the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
+			+ " This is the most legit option.");
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"
@@ -104,6 +116,7 @@ public final class AutoLibrarianHack extends Hack
 			+ "Can be adjusted from 0 (off) to 100.",
 		1, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	private final HashSet<VillagerEntity> experiencedVillagers =
 		new HashSet<>();
 	
@@ -112,8 +125,6 @@ public final class AutoLibrarianHack extends Hack
 	
 	private boolean placingJobSite;
 	private boolean breakingJobSite;
-	private float progress;
-	private float prevProgress;
 	
 	public AutoLibrarianHack()
 	{
@@ -143,13 +154,12 @@ public final class AutoLibrarianHack extends Hack
 		
 		if(breakingJobSite)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			breakingJobSite = false;
 		}
 		
-		progress = 0;
-		prevProgress = 0;
+		overlay.resetProgress();
 		villager = null;
 		jobSite = null;
 		placingJobSite = false;
@@ -290,19 +300,7 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.getSelected().swing(Hand.MAIN_HAND);
 		
 		// update progress
-		if(MC.player.getAbilities().creativeMode
-			|| BlockUtils.getHardness(jobSite) >= 1)
-		{
-			progress = 1;
-			prevProgress = 1;
-			return;
-		}
-		
-		prevProgress = progress;
-		progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-		
-		if(progress < prevProgress)
-			prevProgress = progress;
+		overlay.updateProgress();
 	}
 	
 	private void placeJobSite()
@@ -369,7 +367,7 @@ public final class AutoLibrarianHack extends Hack
 	
 	private void openTradeScreen()
 	{
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		ClientPlayerInteractionManager im = MC.interactionManager;
@@ -406,13 +404,13 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.getSelected().swing(hand);
 		
 		// set cooldown
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private void closeTradeScreen()
 	{
 		MC.player.closeHandledScreen();
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private BookOffer findEnchantedBookOffer(TradeOfferList tradeOffers)
@@ -454,7 +452,7 @@ public final class AutoLibrarianHack extends Hack
 		Stream<VillagerEntity> stream =
 			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
 				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof VillagerEntity)
+				.filter(VillagerEntity.class::isInstance)
 				.map(e -> (VillagerEntity)e).filter(e -> e.getHealth() > 0)
 				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 				.filter(e -> e.getVillagerData()
@@ -520,62 +518,32 @@ public final class AutoLibrarianHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		Vec3d regionOffset = region.negate().toVec3d();
 		
 		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		
 		if(villager != null)
 			RenderUtils.drawOutlinedBox(
-				villager.getBoundingBox().offset(-regionX, 0, -regionZ),
-				matrixStack);
+				villager.getBoundingBox().offset(regionOffset), matrixStack);
 		
 		if(jobSite != null)
-			RenderUtils.drawOutlinedBox(
-				new Box(jobSite).offset(-regionX, 0, -regionZ), matrixStack);
+			RenderUtils.drawOutlinedBox(new Box(jobSite).offset(regionOffset),
+				matrixStack);
 		
 		RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 		
 		for(VillagerEntity villager : experiencedVillagers)
 		{
-			Box box = villager.getBoundingBox().offset(-regionX, 0, -regionZ);
+			Box box = villager.getBoundingBox().offset(regionOffset);
 			RenderUtils.drawOutlinedBox(box, matrixStack);
 			RenderUtils.drawCrossBox(box, matrixStack);
-		}
-		
-		if(breakingJobSite && jobSite != null)
-		{
-			matrixStack.push();
-			
-			Box box = new Box(BlockPos.ORIGIN);
-			float p = prevProgress + (progress - prevProgress) * partialTicks;
-			float red = p * 2F;
-			float green = 2 - red;
-			
-			matrixStack.translate(jobSite.getX() - regionX, jobSite.getY(),
-				jobSite.getZ() - regionZ);
-			if(p < 1)
-			{
-				matrixStack.translate(0.5, 0.5, 0.5);
-				matrixStack.scale(p, p, p);
-				matrixStack.translate(-0.5, -0.5, -0.5);
-			}
-			
-			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box, matrixStack);
-			
-			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box, matrixStack);
-			
-			matrixStack.pop();
 		}
 		
 		matrixStack.pop();
@@ -584,6 +552,8 @@ public final class AutoLibrarianHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		
+		if(breakingJobSite)
+			overlay.render(matrixStack, partialTicks, jobSite);
 	}
 }

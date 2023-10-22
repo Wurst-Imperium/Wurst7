@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
@@ -109,6 +110,23 @@ public final class BlockListSetting extends Setting
 	{
 		JsonArray json = new JsonArray();
 		blockNames.forEach(s -> json.add(s));
+		return json;
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "BlockList");
+		
+		JsonArray defaultBlocksJson = new JsonArray();
+		for(String blockName : defaultNames)
+			defaultBlocksJson.add(blockName);
+		json.add("defaultBlocks", defaultBlocksJson);
+		
 		return json;
 	}
 	
