@@ -54,6 +54,8 @@
     "ShulkerBoxScreenMixin",
     "SimpleOptionMixin",
     "SodiumBlockOcclusionCacheMixin",
+    "SodiumBlockRendererMixin",
+    "SodiumFluidRendererMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "TelemetryManagerMixin",
