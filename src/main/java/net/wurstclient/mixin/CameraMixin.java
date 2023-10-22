@@ -26,10 +26,10 @@ public abstract class CameraMixin
 		argsOnly = true)
 	private double changeClipToSpaceDistance(double desiredCameraDistance)
 	{
-		CameraDistanceHack cameraDistanceHack =
+		CameraDistanceHack cameraDistance =
 			WurstClient.INSTANCE.getHax().cameraDistanceHack;
-		if(cameraDistanceHack.isEnabled())
-			return cameraDistanceHack.getDistance();
+		if(cameraDistance.isEnabled())
+			return cameraDistance.getDistance();
 		
 		return desiredCameraDistance;
 	}

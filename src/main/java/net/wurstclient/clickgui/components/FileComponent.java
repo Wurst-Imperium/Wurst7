@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -54,7 +55,7 @@ public final class FileComponent extends Component
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -63,8 +64,8 @@ public final class FileComponent extends Component
 		int txtColor = gui.getTxtColor();
 		float opacity = gui.getOpacity();
 		
-		TextRenderer fr = WurstClient.MC.textRenderer;
-		int buttonWidth = fr.getWidth(setting.getSelectedFileName());
+		TextRenderer tr = WurstClient.MC.textRenderer;
+		int buttonWidth = tr.getWidth(setting.getSelectedFileName());
 		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -80,6 +81,7 @@ public final class FileComponent extends Component
 		boolean hText = hovering && mouseX < x3;
 		boolean hBox = hovering && mouseX >= x3;
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -128,9 +130,9 @@ public final class FileComponent extends Component
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		String text = setting.getName() + ": ";
-		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
-		fr.draw(matrixStack, setting.getSelectedFileName(), x3 + 2, y1 + 2,
-			txtColor);
+		context.drawText(tr, text, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, setting.getSelectedFileName(), x3 + 2, y1 + 2,
+			txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	

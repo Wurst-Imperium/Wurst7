@@ -17,10 +17,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
 
 public enum BlockUtils
@@ -118,6 +122,31 @@ public enum BlockUtils
 	public static boolean canBeClicked(BlockPos pos)
 	{
 		return getOutlineShape(pos) != VoxelShapes.empty();
+	}
+	
+	public static boolean isOpaqueFullCube(BlockPos pos)
+	{
+		return getState(pos).isOpaqueFullCube(MC.world, pos);
+	}
+	
+	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	{
+		RaycastContext context =
+			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+		
+		return MC.world.raycast(context);
+	}
+	
+	public static boolean hasLineOfSight(Vec3d from, Vec3d to)
+	{
+		return raycast(from, to).getType() == HitResult.Type.MISS;
+	}
+	
+	public static boolean hasLineOfSight(Vec3d to)
+	{
+		return raycast(RotationUtils.getEyesPos(), to)
+			.getType() == HitResult.Type.MISS;
 	}
 	
 	public static ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)

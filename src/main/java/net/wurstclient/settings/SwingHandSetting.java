@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.hacks.autolibrarian;
+package net.wurstclient.settings;
 
 import java.util.function.Consumer;
 
@@ -13,24 +13,25 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.WurstClient;
-import net.wurstclient.settings.EnumSetting;
 
 public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
-	protected static final MinecraftClient MC = WurstClient.MC;
+	private static final MinecraftClient MC = WurstClient.MC;
 	
-	public SwingHandSetting()
+	public SwingHandSetting(String description)
 	{
-		super("Swing hand", "How to swing your hand when interacting with the"
-			+ " villager and job site.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.", SwingHand.values(),
-			SwingHand.SERVER);
+		super("Swing hand", description, SwingHand.values(), SwingHand.SERVER);
+	}
+	
+	public SwingHandSetting(String description, SwingHand selected)
+	{
+		super("Swing hand", description, SwingHand.values(), selected);
+	}
+	
+	public SwingHandSetting(String name, String description, SwingHand selected)
+	{
+		super(name, description, SwingHand.values(), selected);
 	}
 	
 	public enum SwingHand

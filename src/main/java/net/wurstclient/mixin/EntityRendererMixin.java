@@ -112,8 +112,5 @@ public abstract class EntityRendererMixin<T extends Entity>
 	}
 	
 	@Shadow
-	public TextRenderer getTextRenderer()
-	{
-		return null;
-	}
+	public abstract TextRenderer getTextRenderer();
 }
