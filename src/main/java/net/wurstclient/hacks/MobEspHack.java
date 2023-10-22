@@ -209,7 +209,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			VertexFormats.POSITION_COLOR);
 		
 		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec()
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
 		for(LivingEntity e : mobs)
