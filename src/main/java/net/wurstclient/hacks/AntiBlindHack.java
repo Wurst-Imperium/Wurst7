@@ -23,5 +23,6 @@ public final class AntiBlindHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See BackgroundRendererMixin, LightTextureManagerMixin, WorldRendererMixin
+	// See BackgroundRendererMixin, WorldRendererMixin,
+	// ClientPlayerEntityMixin.hasStatusEffect()
 }

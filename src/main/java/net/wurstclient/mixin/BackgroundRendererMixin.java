@@ -10,14 +10,11 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
 import net.wurstclient.WurstClient;
 
 @Mixin(BackgroundRenderer.class)
@@ -31,16 +28,5 @@ public class BackgroundRendererMixin
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			ci.setReturnValue(null);
-	}
-	
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z",
-		ordinal = 1), method = "render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V")
-	private static boolean onCheckDarkness(LivingEntity living, StatusEffect effect)
-	{
-		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			return false;
-		
-		return living.hasStatusEffect(effect);
 	}
 }
