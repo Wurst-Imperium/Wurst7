@@ -17,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.class_8887;
 import net.minecraft.block.entity.*;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -190,7 +189,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				droppers.add(blockEntity);
 			else if(blockEntity instanceof DispenserBlockEntity)
 				dispensers.add(blockEntity);
-			else if(blockEntity instanceof class_8887)
+			else if(blockEntity instanceof CrafterBlockEntity)
 				crafters.add(blockEntity);
 			else if(blockEntity instanceof AbstractFurnaceBlockEntity)
 				furnaces.add(blockEntity);
