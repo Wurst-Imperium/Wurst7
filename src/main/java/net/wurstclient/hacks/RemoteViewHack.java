@@ -54,7 +54,7 @@ public final class RemoteViewHack extends Hack
 		{
 			Stream<Entity> stream = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
@@ -127,7 +127,7 @@ public final class RemoteViewHack extends Hack
 		{
 			entity = StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)

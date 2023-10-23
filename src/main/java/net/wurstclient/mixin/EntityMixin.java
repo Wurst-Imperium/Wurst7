@@ -18,12 +18,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.EntityLike;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, CommandOutput
+public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 {
 	@Redirect(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",

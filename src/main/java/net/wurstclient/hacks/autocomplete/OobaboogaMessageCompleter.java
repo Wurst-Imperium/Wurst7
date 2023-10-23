@@ -50,7 +50,7 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 		throws IOException, JsonException
 	{
 		// set up the API request
-		URL url = new URL("http://127.0.0.1:5000/api/v1/generate");
+		URL url = new URL(modelSettings.oobaboogaEndpoint.getValue());
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/json");

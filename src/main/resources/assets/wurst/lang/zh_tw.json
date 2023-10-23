@@ -183,5 +183,6 @@
   "button.wurst.nochatreports.signatures_status": "簽名： ",
   "description.wurst.nochatreports.message_is_reportable": "此訊息具有有效簽名，因此容易受到欺詐性聊天檢舉的攻擊。",
   "gui.wurst.generic.allcaps_blocked": "封鎖",
-  "gui.wurst.generic.allcaps_allowed": "允許"
+  "gui.wurst.generic.allcaps_allowed": "允許",
+  "key.wurst.zoom": "縮放"
 }
