@@ -206,7 +206,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		// line
 		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec()
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionVec);
 		
