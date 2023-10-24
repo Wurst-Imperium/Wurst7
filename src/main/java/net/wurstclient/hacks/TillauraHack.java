@@ -84,7 +84,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// wait for right click timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// check held item
@@ -174,7 +174,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			// right click block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			return true;
 		}
 		

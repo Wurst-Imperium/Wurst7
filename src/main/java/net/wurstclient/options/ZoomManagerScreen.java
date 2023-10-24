@@ -33,11 +33,11 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	@Override
 	public void init()
 	{
-		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
+		WurstClient wurst = WurstClient.INSTANCE;
+		ZoomOtf zoom = wurst.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
-		String zoomKeyName = WurstClient.INSTANCE.getZoomKey()
-			.getBoundKeyTranslationKey().replace("key.keyboard.", "");
+		Text zoomKeyName = wurst.getZoomKey().getBoundKeyLocalizedText();
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
@@ -45,7 +45,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.build());
 		
 		addDrawableChild(keyButton = ButtonWidget
-			.builder(Text.literal("Zoom Key: " + zoomKeyName),
+			.builder(Text.literal("Zoom Key: ").append(zoomKeyName),
 				b -> client.setScreen(new PressAKeyScreen(this)))
 			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
 		

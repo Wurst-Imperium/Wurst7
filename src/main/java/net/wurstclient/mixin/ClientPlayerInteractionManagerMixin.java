@@ -46,12 +46,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Shadow
 	@Final
 	private MinecraftClient client;
-	@Shadow
-	private float currentBreakingProgress;
-	@Shadow
-	private boolean breakingBlock;
-	@Shadow
-	private int blockBreakingCooldown;
 	
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
@@ -97,18 +91,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
-	public float getCurrentBreakingProgress()
-	{
-		return currentBreakingProgress;
-	}
-	
-	@Override
-	public void setBreakingBlock(boolean breakingBlock)
-	{
-		this.breakingBlock = breakingBlock;
-	}
-	
-	@Override
 	public void windowClick_PICKUP(int slot)
 	{
 		clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
@@ -139,18 +121,12 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Override
-	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec,
-		Hand hand)
-	{
-		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
-		interactBlock(client.player, hand, hitResult);
-		interactItem(client.player, hand);
-	}
-	
-	@Override
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
 	{
-		rightClickBlock(pos, side, hitVec, Hand.MAIN_HAND);
+		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
+		Hand hand = Hand.MAIN_HAND;
+		interactBlock(client.player, hand, hitResult);
+		interactItem(client.player, hand);
 	}
 	
 	@Override
@@ -167,12 +143,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 	{
 		sendSequencedPacket(client.world,
 			i -> new PlayerInteractBlockC2SPacket(hand, blockHitResult, i));
-	}
-	
-	@Override
-	public void setBlockHitDelay(int delay)
-	{
-		blockBreakingCooldown = delay;
 	}
 	
 	@Shadow

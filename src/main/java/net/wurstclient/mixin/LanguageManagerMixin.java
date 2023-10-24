@@ -24,19 +24,19 @@ import net.wurstclient.mixinterface.ILanguageManager;
 public abstract class LanguageManagerMixin
 	implements SynchronousResourceReloader, ILanguageManager
 {
-	private TranslationStorage english;
+	private TranslationStorage wurstEnglish;
 	
 	@Inject(at = @At("HEAD"),
 		method = "reload(Lnet/minecraft/resource/ResourceManager;)V")
 	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
-		english = TranslationStorage.load(manager, Lists.newArrayList("en_us"),
-			false);
+		wurstEnglish = TranslationStorage.load(manager,
+			Lists.newArrayList("en_us"), false);
 	}
 	
 	@Override
-	public TranslationStorage getEnglish()
+	public TranslationStorage wurst_getEnglish()
 	{
-		return english;
+		return wurstEnglish;
 	}
 }

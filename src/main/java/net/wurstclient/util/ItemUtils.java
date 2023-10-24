@@ -7,7 +7,10 @@
  */
 package net.wurstclient.util;
 
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
+import net.minecraft.item.ToolItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -45,5 +48,12 @@ public enum ItemUtils
 		{
 			return null;
 		}
+	}
+	
+	public static float getAttackSpeed(ToolItem item)
+	{
+		return (float)item.getAttributeModifiers(EquipmentSlot.MAINHAND)
+			.get(EntityAttributes.GENERIC_ATTACK_SPEED).stream().findFirst()
+			.orElseThrow().getValue();
 	}
 }

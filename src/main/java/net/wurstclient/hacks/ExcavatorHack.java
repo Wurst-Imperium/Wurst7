@@ -295,8 +295,7 @@ public final class ExcavatorHack extends Hack
 			// get progress
 			float progress;
 			if(BlockUtils.getHardness(currentBlock) < 1)
-				progress =
-					IMC.getInteractionManager().getCurrentBreakingProgress();
+				progress = MC.interactionManager.currentBreakingProgress;
 			else
 				progress = 1;
 			

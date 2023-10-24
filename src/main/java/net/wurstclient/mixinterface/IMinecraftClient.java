@@ -11,15 +11,7 @@ import net.minecraft.client.util.Session;
 
 public interface IMinecraftClient
 {
-	public void rightClick();
-	
-	public void setItemUseCooldown(int itemUseCooldown);
-	
 	public IClientPlayerInteractionManager getInteractionManager();
-	
-	public ILanguageManager getLanguageManager();
-	
-	public int getItemUseCooldown();
 	
 	public IClientPlayerEntity getPlayer();
 	

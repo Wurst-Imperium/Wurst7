@@ -49,7 +49,7 @@ public final class ThrowHack extends Hack implements RightClickListener
 	@Override
 	public void onRightClick(RightClickEvent event)
 	{
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		if(!MC.options.useKey.isPressed())
