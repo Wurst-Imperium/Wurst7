@@ -39,7 +39,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -47,7 +46,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.EmptyBlockView;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -807,7 +805,7 @@ public final class TunnellerHack extends Hack
 			// check for nearby falling blocks
 			return StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof FallingBlockEntity)
+				.filter(FallingBlockEntity.class::isInstance)
 				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
 		}
 		
@@ -923,7 +921,7 @@ public final class TunnellerHack extends Hack
 			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
+			linesOfSight[i] = BlockUtils.hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
 		Direction side = sides[0];
@@ -955,15 +953,6 @@ public final class TunnellerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		return true;
-	}
-	
-	private boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
-		
-		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
 	}
 	
 	private enum TunnelSize

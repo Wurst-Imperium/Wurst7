@@ -40,7 +40,6 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
-    "LightTextureManagerMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MouseMixin",

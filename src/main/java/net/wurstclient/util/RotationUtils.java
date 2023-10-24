@@ -28,16 +28,16 @@ public enum RotationUtils
 			player.getZ());
 	}
 	
-	public static Vec3d getClientLookVec()
+	public static Vec3d getClientLookVec(float partialTicks)
 	{
 		ClientPlayerEntity player = WurstClient.MC.player;
 		float f = 0.017453292F;
 		float pi = (float)Math.PI;
 		
-		float f1 = MathHelper.cos(-player.getYaw() * f - pi);
-		float f2 = MathHelper.sin(-player.getYaw() * f - pi);
-		float f3 = -MathHelper.cos(-player.getPitch() * f);
-		float f4 = MathHelper.sin(-player.getPitch() * f);
+		float f1 = MathHelper.cos(-player.getYaw(partialTicks) * f - pi);
+		float f2 = MathHelper.sin(-player.getYaw(partialTicks) * f - pi);
+		float f3 = -MathHelper.cos(-player.getPitch(partialTicks) * f);
+		float f4 = MathHelper.sin(-player.getPitch(partialTicks) * f);
 		
 		return new Vec3d(f2 * f3, f4, f1 * f3);
 	}
