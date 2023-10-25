@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.stream.Stream;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -24,6 +26,7 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ItemUtils;
+import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
@@ -75,7 +78,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			&& MC.crosshairTarget.getType() == HitResult.Type.ENTITY)
 		{
 			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
-			
+				//check if entity is correct
+				if(!isCorrectEntity(entity))
+					return;
+
 			if(entity instanceof LivingEntity
 				&& ((LivingEntity)entity).getHealth() > 0)
 				setSlot();
@@ -191,4 +197,12 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			return name;
 		}
 	}
+	private boolean isCorrectEntity(Entity entity)
+	{
+		Stream<Entity> stream = Stream.of(entity);
+		stream = stream.filter(EntityUtils.IS_ATTACKABLE);
+		
+		return stream.findFirst().isPresent();
+	}
 }
+
