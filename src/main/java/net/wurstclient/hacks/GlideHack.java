@@ -10,20 +10,21 @@ package net.wurstclient.hacks;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 
-public final class GlideHack extends Hack implements UpdateListener
+public final class GlideHack extends Hack
+	implements UpdateListener, AirStrafingSpeedListener
 {
 	private final SliderSetting fallSpeed = new SliderSetting("Fall speed",
 		0.125, 0.005, 0.25, 0.005, ValueDisplay.DECIMAL);
@@ -50,12 +51,14 @@ public final class GlideHack extends Hack implements UpdateListener
 	public void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(AirStrafingSpeedListener.class, this);
 	}
 	
 	@Override
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(AirStrafingSpeedListener.class, this);
 	}
 	
 	@Override
@@ -75,20 +78,23 @@ public final class GlideHack extends Hack implements UpdateListener
 			if(!MC.world.isSpaceEmpty(box))
 				return;
 			
-			BlockPos min =
-				new BlockPos(new Vec3d(box.minX, box.minY, box.minZ));
-			BlockPos max =
-				new BlockPos(new Vec3d(box.maxX, box.maxY, box.maxZ));
+			BlockPos min = BlockPos.ofFloored(box.minX, box.minY, box.minZ);
+			BlockPos max = BlockPos.ofFloored(box.maxX, box.maxY, box.maxZ);
 			Stream<BlockPos> stream = StreamSupport
 				.stream(BlockUtils.getAllInBox(min, max).spliterator(), true);
 			
 			// manual collision check, since liquids don't have bounding boxes
-			if(stream.map(BlockUtils::getState).map(BlockState::getMaterial)
-				.anyMatch(Material::isLiquid))
+			if(stream.map(BlockUtils::getBlock)
+				.anyMatch(FluidBlock.class::isInstance))
 				return;
 		}
 		
 		player.setVelocity(v.x, Math.max(v.y, -fallSpeed.getValue()), v.z);
-		player.airStrafingSpeed *= moveSpeed.getValueF();
+	}
+	
+	@Override
+	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
+	{
+		event.setSpeed(event.getDefaultSpeed() * moveSpeed.getValueF());
 	}
 }

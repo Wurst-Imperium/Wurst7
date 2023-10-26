@@ -18,13 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.crash.CrashException;
@@ -35,17 +34,17 @@ import net.wurstclient.options.WurstOptionsScreen;
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
-	private static final Identifier wurstTexture =
+	private static final Identifier WURST_TEXTURE =
 		new Identifier("wurst", "wurst_128.png");
 	
 	private ButtonWidget wurstOptionsButton;
 	
-	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
+	private GameMenuScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"initWidgets()V"})
+	@Inject(at = @At("TAIL"), method = "initWidgets()V")
 	private void onInitWidgets(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -54,9 +53,35 @@ public abstract class GameMenuScreenMixin extends Screen
 		addWurstOptionsButton();
 	}
 	
+	@Inject(at = @At("TAIL"),
+		method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	private void onRender(DrawContext context, int mouseX, int mouseY,
+		float partialTicks, CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
+			return;
+		
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		
+		int x = wurstOptionsButton.getX() + 34;
+		int y = wurstOptionsButton.getY() + 2;
+		int w = 63;
+		int h = 16;
+		int fw = 63;
+		int fh = 16;
+		float u = 0;
+		float v = 0;
+		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
+	}
+	
 	private void addWurstOptionsButton()
 	{
-		List<ClickableWidget> buttons = getRealButtons();
+		List<ClickableWidget> buttons = Screens.getButtons(this);
 		
 		int buttonY = -1;
 		int buttonI = -1;
@@ -90,25 +115,9 @@ public abstract class GameMenuScreenMixin extends Screen
 		buttons.add(wurstOptionsButton);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private List<ClickableWidget> getRealButtons()
+	private void openWurstOptions()
 	{
-		// As of 22w43a, Fabric Screen API doesn't understand the new grid
-		// system (class_7845), so we must manually extract the real buttons
-		// from the grid.
-		
-		List<ClickableWidget> notButtons = Screens.getButtons(this);
-		
-		for(ClickableWidget cw : notButtons)
-		{
-			if(!(cw instanceof GridWidget grid))
-				continue;
-			
-			return (List<ClickableWidget>)grid.wrappedWidgets();
-		}
-		
-		throw new IllegalStateException(
-			"There's no longer a button grid in the game menu?");
+		client.setScreen(new WurstOptionsScreen(this));
 	}
 	
 	private boolean isFeedbackButton(ClickableWidget button)
@@ -125,38 +134,5 @@ public abstract class GameMenuScreenMixin extends Screen
 	{
 		String message = button.getMessage().getString();
 		return message != null && message.equals(I18n.translate(key));
-	}
-	
-	private void openWurstOptions()
-	{
-		client.setScreen(new WurstOptionsScreen(this));
-	}
-	
-	@Inject(at = {@At("TAIL")},
-		method = {"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"})
-	private void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
-		float partialTicks, CallbackInfo ci)
-	{
-		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
-			return;
-		
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		RenderSystem.setShaderTexture(0, wurstTexture);
-		
-		int x = wurstOptionsButton.getX() + 34;
-		int y = wurstOptionsButton.getY() + 2;
-		int w = 63;
-		int h = 16;
-		int fw = 63;
-		int fh = 16;
-		float u = 0;
-		float v = 0;
-		drawTexture(matrixStack, x, y, u, v, w, h, fw, fh);
 	}
 }

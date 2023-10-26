@@ -18,9 +18,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -93,7 +94,7 @@ public abstract class ListWidget extends AbstractParentElement
 	protected void updateItemPosition(int index, int x, int y, float delta)
 	{}
 	
-	protected abstract void renderItem(MatrixStack matrixStack, int x, int y,
+	protected abstract void renderItem(DrawContext context, int x, int y,
 		int itemHeight, int mouseX, int mouseY, int i, float f);
 	
 	protected void renderHeader(int x, int y, Tessellator tessellator)
@@ -133,8 +134,7 @@ public abstract class ListWidget extends AbstractParentElement
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY,
-		float delta)
+	public void render(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		if(visible)
 		{
@@ -144,8 +144,7 @@ public abstract class ListWidget extends AbstractParentElement
 			capYPosition();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShaderTexture(0,
-				DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -168,7 +167,7 @@ public abstract class ListWidget extends AbstractParentElement
 			if(renderHeader)
 				renderHeader(k, l, tessellator);
 			
-			renderList(matrices, k, l, mouseX, mouseY, delta);
+			renderList(context, k, l, mouseX, mouseY, delta);
 			RenderSystem.disableDepthTest();
 			renderHoleBackground(0, top, 255, 255);
 			renderHoleBackground(bottom, height, 255, 255);
@@ -178,7 +177,7 @@ public abstract class ListWidget extends AbstractParentElement
 				GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
 			// RenderSystem.disableAlphaTest();
 			// RenderSystem.shadeModel(7425);
-			RenderSystem.disableTexture();
+			// RenderSystem.disableTexture();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
@@ -247,7 +246,7 @@ public abstract class ListWidget extends AbstractParentElement
 			}
 			
 			renderDecorations(mouseX, mouseY);
-			RenderSystem.enableTexture();
+			// RenderSystem.enableTexture();
 			// RenderSystem.shadeModel(7424);
 			// RenderSystem.enableAlphaTest();
 			RenderSystem.disableBlend();
@@ -326,11 +325,12 @@ public abstract class ListWidget extends AbstractParentElement
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
 		if(!isVisible())
 			return false;
-		scrollAmount -= amount * itemHeight / 2.0D;
+		scrollAmount -= verticalAmount * itemHeight / 2.0D;
 		return true;
 	}
 	
@@ -374,8 +374,8 @@ public abstract class ListWidget extends AbstractParentElement
 		return 220;
 	}
 	
-	protected void renderList(MatrixStack matrixStack, int i, int j, int k,
-		int l, float f)
+	protected void renderList(DrawContext context, int i, int j, int k, int l,
+		float f)
 	{
 		int m = getItemCount();
 		Tessellator tessellator = Tessellator.getInstance();
@@ -392,7 +392,7 @@ public abstract class ListWidget extends AbstractParentElement
 			{
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
-				RenderSystem.disableTexture();
+				// RenderSystem.disableTexture();
 				float g = isFocused() ? 1.0F : 0.5F;
 				RenderSystem.setShaderColor(g, g, g, 1.0F);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -410,15 +410,17 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
 				bufferBuilder.vertex(q + 1, o - 1, 0.0D).next();
 				tessellator.draw();
-				RenderSystem.enableTexture();
+				// RenderSystem.enableTexture();
 			}
 			
-			renderItem(matrixStack, n, i, o, p, k, l, f);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
+			renderItem(context, n, i, o, p, k, l, f);
 		}
 		
 	}
 	
-	protected boolean isFocused()
+	@Override
+	public boolean isFocused()
 	{
 		return false;
 	}
@@ -433,8 +435,7 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShaderTexture(0,
-			DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,

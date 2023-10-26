@@ -28,4 +28,10 @@ public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 		return new FilterArmorStandsSetting("Won't attack armor stands.",
 			checked);
 	}
+	
+	public static FilterArmorStandsSetting genericVision(boolean checked)
+	{
+		return new FilterArmorStandsSetting("Won't show armor stands.",
+			checked);
+	}
 }

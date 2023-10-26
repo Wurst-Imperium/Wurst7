@@ -53,10 +53,10 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		BlockPos belowPlayer = new BlockPos(MC.player.getPos()).down();
+		BlockPos belowPlayer = BlockPos.ofFloored(MC.player.getPos()).down();
 		
 		// check if block is already placed
-		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())
+		if(!BlockUtils.getState(belowPlayer).isReplaceable())
 			return;
 		
 		// search blocks in hotbar
@@ -163,7 +163,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			
 			return true;
 		}

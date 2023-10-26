@@ -10,22 +10,31 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.MathUtils;
 
 public final class TpCmd extends Command
 {
+	private final CheckboxSetting disableFreecam =
+		new CheckboxSetting("Disable Freecam",
+			"Disables Freecam just before teleporting.\n\n"
+				+ "This allows you to teleport your actual character to your"
+				+ " Freecam position by typing \".tp ~ ~ ~\" while Freecam is"
+				+ " enabled.",
+			true);
+	
 	public TpCmd()
 	{
 		super("tp", "Teleports you up to 10 blocks away.", ".tp <x> <y> <z>",
 			".tp <entity>");
+		addSetting(disableFreecam);
 	}
 	
 	@Override
@@ -33,8 +42,10 @@ public final class TpCmd extends Command
 	{
 		BlockPos pos = argsToPos(args);
 		
-		ClientPlayerEntity player = MC.player;
-		player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		if(disableFreecam.isChecked() && WURST.getHax().freecamHack.isEnabled())
+			WURST.getHax().freecamHack.setEnabled(false);
+		
+		MC.player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -56,7 +67,7 @@ public final class TpCmd extends Command
 	{
 		LivingEntity entity = StreamSupport
 			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity)e)
+			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
 			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
@@ -68,12 +79,12 @@ public final class TpCmd extends Command
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		return new BlockPos(entity.getPos());
+		return BlockPos.ofFloored(entity.getPos());
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = new BlockPos(MC.player.getPos());
+		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
 		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		

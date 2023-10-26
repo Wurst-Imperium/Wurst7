@@ -16,45 +16,91 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.FacingSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.util.BlockPlacer;
+import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InteractionSimulator;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"build random", "RandomBuild", "random build", "PlaceRandom",
 	"place random", "RandomPlace", "random place"})
 public final class BuildRandomHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lFast\u00a7r mode can place blocks behind other blocks.\n"
-			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
-		Mode.values(), Mode.FAST);
+	private final SliderSetting range =
+		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting checkItem = new CheckboxSetting(
-		"Check held item",
-		"Only builds when you are actually holding a block.\n"
-			+ "Turn this off to build with fire, water, lava, spawn eggs, or if you just want to right click with an empty hand in random places.",
-		true);
+	private SliderSetting maxAttempts = new SliderSetting("Max attempts",
+		"Maximum number of random positions that BuildRandom will try to place"
+			+ " a block at in one tick.\n\n"
+			+ "Higher values speed up the building process at the cost of"
+			+ " increased lag.",
+		128, 1, 1024, 1, ValueDisplay.INTEGER);
+	
+	private final CheckboxSetting checkItem =
+		new CheckboxSetting("Check held item",
+			"Only builds when you are actually holding a block.\n"
+				+ "Turn this off to build with fire, water, lava, spawn eggs,"
+				+ " or if you just want to right click with an empty hand"
+				+ " in random places.",
+			true);
+	
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"Ensure that BuildRandom won't try to place blocks behind walls.",
+			false);
+	
+	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
+		"How BuildRandom should face the randomly placed blocks.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
+			+ " detected by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Face the blocks on the"
+			+ " server-side, while still letting you move the camera freely on"
+			+ " the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Face the blocks by moving your"
+			+ " camera on the client-side. This is the most legit option, but"
+			+ " can be VERY disorienting to look at.");
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How BuildRandom should swing your hand when placing blocks.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
+			+ " by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
+			+ " without playing the animation on the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
+			+ " This is the most legit option.");
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
 			"Builds as if FastPlace was enabled, even if it's not.", false);
+	
+	private final CheckboxSetting placeWhileBreaking = new CheckboxSetting(
+		"Place while breaking",
+		"Builds even while you are breaking a block.\n"
+			+ "Possible with hacks, but wouldn't work in vanilla. May look suspicious.",
+		false);
+	
+	private final CheckboxSetting placeWhileRiding = new CheckboxSetting(
+		"Place while riding",
+		"Builds even while you are riding a vehicle.\n"
+			+ "Possible with hacks, but wouldn't work in vanilla. May look suspicious.",
+		false);
+	
+	private final CheckboxSetting indicator = new CheckboxSetting("Indicator",
+		"Shows where BuildRandom is placing blocks.", true);
 	
 	private final Random random = new Random();
 	private BlockPos lastPos;
@@ -63,9 +109,16 @@ public final class BuildRandomHack extends Hack
 	{
 		super("BuildRandom");
 		setCategory(Category.BLOCKS);
-		addSetting(mode);
+		addSetting(range);
+		addSetting(maxAttempts);
 		addSetting(checkItem);
+		addSetting(checkLOS);
+		addSetting(facing);
+		addSetting(swingHand);
 		addSetting(fastPlace);
+		addSetting(placeWhileBreaking);
+		addSetting(placeWhileRiding);
+		addSetting(indicator);
 	}
 	
 	@Override
@@ -91,64 +144,78 @@ public final class BuildRandomHack extends Hack
 		if(WURST.getHax().freecamHack.isEnabled())
 			return;
 		
-		// check timer
-		if(!fastPlace.isChecked() && IMC.getItemUseCooldown() > 0)
+		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
-		if(!checkHeldItem())
+		if(checkItem.isChecked() && !MC.player.isHolding(
+			stack -> !stack.isEmpty() && stack.getItem() instanceof BlockItem))
 			return;
 		
-		// set mode & range
-		boolean legitMode = mode.getSelected() == Mode.LEGIT;
-		int range = legitMode ? 5 : 6;
-		int bound = range * 2 + 1;
+		if(!placeWhileBreaking.isChecked()
+			&& MC.interactionManager.isBreakingBlock())
+			return;
 		
+		if(!placeWhileRiding.isChecked() && MC.player.isRiding())
+			return;
+		
+		int maxAttempts = this.maxAttempts.getValueI();
+		int blockRange = range.getValueCeil();
+		int bound = blockRange * 2 + 1;
 		BlockPos pos;
 		int attempts = 0;
 		
 		do
 		{
 			// generate random position
-			pos = new BlockPos(MC.player.getPos()).add(
-				random.nextInt(bound) - range, random.nextInt(bound) - range,
-				random.nextInt(bound) - range);
+			pos = BlockPos.ofFloored(RotationUtils.getEyesPos()).add(
+				random.nextInt(bound) - blockRange,
+				random.nextInt(bound) - blockRange,
+				random.nextInt(bound) - blockRange);
 			attempts++;
 			
-		}while(attempts < 128 && !tryToPlaceBlock(legitMode, pos));
+		}while(attempts < maxAttempts && !tryToPlaceBlock(pos));
 	}
 	
-	private boolean checkHeldItem()
+	private boolean tryToPlaceBlock(BlockPos pos)
 	{
-		if(!checkItem.isChecked())
-			return true;
+		if(!BlockUtils.getState(pos).isReplaceable())
+			return false;
 		
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
-		return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
+		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+		if(params == null || params.distanceSq() > range.getValueSq())
+			return false;
+		if(checkLOS.isChecked() && !params.lineOfSight())
+			return false;
+		
+		MC.itemUseCooldown = 4;
+		facing.getSelected().face(params.hitVec());
+		lastPos = pos;
+		
+		InteractionSimulator.rightClickBlock(params.toHitResult(),
+			swingHand.getSelected());
+		return true;
 	}
 	
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(lastPos == null)
+		if(lastPos == null || !indicator.isChecked())
 			return;
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		// set position
-		matrixStack.translate(lastPos.getX() - regionX, lastPos.getY(),
-			lastPos.getZ() - regionZ);
+		matrixStack.translate(lastPos.getX() - region.x(), lastPos.getY(),
+			lastPos.getZ() - region.z());
 		
 		// get color
 		float red = partialTicks * 2F;
@@ -166,129 +233,5 @@ public final class BuildRandomHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-	}
-	
-	private boolean tryToPlaceBlock(boolean legitMode, BlockPos pos)
-	{
-		if(!BlockUtils.getState(pos).getMaterial().isReplaceable())
-			return false;
-		
-		if(legitMode)
-		{
-			if(!placeBlockLegit(pos))
-				return false;
-		}else
-		{
-			if(!placeBlockSimple_old(pos))
-				return false;
-			
-			MC.player.swingHand(Hand.MAIN_HAND);
-		}
-		IMC.setItemUseCooldown(4);
-		
-		lastPos = pos;
-		return true;
-	}
-	
-	private boolean placeBlockLegit(BlockPos pos)
-	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
-		
-		for(Direction side : Direction.values())
-		{
-			BlockPos neighbor = pos.offset(side);
-			
-			// check if neighbor can be right clicked
-			if(!BlockUtils.canBeClicked(neighbor))
-				continue;
-			
-			Vec3d dirVec = Vec3d.of(side.getVector());
-			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
-			
-			// check if hitVec is within range (4.25 blocks)
-			if(eyesPos.squaredDistanceTo(hitVec) > 18.0625)
-				continue;
-			
-			// check if side is visible (facing away from player)
-			if(distanceSqPosVec > eyesPos.squaredDistanceTo(posVec.add(dirVec)))
-				continue;
-			
-			// check line of sight
-			if(MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
-				continue;
-			
-			// face block
-			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
-			MC.player.networkHandler.sendPacket(packet);
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean placeBlockSimple_old(BlockPos pos)
-	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		
-		for(Direction side : Direction.values())
-		{
-			BlockPos neighbor = pos.offset(side);
-			
-			// check if neighbor can be right clicked
-			if(!BlockUtils.canBeClicked(neighbor))
-				continue;
-			
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			
-			// check if hitVec is within range (6 blocks)
-			if(eyesPos.squaredDistanceTo(hitVec) > 36)
-				continue;
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private enum Mode
-	{
-		FAST("Fast"),
-		
-		LEGIT("Legit");
-		
-		private final String name;
-		
-		private Mode(String name)
-		{
-			this.name = name;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

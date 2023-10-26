@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
@@ -100,6 +101,17 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	public final JsonElement toJson()
 	{
 		return new JsonPrimitive(checked);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "Checkbox");
+		json.addProperty("checkedByDefault", checkedByDefault);
+		return json;
 	}
 	
 	@Override

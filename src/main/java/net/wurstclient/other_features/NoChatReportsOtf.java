@@ -17,6 +17,7 @@ import net.minecraft.network.encryption.ClientPlayerSession;
 import net.minecraft.network.message.MessageChain;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
+import net.wurstclient.Category;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -116,6 +117,12 @@ public final class NoChatReportsOtf extends OtherFeature
 	public void doPrimaryAction()
 	{
 		disableSignatures.setChecked(!disableSignatures.isChecked());
+	}
+	
+	@Override
+	public Category getCategory()
+	{
+		return Category.CHAT;
 	}
 	
 	// See ChatHudMixin, ClientPlayNetworkHandlerMixin.onOnServerMetadata(),

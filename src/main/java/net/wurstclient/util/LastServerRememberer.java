@@ -49,6 +49,6 @@ public enum LastServerRememberer
 			return;
 		
 		ConnectScreen.connect(prevScreen, WurstClient.MC,
-			ServerAddress.parse(lastServer.address), lastServer);
+			ServerAddress.parse(lastServer.address), lastServer, false);
 	}
 }

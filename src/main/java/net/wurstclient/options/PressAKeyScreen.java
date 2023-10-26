@@ -9,9 +9,10 @@ package net.wurstclient.options;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class PressAKeyScreen extends Screen
@@ -50,12 +51,14 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, textRenderer, "Press a key", width / 2,
-			height / 4 + 48, 16777215);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		context.drawCenteredTextWithShadow(textRenderer, "Press a key",
+			width / 2, height / 4 + 48, 16777215);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 }
