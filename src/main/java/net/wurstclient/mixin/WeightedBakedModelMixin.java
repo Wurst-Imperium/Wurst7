@@ -7,14 +7,15 @@
  */
 package net.wurstclient.mixin;
 
-import me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderContext;
-import me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer;
-
+import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.render.model.WeightedBakedModel;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
+import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFacelessModelEvent;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,21 +23,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(value = BlockRenderer.class, remap = false)
-public class SodiumBlockRendererMixin
-{
-    @Inject(at = @At("HEAD"),
-        method = "getGeometry",
-        cancellable = true)
-    private void getGeometry(BlockRenderContext ctx, Direction face,
-		CallbackInfoReturnable<List<BakedQuad>> cir)
+@Mixin(WeightedBakedModel.class)
+public class WeightedBakedModelMixin {
+    @Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
+    private void getQuads(@Nullable BlockState state, @Nullable Direction face,
+        Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
     {
-        if (face != null) return;
+        if (face != null || state == null) return;
 
-        ShouldDrawSideEvent event = new ShouldDrawSideEvent(ctx.state(), ctx.pos());
+        ShouldDrawFacelessModelEvent event = new ShouldDrawFacelessModelEvent(state);
         EventManager.fire(event);
 
-        if (event.isRendered() != null && !event.isRendered())
+        if(event.isCancelled())
             cir.setReturnValue(List.of());
     }
 }

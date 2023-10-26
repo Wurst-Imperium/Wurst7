@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -16,17 +17,16 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
-import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
-import net.wurstclient.events.RenderBlockEntityListener;
-import net.wurstclient.events.SetOpaqueCubeListener;
-import net.wurstclient.events.ShouldDrawSideListener;
-import net.wurstclient.events.TesselateBlockListener;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.*;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
@@ -34,10 +34,14 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
 public final class XRayHack extends Hack implements UpdateListener,
-	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
-	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
+	SetOpaqueCubeListener,GetAmbientOcclusionLightLevelListener,
+	ShouldDrawSideListener, ShouldDrawFacelessModelListener,
+	TesselateBlockListener, RenderBlockEntityListener
 {
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
@@ -109,6 +113,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.add(ShouldDrawSideListener.class, this);
+		EVENTS.add(ShouldDrawFacelessModelListener.class, this);
 		EVENTS.add(TesselateBlockListener.class, this);
 		EVENTS.add(RenderBlockEntityListener.class, this);
 		
@@ -128,6 +133,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.remove(ShouldDrawSideListener.class, this);
+		EVENTS.remove(ShouldDrawFacelessModelListener.class, this);
 		EVENTS.remove(TesselateBlockListener.class, this);
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		
@@ -167,6 +173,13 @@ public final class XRayHack extends Hack implements UpdateListener,
 		event.setRendered(
 			isVisible(event.getState().getBlock(), event.getPos()));
 	}
+
+	@Override
+	public void onShouldDrawFacelessModel(ShouldDrawFacelessModelEvent event)
+	{
+		if (!isVisible(event.getState().getBlock(), null))
+			event.cancel();
+	}
 	
 	@Override
 	public void onTesselateBlock(TesselateBlockEvent event)
@@ -189,7 +202,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		int index = Collections.binarySearch(oreNamesCache, name);
 		boolean visible = index >= 0;
 		
-		if(visible && onlyExposed.isChecked())
+		if(visible && onlyExposed.isChecked() && pos != null)
 			return !BlockUtils.isOpaqueFullCube(pos.up())
 				|| !BlockUtils.isOpaqueFullCube(pos.down())
 				|| !BlockUtils.isOpaqueFullCube(pos.east())
