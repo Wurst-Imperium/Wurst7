@@ -12,6 +12,7 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.BasicBakedModel;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFacelessModelEvent;
 
@@ -29,7 +30,8 @@ public class BasicBakedModelMixin {
     private void getQuads(@Nullable BlockState state, @Nullable Direction face,
         Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
     {
-        if (face != null || state == null) return;
+        if (face != null || state == null || !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
+            return;
 
         ShouldDrawFacelessModelEvent event = new ShouldDrawFacelessModelEvent(state);
         EventManager.fire(event);

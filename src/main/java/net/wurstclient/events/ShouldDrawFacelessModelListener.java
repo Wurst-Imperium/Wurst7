@@ -28,7 +28,8 @@ public interface ShouldDrawFacelessModelListener extends Listener
         public void fire(ArrayList<ShouldDrawFacelessModelListener> listeners)
         {
             // fire only if called from Sodium's BlockRenderer
-            if (Thread.currentThread().getStackTrace().length < 8 || !Thread.currentThread().getStackTrace()[7].getClassName()
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            if (stackTrace.length < 8 || !stackTrace[7].getClassName()
                 .equals("me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer"))
                 return;
 
