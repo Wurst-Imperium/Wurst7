@@ -24,8 +24,8 @@ import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
-import net.wurstclient.events.ShouldDrawSideListener;
 import net.wurstclient.events.ShouldDrawFacelessModelListener;
+import net.wurstclient.events.ShouldDrawSideListener;
 import net.wurstclient.events.TesselateBlockListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -37,7 +37,7 @@ import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
 public final class XRayHack extends Hack implements UpdateListener,
-	SetOpaqueCubeListener,GetAmbientOcclusionLightLevelListener,
+	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, ShouldDrawFacelessModelListener,
 	TesselateBlockListener, RenderBlockEntityListener
 {
@@ -171,11 +171,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 		event.setRendered(
 			isVisible(event.getState().getBlock(), event.getPos()));
 	}
-
+	
 	@Override
 	public void onShouldDrawFacelessModel(ShouldDrawFacelessModelEvent event)
 	{
-		if (!isVisible(event.getState().getBlock(), null))
+		if(!isVisible(event.getState().getBlock(), null))
 			event.cancel();
 	}
 	

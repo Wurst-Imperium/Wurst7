@@ -7,6 +7,14 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.WeightedBakedModel;
@@ -16,27 +24,22 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFacelessModelEvent;
 
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.List;
-
 @Mixin(WeightedBakedModel.class)
-public class WeightedBakedModelMixin {
-    @Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
-    private void getQuads(@Nullable BlockState state, @Nullable Direction face,
-        Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
-    {
-        if (face != null || state == null || !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
-            return;
-
-        ShouldDrawFacelessModelEvent event = new ShouldDrawFacelessModelEvent(state);
-        EventManager.fire(event);
-
-        if(event.isCancelled())
-            cir.setReturnValue(List.of());
-    }
+public class WeightedBakedModelMixin
+{
+	@Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
+	private void getQuads(@Nullable BlockState state, @Nullable Direction face,
+		Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
+	{
+		if(face != null || state == null
+			|| !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
+			return;
+		
+		ShouldDrawFacelessModelEvent event =
+			new ShouldDrawFacelessModelEvent(state);
+		EventManager.fire(event);
+		
+		if(event.isCancelled())
+			cir.setReturnValue(List.of());
+	}
 }
