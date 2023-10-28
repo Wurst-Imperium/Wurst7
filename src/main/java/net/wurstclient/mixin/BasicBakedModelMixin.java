@@ -27,6 +27,10 @@ import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFaceless
 @Mixin(BasicBakedModel.class)
 public class BasicBakedModelMixin
 {
+	/**
+	 * This mixin hides blocks like grass and snow when using X-Ray. It works
+	 * with and without Sodium installed.
+	 */
 	@Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
 	private void getQuads(@Nullable BlockState state, @Nullable Direction face,
 		Random random, CallbackInfoReturnable<List<BakedQuad>> cir)

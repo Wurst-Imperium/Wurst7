@@ -27,6 +27,9 @@ import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFaceless
 @Mixin(MultipartBakedModel.class)
 public class MultipartBakedModelMixin
 {
+	/**
+	 * TODO: This mixin doesn't seem to do anything?
+	 */
 	@Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
 	private void getQuads(@Nullable BlockState state, @Nullable Direction face,
 		Random random, CallbackInfoReturnable<List<BakedQuad>> cir)

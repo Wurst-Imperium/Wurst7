@@ -29,6 +29,10 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 	remap = false)
 public class SodiumBlockOcclusionCacheMixin
 {
+	/**
+	 * This mixin hides and shows regular full blocks when using X-Ray with
+	 * Sodium installed.
+	 */
 	@Inject(at = @At("HEAD"), method = "shouldDrawSide", cancellable = true)
 	public void shouldDrawSide(BlockState state, BlockView world, BlockPos pos,
 		Direction side, CallbackInfoReturnable<Boolean> cir)

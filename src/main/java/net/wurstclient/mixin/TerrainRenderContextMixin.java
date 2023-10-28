@@ -31,6 +31,8 @@ public class TerrainRenderContextMixin
 	 * <p>
 	 * We could make this optional to stop the game from crashing, but then
 	 * X-Ray would silently stop working and it would be much harder to debug.
+	 *
+	 * TODO: {@link BasicBakedModelMixin} makes this mixin redundant.
 	 */
 	@Inject(at = @At("HEAD"),
 		method = "tessellateBlock",

@@ -28,6 +28,12 @@ import net.wurstclient.events.TesselateBlockListener.TesselateBlockEvent;
 @Mixin(BlockModelRenderer.class)
 public abstract class BlockModelRendererMixin
 {
+	/**
+	 * This mixin hides and shows blocks when using X-Ray with OptiFine
+	 * installed.
+	 *
+	 * TODO: Does {@link BasicBakedModelMixin} make this mixin redundant?
+	 */
 	@Inject(at = @At("HEAD"),
 		method = {
 			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
