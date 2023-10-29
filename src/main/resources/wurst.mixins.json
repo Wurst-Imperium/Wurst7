@@ -44,7 +44,6 @@
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MouseMixin",
-    "MultipartBakedModelMixin",
     "MultiplayerScreenMixin",
     "PackScreenMixin",
     "PlayerInventoryMixin",
@@ -62,7 +61,6 @@
     "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WeightedBakedModelMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],
