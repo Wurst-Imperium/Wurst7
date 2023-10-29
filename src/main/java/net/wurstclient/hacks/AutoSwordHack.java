@@ -23,6 +23,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.ItemUtils;
 
 @SearchTags({"auto sword"})
@@ -77,7 +78,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
 			
 			if(entity instanceof LivingEntity
-				&& ((LivingEntity)entity).getHealth() > 0)
+				&& EntityUtils.IS_ATTACKABLE.test(entity))
 				setSlot();
 		}
 		
