@@ -22,7 +22,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawFacelessModelListener.ShouldDrawFacelessModelEvent;
+import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 @Mixin(BasicBakedModel.class)
 public class BasicBakedModelMixin
@@ -39,11 +39,10 @@ public class BasicBakedModelMixin
 			|| !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
 			return;
 		
-		ShouldDrawFacelessModelEvent event =
-			new ShouldDrawFacelessModelEvent(state);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
-		if(event.isCancelled())
+		if(Boolean.FALSE.equals(event.isRendered()))
 			cir.setReturnValue(List.of());
 	}
 }
