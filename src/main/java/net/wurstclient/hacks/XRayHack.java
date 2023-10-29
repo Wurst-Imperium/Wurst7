@@ -189,7 +189,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		int index = Collections.binarySearch(oreNamesCache, name);
 		boolean visible = index >= 0;
 		
-		if(visible && onlyExposed.isChecked())
+		if(visible && onlyExposed.isChecked() && pos != null)
 			return !BlockUtils.isOpaqueFullCube(pos.up())
 				|| !BlockUtils.isOpaqueFullCube(pos.down())
 				|| !BlockUtils.isOpaqueFullCube(pos.east())
