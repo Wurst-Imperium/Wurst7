@@ -58,7 +58,6 @@
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "TelemetryManagerMixin",
-    "TerrainRenderContextMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
     "WorldMixin",
