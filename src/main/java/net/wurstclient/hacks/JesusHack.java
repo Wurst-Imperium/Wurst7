@@ -19,7 +19,6 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -157,25 +156,21 @@ public final class JesusHack extends Hack
 	{
 		boolean foundLiquid = false;
 		boolean foundSolid = false;
+		ClientPlayerEntity player = MC.player;
+		Box box = player.getBoundingBox().offset(0, -0.5, 0);
 		
 		// check collision boxes below player
-		ArrayList<Box> blockCollisions = IMC.getWorld()
-			.getBlockCollisionsStream(MC.player,
-				MC.player.getBoundingBox().offset(0, -0.5, 0))
-			.map(VoxelShape::getBoundingBox)
+		ArrayList<Block> blockCollisions = IMC.getWorld()
+			.getCollidingBoxes(player, box)
+			.map(bb -> BlockUtils.getBlock(BlockPos.ofFloored(bb.getCenter())))
 			.collect(Collectors.toCollection(ArrayList::new));
 		
-		for(Box bb : blockCollisions)
-		{
-			BlockPos pos = BlockPos.ofFloored(bb.getCenter());
-			Block block = BlockUtils.getBlock(pos);
-			
+		for(Block block : blockCollisions)
 			if(block instanceof FluidBlock)
 				foundLiquid = true;
 			else if(!(block instanceof AirBlock))
 				foundSolid = true;
-		}
-		
+			
 		return foundLiquid && !foundSolid;
 	}
 	
