@@ -17,6 +17,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.BlockUtils;
 
 public final class StepHack extends Hack implements UpdateListener
 {
@@ -83,7 +84,7 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
-		double stepHeight = IMC.getWorld().getCollidingBoxes(player, box)
+		double stepHeight = BlockUtils.getBlockCollisions(box)
 			.mapToDouble(bb -> bb.maxY).max().orElse(Double.NEGATIVE_INFINITY);
 		
 		stepHeight -= player.getY();

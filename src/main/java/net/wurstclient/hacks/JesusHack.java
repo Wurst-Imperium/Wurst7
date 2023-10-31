@@ -156,12 +156,10 @@ public final class JesusHack extends Hack
 	{
 		boolean foundLiquid = false;
 		boolean foundSolid = false;
-		ClientPlayerEntity player = MC.player;
-		Box box = player.getBoundingBox().offset(0, -0.5, 0);
+		Box box = MC.player.getBoundingBox().offset(0, -0.5, 0);
 		
 		// check collision boxes below player
-		ArrayList<Block> blockCollisions = IMC.getWorld()
-			.getCollidingBoxes(player, box)
+		ArrayList<Block> blockCollisions = BlockUtils.getBlockCollisions(box)
 			.map(bb -> BlockUtils.getBlock(BlockPos.ofFloored(bb.getCenter())))
 			.collect(Collectors.toCollection(ArrayList::new));
 		
