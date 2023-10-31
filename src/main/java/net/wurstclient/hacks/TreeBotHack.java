@@ -28,7 +28,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -48,7 +47,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.treebot.Tree;
 import net.wurstclient.treebot.TreeBotUtils;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RegionPos;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -67,8 +66,7 @@ public final class TreeBotHack extends Hack
 	private Tree tree;
 	
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	
 	public TreeBotHack()
 	{
@@ -124,6 +122,8 @@ public final class TreeBotHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
+		
+		overlay.resetProgress();
 	}
 	
 	@Override
@@ -236,18 +236,9 @@ public final class TreeBotHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 		
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
-		{
-			prevProgress = progress;
-			progress = MC.interactionManager.currentBreakingProgress;
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
-			
-		}else
-		{
-			progress = 1;
-			prevProgress = 1;
-		}
+			overlay.updateProgress();
+		else
+			overlay.resetProgress();
 	}
 	
 	private boolean breakBlock(BlockPos pos)
@@ -301,13 +292,12 @@ public final class TreeBotHack extends Hack
 		if(tree != null)
 			drawTree(matrixStack);
 		
-		if(currentBlock != null)
-			drawCurrentBlock(matrixStack, partialTicks);
-		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private void drawTree(MatrixStack matrixStack)
@@ -325,36 +315,6 @@ public final class TreeBotHack extends Hack
 		tree.getVertexBuffer().bind();
 		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
 		VertexBuffer.unbind();
-		
-		matrixStack.pop();
-	}
-	
-	private void drawCurrentBlock(MatrixStack matrixStack, float partialTicks)
-	{
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Box box = new Box(BlockPos.ORIGIN);
-		float p = prevProgress + (progress - prevProgress) * partialTicks;
-		float red = p * 2F;
-		float green = 2 - red;
-		
-		matrixStack.translate(currentBlock.getX() - region.x(),
-			currentBlock.getY(), currentBlock.getZ() - region.z());
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box, matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();
 	}
