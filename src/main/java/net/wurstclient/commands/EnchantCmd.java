@@ -42,7 +42,10 @@ public final class EnchantCmd extends Command
 	
 	private ItemStack getHeldItem() throws CmdError
 	{
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getMainHandStack();
+		
+		if(stack.isEmpty())
+			stack = MC.player.getOffHandStack();
 		
 		if(stack.isEmpty())
 			throw new CmdError("There is no item in your hand.");
