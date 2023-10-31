@@ -376,7 +376,7 @@ public final class TreeBotHack extends Hack
 				return;
 			}
 			
-			if(breakBlocks(getLeavesOnPath()))
+			if(processor.canBreakBlocks() && breakBlocks(getLeavesOnPath()))
 				return;
 			
 			processor.process();
