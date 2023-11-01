@@ -45,8 +45,7 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = {
-			"isFullCube(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"},
+		method = "isFullCube(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z",
 		cancellable = true)
 	private void onIsFullCube(BlockView world, BlockPos pos,
 		CallbackInfoReturnable<Boolean> cir)
@@ -58,8 +57,7 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = {
-			"getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F"},
+		method = "getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F",
 		cancellable = true)
 	private void onGetAmbientOcclusionLightLevel(BlockView blockView,
 		BlockPos blockPos, CallbackInfoReturnable<Float> cir)
@@ -73,8 +71,7 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {
-			"getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+		method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
 		cancellable = true)
 	private void onGetOutlineShape(BlockView view, BlockPos pos,
 		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)

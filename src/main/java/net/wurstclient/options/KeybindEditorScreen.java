@@ -8,6 +8,7 @@
 package net.wurstclient.options;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -88,16 +89,10 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		commandField.tick();
-	}
-	
-	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(textRenderer,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
@@ -110,7 +105,9 @@ public final class KeybindEditorScreen extends Screen
 			width / 2 - 100, 87, 0xa0a0a0);
 		
 		commandField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

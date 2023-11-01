@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
@@ -24,7 +25,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.WurstAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 
@@ -150,9 +150,12 @@ public class WurstOptionsScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		renderTitles(context);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
 		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
@@ -177,13 +180,8 @@ public class WurstOptionsScreen extends Screen
 	private void renderButtonTooltip(DrawContext context, int mouseX,
 		int mouseY)
 	{
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
 			if(!button.isSelected() || !(button instanceof WurstOptionsButton))
 				continue;
 			

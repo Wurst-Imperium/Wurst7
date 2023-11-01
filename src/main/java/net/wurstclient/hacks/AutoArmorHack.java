@@ -28,7 +28,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IArmorItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -176,7 +175,7 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)((IArmorItem)item).getToughness();
+		int armorToughness = (int)item.toughness;
 		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())

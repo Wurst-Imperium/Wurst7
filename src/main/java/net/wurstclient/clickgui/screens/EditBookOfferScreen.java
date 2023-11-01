@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -246,9 +247,6 @@ public final class EditBookOfferScreen extends Screen
 			offerToSave != null && offerToSave.price() < 64;
 		priceMinusButton.active =
 			offerToSave != null && offerToSave.price() > 1;
-		
-		levelField.tick();
-		priceField.tick();
 	}
 	
 	@Override
@@ -296,7 +294,9 @@ public final class EditBookOfferScreen extends Screen
 		
 		levelField.render(context, mouseX, mouseY, partialTicks);
 		priceField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 112, 0);
 		

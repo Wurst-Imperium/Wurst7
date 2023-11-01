@@ -28,4 +28,10 @@ public final class FilterGolemsSetting extends EntityFilterCheckbox
 		return new FilterGolemsSetting(
 			"Won't attack iron golems, snow golems and shulkers.", checked);
 	}
+	
+	public static FilterGolemsSetting genericVision(boolean checked)
+	{
+		return new FilterGolemsSetting(
+			"Won't show iron golems, snow golems and shulkers.", checked);
+	}
 }
