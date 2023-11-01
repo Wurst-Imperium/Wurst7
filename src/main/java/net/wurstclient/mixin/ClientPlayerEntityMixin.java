@@ -270,6 +270,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			&& hax.noLevitationHack.isEnabled())
 			return false;
 		
+		if(effect == StatusEffects.DARKNESS && hax.antiBlindHack.isEnabled())
+			return false;
+		
 		return super.hasStatusEffect(effect);
 	}
 }

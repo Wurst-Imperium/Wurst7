@@ -25,13 +25,9 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -43,14 +39,17 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.treebot.Tree;
+import net.wurstclient.hacks.treebot.TreeBotUtils;
+import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.treebot.Tree;
-import net.wurstclient.treebot.TreeBotUtils;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RegionPos;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"tree bot"})
 @DontSaveState
@@ -61,20 +60,43 @@ public final class TreeBotHack extends Hack
 		"How far TreeBot will reach to break blocks.", 4.5, 1, 6, 0.05,
 		ValueDisplay.DECIMAL);
 	
+	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
+		"How to face the logs and leaves when breaking them.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
+			+ " detected by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Face the blocks on the"
+			+ " server-side, while still letting you move the camera freely on"
+			+ " the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Face the blocks by moving your"
+			+ " camera on the client-side. This is the most legit option, but"
+			+ " can be disorienting to look at.");
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How TreeBot should swing your hand when breaking logs and leaves.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
+			+ " by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
+			+ " without playing the animation on the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
+			+ " This is the most legit option.");
+	
 	private TreeFinder treeFinder;
 	private AngleFinder angleFinder;
 	private TreeBotPathProcessor processor;
 	private Tree tree;
 	
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	
 	public TreeBotHack()
 	{
 		super("TreeBot");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		
+		// settings to be added in v7.39
+		// addSetting(facing);
+		// addSetting(swingHand);
 	}
 	
 	@Override
@@ -124,6 +146,8 @@ public final class TreeBotHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
+		
+		overlay.resetProgress();
 	}
 	
 	@Override
@@ -157,13 +181,8 @@ public final class TreeBotHack extends Hack
 			return;
 		}
 		
-		ArrayList<BlockPos> logsInRange = getLogsInRange();
-		
-		if(!logsInRange.isEmpty())
-		{
-			breakBlocks(logsInRange);
+		if(breakBlocks(tree.getLogs()))
 			return;
-		}
 		
 		if(angleFinder == null)
 			angleFinder = new AngleFinder();
@@ -211,69 +230,38 @@ public final class TreeBotHack extends Hack
 		angleFinder = null;
 	}
 	
-	private ArrayList<BlockPos> getLogsInRange()
+	private boolean breakBlocks(ArrayList<BlockPos> blocks)
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeSq = Math.pow(range.getValue(), 2);
-		
-		return tree.getLogs().stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(TreeBotUtils::hasLineOfSight)
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private void breakBlocks(ArrayList<BlockPos> blocksInRange)
-	{
-		for(BlockPos pos : blocksInRange)
+		for(BlockPos pos : blocks)
 			if(breakBlock(pos))
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 				currentBlock = pos;
-				break;
+				return true;
 			}
 		
-		if(currentBlock == null)
-			MC.interactionManager.cancelBlockBreaking();
-		
-		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
-		{
-			prevProgress = progress;
-			progress = MC.interactionManager.currentBreakingProgress;
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
-			
-		}else
-		{
-			progress = 1;
-			prevProgress = 1;
-		}
+		return false;
 	}
 	
 	private boolean breakBlock(BlockPos pos)
 	{
-		Direction side =
-			TreeBotUtils.getLineOfSightSide(RotationUtils.getEyesPos(), pos);
-		
-		Vec3d relCenter = BlockUtils.getBoundingBox(pos)
-			.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter();
-		Vec3d center = Vec3d.of(pos).add(relCenter);
-		
-		Vec3i dirVec = side.getVector();
-		Vec3d relHitVec = new Vec3d(relCenter.x * dirVec.getX(),
-			relCenter.y * dirVec.getY(), relCenter.z * dirVec.getZ());
-		Vec3d hitVec = center.add(relHitVec);
-		
-		// face block
-		WURST.getRotationFaker().faceVectorPacket(hitVec);
-		
-		// damage block
-		if(!MC.interactionManager.updateBlockBreakingProgress(pos, side))
+		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
+		if(params == null || !params.lineOfSight()
+			|| params.distanceSq() > range.getValueSq())
 			return false;
 		
-		// swing arm
-		MC.player.networkHandler
-			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		// select tool
+		WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
+		
+		// face block
+		facing.getSelected().face(params.hitVec());
+		
+		// damage block and swing hand
+		if(MC.interactionManager.updateBlockBreakingProgress(pos,
+			params.side()))
+			swingHand.getSelected().swing(Hand.MAIN_HAND);
+		
+		// update progress
+		overlay.updateProgress();
 		
 		return true;
 	}
@@ -301,13 +289,12 @@ public final class TreeBotHack extends Hack
 		if(tree != null)
 			drawTree(matrixStack);
 		
-		if(currentBlock != null)
-			drawCurrentBlock(matrixStack, partialTicks);
-		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private void drawTree(MatrixStack matrixStack)
@@ -325,36 +312,6 @@ public final class TreeBotHack extends Hack
 		tree.getVertexBuffer().bind();
 		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
 		VertexBuffer.unbind();
-		
-		matrixStack.pop();
-	}
-	
-	private void drawCurrentBlock(MatrixStack matrixStack, float partialTicks)
-	{
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Box box = new Box(BlockPos.ORIGIN);
-		float p = prevProgress + (progress - prevProgress) * partialTicks;
-		float red = p * 2F;
-		float green = 2 - red;
-		
-		matrixStack.translate(currentBlock.getX() - region.x(),
-			currentBlock.getY(), currentBlock.getZ() - region.z());
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box, matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();
 	}
@@ -419,28 +376,19 @@ public final class TreeBotHack extends Hack
 				return;
 			}
 			
-			ArrayList<BlockPos> leaves = getLeavesInRange(pathFinder.getPath());
-			if(!leaves.isEmpty())
-			{
-				breakBlocks(leaves);
+			if(processor.canBreakBlocks() && breakBlocks(getLeavesOnPath()))
 				return;
-			}
 			
 			processor.process();
 		}
 		
-		private ArrayList<BlockPos> getLeavesInRange(List<PathPos> path)
+		private ArrayList<BlockPos> getLeavesOnPath()
 		{
-			Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-			double rangeSq = Math.pow(range.getValue(), 2);
-			
+			List<PathPos> path = pathFinder.getPath();
 			path = path.subList(processor.getIndex(), path.size());
 			
 			return path.stream().flatMap(pos -> Stream.of(pos, pos.up()))
 				.distinct().filter(TreeBotUtils::isLeaves)
-				.filter(
-					pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-				.filter(TreeBotUtils::hasLineOfSight)
 				.collect(Collectors.toCollection(ArrayList::new));
 		}
 		
@@ -557,19 +505,18 @@ public final class TreeBotHack extends Hack
 		
 		private boolean hasAngle(PathPos pos)
 		{
+			double rangeSq = range.getValueSq();
 			ClientPlayerEntity player = WurstClient.MC.player;
 			Vec3d eyes = Vec3d.ofBottomCenter(pos).add(0,
 				player.getEyeHeight(player.getPose()), 0);
 			
-			Vec3d eyesVec = eyes.subtract(0.5, 0.5, 0.5);
-			double rangeSq = Math.pow(range.getValue(), 2);
-			
 			for(BlockPos log : tree.getLogs())
 			{
-				if(eyesVec.squaredDistanceTo(Vec3d.of(log)) > rangeSq)
-					continue;
+				BlockBreakingParams params =
+					BlockBreaker.getBlockBreakingParams(eyes, log);
 				
-				if(TreeBotUtils.getLineOfSightSide(eyes, log) != null)
+				if(params != null && params.lineOfSight()
+					&& params.distanceSq() <= rangeSq)
 					return true;
 			}
 			

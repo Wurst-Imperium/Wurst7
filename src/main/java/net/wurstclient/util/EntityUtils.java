@@ -35,7 +35,7 @@ public enum EntityUtils
 			.filter(IS_ATTACKABLE);
 	}
 	
-	public static Predicate<Entity> IS_ATTACKABLE = e -> e != null
+	public static final Predicate<Entity> IS_ATTACKABLE = e -> e != null
 		&& !e.isRemoved()
 		&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
 			|| e instanceof EndCrystalEntity
@@ -50,7 +50,7 @@ public enum EntityUtils
 			.filter(IS_VALID_ANIMAL);
 	}
 	
-	public static Predicate<AnimalEntity> IS_VALID_ANIMAL =
+	public static final Predicate<AnimalEntity> IS_VALID_ANIMAL =
 		a -> a != null && !a.isRemoved() && a.getHealth() > 0;
 	
 	/**

@@ -1,7 +1,7 @@
 name: "Close stale issues and pull requests"
 on:
   schedule:
-    - cron: "30 1 * * *"
+    - cron: "30 1 * * 1-5"
 
 permissions:
   issues: write
@@ -33,5 +33,5 @@ jobs:
           days-before-close: 7
           stale-issue-label: "status:stale"
           stale-pr-label: "status:stale"
-          operations-per-run: 60
+          operations-per-run: 30
           enable-statistics: true
