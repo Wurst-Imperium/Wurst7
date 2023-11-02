@@ -93,10 +93,8 @@ public final class TreeBotHack extends Hack
 		super("TreeBot");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		
-		// settings to be added in v7.39
-		// addSetting(facing);
-		// addSetting(swingHand);
+		addSetting(facing);
+		addSetting(swingHand);
 	}
 	
 	@Override
