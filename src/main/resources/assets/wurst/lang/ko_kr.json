@@ -188,6 +188,6 @@
   "button.wurst.nochatreports.signatures_status": "서명: ",
   "description.wurst.nochatreports.message_is_reportable": "이 메시지에는 유효한 서명이 있으므로 가짜 채팅 신고에 취약합니다.",
   "gui.wurst.generic.allcaps_blocked": "차단됨",
-  "gui.wurst.generic.allcaps_allowed": "허용됨"
+  "gui.wurst.generic.allcaps_allowed": "허용됨",
   "key.wurst.zoom": "화면확대 Optifine Zoom 기능과 같지만 더 좋은 성능을 제공합니다."
 }
