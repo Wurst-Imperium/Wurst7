@@ -7,11 +7,8 @@
  */
 package net.wurstclient.hacks.treebot;
 
-import java.util.Arrays;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.util.BlockUtils;
 
@@ -19,21 +16,15 @@ public enum TreeBotUtils
 {
 	;
 	
-	private static final List<Block> LOG_BLOCKS =
-		Arrays.asList(Blocks.OAK_LOG, Blocks.SPRUCE_LOG, Blocks.BIRCH_LOG,
-			Blocks.JUNGLE_LOG, Blocks.ACACIA_LOG, Blocks.DARK_OAK_LOG);
-	
-	private static final List<Block> LEAVES_BLOCKS = Arrays.asList(
-		Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.BIRCH_LEAVES,
-		Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES);
-	
 	public static boolean isLog(BlockPos pos)
 	{
-		return LOG_BLOCKS.contains(BlockUtils.getBlock(pos));
+		return BlockUtils.getState(pos).isIn(BlockTags.LOGS);
 	}
 	
 	public static boolean isLeaves(BlockPos pos)
 	{
-		return LEAVES_BLOCKS.contains(BlockUtils.getBlock(pos));
+		BlockState state = BlockUtils.getState(pos);
+		return state.isIn(BlockTags.LEAVES)
+			|| state.isIn(BlockTags.WART_BLOCKS);
 	}
 }

@@ -77,7 +77,7 @@ public final class RemoteViewHack extends Hack
 		}
 		
 		// save old data
-		wasInvisible = entity.isInvisibleTo(MC.player);
+		wasInvisible = entity.isInvisible();
 		
 		// enable NoClip
 		MC.player.noClip = true;
