@@ -20,6 +20,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.wurstclient.Category;
@@ -53,12 +54,41 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         item2lvl.put(Items.TORCH, 14);
     }
 
+    /**
+     * Placement range. Only blocks will be placed within this range. <br/>
+     * 放置范围。只会在此范围内放置方块。
+     */
     private final SliderSetting range1 =
         new SliderSetting("RangePlace", 4.25, 1, 6, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+    /**
+     * Search range. The placement position will be calculated within this range.<br/>
+     * 搜索范围。会在此范围内计算放置位置。
+     */
     private final SliderSetting range2 =
         new SliderSetting("RangeSearch", 8, 1, 10, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+    /**
+     * Include range. Use this range to calculate the newly illuminated blocks.<br/>
+     * 包含范围。用此范围计算可新照亮的方块。
+     */
+    private final SliderSetting range3 =
+        new SliderSetting("RangeInclude", 30, 10, 15 * 4, 0.05, SliderSetting.ValueDisplay.DECIMAL);
     private final CheckboxSetting debug = new CheckboxSetting("debug", "Output Debug Message", false);
     private final CheckboxSetting crp = new CheckboxSetting("Compare RP", "Compare Pos with RangePlace", false);
+    /**
+     * Forward path radius. Set to 0 to calculate only within the RangeSearch range. Otherwise, Search is calculated as:
+     * the range with a radius less than RangePlace +
+     * starts from the player eye forward (ignoring the pitch, only keeping yaw) to radius less than RangeSearch.<br/>
+     * 向前路径半径。设为0则只在RangeSearch范围内计算。否则Search计算为：
+     * 半径小于RangePlace的范围 + 玩家从眼睛开始向前（忽略pitch，只保留yaw）到半径小于RangeSearch。
+     */
+    private final SliderSetting frontpath =
+        new SliderSetting("Front Path Distance", 3, 0, 6, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+    /**
+     * The cooling time after placing a torch once (seconds). The minimum unit is 1 tick (i.e. 0.05 seconds).<br/>
+     * 放置一次火把后的冷却时长（秒）。最小单位为1tick（即0.05秒）。
+     */
+    private final SliderSetting cooldown =
+        new SliderSetting("Place Cooldown(s)", 0.25, 1.0 / 2, 2, 1.0 / 20, SliderSetting.ValueDisplay.DECIMAL);
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Future<BlockPos> currentSearchTask = null;
     private @Nullable BlockPos putPos = null;
@@ -71,8 +101,11 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
 
         addSetting(this.range1);
         addSetting(this.range2);
-        addSetting(this.debug);
+        addSetting(this.range3);
+        addSetting(this.cooldown);
+        addSetting(this.frontpath);
         addSetting(this.crp);
+        addSetting(this.debug);
     }
 
     /**
@@ -216,7 +249,7 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
 
         MC.player.getInventory().selectedSlot = oldSlot;
 
-        this.idleCooldown = 5;
+        this.idleCooldown = (int)(this.cooldown.getValue() * 20);
 
         return true;
     }
@@ -264,15 +297,23 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         if (placeBlock()) this.putPos = null;
     }
 
-    private BlockPos search() {
+    private Vec3d ofBottom(BlockPos place) {
+        return Vec3d.add(place, 0.5, 0, 0.5);
+    }
+
+    private @Nullable BlockPos search() {
         final int level = 14 - 1;
-        final double range1Sq = this.range1.getValueSq();
+        final double range1 = this.range1.getValue();
+        final double range1Sq = MathHelper.square(range1);
         final double range2Sq = this.range2.getValueSq();
+        final double range3Sq = this.range3.getValueSq();
+        final double frontpath = this.frontpath.getValue();
+        final double frontpathSq = MathHelper.square(frontpath);
         Vec3d eyesVec = RotationUtils.getEyesPos();
         ClientWorld world = Objects.requireNonNull(MC.world);
         @SuppressWarnings("all") Stream<BlockPos> stream =//
-            BlockUtils.getAllInBoxStream(BlockPos.ofFloored(eyesVec), range2.getValueCeil())//
-                .filter(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)) <= range2Sq)//
+            BlockUtils.getAllInBoxStream(BlockPos.ofFloored(eyesVec), range3.getValueCeil())//
+                .filter(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)) <= range3Sq)//
                 .sorted(Comparator.comparingDouble(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos))))//
                 .filter(pos -> {
                     BlockState state = world.getBlockState(pos);
@@ -286,31 +327,67 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
                     return world.getLightLevel(LightType.BLOCK, pos) < 1;
                 })//
             ;
-        final var blocks = stream.toList();
-        final var blocksSet = new HashSet<>(blocks);
-        final var blocksR1Set =
-            blocks.stream().filter(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)) <= range1Sq)
+        final var blocksAll = stream.toList();
+        final var blocksAllSet = new HashSet<>(blocksAll);
+        final var blocksPlaceSet =
+            blocksAll.stream().filter(pos -> eyesVec.squaredDistanceTo(ofBottom(pos)) <= range1Sq)
                 .collect(Collectors.toSet());
+        if (blocksPlaceSet.isEmpty()) return null;
+        var blocksSearchStream = blocksAll.stream();
+        if (frontpath > 0.03) {
+            // final var currentYaw = MathHelper.wrapDegrees(WurstClient.MC.player.getYaw());
+            //            var rd = MC.player.getRotationVector();
+            //            rd = new Vec3d(rd.x, 0, rd.z);
+
+            float g = -MC.player.getYaw() * ((float)Math.PI / 180);
+            final var rayDir = new Vec3d(MathHelper.sin(g), 0, MathHelper.cos(g));
+            final var rayStart = RotationUtils.getEyesPos();
+
+            blocksSearchStream = blocksSearchStream.filter(pos -> {
+                final var btn = ofBottom(pos);
+                if (eyesVec.squaredDistanceTo(btn) < range1Sq) {
+                    // final var needed = RotationUtils.getNeededRotations(btn).getYaw();
+                    // final var diffYaw = MathHelper.wrapDegrees(currentYaw - needed);
+                    // return Math.abs(diffYaw) < 60;
+                    return true;
+                }
+                if (eyesVec.squaredDistanceTo(btn) < range2Sq) {
+                    final var v = btn.subtract(rayStart);
+                    // 计算点到射线的投影向量
+                    double dotProduct = v.dotProduct(rayDir);
+                    if (dotProduct < 0) return false;
+                    Vec3d projection = rayDir.multiply(dotProduct / rayDir.dotProduct(rayDir));
+                    // 计算垂线的长度（点到射线的距离）
+                    double distance = v.subtract(projection).lengthSquared();
+                    //在远端应该仍然可以直接到达
+                    return distance < frontpathSq;
+                }
+                return false;
+            });
+        } else {
+            blocksSearchStream = blocksSearchStream.filter(pos -> eyesVec.squaredDistanceTo(ofBottom(pos)) < range2Sq);
+        }
+        final var blocksSearch = blocksSearchStream.toList();
 
         BlockPos bestPos = null;
 
-        {
-            var bestLights = 0;
-            var bestLights_r1 = 0;
-            for (final var p : blocks) {
-                if (!BlockUtils.canBeClicked(p.offset(Direction.DOWN))) continue;
-                if (!world.getBlockState(p).isAir()) continue;
-                final var light_count = getLight(p.getX(), p.getY(), p.getZ(), level, blocksSet);
-                var l = light_count.size();
-                light_count.retainAll(blocksR1Set);
-                var l_r1 = light_count.size();
-                if (l_r1 > bestLights_r1 || (l > bestLights && (l_r1 == bestLights_r1 || !this.crp.isChecked()))) {
-                    bestLights_r1 = l_r1;
-                    bestLights = l;
-                    bestPos = p;
-                }
-            }
+        var bestLights = 0;
+        var bestLights_r1 = 0;
+        for (final var p : blocksSearch) {
+            if (!BlockUtils.canBeClicked(p.offset(Direction.DOWN))) continue;
+            if (!world.getBlockState(p).isAir()) continue;
+            final var light_count = getLight(p.getX(), p.getY(), p.getZ(), level, blocksAllSet);
+            final var l = light_count.size();
+            if (this.crp.isChecked()) {
+                light_count.retainAll(blocksPlaceSet);
+                final var l_r1 = light_count.size();
+                if (!(l_r1 > bestLights_r1 || (l > bestLights && (l_r1 == bestLights_r1)))) continue;
+                bestLights_r1 = l_r1;
+            } else if (!(l > bestLights)) continue;
+            bestLights = l;
+            bestPos = p;
         }
+
         if (bestPos != null) message("Search done " + bestPos, true);
         return bestPos;
         /*
