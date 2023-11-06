@@ -1,4 +1,6 @@
-package net.wurstclient.hack;
+package net.wurstclient.hacks;
+
+import net.wurstclient.hack.Hack;
 
 public class BarrierEspHack extends Hack {
 
