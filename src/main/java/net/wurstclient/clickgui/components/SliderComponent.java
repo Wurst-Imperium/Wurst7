@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,12 +7,14 @@
  */
 package net.wurstclient.clickgui.components;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -20,7 +22,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -75,9 +76,10 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x1 + 2;
@@ -94,7 +96,7 @@ public final class SliderComponent extends Component
 		boolean hSlider = hovering && mouseY >= y3 || dragging;
 		boolean renderAsDisabled = setting.isDisabled() || setting.isLocked();
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(hovering && mouseY < y3)
 			setTooltip();
@@ -112,7 +114,7 @@ public final class SliderComponent extends Component
 		drawBackground(matrixStack, x1, x2, x3, x4, y1, y2, y4, y5);
 		drawRail(matrixStack, x3, x4, y4, y5, hSlider, renderAsDisabled);
 		drawKnob(matrixStack, x1, x2, y2, y3, hSlider, renderAsDisabled);
-		drawNameAndValue(matrixStack, x1, x2, y1, renderAsDisabled);
+		drawNameAndValue(context, x1, x2, y1, renderAsDisabled);
 	}
 	
 	private void handleDragging(int mouseX, int x3, int x4)
@@ -300,8 +302,8 @@ public final class SliderComponent extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x2,
-		int y1, boolean renderAsDisabled)
+	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1,
+		boolean renderAsDisabled)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -312,8 +314,8 @@ public final class SliderComponent extends Component
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = tr.getWidth(value);
-		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
-		tr.draw(matrixStack, value, x2 - valueWidth, y1 + 2, txtColor);
+		context.drawText(tr, name, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, value, x2 - valueWidth, y1 + 2, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,27 +10,25 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.ListWidget;
+import net.wurstclient.util.RenderUtils;
 
 public final class EditItemListScreen extends Screen
 {
@@ -58,32 +56,33 @@ public final class EditItemListScreen extends Screen
 		listGui = new ListGui(client, this, itemList.getItemNames());
 		
 		itemNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 55, 150, 18, Text.literal(""));
+			width / 2 - 152, height - 56, 150, 20, Text.literal(""));
 		addSelectableChild(itemNameField);
 		itemNameField.setMaxLength(256);
 		
-		addDrawableChild(addButton = new ButtonWidget(width / 2 - 2,
-			height - 56, 30, 20, Text.literal("Add"), b -> {
+		addDrawableChild(
+			addButton = ButtonWidget.builder(Text.literal("Add"), b -> {
 				itemList.add(itemToAdd);
 				itemNameField.setText("");
-			}));
+			}).dimensions(width / 2 - 2, height - 56, 30, 20).build());
 		
-		addDrawableChild(removeButton = new ButtonWidget(width / 2 + 52,
-			height - 56, 100, 20, Text.literal("Remove Selected"),
-			b -> itemList.remove(listGui.selected)));
+		addDrawableChild(removeButton = ButtonWidget
+			.builder(Text.literal("Remove Selected"),
+				b -> itemList.remove(listGui.selected))
+			.dimensions(width / 2 + 52, height - 56, 100, 20).build());
 		
-		addDrawableChild(new ButtonWidget(width - 108, 8, 100, 20,
-			Text.literal("Reset to Defaults"),
+		addDrawableChild(ButtonWidget.builder(Text.literal("Reset to Defaults"),
 			b -> client.setScreen(new ConfirmScreen(b2 -> {
 				if(b2)
 					itemList.resetToDefaults();
 				client.setScreen(EditItemListScreen.this);
 			}, Text.literal("Reset to Defaults"),
-				Text.literal("Are you sure?")))));
+				Text.literal("Are you sure?"))))
+			.dimensions(width - 108, 8, 100, 20).build());
 		
-		addDrawableChild(
-			doneButton = new ButtonWidget(width / 2 - 100, height - 28, 200, 20,
-				Text.literal("Done"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(doneButton = ButtonWidget
+			.builder(Text.literal("Done"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height - 28, 200, 20).build());
 	}
 	
 	@Override
@@ -118,11 +117,12 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -154,8 +154,6 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void tick()
 	{
-		itemNameField.tick();
-		
 		itemToAdd = ItemUtils
 			.getItemFromNameOrID(itemNameField.getText().toLowerCase());
 		addButton.active = itemToAdd != null;
@@ -165,49 +163,56 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(matrixStack, mouseX, mouseY, partialTicks);
+		MatrixStack matrixStack = context.getMatrices();
+		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		drawCenteredText(matrixStack, client.textRenderer,
+		context.drawCenteredTextWithShadow(client.textRenderer,
 			itemList.getName() + " (" + listGui.getItemCount() + ")", width / 2,
 			12, 0xffffff);
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
 		
-		itemNameField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
 		{
 			matrixStack.push();
 			matrixStack.translate(0, 0, 300);
-			drawStringWithShadow(matrixStack, client.textRenderer,
-				"item name or ID", 68, height - 50, 0x808080);
+			context.drawTextWithShadow(client.textRenderer, "item name or ID",
+				68, height - 50, 0x808080);
 			matrixStack.pop();
 		}
 		
 		int border = itemNameField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
 		
-		fill(matrixStack, 48, height - 56, 64, height - 36, border);
-		fill(matrixStack, 49, height - 55, 64, height - 37, black);
-		fill(matrixStack, 214, height - 56, 244, height - 55, border);
-		fill(matrixStack, 214, height - 37, 244, height - 36, border);
-		fill(matrixStack, 244, height - 56, 246, height - 36, border);
-		fill(matrixStack, 214, height - 55, 243, height - 52, black);
-		fill(matrixStack, 214, height - 40, 243, height - 37, black);
-		fill(matrixStack, 215, height - 55, 216, height - 37, black);
-		fill(matrixStack, 242, height - 55, 245, height - 37, black);
+		context.fill(48, height - 56, 64, height - 36, border);
+		context.fill(49, height - 55, 65, height - 37, black);
+		context.fill(214, height - 56, 244, height - 55, border);
+		context.fill(214, height - 37, 244, height - 36, border);
+		context.fill(244, height - 56, 246, height - 36, border);
+		context.fill(213, height - 55, 243, height - 52, black);
+		context.fill(213, height - 40, 243, height - 37, black);
+		context.fill(213, height - 55, 216, height - 37, black);
+		context.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
 		
-		listGui.renderIconAndGetName(matrixStack, new ItemStack(itemToAdd),
+		RenderUtils.drawItem(context,
+			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
+		
+		matrixStack.pop();
 	}
 	
 	@Override
@@ -265,73 +270,21 @@ public final class EditItemListScreen extends Screen
 		}
 		
 		@Override
-		protected void renderItem(MatrixStack matrixStack, int index, int x,
-			int y, int var4, int var5, int var6, float partialTicks)
+		protected void renderItem(DrawContext context, int index, int x, int y,
+			int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registry.ITEM.get(new Identifier(name));
+			Item item = Registries.ITEM.get(new Identifier(name));
 			ItemStack stack = new ItemStack(item);
-			TextRenderer fr = mc.textRenderer;
+			TextRenderer tr = mc.textRenderer;
 			
-			String displayName =
-				renderIconAndGetName(matrixStack, stack, x + 1, y + 1, true);
-			fr.draw(matrixStack, displayName, x + 28, y, 0xf0f0f0);
-			fr.draw(matrixStack, name, x + 28, y + 9, 0xa0a0a0);
-			fr.draw(matrixStack, "ID: " + Registry.ITEM.getRawId(item), x + 28,
-				y + 18, 0xa0a0a0);
-		}
-		
-		private String renderIconAndGetName(MatrixStack matrixStack,
-			ItemStack stack, int x, int y, boolean large)
-		{
-			if(stack.isEmpty())
-			{
-				MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-				modelViewStack.push();
-				modelViewStack.translate(x, y, 0);
-				if(large)
-					modelViewStack.scale(1.5F, 1.5F, 1.5F);
-				else
-					modelViewStack.scale(0.75F, 0.75F, 0.75F);
-				
-				DiffuseLighting.enableGuiDepthLighting();
-				mc.getItemRenderer().renderInGuiWithOverrides(
-					new ItemStack(Blocks.GRASS_BLOCK), 0, 0);
-				DiffuseLighting.disableGuiDepthLighting();
-				
-				modelViewStack.pop();
-				RenderSystem.applyModelViewMatrix();
-				
-				matrixStack.push();
-				matrixStack.translate(x, y, 0);
-				if(large)
-					matrixStack.scale(2, 2, 2);
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				TextRenderer fr = mc.textRenderer;
-				fr.drawWithShadow(matrixStack, "?", 3, 2, 0xf0f0f0);
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				matrixStack.pop();
-				
-				return "\u00a7ounknown item\u00a7r";
-			}
-			
-			MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-			modelViewStack.push();
-			modelViewStack.translate(x, y, 0);
-			
-			if(large)
-				modelViewStack.scale(1.5F, 1.5F, 1.5F);
-			else
-				modelViewStack.scale(0.75F, 0.75F, 0.75F);
-			
-			DiffuseLighting.enableGuiDepthLighting();
-			mc.getItemRenderer().renderInGuiWithOverrides(stack, 0, 0);
-			DiffuseLighting.disableGuiDepthLighting();
-			
-			modelViewStack.pop();
-			RenderSystem.applyModelViewMatrix();
-			
-			return stack.getName().getString();
+			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
+			String displayName = stack.isEmpty() ? "\u00a7ounknown item\u00a7r"
+				: stack.getName().getString();
+			context.drawText(tr, displayName, x + 28, y, 0xf0f0f0, false);
+			context.drawText(tr, name, x + 28, y + 9, 0xa0a0a0, false);
+			context.drawText(tr, "ID: " + Registries.ITEM.getRawId(item),
+				x + 28, y + 18, 0xa0a0a0, false);
 		}
 	}
 }

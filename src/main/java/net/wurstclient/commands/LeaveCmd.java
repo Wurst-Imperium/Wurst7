@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,7 +23,7 @@ public final class LeaveCmd extends Command
 	{
 		if(args.length == 1 && args[0].equalsIgnoreCase("taco"))
 			for(int i = 0; i < 128; i++)
-				MC.player.sendChatMessage("Taco!", null);
+				MC.getNetworkHandler().sendChatMessage("Taco!");
 		else if(args.length != 0)
 			throw new CmdSyntaxError();
 		

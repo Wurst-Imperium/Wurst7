@@ -1,5 +1,5 @@
 {
-  "description.wurst.hack.airplace": "允许您放置中空中方块。",
+  "description.wurst.hack.airplace": "允许您在空中放置方块。",
   "description.wurst.hack.anchoraura": "自动放置（可选），充能，引爆重生锚并击杀你附近的实体。",
   "description.wurst.hack.antiafk": "随机走动，用于避免服务器挂机检测。\n需要至少有 3x3 的区域可以走动。",
   "description.wurst.hack.antiblind": "防止失明和黑暗效果。\n与 OptiFine 不兼容。",
@@ -124,7 +124,6 @@
   "description.wurst.hack.panic": "瞬间关闭所有的作弊功能。\n请小心使用！",
   "description.wurst.hack.parkour": "当你到达方块边缘时自动跳起。\n适用于跑酷或部分需要跑跳的场景。",
   "description.wurst.hack.playeresp": "高亮透视附近的玩家。\n你的好友会显示蓝色框框。",
-  "description.wurst.hack.playerfinder": "在雷雨中寻找远处的玩家。",
   "description.wurst.hack.portalgui": "允许你在传送门内打开 GUI。",
   "description.wurst.hack.potionsaver": "当你站着不动时冻结所有的药水效果时间。",
   "description.wurst.hack.prophuntesp": "在躲猫猫小游戏中知道哪些是人扮的方块。\n用于 Mineplex 服务器的 Prophunt（躲猫猫），其他服务器未必奏效。",
@@ -133,6 +132,7 @@
   "description.wurst.hack.rainbowui": "§c让§a每§9一§c样§a都§9充§c满§a五§9彩§c斑§a斓§9的§c样§a子§9，§c包§a括§9你§c当§a前§9所§c在 §aU§9I",
   "description.wurst.hack.reach": "允许你碰到更远的距离。",
   "description.wurst.hack.remoteview": "允许你以另一个视角观看世界。\n使用 .rv 指令来指定一个特定的实体。",
+  "description.wurst.hack.restock": "自动从背包中取出指定物品来补充手中的消耗，建议与 FastPlace 一起使用。",
   "description.wurst.hack.safewalk": "防止你从方块边缘摔落。",
   "description.wurst.hack.scaffoldwalk": "自动在你的脚下搭方块。",
   "description.wurst.hack.search": "帮助你找到所需要的方块并以彩虹色的方式高亮。",
@@ -184,5 +184,6 @@
   "button.wurst.nochatreports.signatures_status": "签名: ",
   "description.wurst.nochatreports.message_is_reportable": "此消息有一个有效的签名，因此容易受到欺诈性聊天报告的伤害。",
   "gui.wurst.generic.allcaps_blocked": "黑名单",
-  "gui.wurst.generic.allcaps_allowed": "已允许"
+  "gui.wurst.generic.allcaps_allowed": "已允许",
+  "key.wurst.zoom": "缩放"
 }

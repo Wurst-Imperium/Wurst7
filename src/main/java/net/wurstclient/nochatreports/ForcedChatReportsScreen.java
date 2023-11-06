@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
@@ -29,10 +29,13 @@ public final class ForcedChatReportsScreen extends Screen
 	private static final List<String> TRANSLATABLE_DISCONNECT_REASONS =
 		Arrays.asList("multiplayer.disconnect.missing_public_key",
 			"multiplayer.disconnect.invalid_public_key_signature",
-			"multiplayer.disconnect.invalid_public_key");
+			"multiplayer.disconnect.invalid_public_key",
+			"multiplayer.disconnect.unsigned_chat");
 	
 	private static final List<String> LITERAL_DISCONNECT_REASONS =
-		Arrays.asList("An internal error occurred in your connection.");
+		Arrays.asList("An internal error occurred in your connection.",
+			"A secure profile is required to join this server.",
+			"Secure profile expired.", "Secure profile invalid.");
 	
 	private final Screen prevScreen;
 	private final Text reason;
@@ -77,17 +80,19 @@ public final class ForcedChatReportsScreen extends Screen
 		int reconnectY = signaturesY + 24;
 		int backButtonY = reconnectY + 24;
 		
-		addDrawableChild(
-			signatureButton = new ButtonWidget(buttonX, signaturesY, 200, 20,
-				Text.literal(sigButtonMsg.get()), b -> toggleSignatures()));
+		addDrawableChild(signatureButton = ButtonWidget
+			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
+			.dimensions(buttonX, signaturesY, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, reconnectY, 200, 20,
-			Text.literal("Reconnect"),
-			b -> LastServerRememberer.reconnect(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(prevScreen))
+			.dimensions(buttonX, reconnectY, 200, 20).build());
 		
-		addDrawableChild(new ButtonWidget(buttonX, backButtonY, 200, 20,
-			Text.translatable("gui.toMenu"),
-			b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.translatable("gui.toMenu"),
+				b -> client.setScreen(prevScreen))
+			.dimensions(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()
@@ -97,20 +102,21 @@ public final class ForcedChatReportsScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY,
-		float delta)
+	public void render(DrawContext context, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		renderBackground(matrices);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
-		DrawableHelper.drawCenteredText(matrices, textRenderer, title, centerX,
-			titleY, 0xAAAAAA);
-		reasonFormatted.drawCenterWithShadow(matrices, centerX, reasonY);
+		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
+			0xAAAAAA);
+		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
 		
-		super.render(matrices, mouseX, mouseY, delta);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

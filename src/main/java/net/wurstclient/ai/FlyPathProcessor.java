@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,7 +30,7 @@ public class FlyPathProcessor extends PathProcessor
 	public void process()
 	{
 		// get positions
-		BlockPos pos = new BlockPos(MC.player.getPos());
+		BlockPos pos = BlockPos.ofFloored(MC.player.getPos());
 		Vec3d posVec = MC.player.getPos();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
@@ -150,5 +150,11 @@ public class FlyPathProcessor extends PathProcessor
 				MC.options.forwardKey.setPressed(true);
 			}
 		}
+	}
+	
+	@Override
+	public boolean canBreakBlocks()
+	{
+		return true;
 	}
 }

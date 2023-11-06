@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,16 +10,12 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -39,7 +35,7 @@ import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"fight bot"})
 @DontSaveState
@@ -88,6 +84,7 @@ public final class FightBotHack extends Hack
 	public void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().killauraLegitHack.setEnabled(false);
@@ -127,17 +124,7 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// set entity
-		Stream<Entity> stream = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> !e.isRemoved())
-			.filter(e -> e instanceof LivingEntity
-				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity
-				|| e instanceof ShulkerBulletEntity)
-			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
-		
+		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		stream = entityFilters.applyTo(stream);
 		
 		Entity entity = stream
@@ -232,7 +219,7 @@ public final class FightBotHack extends Hack
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 			pathCmd.isDepthTest());
 	}
@@ -243,7 +230,7 @@ public final class FightBotHack extends Hack
 		
 		public EntityPathFinder(Entity entity)
 		{
-			super(new BlockPos(entity.getPos()));
+			super(BlockPos.ofFloored(entity.getPos()));
 			this.entity = entity;
 			setThinkTime(1);
 		}

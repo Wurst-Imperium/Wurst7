@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,20 +7,17 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.BlockUtils;
 
 public final class StepHack extends Hack implements UpdateListener
 {
@@ -87,18 +84,10 @@ public final class StepHack extends Hack implements UpdateListener
 		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
-		double stepHeight = -1;
+		double stepHeight = BlockUtils.getBlockCollisions(box)
+			.mapToDouble(bb -> bb.maxY).max().orElse(Double.NEGATIVE_INFINITY);
 		
-		ArrayList<Box> blockCollisions =
-			IMC.getWorld().getBlockCollisionsStream(player, box)
-				.map(VoxelShape::getBoundingBox)
-				.collect(Collectors.toCollection(ArrayList::new));
-		
-		for(Box bb : blockCollisions)
-			if(bb.maxY > stepHeight)
-				stepHeight = bb.maxY;
-			
-		stepHeight = stepHeight - player.getY();
+		stepHeight -= player.getY();
 		
 		if(stepHeight < 0 || stepHeight > 1)
 			return;
@@ -113,7 +102,7 @@ public final class StepHack extends Hack implements UpdateListener
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
 			player.isOnGround()));
 		
-		player.setPosition(player.getX(), player.getY() + 1 * stepHeight,
+		player.setPosition(player.getX(), player.getY() + stepHeight,
 			player.getZ());
 	}
 	

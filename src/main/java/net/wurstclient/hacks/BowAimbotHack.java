@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,10 +13,13 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -27,14 +30,11 @@ import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
@@ -46,7 +46,8 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -58,8 +59,9 @@ public final class BowAimbotHack extends Hack
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
 			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
+			+ "\u00a7lAngle+Dist\u00a7r - A hybrid of Angle and Distance. This is usually the best at figuring out what you want to aim at.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+		Priority.values(), Priority.ANGLE_DIST);
 	
 	private final SliderSetting predictMovement = new SliderSetting(
 		"Predict movement",
@@ -94,6 +96,10 @@ public final class BowAimbotHack extends Hack
 	@Override
 	public void onEnable()
 	{
+		// disable conflicting hacks
+		WURST.getHax().excavatorHack.setEnabled(false);
+		
+		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -162,7 +168,9 @@ public final class BowAimbotHack extends Hack
 			- player.getZ();
 		
 		// set yaw
-		MC.player.setYaw((float)Math.toDegrees(Math.atan2(posZ, posX)) - 90);
+		float neededYaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
+		MC.player.setYaw(
+			RotationUtils.limitAngleChange(MC.player.getYaw(), neededYaw));
 		
 		// calculate needed pitch
 		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
@@ -184,15 +192,7 @@ public final class BowAimbotHack extends Hack
 	
 	private Entity filterEntities(Stream<Entity> s)
 	{
-		Stream<Entity> stream = s.filter(e -> e != null && !e.isRemoved())
-			.filter(e -> e instanceof LivingEntity
-				&& ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystalEntity
-				|| e instanceof ShulkerBulletEntity)
-			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
-			.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
-		
+		Stream<Entity> stream = s.filter(EntityUtils.IS_ATTACKABLE);
 		stream = entityFilters.applyTo(stream);
 		
 		return stream.min(priority.getSelected().comparator).orElse(null);
@@ -207,14 +207,16 @@ public final class BowAimbotHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		// set position
-		matrixStack.translate(target.getX(), target.getY(), target.getZ());
+		matrixStack.translate(target.getX() - region.x(), target.getY(),
+			target.getZ() - region.z());
 		
 		// set size
 		float boxWidth = target.getWidth() + 0.1F;
@@ -227,7 +229,7 @@ public final class BowAimbotHack extends Hack
 		float v = 1 / velocity;
 		matrixStack.scale(v, v, v);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		float[] colorF = color.getColorF();
 		
 		// draw outline
@@ -245,12 +247,13 @@ public final class BowAimbotHack extends Hack
 		// GL resets
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override
-	public void onRenderGUI(MatrixStack matrixStack, float partialTicks)
+	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		if(target == null)
 			return;
 		
@@ -271,30 +274,35 @@ public final class BowAimbotHack extends Hack
 		else
 			message = "Target Locked";
 		
+		TextRenderer tr = MC.textRenderer;
+		
 		// translate to center
 		Window sr = MC.getWindow();
-		int msgWidth = MC.textRenderer.getWidth(message);
+		int msgWidth = tr.getWidth(message);
 		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
 		
 		// background
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0).next();
 		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
 		bufferBuilder.vertex(matrix, 0, 10, 0).next();
 		tessellator.draw();
 		
 		// text
-		MC.textRenderer.draw(matrixStack, message, 2, 1, 0xffffffff);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.drawText(MC.textRenderer, message, 2, 1, 0xffffffff, false);
 		
 		matrixStack.pop();
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private enum Priority
@@ -304,6 +312,12 @@ public final class BowAimbotHack extends Hack
 		ANGLE("Angle",
 			e -> RotationUtils
 				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+		
+		ANGLE_DIST("Angle+Dist",
+			e -> Math
+				.pow(RotationUtils
+					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
+				+ MC.player.squaredDistanceTo(e)),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -24,7 +25,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -37,13 +37,14 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack
-	implements UpdateListener, PacketOutputListener, IsPlayerInWaterListener,
+public final class FreecamHack extends Hack implements UpdateListener,
+	PacketOutputListener, IsPlayerInWaterListener, AirStrafingSpeedListener,
 	IsPlayerInLavaListener, CameraTransformViewBobbingListener,
 	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener
 {
@@ -74,6 +75,7 @@ public final class FreecamHack extends Hack
 		EVENTS.add(PacketOutputListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);
 		EVENTS.add(IsPlayerInLavaListener.class, this);
+		EVENTS.add(AirStrafingSpeedListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
@@ -86,7 +88,7 @@ public final class FreecamHack extends Hack
 			gs.rightKey, gs.jumpKey, gs.sneakKey};
 		
 		for(KeyBinding binding : bindings)
-			binding.setPressed(((IKeyBinding)binding).isActallyPressed());
+			((IKeyBinding)binding).resetPressedState();
 	}
 	
 	@Override
@@ -96,6 +98,7 @@ public final class FreecamHack extends Hack
 		EVENTS.remove(PacketOutputListener.class, this);
 		EVENTS.remove(IsPlayerInWaterListener.class, this);
 		EVENTS.remove(IsPlayerInLavaListener.class, this);
+		EVENTS.remove(AirStrafingSpeedListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
@@ -118,7 +121,6 @@ public final class FreecamHack extends Hack
 		player.getAbilities().flying = false;
 		
 		player.setOnGround(false);
-		player.airStrafingSpeed = speed.getValueF();
 		Vec3d velocity = player.getVelocity();
 		
 		if(MC.options.jumpKey.isPressed())
@@ -126,6 +128,12 @@ public final class FreecamHack extends Hack
 		
 		if(MC.options.sneakKey.isPressed())
 			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
+	}
+	
+	@Override
+	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
+	{
+		event.setSpeed(speed.getValueF());
 	}
 	
 	@Override
@@ -176,19 +184,20 @@ public final class FreecamHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
 		// box
 		matrixStack.push();
-		matrixStack.translate(fakePlayer.getX(), fakePlayer.getY(),
-			fakePlayer.getZ());
+		matrixStack.translate(fakePlayer.getX() - region.x(), fakePlayer.getY(),
+			fakePlayer.getZ() - region.z());
 		matrixStack.scale(fakePlayer.getWidth() + 0.1F,
 			fakePlayer.getHeight() + 0.1F, fakePlayer.getWidth() + 0.1F);
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
@@ -196,14 +205,15 @@ public final class FreecamHack extends Hack
 		matrixStack.pop();
 		
 		// line
-		Vec3d start =
-			RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos());
-		Vec3d end = fakePlayer.getBoundingBox().getCenter();
+		Vec3d regionVec = region.toVec3d();
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
+		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionVec);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -217,8 +227,8 @@ public final class FreecamHack extends Hack
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

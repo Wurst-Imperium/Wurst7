@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,6 +15,7 @@ import net.wurstclient.events.RightClickListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InteractionSimulator;
 
 @SearchTags({"air place"})
 public final class AirPlaceHack extends Hack implements RightClickListener
@@ -32,8 +33,6 @@ public final class AirPlaceHack extends Hack implements RightClickListener
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().autoFishHack.setEnabled(false);
-		
 		EVENTS.add(RightClickListener.class, this);
 	}
 	
@@ -47,11 +46,17 @@ public final class AirPlaceHack extends Hack implements RightClickListener
 	public void onRightClick(RightClickEvent event)
 	{
 		HitResult hitResult = MC.player.raycast(range.getValue(), 0, false);
+		if(hitResult.getType() != HitResult.Type.MISS)
+			return;
+		
 		if(!(hitResult instanceof BlockHitResult blockHitResult))
 			return;
 		
-		IMC.getInteractionManager().rightClickBlock(
-			blockHitResult.getBlockPos(), blockHitResult.getSide(),
-			blockHitResult.getPos());
+		MC.itemUseCooldown = 4;
+		if(MC.player.isRiding())
+			return;
+		
+		InteractionSimulator.rightClickBlock(blockHitResult);
+		event.cancel();
 	}
 }

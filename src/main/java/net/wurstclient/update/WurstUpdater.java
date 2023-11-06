@@ -1,11 +1,14 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.update;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
@@ -84,7 +87,8 @@ public final class WurstUpdater implements UpdateListener
 		{
 			String text = "An error occurred while checking for updates."
 				+ " Click \u00a7nhere\u00a7r to check manually.";
-			String url = "https://www.wurstclient.net/download/";
+			String url =
+				"https://www.wurstclient.net/download/?utm_source=Wurst+Client&utm_medium=WurstUpdater+chat+message&utm_content=An+error+occurred+while+checking+for+updates.";
 			showLink(text, url);
 			return;
 		}
@@ -92,9 +96,13 @@ public final class WurstUpdater implements UpdateListener
 		if(!outdated)
 			return;
 		
-		String text = "Wurst " + latestVersion + " is now available."
-			+ " Click \u00a7nhere\u00a7r to download the update.";
-		String url = "https://www.wurstclient.net/download/";
+		String textPart1 = "Wurst " + latestVersion + " MC"
+			+ WurstClient.MC_VERSION + " is now available.";
+		String text =
+			textPart1 + " Click \u00a7nhere\u00a7r to download the update.";
+		String url =
+			"https://www.wurstclient.net/download/?utm_source=Wurst+Client&utm_medium=WurstUpdater+chat+message&utm_content="
+				+ URLEncoder.encode(textPart1, StandardCharsets.UTF_8);
 		showLink(text, url);
 	}
 	

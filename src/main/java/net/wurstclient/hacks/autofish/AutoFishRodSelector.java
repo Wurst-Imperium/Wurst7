@@ -1,11 +1,14 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.hacks.autofish;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -14,48 +17,62 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.hacks.AutoFishHack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.Setting;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.InventoryUtils;
 
 public final class AutoFishRodSelector
 {
 	private static final MinecraftClient MC = WurstClient.MC;
-	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
+	private final CheckboxSetting stopWhenOutOfRods = new CheckboxSetting(
+		"Stop when out of rods",
+		"If enabled, AutoFish will turn itself off when it runs out of fishing rods.",
+		false);
+	
+	private final AutoFishHack autoFish;
 	private int bestRodValue;
 	private int bestRodSlot;
 	
-	private int scheduledWindowClick;
+	public AutoFishRodSelector(AutoFishHack autoFish)
+	{
+		this.autoFish = autoFish;
+	}
+	
+	public Stream<Setting> getSettings()
+	{
+		return Stream.of(stopWhenOutOfRods);
+	}
 	
 	public void reset()
 	{
 		bestRodValue = -1;
 		bestRodSlot = -1;
-		scheduledWindowClick = -1;
 	}
 	
-	public boolean hasScheduledClick()
+	public boolean hasARod()
 	{
-		return scheduledWindowClick != -1;
+		return bestRodSlot != -1;
 	}
 	
-	public void doScheduledClick()
-	{
-		IMC.getInteractionManager().windowClick_PICKUP(scheduledWindowClick);
-		scheduledWindowClick = -1;
-	}
-	
-	public void updateBestRod()
+	public boolean isBestRodAlreadySelected()
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		int selectedSlot = inventory.selectedSlot;
 		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
-		// start with selected rod
+		// evaluate selected rod (or lack thereof)
 		bestRodValue = getRodValue(selectedStack);
 		bestRodSlot = bestRodValue > -1 ? selectedSlot : -1;
 		
+		// create a stream of all slots that we want to search
+		IntStream stream = IntStream.range(0, 36);
+		stream = IntStream.concat(stream, IntStream.of(40));
+		
 		// search inventory for better rod
-		for(int slot = 0; slot < 36; slot++)
+		for(int slot : stream.toArray())
 		{
 			ItemStack stack = inventory.getStack(slot);
 			int rodValue = getRodValue(stack);
@@ -66,46 +83,21 @@ public final class AutoFishRodSelector
 				bestRodSlot = slot;
 			}
 		}
-	}
-	
-	public boolean hasARod()
-	{
-		return bestRodSlot != -1;
-	}
-	
-	public boolean isBestRodAlreadySelected()
-	{
-		return bestRodSlot == MC.player.getInventory().selectedSlot;
+		
+		// return true if selected rod is best rod
+		return bestRodSlot == selectedSlot;
 	}
 	
 	public void selectBestRod()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		
-		if(bestRodSlot < 9)
+		if(bestRodSlot == -1 && stopWhenOutOfRods.isChecked())
 		{
-			inventory.selectedSlot = bestRodSlot;
+			ChatUtils.message("AutoFish has run out of fishing rods.");
+			autoFish.setEnabled(false);
 			return;
 		}
 		
-		int firstEmptySlot = inventory.getEmptySlot();
-		
-		if(firstEmptySlot != -1)
-		{
-			if(firstEmptySlot >= 9)
-				IMC.getInteractionManager()
-					.windowClick_QUICK_MOVE(36 + inventory.selectedSlot);
-			
-			IMC.getInteractionManager().windowClick_QUICK_MOVE(bestRodSlot);
-			
-		}else
-		{
-			IMC.getInteractionManager().windowClick_PICKUP(bestRodSlot);
-			IMC.getInteractionManager()
-				.windowClick_PICKUP(36 + inventory.selectedSlot);
-			
-			scheduledWindowClick = -bestRodSlot;
-		}
+		InventoryUtils.selectItem(bestRodSlot);
 	}
 	
 	private int getRodValue(ItemStack stack)

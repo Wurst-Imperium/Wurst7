@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,8 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -42,7 +42,7 @@ public final class ServerCrasherHack extends Hack
 			return;
 		}
 		
-		Item item = Registry.ITEM.get(new Identifier("creeper_spawn_egg"));
+		Item item = Registries.ITEM.get(new Identifier("creeper_spawn_egg"));
 		ItemStack stack = new ItemStack(item, 1);
 		stack.setNbt(createNBT());
 		
