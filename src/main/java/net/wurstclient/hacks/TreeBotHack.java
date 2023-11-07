@@ -15,13 +15,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -49,7 +44,6 @@ import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
-import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"tree bot"})
 @DontSaveState
@@ -280,40 +274,10 @@ public final class TreeBotHack extends Hack
 			angleFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 				pathCmd.isDepthTest());
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
 		if(tree != null)
-			drawTree(matrixStack);
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+			tree.draw(matrixStack);
 		
 		overlay.render(matrixStack, partialTicks, currentBlock);
-	}
-	
-	private void drawTree(MatrixStack matrixStack)
-	{
-		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack,
-			MC.world.getChunk(tree.getStump()));
-		
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		ShaderProgram shader = RenderSystem.getShader();
-		
-		tree.getVertexBuffer().bind();
-		tree.getVertexBuffer().draw(viewMatrix, projMatrix, shader);
-		VertexBuffer.unbind();
-		
-		matrixStack.pop();
 	}
 	
 	private ArrayList<BlockPos> getNeighbors(BlockPos pos)
