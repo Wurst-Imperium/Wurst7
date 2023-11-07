@@ -19,6 +19,7 @@ import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"mass tpa"})
@@ -26,6 +27,10 @@ import net.wurstclient.util.ChatUtils;
 public final class MassTpaHack extends Hack
 	implements UpdateListener, ChatInputListener
 {
+	private final CheckboxSetting typeOfTp = new CheckboxSetting("Type of Teleport",
+			"checked -> tpa, nonChecked -> tpahere",true
+	);
+
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
 	
@@ -36,6 +41,7 @@ public final class MassTpaHack extends Hack
 	{
 		super("MassTPA");
 		setCategory(Category.CHAT);
+		addSetting(typeOfTp);
 	}
 	
 	@Override
@@ -57,7 +63,7 @@ public final class MassTpaHack extends Hack
 			
 			players.add(name);
 		}
-		
+
 		Collections.shuffle(players, random);
 		
 		EVENTS.add(ChatInputListener.class, this);
@@ -91,12 +97,20 @@ public final class MassTpaHack extends Hack
 			setEnabled(false);
 			return;
 		}
-		
-		MC.getNetworkHandler().sendChatCommand("tpa " + players.get(index));
+
+		if (typeOfTp.isChecked())
+			sendingTeleportCommand("tpa");
+		else
+			sendingTeleportCommand("tpahere");
+
 		index++;
 		timer = 20;
 	}
-	
+
+	private void sendingTeleportCommand(String command) {
+		MC.getNetworkHandler().sendChatCommand(command + " " + players.get(index));
+	}
+
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
@@ -107,15 +121,25 @@ public final class MassTpaHack extends Hack
 		if(message.contains("/help") || message.contains("permission"))
 		{
 			event.cancel();
-			ChatUtils.error("This server doesn't have TPA.");
+			if (typeOfTp.isChecked())
+				sendChatting("This server doesn't have TPA.");
+			else
+				sendChatting("This server doesn't have TPAHERE.");
 			setEnabled(false);
 			
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
 			event.cancel();
-			ChatUtils.message("Someone accepted your TPA request. Stopping.");
+			if (typeOfTp.isChecked())
+				sendChatting("Someone accepted your TPA request. Stopping.");
+			else
+				sendChatting("Someone accepted your TPAHERE request. Stopping.");
 			setEnabled(false);
 		}
+	}
+
+	private void sendChatting(String comment) {
+		ChatUtils.error(comment);
 	}
 }
