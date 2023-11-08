@@ -19,7 +19,7 @@ import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"mass tpa"})
@@ -27,8 +27,10 @@ import net.wurstclient.util.ChatUtils;
 public final class MassTpaHack extends Hack
 	implements UpdateListener, ChatInputListener
 {
-	private final CheckboxSetting typeOfTp = new CheckboxSetting("Type of Teleport",
-			"checked -> tpa, nonChecked -> tpahere",true
+	private final TextFieldSetting commandSetup = new TextFieldSetting(
+			"Type of Teleport Command",
+			"Write down the tpa command statement you want > tpo, tpahere, etc..",
+			"tpa"
 	);
 
 	private final Random random = new Random();
@@ -41,7 +43,7 @@ public final class MassTpaHack extends Hack
 	{
 		super("MassTPA");
 		setCategory(Category.CHAT);
-		addSetting(typeOfTp);
+		addSetting(commandSetup);
 	}
 	
 	@Override
@@ -71,11 +73,20 @@ public final class MassTpaHack extends Hack
 		
 		if(players.isEmpty())
 		{
-			ChatUtils.error("Couldn't find any players.");
-			setEnabled(false);
+			errorComment("Couldn't find any players.");
+		}
+
+		if (!commandSetup.getValue().contains("tp"))
+		{
+			errorComment("Commands other than tp are not available.");
 		}
 	}
-	
+
+	private void errorComment(String comment) {
+		ChatUtils.error(comment);
+		setEnabled(false);
+	}
+
 	@Override
 	public void onDisable()
 	{
@@ -98,17 +109,11 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 
-		if (typeOfTp.isChecked())
-			sendingTeleportCommand("tpa");
-		else
-			sendingTeleportCommand("tpahere");
+		String commandLabel = this.commandSetup.getValue() + " ";
+ 		MC.getNetworkHandler().sendChatCommand(commandLabel + players.get(index));
 
 		index++;
 		timer = 20;
-	}
-
-	private void sendingTeleportCommand(String command) {
-		MC.getNetworkHandler().sendChatCommand(command + " " + players.get(index));
 	}
 
 	@Override
@@ -121,20 +126,14 @@ public final class MassTpaHack extends Hack
 		if(message.contains("/help") || message.contains("permission"))
 		{
 			event.cancel();
-			if (typeOfTp.isChecked())
-				sendChatting("This server doesn't have TPA.");
-			else
-				sendChatting("This server doesn't have TPAHERE.");
+			sendChatting("This server doesn't have " + this.commandSetup.getValue() + ".");
 			setEnabled(false);
 			
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
 			event.cancel();
-			if (typeOfTp.isChecked())
-				sendChatting("Someone accepted your TPA request. Stopping.");
-			else
-				sendChatting("Someone accepted your TPAHERE request. Stopping.");
+			sendChatting("Someone accepted. Stopping.");
 			setEnabled(false);
 		}
 	}
