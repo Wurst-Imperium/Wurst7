@@ -1,5 +1,5 @@
 name: Bug Report
-about: Report a bug
+description: Report a bug
 labels: ["type:bug", "status:unconfirmed"]
 body:
 - type: markdown
