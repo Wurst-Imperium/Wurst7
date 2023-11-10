@@ -87,7 +87,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
-	private Entity renderTarget;
 	public LivingEntity le;
 	
 	public MobEspHack()
