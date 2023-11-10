@@ -1,4 +1,3 @@
----
 name: Bug Report
 about: Report a bug
 labels: ["type:bug", "status:unconfirmed"]
@@ -65,4 +64,3 @@ body:
     value: |
       ## Thank you!
       We appreciate your help in improving Wurst Client by reporting this bug. Please make sure you have filled out all the necessary information before submitting this issue.
----
