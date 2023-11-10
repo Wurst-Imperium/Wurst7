@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
@@ -27,6 +28,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -34,7 +36,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -58,6 +59,8 @@ public final class ClickGui
 	private int txtColor;
 	private float opacity;
 	private float ttOpacity;
+	private int maxHeight;
+	private int maxSettingsHeight;
 	
 	private String tooltip = "";
 	
@@ -90,6 +93,7 @@ public final class ClickGui
 		Window uiSettings = new Window("UI Settings");
 		uiSettings.add(new FeatureButton(WURST.getOtfs().wurstLogoOtf));
 		uiSettings.add(new FeatureButton(WURST.getOtfs().hackListOtf));
+		uiSettings.add(new FeatureButton(WURST.getOtfs().keybindManagerOtf));
 		ClickGuiHack clickGuiHack = WURST.getHax().clickGuiHack;
 		Stream<Setting> settings = clickGuiHack.getSettings().values().stream();
 		settings.map(Setting::getComponent).forEach(c -> uiSettings.add(c));
@@ -176,8 +180,8 @@ public final class ClickGui
 				continue;
 			
 			JsonObject jsonWindow = new JsonObject();
-			jsonWindow.addProperty("x", window.getX());
-			jsonWindow.addProperty("y", window.getY());
+			jsonWindow.addProperty("x", window.getActualX());
+			jsonWindow.addProperty("y", window.getActualY());
 			jsonWindow.addProperty("minimized", window.isMinimized());
 			jsonWindow.addProperty("pinned", window.isPinned());
 			json.add(window.getTitle(), jsonWindow);
@@ -456,7 +460,7 @@ public final class ClickGui
 		}
 	}
 	
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		updateColors();
@@ -490,18 +494,19 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			renderWindow(matrixStack, window, mouseX, mouseY, partialTicks);
+			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
-		renderPopups(matrixStack, mouseX, mouseY);
-		renderTooltip(matrixStack, mouseX, mouseY);
+		renderPopups(context, mouseX, mouseY);
+		renderTooltip(context, mouseX, mouseY);
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public void renderPopups(MatrixStack matrixStack, int mouseX, int mouseY)
+	public void renderPopups(DrawContext context, int mouseX, int mouseY)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -516,15 +521,15 @@ public final class ClickGui
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
-			popup.render(matrixStack, cMouseX, cMouseY);
+			popup.render(context, cMouseX, cMouseY);
 			
 			matrixStack.pop();
 		}
 	}
 	
-	public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		MatrixStack matrixStack = context.getMatrices();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
@@ -552,8 +557,9 @@ public final class ClickGui
 		
 		matrixStack.push();
 		matrixStack.translate(0, 0, 300);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -578,15 +584,16 @@ public final class ClickGui
 		tessellator.draw();
 		
 		// text
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for(int i = 0; i < lines.length; i++)
-			fr.draw(matrixStack, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
-				txtColor);
+			context.drawText(fr, lines[i], xt1 + 2, yt1 + 2 + i * fr.fontHeight,
+				txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		matrixStack.pop();
 	}
 	
-	public void renderPinnedWindows(MatrixStack matrixStack, float partialTicks)
+	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -595,7 +602,7 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
-				renderWindow(matrixStack, window, Integer.MIN_VALUE,
+				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
 			
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -610,6 +617,8 @@ public final class ClickGui
 		ttOpacity = clickGui.getTooltipOpacity();
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
+		maxHeight = clickGui.getMaxHeight();
+		maxSettingsHeight = clickGui.getMaxSettingsHeight();
 		
 		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
 			acColor = RenderUtils.getRainbowColor();
@@ -617,8 +626,8 @@ public final class ClickGui
 			acColor = clickGui.getAccentColor();
 	}
 	
-	private void renderWindow(MatrixStack matrixStack, Window window,
-		int mouseX, int mouseY, float partialTicks)
+	private void renderWindow(DrawContext context, Window window, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		int x1 = window.getX();
 		int y1 = window.getY();
@@ -626,10 +635,11 @@ public final class ClickGui
 		int y2 = y1 + window.getHeight();
 		int y3 = y1 + 13;
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -639,7 +649,8 @@ public final class ClickGui
 		
 		if(!window.isMinimized())
 		{
-			window.setMaxHeight(187);
+			window.setMaxHeight(window instanceof SettingsWindow
+				? maxSettingsHeight : maxHeight);
 			window.validate();
 			
 			// scrollbar
@@ -785,7 +796,7 @@ public final class ClickGui
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y4;
 			for(int i = 0; i < window.countChildren(); i++)
-				window.getChild(i).render(matrixStack, cMouseX, cMouseY,
+				window.getChild(i).render(context, cMouseX, cMouseY,
 					partialTicks);
 			
 			matrixStack.pop();
@@ -881,7 +892,7 @@ public final class ClickGui
 		TextRenderer fr = MC.textRenderer;
 		String title = fr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
 			.getString();
-		fr.draw(matrixStack, title, x1 + 2, y1 + 3, txtColor);
+		context.drawText(fr, title, x1 + 2, y1 + 3, txtColor, false);
 		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
@@ -893,7 +904,7 @@ public final class ClickGui
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// button background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],

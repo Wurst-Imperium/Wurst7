@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,12 +7,13 @@
  */
 package net.wurstclient.hud;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -20,7 +21,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
 
@@ -29,8 +29,9 @@ public final class WurstLogo
 	private static final Identifier texture =
 		new Identifier("wurst", "wurst_128.png");
 	
-	public void render(MatrixStack matrixStack)
+	public void render(DrawContext context)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		WurstLogoOtf otf = WurstClient.INSTANCE.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
 			return;
@@ -54,13 +55,12 @@ public final class WurstLogo
 		// draw version string
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		tr.draw(matrixStack, version, 74, 8, otf.getTextColor());
+		context.drawText(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
-		RenderSystem.setShaderTexture(0, texture);
-		DrawableHelper.drawTexture(matrixStack, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.drawTexture(texture, 0, 3, 0, 0, 72, 18, 72, 18);
 	}
 	
 	private String getVersionString()
@@ -78,7 +78,7 @@ public final class WurstLogo
 		float r, float g, float b, float a)
 	{
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();

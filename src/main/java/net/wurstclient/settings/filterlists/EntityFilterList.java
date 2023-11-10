@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -50,21 +50,43 @@ public class EntityFilterList
 		return stream;
 	}
 	
+	public final boolean testOne(Entity entity)
+	{
+		for(EntityFilter filter : entityFilters)
+			if(filter.isFilterEnabled() && !filter.test(entity))
+				return false;
+			
+		return true;
+	}
+	
 	public static EntityFilterList genericCombat()
 	{
 		return new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
-			FilterMonstersSetting.genericCombat(false),
-			FilterPigmenSetting.genericCombat(false),
-			FilterEndermenSetting.genericCombat(false),
-			FilterAnimalsSetting.genericCombat(false),
+			FilterHostileSetting.genericCombat(false),
+			FilterNeutralSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
 			FilterBabiesSetting.genericCombat(false),
+			FilterBatsSetting.genericCombat(false),
+			FilterSlimesSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
-			FilterTradersSetting.genericCombat(false),
+			FilterVillagersSetting.genericCombat(false),
+			FilterZombieVillagersSetting.genericCombat(false),
 			FilterGolemsSetting.genericCombat(false),
+			FilterPiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericCombat(false),
+			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(false),
 			FilterNamedSetting.genericCombat(false),
+			FilterShulkerBulletSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
 			FilterCrystalsSetting.genericCombat(false));
 	}

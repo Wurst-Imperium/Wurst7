@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,9 +8,11 @@
 package net.wurstclient.update;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.wurstclient.WurstClient;
@@ -74,13 +76,20 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 	{
 		try
 		{
-			ArrayList<String> lines =
-				StreamUtils.readAllLines(pack.openRoot("Selected Packs.txt"));
+			// some implementations of ResourcePack.openRoot() throw an
+			// IllegalArgumentException when the pack doesn't contain the
+			// specified file
+			InputSupplier<InputStream> supplier =
+				pack.openRoot("Selected Packs.txt");
+			if(supplier == null)
+				return false;
+			
+			ArrayList<String> lines = StreamUtils.readAllLines(supplier.get());
 			
 			return lines.stream()
 				.anyMatch(line -> line.contains("TwinklingStars"));
 			
-		}catch(IOException e)
+		}catch(IOException | IllegalArgumentException e)
 		{
 			return false;
 		}

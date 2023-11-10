@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,18 +11,19 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ComboBoxPopup;
@@ -102,9 +103,10 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x2 - 11;
@@ -116,7 +118,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		boolean hText = hovering && mouseX < x4;
 		boolean hBox = hovering && mouseX >= x4;
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tooltip
 		if(hText)
@@ -128,7 +130,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		drawSeparator(matrixStack, x3, y1, y2);
 		drawArrow(matrixStack, x2, x3, y1, y2, hBox);
 		
-		drawNameAndValue(matrixStack, x1, x4, y1);
+		drawNameAndValue(context, x1, x4, y1);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
@@ -257,8 +259,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		tessellator.draw();
 	}
 	
-	private void drawNameAndValue(MatrixStack matrixStack, int x1, int x4,
-		int y1)
+	private void drawNameAndValue(DrawContext context, int x1, int x4, int y1)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -268,8 +269,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
 		
-		tr.draw(matrixStack, name, x1, y1 + 2, txtColor);
-		tr.draw(matrixStack, value, x4 + 2, y1 + 2, txtColor);
+		context.drawText(tr, name, x1, y1 + 2, txtColor, false);
+		context.drawText(tr, value, x4 + 2, y1 + 2, txtColor, false);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

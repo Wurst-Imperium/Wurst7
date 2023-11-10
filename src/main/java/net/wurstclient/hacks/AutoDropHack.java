@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -79,7 +79,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 				continue;
 			
 			Item item = stack.getItem();
-			String itemName = Registry.ITEM.getId(item).toString();
+			String itemName = Registries.ITEM.getId(item).toString();
 			
 			if(!items.getItemNames().contains(itemName))
 				continue;

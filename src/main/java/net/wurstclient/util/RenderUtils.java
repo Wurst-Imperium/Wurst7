@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,25 +7,30 @@
  */
 package net.wurstclient.util;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
 
@@ -49,40 +54,28 @@ public enum RenderUtils
 		GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 	}
 	
-	public static void applyRenderOffset(MatrixStack matrixStack)
-	{
-		applyCameraRotationOnly();
-		Vec3d camPos = getCameraPos();
-		
-		matrixStack.translate(-camPos.x, -camPos.y, -camPos.z);
-	}
-	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
-		applyCameraRotationOnly();
-		
-		Vec3d camPos = getCameraPos();
-		BlockPos blockPos = getCameraBlockPos();
-		
-		int regionX = (blockPos.getX() >> 9) * 512;
-		int regionZ = (blockPos.getZ() >> 9) * 512;
-		
-		matrixStack.translate(regionX - camPos.x, -camPos.y,
-			regionZ - camPos.z);
+		applyRegionalRenderOffset(matrixStack, getCameraRegion());
 	}
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack,
 		Chunk chunk)
 	{
-		applyCameraRotationOnly();
-		
+		applyRegionalRenderOffset(matrixStack, RegionPos.of(chunk.getPos()));
+	}
+	
+	public static void applyRegionalRenderOffset(MatrixStack matrixStack,
+		RegionPos region)
+	{
+		Vec3d offset = region.toVec3d().subtract(getCameraPos());
+		matrixStack.translate(offset.x, offset.y, offset.z);
+	}
+	
+	public static void applyRenderOffset(MatrixStack matrixStack)
+	{
 		Vec3d camPos = getCameraPos();
-		
-		int regionX = (chunk.getPos().getStartX() >> 9) * 512;
-		int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
-		
-		matrixStack.translate(regionX - camPos.x, -camPos.y,
-			regionZ - camPos.z);
+		matrixStack.translate(-camPos.x, -camPos.y, -camPos.z);
 	}
 	
 	public static void applyCameraRotationOnly()
@@ -114,6 +107,11 @@ public enum RenderUtils
 		return camera.getBlockPos();
 	}
 	
+	public static RegionPos getCameraRegion()
+	{
+		return RegionPos.of(getCameraBlockPos());
+	}
+	
 	public static float[] getRainbowColor()
 	{
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -136,7 +134,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -278,7 +276,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
@@ -575,7 +573,7 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
 		double midY = (bb.minY + bb.maxY) / 2;
@@ -707,7 +705,7 @@ public enum RenderUtils
 	
 	public static void drawArrow(Vec3d from, Vec3d to, MatrixStack matrixStack)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -738,11 +736,11 @@ public enum RenderUtils
 		double zDiff = endZ - startZ;
 		
 		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrixStack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
 		
 		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
 		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrixStack.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();
@@ -807,26 +805,26 @@ public enum RenderUtils
 		double endZ = to.z;
 		
 		Matrix4f matrix = new Matrix4f();
-		matrix.loadIdentity();
+		matrix.identity();
 		
 		bufferBuilder
 			.vertex(matrix, (float)startX, (float)startY, (float)startZ).next();
 		bufferBuilder.vertex(matrix, (float)endX, (float)endY, (float)endZ)
 			.next();
 		
-		matrix.multiplyByTranslation((float)endX, (float)endY, (float)endZ);
-		matrix.multiply(Matrix4f.scale(0.1F, 0.1F, 0.1F));
+		matrix.translate((float)endX, (float)endY, (float)endZ);
+		matrix.scale(0.1F, 0.1F, 0.1F);
 		
 		double xDiff = endX - startX;
 		double yDiff = endY - startY;
 		double zDiff = endZ - startZ;
 		
 		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrix.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(xAngle));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
 		
 		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
 		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrix.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion(zAngle));
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
 		bufferBuilder.vertex(matrix, -1, 2, 0).next();
@@ -857,5 +855,42 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(matrix, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+	}
+	
+	public static void drawItem(DrawContext context, ItemStack stack, int x,
+		int y, boolean large)
+	{
+		MatrixStack matrixStack = context.getMatrices();
+		
+		matrixStack.push();
+		matrixStack.translate(x, y, 0);
+		if(large)
+			matrixStack.scale(1.5F, 1.5F, 1.5F);
+		else
+			matrixStack.scale(0.75F, 0.75F, 0.75F);
+		
+		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
+			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
+		
+		DiffuseLighting.enableGuiDepthLighting();
+		context.drawItem(renderStack, 0, 0);
+		DiffuseLighting.disableGuiDepthLighting();
+		
+		matrixStack.pop();
+		
+		if(stack.isEmpty())
+		{
+			matrixStack.push();
+			matrixStack.translate(x, y, 250);
+			if(large)
+				matrixStack.scale(2, 2, 2);
+			
+			TextRenderer tr = WurstClient.MC.textRenderer;
+			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
+			
+			matrixStack.pop();
+		}
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 }

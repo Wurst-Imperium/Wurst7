@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 package net.wurstclient.mixin;
+
+import java.util.stream.Stream;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
@@ -37,14 +40,15 @@ public class DisconnectedScreenMixin extends Screen
 	@Final
 	private Screen parent;
 	@Shadow
-	private int reasonHeight;
+	@Final
+	private DirectionalLayoutWidget grid;
 	
 	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -69,20 +73,25 @@ public class DisconnectedScreenMixin extends Screen
 	
 	private void addReconnectButtons()
 	{
-		int backButtonX = width / 2 - 100;
-		int backButtonY =
-			Math.min(height / 2 + reasonHeight / 2 + 9, height - 30);
+		ButtonWidget reconnectButton = grid.add(
+			ButtonWidget.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(parent)).build(),
+			grid.copyPositioner().margin(2).marginTop(-6));
 		
-		addDrawableChild(new ButtonWidget(backButtonX, backButtonY + 24, 200,
-			20, Text.literal("Reconnect"),
-			b -> LastServerRememberer.reconnect(parent)));
+		autoReconnectButton = grid.add(
+			ButtonWidget.builder(Text.literal("AutoReconnect"),
+				b -> pressAutoReconnect()).build(),
+			grid.copyPositioner().margin(2));
 		
-		autoReconnectButton = addDrawableChild(
-			new ButtonWidget(backButtonX, backButtonY + 48, 200, 20,
-				Text.literal("AutoReconnect"), b -> pressAutoReconnect()));
+		grid.refreshPositions();
+		Stream.of(reconnectButton, autoReconnectButton)
+			.forEach(this::addDrawableChild);
 		
-		if(WurstClient.INSTANCE.getHax().autoReconnectHack.isEnabled())
-			autoReconnectTimer = 100;
+		AutoReconnectHack autoReconnect =
+			WurstClient.INSTANCE.getHax().autoReconnectHack;
+		
+		if(autoReconnect.isEnabled())
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	private void pressAutoReconnect()
@@ -93,7 +102,7 @@ public class DisconnectedScreenMixin extends Screen
 		autoReconnect.setEnabled(!autoReconnect.isEnabled());
 		
 		if(autoReconnect.isEnabled())
-			autoReconnectTimer = 100;
+			autoReconnectTimer = autoReconnect.getWaitTicks();
 	}
 	
 	@Override

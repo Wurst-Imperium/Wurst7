@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,18 +33,16 @@ import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.hacks.chestesp.ChestEspRenderer;
-import net.wurstclient.hacks.chestesp.ChestEspStyle;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.RenderUtils;
 
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	private final EnumSetting<ChestEspStyle> style =
-		new EnumSetting<>("Style", ChestEspStyle.values(), ChestEspStyle.BOXES);
+	private final EspStyleSetting style = new EspStyleSetting();
 	
 	private final ChestEspBlockGroup basicChests = new ChestEspBlockGroup(
 		new ColorSetting("Chest color",
@@ -194,7 +192,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			event.cancel();
 	}
 	
@@ -204,7 +202,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
@@ -214,18 +211,19 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
-		ChestEspRenderer espRenderer = new ChestEspRenderer(matrixStack);
+		ChestEspRenderer espRenderer =
+			new ChestEspRenderer(matrixStack, partialTicks);
 		
-		if(style.getSelected().hasBoxes())
+		if(style.hasBoxes())
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderBoxes);
 		}
 		
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderLines);
 		}
@@ -236,6 +234,5 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

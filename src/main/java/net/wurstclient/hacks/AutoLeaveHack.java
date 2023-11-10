@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -95,7 +95,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			break;
 			
 			case CHARS:
-			MC.player.sendChatMessage("\u00a7", null);
+			MC.getNetworkHandler().sendChatMessage("\u00a7");
 			break;
 			
 			case TELEPORT:

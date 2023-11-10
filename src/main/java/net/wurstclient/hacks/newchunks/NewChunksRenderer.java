@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,16 +7,16 @@
  */
 package net.wurstclient.hacks.newchunks;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RenderUtils;
@@ -41,7 +41,7 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
-		vertexBuffers[i] = new VertexBuffer();
+		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);
 		VertexBuffer.unbind();
@@ -64,17 +64,16 @@ public final class NewChunksRenderer
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		Shader shader = RenderSystem.getShader();
+		ShaderProgram shader = RenderSystem.getShader();
 		
 		float alpha = opacity.getValueF();
 		float[] newColorF = newChunksColor.getColorF();
@@ -112,6 +111,5 @@ public final class NewChunksRenderer
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

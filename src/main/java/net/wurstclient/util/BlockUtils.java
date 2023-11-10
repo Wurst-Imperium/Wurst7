@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,18 +9,25 @@ package net.wurstclient.util;
 
 import java.util.ArrayList;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.CollisionView;
+import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
 
 public enum BlockUtils
@@ -51,7 +58,7 @@ public enum BlockUtils
 	
 	public static String getName(Block block)
 	{
-		return Registry.BLOCK.getId(block).toString();
+		return Registries.BLOCK.getId(block).toString();
 	}
 	
 	/**
@@ -64,7 +71,7 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registry.BLOCK.get(new Identifier(name));
+			return Registries.BLOCK.get(new Identifier(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
@@ -91,7 +98,7 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registry.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
@@ -120,6 +127,50 @@ public enum BlockUtils
 		return getOutlineShape(pos) != VoxelShapes.empty();
 	}
 	
+	public static boolean isOpaqueFullCube(BlockPos pos)
+	{
+		return getState(pos).isOpaqueFullCube(MC.world, pos);
+	}
+	
+	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	{
+		RaycastContext context =
+			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE, MC.player);
+		
+		return MC.world.raycast(context);
+	}
+	
+	public static boolean hasLineOfSight(Vec3d from, Vec3d to)
+	{
+		return raycast(from, to).getType() == HitResult.Type.MISS;
+	}
+	
+	public static boolean hasLineOfSight(Vec3d to)
+	{
+		return raycast(RotationUtils.getEyesPos(), to)
+			.getType() == HitResult.Type.MISS;
+	}
+	
+	/**
+	 * Returns a stream of all blocks that collide with the given box.
+	 *
+	 * <p>
+	 * Unlike {@link CollisionView#getBlockCollisions(Entity, Box)}, this method
+	 * breaks the voxel shapes down into their bounding boxes and only returns
+	 * those that actually intersect with the given box. It also assumes that
+	 * the entity is the player.
+	 */
+	public static Stream<Box> getBlockCollisions(Box box)
+	{
+		Iterable<VoxelShape> blockCollisions =
+			MC.world.getBlockCollisions(MC.player, box);
+		
+		return StreamSupport.stream(blockCollisions.spliterator(), false)
+			.flatMap(shape -> shape.getBoundingBoxes().stream())
+			.filter(shapeBox -> shapeBox.intersects(box));
+	}
+	
 	public static ArrayList<BlockPos> getAllInBox(BlockPos from, BlockPos to)
 	{
 		ArrayList<BlockPos> blocks = new ArrayList<>();
@@ -135,6 +186,12 @@ public enum BlockUtils
 					blocks.add(new BlockPos(x, y, z));
 				
 		return blocks;
+	}
+	
+	public static ArrayList<BlockPos> getAllInBox(BlockPos center, int range)
+	{
+		return getAllInBox(center.add(-range, -range, -range),
+			center.add(range, range, range));
 	}
 	
 	public static Stream<BlockPos> getAllInBoxStream(BlockPos from, BlockPos to)
@@ -174,5 +231,11 @@ public enum BlockUtils
 			* (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
 		
 		return stream.limit(limit);
+	}
+	
+	public static Stream<BlockPos> getAllInBoxStream(BlockPos center, int range)
+	{
+		return getAllInBoxStream(center.add(-range, -range, -range),
+			center.add(range, range, range));
 	}
 }

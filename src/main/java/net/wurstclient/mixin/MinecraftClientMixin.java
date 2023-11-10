@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,16 +10,15 @@ package net.wurstclient.mixin;
 import java.io.File;
 import java.util.UUID;
 
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -28,11 +27,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.resource.language.LanguageManager;
-import net.minecraft.client.util.ProfileKeys;
-import net.minecraft.client.util.Session;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.session.ProfileKeys;
+import net.minecraft.client.session.ProfileKeysImpl;
+import net.minecraft.client.session.Session;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -42,9 +39,7 @@ import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
-import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
-import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -55,34 +50,24 @@ public abstract class MinecraftClientMixin
 	@Final
 	public File runDirectory;
 	@Shadow
-	private int itemUseCooldown;
+	public ClientPlayerInteractionManager interactionManager;
 	@Shadow
-	private ClientPlayerInteractionManager interactionManager;
-	@Shadow
-	@Final
-	private LanguageManager languageManager;
-	@Shadow
-	private ClientPlayerEntity player;
-	@Shadow
-	public ClientWorld world;
-	@Shadow
-	@Final
-	private Session session;
+	public ClientPlayerEntity player;
 	@Shadow
 	@Final
 	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
-	private ProfileKeys wurstProfileKeys;
+	private ProfileKeysImpl wurstProfileKeys;
 	
-	private MinecraftClientMixin(WurstClient wurst, String string_1)
+	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
-		super(string_1);
+		super(name);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
+	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0)}, method = {"doAttack()Z"}, cancellable = true)
+		ordinal = 0), method = "doAttack()Z", cancellable = true)
 	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
@@ -92,9 +77,12 @@ public abstract class MinecraftClientMixin
 			cir.setReturnValue(false);
 	}
 	
-	@Inject(at = {@At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
-		ordinal = 0)}, method = {"doItemUse()V"}, cancellable = true)
+	@Inject(
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
+			ordinal = 0),
+		method = "doItemUse()V",
+		cancellable = true)
 	private void onDoItemUse(CallbackInfo ci)
 	{
 		RightClickEvent event = new RightClickEvent();
@@ -104,72 +92,74 @@ public abstract class MinecraftClientMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"doItemPick()V"})
+	@Inject(at = @At("HEAD"), method = "doItemPick()V")
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
 		HitResult hitResult = WurstClient.MC.crosshairTarget;
-		if(hitResult == null || hitResult.getType() != HitResult.Type.ENTITY)
+		if(!(hitResult instanceof EntityHitResult eHitResult))
 			return;
 		
-		Entity entity = ((EntityHitResult)hitResult).getEntity();
-		WurstClient.INSTANCE.getFriends().middleClick(entity);
+		WurstClient.INSTANCE.getFriends().middleClick(eHitResult.getEntity());
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {"getSession()Lnet/minecraft/client/util/Session;"},
+		method = "getSession()Lnet/minecraft/client/session/Session;",
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<Session> cir)
+	{
+		if(wurstSession != null)
+			cir.setReturnValue(wurstSession);
+	}
+	
+	@Inject(at = @At("RETURN"),
+		method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
+		cancellable = true)
+	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
 		if(wurstSession == null)
 			return;
 		
-		cir.setReturnValue(wurstSession);
-	}
-	
-	@Redirect(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;session:Lnet/minecraft/client/util/Session;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0),
-		method = {
-			"getSessionProperties()Lcom/mojang/authlib/properties/PropertyMap;"})
-	private Session getSessionForSessionProperties(MinecraftClient mc)
-	{
-		if(wurstSession != null)
-			return wurstSession;
-		
-		return session;
+		GameProfile oldProfile = cir.getReturnValue();
+		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
+			wurstSession.getUsername());
+		newProfile.getProperties().putAll(oldProfile.getProperties());
+		cir.setReturnValue(newProfile);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = {"getProfileKeys()Lnet/minecraft/client/util/ProfileKeys;"},
+		method = "getProfileKeys()Lnet/minecraft/client/session/ProfileKeys;",
 		cancellable = true)
-	public void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
+	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
 	{
+		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
+			cir.setReturnValue(ProfileKeys.MISSING);
+		
 		if(wurstProfileKeys == null)
 			return;
 		
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Override
-	public void rightClick()
+	@Inject(at = @At("HEAD"),
+		method = "isTelemetryEnabledByApi()Z",
+		cancellable = true)
+	private void onIsTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
 	{
-		doItemUse();
+		cir.setReturnValue(
+			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
 	}
 	
-	@Override
-	public int getItemUseCooldown()
+	@Inject(at = @At("HEAD"),
+		method = "isOptionalTelemetryEnabledByApi()Z",
+		cancellable = true)
+	private void onIsOptionalTelemetryEnabledByApi(
+		CallbackInfoReturnable<Boolean> cir)
 	{
-		return itemUseCooldown;
-	}
-	
-	@Override
-	public void setItemUseCooldown(int itemUseCooldown)
-	{
-		this.itemUseCooldown = itemUseCooldown;
+		cir.setReturnValue(
+			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
 	}
 	
 	@Override
@@ -179,21 +169,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public IWorld getWorld()
-	{
-		return (IWorld)world;
-	}
-	
-	@Override
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
-	}
-	
-	@Override
-	public ILanguageManager getLanguageManager()
-	{
-		return (ILanguageManager)languageManager;
 	}
 	
 	@Override
@@ -203,9 +181,9 @@ public abstract class MinecraftClientMixin
 		
 		UserApiService userApiService =
 			wurst_createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getProfile().getId();
+		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
-			new ProfileKeys(userApiService, uuid, runDirectory.toPath());
+			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
 	}
 	
 	private UserApiService wurst_createUserApiService(String accessToken)
@@ -219,11 +197,5 @@ public abstract class MinecraftClientMixin
 			e.printStackTrace();
 			return UserApiService.OFFLINE;
 		}
-	}
-	
-	@Shadow
-	private void doItemUse()
-	{
-		
 	}
 }

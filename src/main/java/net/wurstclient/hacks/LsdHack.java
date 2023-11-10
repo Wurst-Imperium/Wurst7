@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 import net.wurstclient.Category;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IGameRenderer;
 
 @DontSaveState
 public final class LsdHack extends Hack
@@ -32,17 +31,17 @@ public final class LsdHack extends Hack
 			return;
 		}
 		
-		if(MC.gameRenderer.getShader() != null)
-			MC.gameRenderer.disableShader();
+		if(MC.gameRenderer.getPostProcessor() != null)
+			MC.gameRenderer.disablePostProcessor();
 		
-		((IGameRenderer)MC.gameRenderer)
-			.loadWurstShader(new Identifier("shaders/post/wobble.json"));
+		MC.gameRenderer
+			.loadPostProcessor(new Identifier("shaders/post/wobble.json"));
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		if(MC.gameRenderer.getShader() != null)
-			MC.gameRenderer.disableShader();
+		if(MC.gameRenderer.getPostProcessor() != null)
+			MC.gameRenderer.disablePostProcessor();
 	}
 }
