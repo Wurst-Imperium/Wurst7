@@ -27,6 +27,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -44,12 +45,18 @@ import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"mob esp", "MobTracers", "mob tracers"})
 public final class MobEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	private final EspStyleSetting style = new EspStyleSetting();
+	
+	private final CheckboxSetting damageIndicator = new CheckboxSetting(
+		"Damage indicator",
+		"Renders a colored box within the target, inversely proportional to its remaining health.",
+		true);
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
@@ -80,6 +87,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
+	private Entity renderTarget;
 	
 	public MobEspHack()
 	{
@@ -140,6 +148,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		if(renderTarget == null || !damageIndicator.isChecked())
+		return;
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -167,11 +178,20 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
+		if(renderTarget == null || !damageIndicator.isChecked())
+		return;
+		
 		float extraSize = boxSize.getExtraSize();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		for(LivingEntity e : mobs)
 		{
+			
+		if(renderTarget instanceof LivingEntity le)
+		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
+		float red = p * 2F;
+		float green = 2 - red;
+			
 			matrixStack.push();
 			
 			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
@@ -181,8 +201,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			matrixStack.scale(e.getWidth() + extraSize,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
-			float f = MC.player.distanceTo(e) / 20F;
-			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+			RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
