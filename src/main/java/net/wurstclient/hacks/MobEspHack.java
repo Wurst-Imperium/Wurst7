@@ -216,10 +216,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
-	{
-		if(renderTarget == null || !damageIndicator.isChecked())
-		return;
-		
+	{	
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
