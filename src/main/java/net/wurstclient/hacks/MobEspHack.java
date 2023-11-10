@@ -95,6 +95,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);
+		addSetting(damageIndicator);
 		entityFilters.forEach(this::addSetting);
 	}
 	
