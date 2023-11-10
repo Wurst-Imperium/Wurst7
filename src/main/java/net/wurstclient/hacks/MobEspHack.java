@@ -185,10 +185,12 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		for(LivingEntity e : mobs)
 		{
 		float p = 1;	
-		if(e instanceof LivingEntity le)
+		if(e instanceof LivingEntity le || damageIndicator.isChecked())
 		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
+			
 		float red = p * 2F;
 		float green = 2 - red;
+		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			
 			matrixStack.push();
 			
@@ -198,8 +200,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			
 			matrixStack.scale(e.getWidth() + extraSize,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
-			
-			RenderSystem.setShaderColor(red, green, 0, 0.5F);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
