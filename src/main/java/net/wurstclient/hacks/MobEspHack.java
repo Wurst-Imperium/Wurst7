@@ -148,8 +148,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(renderTarget == null)
-		return;
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
@@ -185,7 +183,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		for(LivingEntity e : mobs)
 		{
 		float p = 1;	
-		if(e instanceof LivingEntity le || damageIndicator.isChecked())
+		if(damageIndicator.isChecked())
 		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
 			
 		float red = p * 2F;
