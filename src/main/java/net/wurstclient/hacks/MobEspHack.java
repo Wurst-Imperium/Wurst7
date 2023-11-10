@@ -184,7 +184,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		for(LivingEntity e : mobs)
 		{
 		float p = 1;
-		LivingEntity le;
+		le = e;
 		if(damageIndicator.isChecked())
 		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
 			
