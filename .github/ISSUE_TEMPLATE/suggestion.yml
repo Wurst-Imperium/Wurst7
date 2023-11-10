@@ -31,8 +31,8 @@ body:
       - "Turning a Wurst feature into a standalone mod."
       - "Removing an old feature that doesn't work anymore."
       - "Other (please explain in description)"
-    validations:
-      required: true
+  validations:
+    required: true
 - type: dropdown
   id: target-audience
   attributes:
@@ -46,8 +46,8 @@ body:
       - "Redstoners"
       - "Anarchy/faction players"
       - "Other (please explain in description)"
-    validations:
-      required: true
+  validations:
+    required: true
 - type: textarea
   id: description
   attributes:
