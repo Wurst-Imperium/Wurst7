@@ -40,7 +40,7 @@ public final class DolphinHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		if(!player.isWet() || player.isSneaking())
+		if(!player.isTouchingWater() || player.isSneaking())
 			return;
 		
 		Vec3d velocity = player.getVelocity();

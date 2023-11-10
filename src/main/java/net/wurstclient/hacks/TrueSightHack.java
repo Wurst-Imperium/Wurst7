@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.entity.Entity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -20,5 +21,10 @@ public final class TrueSightHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See LivingEntityRendererMixin
+	public boolean shouldBeVisible(Entity entity)
+	{
+		return isEnabled();
+	}
+	
+	// See EntityMixin.onIsInvisibleTo()
 }

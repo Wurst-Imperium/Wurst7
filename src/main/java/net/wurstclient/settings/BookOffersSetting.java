@@ -200,6 +200,30 @@ public final class BookOffersSetting extends Setting
 	}
 	
 	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "BookOffers");
+		
+		JsonArray jsonDefaultOffers = new JsonArray();
+		for(BookOffer offer : defaultOffers)
+		{
+			JsonObject jsonOffer = new JsonObject();
+			jsonOffer.addProperty("id", offer.id());
+			jsonOffer.addProperty("level", offer.level());
+			if(offer.price() < 64)
+				jsonOffer.addProperty("max_price", offer.price());
+			
+			jsonDefaultOffers.add(jsonOffer);
+		}
+		json.add("defaultOffers", jsonDefaultOffers);
+		
+		return json;
+	}
+	
+	@Override
 	public Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
 		return new LinkedHashSet<>();

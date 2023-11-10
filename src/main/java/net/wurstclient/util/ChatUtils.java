@@ -7,9 +7,16 @@
  */
 package net.wurstclient.util;
 
+import java.util.List;
+import java.util.StringJoiner;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
@@ -63,5 +70,34 @@ public enum ChatUtils
 	public static void syntaxError(String message)
 	{
 		message(SYNTAX_ERROR_PREFIX + message);
+	}
+	
+	public static String getAsString(ChatHudLine.Visible visible)
+	{
+		return getAsString(visible.content());
+	}
+	
+	public static String getAsString(OrderedText text)
+	{
+		JustGiveMeTheStringVisitor visitor = new JustGiveMeTheStringVisitor();
+		text.accept(visitor);
+		return visitor.toString();
+	}
+	
+	public static final String wrapText(String text, int width)
+	{
+		return wrapText(text, width, Style.EMPTY);
+	}
+	
+	public static final String wrapText(String text, int width, Style style)
+	{
+		List<StringVisitable> lines = MC.textRenderer.getTextHandler()
+			.wrapLines(text, width, Style.EMPTY);
+		
+		StringJoiner joiner = new StringJoiner("\n");
+		lines.stream().map(StringVisitable::getString)
+			.forEach(s -> joiner.add(s));
+		
+		return joiner.toString();
 	}
 }

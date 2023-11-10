@@ -124,7 +124,6 @@
   "description.wurst.hack.panic": "Моментально выключает все читы.\nОсторожней с этим!",
   "description.wurst.hack.parkour": "Заставляет вас автоматически прыгать по достижении края блока.\nПолезно для паркуров и побегов.",
   "description.wurst.hack.playeresp": "Подсвечивает игроков неподалеку.\nДрузей будет подсвечивать синим.",
-  "description.wurst.hack.playerfinder": "Находит игроков во время грозы.",
   "description.wurst.hack.portalgui": "Позволяет открывать инвентарь и чат в порталах.",
   "description.wurst.hack.potionsaver": "Замораживает время действия всех эффектов пока Вы стоите на месте.",
   "description.wurst.hack.prophuntesp": "Позволяет отличать ненастоящие блоки в Prophunt.\nСделано для Mineplex Prophunt. Может не работать на других серверах.",
@@ -184,5 +183,6 @@
   "button.wurst.nochatreports.signatures_status": "Подписи: ",
   "description.wurst.nochatreports.message_is_reportable": "Это сообщение имеет действительную подпись и поэтому уязвимо для заведомо ложных чат-репортов.",
   "gui.wurst.generic.allcaps_blocked": "ЗАБЛОКИРОВАНО",
-  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО"
+  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО",
+  "key.wurst.zoom": "Приблизить"
 }

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.AirBlock;
@@ -125,6 +126,18 @@ public final class BlockSetting extends Setting
 	public JsonElement toJson()
 	{
 		return new JsonPrimitive(blockName);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "Block");
+		json.addProperty("defaultValue", defaultName);
+		json.addProperty("allowAir", allowAir);
+		return json;
 	}
 	
 	@Override

@@ -24,12 +24,12 @@ import net.wurstclient.hacks.AutoRespawnHack;
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen
 {
-	private DeathScreenMixin(WurstClient wurst, Text text_1)
+	private DeathScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At(value = "TAIL")}, method = {"tick()V"})
+	@Inject(at = @At(value = "TAIL"), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(DeathEvent.INSTANCE);

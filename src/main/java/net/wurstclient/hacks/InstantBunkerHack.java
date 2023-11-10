@@ -85,7 +85,7 @@ public final class InstantBunkerHack extends Hack
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings
-		BlockPos startPos = new BlockPos(MC.player.getPos());
+		BlockPos startPos = BlockPos.ofFloored(MC.player.getPos());
 		Direction facing = MC.player.getHorizontalFacing();
 		Direction facing2 = facing.rotateYCounterclockwise();
 		
@@ -100,7 +100,7 @@ public final class InstantBunkerHack extends Hack
 			// initialize building process
 			blockIndex = 0;
 			building = true;
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 		}
 		
 		startTimer = 2;
@@ -131,7 +131,7 @@ public final class InstantBunkerHack extends Hack
 		if(!building && startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).getMaterial().isReplaceable()
+				if(BlockUtils.getState(pos).isReplaceable()
 					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
 					placeBlockSimple(pos);
 			MC.player.swingHand(Hand.MAIN_HAND);
@@ -150,7 +150,7 @@ public final class InstantBunkerHack extends Hack
 		// {
 		// if(!BlockUtils.placeBlockLegit(pos))
 		// {
-		// BlockPos playerPos = new BlockPos(MC.player);
+		// BlockPos playerPos = BlockPos.method_49638(MC.player);
 		// if(MC.player.onGround
 		// && Math.abs(pos.getX() - playerPos.getX()) == 2
 		// && pos.getY() - playerPos.getY() == 2
@@ -240,7 +240,7 @@ public final class InstantBunkerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		// reset timer
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	@Override
@@ -256,17 +256,19 @@ public final class InstantBunkerHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		
 		matrixStack.push();
-		RenderUtils.applyRenderOffset(matrixStack);
+		
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		BlockPos regionOffset =
+			RenderUtils.getCameraRegion().negate().toBlockPos();
 		
 		// green box
 		{
 			GL11.glDepthMask(false);
 			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-			BlockPos pos = positions.get(blockIndex);
+			BlockPos pos = positions.get(blockIndex).add(regionOffset);
 			
 			matrixStack.push();
 			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
@@ -283,7 +285,7 @@ public final class InstantBunkerHack extends Hack
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(int i = blockIndex; i < positions.size(); i++)
 		{
-			BlockPos pos = positions.get(i);
+			BlockPos pos = positions.get(i).add(regionOffset);
 			
 			matrixStack.push();
 			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
@@ -298,7 +300,7 @@ public final class InstantBunkerHack extends Hack
 		matrixStack.pop();
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 }

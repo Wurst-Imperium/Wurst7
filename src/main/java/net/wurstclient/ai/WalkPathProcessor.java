@@ -32,11 +32,11 @@ public class WalkPathProcessor extends PathProcessor
 		// get positions
 		BlockPos pos;
 		if(WurstClient.MC.player.isOnGround())
-			pos = new BlockPos(WurstClient.MC.player.getX(),
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = new BlockPos(WurstClient.MC.player.getPos());
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		
@@ -137,5 +137,11 @@ public class WalkPathProcessor extends PathProcessor
 				if(WurstClient.MC.player.isOnGround())
 					MC.options.forwardKey.setPressed(true);
 			}
+	}
+	
+	@Override
+	public boolean canBreakBlocks()
+	{
+		return MC.player.isOnGround();
 	}
 }

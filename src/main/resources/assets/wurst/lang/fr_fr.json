@@ -121,7 +121,6 @@
   "description.wurst.hack.panic": "Désactive instantanément tous les hacks activés.\nSoyez prudent avec celui-ci !",
   "description.wurst.hack.parkour": "Vous fait sauter automatiquement lorsque vous atteignez le bord d'un bloc.\nUtile pour les parcours.",
   "description.wurst.hack.playeresp": "Met en évidence les joueurs à proximité.\nLes boîtes ESP des amis apparaîtront en bleu.",
-  "description.wurst.hack.playerfinder": "Trouve les joueurs éloignés pendant les orages.",
   "description.wurst.hack.portalgui": "Vous permet d'ouvrir les GUI dans des portails.",
   "description.wurst.hack.potionsaver": "Gèle tous les effets de potion pendant que vous êtes immobile.",
   "description.wurst.hack.prophuntesp": "Permet de voir les faux blocs dans le Prophunt.\nConçu pour le Prohunt de Mineplex. Peut ne pas fonctionner sur d'autres serveurs.",
@@ -181,5 +180,6 @@
   "button.wurst.nochatreports.signatures_status": "Signatures: ",
   "description.wurst.nochatreports.message_is_reportable": "Ce message a une signature valide et est donc vulnérable aux signalements de chat frauduleux.",
   "gui.wurst.generic.allcaps_blocked": "BLOQUÉ",
-  "gui.wurst.generic.allcaps_allowed": "AUTORISÉ"
+  "gui.wurst.generic.allcaps_allowed": "AUTORISÉ",
+  "key.wurst.zoom": "Zoom"
 }

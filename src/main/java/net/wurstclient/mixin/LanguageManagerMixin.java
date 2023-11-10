@@ -7,8 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import java.util.ArrayList;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.resource.ResourceManager;
@@ -27,23 +24,19 @@ import net.wurstclient.mixinterface.ILanguageManager;
 public abstract class LanguageManagerMixin
 	implements SynchronousResourceReloader, ILanguageManager
 {
-	private TranslationStorage english;
+	private TranslationStorage wurstEnglish;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"reload(Lnet/minecraft/resource/ResourceManager;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "reload(Lnet/minecraft/resource/ResourceManager;)V")
 	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
-		LanguageDefinition englishDef =
-			new LanguageDefinition("en_us", "US", "English", false);
-		ArrayList<LanguageDefinition> englishDefList =
-			Lists.newArrayList(englishDef);
-		
-		english = TranslationStorage.load(manager, englishDefList);
+		wurstEnglish = TranslationStorage.load(manager,
+			Lists.newArrayList("en_us"), false);
 	}
 	
 	@Override
-	public TranslationStorage getEnglish()
+	public TranslationStorage wurst_getEnglish()
 	{
-		return english;
+		return wurstEnglish;
 	}
 }

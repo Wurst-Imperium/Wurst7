@@ -19,10 +19,10 @@ import net.wurstclient.WurstClient;
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"method_43788(Lnet/minecraft/client/render/Camera;)Z"},
+	@Inject(at = @At("HEAD"),
+		method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z",
 		cancellable = true)
-	private void onHasBlindnessOrDarknessEffect(Camera camera,
+	private void onHasBlindnessOrDarkness(Camera camera,
 		CallbackInfoReturnable<Boolean> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())

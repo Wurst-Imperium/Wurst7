@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -25,7 +26,6 @@ import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.RenderUtils;
@@ -61,7 +61,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -85,6 +85,7 @@ public final class BlockComponent extends Component
 		
 		ItemStack stack = new ItemStack(setting.getBlock());
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -117,18 +118,11 @@ public final class BlockComponent extends Component
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		TextRenderer fr = WurstClient.MC.textRenderer;
+		TextRenderer tr = WurstClient.MC.textRenderer;
 		String text = setting.getName() + ":";
-		fr.draw(matrixStack, text, x1, y1 + 2, txtColor);
+		context.drawText(tr, text, x1, y1 + 2, txtColor, false);
 		
-		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
-		modelViewStack.push();
-		Window parent = getParent();
-		modelViewStack.translate(parent.getX(),
-			parent.getY() + 13 + parent.getScrollOffset(), 0);
-		RenderUtils.drawItem(matrixStack, stack, x3, y1, true);
-		modelViewStack.pop();
-		RenderSystem.applyModelViewMatrix();
+		RenderUtils.drawItem(context, stack, x3, y1, true);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 	}

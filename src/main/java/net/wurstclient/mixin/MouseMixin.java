@@ -19,11 +19,10 @@ import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 @Mixin(Mouse.class)
 public class MouseMixin
 {
-	@Inject(at = {@At("RETURN")}, method = {"onMouseScroll(JDD)V"})
-	private void onOnMouseScroll(long long_1, double double_1, double double_2,
-		CallbackInfo ci)
+	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	private void onOnMouseScroll(long window, double horizontal,
+		double vertical, CallbackInfo ci)
 	{
-		MouseScrollEvent event = new MouseScrollEvent(double_2);
-		EventManager.fire(event);
+		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 }

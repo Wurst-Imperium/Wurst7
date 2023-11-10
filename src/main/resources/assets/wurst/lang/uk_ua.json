@@ -120,7 +120,6 @@
   "description.wurst.hack.panic": "Миттєво вимикає всі чити.\nОбережніше з цим!",
   "description.wurst.hack.parkour": "Примушує вас автоматично стрибати після досягнення краю блоку.\nКорисно для паркурів та пагонів.",
   "description.wurst.hack.playeresp": "Підсвічує гравців.\nДрузів буде підсвічувати синім.",
-  "description.wurst.hack.playerfinder": "Знаходить гравців під час грози.",
   "description.wurst.hack.portalgui": "Дозволяє відкривати інвентар та чат у порталах.",
   "description.wurst.hack.potionsaver": "Заморожує дію всіх ефектів, поки ви стоїте на місці.",
   "description.wurst.hack.prophuntesp": "Дозволяє відрізняти несправжні блоки в Prophunt.\nЗроблено для Mineplex Prophunt. Може працювати на інших серверах.",
