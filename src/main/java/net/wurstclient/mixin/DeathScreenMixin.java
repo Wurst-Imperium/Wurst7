@@ -29,20 +29,21 @@ public abstract class DeathScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At(value = "TAIL"), method = "tick()V")
+	@Inject(at = @At("TAIL"), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(DeathEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("TAIL"), method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
-			
+		
 		addAutoRespawnButton();
 	}
+	
 	private void addAutoRespawnButton()
 	{
 		int backButtonX = width / 2 - 100;
@@ -52,6 +53,7 @@ public abstract class DeathScreenMixin extends Screen
 			.builder(Text.literal("AutoRespawn"), b -> pressAutoRespawn())
 			.dimensions(backButtonX, backButtonY + 48, 200, 20).build());
 	}
+	
 	private void pressAutoRespawn()
 	{
 		AutoRespawnHack autoRespawn =
