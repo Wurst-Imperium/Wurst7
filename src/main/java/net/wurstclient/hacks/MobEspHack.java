@@ -235,7 +235,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		float[] colorF = color.getColorF();
 		
 		if(monocromeColor.isChecked()) {
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
+		float avgColor = (colorF[0] + colorF[1] + colorF[2]) / 3;
+		RenderSystem.setShaderColor(avgColor, avgColor, avgColor, 1);
 		}
                 
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
