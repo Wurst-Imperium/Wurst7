@@ -189,8 +189,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RegionPos region)
 	{
 		float p = 1;	
-		float red = p * 2F;
-		float green = 2 - red;
+		
 		float extraSize = boxSize.getExtraSize();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -198,7 +197,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		{
 			
 		if(damageIndicator.isChecked()) {	
-		p = (e.getMaxHealth() - e.getHealth()) / e.getMaxHealth();	
+		p = (e.getMaxHealth() - e.getHealth()) / e.getMaxHealth();
+		float red = p * 2F;
+		float green = 2 - red;	
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		}
 		else {
