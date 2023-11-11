@@ -67,9 +67,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
-
+	
 	private final ColorSetting color = new ColorSetting("Color",
-		"Mobs will be highlighted in this color.", Color.GREEN);
+		"Mobs will be highlighted in this color.", Color.YELLOW);
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterHostileSetting.genericVision(false),
@@ -231,7 +231,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{	
 		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		if(monochrome.isChecked()) {
+		if(monoChrome.isChecked()) {
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
 		}
 		else {
