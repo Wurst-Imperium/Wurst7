@@ -38,27 +38,19 @@ public abstract class DeathScreenMixin extends Screen
 	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
-			return;
-		
-		addAutoRespawnButton();
-	}
-	
-	private void addAutoRespawnButton()
-	{
-		int backButtonX = width / 2 - 100;
-		int backButtonY = height / 4;
-		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("AutoRespawn"), b -> pressAutoRespawn())
-			.dimensions(backButtonX, backButtonY + 48, 200, 20).build());
-	}
-	
-	private void pressAutoRespawn()
-	{
 		AutoRespawnHack autoRespawn =
 			WurstClient.INSTANCE.getHax().autoRespawnHack;
 		
-		autoRespawn.setEnabled(!autoRespawn.isEnabled());
+		if(!autoRespawn.shouldShowButton())
+			return;
+		
+		int backButtonX = width / 2 - 100;
+		int backButtonY = height / 4;
+		
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("AutoRespawn: OFF"), b -> {
+				autoRespawn.setEnabled(true);
+				autoRespawn.onDeath();
+			}).dimensions(backButtonX, backButtonY + 48, 200, 20).build());
 	}
 }
