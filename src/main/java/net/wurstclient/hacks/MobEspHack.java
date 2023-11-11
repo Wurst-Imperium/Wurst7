@@ -106,6 +106,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		addSetting(boxSize);
 		addSetting(damageIndicator);
 		addSetting(color);
+		addSetting(monocromeColor);
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -197,13 +198,11 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		float red = p * 2F;
 		float green = 2 - red;
 		float f = MC.player.distanceTo(e) / 20F;
-		float[] colorF = color.getColorF();
-		if(damageIndicator.isChecked()) {
 		p = (e.getMaxHealth() - e.getHealth()) / e.getMaxHealth();
+		float[] colorF = color.getColorF();
+			
+		if(damageIndicator.isChecked()) {
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		}
-		else {
-                RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 		}
 			matrixStack.push();
 			
@@ -212,7 +211,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 			
 			matrixStack.scale(e.getWidth() + extraSize,
-				e.getHeight() + extraSize, e.getWidth() + extraSize);
+			e.getHeight() + extraSize, e.getWidth() + extraSize);
+			
+			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
@@ -229,13 +230,11 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RegionPos region)
 	{	
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                RenderSystem.setShaderColor(1, 1, 1, 1);
+		float[] colorF = color.getColorF();
 		
 		if(monocromeColor.isChecked()) {
-		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
-		}
-		else {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 		}
                 
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
