@@ -188,17 +188,16 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
-		
+		float p = 1;	
+		float red = p * 2F;
+		float green = 2 - red;
 		float extraSize = boxSize.getExtraSize();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		for(LivingEntity e : mobs)
 		{
 			
-		if(damageIndicator.isChecked()) {
-		float p = 1;	
-		float red = p * 2F;
-		float green = 2 - red;	
+		if(damageIndicator.isChecked()) {	
 		p = (e.getMaxHealth() - e.getHealth()) / e.getMaxHealth();	
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		}
