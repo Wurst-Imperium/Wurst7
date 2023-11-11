@@ -229,11 +229,13 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RegionPos region)
 	{	
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		if(monocromeColor.isChecked()) {
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
+		}
+		else {
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		}
                 
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
