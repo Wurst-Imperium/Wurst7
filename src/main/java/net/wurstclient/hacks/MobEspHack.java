@@ -58,9 +58,17 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		"Renders a colored box within the target, inversely proportional to its remaining health.",
 		true);
 	
+	private final CheckboxSetting monoCrome = new CheckboxSetting(
+		"Monochrome color",
+		"Renders all mobs in the selected color",
+		true);
+	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
+
+	private final ColorSetting color = new ColorSetting("Color",
+		"Mobs will be highlighted in this color.", Color.GREEN);
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterHostileSetting.genericVision(false),
@@ -96,6 +104,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(damageIndicator);
+		addSetting(color);
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -184,14 +193,18 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		for(LivingEntity e : mobs)
 		{
 		float p = 1;
-		le = e;
-		if(damageIndicator.isChecked())
-		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
-			
 		float red = p * 2F;
 		float green = 2 - red;
+		float f = MC.player.distanceTo(e) / 20F;
+		float[] colorF = color.getColorF();
+		le = e;	
+		if(damageIndicator.isChecked()) {
+		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			
+		}
+		else {
+                RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+		}
 			matrixStack.push();
 			
 			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
@@ -215,8 +228,14 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{	
+		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		if(monochrome.isChecked()) {
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
+		}
+		else {
+		RenderSystem.setShaderColor(1, 1, 1, 1);	
+		}
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
@@ -237,6 +256,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			float f = MC.player.distanceTo(e) / 20F;
 			float r = MathHelper.clamp(2 - f, 0, 1);
 			float g = MathHelper.clamp(f, 0, 1);
+			
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
