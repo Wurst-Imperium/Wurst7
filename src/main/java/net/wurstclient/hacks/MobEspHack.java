@@ -59,10 +59,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		"Renders a colored box within the target, inversely proportional to its remaining health.",
 		true);
 	
-	private final CheckboxSetting monoCrome = new CheckboxSetting(
+	private final CheckboxSetting monocromeColor = new CheckboxSetting(
 		"Monochrome color",
 		"Renders all mobs in the selected color",
-		true);
+		false);
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each mob.\n"
@@ -96,7 +96,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
 	private VertexBuffer mobBox;
-	public LivingEntity le;
 	
 	public MobEspHack()
 	{
@@ -198,9 +197,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		float green = 2 - red;
 		float f = MC.player.distanceTo(e) / 20F;
 		float[] colorF = color.getColorF();
-		le = e;	
 		if(damageIndicator.isChecked()) {
-		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
+		p = (e.getMaxHealth() - e.getHealth()) / e.getMaxHealth();
 		RenderSystem.setShaderColor(red, green, 0, 0.5F);
 		}
 		else {
@@ -229,15 +227,14 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{	
-		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		if(monoChrome.isChecked()) {
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		
+		if(monocromeColor.isChecked()) {
+		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1);
 		}
-		else {
-		RenderSystem.setShaderColor(1, 1, 1, 1);	
-		}
-		
+                
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
