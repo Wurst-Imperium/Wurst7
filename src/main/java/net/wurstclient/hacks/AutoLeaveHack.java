@@ -38,12 +38,13 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		Mode.values(), Mode.QUIT);
 	
 	private final CheckboxSetting disableAutoReconnect = new CheckboxSetting(
-		"Disable AutoReconnect", true);
+		"Disable AutoReconnect", "Automatically turns off AutoReconnect when"
+			+ " AutoLeave makes you leave the server.",
+		true);
 	
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
-		
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
@@ -81,10 +82,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// check health
-		if(MC.player.getHealth() > health.getValueF() * 2F)
-			return;
-		
-		if(MC.player.getHealth() <= 0F)
+		float currentHealth = MC.player.getHealth();
+		if(currentHealth <= 0F || currentHealth > health.getValueF() * 2F)
 			return;
 		
 		// leave server
