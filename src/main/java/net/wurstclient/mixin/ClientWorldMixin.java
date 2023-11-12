@@ -7,19 +7,28 @@
  */
 package net.wurstclient.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.Items;
+import net.minecraft.world.GameMode;
 import net.wurstclient.WurstClient;
 
 @Mixin(ClientWorld.class)
 public class ClientWorldMixin
 {
+	@Shadow
+	@Final
+	private MinecraftClient client;
+	
 	/**
 	 * This is the part that makes BarrierESP work.
 	 */
@@ -28,7 +37,13 @@ public class ClientWorldMixin
 		cancellable = true)
 	private void getBlockParticle(CallbackInfoReturnable<Block> cir)
 	{
-		if(WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
-			cir.setReturnValue(Blocks.BARRIER);
+		if(!WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
+			return;
+		
+		if(client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE
+			&& client.player.getMainHandStack().getItem() == Items.LIGHT)
+			return;
+		
+		cir.setReturnValue(Blocks.BARRIER);
 	}
 }
