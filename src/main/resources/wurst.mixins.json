@@ -35,6 +35,7 @@
     "GameMenuScreenMixin",
     "GameRendererMixin",
     "GenericContainerScreenMixin",
+    "HeldItemRendererMixin",
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
