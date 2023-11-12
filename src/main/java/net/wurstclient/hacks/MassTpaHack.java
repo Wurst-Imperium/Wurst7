@@ -20,12 +20,20 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.settings.TextFieldSetting;
 
 @SearchTags({"mass tpa"})
 @DontSaveState
 public final class MassTpaHack extends Hack
 	implements UpdateListener, ChatInputListener
 {
+
+	private final TextFieldSetting commandSetup = new TextFieldSetting(
+			"Type of Teleport Command",
+			"Write down the tpa command statement you want > tpo, tpahere, etc..",
+			"tpa"
+	);
+	
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
 	
@@ -36,6 +44,7 @@ public final class MassTpaHack extends Hack
 	{
 		super("MassTPA");
 		setCategory(Category.CHAT);
+		addSetting(commandSetup);
 	}
 	
 	@Override
@@ -65,9 +74,19 @@ public final class MassTpaHack extends Hack
 		
 		if(players.isEmpty())
 		{
-			ChatUtils.error("Couldn't find any players.");
-			setEnabled(false);
+		   ChatUtils.error("Couldn't find any players.");
+		   setEnabled(false);
 		}
+
+		if (!commandSetup.getValue().contains("tp"))
+		{
+			errorComment("Commands other than tp are not available.");
+		}
+	}
+
+	private void errorComment(String comment) {
+		ChatUtils.error(comment);
+		setEnabled(false);
 	}
 	
 	@Override
@@ -92,7 +111,8 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 		
-		MC.getNetworkHandler().sendChatCommand("tpa " + players.get(index));
+		String commandLabel = this.commandSetup.getValue() + " ";
+ 		MC.getNetworkHandler().sendChatCommand(commandLabel + players.get(index));
 		index++;
 		timer = 20;
 	}
@@ -107,14 +127,14 @@ public final class MassTpaHack extends Hack
 		if(message.contains("/help") || message.contains("permission"))
 		{
 			event.cancel();
-			ChatUtils.error("This server doesn't have TPA.");
+			ChatUtils.message("This server doesn't have " + this.commandSetup.getValue() + ".");
 			setEnabled(false);
 			
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
 			event.cancel();
-			ChatUtils.message("Someone accepted your TPA request. Stopping.");
+			ChatUtils.message("Someone accepted your" + this.commandSetup.getValue() + "request. Stopping.");
 			setEnabled(false);
 		}
 	}
