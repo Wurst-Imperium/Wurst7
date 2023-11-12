@@ -26,13 +26,18 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		Mode.values(), Mode.SIMPLE);
 
 	public final SliderSetting speed = new SliderSetting(
-	"Horizontal Speed", 0.66, 0.4, 20, 0.01, ValueDisplay.DECIMAL);
+	"Horizontal Speed", 0.66, 0.01, 20, 0.01, ValueDisplay.DECIMAL);
+	
+	public final SliderSetting jumpscale = new SliderSetting(
+	"Jump Scale", 0.1, 0, 20, 0.01, ValueDisplay.DECIMAL);
+	
 	public SpeedHackHack()
 	{
 		super("SpeedHack");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(speed);
+		addSetting(jumpscale);
 	}
 	
 	@Override
@@ -57,6 +62,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 
 		// only use SpeedHack when on ground
 		double maxSpeed = speed.getValue();
+		double jumpScale = jumpscale.getValue();
 		Vec3d v = MC.player.getVelocity();
 
 		// activate mini jump if on ground
@@ -65,22 +71,14 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		
 if (mode.getSelected() == Mode.MICROJUMP) {
 			// activate sprint if walking forward
-			if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision && 
-				mode.getSelected() == Mode.MICROJUMP)
-				MC.player.setSprinting(true);
+	
+if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision && mode.getSelected() == Mode.MICROJUMP)
+                        MC.player.setSprinting(true);
 
 			double multiplier = maxSpeed / 0.66 * 1.8;
-
-			MC.player.setVelocity(v.x * multiplier, v.y + 0.1, v.z * multiplier);
-
+			MC.player.setVelocity(v.x * multiplier, v.y + jumpScale, v.z * multiplier);
 			v = MC.player.getVelocity();
-		} else {
-			double multiplier = maxSpeed / 0.66 * 1.8;
-
-			MC.player.setVelocity(v.x * multiplier, v.y, v.z * multiplier);
-
-			v = MC.player.getVelocity();
-		}
+		} 
 		// limit movement speed
 		double currentSpeed = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.z, 2));
 		
