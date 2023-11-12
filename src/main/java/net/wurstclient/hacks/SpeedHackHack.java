@@ -26,7 +26,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		Mode.values(), Mode.SIMPLE);
 
 	public final SliderSetting speed = new SliderSetting(
-	"Horizontal Speed", 0.66, 0.4, 5, 0.01, ValueDisplay.DECIMAL);
+	"Horizontal Speed", 0.66, 0.4, 20, 0.01, ValueDisplay.DECIMAL);
 	public SpeedHackHack()
 	{
 		super("SpeedHack");
