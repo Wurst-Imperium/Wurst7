@@ -49,12 +49,11 @@ public final class AimAssistHack extends Hack
 		"Check line of sight", "Won't aim at entities behind blocks.", true);
 	
 	private final EntityFilterList entityFilters =
-		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+		new EntityFilterList(FilterFlyingSetting.genericCombat(0),
+			FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
-			FilterFlyingSetting.genericCombat(0),
 			FilterHostileSetting.genericCombat(false),
-			FilterNeutralSetting
-				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterNeutralSetting.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericCombat(true),
 			FilterPassiveWaterSetting.genericCombat(true),
 			FilterBabiesSetting.genericCombat(true),
@@ -64,12 +63,9 @@ public final class AimAssistHack extends Hack
 			FilterVillagersSetting.genericCombat(true),
 			FilterZombieVillagersSetting.genericCombat(true),
 			FilterGolemsSetting.genericCombat(false),
-			FilterPiglinsSetting
-				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
-			FilterZombiePiglinsSetting
-				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
-			FilterEndermenSetting
-				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPiglinsSetting.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
 			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
