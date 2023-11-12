@@ -65,7 +65,6 @@ public abstract class BlockMixin implements ItemConvertible
 		if(hax == null || !hax.noFrictionHack.isEnabled())
 			return;
 
-		if(cir.getReturnValueF() < 0.989F)
-			cir.setReturnValue(0.989F);
+                cir.setReturnValue((float)hax.noFrictionHack.friction.getValue());
 	}
 }
