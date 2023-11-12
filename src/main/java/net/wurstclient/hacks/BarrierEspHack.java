@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
@@ -16,6 +17,7 @@ public class BarrierEspHack extends Hack
 	public BarrierEspHack()
 	{
 		super("BarrierESP");
+		setCategory(Category.RENDER);
 	}
 	
 	// See ClientWorldMixin
