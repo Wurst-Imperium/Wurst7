@@ -16,6 +16,10 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.CheckboxSetting;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 @SearchTags({"auto leave", "AutoDisconnect", "auto disconnect", "AutoQuit",
 	"auto quit"})
@@ -35,6 +39,16 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ "\u00a7lSelfHurt\u00a7r mode sends the packet for attacking another player, but with yourself as both the attacker and the target. This causes the server to kick you.\n"
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
+
+	private final CheckboxSetting checkTotems = new CheckboxSetting(
+		"Check totems",
+		"Turn on and off CheckTotems setting.",
+		true);
+	
+	private final SliderSetting totems = new SliderSetting("Totems",
+		"Effectively disables AutoLeave until the number of totems you have is at or below this value.\n",
+		11, 0, 36, 1, ValueDisplay.INTEGER.withSuffix(" totems")
+			.withLabel(11, "unlimited"));
 	
 	public AutoLeaveHack()
 	{
@@ -43,6 +57,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
+		addSetting(checkTotems);
+		addSetting(totems);
 	}
 	
 	@Override
@@ -79,6 +95,11 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		if(MC.player.getHealth() > health.getValueF() * 2F)
 			return;
 		
+                //check totems count
+                if(totems.getValueI() != 11 && countTotems(MC.player.getInventory()) > totems.getValueI() && checkTotems.isChecked())
+			return;
+		
+		
 		// leave server
 		switch(mode.getSelected())
 		{
@@ -104,6 +125,21 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		// disable
 		setEnabled(false);
+	}
+	
+	private int countTotems(PlayerInventory inventory)
+	{
+		int totems = 0;
+
+		for(int slot = 0; slot <= 36; slot++)
+			if(inventory.getStack(slot).getItem() == Items.TOTEM_OF_UNDYING)
+				totems++;
+
+		ItemStack offhandStack = inventory.getStack(40);
+		if(offhandStack.getItem() == Items.TOTEM_OF_UNDYING)
+			totems++;
+
+		return totems;
 	}
 	
 	public static enum Mode
