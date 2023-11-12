@@ -24,8 +24,8 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class JetpackHack extends Hack implements UpdateListener
 {
 	public final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lJump\u00a7r mode use default jump mechanic\n\n",
-		"\u00a7lVelocity\u00a7r mode uses velocity mechanic and help consumes less food\n",
+		"\u00a7lJump\u00a7r mode use default jump mechanic\n\n"
+	        + "\u00a7lVelocity\u00a7r mode uses velocity mechanic and help consumes less food\n",
 		Mode.values(), Mode.JUMP);
 	
 	public final SliderSetting verticalSpeed = new SliderSetting(
