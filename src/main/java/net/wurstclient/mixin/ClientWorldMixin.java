@@ -35,7 +35,7 @@ public class ClientWorldMixin
 	@Inject(at = @At("HEAD"),
 		method = "getBlockParticle()Lnet/minecraft/block/Block;",
 		cancellable = true)
-	private void getBlockParticle(CallbackInfoReturnable<Block> cir)
+	private void onGetBlockParticle(CallbackInfoReturnable<Block> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
 			return;
