@@ -31,6 +31,8 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 	{
 		super("SpeedHack");
 		setCategory(Category.MOVEMENT);
+		addSetting(mode);
+		addSetting(speed);
 	}
 	
 	@Override
