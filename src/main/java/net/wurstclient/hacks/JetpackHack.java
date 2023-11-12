@@ -7,12 +7,16 @@
  */
 package net.wurstclient.hacks;
 
+import java.lang.Math;
+
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.network.ClientPlayerEntity;
+
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
@@ -20,14 +24,18 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class JetpackHack extends Hack implements UpdateListener
 {
 	public final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lJump\u00a7r mode is default jetpack setting \n\n",
+		"\u00a7lJump\u00a7r mode use default jump mechanic\n\n",
 		"\u00a7lVelocity\u00a7r mode uses velocity mechanic and help consumes less food\n",
 		Mode.values(), Mode.JUMP);
 	
 	public final SliderSetting verticalSpeed = new SliderSetting(
 		"Vertical Speed",
 		"The default 0.42 is vanilla jump speed",
-		0.42, 0.05, 4, 0.01, ValueDisplay.DECIMAL);
+		0.42, 0, 5, 0.01, ValueDisplay.DECIMAL);
+	public final SliderSetting horizontalSpeed = new SliderSetting(
+		"Horizontal Speed",
+		"The default 0.2 is vanilla jump horizontal speed",
+		0.2, 0, 5, 0.01, ValueDisplay.DECIMAL);
 	
 	public JetpackHack()
 	{
@@ -35,6 +43,7 @@ public final class JetpackHack extends Hack implements UpdateListener
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
 		addSetting(verticalSpeed);
+		addSetting(horizontalSpeed);
 	}
 	
 	@Override
@@ -52,16 +61,24 @@ public final class JetpackHack extends Hack implements UpdateListener
 		EVENTS.remove(UpdateListener.class, this);
 	}
 	
-	@Overridew
+	@Override
 	public void onUpdate()
 	{
 		if (mode.getSelected() == Mode.VELOCITY) {
 			
 		ClientPlayerEntity player = MC.player;
 		Vec3d velocity = player.getVelocity();
-		if((player.isFallFlying() || velocity.y != 0) && MC.options.jumpKey.isPressed())
-		player.setVelocity(velocity.x, verticalSpeed.getValue(), velocity.z);
-			
+
+		if((player.isFallFlying() || velocity.y != 0) && MC.options.jumpKey.isPressed()) {
+			if (MC.options.sprintKey.isPressed()) {
+				double yaw = -Math.toRadians(player.getYaw()) - (Math.PI/2);
+				double velx = velocity.x + ((float)Math.cos(yaw) * horizontalSpeed.getValue());
+				double velz = velocity.z - ((float)Math.sin(yaw) * horizontalSpeed.getValue());
+				player.setVelocity(velx, verticalSpeed.getValue(), velz);
+			} else {
+				player.setVelocity(velocity.x, verticalSpeed.getValue(), velocity.z);
+			}
+		     }	
 		}
 		else {
 		if(MC.options.jumpKey.isPressed())
