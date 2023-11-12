@@ -71,14 +71,17 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		
 if (mode.getSelected() == Mode.MICROJUMP) {
 			// activate sprint if walking forward
-	
 if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision && mode.getSelected() == Mode.MICROJUMP)
                         MC.player.setSprinting(true);
 
 			double multiplier = maxSpeed / 0.66 * 1.8;
 			MC.player.setVelocity(v.x * multiplier, v.y + jumpScale, v.z * multiplier);
 			v = MC.player.getVelocity();
-		} 
+		} else {
+			double multiplier = maxSpeed / 0.66 * 1.8;
+			MC.player.setVelocity(v.x * multiplier, v.y, v.z * multiplier);
+			v = MC.player.getVelocity();
+		}
 		// limit movement speed
 		double currentSpeed = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.z, 2));
 		
