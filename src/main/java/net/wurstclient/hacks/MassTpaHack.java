@@ -80,13 +80,9 @@ public final class MassTpaHack extends Hack
 
 		if (!commandSetup.getValue().contains("tp"))
 		{
-			errorComment("Commands other than tp are not available.");
+			ChatUtils.error("Commands other than tp are not available.");
+			setEnabled(false);
 		}
-	}
-
-	private void errorComment(String comment) {
-		ChatUtils.error(comment);
-		setEnabled(false);
 	}
 	
 	@Override
@@ -127,14 +123,14 @@ public final class MassTpaHack extends Hack
 		if(message.contains("/help") || message.contains("permission"))
 		{
 			event.cancel();
-			ChatUtils.message("This server doesn't have " + this.commandSetup.getValue() + ".");
+			ChatUtils.error("This server doesn't have " + this.commandSetup.getValue() + ".");
 			setEnabled(false);
 			
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
 			event.cancel();
-			ChatUtils.message("Someone accepted your" + this.commandSetup.getValue() + "request. Stopping.");
+			ChatUtils.error("Someone accepted your" + this.commandSetup.getValue() + "request. Stopping.");
 			setEnabled(false);
 		}
 	}
