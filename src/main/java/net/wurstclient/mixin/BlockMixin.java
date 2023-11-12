@@ -56,4 +56,16 @@ public abstract class BlockMixin implements ItemConvertible
 		if(cir.getReturnValueF() < 1)
 			cir.setReturnValue(1F);
 	}
+	
+	@Inject(at = {@At("HEAD")},
+		method = {"getSlipperiness()F"},
+		cancellable = true)
+	private void onGetSlipperiness(CallbackInfoReturnable<Float> cir) {
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.noFrictionHack.isEnabled())
+			return;
+
+		if(cir.getReturnValueF() < 0.989F)
+			cir.setReturnValue(0.989F);
+	}
 }
