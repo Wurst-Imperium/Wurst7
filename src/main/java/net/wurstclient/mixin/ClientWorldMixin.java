@@ -39,7 +39,9 @@ public class ClientWorldMixin
 	{
 		if(!WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
 			return;
-		
+			
+		// Pause BarrierESP when holding a light in Creative Mode, since it
+		// would otherwise prevent the player from seeing light blocks.
 		if(client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE
 			&& client.player.getMainHandStack().getItem() == Items.LIGHT)
 			return;
