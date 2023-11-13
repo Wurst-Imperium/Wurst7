@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.StringHelper;
@@ -27,15 +28,20 @@ import net.wurstclient.util.ChatUtils;
 public final class MassTpaHack extends Hack
 	implements UpdateListener, ChatInputListener
 {
-	private final TextFieldSetting commandSetup = new TextFieldSetting(
-			"Type of Teleport Command",
-			"Write down the tpa command statement you want > tpo, tpahere, etc..",
-			"tpa"
-	);
-
+	private static final Pattern ALLOWED_COMMANDS =
+		Pattern.compile("^/+[a-zA-Z0-9_\\-]+$");
+	
+	private final TextFieldSetting commandSetting =
+		new TextFieldSetting("Command",
+			"The command to use for teleporting.\n"
+				+ "Examples: /tp, /tpa, /tpahere, /tpo",
+			"/tpa",
+			s -> s.length() < 64 && ALLOWED_COMMANDS.matcher(s).matches());
+	
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
 	
+	private String command;
 	private int index;
 	private int timer;
 	
@@ -43,18 +49,22 @@ public final class MassTpaHack extends Hack
 	{
 		super("MassTPA");
 		setCategory(Category.CHAT);
-		addSetting(commandSetup);
+		addSetting(commandSetting);
 	}
 	
 	@Override
 	public void onEnable()
 	{
+		// reset state
+		players.clear();
 		index = 0;
 		timer = -1;
 		
-		players.clear();
-		String playerName = MC.getSession().getUsername();
+		// cache command in case the setting is changed mid-run
+		command = commandSetting.getValue().substring(1);
 		
+		// collect player names
+		String playerName = MC.getSession().getUsername();
 		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
 		{
 			String name = info.getProfile().getName();
@@ -65,7 +75,7 @@ public final class MassTpaHack extends Hack
 			
 			players.add(name);
 		}
-
+		
 		Collections.shuffle(players, random);
 		
 		EVENTS.add(ChatInputListener.class, this);
@@ -73,20 +83,11 @@ public final class MassTpaHack extends Hack
 		
 		if(players.isEmpty())
 		{
-			errorComment("Couldn't find any players.");
-		}
-
-		if (!commandSetup.getValue().contains("tp"))
-		{
-			errorComment("Commands other than tp are not available.");
+			ChatUtils.error("Couldn't find any players.");
+			setEnabled(false);
 		}
 	}
-
-	private void errorComment(String comment) {
-		ChatUtils.error(comment);
-		setEnabled(false);
-	}
-
+	
 	@Override
 	public void onDisable()
 	{
@@ -108,14 +109,14 @@ public final class MassTpaHack extends Hack
 			setEnabled(false);
 			return;
 		}
-
-		String commandLabel = this.commandSetup.getValue() + " ";
- 		MC.getNetworkHandler().sendChatCommand(commandLabel + players.get(index));
-
+		
+		MC.getNetworkHandler()
+			.sendChatCommand(command + " " + players.get(index));
+		
 		index++;
 		timer = 20;
 	}
-
+	
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
@@ -126,19 +127,17 @@ public final class MassTpaHack extends Hack
 		if(message.contains("/help") || message.contains("permission"))
 		{
 			event.cancel();
-			sendChatting("This server doesn't have " + this.commandSetup.getValue() + ".");
+			ChatUtils.error("This server doesn't have a "
+				+ command.toUpperCase() + " command.");
 			setEnabled(false);
 			
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
 			event.cancel();
-			sendChatting("Someone accepted. Stopping.");
+			ChatUtils.message("Someone accepted your " + command.toUpperCase()
+				+ " request. Stopping.");
 			setEnabled(false);
 		}
-	}
-
-	private void sendChatting(String comment) {
-		ChatUtils.error(comment);
 	}
 }
