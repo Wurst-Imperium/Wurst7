@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,10 +17,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
@@ -28,7 +28,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IArmorItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -176,9 +175,8 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)((IArmorItem)item).getToughness();
-		int armorType =
-			item.getMaterial().getProtectionAmount(EquipmentSlot.LEGS);
+		int armorToughness = (int)item.toughness;
+		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
@@ -186,7 +184,8 @@ public final class AutoArmorHack extends Hack
 			int prtLvl = EnchantmentHelper.getLevel(protection, stack);
 			
 			ClientPlayerEntity player = MC.player;
-			DamageSource dmgSource = DamageSource.player(player);
+			DamageSource dmgSource =
+				player.getDamageSources().playerAttack(player);
 			prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
 		}
 		

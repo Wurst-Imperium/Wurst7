@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.passive.GolemEntity;
 
 public final class FilterGolemsSetting extends EntityFilterCheckbox
@@ -20,12 +21,18 @@ public final class FilterGolemsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof GolemEntity);
+		return !(e instanceof GolemEntity) || e instanceof ShulkerEntity;
 	}
 	
 	public static FilterGolemsSetting genericCombat(boolean checked)
 	{
 		return new FilterGolemsSetting(
-			"Won't attack iron golems, snow golems and shulkers.", checked);
+			"Won't attack iron golems and snow golems.", checked);
+	}
+	
+	public static FilterGolemsSetting genericVision(boolean checked)
+	{
+		return new FilterGolemsSetting(
+			"Won't show iron golems and snow golems.", checked);
 	}
 }

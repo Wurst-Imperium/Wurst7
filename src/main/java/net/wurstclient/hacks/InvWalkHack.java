@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -93,7 +93,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 			keys.add(MC.options.jumpKey);
 		
 		for(KeyBinding key : keys)
-			key.setPressed(((IKeyBinding)key).isActallyPressed());
+			((IKeyBinding)key).resetPressedState();
 	}
 	
 	private boolean isAllowedScreen(Screen screen)
@@ -117,13 +117,13 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		if(!(screen instanceof CreativeInventoryScreen))
 			return false;
 		
-		CreativeInventoryScreen crInvScreen = (CreativeInventoryScreen)screen;
-		return crInvScreen.getSelectedTab() == ItemGroup.SEARCH.getIndex();
+		return CreativeInventoryScreen.selectedTab == ItemGroups
+			.getSearchGroup();
 	}
 	
 	private boolean hasTextBox(Screen screen)
 	{
 		return screen.children().stream()
-			.anyMatch(e -> e instanceof TextFieldWidget);
+			.anyMatch(TextFieldWidget.class::isInstance);
 	}
 }

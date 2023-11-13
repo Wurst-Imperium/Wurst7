@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,11 +18,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -94,7 +92,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// wait for right click timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// get valid blocks
@@ -185,7 +183,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range + 0.5, 2);
 		int rangeI = (int)Math.ceil(range);
 		
-		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
@@ -210,16 +208,16 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			return false;
 		
 		if(block instanceof SaplingBlock
-			&& ((SaplingBlock)block).isFertilizable(world, pos, state, true))
+			&& ((SaplingBlock)block).isFertilizable(world, pos, state))
 			return saplings.isChecked();
 		if(block instanceof CropBlock
-			&& ((CropBlock)block).isFertilizable(world, pos, state, true))
+			&& ((CropBlock)block).isFertilizable(world, pos, state))
 			return crops.isChecked();
 		if(block instanceof StemBlock
-			&& ((StemBlock)block).isFertilizable(world, pos, state, true))
+			&& ((StemBlock)block).isFertilizable(world, pos, state))
 			return stems.isChecked();
 		if(block instanceof CocoaBlock
-			&& ((CocoaBlock)block).isFertilizable(world, pos, state, true))
+			&& ((CocoaBlock)block).isFertilizable(world, pos, state))
 			return cocoa.isChecked();
 		return other.isChecked();
 	}
@@ -244,11 +242,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 				continue;
 			
 			// check line of sight
-			if(MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(!BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -257,7 +251,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			// place block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			
 			return true;
 		}

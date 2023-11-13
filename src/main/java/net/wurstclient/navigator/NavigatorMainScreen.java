@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,12 +10,14 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -25,7 +27,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -70,10 +71,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		searchBar.setMaxLength(128);
 		
 		addSelectableChild(searchBar);
-		setInitialFocus(searchBar);
-		searchBar.setTextFieldFocused(true);
+		setFocused(searchBar);
+		searchBar.setFocused(true);
 		
-		searchBar.x = middleX - 100;
+		searchBar.setX(middleX - 100);
 		setContentHeight(navigatorDisplayList.size() / 3 * 20);
 	}
 	
@@ -188,8 +189,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	@Override
 	protected void onUpdate()
 	{
-		searchBar.tick();
-		
 		String newText = searchBar.getText();
 		if(clickTimer == -1 && !newText.equals(lastSearchText))
 		{
@@ -227,9 +226,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(MatrixStack matrixStack, int mouseX, int mouseY,
+	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		float[] acColor = gui.getAcColor();
@@ -241,9 +241,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// search bar
 		if(!clickTimerRunning)
 		{
-			WurstClient.MC.textRenderer.drawWithShadow(matrixStack, "Search: ",
+			RenderSystem.setShaderColor(1, 1, 1, 1);
+			context.drawTextWithShadow(WurstClient.MC.textRenderer, "Search: ",
 				middleX - 150, 32, txtColor);
-			searchBar.render(matrixStack, mouseX, mouseY, partialTicks);
+			searchBar.render(context, mouseX, mouseY, partialTicks);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 		
@@ -266,8 +267,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(featureY > height - 40)
 				break;
 			
-			renderFeature(matrixStack, mouseX, mouseY, partialTicks, i,
-				featureX, featureY);
+			renderFeature(context, mouseX, mouseY, partialTicks, i, featureX,
+				featureY);
 		}
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -276,13 +277,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(tooltip != null)
 		{
 			String[] lines = tooltip.split("\n");
-			TextRenderer fr = client.textRenderer;
+			TextRenderer tr = client.textRenderer;
 			
 			int tw = 0;
-			int th = lines.length * fr.fontHeight;
+			int th = lines.length * tr.fontHeight;
 			for(String line : lines)
 			{
-				int lw = fr.getWidth(line);
+				int lw = tr.getWidth(line);
 				if(lw > tw)
 					tw = lw;
 			}
@@ -297,7 +298,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// background
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -322,16 +323,19 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
 			tessellator.draw();
 			
+			RenderSystem.setShaderColor(1, 1, 1, 1);
+			
 			// text
 			for(int i = 0; i < lines.length; i++)
-				fr.draw(matrixStack, lines[i], xt1 + 2,
-					yt1 + 1 + i * fr.fontHeight, txtColor);
+				context.drawText(tr, lines[i], xt1 + 2,
+					yt1 + 2 + i * tr.fontHeight, txtColor, false);
 		}
 	}
 	
-	private void renderFeature(MatrixStack matrixStack, int mouseX, int mouseY,
+	private void renderFeature(DrawContext context, int mouseX, int mouseY,
 		float partialTicks, int i, int x, int y)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		float[] bgColor = gui.getBgColor();
 		int txtColor = gui.getTxtColor();
@@ -417,7 +421,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
@@ -466,10 +470,11 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// text
 		if(!clickTimerRunning)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
-			client.textRenderer.draw(matrixStack, buttonText, area.x + 4,
-				area.y + 4, txtColor);
+			context.drawText(client.textRenderer, buttonText, area.x + 4,
+				area.y + 4, txtColor, false);
 			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}

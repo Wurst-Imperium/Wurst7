@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,23 +14,23 @@ import net.wurstclient.event.Listener;
 
 public interface HitResultRayTraceListener extends Listener
 {
-	public void onHitResultRayTrace(float float_1);
+	public void onHitResultRayTrace(float partialTicks);
 	
 	public static class HitResultRayTraceEvent
 		extends Event<HitResultRayTraceListener>
 	{
-		private float float_1;
+		private float partialTicks;
 		
-		public HitResultRayTraceEvent(float float_1)
+		public HitResultRayTraceEvent(float partialTicks)
 		{
-			this.float_1 = float_1;
+			this.partialTicks = partialTicks;
 		}
 		
 		@Override
 		public void fire(ArrayList<HitResultRayTraceListener> listeners)
 		{
 			for(HitResultRayTraceListener listener : listeners)
-				listener.onHitResultRayTrace(float_1);
+				listener.onHitResultRayTrace(partialTicks);
 		}
 		
 		@Override

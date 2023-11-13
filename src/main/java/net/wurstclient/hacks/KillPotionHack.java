@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -107,15 +107,15 @@ public final class KillPotionHack extends Hack
 			ItemStack stack = new ItemStack(item);
 			
 			NbtCompound effect = new NbtCompound();
-			effect.putInt("Amplifier", 125);
-			effect.putInt("Duration", 2000);
-			effect.putInt("Id", 6);
+			effect.putInt("amplifier", 125);
+			effect.putInt("duration", 2000);
+			effect.putString("id", "instant_health");
 			
 			NbtList effects = new NbtList();
 			effects.add(effect);
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("custom_potion_effects", effects);
 			stack.setNbt(nbt);
 			
 			String name =

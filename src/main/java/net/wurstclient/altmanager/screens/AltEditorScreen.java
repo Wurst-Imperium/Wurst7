@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,6 +19,7 @@ import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -27,6 +28,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -40,7 +43,6 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;
@@ -70,31 +72,38 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
-		addDrawableChild(doneButton =
-			new ButtonWidget(width / 2 - 100, height / 4 + 72 + 12, 200, 20,
-				Text.literal(getDoneButtonText()), b -> pressDoneButton()));
+		addDrawableChild(doneButton = ButtonWidget
+			.builder(Text.literal(getDoneButtonText()), b -> pressDoneButton())
+			.dimensions(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
+			.build());
 		
-		addDrawableChild(
-			new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20,
-				Text.literal("Cancel"), b -> client.setScreen(prevScreen)));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
+			.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+			.build());
 		
-		addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12,
-			200, 20, Text.literal("Random Name"),
-			b -> nameOrEmailBox.setText(NameGenerator.generateName())));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Random Name"),
+				b -> nameOrEmailBox.setText(NameGenerator.generateName()))
+			.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
+			.build());
 		
-		addDrawableChild(stealSkinButton =
-			new ButtonWidget(width - (width / 2 - 100) / 2 - 64, height - 32,
-				128, 20, Text.literal("Steal Skin"),
-				b -> message = stealSkin(getNameOrEmail())));
+		addDrawableChild(stealSkinButton = ButtonWidget
+			.builder(Text.literal("Steal Skin"),
+				b -> message = stealSkin(getNameOrEmail()))
+			.dimensions(width - (width / 2 - 100) / 2 - 64, height - 32, 128,
+				20)
+			.build());
 		
-		addDrawableChild(
-			new ButtonWidget((width / 2 - 100) / 2 - 64, height - 32, 128, 20,
-				Text.literal("Open Skin Folder"), b -> openSkinFolder()));
+		addDrawableChild(ButtonWidget
+			.builder(Text.literal("Open Skin Folder"), b -> openSkinFolder())
+			.dimensions((width / 2 - 100) / 2 - 64, height - 32, 128, 20)
+			.build());
 		
 		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
 			200, 20, Text.literal(""));
 		nameOrEmailBox.setMaxLength(48);
-		nameOrEmailBox.setTextFieldFocused(true);
+		nameOrEmailBox.setFocused(true);
 		nameOrEmailBox.setText(getDefaultNameOrEmail());
 		addSelectableChild(nameOrEmailBox);
 		
@@ -110,7 +119,7 @@ public abstract class AltEditorScreen extends Screen
 		passwordBox.setMaxLength(256);
 		addSelectableChild(passwordBox);
 		
-		setInitialFocus(nameOrEmailBox);
+		setFocused(nameOrEmailBox);
 	}
 	
 	private void openSkinFolder()
@@ -135,9 +144,6 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void tick()
 	{
-		nameOrEmailBox.tick();
-		passwordBox.tick();
-		
 		String nameOrEmail = nameOrEmailBox.getText().trim();
 		boolean alex = nameOrEmail.equalsIgnoreCase("Alexander01998");
 		
@@ -335,39 +341,40 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
-		AltRenderer.drawAltBack(matrixStack, nameOrEmailBox.getText(),
+		AltRenderer.drawAltBack(context, nameOrEmailBox.getText(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(matrixStack, nameOrEmailBox.getText(),
+		AltRenderer.drawAltBody(context, nameOrEmailBox.getText(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		// text
-		drawStringWithShadow(matrixStack, textRenderer,
-			"Name (for cracked alts), or", width / 2 - 100, 37, 10526880);
-		drawStringWithShadow(matrixStack, textRenderer,
-			"E-Mail (for premium alts)", width / 2 - 100, 47, 10526880);
-		drawStringWithShadow(matrixStack, textRenderer,
+		context.drawTextWithShadow(textRenderer, "Name (for cracked alts), or",
+			width / 2 - 100, 37, 10526880);
+		context.drawTextWithShadow(textRenderer, "E-Mail (for premium alts)",
+			width / 2 - 100, 47, 10526880);
+		context.drawTextWithShadow(textRenderer,
 			"Password (leave blank for cracked alts)", width / 2 - 100, 87,
 			10526880);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			drawCenteredText(matrixStack, textRenderer, lines[i], width / 2,
-				142 + 10 * i, 16777215);
+			context.drawCenteredTextWithShadow(textRenderer, lines[i],
+				width / 2, 142 + 10 * i, 16777215);
 		
 		// text boxes
-		nameOrEmailBox.render(matrixStack, mouseX, mouseY, partialTicks);
-		passwordBox.render(matrixStack, mouseX, mouseY, partialTicks);
+		nameOrEmailBox.render(context, mouseX, mouseY, partialTicks);
+		passwordBox.render(context, mouseX, mouseY, partialTicks);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -390,7 +397,8 @@ public abstract class AltEditorScreen extends Screen
 			errorTimer--;
 		}
 		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

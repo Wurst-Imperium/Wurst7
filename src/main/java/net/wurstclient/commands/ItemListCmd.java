@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.item.Item;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
@@ -86,7 +86,7 @@ public final class ItemListCmd extends Command
 			throw new CmdSyntaxError(
 				"\"" + inputItemName + "\" is not a valid item.");
 		
-		String itemName = Registry.ITEM.getId(item).toString();
+		String itemName = Registries.ITEM.getId(item).toString();
 		int index = Collections.binarySearch(setting.getItemNames(), itemName);
 		if(index >= 0)
 			throw new CmdError(feature.getName() + " " + setting.getName()
@@ -107,7 +107,7 @@ public final class ItemListCmd extends Command
 			throw new CmdSyntaxError(
 				"\"" + inputItemName + "\" is not a valid item.");
 		
-		String itemName = Registry.ITEM.getId(item).toString();
+		String itemName = Registries.ITEM.getId(item).toString();
 		int index = Collections.binarySearch(setting.getItemNames(), itemName);
 		if(index < 0)
 			throw new CmdError(feature.getName() + " " + setting.getName()

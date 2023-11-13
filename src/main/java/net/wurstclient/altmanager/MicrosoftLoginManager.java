@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 package net.wurstclient.altmanager;
 
 import java.io.BufferedReader;
@@ -23,7 +30,7 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.util.Session;
+import net.minecraft.client.session.Session;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -143,8 +150,13 @@ public enum MicrosoftLoginManager
 		{
 			URLConnection connection = LOGIN_URL.openConnection();
 			
-			System.out.println("Getting login cookie...");
-			cookie = connection.getHeaderField("set-cookie");
+			System.out.println("Getting login cookies...");
+			cookie = "";
+			for(String c : connection.getHeaderFields().get("Set-Cookie"))
+			{
+				String cookieTrimmed = c.substring(0, c.indexOf(";") + 1);
+				cookie += cookieTrimmed;
+			}
 			
 			System.out.println("Downloading login page...");
 			loginWebpage = downloadData(connection);

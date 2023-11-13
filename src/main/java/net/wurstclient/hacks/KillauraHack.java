@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.lwjgl.opengl.GL11;
 
@@ -21,10 +20,10 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -38,7 +37,9 @@ import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -73,6 +74,12 @@ public final class KillauraHack extends Hack
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(true);
 	
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"Ensures that you don't reach through blocks when attacking.\n\n"
+				+ "Slower but can help with anti-cheat plugins.",
+			false);
+	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
 	
@@ -90,6 +97,7 @@ public final class KillauraHack extends Hack
 		addSetting(fov);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
+		addSetting(checkLOS);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -98,6 +106,7 @@ public final class KillauraHack extends Hack
 	protected void onEnable()
 	{
 		// disable other killauras
+		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
 		WURST.getHax().fightBotHack.setEnabled(false);
@@ -134,19 +143,9 @@ public final class KillauraHack extends Hack
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		ClientPlayerEntity player = MC.player;
-		
+		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof EndCrystalEntity)
-				.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-				.filter(e -> e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> !WURST.getFriends().contains(e.getEntityName()));
+		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
@@ -161,8 +160,14 @@ public final class KillauraHack extends Hack
 		
 		WURST.getHax().autoSwordHack.setSlot();
 		
-		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+		Vec3d hitVec = target.getBoundingBox().getCenter();
+		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
+		{
+			target = null;
+			return;
+		}
+		
+		WURST.getRotationFaker().faceVectorPacket(hitVec);
 	}
 	
 	@Override
@@ -189,16 +194,13 @@ public final class KillauraHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -207,15 +209,10 @@ public final class KillauraHack extends Hack
 		float red = p * 2F;
 		float green = 2 - red;
 		
-		matrixStack.translate(
-			renderTarget.prevX
-				+ (renderTarget.getX() - renderTarget.prevX) * partialTicks
-				- regionX,
-			renderTarget.prevY
-				+ (renderTarget.getY() - renderTarget.prevY) * partialTicks,
-			renderTarget.prevZ
-				+ (renderTarget.getZ() - renderTarget.prevZ) * partialTicks
-				- regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
+		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
 			renderTarget.getWidth());
@@ -228,7 +225,7 @@ public final class KillauraHack extends Hack
 			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);
@@ -242,7 +239,6 @@ public final class KillauraHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private enum Priority
