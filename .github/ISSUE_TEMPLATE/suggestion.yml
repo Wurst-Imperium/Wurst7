@@ -1,0 +1,62 @@
+name: Suggestion
+description: "Suggest a change to improve the Wurst Client"
+labels: ["type:enhancement", "status:unconfirmed"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## Welcome!
+      Please fill out the following template to help us understand the improvement you're suggesting.
+- type: checkboxes
+  id: checklist
+  attributes:
+    label: Pre-suggestion checklist
+    description: "Please select all that apply."
+    options:
+      - label: "I have searched existing issues and didn't find any previous issues with the same suggestion."
+      - label: "This is only one suggestion. I understand that GitHub issues don't work well with lists."
+      - label: "This feature doesn't already exist in the latest version of Wurst. I've made sure my installation is up to date."
+      - label: "I have looked at the code and am reasonably confident that this suggestion is possible to implement."
+- type: dropdown
+  id: type
+  attributes:
+    label: What type of improvement are you suggesting?
+    multiple: true
+    options:
+      - "Adding a new hack."
+      - "Adding a new chat command."
+      - "Adding a different kind of feature."
+      - "Changing the settings of existing features."
+      - "Porting existing features to a different Minecraft version."
+      - "Turning a Wurst feature into a standalone mod."
+      - "Removing an old feature that doesn't work anymore."
+      - "Other (please explain in description)"
+  validations:
+    required: true
+- type: dropdown
+  id: target-audience
+  attributes:
+    label: What type of player would find this improvement useful?
+    multiple: true
+    options:
+      - "Builders"
+      - "Miners"
+      - "Griefers"
+      - "PVPers"
+      - "Redstoners"
+      - "Anarchy/faction players"
+      - "Other (please explain in description)"
+  validations:
+    required: true
+- type: textarea
+  id: description
+  attributes:
+    label: Description
+    description: "Please describe the improvement in as much detail as possible. What does it do and how is it useful? Assume that we have never heard of it before, even if it exists in other hacked clients."
+  validations:
+    required: true
+- type: markdown
+  attributes:
+    value: |
+      ## Thank you!
+      We appreciate your help in improving Wurst Client by suggesting this improvement. Please make sure you have filled out all the necessary information before submitting this issue.
