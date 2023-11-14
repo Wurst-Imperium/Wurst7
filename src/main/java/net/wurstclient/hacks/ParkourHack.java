@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,21 +7,32 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.stream.Stream;
-
 import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 public final class ParkourHack extends Hack implements UpdateListener
 {
+	private final SliderSetting minDepth = new SliderSetting("Min depth",
+		"Won't jump over a pit if it isn't at least this deep.\n"
+			+ "Increase to stop Parkour from jumping down stairs.\n"
+			+ "Decrease to make Parkour jump at the edge of carpets.",
+		0.5, 0.05, 10, 0.05, ValueDisplay.DECIMAL.withSuffix("m"));
+	
+	private final SliderSetting edgeDistance =
+		new SliderSetting("Edge distance",
+			"How close Parkour will let you get to the edge before jumping.",
+			0.001, 0.001, 0.25, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
+	
 	public ParkourHack()
 	{
 		super("Parkour");
-		
 		setCategory(Category.MOVEMENT);
+		addSetting(minDepth);
+		addSetting(edgeDistance);
 	}
 	
 	@Override
@@ -47,12 +58,10 @@ public final class ParkourHack extends Hack implements UpdateListener
 			return;
 		
 		Box box = MC.player.getBoundingBox();
-		Box adjustedBox = box.offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
+		Box adjustedBox = box.stretch(0, -minDepth.getValue(), 0)
+			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
-		Stream<VoxelShape> blockCollisions =
-			IMC.getWorld().getBlockCollisionsStream(MC.player, adjustedBox);
-		
-		if(blockCollisions.findAny().isPresent())
+		if(!MC.world.isSpaceEmpty(MC.player, adjustedBox))
 			return;
 		
 		MC.player.jump();

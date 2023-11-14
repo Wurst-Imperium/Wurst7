@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,21 +25,17 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class FullbrightHack extends Hack implements UpdateListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
-		"\u00a7lGamma\u00a7r works by setting your brightness slider\n"
-			+ "beyond 100%. Incompatible with shader packs.\n\n"
-			+ "\u00a7lNight Vision\u00a7r works by applying the night\n"
-			+ "vision effect. This \u00a7ousually\u00a7r works with\n"
-			+ "shader packs.",
+		"\u00a7lGamma\u00a7r works by setting your brightness slider beyond 100%. Incompatible with shader packs.\n\n"
+			+ "\u00a7lNight Vision\u00a7r works by applying the night vision effect. This \u00a7ousually\u00a7r works with shader packs.",
 		Method.values(), Method.GAMMA);
 	
 	private final CheckboxSetting fade = new CheckboxSetting("Fade",
 		"Slowly fades between brightness and darkness.", true);
 	
-	private final SliderSetting defaultGamma =
-		new SliderSetting("Default brightness",
-			"Fullbright will set your brightness slider\n"
-				+ "back to this value when you turn it off.",
-			0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+	private final SliderSetting defaultGamma = new SliderSetting(
+		"Default brightness",
+		"Fullbright will set your brightness slider back to this value when you turn it off.",
+		0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private boolean wasGammaChanged;
 	private float nightVisionStrength;
@@ -103,9 +99,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		wasGammaChanged = true;
 		
 		SimpleOption<Double> gammaOption = MC.options.getGamma();
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption2 =
-			(ISimpleOption<Double>)(Object)gammaOption;
+		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
 		double oldGammaValue = gammaOption.getValue();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -123,9 +117,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	private void resetGamma(double target)
 	{
 		SimpleOption<Double> gammaOption = MC.options.getGamma();
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption2 =
-			(ISimpleOption<Double>)(Object)gammaOption;
+		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
 		double oldGammaValue = gammaOption.getValue();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -171,6 +163,15 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		return nightVisionStrength;
 	}
 	
+	/**
+	 * Returns the value of Fullbright's "Default brightness" slider. Used by
+	 * {@link XRayHack} to restore the gamma value when X-Ray is turned off.
+	 */
+	public double getDefaultGamma()
+	{
+		return defaultGamma.getValue();
+	}
+	
 	private static enum Method
 	{
 		GAMMA("Gamma"),
@@ -189,4 +190,6 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			return name;
 		}
 	}
+	
+	// See ClientPlayerEntityMixin.hasStatusEffect()
 }

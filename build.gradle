@@ -1,7 +1,15 @@
+buildscript {
+	dependencies {
+		classpath 'org.kohsuke:github-api:1.135'
+	}
+}
+
 plugins {
-	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
+
+def ENV = System.getenv()
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
@@ -36,9 +44,13 @@ dependencies {
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
+}
+
 processResources {
 	inputs.property "version", project.version
-  
+	
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
@@ -69,7 +81,7 @@ publishing {
 			from components.java
 		}
 	}
-  
+	
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
 		// Add repositories to publish to here.
@@ -79,13 +91,35 @@ publishing {
 	}
 }
 
-afterEvaluate {
-  // Loom 0.11's devlibs folder messes with my other scripts,
-  // so I'm moving these files back to the old location.
-  tasks.named("remapJar") {
-    doLast {
-      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-      ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
-    }
-  }
+task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
+	doLast {
+		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
+		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+	}
+}
+
+import org.kohsuke.github.GHReleaseBuilder
+import org.kohsuke.github.GitHub
+
+task github(dependsOn: moveDevLibs) {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
+		def ghVersion = version.substring(0, version.indexOf("-"))
+		
+		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
+		if(ghRelease == null) {
+			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			ghRelease = releaseBuilder.create()
+		}
+		
+		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
+	}
 }

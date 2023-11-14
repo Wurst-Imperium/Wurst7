@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,19 +10,21 @@ package net.wurstclient.hacks.chestesp;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -32,20 +34,15 @@ public final class ChestEspRenderer
 	private static VertexBuffer outlinedBox;
 	
 	private final MatrixStack matrixStack;
-	private final int regionX;
-	private final int regionZ;
+	private final RegionPos region;
 	private final Vec3d start;
 	
-	public ChestEspRenderer(MatrixStack matrixStack)
+	public ChestEspRenderer(MatrixStack matrixStack, float partialTicks)
 	{
 		this.matrixStack = matrixStack;
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		regionX = (camPos.getX() >> 9) * 512;
-		regionZ = (camPos.getZ() >> 9) * 512;
-		
-		start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos())
-			.subtract(regionX, 0, regionZ);
+		region = RenderUtils.getCameraRegion();
+		start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).subtract(region.toVec3d());
 	}
 	
 	public void renderBoxes(ChestEspGroup group)
@@ -56,15 +53,15 @@ public final class ChestEspRenderer
 		{
 			matrixStack.push();
 			
-			matrixStack.translate(box.minX - regionX, box.minY,
-				box.minZ - regionZ);
+			matrixStack.translate(box.minX - region.x(), box.minY,
+				box.minZ - region.z());
 			
 			matrixStack.scale((float)(box.maxX - box.minX),
 				(float)(box.maxY - box.minY), (float)(box.maxZ - box.minZ));
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
+			ShaderProgram shader = RenderSystem.getShader();
 			
 			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
 			solidBox.bind();
@@ -94,7 +91,7 @@ public final class ChestEspRenderer
 		
 		for(Box box : group.getBoxes())
 		{
-			Vec3d end = box.getCenter().subtract(regionX, 0, regionZ);
+			Vec3d end = box.getCenter().subtract(region.toVec3d());
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
@@ -111,8 +108,8 @@ public final class ChestEspRenderer
 	public static void prepareBuffers()
 	{
 		closeBuffers();
-		solidBox = new VertexBuffer();
-		outlinedBox = new VertexBuffer();
+		solidBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		outlinedBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		RenderUtils.drawSolidBox(box, solidBox);

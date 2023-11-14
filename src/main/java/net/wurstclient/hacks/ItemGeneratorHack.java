@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,9 +12,9 @@ import java.util.Optional;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -27,8 +27,7 @@ import net.wurstclient.util.ChatUtils;
 public final class ItemGeneratorHack extends Hack implements UpdateListener
 {
 	private final SliderSetting speed = new SliderSetting("Speed",
-		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton\n"
-			+ "of lag and can easily crash the game!",
+		"\u00a74\u00a7lWARNING:\u00a7r High speeds will cause a ton of lag and can easily crash the game!",
 		1, 1, 36, 1, ValueDisplay.INTEGER);
 	
 	private final SliderSetting stackSize = new SliderSetting("Stack size",
@@ -73,9 +72,9 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		{
 			// Not sure if it's possible to get an empty optional here,
 			// but if so it will just retry.
-			Optional<RegistryEntry<Item>> optional = Optional.empty();
+			Optional<RegistryEntry.Reference<Item>> optional = Optional.empty();
 			while(optional.isEmpty())
-				optional = Registry.ITEM.getRandom(random);
+				optional = Registries.ITEM.getRandom(random);
 			
 			Item item = optional.get().value();
 			ItemStack stack = new ItemStack(item, stackSize.getValueI());

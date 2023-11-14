@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,18 +12,19 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
+import net.minecraft.item.ToolItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IMiningToolItem;
-import net.wurstclient.mixinterface.ISwordItem;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.ItemUtils;
 
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
@@ -32,13 +33,12 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back", "Switches back to the previously selected slot\n"
-			+ "after \u00a7lRelease time\u00a7r has passed.",
+		"Switch back",
+		"Switches back to the previously selected slot after \u00a7lRelease time\u00a7r has passed.",
 		true);
 	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
-		"Time until AutoSword will switch back from\n"
-			+ "the weapon to the previously selected slot.\n\n"
+		"Time until AutoSword will switch back from the weapon to the previously selected slot.\n\n"
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
 		10, 1, 200, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
@@ -48,7 +48,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	public AutoSwordHack()
 	{
 		super("AutoSword");
-		
 		setCategory(Category.COMBAT);
 		
 		addSetting(priority);
@@ -79,7 +78,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
 			
 			if(entity instanceof LivingEntity
-				&& ((LivingEntity)entity).getHealth() > 0)
+				&& EntityUtils.IS_ATTACKABLE.test(entity))
 				setSlot();
 		}
 		
@@ -145,17 +144,15 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			if(item instanceof SwordItem)
-				return ((ISwordItem)item).fuckMcAfee();
-			if(item instanceof MiningToolItem)
-				return ((IMiningToolItem)item).fuckMcAfee2();
+			if(item instanceof ToolItem tool)
+				return ItemUtils.getAttackSpeed(tool);
 			break;
 			
 			case DAMAGE:
-			if(item instanceof SwordItem)
-				return ((SwordItem)item).getAttackDamage();
-			if(item instanceof MiningToolItem)
-				return ((IMiningToolItem)item).fuckMcAfee1();
+			if(item instanceof SwordItem sword)
+				return sword.getAttackDamage();
+			if(item instanceof MiningToolItem miningTool)
+				return miningTool.getAttackDamage();
 			break;
 		}
 		

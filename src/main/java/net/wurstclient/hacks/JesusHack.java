@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,14 +10,15 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import net.minecraft.block.Material;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -67,8 +68,8 @@ public final class JesusHack extends Hack
 		
 		ClientPlayerEntity player = MC.player;
 		
-		// move up in water
-		if(player.isTouchingWater())
+		// move up in liquid
+		if(player.isTouchingWater() || player.isInLava())
 		{
 			Vec3d velocity = player.getVelocity();
 			player.setVelocity(velocity.x, 0.11, velocity.z);
@@ -155,31 +156,26 @@ public final class JesusHack extends Hack
 	{
 		boolean foundLiquid = false;
 		boolean foundSolid = false;
+		Box box = MC.player.getBoundingBox().offset(0, -0.5, 0);
 		
 		// check collision boxes below player
-		ArrayList<Box> blockCollisions = IMC.getWorld()
-			.getBlockCollisionsStream(MC.player,
-				MC.player.getBoundingBox().offset(0, -0.5, 0))
-			.map(VoxelShape::getBoundingBox)
+		ArrayList<Block> blockCollisions = BlockUtils.getBlockCollisions(box)
+			.map(bb -> BlockUtils.getBlock(BlockPos.ofFloored(bb.getCenter())))
 			.collect(Collectors.toCollection(ArrayList::new));
 		
-		for(Box bb : blockCollisions)
-		{
-			BlockPos pos = new BlockPos(bb.getCenter());
-			Material material = BlockUtils.getState(pos).getMaterial();
-			
-			if(material == Material.WATER || material == Material.LAVA)
+		for(Block block : blockCollisions)
+			if(block instanceof FluidBlock)
 				foundLiquid = true;
-			else if(material != Material.AIR)
+			else if(!(block instanceof AirBlock))
 				foundSolid = true;
-		}
-		
+			
 		return foundLiquid && !foundSolid;
 	}
 	
 	public boolean shouldBeSolid()
 	{
 		return isEnabled() && MC.player != null && MC.player.fallDistance <= 3
-			&& !MC.options.sneakKey.isPressed() && !MC.player.isTouchingWater();
+			&& !MC.options.sneakKey.isPressed() && !MC.player.isTouchingWater()
+			&& !MC.player.isInLava();
 	}
 }

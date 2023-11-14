@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,8 +25,8 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		50, 0.1, ValueDisplay.DECIMAL.withSuffix("x"));
 	
 	private final CheckboxSetting scroll = new CheckboxSetting(
-		"Use mouse wheel", "If enabled, you can use the mouse wheel\n"
-			+ "while zooming to zoom in even further.",
+		"Use mouse wheel",
+		"If enabled, you can use the mouse wheel while zooming to zoom in even further.",
 		true);
 	
 	private Double currentLevel;
@@ -91,6 +91,11 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		
 		currentLevel = MathUtils.clamp(currentLevel, level.getMinimum(),
 			level.getMaximum());
+	}
+	
+	public boolean shouldPreventHotbarScrolling()
+	{
+		return WURST.getZoomKey().isPressed() && scroll.isChecked();
 	}
 	
 	public SliderSetting getLevelSetting()

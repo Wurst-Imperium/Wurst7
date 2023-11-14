@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,12 +10,13 @@ package net.wurstclient.commands;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.ItemUtils;
 
 public final class EnchantCmd extends Command
 {
@@ -34,15 +35,16 @@ public final class EnchantCmd extends Command
 		if(args.length > 1)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = getHeldItem();
-		enchant(stack);
-		
+		enchant(getHeldItem(), 127);
 		ChatUtils.message("Item enchanted.");
 	}
 	
 	private ItemStack getHeldItem() throws CmdError
 	{
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getMainHandStack();
+		
+		if(stack.isEmpty())
+			stack = MC.player.getOffHandStack();
 		
 		if(stack.isEmpty())
 			throw new CmdError("There is no item in your hand.");
@@ -50,23 +52,26 @@ public final class EnchantCmd extends Command
 		return stack;
 	}
 	
-	private void enchant(ItemStack stack)
+	private void enchant(ItemStack stack, int level)
 	{
-		for(Enchantment enchantment : Registry.ENCHANTMENT)
+		for(Enchantment enchantment : Registries.ENCHANTMENT)
 		{
-			if(enchantment == Enchantments.SILK_TOUCH)
-				continue;
-			
+			// Skip curses
 			if(enchantment.isCursed())
 				continue;
 			
+			// Skip Silk Touch so it doesn't remove Fortune
+			if(enchantment == Enchantments.SILK_TOUCH)
+				continue;
+			
+			// Limit Quick Charge to level 5 so it doesn't break
 			if(enchantment == Enchantments.QUICK_CHARGE)
 			{
-				stack.addEnchantment(enchantment, 5);
+				stack.addEnchantment(enchantment, Math.min(level, 5));
 				continue;
 			}
 			
-			stack.addEnchantment(enchantment, 127);
+			ItemUtils.addEnchantment(stack, enchantment, level);
 		}
 	}
 	

@@ -1,8 +1,8 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: Reddit Community
-    url: https://www.reddit.com/r/WurstClient/
+  - name: WurstForum
+    url: https://wurstforum.net/?utm_source=GitHub&utm_medium=Wurst7+repo
     about: For general discussion, support, memes, etc.
   - name: Contact Alexander
-    url: https://www.wurstclient.net/contact/
+    url: https://www.wurstclient.net/contact/?utm_source=GitHub&utm_medium=Wurst7&utm_campaign=Issues&utm_content=Contact+Alexander
     about: For anything that shouldn't be public.

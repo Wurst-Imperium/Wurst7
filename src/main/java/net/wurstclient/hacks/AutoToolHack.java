@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,6 +21,8 @@ import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"auto tool", "AutoSwitch", "auto switch"})
@@ -28,20 +30,20 @@ public final class AutoToolHack extends Hack
 	implements BlockBreakingProgressListener, UpdateListener
 {
 	private final CheckboxSetting useSwords = new CheckboxSetting("Use swords",
-		"Uses swords to break leaves,\n" + "cobwebs, etc.", false);
+		"Uses swords to break leaves, cobwebs, etc.", false);
 	
-	private final CheckboxSetting useHands =
-		new CheckboxSetting(
-			"Use hands", "Uses an empty hand or a\n"
-				+ "non-damageable item when\n" + "no applicable tool is found.",
-			true);
+	private final CheckboxSetting useHands = new CheckboxSetting("Use hands",
+		"Uses an empty hand or a non-damageable item when no applicable tool is found.",
+		true);
 	
-	private final CheckboxSetting repairMode = new CheckboxSetting(
-		"Repair mode", "Won't use tools that are about to break.", false);
+	private final SliderSetting repairMode = new SliderSetting("Repair mode",
+		"Prevents tools from being used when their durability reaches the given threshold, so you can repair them before they break.\n"
+			+ "Can be adjusted from 0 (off) to 100.",
+		0, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back", "After using a tool, automatically switches\n"
-			+ "back to the previously selected slot.",
+		"Switch back",
+		"After using a tool, automatically switches back to the previously selected slot.",
 		true);
 	
 	private int prevSelectedSlot;
@@ -83,7 +85,7 @@ public final class AutoToolHack extends Hack
 			prevSelectedSlot = MC.player.getInventory().selectedSlot;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.isChecked());
+			repairMode.getValueI());
 	}
 	
 	@Override
@@ -104,11 +106,11 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
-			repairMode.isChecked());
+			repairMode.getValueI());
 	}
 	
 	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
-		boolean repairMode)
+		int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		if(player.getAbilities().creativeMode)
@@ -121,7 +123,7 @@ public final class AutoToolHack extends Hack
 			if(!isDamageable(heldItem))
 				return;
 			
-			if(repairMode && isTooDamaged(heldItem))
+			if(isTooDamaged(heldItem, repairMode))
 			{
 				selectFallbackSlot();
 				return;
@@ -136,7 +138,7 @@ public final class AutoToolHack extends Hack
 		player.getInventory().selectedSlot = bestSlot;
 	}
 	
-	private int getBestSlot(BlockPos pos, boolean useSwords, boolean repairMode)
+	private int getBestSlot(BlockPos pos, boolean useSwords, int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		PlayerInventory inventory = player.getInventory();
@@ -144,6 +146,8 @@ public final class AutoToolHack extends Hack
 		
 		BlockState state = BlockUtils.getState(pos);
 		float bestSpeed = getMiningSpeed(heldItem, state);
+		if(isTooDamaged(heldItem, repairMode))
+			bestSpeed = 1;
 		int bestSlot = -1;
 		
 		for(int slot = 0; slot < 9; slot++)
@@ -160,7 +164,7 @@ public final class AutoToolHack extends Hack
 			if(!useSwords && stack.getItem() instanceof SwordItem)
 				continue;
 			
-			if(repairMode && isTooDamaged(stack))
+			if(isTooDamaged(stack, repairMode))
 				continue;
 			
 			bestSpeed = speed;
@@ -190,9 +194,9 @@ public final class AutoToolHack extends Hack
 		return !stack.isEmpty() && stack.getItem().isDamageable();
 	}
 	
-	private boolean isTooDamaged(ItemStack stack)
+	private boolean isTooDamaged(ItemStack stack, int repairMode)
 	{
-		return stack.getMaxDamage() - stack.getDamage() <= 4;
+		return stack.getMaxDamage() - stack.getDamage() <= repairMode;
 	}
 	
 	private boolean isWrongTool(ItemStack heldItem, BlockPos pos)
