@@ -20,6 +20,8 @@ import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.ChatUtils;
 
@@ -38,6 +40,10 @@ public final class MassTpaHack extends Hack
 			"/tpa",
 			s -> s.length() < 64 && ALLOWED_COMMANDS.matcher(s).matches());
 	
+	private final SliderSetting delay = new SliderSetting("Delay",
+		"The delay between each teleport request.", 20, 1, 200, 1,
+		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
+	
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
 	
@@ -50,6 +56,7 @@ public final class MassTpaHack extends Hack
 		super("MassTPA");
 		setCategory(Category.CHAT);
 		addSetting(commandSetting);
+		addSetting(delay);
 	}
 	
 	@Override
@@ -58,7 +65,7 @@ public final class MassTpaHack extends Hack
 		// reset state
 		players.clear();
 		index = 0;
-		timer = -1;
+		timer = 0;
 		
 		// cache command in case the setting is changed mid-run
 		command = commandSetting.getValue().substring(1);
@@ -98,7 +105,7 @@ public final class MassTpaHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		if(timer > -1)
+		if(timer > 0)
 		{
 			timer--;
 			return;
@@ -114,7 +121,7 @@ public final class MassTpaHack extends Hack
 			.sendChatCommand(command + " " + players.get(index));
 		
 		index++;
-		timer = 20;
+		timer = delay.getValueI() - 1;
 	}
 	
 	@Override
