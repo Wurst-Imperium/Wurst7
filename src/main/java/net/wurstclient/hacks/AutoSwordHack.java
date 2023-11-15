@@ -40,7 +40,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
 		"Time until AutoSword will switch back from the weapon to the previously selected slot.\n\n"
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
-		10, 1, 200, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		10, 1, 200, 1,
+		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private int oldSlot;
 	private int timer;
