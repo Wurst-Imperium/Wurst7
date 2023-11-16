@@ -8,6 +8,7 @@
 package net.wurstclient.events;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +28,7 @@ public interface ShouldDrawSideListener extends Listener
 		
 		public ShouldDrawSideEvent(BlockState state, BlockPos pos)
 		{
-			this.state = state;
+			this.state = Objects.requireNonNull(state);
 			this.pos = pos;
 		}
 		

@@ -18,9 +18,11 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GoogleTranslate
+public enum GoogleTranslate
 {
-	public String translate(String text, String langFrom, String langTo)
+	;
+	
+	public static String translate(String text, String langFrom, String langTo)
 	{
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
@@ -31,7 +33,7 @@ public class GoogleTranslate
 		return translated;
 	}
 	
-	private String getHTML(String text, String langFrom, String langTo)
+	private static String getHTML(String text, String langFrom, String langTo)
 	{
 		URL url = createURL(text, langFrom, langTo);
 		
@@ -57,7 +59,7 @@ public class GoogleTranslate
 		}
 	}
 	
-	private URL createURL(String text, String langFrom, String langTo)
+	private static URL createURL(String text, String langFrom, String langTo)
 	{
 		try
 		{
@@ -75,7 +77,7 @@ public class GoogleTranslate
 		}
 	}
 	
-	private URLConnection setupConnection(URL url) throws IOException
+	private static URLConnection setupConnection(URL url) throws IOException
 	{
 		URLConnection connection = url.openConnection();
 		
@@ -87,7 +89,7 @@ public class GoogleTranslate
 	}
 	
 	@SuppressWarnings("deprecation")
-	private String parseHTML(String html)
+	private static String parseHTML(String html)
 	{
 		String regex = "class=\"result-container\">([^<]*)<\\/div>";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);

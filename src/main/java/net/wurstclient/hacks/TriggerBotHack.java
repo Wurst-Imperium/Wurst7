@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.stream.Stream;
-
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -110,14 +108,12 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	private boolean isCorrectEntity(Entity entity)
 	{
-		Stream<Entity> stream = Stream.of(entity);
-		stream = stream.filter(EntityUtils.IS_ATTACKABLE);
+		if(!EntityUtils.IS_ATTACKABLE.test(entity))
+			return false;
 		
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		if(MC.player.squaredDistanceTo(entity) > range.getValueSq())
+			return false;
 		
-		stream = entityFilters.applyTo(stream);
-		
-		return stream.findFirst().isPresent();
+		return entityFilters.testOne(entity);
 	}
 }

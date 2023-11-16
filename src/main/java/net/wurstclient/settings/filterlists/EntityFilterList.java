@@ -50,6 +50,15 @@ public class EntityFilterList
 		return stream;
 	}
 	
+	public final boolean testOne(Entity entity)
+	{
+		for(EntityFilter filter : entityFilters)
+			if(filter.isFilterEnabled() && !filter.test(entity))
+				return false;
+			
+		return true;
+	}
+	
 	public static EntityFilterList genericCombat()
 	{
 		return new EntityFilterList(FilterPlayersSetting.genericCombat(false),
