@@ -160,7 +160,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
 			// set color
-			if(WURST.getFriends().contains(e.getEntityName()))
+			if(WURST.getFriends().contains(e.method_5820()))
 				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
 			else
 			{
@@ -199,7 +199,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			
 			float r, g, b;
 			
-			if(WURST.getFriends().contains(e.getEntityName()))
+			if(WURST.getFriends().contains(e.method_5820()))
 			{
 				r = 0;
 				g = 0;
