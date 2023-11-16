@@ -101,7 +101,7 @@
   "description.wurst.hack.killpotion": "Generates a potion that can kill almost anything, including players in Creative mode. Does not work on undead mobs, since they are already dead.\n\nRequires Creative mode.",
   "description.wurst.hack.liquids": "Allows you to place blocks in liquids.",
   "description.wurst.hack.lsd": "Causes hallucinations.",
-  "description.wurst.hack.masstpa": "Sends a TPA request to all players.\nStops if someone accepts.",
+  "description.wurst.hack.masstpa": "Sends a TPA request to all players.",
   "description.wurst.hack.mileycyrus": "Makes you twerk.",
   "description.wurst.hack.mobesp": "Highlights nearby mobs.",
   "description.wurst.hack.mobspawnesp": "Highlights areas where mobs can spawn.\n§eyellow§r - mobs can spawn at night\n§cred§r - mobs can always spawn",

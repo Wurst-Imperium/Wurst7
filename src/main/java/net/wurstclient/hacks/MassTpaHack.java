@@ -20,6 +20,7 @@ import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.TextFieldSetting;
@@ -41,8 +42,20 @@ public final class MassTpaHack extends Hack
 			s -> s.length() < 64 && ALLOWED_COMMANDS.matcher(s).matches());
 	
 	private final SliderSetting delay = new SliderSetting("Delay",
-		"The delay between each teleport request.", 20, 1, 200, 1,
+		"The delay between each teleportation request.", 20, 1, 200, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
+	
+	private final CheckboxSetting ignoreErrors =
+		new CheckboxSetting("Ignore errors",
+			"Whether to ignore messages from the server telling you that the"
+				+ " teleportation command isn't valid or that you don't have"
+				+ " permission to use it.",
+			false);
+	
+	private final CheckboxSetting stopWhenAccepted = new CheckboxSetting(
+		"Stop when accepted", "Whether to stop sending more teleportation"
+			+ " requests when someone accepts one of them.",
+		true);
 	
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
@@ -57,6 +70,8 @@ public final class MassTpaHack extends Hack
 		setCategory(Category.CHAT);
 		addSetting(commandSetting);
 		addSetting(delay);
+		addSetting(ignoreErrors);
+		addSetting(stopWhenAccepted);
 	}
 	
 	@Override
@@ -133,6 +148,9 @@ public final class MassTpaHack extends Hack
 		
 		if(message.contains("/help") || message.contains("permission"))
 		{
+			if(ignoreErrors.isChecked())
+				return;
+			
 			event.cancel();
 			ChatUtils.error("This server doesn't have a "
 				+ command.toUpperCase() + " command.");
@@ -141,6 +159,9 @@ public final class MassTpaHack extends Hack
 		}else if(message.contains("accepted") && message.contains("request")
 			|| message.contains("akzeptiert") && message.contains("anfrage"))
 		{
+			if(!stopWhenAccepted.isChecked())
+				return;
+			
 			event.cancel();
 			ChatUtils.message("Someone accepted your " + command.toUpperCase()
 				+ " request. Stopping.");
