@@ -33,5 +33,5 @@ jobs:
           days-before-close: 7
           stale-issue-label: "status:stale"
           stale-pr-label: "status:stale"
-          operations-per-run: 30
+          operations-per-run: 50
           enable-statistics: true

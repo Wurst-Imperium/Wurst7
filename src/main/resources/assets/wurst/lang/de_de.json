@@ -98,7 +98,7 @@
   "description.wurst.hack.killpotion": "Generiert einen Trank, der fast alles töten kann, sogar Spieler im Kreativmodus. Funktioniert nicht bei untoten Mobs, weil die nach der Spiellogik bereits tot sind.\n\nFunktioniert nur im Kreativmodus.",
   "description.wurst.hack.liquids": "Ermöglicht dir, Blöcke direkt in bzw. an Flüssigkeiten zu platzieren.",
   "description.wurst.hack.lsd": "Verursacht Halluzinationen.",
-  "description.wurst.hack.masstpa": "Sendet TPA-Requests an alle Spieler.\nHört auf, sobald jemand akzeptiert.",
+  "description.wurst.hack.masstpa": "Sendet TPA-Requests an alle Spieler.",
   "description.wurst.hack.mileycyrus": "Lässt dich twerken.",
   "description.wurst.hack.mobesp": "Markiert Mobs in deiner Umgebung.",
   "description.wurst.hack.mobspawnesp": "Markiert Orte, an denen Mobs spawnen können.\n§eGelb§r - Mobs können nachts spawnen\n§cRot§r - Mobs können jederzeit spawnen",

@@ -17,27 +17,11 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.wurstclient.WurstClient;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin
 {
-	/**
-	 * Makes invisible entities render as ghosts if TrueSight is enabled.
-	 */
-	@Redirect(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
-		ordinal = 0),
-		method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
-	private boolean isInvisibleToWurst(LivingEntity e, PlayerEntity player)
-	{
-		if(WurstClient.INSTANCE.getHax().trueSightHack.isEnabled())
-			return false;
-		
-		return e.isInvisibleTo(player);
-	}
-	
 	/**
 	 * Disables the distance limit in hasLabel() if configured in NameTags.
 	 */

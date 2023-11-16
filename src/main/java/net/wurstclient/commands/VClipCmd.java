@@ -10,11 +10,11 @@ package net.wurstclient.commands;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.MathUtils;
 
 public final class VClipCmd extends Command
@@ -92,15 +92,12 @@ public final class VClipCmd extends Command
 	
 	private boolean hasCollisions(Box box)
 	{
-		Iterable<VoxelShape> collisions =
-			MC.world.getBlockCollisions(MC.player, box);
-		
-		return collisions.iterator().hasNext();
+		return BlockUtils.getBlockCollisions(box).findAny().isPresent();
 	}
 	
 	private double getSubBlockOffset(Box offsetBox)
 	{
-		return IMC.getWorld().getCollidingBoxes(MC.player, offsetBox)
+		return BlockUtils.getBlockCollisions(offsetBox)
 			.mapToDouble(box -> box.maxY).max().getAsDouble() - offsetBox.minY;
 	}
 	

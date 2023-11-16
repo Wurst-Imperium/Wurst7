@@ -40,6 +40,8 @@ public abstract class PathProcessor
 	
 	public abstract void process();
 	
+	public abstract boolean canBreakBlocks();
+	
 	public final int getIndex()
 	{
 		return index;
