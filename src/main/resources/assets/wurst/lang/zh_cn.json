@@ -136,7 +136,6 @@
   "description.wurst.hack.safewalk": "防止你从方块边缘摔落。",
   "description.wurst.hack.scaffoldwalk": "自动在你的脚下搭方块。",
   "description.wurst.hack.search": "帮助你找到所需要的方块并以彩虹色的方式高亮。",
-  "description.wurst.hack.servercrasher": "生成一个可以崩掉 1.15.x 服务器的物品。\n§o需要创造模式。§r",
   "description.wurst.hack.skinderp": "随机切换你的皮肤。",
   "description.wurst.hack.sneak": "让你自动保持潜行行走。",
   "description.wurst.hack.snowshoe": "允许你在细雪上行走。",

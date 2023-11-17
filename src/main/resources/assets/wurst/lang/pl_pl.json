@@ -135,7 +135,6 @@
   "description.wurst.hack.safewalk": "Zapobiega spadaniu z krawędzi.",
   "description.wurst.hack.scaffoldwalk": "Automatycznie umieszcza bloki pod nogami.",
   "description.wurst.hack.search": "Pomaga znaleźć konkretne bloki, podświetlając je kolorem tęczy.",
-  "description.wurst.hack.servercrasher": "Generuje przedmiot, który może zcrashować serwery 1.15.x.\n§oTylko tryb kreatywny.§r",
   "description.wurst.hack.skinderp": "Losowo przełącza części twojego skina.",
   "description.wurst.hack.sneak": "Sprawia, że automatycznie się skradasz.",
   "description.wurst.hack.snowshoe": "Umożliwia chodzenie po sypkim śniegu.",
