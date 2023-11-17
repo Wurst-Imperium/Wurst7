@@ -152,7 +152,8 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		PortalEspRenderer espRenderer = new PortalEspRenderer(matrixStack);
+		PortalEspRenderer espRenderer =
+			new PortalEspRenderer(matrixStack, partialTicks);
 		
 		if(style.getSelected().hasBoxes())
 		{

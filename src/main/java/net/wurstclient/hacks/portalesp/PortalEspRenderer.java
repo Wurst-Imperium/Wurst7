@@ -37,12 +37,12 @@ public final class PortalEspRenderer
 	private final RegionPos region;
 	private final Vec3d start;
 	
-	public PortalEspRenderer(MatrixStack matrixStack)
+	public PortalEspRenderer(MatrixStack matrixStack, float partialTicks)
 	{
 		this.matrixStack = matrixStack;
 		region = RenderUtils.getCameraRegion();
-		start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos())
-			.subtract(region.toVec3d());
+		start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).subtract(region.toVec3d());
 	}
 	
 	public void renderBoxes(PortalEspBlockGroup group)
