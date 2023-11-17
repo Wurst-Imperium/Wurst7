@@ -151,4 +151,10 @@ public class FlyPathProcessor extends PathProcessor
 			}
 		}
 	}
+	
+	@Override
+	public boolean canBreakBlocks()
+	{
+		return true;
+	}
 }

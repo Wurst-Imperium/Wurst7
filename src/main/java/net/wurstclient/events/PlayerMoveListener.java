@@ -11,26 +11,20 @@ import java.util.ArrayList;
 
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 public interface PlayerMoveListener extends Listener
 {
-	public void onPlayerMove(IClientPlayerEntity player);
+	public void onPlayerMove();
 	
 	public static class PlayerMoveEvent extends Event<PlayerMoveListener>
 	{
-		private final IClientPlayerEntity player;
-		
-		public PlayerMoveEvent(IClientPlayerEntity player)
-		{
-			this.player = player;
-		}
+		public static final PlayerMoveEvent INSTANCE = new PlayerMoveEvent();
 		
 		@Override
 		public void fire(ArrayList<PlayerMoveListener> listeners)
 		{
 			for(PlayerMoveListener listener : listeners)
-				listener.onPlayerMove(player);
+				listener.onPlayerMove();
 		}
 		
 		@Override

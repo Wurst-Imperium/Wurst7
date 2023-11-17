@@ -55,7 +55,7 @@ public enum ChunkUtils
 		if(packet instanceof ChunkDeltaUpdateS2CPacket p)
 			return p.sectionPos.toChunkPos();
 		if(packet instanceof ChunkDataS2CPacket p)
-			return new ChunkPos(p.getX(), p.getZ());
+			return new ChunkPos(p.getChunkX(), p.getChunkZ());
 		
 		return null;
 	}

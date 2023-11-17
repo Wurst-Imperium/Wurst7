@@ -26,7 +26,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
@@ -199,7 +198,7 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(!fastPlace.isChecked() && IMC.getItemUseCooldown() > 0)
+		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
 		placeNextBlock();
@@ -253,11 +252,8 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			// check line of sight
-			if(checkLOS.isChecked() && MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -271,7 +267,7 @@ public final class AutoBuildHack extends Hack
 			IMC.getInteractionManager().rightClickBlock(neighbor,
 				side.getOpposite(), hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			return true;
 		}
 		

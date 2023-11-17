@@ -35,7 +35,7 @@ public enum EntityUtils
 			.filter(IS_ATTACKABLE);
 	}
 	
-	public static Predicate<Entity> IS_ATTACKABLE = e -> e != null
+	public static final Predicate<Entity> IS_ATTACKABLE = e -> e != null
 		&& !e.isRemoved()
 		&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
 			|| e instanceof EndCrystalEntity
@@ -46,11 +46,11 @@ public enum EntityUtils
 	public static Stream<AnimalEntity> getValidAnimals()
 	{
 		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof AnimalEntity).map(e -> (AnimalEntity)e)
+			.filter(AnimalEntity.class::isInstance).map(e -> (AnimalEntity)e)
 			.filter(IS_VALID_ANIMAL);
 	}
 	
-	public static Predicate<AnimalEntity> IS_VALID_ANIMAL =
+	public static final Predicate<AnimalEntity> IS_VALID_ANIMAL =
 		a -> a != null && !a.isRemoved() && a.getHealth() > 0;
 	
 	/**

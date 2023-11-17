@@ -35,6 +35,6 @@ public final class NoWebHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		IMC.getPlayer().setMovementMultiplier(Vec3d.ZERO);
+		MC.player.movementMultiplier = Vec3d.ZERO;
 	}
 }

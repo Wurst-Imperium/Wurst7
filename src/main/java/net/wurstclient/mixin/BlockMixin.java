@@ -26,6 +26,10 @@ import net.wurstclient.hack.HackList;
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
 {
+	/**
+	 * This mixin allows X-Ray to show ores that would normally be obstructed by
+	 * other blocks.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z",
 		cancellable = true)

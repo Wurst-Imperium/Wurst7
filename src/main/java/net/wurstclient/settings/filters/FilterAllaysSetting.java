@@ -27,4 +27,9 @@ public final class FilterAllaysSetting extends EntityFilterCheckbox
 	{
 		return new FilterAllaysSetting("Won't attack allays.", checked);
 	}
+	
+	public static FilterAllaysSetting genericVision(boolean checked)
+	{
+		return new FilterAllaysSetting("Won't show allays.", checked);
+	}
 }

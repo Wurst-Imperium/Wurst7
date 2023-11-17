@@ -15,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -237,10 +238,12 @@ public final class AddBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		listGui.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -281,9 +284,6 @@ public final class AddBookOfferScreen extends Screen
 		
 		pricePlusButton.active = offerToAdd != null && offerToAdd.price() < 64;
 		priceMinusButton.active = offerToAdd != null && offerToAdd.price() > 1;
-		
-		levelField.tick();
-		priceField.tick();
 	}
 	
 	@Override
@@ -303,7 +303,9 @@ public final class AddBookOfferScreen extends Screen
 		
 		levelField.render(context, mouseX, mouseY, partialTicks);
 		priceField.render(context, mouseX, mouseY, partialTicks);
-		super.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 0, 0);
 		

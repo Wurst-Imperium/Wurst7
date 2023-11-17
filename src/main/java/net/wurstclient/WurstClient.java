@@ -40,6 +40,7 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
+import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
@@ -56,8 +57,8 @@ public enum WurstClient
 	public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.37";
-	public static final String MC_VERSION = "1.20.1";
+	public static final String VERSION = "7.39";
+	public static final String MC_VERSION = "1.20.2";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -149,7 +150,7 @@ public enum WurstClient
 		altManager = new AltManager(altsFile, encFolder);
 		
 		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, "Zoom");
+			GLFW.GLFW_KEY_V, KeyBinding.MISC_CATEGORY);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
@@ -177,7 +178,7 @@ public enum WurstClient
 	public String translate(String key)
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
-			return IMC.getLanguageManager().getEnglish().get(key);
+			return ILanguageManager.getEnglish().get(key);
 			
 		// This extra check is necessary because I18n.translate() doesn't
 		// always return the key when the translation is missing. If the key

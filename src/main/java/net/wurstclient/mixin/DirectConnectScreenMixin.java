@@ -28,12 +28,12 @@ public class DirectConnectScreenMixin extends Screen
 	@Final
 	private ServerInfo serverEntry;
 	
-	private DirectConnectScreenMixin(WurstClient wurst, Text text_1)
+	private DirectConnectScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"saveAndClose()V"})
+	@Inject(at = @At("TAIL"), method = "saveAndClose()V")
 	private void onSaveAndClose(CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(serverEntry);
