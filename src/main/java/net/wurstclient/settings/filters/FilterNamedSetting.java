@@ -27,4 +27,10 @@ public final class FilterNamedSetting extends EntityFilterCheckbox
 		return new FilterNamedSetting("Won't attack name-tagged entities.",
 			checked);
 	}
+	
+	public static FilterNamedSetting genericVision(boolean checked)
+	{
+		return new FilterNamedSetting("Won't show name-tagged entities.",
+			checked);
+	}
 }

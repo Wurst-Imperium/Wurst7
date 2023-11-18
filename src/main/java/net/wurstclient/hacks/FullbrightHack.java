@@ -99,9 +99,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		wasGammaChanged = true;
 		
 		SimpleOption<Double> gammaOption = MC.options.getGamma();
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption2 =
-			(ISimpleOption<Double>)(Object)gammaOption;
+		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
 		double oldGammaValue = gammaOption.getValue();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -119,9 +117,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	private void resetGamma(double target)
 	{
 		SimpleOption<Double> gammaOption = MC.options.getGamma();
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption2 =
-			(ISimpleOption<Double>)(Object)gammaOption;
+		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
 		double oldGammaValue = gammaOption.getValue();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -165,6 +161,15 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	public float getNightVisionStrength()
 	{
 		return nightVisionStrength;
+	}
+	
+	/**
+	 * Returns the value of Fullbright's "Default brightness" slider. Used by
+	 * {@link XRayHack} to restore the gamma value when X-Ray is turned off.
+	 */
+	public double getDefaultGamma()
+	{
+		return defaultGamma.getValue();
 	}
 	
 	private static enum Method

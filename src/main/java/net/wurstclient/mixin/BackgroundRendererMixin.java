@@ -20,9 +20,8 @@ import net.wurstclient.WurstClient;
 @Mixin(BackgroundRenderer.class)
 public class BackgroundRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;"},
+	@Inject(at = @At("HEAD"),
+		method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
 		cancellable = true)
 	private static void onGetFogModifier(Entity entity, float tickDelta,
 		CallbackInfoReturnable<StatusEffectFogModifier> ci)

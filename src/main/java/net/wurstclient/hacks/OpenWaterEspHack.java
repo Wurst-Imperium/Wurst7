@@ -19,7 +19,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IFishingBobberEntity;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"open water esp", "AutoFishESP", "auto fish esp"})
@@ -36,13 +36,10 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	public String getRenderName()
 	{
 		FishingBobberEntity bobber = MC.player.fishHook;
-		
 		if(bobber == null)
 			return getName();
 		
-		if(isInOpenWater(bobber))
-			return getName() + " [open]";
-		return getName() + " [shallow]";
+		return getName() + (isInOpenWater(bobber) ? " [open]" : " [shallow]");
 	}
 	
 	@Override
@@ -84,14 +81,11 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	private void drawOpenWater(MatrixStack matrixStack,
 		FishingBobberEntity bobber)
 	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
 		
 		matrixStack.push();
-		BlockPos pos = bobber.getBlockPos();
-		matrixStack.translate(pos.getX() - regionX, pos.getY(),
-			pos.getZ() - regionZ);
+		BlockPos pos = bobber.getBlockPos().subtract(region.toBlockPos());
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		
 		Box bb = new Box(-2, -1, -2, 3, 2, 3);
 		
@@ -109,7 +103,6 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	
 	private boolean isInOpenWater(FishingBobberEntity bobber)
 	{
-		return ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
+		return bobber.isOpenOrWaterAround(bobber.getBlockPos());
 	}
 }

@@ -41,12 +41,13 @@ public final class AutoFishHack extends Hack
 	
 	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
 		"How long AutoFish will wait after a bite before reeling in.", 0, 0, 60,
-		1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		1, ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting retryDelay = new SliderSetting("Retry delay",
 		"If casting or reeling in the fishing rod fails, this is how long"
 			+ " AutoFish will wait before trying again.",
-		15, 0, 100, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		15, 0, 100, 1,
+		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting patience = new SliderSetting("Patience",
 		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
@@ -95,8 +96,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().airPlaceHack.setEnabled(false);
-		
 		castRodTimer = 0;
 		reelInTimer = 0;
 		rodSelector.reset();
@@ -148,7 +147,7 @@ public final class AutoFishHack extends Hack
 			if(castRodTimer > 0)
 				return;
 			
-			IMC.rightClick();
+			MC.doItemUse();
 			castRodTimer = retryDelay.getValueI();
 			reelInTimer = 20 * patience.getValueI();
 			return;
@@ -157,7 +156,7 @@ public final class AutoFishHack extends Hack
 		// otherwise, reel in when it's time
 		if(reelInTimer == 0)
 		{
-			IMC.rightClick();
+			MC.doItemUse();
 			reelInTimer = retryDelay.getValueI();
 			castRodTimer = retryDelay.getValueI();
 		}

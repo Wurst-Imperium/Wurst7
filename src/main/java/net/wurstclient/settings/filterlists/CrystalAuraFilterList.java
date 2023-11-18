@@ -30,25 +30,50 @@ public final class CrystalAuraFilterList extends EntityFilterList
 				+ damageWarning,
 			false));
 		
-		builder.add(new FilterMonstersSetting(
-			"Won't target zombies, creepers, etc. when auto-placing crystals."
-				+ damageWarning,
+		builder.add(new FilterHostileSetting("Won't target hostile mobs like"
+			+ " zombies and creepers when auto-placing crystals."
+			+ damageWarning, true));
+		
+		builder.add(new FilterNeutralSetting("Won't target neutral mobs like"
+			+ " endermen and wolves when auto-placing crystals."
+			+ damageWarning, AttackDetectingEntityFilter.Mode.ON));
+		
+		builder.add(new FilterPassiveSetting("Won't target animals like pigs"
+			+ " and cows, ambient mobs like bats, and water mobs like fish,"
+			+ " squid and dolphins when auto-placing crystals." + damageWarning,
 			true));
 		
-		builder.add(new FilterAnimalsSetting(
-			"Won't target pigs, cows, etc. when auto-placing crystals."
-				+ damageWarning,
+		builder.add(new FilterPassiveWaterSetting("Won't target passive water"
+			+ " mobs like fish, squid, dolphins and axolotls when auto-placing"
+			+ " crystals." + damageWarning, true));
+		
+		builder.add(new FilterBatsSetting("Won't target bats and any other"
+			+ " \"ambient\" mobs when auto-placing crystals." + damageWarning,
 			true));
 		
-		builder.add(new FilterTradersSetting(
-			"Won't target villagers, wandering traders, etc. when auto-placing crystals."
-				+ damageWarning,
+		builder.add(new FilterSlimesSetting("Won't target slimes when"
+			+ " auto-placing crystals." + damageWarning, true));
+		
+		builder.add(new FilterVillagersSetting("Won't target villagers and"
+			+ " wandering traders when auto-placing crystals." + damageWarning,
 			true));
 		
-		builder.add(new FilterGolemsSetting(
-			"Won't target iron golems, snow golems and shulkers when auto-placing crystals."
-				+ damageWarning,
-			true));
+		builder.add(new FilterZombieVillagersSetting("Won't target zombified"
+			+ " villagers when auto-placing crystals." + damageWarning, true));
+		
+		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
+			+ " golems when auto-placing crystals." + damageWarning, true));
+		
+		builder.add(new FilterPiglinsSetting("Won't target piglins when"
+			+ " auto-placing crystals." + damageWarning,
+			AttackDetectingEntityFilter.Mode.ON));
+		
+		builder.add(new FilterZombiePiglinsSetting("Won't target"
+			+ " zombified piglins when auto-placing crystals." + damageWarning,
+			AttackDetectingEntityFilter.Mode.ON));
+		
+		builder.add(new FilterShulkersSetting("Won't target shulkers when"
+			+ " auto-placing crystals." + damageWarning, true));
 		
 		builder.add(new FilterAllaysSetting(
 			"Won't target allays when auto-placing crystals." + damageWarning,
