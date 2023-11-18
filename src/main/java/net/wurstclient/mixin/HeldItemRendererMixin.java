@@ -26,26 +26,30 @@ public abstract class HeldItemRendererMixin
 {
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applyEquipOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 4)},
-		method = "renderFirstPersonItem")
-	private void lowerShieldBlocking(AbstractClientPlayerEntity player, float tickDelta, float pitch,
-		Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
+		ordinal = 4)}, method = "renderFirstPersonItem")
+	private void onApplyEquipOffsetBlocking(AbstractClientPlayerEntity player,
+		float tickDelta, float pitch, Hand hand, float swingProgress,
+		ItemStack item, float equipProgress, MatrixStack matrices,
 		VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
 	{
 		// lower shield when blocking
-		WurstClient.INSTANCE.getHax().noShieldOverlayHack.adjustShieldPosition(matrices, true);
+		if(item.getItem() == Items.SHIELD)
+			WurstClient.INSTANCE.getHax().noShieldOverlayHack
+				.adjustShieldPosition(matrices, true);
 	}
 	
 	@Inject(at = {@At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applySwingOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 1)},
-		method = "renderFirstPersonItem")
-	private void lowerShieldNonBlocking(AbstractClientPlayerEntity player, float tickDelta, float pitch,
-		Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
-		VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+		ordinal = 1)}, method = "renderFirstPersonItem")
+	private void onApplySwingOffsetNotBlocking(
+		AbstractClientPlayerEntity player, float tickDelta, float pitch,
+		Hand hand, float swingProgress, ItemStack item, float equipProgress,
+		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
+		CallbackInfo ci)
 	{
 		// lower shield when not blocking
-		if(hand == Hand.OFF_HAND && item.getItem() == Items.SHIELD)
-			WurstClient.INSTANCE.getHax().noShieldOverlayHack.adjustShieldPosition(matrices, false);
+		if(item.getItem() == Items.SHIELD)
+			WurstClient.INSTANCE.getHax().noShieldOverlayHack
+				.adjustShieldPosition(matrices, false);
 	}
 }
