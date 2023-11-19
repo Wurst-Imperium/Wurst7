@@ -115,6 +115,7 @@
   "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
+  "description.wurst.hack.nofog": "Removes fog from the world.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
   "description.wurst.hack.nolevitation": "Disables the levitation effect when you get hit by a Shulker.\n\n§c§lWARNING:§r You will fall if you activate this while the levitation effect is already active!",
   "description.wurst.hack.nooverlay": "Blocks the overlays of water and lava.",

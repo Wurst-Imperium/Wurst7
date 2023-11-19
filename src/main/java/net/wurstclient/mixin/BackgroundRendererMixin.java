@@ -7,9 +7,11 @@
  */
 package net.wurstclient.mixin;
 
+import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.BackgroundRenderer;
@@ -20,6 +22,15 @@ import net.wurstclient.WurstClient;
 @Mixin(BackgroundRenderer.class)
 public class BackgroundRendererMixin
 {
+	@Inject(at = @At("HEAD"),
+		method = "applyFog",
+		cancellable = true)
+	private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
+	{
+		if (WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+			ci.cancel();
+	}
+
 	@Inject(at = @At("HEAD"),
 		method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
 		cancellable = true)
