@@ -52,8 +52,8 @@ public abstract class ClientPlayNetworkHandlerMixin
 		// Remove Mojang's dishonest warning toast on safe servers
 		if(!packet.isSecureChatEnforced())
 		{
-			client.getToastManager().toastQueue.removeIf(toast -> toast
-				.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);
+			client.getToastManager().toastQueue.removeIf(
+				toast -> toast.getType() == SystemToast.class_9037.field_47589);
 			return;
 		}
 		
@@ -64,7 +64,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 			.translatable("toast.wurst.nochatreports.unsafe_server.message");
 		
 		SystemToast systemToast = SystemToast.create(client,
-			SystemToast.Type.UNSECURE_SERVER_WARNING, title, message);
+			SystemToast.class_9037.field_47589, title, message);
 		client.getToastManager().add(systemToast);
 	}
 	
