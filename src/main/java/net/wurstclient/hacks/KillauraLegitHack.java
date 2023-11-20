@@ -178,7 +178,7 @@ public final class KillauraLegitHack extends Hack
 		if(target == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		WURST.getHax().autoSwordHack.setSlot(target);
 		
 		// check line of sight
 		if(!BlockUtils.hasLineOfSight(target.getBoundingBox().getCenter()))

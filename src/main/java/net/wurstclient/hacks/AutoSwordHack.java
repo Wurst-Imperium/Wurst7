@@ -7,9 +7,12 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
@@ -82,7 +85,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			
 			if(entity instanceof LivingEntity
 				&& EntityUtils.IS_ATTACKABLE.test(entity))
-				setSlot();
+				setSlot(entity);
 		}
 		
 		// update timer
@@ -95,7 +98,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		resetSlot();
 	}
 	
-	public void setSlot()
+	public void setSlot(Entity entity)
 	{
 		// check if active
 		if(!isEnabled())
@@ -114,10 +117,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			if(MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.getInventory().getStack(i).getItem();
-			
 			// get weapon value
-			float value = getValue(item);
+			ItemStack stack = MC.player.getInventory().getStack(i);
+			float value = getValue(stack, entity);
 			
 			// compare with previous best weapon
 			if(value > bestValue)
@@ -142,23 +144,28 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		timer = releaseTime.getValueI();
 	}
 	
-	private float getValue(Item item)
+	private float getValue(ItemStack stack, Entity entity)
 	{
+		Item item = stack.getItem();
+		if(!(item instanceof ToolItem || item instanceof TridentItem))
+			return Integer.MIN_VALUE;
+		
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			if(item instanceof ToolItem || item instanceof TridentItem)
-				return ItemUtils.getAttackSpeed(item);
-			break;
+			return ItemUtils.getAttackSpeed(item);
 			
 			case DAMAGE:
+			EntityGroup group = entity instanceof LivingEntity le
+				? le.getGroup() : EntityGroup.DEFAULT;
+			float dmg = EnchantmentHelper.getAttackDamage(stack, group);
 			if(item instanceof SwordItem sword)
-				return sword.getAttackDamage();
+				dmg += sword.getAttackDamage();
 			if(item instanceof MiningToolItem tool)
-				return tool.getAttackDamage();
+				dmg += tool.getAttackDamage();
 			if(item instanceof TridentItem)
-				return TridentItem.ATTACK_DAMAGE;
-			break;
+				dmg += TridentItem.ATTACK_DAMAGE;
+			return dmg;
 		}
 		
 		return Integer.MIN_VALUE;
