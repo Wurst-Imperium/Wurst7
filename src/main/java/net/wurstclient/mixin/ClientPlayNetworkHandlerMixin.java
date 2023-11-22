@@ -53,7 +53,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 		if(!packet.isSecureChatEnforced())
 		{
 			client.getToastManager().toastQueue.removeIf(
-				toast -> toast.getType() == SystemToast.class_9037.field_47589);
+				toast -> toast.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);
 			return;
 		}
 		
@@ -64,7 +64,7 @@ public abstract class ClientPlayNetworkHandlerMixin
 			.translatable("toast.wurst.nochatreports.unsafe_server.message");
 		
 		SystemToast systemToast = SystemToast.create(client,
-			SystemToast.class_9037.field_47589, title, message);
+			SystemToast.Type.UNSECURE_SERVER_WARNING, title, message);
 		client.getToastManager().add(systemToast);
 	}
 	
