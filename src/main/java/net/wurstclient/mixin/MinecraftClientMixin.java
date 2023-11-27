@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
@@ -179,23 +178,10 @@ public abstract class MinecraftClientMixin
 	{
 		wurstSession = session;
 		
-		UserApiService userApiService =
-			wurst_createUserApiService(session.getAccessToken());
+		UserApiService userApiService = authenticationService
+			.createUserApiService(session.getAccessToken());
 		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
 			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
-	}
-	
-	private UserApiService wurst_createUserApiService(String accessToken)
-	{
-		try
-		{
-			return authenticationService.createUserApiService(accessToken);
-			
-		}catch(AuthenticationException e)
-		{
-			e.printStackTrace();
-			return UserApiService.OFFLINE;
-		}
 	}
 }
