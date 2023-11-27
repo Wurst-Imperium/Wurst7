@@ -21,12 +21,12 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 	private final SliderSetting hStrength =
 		new SliderSetting("Horizontal Strength",
 			"How far to reduce horizontal knockback.\n" + "100% = no knockback",
-			1, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
+			1, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting vStrength =
 		new SliderSetting("Vertical Strength",
 			"How far to reduce vertical knockback.\n" + "100% = no knockback",
-			1, 0.01, 1, 0.01, ValueDisplay.PERCENTAGE);
+			1, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	public AntiKnockbackHack()
 	{
