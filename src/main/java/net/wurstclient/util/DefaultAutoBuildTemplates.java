@@ -96,19 +96,23 @@ public enum DefaultAutoBuildTemplates
 	{
 		for(DefaultAutoBuildTemplates template : DefaultAutoBuildTemplates
 			.values())
+			createFile(folder, template);
+	}
+	
+	private static void createFile(Path folder,
+		DefaultAutoBuildTemplates template)
+	{
+		JsonObject json = toJson(template);
+		Path path = folder.resolve(template.name + ".json");
+		
+		try
 		{
-			JsonObject json = toJson(template);
-			Path path = folder.resolve(template.name + ".json");
+			JsonUtils.toJson(json, path);
 			
-			try
-			{
-				JsonUtils.toJson(json, path);
-				
-			}catch(IOException | JsonException e)
-			{
-				System.out.println("Couldn't save " + path.getFileName());
-				e.printStackTrace();
-			}
+		}catch(IOException | JsonException e)
+		{
+			System.out.println("Couldn't save " + path.getFileName());
+			e.printStackTrace();
 		}
 	}
 	
