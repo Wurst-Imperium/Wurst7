@@ -12,10 +12,11 @@ import net.wurstclient.hack.Hack;
 
 public final class NoFogHack extends Hack
 {
-
-    public NoFogHack()
-    {
-        super("NoFog");
-        setCategory(Category.RENDER);
-    }
+	public NoFogHack()
+	{
+		super("NoFog");
+		setCategory(Category.RENDER);
+	}
+	
+	// See BackgroundRendererMixin
 }

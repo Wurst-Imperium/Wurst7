@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
+import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.wurstclient.WurstClient;
 
@@ -23,14 +23,16 @@ import net.wurstclient.WurstClient;
 public class BackgroundRendererMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "applyFog",
+		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V",
 		cancellable = true)
-	private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
+	private static void onApplyFog(Camera camera,
+		BackgroundRenderer.FogType fogType, float viewDistance,
+		boolean thickFog, float tickDelta, CallbackInfo ci)
 	{
-		if (WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			ci.cancel();
 	}
-
+	
 	@Inject(at = @At("HEAD"),
 		method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
 		cancellable = true)
