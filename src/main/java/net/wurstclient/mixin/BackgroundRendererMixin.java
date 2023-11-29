@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.CameraSubmersionType;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,8 @@ public abstract class BackgroundRendererMixin
 
 			if (cameraSubmersionType == CameraSubmersionType.NONE && statusEffectFogModifier == null)
 			{
-				ci.cancel();
+				RenderSystem.setShaderFogColor(0, 0, 0, 0);
+				return;
 			}
 		}
 	}
