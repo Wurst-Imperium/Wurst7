@@ -35,8 +35,7 @@ public abstract class BackgroundRendererMixin
 	}
 
 	@Inject(at = @At("HEAD"),
-		method = "applyFog",
-		cancellable = true)
+		method = "applyFog")
 	private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
 	{
 		if (WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
@@ -49,7 +48,6 @@ public abstract class BackgroundRendererMixin
 			if (cameraSubmersionType == CameraSubmersionType.NONE && statusEffectFogModifier == null)
 			{
 				RenderSystem.setShaderFogColor(0, 0, 0, 0);
-				return;
 			}
 		}
 	}
