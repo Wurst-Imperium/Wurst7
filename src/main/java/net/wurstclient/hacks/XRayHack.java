@@ -25,7 +25,6 @@ import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.ShouldDrawSideListener;
-import net.wurstclient.events.TesselateBlockListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
@@ -37,7 +36,7 @@ import net.wurstclient.util.ChatUtils;
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
 public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
-	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
+	ShouldDrawSideListener, RenderBlockEntityListener
 {
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
@@ -109,7 +108,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.add(ShouldDrawSideListener.class, this);
-		EVENTS.add(TesselateBlockListener.class, this);
 		EVENTS.add(RenderBlockEntityListener.class, this);
 		
 		// reload chunks
@@ -128,7 +126,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.remove(ShouldDrawSideListener.class, this);
-		EVENTS.remove(TesselateBlockListener.class, this);
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		
 		// reload chunks
@@ -169,13 +166,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onTesselateBlock(TesselateBlockEvent event)
-	{
-		if(!isVisible(event.getState().getBlock(), event.getPos()))
-			event.cancel();
-	}
-	
-	@Override
 	public void onRenderBlockEntity(RenderBlockEntityEvent event)
 	{
 		BlockPos pos = event.getBlockEntity().getPos();
@@ -189,7 +179,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		int index = Collections.binarySearch(oreNamesCache, name);
 		boolean visible = index >= 0;
 		
-		if(visible && onlyExposed.isChecked())
+		if(visible && onlyExposed.isChecked() && pos != null)
 			return !BlockUtils.isOpaqueFullCube(pos.up())
 				|| !BlockUtils.isOpaqueFullCube(pos.down())
 				|| !BlockUtils.isOpaqueFullCube(pos.east())

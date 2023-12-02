@@ -30,7 +30,6 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.ProfileKeysImpl;
 import net.minecraft.client.session.Session;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -41,7 +40,6 @@ import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
-import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -55,8 +53,6 @@ public abstract class MinecraftClientMixin
 	public ClientPlayerInteractionManager interactionManager;
 	@Shadow
 	public ClientPlayerEntity player;
-	@Shadow
-	public ClientWorld world;
 	@Shadow
 	@Final
 	private YggdrasilAuthenticationService authenticationService;
@@ -170,12 +166,6 @@ public abstract class MinecraftClientMixin
 	public IClientPlayerEntity getPlayer()
 	{
 		return (IClientPlayerEntity)player;
-	}
-	
-	@Override
-	public IWorld getWorld()
-	{
-		return (IWorld)world;
 	}
 	
 	@Override

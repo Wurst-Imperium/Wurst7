@@ -211,7 +211,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
-		ChestEspRenderer espRenderer = new ChestEspRenderer(matrixStack);
+		ChestEspRenderer espRenderer =
+			new ChestEspRenderer(matrixStack, partialTicks);
 		
 		if(style.hasBoxes())
 		{

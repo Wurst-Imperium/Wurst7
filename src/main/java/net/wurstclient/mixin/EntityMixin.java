@@ -13,12 +13,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.entity.EntityLike;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
@@ -52,5 +55,23 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 		
 		if(event.isCancelled())
 			ci.cancel();
+	}
+	
+	/**
+	 * Makes invisible entities render as ghosts if TrueSight is enabled.
+	 */
+	@Inject(at = @At("RETURN"),
+		method = "Lnet/minecraft/entity/Entity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		cancellable = true)
+	private void onIsInvisibleTo(PlayerEntity player,
+		CallbackInfoReturnable<Boolean> cir)
+	{
+		// Return early if the entity is not invisible
+		if(!cir.getReturnValueZ())
+			return;
+		
+		if(WurstClient.INSTANCE.getHax().trueSightHack
+			.shouldBeVisible((Entity)(Object)this))
+			cir.setReturnValue(false);
 	}
 }

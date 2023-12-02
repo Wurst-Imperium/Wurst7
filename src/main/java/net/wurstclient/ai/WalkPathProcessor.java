@@ -138,4 +138,10 @@ public class WalkPathProcessor extends PathProcessor
 					MC.options.forwardKey.setPressed(true);
 			}
 	}
+	
+	@Override
+	public boolean canBreakBlocks()
+	{
+		return MC.player.isOnGround();
+	}
 }

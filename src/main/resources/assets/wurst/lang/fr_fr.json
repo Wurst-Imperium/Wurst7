@@ -93,7 +93,7 @@
   "description.wurst.hack.killpotion": "Génère une potion qui peut presque tout tuer, y compris les joueurs en mode Créatif. Ne fonctionne pas sur les monstres morts-vivants, car ils sont déjà morts.\n\nNécessite le mode Créatif.",
   "description.wurst.hack.liquids": "Permet de placer des blocs dans des liquides.",
   "description.wurst.hack.lsd": "Provoque des hallucinations.",
-  "description.wurst.hack.masstpa": "Envoie une requête TPA à tous les joueurs.\nS'arrête si quelqu'un accepte.",
+  "description.wurst.hack.masstpa": "Envoie une requête TPA à tous les joueurs.",
   "description.wurst.hack.mileycyrus": "Vous fait twerker.",
   "description.wurst.hack.mobesp": "Met en évidence les monstres à proximité.",
   "description.wurst.hack.mobspawnesp": "Met en évidence les zones où les monstres peuvent apparaître.\n§ejaune§r - les monstres peuvent apparaître la nuit\n§crouge§r - les monstres peuvent toujours apparaître",

@@ -10,11 +10,11 @@ package net.wurstclient.settings.filters;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.MerchantEntity;
 
-public final class FilterTradersSetting extends EntityFilterCheckbox
+public final class FilterVillagersSetting extends EntityFilterCheckbox
 {
-	public FilterTradersSetting(String description, boolean checked)
+	public FilterVillagersSetting(String description, boolean checked)
 	{
-		super("Filter traders", description, checked);
+		super("Filter villagers", description, checked);
 	}
 	
 	@Override
@@ -23,15 +23,15 @@ public final class FilterTradersSetting extends EntityFilterCheckbox
 		return !(e instanceof MerchantEntity);
 	}
 	
-	public static FilterTradersSetting genericCombat(boolean checked)
+	public static FilterVillagersSetting genericCombat(boolean checked)
 	{
-		return new FilterTradersSetting(
-			"Won't attack villagers, wandering traders, etc.", checked);
+		return new FilterVillagersSetting(
+			"Won't attack villagers and wandering traders.", checked);
 	}
 	
-	public static FilterTradersSetting genericVision(boolean checked)
+	public static FilterVillagersSetting genericVision(boolean checked)
 	{
-		return new FilterTradersSetting(
-			"Won't show villagers, wandering traders, etc.", checked);
+		return new FilterVillagersSetting(
+			"Won't show villagers and wandering traders.", checked);
 	}
 }
