@@ -33,6 +33,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -46,7 +47,7 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
 public final class KillauraHack extends Hack
-	implements UpdateListener, PostMotionListener, RenderListener
+	implements UpdateListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Determines how far Killaura will reach to attack entities.\n"
@@ -62,6 +63,15 @@ public final class KillauraHack extends Hack
 			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
+
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How BuildRandom should swing your hand when placing blocks.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
+			+ " by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
+			+ " without playing the animation on the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
+			+ " This is the most legit option.");
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
@@ -94,6 +104,7 @@ public final class KillauraHack extends Hack
 		addSetting(range);
 		addSetting(speed);
 		addSetting(priority);
+		addSetting(swingHand);
 		addSetting(fov);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
@@ -118,7 +129,6 @@ public final class KillauraHack extends Hack
 		
 		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PostMotionListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -126,7 +136,6 @@ public final class KillauraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PostMotionListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
 		target = null;
@@ -168,20 +177,12 @@ public final class KillauraHack extends Hack
 		}
 		
 		WURST.getRotationFaker().faceVectorPacket(hitVec);
-	}
-	
-	@Override
-	public void onPostMotion()
-	{
-		if(target == null)
-			return;
 		
+		//attack entity
 		WURST.getHax().criticalsHack.doCritical();
 		ClientPlayerEntity player = MC.player;
 		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
-		
-		target = null;
+		swingHand.getSelected().swing(Hand.MAIN_HAND);
 		speed.resetTimer();
 	}
 	
