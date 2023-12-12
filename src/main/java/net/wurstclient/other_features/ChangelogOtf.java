@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,7 +33,8 @@ public final class ChangelogOtf extends OtherFeature
 	@Override
 	public void doPrimaryAction()
 	{
-		String link = new Version(WurstClient.VERSION).getChangelogLink();
+		String link = new Version(WurstClient.VERSION).getChangelogLink()
+			+ "?utm_source=Wurst+Client&utm_medium=ChangelogOtf&utm_content=View+Changelog";
 		Util.getOperatingSystem().open(link);
 	}
 }

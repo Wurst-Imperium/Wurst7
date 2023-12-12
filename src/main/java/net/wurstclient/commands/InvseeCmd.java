@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -51,8 +51,10 @@ public final class InvseeCmd extends Command implements RenderListener
 		
 		for(Entity entity : MC.world.getEntities())
 		{
-			if(!(entity instanceof OtherClientPlayerEntity player))
+			if(!(entity instanceof OtherClientPlayerEntity))
 				continue;
+			
+			OtherClientPlayerEntity player = (OtherClientPlayerEntity)entity;
 			
 			String otherPlayerName = player.getName().getString();
 			if(!otherPlayerName.equalsIgnoreCase(targetName))

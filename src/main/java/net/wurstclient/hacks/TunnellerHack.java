@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,13 +22,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -37,16 +39,13 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.EmptyBlockView;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -56,8 +55,10 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -69,16 +70,14 @@ public final class TunnellerHack extends Hack
 		"Tunnel size", TunnelSize.values(), TunnelSize.SIZE_3X3);
 	
 	private final SliderSetting limit = new SliderSetting("Limit",
-		"Automatically stops once the tunnel\n"
-			+ "has reached the given length.\n\n" + "0 = no limit",
-		0, 0, 1000, 1,
-		v -> v == 0 ? "disabled" : v == 1 ? "1 block" : (int)v + " blocks");
+		"Automatically stops once the tunnel has reached the given length.\n\n"
+			+ "0 = no limit",
+		0, 0, 1000, 1, ValueDisplay.INTEGER.withSuffix(" blocks")
+			.withLabel(1, "1 block").withLabel(0, "disabled"));
 	
-	private final CheckboxSetting torches =
-		new CheckboxSetting(
-			"Place torches", "Places just enough torches\n"
-				+ "to prevent mobs from\n" + "spawning inside the tunnel.",
-			false);
+	private final CheckboxSetting torches = new CheckboxSetting("Place torches",
+		"Places just enough torches to prevent mobs from spawning inside the tunnel.",
+		false);
 	
 	private BlockPos start;
 	private Direction direction;
@@ -96,11 +95,7 @@ public final class TunnellerHack extends Hack
 	
 	public TunnellerHack()
 	{
-		super("Tunneller", "Automatically digs a tunnel.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r Although this bot will try to avoid\n"
-			+ "lava and other dangers, there is no guarantee\n"
-			+ "that it won't die. Only send it out with gear\n"
-			+ "that you don't mind losing.");
+		super("Tunneller");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(size);
@@ -134,7 +129,7 @@ public final class TunnellerHack extends Hack
 		EVENTS.add(RenderListener.class, this);
 		
 		ClientPlayerEntity player = MC.player;
-		start = new BlockPos(player.getPos());
+		start = BlockPos.ofFloored(player.getPos());
 		direction = player.getHorizontalFacing();
 		length = 0;
 		lastTorch = null;
@@ -156,14 +151,19 @@ public final class TunnellerHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
 		
-		for(VertexBuffer buffer : vertexBuffers)
-			if(buffer != null)
-				buffer.close();
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			if(vertexBuffers[i] == null)
+				continue;
+			
+			vertexBuffers[i].close();
+			vertexBuffers[i] = null;
+		}
 	}
 	
 	@Override
@@ -180,8 +180,8 @@ public final class TunnellerHack extends Hack
 			return;
 		
 		GameOptions gs = MC.options;
-		KeyBinding[] bindings = {gs.keyForward, gs.keyBack, gs.keyLeft,
-			gs.keyRight, gs.keyJump, gs.keySneak};
+		KeyBinding[] bindings = {gs.forwardKey, gs.backKey, gs.leftKey,
+			gs.rightKey, gs.jumpKey, gs.sneakKey};
 		for(KeyBinding binding : bindings)
 			binding.setPressed(false);
 		
@@ -201,14 +201,15 @@ public final class TunnellerHack extends Hack
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		for(int i = 0; i < vertexBuffers.length; i++)
 		{
@@ -225,10 +226,12 @@ public final class TunnellerHack extends Hack
 				case 4 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			}
 			
-			Matrix4f viewMatrix = matrixStack.peek().getModel();
+			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			Shader shader = RenderSystem.getShader();
-			buffer.setShader(viewMatrix, projMatrix, shader);
+			ShaderProgram shader = RenderSystem.getShader();
+			buffer.bind();
+			buffer.draw(viewMatrix, projMatrix, shader);
+			VertexBuffer.unbind();
 		}
 		
 		if(currentBlock != null)
@@ -237,12 +240,8 @@ public final class TunnellerHack extends Hack
 			float red = p * 2F;
 			float green = 2 - red;
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
-			
-			matrixStack.translate(currentBlock.getX() - regionX,
-				currentBlock.getY(), currentBlock.getZ() - regionZ);
+			matrixStack.translate(currentBlock.getX() - region.x(),
+				currentBlock.getY(), currentBlock.getZ() - region.z());
 			if(p < 1)
 			{
 				matrixStack.translate(0.5, 0.5, 0.5);
@@ -263,7 +262,6 @@ public final class TunnellerHack extends Hack
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void updateCyanBuffer()
@@ -271,17 +269,15 @@ public final class TunnellerHack extends Hack
 		if(vertexBuffers[0] != null)
 			vertexBuffers[0].close();
 		
-		vertexBuffers[0] = new VertexBuffer();
+		vertexBuffers[0] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
-		Vec3d offset = Vec3d.ofCenter(start).subtract(regionX, 0, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		Vec3d offset = Vec3d.ofCenter(start).subtract(region.toVec3d());
 		
 		Box nodeBox =
 			new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25).offset(offset);
@@ -293,8 +289,10 @@ public final class TunnellerHack extends Hack
 			.multiply(Math.max(0.5, length)).add(offset);
 		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
 		
-		bufferBuilder.end();
-		vertexBuffers[0].upload(bufferBuilder);
+		BuiltBuffer buffer = bufferBuilder.end();
+		vertexBuffers[0].bind();
+		vertexBuffers[0].upload(buffer);
+		VertexBuffer.unbind();
 	}
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
@@ -363,7 +361,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			int distance = getDistance(player, base);
 			
@@ -378,7 +376,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			BlockPos from = offset(player, size.getSelected().from);
 			BlockPos to = offset(base, size.getSelected().to);
@@ -389,16 +387,14 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[1] != null)
 				vertexBuffers[1].close();
 			
-			vertexBuffers[1] = new VertexBuffer();
+			vertexBuffers[1] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
+			RegionPos region = RenderUtils.getCameraRegion();
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
+				.offset(region.negate().toVec3d());
 			
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
-				-regionZ);
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
@@ -418,8 +414,10 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			}
 			
-			bufferBuilder.end();
-			vertexBuffers[1].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffers[1].bind();
+			vertexBuffers[1].upload(buffer);
+			VertexBuffer.unbind();
 			
 			if(currentBlock == null)
 			{
@@ -440,7 +438,7 @@ public final class TunnellerHack extends Hack
 			}
 			
 			WURST.getHax().autoToolHack.equipBestTool(currentBlock, false, true,
-				false);
+				0);
 			breakBlock(currentBlock);
 			
 			if(MC.player.getAbilities().creativeMode
@@ -452,7 +450,7 @@ public final class TunnellerHack extends Hack
 			}
 			
 			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+			progress = MC.interactionManager.currentBreakingProgress;
 			
 			if(progress < prevProgress)
 				prevProgress = progress;
@@ -464,7 +462,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos base = start.offset(direction, length);
 			
 			return getDistance(player, base) > 1;
@@ -477,7 +475,7 @@ public final class TunnellerHack extends Hack
 			Vec3d vec = Vec3d.ofCenter(base);
 			WURST.getRotationFaker().faceVectorClientIgnorePitch(vec);
 			
-			MC.options.keyForward.setPressed(true);
+			MC.options.forwardKey.setPressed(true);
 		}
 	}
 	
@@ -488,7 +486,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			BlockPos from = offsetFloor(player, size.getSelected().from);
 			BlockPos to = offsetFloor(player, size.getSelected().to);
 			
@@ -500,24 +498,24 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[2] != null)
 				vertexBuffers[2].close();
 			
-			vertexBuffers[2] = new VertexBuffer();
+			vertexBuffers[2] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
+			RegionPos region = RenderUtils.getCameraRegion();
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
+				.offset(region.negate().toVec3d());
 			
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
-				-regionZ);
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
 			for(BlockPos pos : blocks)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
-			vertexBuffers[2].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			vertexBuffers[2].bind();
+			vertexBuffers[2].upload(buffer);
+			VertexBuffer.unbind();
 			
 			return !blocks.isEmpty();
 		}
@@ -531,7 +529,7 @@ public final class TunnellerHack extends Hack
 		@Override
 		public void run()
 		{
-			MC.options.keySneak.setPressed(true);
+			MC.options.sneakKey.setPressed(true);
 			Vec3d velocity = MC.player.getVelocity();
 			MC.player.setVelocity(0, velocity.y, 0);
 			
@@ -550,12 +548,11 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			if(BlockUtils.getState(pos).getMaterial().isReplaceable())
+			if(BlockUtils.getState(pos).isReplaceable())
 				placeBlockSimple(pos);
 			else
 			{
-				WURST.getHax().autoToolHack.equipBestTool(pos, false, true,
-					false);
+				WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 				breakBlock(pos);
 			}
 		}
@@ -643,32 +640,33 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[3] != null)
 				vertexBuffers[3].close();
 			
-			vertexBuffers[3] = new VertexBuffer();
+			vertexBuffers[3] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
+			RegionPos region = RenderUtils.getCameraRegion();
+			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
+				.offset(region.negate().toVec3d());
 			
-			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9).offset(-regionX, 0,
-				-regionZ);
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 				VertexFormats.POSITION);
 			
 			for(BlockPos pos : liquids)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			bufferBuilder.end();
-			vertexBuffers[3].upload(bufferBuilder);
+			BuiltBuffer buffer = bufferBuilder.end();
+			
+			vertexBuffers[3].bind();
+			vertexBuffers[3].upload(buffer);
+			VertexBuffer.unbind();
 			return true;
 		}
 		
 		@Override
 		public void run()
 		{
-			BlockPos player = new BlockPos(MC.player.getPos());
-			KeyBinding forward = MC.options.keyForward;
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
+			KeyBinding forward = MC.options.forwardKey;
 			
 			Vec3d diffVec = Vec3d.of(player.subtract(start));
 			Vec3d dirVec = Vec3d.of(direction.getVector());
@@ -715,15 +713,19 @@ public final class TunnellerHack extends Hack
 	
 	private class PlaceTorchTask extends Task
 	{
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean canRun()
 		{
 			if(!torches.isChecked())
 			{
 				lastTorch = null;
-				nextTorch = new BlockPos(MC.player.getPos());
+				nextTorch = BlockPos.ofFloored(MC.player.getPos());
 				if(vertexBuffers[4] != null)
+				{
 					vertexBuffers[4].close();
+					vertexBuffers[4] = null;
+				}
 				return false;
 			}
 			
@@ -737,25 +739,25 @@ public final class TunnellerHack extends Hack
 			if(vertexBuffers[4] != null)
 				vertexBuffers[4].close();
 			
-			vertexBuffers[4] = new VertexBuffer();
+			vertexBuffers[4] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
-			BlockPos camPos = RenderUtils.getCameraBlockPos();
-			int regionX = (camPos.getX() >> 9) * 512;
-			int regionZ = (camPos.getZ() >> 9) * 512;
-			
+			RegionPos region = RenderUtils.getCameraRegion();
 			Vec3d torchVec =
-				Vec3d.ofBottomCenter(nextTorch).subtract(regionX, 0, regionZ);
+				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
+			
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0),
 				vertexBuffers[4]);
 			
-			BlockPos player = new BlockPos(MC.player.getPos());
+			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			if(getDistance(player, nextTorch) > 4)
 				return false;
 			
 			BlockState state = BlockUtils.getState(nextTorch);
-			if(!state.getMaterial().isReplaceable())
+			if(!state.isReplaceable())
 				return false;
-			
+				
+			// Can't see why canPlaceAt() is deprecated. Still seems to be
+			// widely used with no replacement.
 			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
 		}
 		
@@ -769,7 +771,7 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			MC.options.keySneak.setPressed(true);
+			MC.options.sneakKey.setPressed(true);
 			placeBlockSimple(nextTorch);
 		}
 		
@@ -803,7 +805,7 @@ public final class TunnellerHack extends Hack
 			// check for nearby falling blocks
 			return StreamSupport
 				.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> e instanceof FallingBlockEntity)
+				.filter(FallingBlockEntity.class::isInstance)
 				.anyMatch(e -> MC.player.squaredDistanceTo(e) < 36);
 		}
 		
@@ -873,7 +875,7 @@ public final class TunnellerHack extends Hack
 			return;
 		
 		// check timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// place block
@@ -885,7 +887,7 @@ public final class TunnellerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		// reset timer
-		IMC.setItemUseCooldown(4);
+		MC.itemUseCooldown = 4;
 	}
 	
 	private boolean breakBlock(BlockPos pos)
@@ -919,7 +921,7 @@ public final class TunnellerHack extends Hack
 			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			linesOfSight[i] = hasLineOfSight(eyesPos, hitVecs[i]);
+			linesOfSight[i] = BlockUtils.hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
 		Direction side = sides[0];
@@ -951,15 +953,6 @@ public final class TunnellerHack extends Hack
 			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 		
 		return true;
-	}
-	
-	private boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
-		
-		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
 	}
 	
 	private enum TunnelSize

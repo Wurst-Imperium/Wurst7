@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,8 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.text.LiteralText;
+import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -29,9 +30,7 @@ public final class TrollPotionHack extends Hack
 	
 	public TrollPotionHack()
 	{
-		super("TrollPotion",
-			"Generates a potion with many annoying effects on it.");
-		
+		super("TrollPotion");
 		setCategory(Category.ITEMS);
 		addSetting(potionType);
 	}
@@ -108,19 +107,22 @@ public final class TrollPotionHack extends Hack
 			NbtList effects = new NbtList();
 			for(int i = 1; i <= 23; i++)
 			{
+				String id = Registries.STATUS_EFFECT.getEntry(i).get().getKey()
+					.get().getValue().toString();
+				
 				NbtCompound effect = new NbtCompound();
-				effect.putInt("Amplifier", Integer.MAX_VALUE);
-				effect.putInt("Duration", Integer.MAX_VALUE);
-				effect.putInt("Id", i);
+				effect.putInt("amplifier", Integer.MAX_VALUE);
+				effect.putInt("duration", Integer.MAX_VALUE);
+				effect.putString("id", id);
 				effects.add(effect);
 			}
 			
 			NbtCompound nbt = new NbtCompound();
-			nbt.put("CustomPotionEffects", effects);
+			nbt.put("custom_potion_effects", effects);
 			stack.setNbt(nbt);
 			
 			String name = "\u00a7f" + itemName + " of Trolling";
-			stack.setCustomName(new LiteralText(name));
+			stack.setCustomName(Text.literal(name));
 			
 			return stack;
 		}

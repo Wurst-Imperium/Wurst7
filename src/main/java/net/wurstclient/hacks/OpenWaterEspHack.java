@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IFishingBobberEntity;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"open water esp", "AutoFishESP", "auto fish esp"})
@@ -27,10 +27,7 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 {
 	public OpenWaterEspHack()
 	{
-		super("OpenWaterESP",
-			"Shows whether or not you are fishing in 'open water' and\n"
-				+ "draws a box around the area used for the open water\n"
-				+ "calculation.");
+		super("OpenWaterESP");
 		
 		setCategory(Category.RENDER);
 	}
@@ -39,13 +36,10 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	public String getRenderName()
 	{
 		FishingBobberEntity bobber = MC.player.fishHook;
-		
 		if(bobber == null)
 			return getName();
 		
-		if(isInOpenWater(bobber))
-			return getName() + " [open]";
-		return getName() + " [shallow]";
+		return getName() + (isInOpenWater(bobber) ? " [open]" : " [shallow]");
 	}
 	
 	@Override
@@ -66,7 +60,6 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
@@ -83,28 +76,22 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	private void drawOpenWater(MatrixStack matrixStack,
 		FishingBobberEntity bobber)
 	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		RegionPos region = RenderUtils.getCameraRegion();
 		
 		matrixStack.push();
-		BlockPos pos = bobber.getBlockPos();
-		matrixStack.translate(pos.getX() - regionX, pos.getY(),
-			pos.getZ() - regionZ);
+		BlockPos pos = bobber.getBlockPos().subtract(region.toBlockPos());
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		
 		Box bb = new Box(-2, -1, -2, 3, 2, 3);
 		
 		if(isInOpenWater(bobber))
-		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-			
-		}else
+		else
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			RenderUtils.drawCrossBox(bb, matrixStack);
@@ -116,7 +103,6 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	
 	private boolean isInOpenWater(FishingBobberEntity bobber)
 	{
-		return ((IFishingBobberEntity)bobber)
-			.checkOpenWaterAround(bobber.getBlockPos());
+		return bobber.isOpenOrWaterAround(bobber.getBlockPos());
 	}
 }

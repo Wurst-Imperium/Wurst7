@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,10 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.clickgui.ClickGui;
 
 public final class ClickGuiScreen extends Screen
@@ -18,12 +19,12 @@ public final class ClickGuiScreen extends Screen
 	
 	public ClickGuiScreen(ClickGui gui)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.gui = gui;
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}
@@ -43,17 +44,21 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
-		gui.handleMouseScroll(mouseX, mouseY, delta);
-		return super.mouseScrolled(mouseX, mouseY, delta);
+		gui.handleMouseScroll(mouseX, mouseY, verticalAmount);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		gui.render(matrixStack, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
+		gui.render(context, mouseX, mouseY, partialTicks);
 	}
 }

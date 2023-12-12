@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,20 +10,20 @@ package net.wurstclient.hud;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -122,10 +122,14 @@ public final class TabGui implements KeyPressListener
 			}
 	}
 	
-	public void render(MatrixStack matrixStack, float partialTicks)
+	public void render(DrawContext context, float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		if(tabGuiOtf.isHidden())
 			return;
+		
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		int txtColor = gui.getTxtColor();
 		
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -154,8 +158,8 @@ public final class TabGui implements KeyPressListener
 			if(i == selected)
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
-			WurstClient.MC.textRenderer.draw(matrixStack, tabName, 2, textY,
-				0xffffffff);
+			context.drawText(WurstClient.MC.textRenderer, tabName, 2, textY,
+				txtColor, false);
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -189,8 +193,8 @@ public final class TabGui implements KeyPressListener
 				if(i == tab.selected)
 					fName = ">" + fName;
 				
-				WurstClient.MC.textRenderer.draw(matrixStack, fName, 2,
-					tabTextY, 0xffffffff);
+				context.drawText(WurstClient.MC.textRenderer, fName, 2,
+					tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
@@ -211,9 +215,10 @@ public final class TabGui implements KeyPressListener
 		float[] acColor = gui.getAcColor();
 		float opacity = gui.getOpacity();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// color
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
@@ -228,8 +233,7 @@ public final class TabGui implements KeyPressListener
 			bufferBuilder.vertex(matrix, x2, y2, 0).next();
 			bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// outline positions
 		float xi1 = x1 - 0.1F;
@@ -249,8 +253,7 @@ public final class TabGui implements KeyPressListener
 			bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 			bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
 		}
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -258,7 +261,7 @@ public final class TabGui implements KeyPressListener
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		// top left
@@ -297,8 +300,7 @@ public final class TabGui implements KeyPressListener
 		bufferBuilder.vertex(matrix, x2, y2, 0)
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	private static final class Tab

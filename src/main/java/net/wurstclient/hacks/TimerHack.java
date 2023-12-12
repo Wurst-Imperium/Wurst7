@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ public final class TimerHack extends Hack
 	
 	public TimerHack()
 	{
-		super("Timer", "Changes the speed of almost everything.");
+		super("Timer");
 		setCategory(Category.OTHER);
 		addSetting(speed);
 	}

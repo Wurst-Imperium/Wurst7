@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,20 +9,20 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 public abstract class NavigatorScreen extends Screen
@@ -39,7 +39,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	public NavigatorScreen()
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 	}
 	
 	@Override
@@ -113,12 +113,13 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta)
+	public boolean mouseScrolled(double mouseX, double mouseY,
+		double horizontalAmount, double verticalAmount)
 	{
 		// scrollbar
 		if(!scrollbarLocked)
 		{
-			scroll += delta * 4;
+			scroll += verticalAmount * 4;
 			
 			if(scroll > 0)
 				scroll = 0;
@@ -133,7 +134,8 @@ public abstract class NavigatorScreen extends Screen
 			scrollKnobPosition += 2;
 		}
 		
-		return super.mouseScrolled(mouseX, mouseY, delta);
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
+			verticalAmount);
 	}
 	
 	@Override
@@ -143,9 +145,11 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public final void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
+		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -181,7 +185,7 @@ public abstract class NavigatorScreen extends Screen
 				drawDownShadow(matrixStack, x1, y1, x2, y2);
 		}
 		
-		onRender(matrixStack, mouseX, mouseY, partialTicks);
+		onRender(context, mouseX, mouseY, partialTicks);
 		
 		// GL resets
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -189,7 +193,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean isPauseScreen()
+	public final boolean shouldPause()
 	{
 		return false;
 	}
@@ -207,7 +211,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(MatrixStack matrixStack, int mouseX,
+	protected abstract void onRender(DrawContext context, int mouseX,
 		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)
@@ -236,9 +240,10 @@ public abstract class NavigatorScreen extends Screen
 	protected final void drawQuads(MatrixStack matrixStack, int x1, int y1,
 		int x2, int y2)
 	{
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -246,8 +251,7 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	protected final void drawBoxShadow(MatrixStack matrixStack, int x1, int y1,
@@ -262,9 +266,10 @@ public abstract class NavigatorScreen extends Screen
 		float yi1 = y1 - 0.1F;
 		float yi2 = y2 + 0.1F;
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
@@ -275,8 +280,7 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
 		bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
 		bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -284,7 +288,7 @@ public abstract class NavigatorScreen extends Screen
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -322,8 +326,7 @@ public abstract class NavigatorScreen extends Screen
 		bufferBuilder.vertex(matrix, x2, y2, 0)
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	protected final void drawDownShadow(MatrixStack matrixStack, int x1, int y1,
@@ -332,9 +335,10 @@ public abstract class NavigatorScreen extends Screen
 		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
-		Matrix4f matrix = matrixStack.peek().getModel();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		float yi1 = y1 + 0.1F;
@@ -343,11 +347,10 @@ public abstract class NavigatorScreen extends Screen
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, yi1, 0).next();
 		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 		
 		// shadow
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
@@ -357,8 +360,7 @@ public abstract class NavigatorScreen extends Screen
 			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).color(0, 0, 0, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		tessellator.draw();
 	}
 	
 	protected final void drawBox(MatrixStack matrixStack, int x1, int y1,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,13 +19,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.RaycastContext.ShapeType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -49,20 +45,18 @@ public final class TillauraHack extends Hack implements UpdateListener
 		new CheckboxSetting("MultiTill", "Tills multiple blocks at once.\n"
 			+ "Faster, but can't bypass NoCheat+.", false);
 	
-	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Prevents Tillaura from reaching through blocks.\n"
-			+ "Good for NoCheat+ servers,\n" + "but unnecessary in vanilla.",
-		true);
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"Prevents Tillaura from reaching through blocks.\n"
+				+ "Good for NoCheat+ servers, but unnecessary in vanilla.",
+			true);
 	
 	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
 		Blocks.DIRT_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
 	
 	public TillauraHack()
 	{
-		super("Tillaura",
-			"Automatically turns dirt, grass, etc. into farmland.\n"
-				+ "Not to be confused with Killaura.");
+		super("Tillaura");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
@@ -86,7 +80,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// wait for right click timer
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return;
 		
 		// check held item
@@ -124,7 +118,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range + 0.5, 2);
 		int rangeI = (int)Math.ceil(range);
 		
-		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		
@@ -167,7 +161,8 @@ public final class TillauraHack extends Hack implements UpdateListener
 			if(distanceSqHitVec >= distanceSqPosVec)
 				continue;
 			
-			if(checkLOS.isChecked() && !hasLineOfSight(eyesPos, hitVec))
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -176,7 +171,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			// right click block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			return true;
 		}
 		
@@ -203,7 +198,8 @@ public final class TillauraHack extends Hack implements UpdateListener
 			if(distanceSqHitVec >= distanceSqPosVec)
 				continue;
 			
-			if(checkLOS.isChecked() && !hasLineOfSight(eyesPos, hitVec))
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
@@ -211,16 +207,5 @@ public final class TillauraHack extends Hack implements UpdateListener
 		}
 		
 		return false;
-	}
-	
-	private boolean hasLineOfSight(Vec3d from, Vec3d to)
-	{
-		ShapeType type = RaycastContext.ShapeType.COLLIDER;
-		FluidHandling fluid = RaycastContext.FluidHandling.NONE;
-		
-		RaycastContext context =
-			new RaycastContext(from, to, type, fluid, MC.player);
-		
-		return MC.world.raycast(context).getType() == HitResult.Type.MISS;
 	}
 }

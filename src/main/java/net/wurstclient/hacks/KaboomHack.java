@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,12 +30,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	
 	public KaboomHack()
 	{
-		super("Kaboom",
-			"Breaks blocks around you like an explosion.\n"
-				+ "This can be a lot faster than Nuker if the server doesn't\n"
-				+ "have NoCheat+.\n"
-				+ "It works best with fast tools and weak blocks.\n"
-				+ "Note: This is not an actual explosion.");
+		super("Kaboom");
 		
 		setCategory(Category.BLOCKS);
 		addSetting(power);
@@ -62,7 +57,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 		
 		// do explosion particles
 		new Explosion(MC.world, MC.player, MC.player.getX(), MC.player.getY(),
-			MC.player.getZ(), 6F, false, Explosion.DestructionType.NONE)
+			MC.player.getZ(), 6F, false, Explosion.DestructionType.KEEP)
 				.affectWorld(true);
 		
 		// get valid blocks
@@ -82,7 +77,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 		double rangeSq = Math.pow(range + 0.5, 2);
 		int rangeI = (int)Math.ceil(range);
 		
-		BlockPos center = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		

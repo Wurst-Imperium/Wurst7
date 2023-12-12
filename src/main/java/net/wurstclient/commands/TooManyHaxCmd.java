@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -269,7 +269,7 @@ public final class TooManyHaxCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		ArrayList<Path> files = WURST.getKeybinds().listProfiles();
+		ArrayList<Path> files = WURST.getHax().tooManyHaxHack.listProfiles();
 		int page = parsePage(args);
 		int pages = (int)Math.ceil(files.size() / 8.0);
 		pages = Math.max(pages, 1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,8 +20,8 @@ import net.wurstclient.events.SetOpaqueCubeListener.SetOpaqueCubeEvent;
 @Mixin(ChunkOcclusionDataBuilder.class)
 public class ChunkOcclusionGraphBuilderMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"markClosed(Lnet/minecraft/util/math/BlockPos;)V"},
+	@Inject(at = @At("HEAD"),
+		method = "markClosed(Lnet/minecraft/util/math/BlockPos;)V",
 		cancellable = true)
 	private void onMarkClosed(BlockPos pos, CallbackInfo ci)
 	{

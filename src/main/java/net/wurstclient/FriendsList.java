@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -71,6 +71,11 @@ public class FriendsList
 	public boolean contains(String name)
 	{
 		return friends.contains(name);
+	}
+	
+	public boolean isFriend(Entity entity)
+	{
+		return entity != null && contains(entity.getEntityName());
 	}
 	
 	public ArrayList<String> toList()

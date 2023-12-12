@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 public abstract class Popup
 {
@@ -27,8 +27,7 @@ public abstract class Popup
 	public abstract void handleMouseClick(int mouseX, int mouseY,
 		int mouseButton);
 	
-	public abstract void render(MatrixStack matrixStack, int mouseX,
-		int mouseY);
+	public abstract void render(DrawContext context, int mouseX, int mouseY);
 	
 	public abstract int getDefaultWidth();
 	

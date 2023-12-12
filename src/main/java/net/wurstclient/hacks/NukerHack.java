@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,18 +19,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
@@ -46,7 +40,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 public final class NukerHack extends Hack
@@ -56,41 +50,42 @@ public final class NukerHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lNormal\u00a7r mode simply breaks everything\n" + "around you.\n"
-			+ "\u00a7lID\u00a7r mode only breaks the selected block\n"
-			+ "type. Left-click on a block to select it.\n"
-			+ "\u00a7lMultiID\u00a7r mode only breaks the block types\n"
-			+ "in your MultiID List.\n"
-			+ "\u00a7lFlat\u00a7r mode flattens the area around you,\n"
-			+ "but won't dig down.\n"
-			+ "\u00a7lSmash\u00a7r mode only breaks blocks that\n"
-			+ "can be destroyed instantly (e.g. tall grass).",
+		"\u00a7lNormal\u00a7r mode simply breaks everything around you.\n"
+			+ "\u00a7lID\u00a7r mode only breaks the selected block type. Left-click on a block to select it.\n"
+			+ "\u00a7lMultiID\u00a7r mode only breaks the block types in your MultiID List.\n"
+			+ "\u00a7lFlat\u00a7r mode flattens the area around you, but won't dig down.\n"
+			+ "\u00a7lSmash\u00a7r mode only breaks blocks that can be destroyed instantly (e.g. tall grass).",
 		Mode.values(), Mode.NORMAL);
 	
 	private final BlockSetting id =
 		new BlockSetting("ID", "The type of block to break in ID mode.\n"
 			+ "air = won't break anything", "minecraft:air", true);
 	
-	private final CheckboxSetting lockId =
-		new CheckboxSetting("Lock ID", "Prevents changing the ID by clicking\n"
-			+ "on blocks or restarting Nuker.", false);
+	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
+		"Prevents changing the ID by clicking on blocks or restarting Nuker.",
+		false);
 	
 	private final BlockListSetting multiIdList = new BlockListSetting(
 		"MultiID List", "The types of blocks to break in MultiID mode.",
-		"minecraft:ancient_debris", "minecraft:bone_block", "minecraft:clay",
-		"minecraft:coal_ore", "minecraft:diamond_ore", "minecraft:emerald_ore",
-		"minecraft:glowstone", "minecraft:gold_ore", "minecraft:iron_ore",
-		"minecraft:lapis_ore", "minecraft:nether_gold_ore",
-		"minecraft:nether_quartz_ore", "minecraft:redstone_ore");
+		"minecraft:ancient_debris", "minecraft:bone_block",
+		"minecraft:coal_ore", "minecraft:copper_ore",
+		"minecraft:deepslate_coal_ore", "minecraft:deepslate_copper_ore",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_emerald_ore",
+		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
+		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
+		"minecraft:diamond_ore", "minecraft:emerald_ore", "minecraft:glowstone",
+		"minecraft:gold_ore", "minecraft:iron_ore", "minecraft:lapis_ore",
+		"minecraft:nether_gold_ore", "minecraft:nether_quartz_ore",
+		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
+		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
+	private final OverlayRenderer renderer = new OverlayRenderer();
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
 	
 	public NukerHack()
 	{
-		super("Nuker", "Automatically breaks blocks around you.");
+		super("Nuker");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
@@ -128,12 +123,13 @@ public final class NukerHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentBlock = null;
 		}
 		
 		prevBlocks.clear();
+		renderer.resetProgress();
 		
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -142,15 +138,19 @@ public final class NukerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		currentBlock = null;
+		
+		// abort if user is mining manually
+		if(MC.options.attackKey.isPressed())
+			return;
+		
 		// abort if using IDNuker without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		
-		currentBlock = null;
 		Vec3d eyesPos = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos eyesBlock = new BlockPos(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
 		double rangeSq = Math.pow(range.getValue(), 2);
 		int blockRange = (int)Math.ceil(range.getValue());
 		
@@ -184,8 +184,7 @@ public final class NukerHack extends Hack
 				currentBlock = blocks3.get(0);
 			
 			MC.interactionManager.cancelBlockBreaking();
-			progress = 1;
-			prevProgress = 1;
+			renderer.resetProgress();
 			BlockBreaker.breakBlocksWithPacketSpam(blocks3);
 			return;
 		}
@@ -201,18 +200,9 @@ public final class NukerHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 		
 		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
-		{
-			prevProgress = progress;
-			progress = IMC.getInteractionManager().getCurrentBreakingProgress();
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
-			
-		}else
-		{
-			progress = 1;
-			prevProgress = 1;
-		}
+			renderer.updateProgress();
+		else
+			renderer.resetProgress();
 	}
 	
 	@Override
@@ -236,53 +226,7 @@ public final class NukerHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(currentBlock == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		
-		Box box = new Box(BlockPos.ORIGIN);
-		float p = prevProgress + (progress - prevProgress) * partialTicks;
-		float red = p * 2F;
-		float green = 2 - red;
-		
-		matrixStack.translate(currentBlock.getX() - regionX,
-			currentBlock.getY(), currentBlock.getZ() - regionZ);
-		if(p < 1)
-		{
-			matrixStack.translate(0.5, 0.5, 0.5);
-			matrixStack.scale(p, p, p);
-			matrixStack.translate(-0.5, -0.5, -0.5);
-		}
-		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box, matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
-		
+		renderer.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private enum Mode

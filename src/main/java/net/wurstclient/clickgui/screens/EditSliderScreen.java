@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,11 +10,12 @@ package net.wurstclient.clickgui.screens;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
@@ -29,7 +30,7 @@ public final class EditSliderScreen extends Screen
 	
 	public EditSliderScreen(Screen prevScreen, SliderSetting slider)
 	{
-		super(new LiteralText(""));
+		super(Text.literal(""));
 		this.prevScreen = prevScreen;
 		this.slider = slider;
 	}
@@ -45,17 +46,16 @@ public final class EditSliderScreen extends Screen
 		ValueDisplay vd = ValueDisplay.DECIMAL;
 		String valueString = vd.getValueString(slider.getValue());
 		
-		valueField =
-			new TextFieldWidget(tr, x1, y1, 200, 20, new LiteralText(""));
+		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
 		valueField.setText(valueString);
 		valueField.setSelectionStart(0);
 		
 		addSelectableChild(valueField);
-		setInitialFocus(valueField);
-		valueField.setTextFieldFocused(true);
+		setFocused(valueField);
+		valueField.setFocused(true);
 		
-		doneButton = new ButtonWidget(x1, y2, 200, 20, new LiteralText("Done"),
-			b -> done());
+		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
+			.dimensions(x1, y2, 200, 20).build();
 		addDrawableChild(doneButton);
 	}
 	
@@ -87,25 +87,21 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		valueField.tick();
-	}
-	
-	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(matrixStack);
-		drawCenteredText(matrixStack, client.textRenderer, slider.getName(),
-			width / 2, 20, 0xFFFFFF);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		context.drawCenteredTextWithShadow(client.textRenderer,
+			slider.getName(), width / 2, 20, 0xFFFFFF);
 		
-		valueField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		valueField.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public boolean isPauseScreen()
+	public boolean shouldPause()
 	{
 		return false;
 	}

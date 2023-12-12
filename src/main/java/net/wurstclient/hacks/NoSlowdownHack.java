@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,8 +16,10 @@ public final class NoSlowdownHack extends Hack
 {
 	public NoSlowdownHack()
 	{
-		super("NoSlowdown", "Cancels slowness effects caused by\n"
-			+ "honey, soul sand and using items.");
+		super("NoSlowdown");
 		setCategory(Category.MOVEMENT);
 	}
+	
+	// See BlockMixin.onGetVelocityMultiplier() and
+	// ClientPlayerEntityMixin.wurstIsUsingItem()
 }

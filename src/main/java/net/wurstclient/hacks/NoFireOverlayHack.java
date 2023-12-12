@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,17 +10,27 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"no fire overlay"})
 public final class NoFireOverlayHack extends Hack
 {
+	private final SliderSetting offset =
+		new SliderSetting("Offset", "The amount to lower the fire overlay by.",
+			0.6, 0.01, 0.6, 0.01, ValueDisplay.DECIMAL);
+	
 	public NoFireOverlayHack()
 	{
-		super("NoFireOverlay",
-			"Blocks the overlay when you are on fire.\n\n"
-				+ "\u00a7c\u00a7lWARNING:\u00a7r This can cause you to burn\n"
-				+ "to death without noticing.");
-		
+		super("NoFireOverlay");
 		setCategory(Category.RENDER);
+		addSetting(offset);
 	}
+	
+	public float getOverlayOffset()
+	{
+		return isEnabled() ? offset.getValueF() : 0;
+	}
+	
+	// See InGameOverlayRendererMixin.getFireOffset()
 }

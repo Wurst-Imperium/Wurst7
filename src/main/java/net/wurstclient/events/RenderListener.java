@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,8 @@
 package net.wurstclient.events;
 
 import java.util.ArrayList;
+
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.Event;
@@ -31,8 +33,12 @@ public interface RenderListener extends Listener
 		@Override
 		public void fire(ArrayList<RenderListener> listeners)
 		{
+			GL11.glEnable(GL11.GL_LINE_SMOOTH);
+			
 			for(RenderListener listener : listeners)
 				listener.onRender(matrixStack, partialTicks);
+			
+			GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		}
 		
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,10 +25,10 @@ public abstract class Hack extends Feature
 	private final boolean stateSaved =
 		!getClass().isAnnotationPresent(DontSaveState.class);
 	
-	public Hack(String name, String description)
+	public Hack(String name)
 	{
 		this.name = Objects.requireNonNull(name);
-		this.description = Objects.requireNonNull(description);
+		description = "description.wurst.hack." + name.toLowerCase();
 		addPossibleKeybind(name, "Toggle " + name);
 	}
 	
@@ -45,6 +45,11 @@ public abstract class Hack extends Feature
 	
 	@Override
 	public final String getDescription()
+	{
+		return WURST.translate(description);
+	}
+	
+	public final String getDescriptionKey()
 	{
 		return description;
 	}

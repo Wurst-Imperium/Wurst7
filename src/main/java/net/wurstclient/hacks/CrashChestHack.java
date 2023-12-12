@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -22,13 +22,7 @@ public final class CrashChestHack extends Hack
 {
 	public CrashChestHack()
 	{
-		super("CrashChest", "Generates a chest that essentially bans people\n"
-			+ "from the server if they have too many copies\n"
-			+ "of it in their inventory. \u00a7c\u00a7lWARNING:\u00a7r \u00a7cThis cannot\n"
-			+ "\u00a7cbe undone. Use with caution!\u00a7r\n\n"
-			+ "If copies are instead placed in a chest, anyone\n"
-			+ "who opens the chest will be kicked from the\n"
-			+ "server (just once).");
+		super("CrashChest");
 		
 		setCategory(Category.ITEMS);
 	}
@@ -58,7 +52,7 @@ public final class CrashChestHack extends Hack
 			nbtList.add(new NbtList());
 		nbtCompound.put("www.wurstclient.net", nbtList);
 		stack.setNbt(nbtCompound);
-		stack.setCustomName(new LiteralText("Copy Me"));
+		stack.setCustomName(Text.literal("Copy Me"));
 		
 		// give item
 		MC.player.getInventory().armor.set(0, stack);

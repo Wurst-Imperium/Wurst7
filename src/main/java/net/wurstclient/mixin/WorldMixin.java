@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,33 +7,24 @@
  */
 package net.wurstclient.mixin;
 
-import java.util.List;
-
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
-import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(World.class)
-public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
+public abstract class WorldMixin implements WorldAccess, AutoCloseable
 {
-	@Shadow
-	@Final
-	protected List<BlockEntityTickInvoker> blockEntityTickers;
-	
-	@Inject(at = {@At("HEAD")},
-		method = {"getRainGradient(F)F"},
+	@Inject(at = @At("HEAD"),
+		method = "getRainGradient(F)F",
 		cancellable = true)
-	private void onGetRainGradient(float f, CallbackInfoReturnable<Float> cir)
+	private void onGetRainGradient(float delta,
+		CallbackInfoReturnable<Float> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
@@ -42,12 +33,10 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	@Override
 	public float getSkyAngle(float tickDelta)
 	{
-		NoWeatherHack noWeatherHack =
-			WurstClient.INSTANCE.getHax().noWeatherHack;
+		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
-		long timeOfDay =
-			noWeatherHack.isTimeChanged() ? noWeatherHack.getChangedTime()
-				: getLevelProperties().getTimeOfDay();
+		long timeOfDay = noWeather.isTimeChanged() ? noWeather.getChangedTime()
+			: getLevelProperties().getTimeOfDay();
 		
 		return getDimension().getSkyAngle(timeOfDay);
 	}
@@ -55,18 +44,11 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, IWorld
 	@Override
 	public int getMoonPhase()
 	{
-		NoWeatherHack noWeatherHack =
-			WurstClient.INSTANCE.getHax().noWeatherHack;
+		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
-		if(noWeatherHack.isMoonPhaseChanged())
-			return noWeatherHack.getChangedMoonPhase();
+		if(noWeather.isMoonPhaseChanged())
+			return noWeather.getChangedMoonPhase();
 		
 		return getDimension().getMoonPhase(getLunarTime());
-	}
-	
-	@Override
-	public List<BlockEntityTickInvoker> getBlockEntityTickers()
-	{
-		return blockEntityTickers;
 	}
 }

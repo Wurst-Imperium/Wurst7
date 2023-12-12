@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,6 +17,7 @@ import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"AutoSneaking"})
@@ -24,16 +25,24 @@ public final class SneakHack extends Hack
 	implements PreMotionListener, PostMotionListener
 {
 	private final EnumSetting<SneakMode> mode = new EnumSetting<>("Mode",
-		"\u00a7lPacket\u00a7r mode makes it look like you're\n"
-			+ "sneaking without slowing you down.\n"
+		"\u00a7lPacket\u00a7r mode makes it look like you're sneaking without slowing you down.\n"
 			+ "\u00a7lLegit\u00a7r mode actually makes you sneak.",
 		SneakMode.values(), SneakMode.LEGIT);
 	
+	private final CheckboxSetting offWhileFlying =
+		new CheckboxSetting("Turn off while flying",
+			"Automatically disables Legit Sneak while you are flying or using"
+				+ " Freecam, so that it doesn't force you to fly down.\n\n"
+				+ "Keep in mind that this also means you won't be hidden from"
+				+ " other players while doing these things.",
+			false);
+	
 	public SneakHack()
 	{
-		super("Sneak", "Makes you sneak automatically.");
+		super("Sneak");
 		setCategory(Category.MOVEMENT);
 		addSetting(mode);
+		addSetting(offWhileFlying);
 	}
 	
 	@Override
@@ -58,8 +67,8 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding sneakKey = (IKeyBinding)MC.options.keySneak;
-			((KeyBinding)sneakKey).setPressed(sneakKey.isActallyPressed());
+			IKeyBinding sneakKey = (IKeyBinding)MC.options.sneakKey;
+			sneakKey.resetPressedState();
 			break;
 			
 			case PACKET:
@@ -71,16 +80,19 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		KeyBinding sneakKey = MC.options.keySneak;
+		KeyBinding sneakKey = MC.options.sneakKey;
 		
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			sneakKey.setPressed(true);
+			if(offWhileFlying.isChecked() && isFlying())
+				((IKeyBinding)sneakKey).resetPressedState();
+			else
+				sneakKey.setPressed(true);
 			break;
 			
 			case PACKET:
-			sneakKey.setPressed(((IKeyBinding)sneakKey).isActallyPressed());
+			((IKeyBinding)sneakKey).resetPressedState();
 			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;
@@ -95,6 +107,20 @@ public final class SneakHack extends Hack
 		
 		sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 		sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+	}
+	
+	private boolean isFlying()
+	{
+		if(MC.player.getAbilities().flying)
+			return true;
+		
+		if(WURST.getHax().flightHack.isEnabled())
+			return true;
+		
+		if(WURST.getHax().freecamHack.isEnabled())
+			return true;
+		
+		return false;
 	}
 	
 	private void sendSneakPacket(Mode mode)

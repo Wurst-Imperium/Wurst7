@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,10 +21,10 @@ public class FriendsCmd extends Command
 {
 	private static final int FRIENDS_PER_PAGE = 8;
 	
-	private final CheckboxSetting middleClickFriends = new CheckboxSetting(
-		"Middle click friends", "Add/remove friends by clicking them with\n"
-			+ "the middle mouse button.",
-		true);
+	private final CheckboxSetting middleClickFriends =
+		new CheckboxSetting("Middle click friends",
+			"Add/remove friends by clicking them with the middle mouse button.",
+			true);
 	
 	public FriendsCmd()
 	{

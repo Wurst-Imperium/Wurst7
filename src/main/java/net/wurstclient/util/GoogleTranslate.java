@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,11 +18,11 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
-public class GoogleTranslate
+public enum GoogleTranslate
 {
-	public String translate(String text, String langFrom, String langTo)
+	;
+	
+	public static String translate(String text, String langFrom, String langTo)
 	{
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
@@ -34,7 +34,7 @@ public class GoogleTranslate
 		return translated;
 	}
 	
-	private String getHTML(String text, String langFrom, String langTo)
+	private static String getHTML(String text, String langFrom, String langTo)
 	{
 		URL url = createURL(text, langFrom, langTo);
 		
@@ -60,7 +60,7 @@ public class GoogleTranslate
 		}
 	}
 	
-	private URL createURL(String text, String langFrom, String langTo)
+	private static URL createURL(String text, String langFrom, String langTo)
 	{
 		try
 		{
@@ -78,7 +78,7 @@ public class GoogleTranslate
 		}
 	}
 	
-	private URLConnection setupConnection(URL url) throws IOException
+	private static URLConnection setupConnection(URL url) throws IOException
 	{
 		URLConnection connection = url.openConnection();
 		
@@ -89,7 +89,8 @@ public class GoogleTranslate
 		return connection;
 	}
 	
-	private String parseHTML(String html)
+	@SuppressWarnings("deprecation")
+	private static String parseHTML(String html)
 	{
 		String regex = "class=\"result-container\">([^<]*)<\\/div>";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -100,7 +101,9 @@ public class GoogleTranslate
 		
 		if(match == null || match.isEmpty())
 			return null;
-		
-		return StringEscapeUtils.unescapeHtml4(match);
+			
+		// deprecated in favor of org.apache.commons.text.StringEscapeUtils,
+		// which isn't bundled with Minecraft
+		return org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(match);
 	}
 }

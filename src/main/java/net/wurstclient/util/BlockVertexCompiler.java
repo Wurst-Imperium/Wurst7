@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,8 +9,9 @@ package net.wurstclient.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
 
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.SearchHack;
@@ -25,85 +26,81 @@ public enum BlockVertexCompiler
 {
 	;
 	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks)
+	public static ArrayList<int[]> compile(HashSet<BlockPos> blocks)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks).stream())
+		return blocks.parallelStream().flatMap(pos -> getVertices(pos, blocks))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
-	public static Callable<ArrayList<int[]>> createTask(
-		HashSet<BlockPos> blocks, int regionX, int regionZ)
+	public static ArrayList<int[]> compile(HashSet<BlockPos> blocks,
+		RegionPos region)
 	{
-		return () -> blocks.parallelStream()
-			.flatMap(pos -> getVertices(pos, blocks).stream())
-			.map(v -> applyRegionOffset(v, regionX, regionZ))
+		return blocks.parallelStream().flatMap(pos -> getVertices(pos, blocks))
+			.map(v -> applyRegionOffset(v, region))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
-	private static int[] applyRegionOffset(int[] vertex, int regionX,
-		int regionZ)
+	private static int[] applyRegionOffset(int[] vertex, RegionPos region)
 	{
-		vertex[0] -= regionX;
-		vertex[2] -= regionZ;
+		vertex[0] -= region.x();
+		vertex[2] -= region.z();
 		return vertex;
 	}
 	
-	private static ArrayList<int[]> getVertices(BlockPos pos,
+	private static Stream<int[]> getVertices(BlockPos pos,
 		HashSet<BlockPos> matchingBlocks)
 	{
-		ArrayList<int[]> vertices = new ArrayList<>();
+		Builder<int[]> builder = Stream.<int[]> builder();
 		
 		if(!matchingBlocks.contains(pos.down()))
 		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 0, 0, 1));
+			builder.accept(getVertex(pos, 0, 0, 0));
+			builder.accept(getVertex(pos, 1, 0, 0));
+			builder.accept(getVertex(pos, 1, 0, 1));
+			builder.accept(getVertex(pos, 0, 0, 1));
 		}
 		
 		if(!matchingBlocks.contains(pos.up()))
 		{
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 1, 0));
+			builder.accept(getVertex(pos, 0, 1, 0));
+			builder.accept(getVertex(pos, 0, 1, 1));
+			builder.accept(getVertex(pos, 1, 1, 1));
+			builder.accept(getVertex(pos, 1, 1, 0));
 		}
 		
 		if(!matchingBlocks.contains(pos.north()))
 		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 0, 0));
+			builder.accept(getVertex(pos, 0, 0, 0));
+			builder.accept(getVertex(pos, 0, 1, 0));
+			builder.accept(getVertex(pos, 1, 1, 0));
+			builder.accept(getVertex(pos, 1, 0, 0));
 		}
 		
 		if(!matchingBlocks.contains(pos.east()))
 		{
-			vertices.add(getVertex(pos, 1, 0, 0));
-			vertices.add(getVertex(pos, 1, 1, 0));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
+			builder.accept(getVertex(pos, 1, 0, 0));
+			builder.accept(getVertex(pos, 1, 1, 0));
+			builder.accept(getVertex(pos, 1, 1, 1));
+			builder.accept(getVertex(pos, 1, 0, 1));
 		}
 		
 		if(!matchingBlocks.contains(pos.south()))
 		{
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 1, 0, 1));
-			vertices.add(getVertex(pos, 1, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
+			builder.accept(getVertex(pos, 0, 0, 1));
+			builder.accept(getVertex(pos, 1, 0, 1));
+			builder.accept(getVertex(pos, 1, 1, 1));
+			builder.accept(getVertex(pos, 0, 1, 1));
 		}
 		
 		if(!matchingBlocks.contains(pos.west()))
 		{
-			vertices.add(getVertex(pos, 0, 0, 0));
-			vertices.add(getVertex(pos, 0, 0, 1));
-			vertices.add(getVertex(pos, 0, 1, 1));
-			vertices.add(getVertex(pos, 0, 1, 0));
+			builder.accept(getVertex(pos, 0, 0, 0));
+			builder.accept(getVertex(pos, 0, 0, 1));
+			builder.accept(getVertex(pos, 0, 1, 1));
+			builder.accept(getVertex(pos, 0, 1, 0));
 		}
 		
-		return vertices;
+		return builder.build();
 	}
 	
 	private static int[] getVertex(BlockPos pos, int x, int y, int z)

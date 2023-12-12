@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
@@ -24,10 +23,10 @@ public interface ChatInputListener extends Listener
 		extends CancellableEvent<ChatInputListener>
 	{
 		private Text component;
-		private List<ChatHudLine<OrderedText>> chatLines;
+		private List<ChatHudLine.Visible> chatLines;
 		
 		public ChatInputEvent(Text component,
-			List<ChatHudLine<OrderedText>> visibleMessages)
+			List<ChatHudLine.Visible> visibleMessages)
 		{
 			this.component = component;
 			chatLines = visibleMessages;
@@ -43,7 +42,7 @@ public interface ChatInputListener extends Listener
 			this.component = component;
 		}
 		
-		public List<ChatHudLine<OrderedText>> getChatLines()
+		public List<ChatHudLine.Visible> getChatLines()
 		{
 			return chatLines;
 		}

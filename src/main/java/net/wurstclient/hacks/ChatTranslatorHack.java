@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -24,9 +23,6 @@ import net.wurstclient.util.GoogleTranslate;
 	"google translator", "GoogleTranslation", "google translation"})
 public final class ChatTranslatorHack extends Hack implements ChatInputListener
 {
-	private static final GoogleTranslate googleTranslate =
-		new GoogleTranslate();
-	
 	private final EnumSetting<FromLanguage> langFrom = new EnumSetting<>(
 		"Translate from", FromLanguage.values(), FromLanguage.AUTO_DETECT);
 	
@@ -35,8 +31,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	
 	public ChatTranslatorHack()
 	{
-		super("ChatTranslator",
-			"Translates incoming chat messages using Google Translate.");
+		super("ChatTranslator");
 		setCategory(Category.CHAT);
 		
 		addSetting(langFrom);
@@ -81,14 +76,14 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 			|| incomingMsg.startsWith(translatorPrefix))
 			return;
 		
-		String translated = googleTranslate.translate(incomingMsg,
+		String translated = GoogleTranslate.translate(incomingMsg,
 			langFrom.getSelected().value, langTo.getSelected().value);
 		
 		if(translated == null)
 			return;
 		
-		Text translationMsg = new LiteralText(translatorPrefix)
-			.append(new LiteralText(translated));
+		Text translationMsg =
+			Text.literal(translatorPrefix).append(Text.literal(translated));
 		
 		MC.inGameHud.getChatHud().addMessage(translationMsg);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -36,14 +36,7 @@ public final class TooManyHaxHack extends Hack
 	
 	public TooManyHaxHack()
 	{
-		super("TooManyHax",
-			"Blocks any features that you don't want.\n"
-				+ "Allows you to make sure that you don't accidentally\n"
-				+ "enable the wrong hack and get banned for it.\n"
-				+ "For those who want to \"only hack a little bit\".\n\n"
-				+ "Use the \u00a76.toomanyhax\u00a7r command to choose\n"
-				+ "which features to block.\n"
-				+ "Type \u00a76.help toomanyhax\u00a7r for more info.");
+		super("TooManyHax");
 		setCategory(Category.OTHER);
 		
 		Path wurstFolder = WURST.getWurstFolder();

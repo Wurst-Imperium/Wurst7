@@ -1,20 +1,33 @@
+buildscript {
+	dependencies {
+		classpath 'org.kohsuke:github-api:1.135'
+	}
+}
+
 plugins {
-	id 'fabric-loom' version '0.9.+'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+def ENV = System.getenv()
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-minecraft {
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
 }
 
 dependencies {
-	//to change the versions see the gradle.properties file
+	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -29,28 +42,23 @@ dependencies {
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+}
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
+loom {
+	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }
 
 processResources {
 	inputs.property "version", project.version
-  
+	
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
-	it.options.encoding = "UTF-8"
-
-	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+	it.options.release = 17
 }
 
 java {
@@ -70,20 +78,48 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+			from components.java
 		}
 	}
+	
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
 		// Add repositories to publish to here.
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+	}
+}
+
+task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
+	doLast {
+		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
+		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+	}
+}
+
+import org.kohsuke.github.GHReleaseBuilder
+import org.kohsuke.github.GitHub
+
+task github(dependsOn: moveDevLibs) {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
+		def ghVersion = version.substring(0, version.indexOf("-"))
+		
+		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
+		if(ghRelease == null) {
+			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			ghRelease = releaseBuilder.create()
+		}
+		
+		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
 	}
 }

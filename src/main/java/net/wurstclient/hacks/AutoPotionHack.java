@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,17 +26,14 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoPotionHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
-		"Throws a potion when your health\n"
-			+ "reaches this value or falls below it.",
-		6, 0.5, 9.5, 0.5,
-		v -> ValueDisplay.DECIMAL.getValueString(v) + " hearts");
+		"Throws a potion when your health reaches this value or falls below it.",
+		6, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts"));
 	
 	private int timer;
 	
 	public AutoPotionHack()
 	{
-		super("AutoPotion", "Automatically throws splash potions of\n"
-			+ "instant health when your health is low.");
+		super("AutoPotion");
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);

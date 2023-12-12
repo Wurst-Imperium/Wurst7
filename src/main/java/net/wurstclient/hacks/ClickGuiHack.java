@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,21 +23,40 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"click gui", "WindowGUI", "window gui", "HackMenu", "hack menu"})
 public final class ClickGuiHack extends Hack
 {
+	private final ColorSetting bgColor =
+		new ColorSetting("Background", "Background color", new Color(0x404040));
+	
+	private final ColorSetting acColor =
+		new ColorSetting("Accent", "Accent color", new Color(0x101010));
+	
+	private final ColorSetting txtColor =
+		new ColorSetting("Text", "Text color", new Color(0xF0F0F0));
+	
 	private final SliderSetting opacity = new SliderSetting("Opacity", 0.5,
 		0.15, 0.85, 0.01, ValueDisplay.PERCENTAGE);
 	
-	private final ColorSetting bgColor =
-		new ColorSetting("BG", "Background color", new Color(64, 64, 64));
+	private final SliderSetting ttOpacity = new SliderSetting("Tooltip opacity",
+		0.75, 0.15, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
-	private final ColorSetting acColor =
-		new ColorSetting("AC", "Accent color", new Color(16, 16, 16));
+	private final SliderSetting maxHeight = new SliderSetting("Max height",
+		"Maximum window height\n" + "0 = no limit", 200, 0, 1000, 50,
+		ValueDisplay.INTEGER);
+	
+	private final SliderSetting maxSettingsHeight =
+		new SliderSetting("Max settings height",
+			"Maximum height for settings windows\n" + "0 = no limit", 200, 0,
+			1000, 50, ValueDisplay.INTEGER);
 	
 	public ClickGuiHack()
 	{
-		super("ClickGUI", "Window-based ClickGUI.");
-		addSetting(opacity);
+		super("ClickGUI");
 		addSetting(bgColor);
 		addSetting(acColor);
+		addSetting(txtColor);
+		addSetting(opacity);
+		addSetting(ttOpacity);
+		addSetting(maxHeight);
+		addSetting(maxSettingsHeight);
 	}
 	
 	@Override
@@ -47,18 +66,38 @@ public final class ClickGuiHack extends Hack
 		setEnabled(false);
 	}
 	
+	public float[] getBackgroundColor()
+	{
+		return bgColor.getColorF();
+	}
+	
+	public float[] getAccentColor()
+	{
+		return acColor.getColorF();
+	}
+	
+	public int getTextColor()
+	{
+		return txtColor.getColorI();
+	}
+	
 	public float getOpacity()
 	{
 		return opacity.getValueF();
 	}
 	
-	public float[] getBgColor()
+	public float getTooltipOpacity()
 	{
-		return bgColor.getColorF();
+		return ttOpacity.getValueF();
 	}
 	
-	public float[] getAcColor()
+	public int getMaxHeight()
 	{
-		return acColor.getColorF();
+		return maxHeight.getValueI();
+	}
+	
+	public int getMaxSettingsHeight()
+	{
+		return maxSettingsHeight.getValueI();
 	}
 }
