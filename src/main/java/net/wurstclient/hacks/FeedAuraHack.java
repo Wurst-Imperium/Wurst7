@@ -30,7 +30,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -43,6 +42,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -192,10 +192,8 @@ public final class FeedAuraHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
@@ -204,13 +202,9 @@ public final class FeedAuraHack extends Hack
 		float green = p * 2F;
 		float red = 2 - green;
 		
-		matrixStack.translate(
-			MathHelper.lerp(partialTicks, renderTarget.prevX,
-				renderTarget.getX()) - regionX,
-			MathHelper.lerp(partialTicks, renderTarget.prevY,
-				renderTarget.getY()),
-			MathHelper.lerp(partialTicks, renderTarget.prevZ,
-				renderTarget.getZ()) - regionZ);
+		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
 		
 		matrixStack.translate(0, 0.05, 0);
 		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),

@@ -47,6 +47,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
@@ -94,9 +95,7 @@ public final class MobSpawnEspHack extends Hack
 		
 		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
 		{
-			if(scanner.vertexBuffer != null)
-				scanner.vertexBuffer.close();
-			
+			scanner.reset();
 			scanners.remove(scanner.chunk.getPos());
 		}
 		
@@ -108,6 +107,17 @@ public final class MobSpawnEspHack extends Hack
 	{
 		DimensionType dimension = MC.world.getDimension();
 		
+		// remove old scanners that are out of range
+		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
+		{
+			if(drawDistance.isInRange(scanner.chunk.getPos())
+				&& dimension == scanner.dimension)
+				continue;
+			
+			scanner.reset();
+			scanners.remove(scanner.chunk.getPos());
+		}
+		
 		// create & start scanners for new chunks
 		for(Chunk chunk : drawDistance.getChunksInRange())
 		{
@@ -118,25 +128,6 @@ public final class MobSpawnEspHack extends Hack
 			ChunkScanner scanner = new ChunkScanner(chunk, dimension);
 			scanners.put(chunkPos, scanner);
 			scanner.future = pool.submit(() -> scanner.scan());
-		}
-		
-		// remove old scanners that are out of range
-		for(ChunkScanner scanner : new ArrayList<>(scanners.values()))
-		{
-			if(drawDistance.isInRange(scanner.chunk.getPos())
-				&& dimension == scanner.dimension)
-				continue;
-			
-			if(!scanner.doneCompiling)
-				continue;
-			
-			if(scanner.vertexBuffer != null)
-				scanner.vertexBuffer.close();
-			
-			if(scanner.future != null)
-				scanner.future.cancel(true);
-			
-			scanners.remove(scanner.chunk.getPos());
 		}
 		
 		// generate vertex buffers
@@ -301,8 +292,7 @@ public final class MobSpawnEspHack extends Hack
 		
 		private void compileBuffer()
 		{
-			int regionX = (chunk.getPos().getStartX() >> 9) * 512;
-			int regionZ = (chunk.getPos().getStartZ() >> 9) * 512;
+			RegionPos region = RegionPos.of(chunk.getPos());
 			
 			if(vertexBuffer != null)
 				vertexBuffer.close();
@@ -315,8 +305,8 @@ public final class MobSpawnEspHack extends Hack
 				VertexFormats.POSITION_COLOR);
 			
 			new ArrayList<>(red).stream().filter(Objects::nonNull)
-				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
-					pos.getZ() - regionZ))
+				.map(pos -> new BlockPos(pos.getX() - region.x(), pos.getY(),
+					pos.getZ() - region.z()))
 				.forEach(pos -> {
 					bufferBuilder
 						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ())
@@ -332,8 +322,8 @@ public final class MobSpawnEspHack extends Hack
 				});
 			
 			new ArrayList<>(yellow).stream().filter(Objects::nonNull)
-				.map(pos -> new BlockPos(pos.getX() - regionX, pos.getY(),
-					pos.getZ() - regionZ))
+				.map(pos -> new BlockPos(pos.getX() - region.x(), pos.getY(),
+					pos.getZ() - region.z()))
 				.forEach(pos -> {
 					bufferBuilder
 						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ())

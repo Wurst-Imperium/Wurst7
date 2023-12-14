@@ -93,7 +93,7 @@
   "description.wurst.hack.killpotion": "Genereaza o potiune care poate ucide orice, inclusiv playerii in Creativ. Nu functioneaza pe mortaciuni, fiindca mortaciunile-s deja moarte.\n\nNecesita Creativ.",
   "description.wurst.hack.liquids": "Iti permite sa pui block-uri in lichide.",
   "description.wurst.hack.lsd": "Cauzeaza halucinatii.",
-  "description.wurst.hack.masstpa": "Trimite TPA request la toti playerii.\nSe opreste atunci cand cineva accepta.",
+  "description.wurst.hack.masstpa": "Trimite TPA request la toti playerii.",
   "description.wurst.hack.mileycyrus": "Faci twerk.",
   "description.wurst.hack.mobesp": "Contureaza mobii din apropiere.",
   "description.wurst.hack.mobspawnesp": "Contureaza zonele in care mobii se pot spawna.\n§egalben§r - mobii se pot spawna noaptea\n§crosu§r - mobii se pot spawna mereu",

@@ -31,4 +31,10 @@ public final class FilterPetsSetting extends EntityFilterCheckbox
 		return new FilterPetsSetting(
 			"Won't attack tamed wolves, tamed horses, etc.", checked);
 	}
+	
+	public static FilterPetsSetting genericVision(boolean checked)
+	{
+		return new FilterPetsSetting(
+			"Won't show tamed wolves, tamed horses, etc.", checked);
+	}
 }

@@ -92,7 +92,7 @@
   "description.wurst.hack.killpotion": "生成一個能殺死絕大多數生物嘅葯水，包括創造模式嘅玩家，但對唔死嘅生物抑或已死生物無效。\n\n需要喺創造模式下。",
   "description.wurst.hack.liquids": "解除限制，允許你喺水中直接放置方塊。",
   "description.wurst.hack.lsd": "產生食咗雲南蘑菇一樣嘅效果。",
-  "description.wurst.hack.masstpa": "畀每個人發送 傳送申請。\n直到有人接受就會停止\n\n§c§l警告：§r中文伺服器使用會因為 Wurst 判斷嘅係英文而導致 傳送申請 仍喺繼續。",
+  "description.wurst.hack.masstpa": "畀每個人發送 傳送申請。\n\n§c§l警告：§r中文伺服器使用會因為 Wurst 判斷嘅係英文而導致 傳送申請 仍喺繼續。",
   "description.wurst.hack.mileycyrus": "類似瘋狂按 Shift 潛行。",
   "description.wurst.hack.mobesp": "高亮附近嘅生物。",
   "description.wurst.hack.mobspawnesp": "高亮生物可以生成嘅區域。\n§e黃色§r 可以喺夜間生成\n§c紅色§r - 可以喺任意時候生成",
@@ -164,5 +164,6 @@
   "gui.wurst.altmanager.folder_error.title": "無法創建 「.Wurst encryption」 文件夾！",
   "gui.wurst.altmanager.folder_error.message": "你可能唔小心阻止 Wurst 訪問呢個文件夾。\n如果Wurst無法訪問， AltManager 將無法加密或解密你嘅帳號列表。\n你依然可以使用 AltManager，但你依家創建嘅任何帳號將冇辦法被保存。\n\n全部錯誤如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你嘅帳號列表係空嘅。",
-  "gui.wurst.altmanager.empty.message": "你想唔想要啲隨機嘅帳號嚟開始？"
+  "gui.wurst.altmanager.empty.message": "你想唔想要啲隨機嘅帳號嚟開始？",
+  "key.wurst.zoom": "縮放"
 }

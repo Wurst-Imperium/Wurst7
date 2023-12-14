@@ -34,6 +34,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChunkUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksHack extends Hack
@@ -87,7 +88,7 @@ public final class NewChunksHack extends Hack
 	private final NewChunksReasonsRenderer reasonsRenderer =
 		new NewChunksReasonsRenderer(drawDistance);
 	
-	private ChunkPos lastRegion;
+	private RegionPos lastRegion;
 	private DimensionType lastDimension;
 	
 	public NewChunksHack()
@@ -248,10 +249,7 @@ public final class NewChunksHack extends Hack
 		if(MC.world.getDimension() != lastDimension)
 			reset();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		ChunkPos region = new ChunkPos(regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
 		if(!region.equals(lastRegion))
 		{
 			onUpdate();

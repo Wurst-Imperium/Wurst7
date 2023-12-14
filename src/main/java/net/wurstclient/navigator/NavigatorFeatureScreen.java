@@ -21,8 +21,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -34,6 +34,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -44,7 +45,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
@@ -337,33 +337,29 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
+		boolean noButtons = Screens.getButtons(this).isEmpty();
+		int bgy3 = bgy2 - (noButtons ? 0 : 24);
+		int windowY1 = bgy1 + scroll + windowComponentY;
+		int windowY2 = windowY1 + window.getInnerHeight();
 		
 		setColorToBackground();
 		drawQuads(matrixStack, bgx1, bgy1, bgx2,
-			Math.max(bgy1,
-				Math.min(bgy2
-					- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
-					bgy1 + scroll + windowComponentY)));
-		drawQuads(matrixStack, bgx1,
-			Math.max(bgy1, Math.min(bgy2
-				- (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24),
-				bgy1 + scroll + windowComponentY + window.getInnerHeight())),
+			MathHelper.clamp(windowY1, bgy1, bgy3));
+		drawQuads(matrixStack, bgx1, MathHelper.clamp(windowY2, bgy1, bgy3),
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (((IScreen)(Object)this).getButtons().isEmpty() ? 0 : 24));
+		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
 		gui.setTooltip("");
 		window.validate();
 		
-		int windowY = bgy1 + scroll + windowComponentY;
-		window.setY(windowY - 13);
+		window.setY(windowY1 - 13);
 		matrixStack.push();
-		matrixStack.translate(bgx1, windowY, 0);
+		matrixStack.translate(bgx1, windowY1, 0);
 		
 		{
 			int x1 = 0;
@@ -433,7 +429,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
-			window.getChild(i).render(context, mouseX - bgx1, mouseY - windowY,
+			window.getChild(i).render(context, mouseX - bgx1, mouseY - windowY1,
 				partialTicks);
 		matrixStack.pop();
 		
@@ -487,13 +483,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(Drawable d : ((IScreen)(Object)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
 			// positions
 			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();
