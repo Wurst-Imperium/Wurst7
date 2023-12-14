@@ -81,10 +81,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	private void updateGamma()
 	{
-		boolean shouldChangeGamma =
-			isEnabled() && method.getSelected() == Method.GAMMA;
-		
-		if(shouldChangeGamma)
+		if(isChangingGamma())
 		{
 			setGamma(16);
 			return;
@@ -163,9 +160,9 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		return nightVisionStrength;
 	}
 	
-	public boolean isGammaOption()
+	public boolean isChangingGamma()
 	{
-		return method.getSelected() == Method.GAMMA;
+		return isEnabled() && method.getSelected() == Method.GAMMA;
 	}
 	
 	/**
