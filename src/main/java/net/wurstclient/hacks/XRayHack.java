@@ -133,7 +133,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
-		if(!fullbright.isEnabled())
+		if(!fullbright.isChangingGamma())
 			ISimpleOption.get(MC.options.getGamma())
 				.forceSetValue(fullbright.getDefaultGamma());
 	}
