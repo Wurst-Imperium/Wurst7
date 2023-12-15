@@ -13,7 +13,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -56,7 +55,7 @@ public enum ItemUtils
 		}
 	}
 	
-	public static float getAttackSpeed(ToolItem item)
+	public static float getAttackSpeed(Item item)
 	{
 		return (float)item.getAttributeModifiers(EquipmentSlot.MAINHAND)
 			.get(EntityAttributes.GENERIC_ATTACK_SPEED).stream().findFirst()

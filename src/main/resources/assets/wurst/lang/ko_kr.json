@@ -111,7 +111,6 @@
   "description.wurst.hack.safewalk": "블럭끝에서 떨어지지 않게 해줍니다.",
   "description.wurst.hack.scaffoldwalk": "자동으로 발 아래에 블록을 배치합니다.",
   "description.wurst.hack.search": "무지개 색상으로 강조하여 특정 블록을 찾는 데 도움을 줍니다.",
-  "description.wurst.hack.servercrasher": "1.15.x 버전 서버를 충돌시킬 수 있는 아이템을 생성합니다.\n§o크리에이티브 모드 전용.§r",
   "description.wurst.hack.skinderp": "스킨의 커버를 무작위로 on/off 합니다.",
   "description.wurst.hack.sneak": "웅크리게 합니다.",
   "description.wurst.hack.speedhack": "달리기와 점프로 할 때보다 약 2.5배 더 빠르게 달릴 수 있게 해줍니다.\n\n§6§l주의:§r NoCheat+ 버전 3.13.2에서 패치되었습니다. 이전 버전의 NoCheat+에서만 우회됩니다.\n서버의 NoCheat+ 버전을 확인하려면 §l/ncp version§r을 입력하세요.",

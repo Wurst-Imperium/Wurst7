@@ -39,7 +39,8 @@
   },
   "breaks": {
     "wi_zoom": "*",
-    "wi-zoom": "*"
+    "wi-zoom": "*",
+    "vulkanmod": "*"
   },
   "custom": {
     "modmenu": {
