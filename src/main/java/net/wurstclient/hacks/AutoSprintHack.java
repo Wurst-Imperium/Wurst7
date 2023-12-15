@@ -17,9 +17,6 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"auto sprint"})
 public final class AutoSprintHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting attack = new CheckboxSetting("Attack Sprint",
-		"Keep sprinting when attacking.", false);
-	
 	private final CheckboxSetting hungry = new CheckboxSetting("Hungry Sprint",
 		"Sprint even on low hunger.", false);
 	
@@ -27,7 +24,6 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 	{
 		super("AutoSprint");
 		setCategory(Category.MOVEMENT);
-		addSetting(attack);
 		addSetting(hungry);
 	}
 	
@@ -56,11 +52,6 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		
 		if(player.forwardSpeed > 0)
 			player.setSprinting(true);
-	}
-	
-	public boolean shouldSprintAttack()
-	{
-		return isEnabled() && attack.isChecked();
 	}
 	
 	public boolean shouldSprintHungry()
