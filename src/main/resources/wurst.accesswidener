@@ -1,6 +1,5 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
-accessible	class	net/minecraft/client/texture/PlayerSkinProvider$Textures
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/render/GameRenderer	loadPostProcessor	(Lnet/minecraft/util/Identifier;)V
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
