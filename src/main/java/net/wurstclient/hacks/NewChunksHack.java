@@ -17,6 +17,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -32,6 +33,8 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChunkUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksHack extends Hack
@@ -85,7 +88,8 @@ public final class NewChunksHack extends Hack
 	private final NewChunksReasonsRenderer reasonsRenderer =
 		new NewChunksReasonsRenderer(drawDistance);
 	
-	private ChunkPos lastRegion;
+	private RegionPos lastRegion;
+	private DimensionType lastDimension;
 	
 	public NewChunksHack()
 	{
@@ -108,12 +112,18 @@ public final class NewChunksHack extends Hack
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		reset();
+	}
+	
+	private void reset()
+	{
 		oldChunks.clear();
 		newChunks.clear();
 		dontCheckAgain.clear();
 		oldChunkReasons.clear();
 		newChunkReasons.clear();
 		lastRegion = null;
+		lastDimension = MC.world.getDimension();
 	}
 	
 	@Override
@@ -184,7 +194,7 @@ public final class NewChunksHack extends Hack
 		int minY = chunk.getBottomY();
 		int minZ = chunkPos.getStartZ();
 		int maxX = chunkPos.getEndX();
-		int maxY = chunk.getHighestNonEmptySectionYOffset() + 16;
+		int maxY = ChunkUtils.getHighestNonEmptySectionYOffset(chunk) + 16;
 		int maxZ = chunkPos.getEndZ();
 		
 		for(int x = minX; x <= maxX; x++)
@@ -236,10 +246,10 @@ public final class NewChunksHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		ChunkPos region = new ChunkPos(regionX, regionZ);
+		if(MC.world.getDimension() != lastDimension)
+			reset();
+		
+		RegionPos region = RenderUtils.getCameraRegion();
 		if(!region.equals(lastRegion))
 		{
 			onUpdate();

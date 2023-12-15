@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -145,8 +144,7 @@ public final class NukerLegitHack extends Hack
 		
 		// check pos
 		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-		if(pos == null
-			|| BlockUtils.getState(pos).getMaterial() == Material.AIR)
+		if(pos == null || BlockUtils.getBlock(pos) == Blocks.AIR)
 			return;
 		
 		// set id

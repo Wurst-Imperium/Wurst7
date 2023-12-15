@@ -83,7 +83,7 @@ public final class AutoMineHack extends Hack implements UpdateListener
 		if(currentBlock == null)
 			return;
 		
-		IMC.getInteractionManager().setBreakingBlock(true);
+		MC.interactionManager.breakingBlock = true;
 		MC.interactionManager.cancelBlockBreaking();
 		currentBlock = null;
 	}

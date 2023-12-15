@@ -116,7 +116,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		if(entity == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		WURST.getHax().autoSwordHack.setSlot(entity);
 		
 		// teleport
 		player.setPosition(entity.getX() + random.nextInt(3) * 2 - 2,

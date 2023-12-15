@@ -25,9 +25,10 @@ public final class TranslationsOtf extends OtherFeature
 	
 	public TranslationsOtf()
 	{
-		super("Translations", "Localization settings.\n\n"
-			+ "\u00a7cThis is an experimental feature!\u00a7r\n"
-			+ "We don't have many translations yet. If you speak both English and some other language, please help us by adding more translations.");
+		super("Translations", "Allows text in Wurst to be displayed"
+			+ " in other languages than English. It will use the same language"
+			+ " that Minecraft is set to.\n\n"
+			+ "This is an experimental feature!");
 		addSetting(forceEnglish);
 	}
 	

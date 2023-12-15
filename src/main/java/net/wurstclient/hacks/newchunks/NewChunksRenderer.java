@@ -41,7 +41,7 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
-		vertexBuffers[i] = new VertexBuffer();
+		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);
 		VertexBuffer.unbind();
