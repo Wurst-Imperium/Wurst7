@@ -168,10 +168,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
 	}
-  
-	@Inject(at = {@At("HEAD")},
-		method = {"canSprint()Z"},
-		cancellable = true)
+	
+	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
 	private void canSprint(CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())

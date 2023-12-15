@@ -17,12 +17,15 @@ import net.wurstclient.settings.CheckboxSetting;
 @SearchTags({"auto sprint"})
 public final class AutoSprintHack extends Hack implements UpdateListener
 {
-	private final CheckboxSetting allDirections = new CheckboxSetting(
-		"Omnidirectional Sprint", "Sprint in all directions, not just forward.", false);
-	private final CheckboxSetting attack = new CheckboxSetting(
-		"Attack Sprint", "Keep sprinting when attacking.", false);
-	private final CheckboxSetting hungry = new CheckboxSetting(
-		"Hungry Sprint", "Sprint even on low hunger.", false);
+	private final CheckboxSetting allDirections =
+		new CheckboxSetting("Omnidirectional Sprint",
+			"Sprint in all directions, not just forward.", false);
+	
+	private final CheckboxSetting attack = new CheckboxSetting("Attack Sprint",
+		"Keep sprinting when attacking.", false);
+	
+	private final CheckboxSetting hungry = new CheckboxSetting("Hungry Sprint",
+		"Sprint even on low hunger.", false);
 	
 	public AutoSprintHack()
 	{
@@ -57,8 +60,8 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 			return;
 		
 		if(player.forwardSpeed > 0
-			|| (allDirections.isChecked()
-				&& (MC.player.getVelocity().x != 0 || MC.player.getVelocity().z != 0)))
+			|| allDirections.isChecked() && (MC.player.getVelocity().x != 0
+				|| MC.player.getVelocity().z != 0))
 			player.setSprinting(true);
 	}
 	
