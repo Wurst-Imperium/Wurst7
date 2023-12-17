@@ -109,8 +109,8 @@ public abstract class GenericContainerScreenMixin
 			if(slot.getStack().isEmpty())
 				continue;
 
-			if(!autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
-				continue;
+		if(itemName != null && !itemName.isEmpty() && !autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
+			continue;
 			
 			waitForDelay();
 			if(this.mode != mode || client.currentScreen == null)
