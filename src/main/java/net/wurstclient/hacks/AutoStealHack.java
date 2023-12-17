@@ -67,7 +67,7 @@ private final SliderSetting delay = new SliderSetting("Delay",
 	   return delay.getValueI();
 	}
 	
-	public void getItemList()
+	public String getItemList()
 	{
 	   return items;
 	}
