@@ -19,6 +19,10 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.wurstclient.settings.ItemListSetting;
 
 @Mixin(ShulkerBoxScreen.class)
 public abstract class ShulkerBoxScreenMixin
@@ -89,8 +93,15 @@ public abstract class ShulkerBoxScreenMixin
 		
 		for(int i = from; i < to; i++)
 		{
-			Slot slot = handler.slots.get(i);
+                        Slot slot = handler.slots.get(i);
+			ItemStack stack = slot.getStack();
+			Item item = stack.getItem();
+			String itemName = Registries.ITEM.getId(item).toString();
+			
 			if(slot.getStack().isEmpty())
+				continue;
+
+		if(itemName != null && !itemName.isEmpty() && !autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
 				continue;
 			
 			waitForDelay();
