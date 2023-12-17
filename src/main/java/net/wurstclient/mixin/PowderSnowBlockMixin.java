@@ -27,8 +27,8 @@ public abstract class PowderSnowBlockMixin extends Block
 		super(settings);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"canWalkOnPowderSnow(Lnet/minecraft/entity/Entity;)Z"},
+	@Inject(at = @At("HEAD"),
+		method = "canWalkOnPowderSnow(Lnet/minecraft/entity/Entity;)Z",
 		cancellable = true)
 	private static void onCanWalkOnPowderSnow(Entity entity,
 		CallbackInfoReturnable<Boolean> cir)
@@ -36,9 +36,7 @@ public abstract class PowderSnowBlockMixin extends Block
 		if(!WurstClient.INSTANCE.getHax().snowShoeHack.isEnabled())
 			return;
 		
-		if(entity != WurstClient.MC.player)
-			return;
-		
-		cir.setReturnValue(true);
+		if(entity == WurstClient.MC.player)
+			cir.setReturnValue(true);
 	}
 }

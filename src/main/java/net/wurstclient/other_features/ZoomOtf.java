@@ -93,6 +93,11 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			level.getMaximum());
 	}
 	
+	public boolean shouldPreventHotbarScrolling()
+	{
+		return WURST.getZoomKey().isPressed() && scroll.isChecked();
+	}
+	
 	public SliderSetting getLevelSetting()
 	{
 		return level;

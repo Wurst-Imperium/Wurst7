@@ -25,18 +25,17 @@ public class InGameOverlayRendererMixin
 	@ModifyConstant(
 		method = "renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
 		constant = @Constant(floatValue = -0.3F))
-	private static float getFireOffset(float orig)
+	private static float getFireOffset(float original)
 	{
-		return orig - WurstClient.INSTANCE.getHax().noFireOverlayHack
+		return original - WurstClient.INSTANCE.getHax().noFireOverlayHack
 			.getOverlayOffset();
 	}
 	
 	@Inject(at = @At("HEAD"),
 		method = "renderUnderwaterOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
 		cancellable = true)
-	private static void onRenderUnderwaterOverlay(
-		MinecraftClient minecraftClient, MatrixStack matrixStack,
-		CallbackInfo ci)
+	private static void onRenderUnderwaterOverlay(MinecraftClient client,
+		MatrixStack matrices, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			ci.cancel();

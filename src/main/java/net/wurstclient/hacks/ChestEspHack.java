@@ -33,18 +33,16 @@ import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.hacks.chestesp.ChestEspRenderer;
-import net.wurstclient.hacks.chestesp.ChestEspStyle;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.RenderUtils;
 
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
-	private final EnumSetting<ChestEspStyle> style =
-		new EnumSetting<>("Style", ChestEspStyle.values(), ChestEspStyle.BOXES);
+	private final EspStyleSetting style = new EspStyleSetting();
 	
 	private final ChestEspBlockGroup basicChests = new ChestEspBlockGroup(
 		new ColorSetting("Chest color",
@@ -81,6 +79,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			"Barrels will be highlighted in this color.", Color.GREEN),
 		new CheckboxSetting("Include barrels", true));
 	
+	private final ChestEspBlockGroup pots = new ChestEspBlockGroup(
+		new ColorSetting("Pots color",
+			"Decorated pots will be highlighted in this color.", Color.GREEN),
+		new CheckboxSetting("Include pots", false));
+	
 	private final ChestEspBlockGroup shulkerBoxes = new ChestEspBlockGroup(
 		new ColorSetting("Shulker color",
 			"Shulker boxes will be highlighted in this color.", Color.MAGENTA),
@@ -109,14 +112,20 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			new Color(0xFF8000)),
 		new CheckboxSetting("Include dispensers", false));
 	
+	private final ChestEspBlockGroup crafters = new ChestEspBlockGroup(
+		new ColorSetting("Crafter color",
+			"Crafters will be highlighted in this color.", Color.WHITE),
+		new CheckboxSetting("Include crafters", false));
+	
 	private final ChestEspBlockGroup furnaces =
 		new ChestEspBlockGroup(new ColorSetting("Furnace color",
 			"Furnaces, smokers, and blast furnaces will be highlighted in this color.",
 			Color.RED), new CheckboxSetting("Include furnaces", false));
 	
-	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
-		trapChests, enderChests, chestCarts, chestBoats, barrels, shulkerBoxes,
-		hoppers, hopperCarts, droppers, dispensers, furnaces);
+	private final List<ChestEspGroup> groups =
+		Arrays.asList(basicChests, trapChests, enderChests, chestCarts,
+			chestBoats, barrels, pots, shulkerBoxes, hoppers, hopperCarts,
+			droppers, dispensers, crafters, furnaces);
 	
 	private final List<ChestEspEntityGroup> entityGroups =
 		Arrays.asList(chestCarts, chestBoats, hopperCarts);
@@ -172,12 +181,16 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				shulkerBoxes.add(blockEntity);
 			else if(blockEntity instanceof BarrelBlockEntity)
 				barrels.add(blockEntity);
+			else if(blockEntity instanceof DecoratedPotBlockEntity)
+				pots.add(blockEntity);
 			else if(blockEntity instanceof HopperBlockEntity)
 				hoppers.add(blockEntity);
 			else if(blockEntity instanceof DropperBlockEntity)
 				droppers.add(blockEntity);
 			else if(blockEntity instanceof DispenserBlockEntity)
 				dispensers.add(blockEntity);
+			else if(blockEntity instanceof CrafterBlockEntity)
+				crafters.add(blockEntity);
 			else if(blockEntity instanceof AbstractFurnaceBlockEntity)
 				furnaces.add(blockEntity);
 			
@@ -194,7 +207,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	public void onCameraTransformViewBobbing(
 		CameraTransformViewBobbingEvent event)
 	{
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 			event.cancel();
 	}
 	
@@ -213,16 +226,17 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
-		ChestEspRenderer espRenderer = new ChestEspRenderer(matrixStack);
+		ChestEspRenderer espRenderer =
+			new ChestEspRenderer(matrixStack, partialTicks);
 		
-		if(style.getSelected().hasBoxes())
+		if(style.hasBoxes())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)
 				.forEach(espRenderer::renderBoxes);
 		}
 		
-		if(style.getSelected().hasLines())
+		if(style.hasLines())
 		{
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			groups.stream().filter(ChestEspGroup::isEnabled)

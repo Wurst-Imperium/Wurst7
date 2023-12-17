@@ -26,18 +26,17 @@ import net.wurstclient.events.CactusCollisionShapeListener.CactusCollisionShapeE
 @Mixin(CactusBlock.class)
 public abstract class CactusBlockMixin extends Block
 {
-	private CactusBlockMixin(WurstClient wurst, Settings block$Settings_1)
+	private CactusBlockMixin(WurstClient wurst, Settings settings)
 	{
-		super(block$Settings_1);
+		super(settings);
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"},
+	@Inject(at = @At("HEAD"),
+		method = "getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
 		cancellable = true)
-	private void onGetCollisionShape(BlockState blockState_1,
-		BlockView blockView_1, BlockPos blockPos_1,
-		ShapeContext entityContext_1, CallbackInfoReturnable<VoxelShape> cir)
+	private void onGetCollisionShape(BlockState state, BlockView world,
+		BlockPos pos, ShapeContext context,
+		CallbackInfoReturnable<VoxelShape> cir)
 	{
 		CactusCollisionShapeEvent event = new CactusCollisionShapeEvent();
 		EventManager.fire(event);

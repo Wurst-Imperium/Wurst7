@@ -37,8 +37,8 @@ public abstract class ClientConnectionMixin
 		ordinal = 0),
 		method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
-	private void onChannelRead0(ChannelHandlerContext channelHandlerContext,
-		Packet<?> packet, CallbackInfo ci)
+	private void onChannelRead0(ChannelHandlerContext context, Packet<?> packet,
+		CallbackInfo ci)
 	{
 		PacketInputEvent event = new PacketInputEvent(packet);
 		EventManager.fire(event);

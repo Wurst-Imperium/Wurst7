@@ -10,14 +10,12 @@ package net.wurstclient.util;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
@@ -58,7 +56,7 @@ public enum BlockPlacer
 		// if there is a replaceable block at the position, we need to place
 		// against the block itself instead of a neighbor
 		if(BlockUtils.canBeClicked(pos)
-			&& BlockUtils.getState(pos).getMaterial().isReplaceable())
+			&& BlockUtils.getState(pos).isReplaceable())
 		{
 			// the parameters for this happen to be the same as for breaking
 			// the block, so we can just use BlockBreaker to get them
@@ -85,7 +83,7 @@ public enum BlockPlacer
 			VoxelShape shape = state.getOutlineShape(MC.world, neighbor);
 			
 			// if neighbor has no shape or is replaceable, it can't be used
-			if(shape.isEmpty() || state.getMaterial().isReplaceable())
+			if(shape.isEmpty() || state.isReplaceable())
 				continue;
 			
 			Box box = shape.getBoundingBox();
@@ -124,11 +122,7 @@ public enum BlockPlacer
 			if(distancesSq[i] <= distanceSqToPosVec)
 				continue;
 			
-			linesOfSight[i] = MC.world
-				.raycast(new RaycastContext(eyesPos, hitVecs[i],
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() == HitResult.Type.MISS;
+			linesOfSight[i] = BlockUtils.hasLineOfSight(eyesPos, hitVecs[i]);
 		}
 		
 		// decide which side to use

@@ -9,15 +9,15 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
@@ -25,26 +25,30 @@ import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.ShouldDrawSideListener;
-import net.wurstclient.events.TesselateBlockListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
 public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
-	ShouldDrawSideListener, TesselateBlockListener, RenderBlockEntityListener
+	ShouldDrawSideListener, RenderBlockEntityListener
 {
-	private final BlockListSetting ores = new BlockListSetting("Ores", "",
+	private final BlockListSetting ores = new BlockListSetting("Ores",
+		"A list of blocks that X-Ray will show. They don't have to be just ores"
+			+ " - you can add any block you want.\n\n"
+			+ "Remember to restart X-Ray when changing this setting.",
 		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
 		"minecraft:bone_block", "minecraft:bookshelf",
 		"minecraft:brewing_stand", "minecraft:chain_command_block",
 		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
 		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
-		"minecraft:crafting_table", "minecraft:deepslate_coal_ore",
+		"minecraft:crafter", "minecraft:crafting_table",
+		"minecraft:decorated_pot", "minecraft:deepslate_coal_ore",
 		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
 		"minecraft:deepslate_emerald_ore", "minecraft:deepslate_gold_ore",
 		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
@@ -62,31 +66,30 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
 		"minecraft:raw_iron_block", "minecraft:redstone_block",
 		"minecraft:redstone_ore", "minecraft:repeating_command_block",
-		"minecraft:spawner", "minecraft:suspicious_sand", "minecraft:tnt",
-		"minecraft:torch", "minecraft:trapped_chest", "minecraft:water");
+		"minecraft:spawner", "minecraft:suspicious_gravel",
+		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
+		"minecraft:trapped_chest", "minecraft:water");
 	
-	private ArrayList<String> oreNames;
-	private final String warning;
+	private final CheckboxSetting onlyExposed = new CheckboxSetting(
+		"Only show exposed",
+		"Only shows ores that would be visible in caves. This can help against"
+			+ " anti-X-Ray plugins.\n\n"
+			+ "Remember to restart X-Ray when changing this setting.",
+		false);
 	
+	private final String optiFineWarning;
 	private final String renderName =
 		Math.random() < 0.01 ? "X-Wurst" : getName();
+	
+	private ArrayList<String> oreNamesCache;
 	
 	public XRayHack()
 	{
 		super("X-Ray");
 		setCategory(Category.RENDER);
 		addSetting(ores);
-		
-		List<String> mods = FabricLoader.getInstance().getAllMods().stream()
-			.map(ModContainer::getMetadata).map(ModMetadata::getId)
-			.collect(Collectors.toList());
-		
-		Pattern optifine = Pattern.compile("opti(?:fine|fabric).*");
-		
-		if(mods.stream().anyMatch(optifine.asPredicate()))
-			warning = "OptiFine is installed. X-Ray will not work properly!";
-		else
-			warning = null;
+		addSetting(onlyExposed);
+		optiFineWarning = checkOptiFine();
 	}
 	
 	@Override
@@ -98,49 +101,49 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onEnable()
 	{
-		oreNames = new ArrayList<>(ores.getBlockNames());
+		// cache block names in case the setting changes while X-Ray is enabled
+		oreNamesCache = new ArrayList<>(ores.getBlockNames());
 		
+		// add event listeners
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.add(ShouldDrawSideListener.class, this);
-		EVENTS.add(TesselateBlockListener.class, this);
 		EVENTS.add(RenderBlockEntityListener.class, this);
+		
+		// reload chunks
 		MC.worldRenderer.reload();
 		
-		if(warning != null)
-			ChatUtils.warning(warning);
+		// display warning if OptiFine is detected
+		if(optiFineWarning != null)
+			ChatUtils.warning(optiFineWarning);
 	}
 	
 	@Override
 	public void onDisable()
 	{
+		// remove event listeners
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(GetAmbientOcclusionLightLevelListener.class, this);
 		EVENTS.remove(ShouldDrawSideListener.class, this);
-		EVENTS.remove(TesselateBlockListener.class, this);
 		EVENTS.remove(RenderBlockEntityListener.class, this);
+		
+		// reload chunks
 		MC.worldRenderer.reload();
 		
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption =
-			(ISimpleOption<Double>)(Object)MC.options.getGamma();
-		
-		// TODO: Why does this use 0.5 instead of
-		// FullBright's defaultGamma setting?
-		if(!WURST.getHax().fullbrightHack.isEnabled())
-			gammaOption.forceSetValue(0.5);
+		// reset gamma
+		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
+		if(!fullbright.isChangingGamma())
+			ISimpleOption.get(MC.options.getGamma())
+				.forceSetValue(fullbright.getDefaultGamma());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		@SuppressWarnings("unchecked")
-		ISimpleOption<Double> gammaOption =
-			(ISimpleOption<Double>)(Object)MC.options.getGamma();
-		
-		gammaOption.forceSetValue(16.0);
+		// force gamma to 16 so that ores are bright enough to see
+		ISimpleOption.get(MC.options.getGamma()).forceSetValue(16.0);
 	}
 	
 	@Override
@@ -159,32 +162,54 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(isVisible(event.getState().getBlock()));
-	}
-	
-	@Override
-	public void onTesselateBlock(TesselateBlockEvent event)
-	{
-		if(!isVisible(event.getState().getBlock()))
-			event.cancel();
+		event.setRendered(
+			isVisible(event.getState().getBlock(), event.getPos()));
 	}
 	
 	@Override
 	public void onRenderBlockEntity(RenderBlockEntityEvent event)
 	{
-		if(!isVisible(BlockUtils.getBlock(event.getBlockEntity().getPos())))
+		BlockPos pos = event.getBlockEntity().getPos();
+		if(!isVisible(BlockUtils.getBlock(pos), pos))
 			event.cancel();
+	}
+	
+	private boolean isVisible(Block block, BlockPos pos)
+	{
+		String name = BlockUtils.getName(block);
+		int index = Collections.binarySearch(oreNamesCache, name);
+		boolean visible = index >= 0;
+		
+		if(visible && onlyExposed.isChecked() && pos != null)
+			return !BlockUtils.isOpaqueFullCube(pos.up())
+				|| !BlockUtils.isOpaqueFullCube(pos.down())
+				|| !BlockUtils.isOpaqueFullCube(pos.east())
+				|| !BlockUtils.isOpaqueFullCube(pos.west())
+				|| !BlockUtils.isOpaqueFullCube(pos.north())
+				|| !BlockUtils.isOpaqueFullCube(pos.south());
+		
+		return visible;
+	}
+	
+	/**
+	 * Checks if OptiFine/OptiFabric is installed and returns a warning message
+	 * if it is.
+	 */
+	private String checkOptiFine()
+	{
+		Stream<String> mods = FabricLoader.getInstance().getAllMods().stream()
+			.map(ModContainer::getMetadata).map(ModMetadata::getId);
+		
+		Pattern optifine = Pattern.compile("opti(?:fine|fabric).*");
+		
+		if(mods.anyMatch(optifine.asPredicate()))
+			return "OptiFine is installed. X-Ray will not work properly!";
+		
+		return null;
 	}
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
-	}
-	
-	private boolean isVisible(Block block)
-	{
-		String name = BlockUtils.getName(block);
-		int index = Collections.binarySearch(oreNames, name);
-		return index >= 0;
 	}
 }

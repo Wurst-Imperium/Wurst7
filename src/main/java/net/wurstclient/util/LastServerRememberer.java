@@ -7,8 +7,8 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
@@ -49,6 +49,6 @@ public enum LastServerRememberer
 			return;
 		
 		ConnectScreen.connect(prevScreen, WurstClient.MC,
-			ServerAddress.parse(lastServer.address), lastServer);
+			ServerAddress.parse(lastServer.address), lastServer, false);
 	}
 }

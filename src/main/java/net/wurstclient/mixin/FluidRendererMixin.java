@@ -23,16 +23,19 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(FluidRenderer.class)
 public class FluidRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z"},
+	/**
+	 * This mixin hides and shows fluids when using X-Ray without Sodium
+	 * installed.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z",
 		cancellable = true)
-	private static void onIsSideCovered(BlockView blockView, BlockPos blockPos,
-		Direction direction, float maxDeviation, BlockState blockState,
+	private static void onIsSideCovered(BlockView world, BlockPos pos,
+		Direction side, float maxDeviation, BlockState neighboringBlockState,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		BlockState state = blockView.getBlockState(blockPos);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state);
+		BlockState state = world.getBlockState(pos);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
