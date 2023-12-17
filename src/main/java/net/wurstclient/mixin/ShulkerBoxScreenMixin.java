@@ -101,7 +101,7 @@ public abstract class ShulkerBoxScreenMixin
 			if(slot.getStack().isEmpty())
 				continue;
 
-			if(!autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
+			if(itemName != null && !itemName.isEmpty() && !autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
 				continue;
 			
 			waitForDelay();
