@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import java.util.List;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -67,7 +68,7 @@ private final SliderSetting delay = new SliderSetting("Delay",
 	   return delay.getValueI();
 	}
 	
-	public String getItemList()
+	public List<String> getItemList()
 	{
 	   return items.getItemNames();
 	}
