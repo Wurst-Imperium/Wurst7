@@ -101,12 +101,11 @@ public abstract class GenericContainerScreenMixin
 		
 		for(int i = from; i < to; i++)
 		{
-                        Slot slot0 = handler.slots.get(i);
-			ItemStack stack = slot0.getStack(i);
+			Slot slot = handler.slots.get(i);
+			ItemStack stack = slot.getStack();
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
-			
-			Slot slot = handler.slots.get(i);
+
 			if(slot.getStack().isEmpty())
 				continue;
 
