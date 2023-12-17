@@ -69,7 +69,7 @@ private final SliderSetting delay = new SliderSetting("Delay",
 	
 	public String getItemList()
 	{
-	   return items;
+	   return items.getItemNames();
 	}
 	// See ContainerScreen54Mixin and ShulkerBoxScreenMixin
 }
