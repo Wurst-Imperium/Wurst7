@@ -81,6 +81,7 @@ spotless {
 		indentWithTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+		lineEndings('WINDOWS')
 	}
 }
 
