@@ -101,8 +101,8 @@ public abstract class GenericContainerScreenMixin
 		
 		for(int i = from; i < to; i++)
 		{
-
-			ItemStack stack = slot.getStack(i);
+                        Slot slot0 = handler.slots.get(i);
+			ItemStack stack = slot0.getStack(i);
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
 			
