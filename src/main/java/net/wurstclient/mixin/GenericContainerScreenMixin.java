@@ -26,6 +26,7 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.hack.Hack;
 
 @Mixin(GenericContainerScreen.class)
 public abstract class GenericContainerScreenMixin
