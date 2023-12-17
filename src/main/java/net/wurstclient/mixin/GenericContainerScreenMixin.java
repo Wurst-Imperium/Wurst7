@@ -96,8 +96,16 @@ public abstract class GenericContainerScreenMixin
 		
 		for(int i = from; i < to; i++)
 		{
+
+			ItemStack stack = MC.player.getInventory().getStack(i);
+			Item item = stack.getItem();
+			String itemName = Registries.ITEM.getId(item).toString();
+			
 			Slot slot = handler.slots.get(i);
 			if(slot.getStack().isEmpty())
+				continue;
+
+			if(!autoSteal.getItemList().getItemNames().contains(itemName) && autoSteal.areFilterEnabled())
 				continue;
 			
 			waitForDelay();
