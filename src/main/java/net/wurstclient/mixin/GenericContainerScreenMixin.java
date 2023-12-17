@@ -102,7 +102,7 @@ public abstract class GenericContainerScreenMixin
 		for(int i = from; i < to; i++)
 		{
 
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = WurstClient.MC.player.getInventory().getStack(i);
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
 			
