@@ -94,15 +94,16 @@ public abstract class ShulkerBoxScreenMixin
 		for(int i = from; i < to; i++)
 		{
 
-			ItemStack stack = slot.getStack(i);
+			
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
-
-                  if(!autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
+			
+			Slot slot = handler.slots.get(i);
+			ItemStack stack = slot.getStack(i);
+			if(slot.getStack().isEmpty())
 				continue;
 
-			Slot slot = handler.slots.get(i);
-			if(slot.getStack().isEmpty())
+			if(!autoSteal.getItemList().contains(itemName) && autoSteal.areFilterEnabled())
 				continue;
 			
 			waitForDelay();
