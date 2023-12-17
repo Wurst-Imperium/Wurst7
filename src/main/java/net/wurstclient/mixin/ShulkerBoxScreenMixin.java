@@ -94,7 +94,7 @@ public abstract class ShulkerBoxScreenMixin
 		for(int i = from; i < to; i++)
 		{
 
-			ItemStack stack = WurstClient.MC.player.getInventory().getStack(i);
+			ItemStack stack = slot.getStack(i);
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
 
