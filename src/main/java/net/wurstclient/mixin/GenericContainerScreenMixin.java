@@ -19,9 +19,13 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
+import net.wurstclient.settings.ItemListSetting;
 
 @Mixin(GenericContainerScreen.class)
 public abstract class GenericContainerScreenMixin
