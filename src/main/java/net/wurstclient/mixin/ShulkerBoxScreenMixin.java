@@ -93,13 +93,11 @@ public abstract class ShulkerBoxScreenMixin
 		
 		for(int i = from; i < to; i++)
 		{
-
-			
+                        Slot slot = handler.slots.get(i);
+			ItemStack stack = slot.getStack();
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
 			
-			Slot slot = handler.slots.get(i);
-			ItemStack stack = slot.getStack(i);
 			if(slot.getStack().isEmpty())
 				continue;
 
