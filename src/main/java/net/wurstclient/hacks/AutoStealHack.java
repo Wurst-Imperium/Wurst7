@@ -44,5 +44,5 @@ public final class AutoStealHack extends Hack
 		return delay.getValueI();
 	}
 	
-	// See ContainerScreen54Mixin and ShulkerBoxScreenMixin
+	// See GenericContainerScreenMixin and ShulkerBoxScreenMixin
 }
