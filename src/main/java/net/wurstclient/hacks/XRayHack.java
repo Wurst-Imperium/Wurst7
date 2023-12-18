@@ -47,7 +47,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:brewing_stand", "minecraft:chain_command_block",
 		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
 		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
-		"minecraft:crafting_table", "minecraft:deepslate_coal_ore",
+		"minecraft:crafter", "minecraft:crafting_table",
+		"minecraft:decorated_pot", "minecraft:deepslate_coal_ore",
 		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
 		"minecraft:deepslate_emerald_ore", "minecraft:deepslate_gold_ore",
 		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
@@ -133,7 +134,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
-		if(!fullbright.isEnabled())
+		if(!fullbright.isChangingGamma())
 			ISimpleOption.get(MC.options.getGamma())
 				.forceSetValue(fullbright.getDefaultGamma());
 	}

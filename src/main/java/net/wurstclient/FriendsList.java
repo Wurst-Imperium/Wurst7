@@ -60,7 +60,7 @@ public class FriendsList
 		if(!middleClickFriends.isChecked())
 			return;
 		
-		String name = entity.getEntityName();
+		String name = entity.getName().getString();
 		
 		if(contains(name))
 			removeAndSave(name);
@@ -75,7 +75,7 @@ public class FriendsList
 	
 	public boolean isFriend(Entity entity)
 	{
-		return entity != null && contains(entity.getEntityName());
+		return entity != null && contains(entity.getName().getString());
 	}
 	
 	public ArrayList<String> toList()

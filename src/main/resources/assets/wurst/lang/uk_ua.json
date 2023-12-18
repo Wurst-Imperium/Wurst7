@@ -131,7 +131,6 @@
   "description.wurst.hack.safewalk": "Не дає вам впасти із краю блока.",
   "description.wurst.hack.scaffoldwalk": "Автоматично ставить блоки під ноги.",
   "description.wurst.hack.search": "Допомагає знайти задані блоки, підсвічуючи їх усіма кольорами веселки.",
-  "description.wurst.hack.servercrasher": "Створює річ, яка може крашити сервер на версії 1.15.x.\n§oПрацює тільки в креативі.§r",
   "description.wurst.hack.skinderp": "Перемикає видимість шарів скіну у випадковому порядку.",
   "description.wurst.hack.sneak": "Примушує вас автоматично присідати.",
   "description.wurst.hack.snowshoe": "Дозволяє ходити по пухкому снігу.",
