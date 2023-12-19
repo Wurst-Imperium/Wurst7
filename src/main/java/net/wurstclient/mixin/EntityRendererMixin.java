@@ -35,11 +35,11 @@ public abstract class EntityRendererMixin<T extends Entity>
 	protected EntityRenderDispatcher dispatcher;
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
 		cancellable = true)
 	private void onRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-		int i, CallbackInfo ci)
+		int i, float tickDelta, CallbackInfo ci)
 	{
 		// add HealthTags info
 		if(entity instanceof LivingEntity)
@@ -48,7 +48,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		// do NameTags adjustments
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
-			vertexConsumerProvider, i);
+			vertexConsumerProvider, i, tickDelta);
 		ci.cancel();
 	}
 	
@@ -57,7 +57,8 @@ public abstract class EntityRendererMixin<T extends Entity>
 	 * an infinite loop. Also makes it easier to modify.
 	 */
 	protected void wurstRenderLabelIfPresent(T entity, Text text,
-		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
+		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
+		float tickDelta)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		

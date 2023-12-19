@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.potion.PotionUtil;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -121,7 +122,8 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 		return -1;
 	}
 	
-	private boolean hasEffect(ItemStack stack, StatusEffect effect)
+	private boolean hasEffect(ItemStack stack,
+		RegistryEntry<StatusEffect> effect)
 	{
 		for(StatusEffectInstance effectInstance : PotionUtil
 			.getPotionEffects(stack))

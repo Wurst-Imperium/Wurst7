@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -41,10 +40,10 @@ public abstract class ChatScreenMixin extends Screen
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "sendMessage(Ljava/lang/String;Z)Z",
+		method = "sendMessage(Ljava/lang/String;Z)V",
 		cancellable = true)
 	public void onSendMessage(String message, boolean addToHistory,
-		CallbackInfoReturnable<Boolean> cir)
+		CallbackInfo ci)
 	{
 		if((message = normalize(message)).isEmpty())
 			return;
@@ -54,7 +53,7 @@ public abstract class ChatScreenMixin extends Screen
 		
 		if(event.isCancelled())
 		{
-			cir.setReturnValue(true);
+			ci.cancel();
 			return;
 		}
 		
@@ -71,7 +70,7 @@ public abstract class ChatScreenMixin extends Screen
 		else
 			client.player.networkHandler.sendChatMessage(newMessage);
 		
-		cir.setReturnValue(true);
+		ci.cancel();
 	}
 	
 	@Shadow

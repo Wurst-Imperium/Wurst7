@@ -80,7 +80,7 @@ public final class PotionCmd extends Command
 		{
 			NbtCompound effect = new NbtCompound();
 			
-			effect.putInt("id", parseEffectId(args[1 + i * 3]));
+			effect.putString("id", parseEffectId(args[1 + i * 3]));
 			effect.putInt("amplifier", parseInt(args[2 + i * 3]) - 1);
 			effect.putInt("duration", parseInt(args[3 + i * 3]) * 20);
 			
@@ -103,8 +103,9 @@ public final class PotionCmd extends Command
 		{
 			NbtCompound tag = new NbtCompound();
 			
-			int id = Registries.STATUS_EFFECT.getRawId(effect.getEffectType());
-			tag.putInt("id", id);
+			String id = Registries.STATUS_EFFECT
+				.getId(effect.getEffectType().value()).toString();
+			tag.putString("id", id);
 			tag.putInt("amplifier", effect.getAmplifier());
 			tag.putInt("duration", effect.getDuration());
 			
@@ -119,7 +120,7 @@ public final class PotionCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		int id = parseEffectId(args[1]);
+		String id = parseEffectId(args[1]);
 		
 		List<StatusEffectInstance> oldEffects =
 			PotionUtil.getCustomPotionEffects(stack);
@@ -127,14 +128,14 @@ public final class PotionCmd extends Command
 		NbtList newEffects = new NbtList();
 		for(StatusEffectInstance oldEffect : oldEffects)
 		{
-			int oldId =
-				Registries.STATUS_EFFECT.getRawId(oldEffect.getEffectType());
+			String oldId = Registries.STATUS_EFFECT
+				.getId(oldEffect.getEffectType().value()).toString();
 			
-			if(oldId == id)
+			if(oldId.equals(id))
 				continue;
 			
 			NbtCompound effect = new NbtCompound();
-			effect.putInt("id", oldId);
+			effect.putString("id", oldId);
 			effect.putInt("amplifier", oldEffect.getAmplifier());
 			effect.putInt("duration", oldEffect.getDuration());
 			newEffects.add(effect);
@@ -146,29 +147,27 @@ public final class PotionCmd extends Command
 		ChatUtils.message("Effect removed.");
 	}
 	
-	private int parseEffectId(String input) throws CmdSyntaxError
+	private String parseEffectId(String input) throws CmdSyntaxError
 	{
-		int id = 0;
+		StatusEffect effect;
 		
 		if(MathUtils.isInteger(input))
-			id = Integer.parseInt(input);
+			effect = Registries.STATUS_EFFECT.get(Integer.parseInt(input));
 		else
 			try
 			{
 				Identifier identifier = new Identifier(input);
-				StatusEffect effect = Registries.STATUS_EFFECT.get(identifier);
-				
-				id = Registries.STATUS_EFFECT.getRawId(effect);
+				effect = Registries.STATUS_EFFECT.get(identifier);
 				
 			}catch(InvalidIdentifierException e)
 			{
 				throw new CmdSyntaxError("Invalid effect: " + input);
 			}
 		
-		if(id < 1)
-			throw new CmdSyntaxError();
+		if(effect == null)
+			throw new CmdSyntaxError("Invalid effect: " + input);
 		
-		return id;
+		return Registries.STATUS_EFFECT.getId(effect).toString();
 	}
 	
 	private int parseInt(String s) throws CmdSyntaxError

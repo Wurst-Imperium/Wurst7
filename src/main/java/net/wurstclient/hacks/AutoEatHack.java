@@ -28,6 +28,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.FoodComponents;
 import net.minecraft.item.Item;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -276,7 +277,8 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
 		{
-			StatusEffect effect = pair.getFirst().getEffectType();
+			RegistryEntry<StatusEffect> effect =
+				pair.getFirst().getEffectType();
 			
 			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
 				return false;
