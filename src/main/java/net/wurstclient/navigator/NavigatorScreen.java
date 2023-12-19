@@ -37,6 +37,11 @@ public abstract class NavigatorScreen extends Screen
 	protected boolean hasBackground = true;
 	protected int nonScrollableArea = 26;
 	private boolean showScrollbar;
+
+	private long scrollTimeStartMillis;
+	private double rawScrollDelta;
+	private int initialScroll;
+	private static final float scrollSensitivity = 4.0f;
 	
 	public NavigatorScreen()
 	{
@@ -113,20 +118,11 @@ public abstract class NavigatorScreen extends Screen
 		return super.mouseReleased(x, y, button);
 	}
 
-
-
-	private long scrollTimeStartMillis;
-	private double rawScrollDelta;
-
-	private int initialScroll;
-
 	// returns [0, 1]
 	private float getEaseInOut(float x) {
 		x = MathUtils.clamp(x, 0, 1);
 		return x * x * (3.0f - 2.0f * x);
 	}
-
-	private static final float scrollSensitivity = 4.0f;
 
 	private void clampScroll() {
 		// THIS CODE WAS MOVED FROM SCROLL HANDLER
@@ -165,22 +161,16 @@ public abstract class NavigatorScreen extends Screen
 		// scrollbar
 		if(!scrollbarLocked)
 		{
-			// now lerp scroll over time
 			long now = System.currentTimeMillis();
 			if (now - scrollTimeStartMillis < 1000) {
-				//rawScrollDelta += verticalAmount;
-				//scrollTimeStartMillis = now - (int)(500f * scrollSensitivity); // will be set to max scroll (t=0.5 is fastest, then decelerates)
+				// If menu was already in the middle of scrolling animation, immediately scroll some more
+				// otherwise stuttery animation will play
 				scroll += verticalAmount * 10.0f;
-			} else {
-				//rawScrollDelta = verticalAmount;
-
 			}
 			scrollTimeStartMillis = now;
 			initialScroll = scroll;
-			//scrollTimeStartMillis = now;
 			rawScrollDelta = verticalAmount;
-
-			//scroll += verticalAmount * 4;
+			// Clamp scroll, otherwise scroll continues beyond screen and snaps back, looking finicky
 			clampScroll();
 		}
 		
