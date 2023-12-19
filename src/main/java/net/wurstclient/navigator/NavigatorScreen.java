@@ -9,6 +9,7 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
+import net.wurstclient.util.MathUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -111,7 +112,52 @@ public abstract class NavigatorScreen extends Screen
 		// vanilla buttons
 		return super.mouseReleased(x, y, button);
 	}
-	
+
+
+
+	private long scrollTimeStartMillis;
+	private double rawScrollDelta;
+
+	private int initialScroll;
+
+	// returns [0, 1]
+	private float getEaseInOut(float x) {
+		x = MathUtils.clamp(x, 0, 1);
+		return x * x * (3.0f - 2.0f * x);
+	}
+
+	private static final float scrollSensitivity = 4.0f;
+
+	private void clampScroll() {
+		// THIS CODE WAS MOVED FROM SCROLL HANDLER
+		if(scroll > 0)
+			scroll = 0;
+		else if(scroll < maxScroll)
+			scroll = maxScroll;
+
+		if(maxScroll == 0)
+			scrollKnobPosition = 0;
+		else
+			scrollKnobPosition =
+					(int)((height - 131) * scroll / (float)maxScroll);
+		scrollKnobPosition += 2;
+	}
+
+	private void updateScrollAnimation() {
+		float t = ((System.currentTimeMillis() - scrollTimeStartMillis) / 1000f) * scrollSensitivity; // * scrollRate;
+		float easeInOut = getEaseInOut(t);
+		if (easeInOut >= 1.0f)
+			return;
+
+		int dWheel = (int) (easeInOut * rawScrollDelta * 100.0f);
+		if (dWheel == 0)
+			return;
+
+		this.scroll = initialScroll + dWheel;
+
+		clampScroll();
+	}
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY,
 		double horizontalAmount, double verticalAmount)
@@ -119,19 +165,23 @@ public abstract class NavigatorScreen extends Screen
 		// scrollbar
 		if(!scrollbarLocked)
 		{
-			scroll += verticalAmount * 4;
-			
-			if(scroll > 0)
-				scroll = 0;
-			else if(scroll < maxScroll)
-				scroll = maxScroll;
-			
-			if(maxScroll == 0)
-				scrollKnobPosition = 0;
-			else
-				scrollKnobPosition =
-					(int)((height - 131) * scroll / (float)maxScroll);
-			scrollKnobPosition += 2;
+			// now lerp scroll over time
+			long now = System.currentTimeMillis();
+			if (now - scrollTimeStartMillis < 1000) {
+				//rawScrollDelta += verticalAmount;
+				//scrollTimeStartMillis = now - (int)(500f * scrollSensitivity); // will be set to max scroll (t=0.5 is fastest, then decelerates)
+				scroll += verticalAmount * 10.0f;
+			} else {
+				//rawScrollDelta = verticalAmount;
+
+			}
+			scrollTimeStartMillis = now;
+			initialScroll = scroll;
+			//scrollTimeStartMillis = now;
+			rawScrollDelta = verticalAmount;
+
+			//scroll += verticalAmount * 4;
+			clampScroll();
 		}
 		
 		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
@@ -148,6 +198,8 @@ public abstract class NavigatorScreen extends Screen
 	public final void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		updateScrollAnimation();
+
 		MatrixStack matrixStack = context.getMatrices();
 		
 		// GL settings
