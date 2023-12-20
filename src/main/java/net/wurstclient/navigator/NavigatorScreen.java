@@ -121,7 +121,10 @@ public abstract class NavigatorScreen extends Screen
 	// returns [0, 1]
 	private float getEaseInOut(float x)
 	{
-		x = MathUtils.clamp(x, 0, 1);
+		if (x <= 0)
+			return 0;
+		if (x >= 1)
+			return 1;
 		return x * x * (3.0f - 2.0f * x);
 	}
 	
@@ -144,7 +147,7 @@ public abstract class NavigatorScreen extends Screen
 	private void updateScrollAnimation()
 	{
 		float t = ((System.currentTimeMillis() - scrollTimeStartMillis) / 1000f)
-			* scrollSensitivity; // * scrollRate;
+			* scrollSensitivity;
 		float easeInOut = getEaseInOut(t);
 		if(easeInOut >= 1.0f)
 			return;
