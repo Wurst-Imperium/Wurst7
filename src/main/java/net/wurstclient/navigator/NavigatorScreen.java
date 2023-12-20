@@ -37,7 +37,7 @@ public abstract class NavigatorScreen extends Screen
 	protected boolean hasBackground = true;
 	protected int nonScrollableArea = 26;
 	private boolean showScrollbar;
-
+	
 	private long scrollTimeStartMillis;
 	private double rawScrollDelta;
 	private int initialScroll;
@@ -117,43 +117,47 @@ public abstract class NavigatorScreen extends Screen
 		// vanilla buttons
 		return super.mouseReleased(x, y, button);
 	}
-
+	
 	// returns [0, 1]
-	private float getEaseInOut(float x) {
+	private float getEaseInOut(float x)
+	{
 		x = MathUtils.clamp(x, 0, 1);
 		return x * x * (3.0f - 2.0f * x);
 	}
-
-	private void clampScroll() {
+	
+	private void clampScroll()
+	{
 		// THIS CODE WAS MOVED FROM SCROLL HANDLER
 		if(scroll > 0)
 			scroll = 0;
 		else if(scroll < maxScroll)
 			scroll = maxScroll;
-
+		
 		if(maxScroll == 0)
 			scrollKnobPosition = 0;
 		else
 			scrollKnobPosition =
-					(int)((height - 131) * scroll / (float)maxScroll);
+				(int)((height - 131) * scroll / (float)maxScroll);
 		scrollKnobPosition += 2;
 	}
-
-	private void updateScrollAnimation() {
-		float t = ((System.currentTimeMillis() - scrollTimeStartMillis) / 1000f) * scrollSensitivity; // * scrollRate;
+	
+	private void updateScrollAnimation()
+	{
+		float t = ((System.currentTimeMillis() - scrollTimeStartMillis) / 1000f)
+			* scrollSensitivity; // * scrollRate;
 		float easeInOut = getEaseInOut(t);
-		if (easeInOut >= 1.0f)
+		if(easeInOut >= 1.0f)
 			return;
-
-		int dWheel = (int) (easeInOut * rawScrollDelta * 100.0f);
-		if (dWheel == 0)
+		
+		int dWheel = (int)(easeInOut * rawScrollDelta * 100.0f);
+		if(dWheel == 0)
 			return;
-
+		
 		this.scroll = initialScroll + dWheel;
-
+		
 		clampScroll();
 	}
-
+	
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY,
 		double horizontalAmount, double verticalAmount)
@@ -162,15 +166,18 @@ public abstract class NavigatorScreen extends Screen
 		if(!scrollbarLocked)
 		{
 			long now = System.currentTimeMillis();
-			if (now - scrollTimeStartMillis < 1000) {
-				// If menu was already in the middle of scrolling animation, immediately scroll some more
+			if(now - scrollTimeStartMillis < 1000)
+			{
+				// If menu was already in the middle of scrolling animation,
+				// immediately scroll some more
 				// otherwise stuttery animation will play
 				scroll += verticalAmount * 10.0f;
 			}
 			scrollTimeStartMillis = now;
 			initialScroll = scroll;
 			rawScrollDelta = verticalAmount;
-			// Clamp scroll, otherwise scroll continues beyond screen and snaps back, looking finicky
+			// Clamp scroll, otherwise scroll continues beyond screen and snaps
+			// back, looking finicky
 			clampScroll();
 		}
 		
@@ -189,7 +196,7 @@ public abstract class NavigatorScreen extends Screen
 		float partialTicks)
 	{
 		updateScrollAnimation();
-
+		
 		MatrixStack matrixStack = context.getMatrices();
 		
 		// GL settings
