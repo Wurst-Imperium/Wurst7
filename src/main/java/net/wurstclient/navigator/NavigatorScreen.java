@@ -9,7 +9,6 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
-import net.wurstclient.util.MathUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -121,9 +120,9 @@ public abstract class NavigatorScreen extends Screen
 	// returns [0, 1]
 	private float getEaseInOut(float x)
 	{
-		if (x <= 0)
+		if(x <= 0)
 			return 0;
-		if (x >= 1)
+		if(x >= 1)
 			return 1;
 		return x * x * (3.0f - 2.0f * x);
 	}
