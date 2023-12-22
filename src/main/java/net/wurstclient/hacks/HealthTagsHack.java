@@ -28,17 +28,19 @@ import net.wurstclient.util.RenderUtils;
 @SearchTags({"health tags"})
 public final class HealthTagsHack extends Hack implements RenderListener
 {
-	private final CheckboxSetting mobs = new CheckboxSetting(
-		"Mobs", "Displays health tags above mobs also.", false);
-	private final CheckboxSetting unlimitedRange =
-		new CheckboxSetting("Unlimited range",
-			"Displays mob health tags at any distance.", false);
-	private final CheckboxSetting max = new CheckboxSetting(
-		"Display max health for players", false);
-	private final CheckboxSetting round = new CheckboxSetting(
-		"Round health", true);
-	
 	private static final DecimalFormat DF = new DecimalFormat("0.##");
+	
+	private final CheckboxSetting mobs = new CheckboxSetting("Mobs",
+		"Displays health tags above mobs also.", false);
+	
+	private final CheckboxSetting unlimitedRange = new CheckboxSetting(
+		"Unlimited range", "Displays mob health tags at any distance.", false);
+	
+	private final CheckboxSetting max =
+		new CheckboxSetting("Display max health for players", false);
+	
+	private final CheckboxSetting round =
+		new CheckboxSetting("Round health", true);
 	
 	public HealthTagsHack()
 	{
@@ -67,19 +69,29 @@ public final class HealthTagsHack extends Hack implements RenderListener
 	{
 		if(!mobs.isChecked())
 			return;
-		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+		
+		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider
+			.immediate(Tessellator.getInstance().getBuffer());
+		
 		for(Entity e : MC.world.getEntities())
 			if(e instanceof MobEntity entity)
 			{
-				String health = round.isChecked() ? Integer.toString((int)entity.getHealth())
+				String health = round.isChecked()
+					? Integer.toString((int)entity.getHealth())
 					: DF.format(entity.getHealth());
-				String maxHealth = round.isChecked() ? Integer.toString((int)entity.getMaxHealth())
+				
+				String maxHealth = round.isChecked()
+					? Integer.toString((int)entity.getMaxHealth())
 					: DF.format(entity.getMaxHealth());
+				
 				Text text = Text.literal(health + "/" + maxHealth).formatted(
 					getColor(entity.getHealth(), entity.getMaxHealth()));
-				RenderUtils.renderTag(matrixStack, text, entity, immediate, 0xffffff,
-					!entity.hasCustomName() ? 0.5 : 1, unlimitedRange.isChecked() ? 1000 : 75, partialTicks);
+				
+				RenderUtils.renderTag(matrixStack, text, entity, immediate,
+					0xffffff, !entity.hasCustomName() ? 0.5 : 1,
+					unlimitedRange.isChecked() ? 1000 : 75, partialTicks);
 			}
+		
 		immediate.draw();
 	}
 	
@@ -88,13 +100,18 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		if(!isEnabled())
 			return nametag;
 		
-		String health = round.isChecked() ? Integer.toString((int)entity.getHealth())
-			: DF.format(entity.getHealth());
-		String maxHealth = round.isChecked() ? Integer.toString((int)entity.getMaxHealth())
-			: DF.format(entity.getMaxHealth());
+		String health =
+			round.isChecked() ? Integer.toString((int)entity.getHealth())
+				: DF.format(entity.getHealth());
+		
+		String maxHealth =
+			round.isChecked() ? Integer.toString((int)entity.getMaxHealth())
+				: DF.format(entity.getMaxHealth());
 		
 		MutableText formattedHealth = Text.literal(" ")
-			.append(max.isChecked() ? health + "/" + maxHealth : health).formatted(getColor(entity.getHealth(), entity.getMaxHealth()));
+			.append(max.isChecked() ? health + "/" + maxHealth : health)
+			.formatted(getColor(entity.getHealth(), entity.getMaxHealth()));
+		
 		return ((MutableText)nametag).append(formattedHealth);
 	}
 	

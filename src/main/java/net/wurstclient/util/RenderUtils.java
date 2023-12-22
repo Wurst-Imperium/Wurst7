@@ -894,14 +894,15 @@ public enum RenderUtils
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
-	public static void renderTag(MatrixStack matrixStack, Text text, Entity entity,
-		VertexConsumerProvider provider, int color, double height, int limit, float partialTicks)
+	public static void renderTag(MatrixStack matrixStack, Text text,
+		Entity entity, VertexConsumerProvider provider, int color,
+		double height, int limit, float partialTicks)
 	{
 		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
 		MinecraftClient MC = MinecraftClient.getInstance();
 		EntityRenderDispatcher dispatcher = MC.getEntityRenderDispatcher();
 		double dist = dispatcher.getSquaredDistanceToCamera(entity);
-		if(dist > limit * limit) 
+		if(dist > limit * limit)
 			return;
 		matrixStack.push();
 		
@@ -909,11 +910,12 @@ public enum RenderUtils
 		Vec3d camPos = RenderUtils.getCameraPos();
 		matrixStack.translate(
 			-camPos.x + entity.prevX
-			+ (entity.getX() - entity.prevX) * partialTicks,
+				+ (entity.getX() - entity.prevX) * partialTicks,
 			-camPos.y + entity.prevY
-			+ (entity.getY() - entity.prevY) * partialTicks + entity.getHeight() + height,
+				+ (entity.getY() - entity.prevY) * partialTicks
+				+ entity.getHeight() + height,
 			-camPos.z + entity.prevZ
-			+ (entity.getZ() - entity.prevZ) * partialTicks);
+				+ (entity.getZ() - entity.prevZ) * partialTicks);
 		
 		matrixStack.multiply(dispatcher.getRotation());
 		
@@ -932,8 +934,10 @@ public enum RenderUtils
 		float bgOpacity = MC.options.getTextBackgroundOpacity(0.25f);
 		int bgColor = (int)(bgOpacity * 255.0f) << 24;
 		int labelX = -MC.textRenderer.getWidth(text) / 2;
-		MC.textRenderer.draw(text, labelX, 0, color, false, matrix, provider, TextLayerType.NORMAL, bgColor, 15728880);
-		MC.textRenderer.draw(text, labelX, 0, -1, false, matrix, provider, TextLayerType.SEE_THROUGH, 0, 15728880);
+		MC.textRenderer.draw(text, labelX, 0, color, false, matrix, provider,
+			TextLayerType.NORMAL, bgColor, 15728880);
+		MC.textRenderer.draw(text, labelX, 0, -1, false, matrix, provider,
+			TextLayerType.SEE_THROUGH, 0, 15728880);
 		matrixStack.pop();
 	}
 }
