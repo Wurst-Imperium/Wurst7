@@ -896,13 +896,13 @@ public enum RenderUtils
 	
 	public static void renderTag(MatrixStack matrixStack, Text text,
 		Entity entity, VertexConsumerProvider provider, int color,
-		double height, int limit, float partialTicks)
+		double height, float partialTicks)
 	{
-		NameTagsHack nameTagsHack = WurstClient.INSTANCE.getHax().nameTagsHack;
+		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		MinecraftClient MC = MinecraftClient.getInstance();
 		EntityRenderDispatcher dispatcher = MC.getEntityRenderDispatcher();
 		double dist = dispatcher.getSquaredDistanceToCamera(entity);
-		if(dist > limit * limit)
+		if(dist > 4096 && !nameTags.isUnlimitedRange())
 			return;
 		matrixStack.push();
 		
@@ -920,7 +920,7 @@ public enum RenderUtils
 		matrixStack.multiply(dispatcher.getRotation());
 		
 		float scale = 0.025F;
-		if(nameTagsHack.isEnabled())
+		if(nameTags.isEnabled())
 		{
 			double distance = MC.player.distanceTo(entity);
 			

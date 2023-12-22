@@ -33,9 +33,6 @@ public final class HealthTagsHack extends Hack implements RenderListener
 	private final CheckboxSetting mobs = new CheckboxSetting("Mobs",
 		"Displays health tags above mobs also.", false);
 	
-	private final CheckboxSetting unlimitedRange = new CheckboxSetting(
-		"Unlimited range", "Displays mob health tags at any distance.", false);
-	
 	private final CheckboxSetting max =
 		new CheckboxSetting("Display max health for players", false);
 	
@@ -47,7 +44,6 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		super("HealthTags");
 		setCategory(Category.RENDER);
 		addSetting(mobs);
-		addSetting(unlimitedRange);
 		addSetting(max);
 		addSetting(round);
 	}
@@ -88,8 +84,7 @@ public final class HealthTagsHack extends Hack implements RenderListener
 					getColor(entity.getHealth(), entity.getMaxHealth()));
 				
 				RenderUtils.renderTag(matrixStack, text, entity, immediate,
-					0xffffff, !entity.hasCustomName() ? 0.5 : 1,
-					unlimitedRange.isChecked() ? 1000 : 75, partialTicks);
+					0xffffff, !entity.hasCustomName() ? 0.5 : 1, partialTicks);
 			}
 		
 		immediate.draw();
