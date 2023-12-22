@@ -206,7 +206,7 @@ public final class AutoFarmHack extends Hack
 		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
-		if(block instanceof GourdBlock)
+		if(block == Blocks.PUMPKIN || block == Blocks.MELON)
 			return true;
 		
 		if(block instanceof SugarCaneBlock)

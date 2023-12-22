@@ -44,7 +44,8 @@ public final class FlightHack extends Hack
 		new SliderSetting("Anti-Kick Interval",
 			"How often Anti-Kick should prevent you from getting kicked.\n"
 				+ "Most servers will kick you after 80 ticks.",
-			30, 5, 80, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+			30, 5, 80, 1,
+			ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting antiKickDistance = new SliderSetting(
 		"Anti-Kick Distance",

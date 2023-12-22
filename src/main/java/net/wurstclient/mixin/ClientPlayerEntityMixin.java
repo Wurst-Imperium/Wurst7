@@ -170,6 +170,17 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	/**
+	 * This mixin allows AutoSprint to enable sprinting even when the player is
+	 * too hungry.
+	 */
+	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
+	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
+			cir.setReturnValue(true);
+	}
+	
+	/**
 	 * Getter method for what used to be airStrafingSpeed.
 	 * Overridden to allow for the speed to be modified by hacks.
 	 */
@@ -268,6 +279,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		if(effect == StatusEffects.LEVITATION
 			&& hax.noLevitationHack.isEnabled())
+			return false;
+		
+		if(effect == StatusEffects.DARKNESS && hax.antiBlindHack.isEnabled())
 			return false;
 		
 		return super.hasStatusEffect(effect);

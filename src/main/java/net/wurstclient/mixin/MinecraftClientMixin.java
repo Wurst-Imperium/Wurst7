@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
@@ -30,7 +29,6 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.ProfileKeysImpl;
 import net.minecraft.client.session.Session;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -41,7 +39,6 @@ import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
-import net.wurstclient.mixinterface.IWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin
@@ -55,8 +52,6 @@ public abstract class MinecraftClientMixin
 	public ClientPlayerInteractionManager interactionManager;
 	@Shadow
 	public ClientPlayerEntity player;
-	@Shadow
-	public ClientWorld world;
 	@Shadow
 	@Final
 	private YggdrasilAuthenticationService authenticationService;
@@ -173,12 +168,6 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public IWorld getWorld()
-	{
-		return (IWorld)world;
-	}
-	
-	@Override
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
@@ -189,23 +178,10 @@ public abstract class MinecraftClientMixin
 	{
 		wurstSession = session;
 		
-		UserApiService userApiService =
-			wurst_createUserApiService(session.getAccessToken());
+		UserApiService userApiService = authenticationService
+			.createUserApiService(session.getAccessToken());
 		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
 			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
-	}
-	
-	private UserApiService wurst_createUserApiService(String accessToken)
-	{
-		try
-		{
-			return authenticationService.createUserApiService(accessToken);
-			
-		}catch(AuthenticationException e)
-		{
-			e.printStackTrace();
-			return UserApiService.OFFLINE;
-		}
 	}
 }

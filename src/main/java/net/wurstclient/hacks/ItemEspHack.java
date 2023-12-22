@@ -169,12 +169,11 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec()
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
-		
 		for(ItemEntity e : items)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
@@ -187,7 +186,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
 				.next();
 		}
-		
 		tessellator.draw();
 	}
 }
