@@ -8,6 +8,8 @@
 package net.wurstclient.hacks;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -28,7 +30,8 @@ import net.wurstclient.util.RenderUtils;
 @SearchTags({"health tags"})
 public final class HealthTagsHack extends Hack implements RenderListener
 {
-	private static final DecimalFormat DF = new DecimalFormat("0.##");
+	private static final DecimalFormat DF =
+		new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ENGLISH));
 	
 	private final CheckboxSetting mobs = new CheckboxSetting("Mobs",
 		"Displays health tags above mobs also.", false);
