@@ -24,6 +24,10 @@ public final class RoundingPrecisionSetting extends SliderSetting
 		super(name, description, value, min, max, 1,
 			ValueDisplay.ROUNDING_PRECISION);
 		
+		if(min < 0)
+			throw new IllegalArgumentException(
+				"min must be greater than or equal to 0");
+		
 		FORMATS = new DecimalFormat[max + 1];
 	}
 	
