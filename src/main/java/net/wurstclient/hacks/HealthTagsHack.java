@@ -115,10 +115,5 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		return Formatting.GREEN;
 	}
 	
-	public boolean hasMobHealthTags()
-	{
-		return isEnabled() && mobs.isChecked();
-	}
-	
 	// See EntityRendererMixin.onRenderLabelIfPresent()
 }
