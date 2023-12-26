@@ -19,19 +19,19 @@ public final class NameTagsHack extends Hack
 		new CheckboxSetting("Unlimited range",
 			"Removes the 64 block distance limit for nametags.", true);
 	
-	private final CheckboxSetting seeThrough = new CheckboxSetting(
-		"See-through mode",
-		"Renders nametags on the see-through text layer. This makes them"
-			+ " easier to read behind walls.",
-		true);
+	private final CheckboxSetting seeThrough =
+		new CheckboxSetting("See-through mode",
+			"Renders nametags on the see-through text layer. This makes them"
+				+ " easier to read behind walls.",
+			true);
 	
 	private final CheckboxSetting forceNametags = new CheckboxSetting(
 		"Force nametags",
 		"Forces nametags of all players to be visible, even your own.", false);
 	
-	private final CheckboxSetting forceMobNametags = new CheckboxSetting(
-		"Force mob nametags",
-		"Forces nametags of all mobs to be visible.", false);
+	private final CheckboxSetting forceMobNametags =
+		new CheckboxSetting("Force mob nametags",
+			"Forces nametags of all mobs to be visible.", false);
 	
 	public NameTagsHack()
 	{
