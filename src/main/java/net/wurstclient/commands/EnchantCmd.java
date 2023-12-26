@@ -16,6 +16,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.ItemUtils;
 
 public final class EnchantCmd extends Command
 {
@@ -34,15 +35,16 @@ public final class EnchantCmd extends Command
 		if(args.length > 1)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = getHeldItem();
-		enchant(stack);
-		
+		enchant(getHeldItem(), 127);
 		ChatUtils.message("Item enchanted.");
 	}
 	
 	private ItemStack getHeldItem() throws CmdError
 	{
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getMainHandStack();
+		
+		if(stack.isEmpty())
+			stack = MC.player.getOffHandStack();
 		
 		if(stack.isEmpty())
 			throw new CmdError("There is no item in your hand.");
@@ -50,23 +52,26 @@ public final class EnchantCmd extends Command
 		return stack;
 	}
 	
-	private void enchant(ItemStack stack)
+	private void enchant(ItemStack stack, int level)
 	{
 		for(Enchantment enchantment : Registries.ENCHANTMENT)
 		{
-			if(enchantment == Enchantments.SILK_TOUCH)
-				continue;
-			
+			// Skip curses
 			if(enchantment.isCursed())
 				continue;
 			
+			// Skip Silk Touch so it doesn't remove Fortune
+			if(enchantment == Enchantments.SILK_TOUCH)
+				continue;
+			
+			// Limit Quick Charge to level 5 so it doesn't break
 			if(enchantment == Enchantments.QUICK_CHARGE)
 			{
-				stack.addEnchantment(enchantment, 5);
+				stack.addEnchantment(enchantment, Math.min(level, 5));
 				continue;
 			}
 			
-			stack.addEnchantment(enchantment, 127);
+			ItemUtils.addEnchantment(stack, enchantment, level);
 		}
 	}
 	

@@ -37,12 +37,12 @@ public final class ChestEspRenderer
 	private final RegionPos region;
 	private final Vec3d start;
 	
-	public ChestEspRenderer(MatrixStack matrixStack)
+	public ChestEspRenderer(MatrixStack matrixStack, float partialTicks)
 	{
 		this.matrixStack = matrixStack;
 		region = RenderUtils.getCameraRegion();
-		start = RotationUtils.getClientLookVec().add(RenderUtils.getCameraPos())
-			.subtract(region.toVec3d());
+		start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).subtract(region.toVec3d());
 	}
 	
 	public void renderBoxes(ChestEspGroup group)

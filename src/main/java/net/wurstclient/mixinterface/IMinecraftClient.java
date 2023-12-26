@@ -15,7 +15,5 @@ public interface IMinecraftClient
 	
 	public IClientPlayerEntity getPlayer();
 	
-	public IWorld getWorld();
-	
 	public void setSession(Session session);
 }
