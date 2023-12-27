@@ -20,7 +20,8 @@ import net.wurstclient.WurstClient;
 public abstract class MobEntityRendererMixin
 {
 	/**
-	 * Makes name-tagged mobs always show their name tags.
+	 * Makes name-tagged mobs always show their name tags if configured in
+	 * NameTags.
 	 */
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;targetedEntity:Lnet/minecraft/entity/Entity;",
@@ -28,9 +29,9 @@ public abstract class MobEntityRendererMixin
 		ordinal = 0),
 		method = "hasLabel(Lnet/minecraft/entity/mob/MobEntity;)Z",
 		cancellable = true)
-	private void shouldForceLabel(CallbackInfoReturnable<Boolean> cir)
+	private void onHasLabel(CallbackInfoReturnable<Boolean> cir)
 	{
-		// return true if mob has custom name
+		// skip the mobEntity == dispatcher.targetedEntity check and return true
 		if(WurstClient.INSTANCE.getHax().nameTagsHack.shouldForceMobNametags())
 			cir.setReturnValue(true);
 	}

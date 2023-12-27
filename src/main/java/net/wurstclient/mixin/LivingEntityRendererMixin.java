@@ -49,7 +49,8 @@ public abstract class LivingEntityRendererMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		// return true immediately after the distance check
-		if(WurstClient.INSTANCE.getHax().nameTagsHack.shouldForceNametags())
+		if(WurstClient.INSTANCE.getHax().nameTagsHack
+			.shouldForcePlayerNametags())
 			cir.setReturnValue(true);
 	}
 }

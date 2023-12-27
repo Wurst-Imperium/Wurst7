@@ -26,13 +26,16 @@ public final class NameTagsHack extends Hack
 			+ " with water and other transparent things.",
 		false);
 	
-	private final CheckboxSetting forceNametags = new CheckboxSetting(
-		"Force nametags",
-		"Forces nametags of all players to be visible, even your own.", false);
+	private final CheckboxSetting forceMobNametags = new CheckboxSetting(
+		"Always show named mobs", "Displays the nametags of named mobs even"
+			+ " when you are not looking directly at them.",
+		true);
 	
-	private final CheckboxSetting forceMobNametags =
-		new CheckboxSetting("Force mob nametags",
-			"Forces nametags of all mobs to be visible.", false);
+	private final CheckboxSetting forcePlayerNametags =
+		new CheckboxSetting("Always show player names",
+			"Displays your own nametag as well as any player names that would"
+				+ " normally be disabled by scoreboard team settings.",
+			false);
 	
 	public NameTagsHack()
 	{
@@ -40,8 +43,8 @@ public final class NameTagsHack extends Hack
 		setCategory(Category.RENDER);
 		addSetting(unlimitedRange);
 		addSetting(seeThrough);
-		addSetting(forceNametags);
 		addSetting(forceMobNametags);
+		addSetting(forcePlayerNametags);
 	}
 	
 	public boolean isUnlimitedRange()
@@ -54,16 +57,16 @@ public final class NameTagsHack extends Hack
 		return isEnabled() && seeThrough.isChecked();
 	}
 	
-	public boolean shouldForceNametags()
-	{
-		return isEnabled() && forceNametags.isChecked();
-	}
-	
 	public boolean shouldForceMobNametags()
 	{
 		return isEnabled() && forceMobNametags.isChecked();
 	}
 	
-	// See LivingEntityRendererMixin, MobEntityRendererMixin, and
-	// EntityRendererMixin.wurstRenderLabelIfPresent()
+	public boolean shouldForcePlayerNametags()
+	{
+		return isEnabled() && forcePlayerNametags.isChecked();
+	}
+	
+	// See EntityRendererMixin.wurstRenderLabelIfPresent(),
+	// LivingEntityRendererMixin, MobEntityRendererMixin
 }
