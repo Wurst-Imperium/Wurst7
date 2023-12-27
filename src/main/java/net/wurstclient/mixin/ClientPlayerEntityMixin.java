@@ -26,6 +26,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.UseAction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -75,9 +76,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		ordinal = 0), method = "tickMovement()V")
 	private void onTickMovementItemUse(CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness()
-			|| (WurstClient.INSTANCE.getHax().noSlowdownHack.noNonBlockingItemSlowness()
-				&& ((ClientPlayerEntity)(Object)this).getActiveItem().getUseAction() != UseAction.BLOCK))
+		boolean noSlowdown =
+			WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness();
+		boolean noSlowdownShield = WurstClient.INSTANCE.getHax().noSlowdownHack
+			.noItemSlownessExceptShields()
+			&& ((ClientPlayerEntity)(Object)this).getActiveItem()
+				.getUseAction() != UseAction.BLOCK;
+		
+		if(noSlowdown || noSlowdownShield)
 			hideNextItemUse = true;
 	}
 	

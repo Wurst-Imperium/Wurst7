@@ -17,9 +17,11 @@ import net.wurstclient.settings.EnumSetting;
 public final class NoSlowdownHack extends Hack
 {
 	private final CheckboxSetting blocks =
-		new CheckboxSetting("Block honey + soul sand slowness", true);
-	private final EnumSetting<ItemSlowness> items =
-		new EnumSetting<>("Block item slowness", ItemSlowness.values(), ItemSlowness.ALL);
+		new CheckboxSetting("Cancel block slowness",
+			"Cancels slowness effects caused by honey and soul sand.", true);
+	
+	private final EnumSetting<ItemSlowness> items = new EnumSetting<>(
+		"Cancel item slowness", ItemSlowness.values(), ItemSlowness.ALL);
 	
 	public NoSlowdownHack()
 	{
@@ -39,15 +41,16 @@ public final class NoSlowdownHack extends Hack
 		return isEnabled() && items.getSelected() == ItemSlowness.ALL;
 	}
 	
-	public boolean noNonBlockingItemSlowness()
+	public boolean noItemSlownessExceptShields()
 	{
-		return isEnabled() && items.getSelected() == ItemSlowness.EXCEPT_BLOCKING;
+		return isEnabled()
+			&& items.getSelected() == ItemSlowness.EXCEPT_SHIELDS;
 	}
 	
 	private enum ItemSlowness
 	{
 		ALL("All"),
-		EXCEPT_BLOCKING("Except blocking"),
+		EXCEPT_SHIELDS("Except shields"),
 		NONE("None");
 		
 		private final String name;
@@ -65,5 +68,5 @@ public final class NoSlowdownHack extends Hack
 	}
 	
 	// See BlockMixin.onGetVelocityMultiplier() and
-	// ClientPlayerEntityMixin.wurstIsUsingItem()
+	// ClientPlayerEntityMixin.onTickMovementItemUse()
 }
