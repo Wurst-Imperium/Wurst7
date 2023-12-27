@@ -12,11 +12,6 @@ on:
       - 'gradle**'
       - 'build.gradle'
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,34 +38,6 @@ jobs:
     - name: Check code style with Spotless
       id: spotless_check
       run: ./gradlew spotlessCheck
-      continue-on-error: true
-
-    - name: Comment on PR on Spotless failure
-      if: ${{ steps.spotless_check.outcome == 'failure' && github.event_name == 'pull_request' }}
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const prAuthor = context.payload.pull_request.user.login;
-          const codestyleUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/master/codestyle`;
-          const commentBody = `
-            Hi @${prAuthor}, thanks for the pull request! It seems there are some format violations that need to be fixed.
-            
-            If you're using Eclipse, please make sure to use the cleanup and format settings located in the [codestyle folder](${codestyleUrl}). This will help ensure consistency with the existing codebase.
-            
-            Alternatively, if you're not using Eclipse, you can also fix these violations by running the following command from the command line:
-            
-            \`\`\`
-            ./gradlew spotlessApply
-            \`\`\`
-            
-            Once you've done this, please commit the changes and push them to your branch. This should cause the check to pass and allow your pull request to be merged.
-          `;
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: commentBody
-          });
 
     - name: Execute Gradle build
       run: ./gradlew build
