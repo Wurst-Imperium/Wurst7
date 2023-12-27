@@ -35,8 +35,14 @@ public final class NoFallHack extends Hack implements UpdateListener
 	@Override
 	public String getRenderName()
 	{
-		if(MC.player != null && MC.player.isFallFlying()
-			&& !allowElytra.isChecked())
+		ClientPlayerEntity player = MC.player;
+		if(player == null)
+			return getName();
+		
+		if(player.isFallFlying() && !allowElytra.isChecked())
+			return getName() + " (paused)";
+		
+		if(player.isCreative())
 			return getName() + " (paused)";
 		
 		return getName();
@@ -57,15 +63,21 @@ public final class NoFallHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// do nothing in creative mode, since there is no fall damage anyway
 		ClientPlayerEntity player = MC.player;
-		boolean fallFlying = player.isFallFlying();
-		
-		// pause when flying with elytra, unless allowed
-		if(fallFlying && !allowElytra.isChecked())
+		if(player.isCreative())
 			return;
 		
-		// ignore small falls that can't cause damage
-		if(player.fallDistance <= (fallFlying ? 1 : 2))
+		// pause when flying with elytra, unless allowed
+		boolean fallFlying = player.isFallFlying();
+		if(fallFlying && !allowElytra.isChecked())
+			return;
+			
+		// ignore small falls that can't cause damage,
+		// unless CreativeFlight is enabled in survival mode
+		boolean creativeFlying = WURST.getHax().creativeFlightHack.isEnabled()
+			&& player.getAbilities().flying;
+		if(!creativeFlying && player.fallDistance <= (fallFlying ? 1 : 2))
 			return;
 		
 		// attempt to fix elytra weirdness, if allowed

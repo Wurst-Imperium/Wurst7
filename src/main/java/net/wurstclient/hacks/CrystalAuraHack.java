@@ -9,8 +9,6 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -21,33 +19,28 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.FacingSetting;
+import net.wurstclient.settings.FacingSetting.Facing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.CrystalAuraFilterList;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"crystal aura"})
 public final class CrystalAuraHack extends Hack implements UpdateListener
@@ -62,11 +55,12 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			+ "When disabled, CrystalAura will only detonate manually placed crystals.",
 		true);
 	
-	private final EnumSetting<FaceBlocks> faceBlocks = new EnumSetting<>(
-		"Face crystals",
-		"Whether or not CrystalAura should face the correct direction when placing and left-clicking end crystals.\n\n"
-			+ "Slower but can help with anti-cheat plugins.",
-		FaceBlocks.values(), FaceBlocks.OFF);
+	private final FacingSetting faceBlocks =
+		FacingSetting.withPacketSpam("Face crystals",
+			"Whether or not CrystalAura should face the correct direction when"
+				+ " placing and left-clicking end crystals.\n\n"
+				+ "Slower but can help with anti-cheat plugins.",
+			Facing.OFF);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
@@ -129,8 +123,11 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(!autoPlace.isChecked()
-			|| !hasItem(item -> item == Items.END_CRYSTAL))
+		if(!autoPlace.isChecked())
+			return;
+		
+		if(InventoryUtils.indexOf(Items.END_CRYSTAL,
+			takeItemsFrom.getSelected().maxInvSlot) == -1)
 			return;
 		
 		ArrayList<Entity> targets = getNearbyTargets();
@@ -175,56 +172,6 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			MC.player.swingHand(Hand.MAIN_HAND);
 	}
 	
-	private boolean selectItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			if(slot < 9)
-				inventory.selectedSlot = slot;
-			else if(inventory.getEmptySlot() < 9)
-				im.windowClick_QUICK_MOVE(slot);
-			else if(inventory.getEmptySlot() != -1)
-			{
-				im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
-				im.windowClick_QUICK_MOVE(slot);
-			}else
-			{
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-				im.windowClick_PICKUP(slot);
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean hasItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
 	private boolean placeCrystal(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
@@ -251,14 +198,13 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			if(distanceSqPosVec > eyesPos.squaredDistanceTo(posVec.add(dirVec)))
 				continue;
 			
-			if(checkLOS.isChecked() && MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
-			if(!selectItem(item -> item == Items.END_CRYSTAL))
+			InventoryUtils.selectItem(Items.END_CRYSTAL,
+				takeItemsFrom.getSelected().maxInvSlot);
+			if(!MC.player.isHolding(Items.END_CRYSTAL))
 				return false;
 			
 			faceBlocks.getSelected().face(hitVec);
@@ -283,7 +229,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			.reversed();
 		
 		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof EndCrystalEntity)
+			.filter(EndCrystalEntity.class::isInstance)
 			.filter(e -> !e.isRemoved())
 			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
 			.sorted(furthestFromPlayer)
@@ -305,7 +251,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 					&& ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> !WURST.getFriends().contains(e.getEntityName()))
+				.filter(
+					e -> !WURST.getFriends().contains(e.getName().getString()))
 				.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
@@ -356,45 +303,6 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	{
 		return BlockUtils.canBeClicked(pos)
 			&& !BlockUtils.getState(pos).isReplaceable();
-	}
-	
-	private enum FaceBlocks
-	{
-		OFF("Off", v -> {}),
-		
-		SERVER("Server-side",
-			v -> WURST.getRotationFaker().faceVectorPacket(v)),
-		
-		CLIENT("Client-side",
-			v -> WURST.getRotationFaker().faceVectorClient(v)),
-		
-		SPAM("Packet spam", v -> {
-			Rotation rotation = RotationUtils.getNeededRotations(v);
-			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
-			MC.player.networkHandler.sendPacket(packet);
-		});
-		
-		private String name;
-		private Consumer<Vec3d> face;
-		
-		private FaceBlocks(String name, Consumer<Vec3d> face)
-		{
-			this.name = name;
-			this.face = face;
-		}
-		
-		public void face(Vec3d v)
-		{
-			face.accept(v);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 	
 	private enum TakeItemsFrom

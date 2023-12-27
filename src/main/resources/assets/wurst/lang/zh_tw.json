@@ -96,7 +96,7 @@
   "description.wurst.hack.killpotion": "生成一個能殺死絕大多數生物的藥水，包括創造模式的玩家，但對那些不死的生物或者已死生物無效。\n\n需要在創造模式下。",
   "description.wurst.hack.liquids": "取消限制，允許你在水面上直接放置方塊。",
   "description.wurst.hack.lsd": "產生和吃了雲南蘑菇一樣的漸變色暈眩效果。",
-  "description.wurst.hack.masstpa": "給每個人發送TPA請求。\n直到有人接受就會停止\n\n§c§l警告：§r國內服務器使用會因為Wurst判斷的是英文而導致TPA仍在繼續。",
+  "description.wurst.hack.masstpa": "給每個人發送TPA請求。\n\n§c§l警告：§r國內服務器使用會因為Wurst判斷的是英文而導致TPA仍在繼續。",
   "description.wurst.hack.mileycyrus": "類似全自動Shift蹲起。",
   "description.wurst.hack.mobesp": "高亮附近的生物。",
   "description.wurst.hack.mobspawnesp": "高亮那些生物可以生成的區域。\n§e黃色§r - 可以在夜間生成\n§c紅色§r - 可以在任意時候生成",
@@ -135,7 +135,6 @@
   "description.wurst.hack.safewalk": "防止你從方塊邊緣掉出。",
   "description.wurst.hack.scaffoldwalk": "自動在你的脚下搭方塊。",
   "description.wurst.hack.search": "幫助你找到所需要的方塊並以彩虹色的管道高亮。",
-  "description.wurst.hack.servercrasher": "生成一個物品可以崩掉1.15.x的服務器。\n§o僅限創造模式§r。",
   "description.wurst.hack.skinderp": "隨機切換你的皮膚。",
   "description.wurst.hack.sneak": "讓你自動保持潜行行走。",
   "description.wurst.hack.snowshoe": "可以讓你在細雪上行走。",
@@ -183,5 +182,6 @@
   "button.wurst.nochatreports.signatures_status": "簽名： ",
   "description.wurst.nochatreports.message_is_reportable": "此訊息具有有效簽名，因此容易受到欺詐性聊天檢舉的攻擊。",
   "gui.wurst.generic.allcaps_blocked": "封鎖",
-  "gui.wurst.generic.allcaps_allowed": "允許"
+  "gui.wurst.generic.allcaps_allowed": "允許",
+  "key.wurst.zoom": "縮放"
 }

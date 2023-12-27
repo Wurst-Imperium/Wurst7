@@ -21,13 +21,11 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.UseAction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -46,12 +44,6 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
-	@Shadow
-	private float lastYaw;
-	@Shadow
-	private float lastPitch;
-	@Shadow
-	private ClientPlayNetworkHandler networkHandler;
 	@Shadow
 	@Final
 	protected MinecraftClient client;
@@ -133,8 +125,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
-		PlayerMoveEvent event = new PlayerMoveEvent(this);
-		EventManager.fire(event);
+		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -178,6 +169,17 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	/**
+	 * This mixin allows AutoSprint to enable sprinting even when the player is
+	 * too hungry.
+	 */
+	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
+	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
+			cir.setReturnValue(true);
 	}
 	
 	/**
@@ -281,30 +283,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			&& hax.noLevitationHack.isEnabled())
 			return false;
 		
+		if(effect == StatusEffects.DARKNESS && hax.antiBlindHack.isEnabled())
+			return false;
+		
 		return super.hasStatusEffect(effect);
-	}
-	
-	@Override
-	public void setNoClip(boolean noClip)
-	{
-		this.noClip = noClip;
-	}
-	
-	@Override
-	public float getLastYaw()
-	{
-		return lastYaw;
-	}
-	
-	@Override
-	public float getLastPitch()
-	{
-		return lastPitch;
-	}
-	
-	@Override
-	public void setMovementMultiplier(Vec3d movementMultiplier)
-	{
-		this.movementMultiplier = movementMultiplier;
 	}
 }

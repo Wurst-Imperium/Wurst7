@@ -36,7 +36,7 @@ public class DisconnectedRealmsScreenMixin extends RealmsScreen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())

@@ -53,10 +53,7 @@ public final class AutoFarmRenderer
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
@@ -101,10 +98,7 @@ public final class AutoFarmRenderer
 		BufferBuilder bufferBuilder =
 			RenderSystem.renderThreadTesselator().getBuffer();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		Vec3d regionOffset = new Vec3d(-regionX, 0, -regionZ);
+		Vec3d regionOffset = RenderUtils.getCameraRegion().negate().toVec3d();
 		
 		double boxMin = 1 / 16.0;
 		double boxMax = 15 / 16.0;

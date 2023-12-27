@@ -10,19 +10,47 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.CameraSubmersionType;
 import net.minecraft.entity.Entity;
 import net.wurstclient.WurstClient;
 
 @Mixin(BackgroundRenderer.class)
-public class BackgroundRendererMixin
+public abstract class BackgroundRendererMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {
-			"getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;"},
+	/**
+	 * Makes the distance fog 100% transparent when NoFog is enabled,
+	 * effectively removing it.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V")
+	private static void onApplyFog(Camera camera,
+		BackgroundRenderer.FogType fogType, float viewDistance,
+		boolean thickFog, float tickDelta, CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+			return;
+		
+		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
+		if(cameraSubmersionType != CameraSubmersionType.NONE)
+			return;
+		
+		Entity entity = camera.getFocusedEntity();
+		if(BackgroundRenderer.getFogModifier(entity, tickDelta) != null)
+			return;
+		
+		RenderSystem.setShaderFogColor(0, 0, 0, 0);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
 		cancellable = true)
 	private static void onGetFogModifier(Entity entity, float tickDelta,
 		CallbackInfoReturnable<StatusEffectFogModifier> ci)
