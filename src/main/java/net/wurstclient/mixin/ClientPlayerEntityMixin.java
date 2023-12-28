@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -20,6 +21,7 @@ import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -63,6 +65,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
+	}
+	
+	/**
+	 * Allows the player to keep sprinting even without the forward key down.
+	 */
+	@Redirect(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z",
+			ordinal = 0),
+		method = "tickMovement()V")
+	private boolean hasForwardMovement(Input input)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack
+			.shouldSprintAllDirections())
+			return true;
+		
+		return input.hasForwardMovement();
 	}
 	
 	/**
