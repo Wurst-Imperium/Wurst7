@@ -11,10 +11,15 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"name tags"})
 public final class NameTagsHack extends Hack
 {
+	private final SliderSetting scale =
+		new SliderSetting("Scale", "How large the nametags should be.", 1, 0.05,
+			5, 0.05, SliderSetting.ValueDisplay.PERCENTAGE);
+	
 	private final CheckboxSetting unlimitedRange =
 		new CheckboxSetting("Unlimited range",
 			"Removes the 64 block distance limit for nametags.", true);
@@ -41,10 +46,16 @@ public final class NameTagsHack extends Hack
 	{
 		super("NameTags");
 		setCategory(Category.RENDER);
+		addSetting(scale);
 		addSetting(unlimitedRange);
 		addSetting(seeThrough);
 		addSetting(forceMobNametags);
 		addSetting(forcePlayerNametags);
+	}
+	
+	public float getScale()
+	{
+		return scale.getValueF();
 	}
 	
 	public boolean isUnlimitedRange()

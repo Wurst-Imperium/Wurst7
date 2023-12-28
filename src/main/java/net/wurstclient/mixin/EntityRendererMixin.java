@@ -77,7 +77,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		matrices.multiply(dispatcher.getRotation());
 		
 		// adjust scale if NameTags is enabled
-		float scale = 0.025F;
+		float scale = 0.025F * nameTags.getScale();
 		if(nameTags.isEnabled())
 		{
 			double distance = WurstClient.MC.player.distanceTo(entity);
