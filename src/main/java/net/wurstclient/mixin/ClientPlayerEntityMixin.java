@@ -76,14 +76,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		ordinal = 0), method = "tickMovement()V")
 	private void onTickMovementItemUse(CallbackInfo ci)
 	{
-		boolean noSlowdown =
-			WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness();
-		boolean noSlowdownShield = WurstClient.INSTANCE.getHax().noSlowdownHack
-			.noItemSlownessExceptShields()
-			&& ((ClientPlayerEntity)(Object)this).getActiveItem()
-				.getUseAction() != UseAction.BLOCK;
-		
-		if(noSlowdown || noSlowdownShield)
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.noItemSlowness()
+			|| (WurstClient.INSTANCE.getHax().noSlowdownHack
+				.noItemSlownessExceptShields()
+				&& ((ClientPlayerEntity)(Object)this).getActiveItem()
+					.getUseAction() != UseAction.BLOCK))
 			hideNextItemUse = true;
 	}
 	
