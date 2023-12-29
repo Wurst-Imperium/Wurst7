@@ -79,7 +79,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack
 			.shouldSprintAllDirections())
-			return true;
+			return input.getMovementInput().length() > 1e-5F;
 		
 		return input.hasForwardMovement();
 	}

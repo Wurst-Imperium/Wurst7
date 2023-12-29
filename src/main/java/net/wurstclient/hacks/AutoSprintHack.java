@@ -55,8 +55,8 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		if(player.isInsideWaterOrBubbleColumn() || player.isSubmergedInWater())
 			return;
 		
-		if(player.forwardSpeed > 0 || (allDirections.isChecked()
-			&& (player.getVelocity().x != 0 || player.getVelocity().z != 0)))
+		if(player.forwardSpeed > 0 || allDirections.isChecked()
+			&& (player.getVelocity().x != 0 || player.getVelocity().z != 0))
 			player.setSprinting(true);
 	}
 	
