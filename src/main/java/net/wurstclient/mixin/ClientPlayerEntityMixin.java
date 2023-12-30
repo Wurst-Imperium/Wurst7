@@ -13,10 +13,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.MinecraftClient;
@@ -68,20 +69,21 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	/**
-	 * Allows the player to keep sprinting even without the forward key down.
+	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
 	 */
-	@Redirect(
+	@WrapOperation(
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z",
 			ordinal = 0),
 		method = "tickMovement()V")
-	private boolean hasForwardMovement(Input input)
+	private boolean wrapHasForwardMovement(Input input,
+		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack
 			.shouldSprintAllDirections())
 			return input.getMovementInput().length() > 1e-5F;
 		
-		return input.hasForwardMovement();
+		return original.call(input);
 	}
 	
 	/**
