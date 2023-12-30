@@ -48,19 +48,22 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		
 		if(player.horizontalCollision || player.isSneaking())
 			return;
 		
 		if(player.isInsideWaterOrBubbleColumn() || player.isSubmergedInWater())
 			return;
 		
-		if(player.forwardSpeed > 0 || allDirections.isChecked()
-			&& (player.getVelocity().x != 0 || player.getVelocity().z != 0))
-			player.setSprinting(true);
+		if(!allDirections.isChecked() && player.forwardSpeed <= 0)
+			return;
+		
+		if(player.input.getMovementInput().length() <= 1e-5F)
+			return;
+		
+		player.setSprinting(true);
 	}
 	
-	public boolean shouldSprintAllDirections()
+	public boolean shouldOmniSprint()
 	{
 		return isEnabled() && allDirections.isChecked();
 	}

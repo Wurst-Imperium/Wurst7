@@ -79,8 +79,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private boolean wrapHasForwardMovement(Input input,
 		Operation<Boolean> original)
 	{
-		if(WurstClient.INSTANCE.getHax().autoSprintHack
-			.shouldSprintAllDirections())
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
 			return input.getMovementInput().length() > 1e-5F;
 		
 		return original.call(input);
