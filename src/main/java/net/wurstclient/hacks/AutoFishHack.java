@@ -154,8 +154,7 @@ public final class AutoFishHack extends Hack
 		}
 		
 		// if an entity got hooked, reel in immediately
-		if(MC.player.fishHook != null
-			&& MC.player.fishHook.getHookedEntity() != null)
+		if(MC.player.fishHook.getHookedEntity() != null)
 			reelInTimer = 0;
 		
 		// otherwise, reel in when it's time
