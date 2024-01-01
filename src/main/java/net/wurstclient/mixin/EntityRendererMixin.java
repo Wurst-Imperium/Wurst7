@@ -77,7 +77,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		matrices.multiply(dispatcher.getRotation());
 		
 		// adjust scale if NameTags is enabled
-		float scale = 0.025F;
+		float scale = 0.025F * nameTags.getScale();
 		if(nameTags.isEnabled())
 		{
 			double distance = WurstClient.MC.player.distanceTo(entity);
@@ -93,15 +93,15 @@ public abstract class EntityRendererMixin<T extends Entity>
 		TextRenderer tr = getTextRenderer();
 		float labelX = -tr.getWidth(text) / 2;
 		
-		// draw background
-		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
-			vertexConsumers,
-			notSneaky ? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL,
-			bgColor, light);
-		
-		// use the see-through layer for text if configured in NameTags
+		// adjust layers if using NameTags in see-through mode
+		TextLayerType bgLayer = notSneaky && !nameTags.isSeeThrough()
+			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
 		TextLayerType textLayer = nameTags.isSeeThrough()
 			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
+		
+		// draw background
+		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
+			vertexConsumers, bgLayer, bgColor, light);
 		
 		// draw text
 		if(notSneaky)
