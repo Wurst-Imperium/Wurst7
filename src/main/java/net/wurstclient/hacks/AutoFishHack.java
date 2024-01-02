@@ -22,10 +22,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.hacks.autofish.AutoFishRodSelector;
 import net.wurstclient.hacks.autofish.ShallowWaterWarningCheckbox;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"AutoFishing", "auto fishing", "AutoFisher", "auto fisher",
 	"AFKFishBot", "afk fish bot", "AFKFishingBot", "afk fishing bot",
@@ -53,11 +51,6 @@ public final class AutoFishHack extends Hack
 		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
 		60, 10, 120, 1, ValueDisplay.INTEGER.withSuffix("s"));
 	
-	private final CheckboxSetting stopWhenInvFull = new CheckboxSetting(
-		"Stop when inv full",
-		"If enabled, AutoFish will turn itself off when your inventory is full.",
-		false);
-	
 	private final ShallowWaterWarningCheckbox shallowWaterWarning =
 		new ShallowWaterWarningCheckbox();
 	
@@ -80,14 +73,13 @@ public final class AutoFishHack extends Hack
 		addSetting(patience);
 		debugDraw.getSettings().forEach(this::addSetting);
 		rodSelector.getSettings().forEach(this::addSetting);
-		addSetting(stopWhenInvFull);
 		addSetting(shallowWaterWarning);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		if(!rodSelector.hasARod())
+		if(rodSelector.isOutOfRods())
 			return getName() + " [out of rods]";
 		
 		return getName();
@@ -124,22 +116,9 @@ public final class AutoFishHack extends Hack
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
-		// check if inventory is full
-		if(stopWhenInvFull.isChecked()
-			&& MC.player.getInventory().getEmptySlot() == -1)
-		{
-			ChatUtils.message(
-				"AutoFish has stopped because your inventory is full.");
-			setEnabled(false);
+		// update inventory
+		if(!rodSelector.update())
 			return;
-		}
-		
-		// select fishing rod
-		if(!rodSelector.isBestRodAlreadySelected())
-		{
-			rodSelector.selectBestRod();
-			return;
-		}
 		
 		// if not fishing, cast rod
 		if(!isFishing())
