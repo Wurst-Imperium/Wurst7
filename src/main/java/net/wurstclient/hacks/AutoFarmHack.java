@@ -54,27 +54,25 @@ public final class AutoFarmHack extends Hack
 		new CheckboxSetting("Replant", true);
 	
 	private final CheckboxSetting harvestFirst = new CheckboxSetting(
-		"Harvest first", "Harvest all crops first before replanting.",
-		false);
-
+		"Harvest first", "Harvest all crops first before replanting.", false);
+	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
 		"Makes sure that you don't reach through walls when breaking or replanting.",
 		false);
-
-	private final CheckboxSetting fortune = new CheckboxSetting(
-		"Choose fortune tool",
-		"Chooses a fortune tool to harvest crops.",
-		false);
-
+	
+	private final CheckboxSetting fortune =
+		new CheckboxSetting("Choose fortune tool",
+			"Chooses a fortune tool to harvest crops.", false);
+	
 	private final CheckboxSetting silkTouch = new CheckboxSetting(
 		"Choose silk touch tool",
 		"Chooses a silk touch tool to harvest melons. Axes will be prioritized.",
 		false);
-
-	private final BlockListSetting excluded = new BlockListSetting("Excluded Crops",
-		"List of crops that will not be harvested.");
-  
+	
+	private final BlockListSetting excluded = new BlockListSetting(
+		"Excluded Crops", "List of crops that will not be harvested.");
+	
 	private final HashMap<Block, Item> seeds = new HashMap<>();
 	{
 		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
@@ -86,8 +84,8 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
 		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
 	}
-  
-  private final HashSet<Block> fortuneBlocks = new HashSet<>();
+	
+	private final HashSet<Block> fortuneBlocks = new HashSet<>();
 	{
 		fortuneBlocks.add(Blocks.WHEAT);
 		fortuneBlocks.add(Blocks.CARROTS);
@@ -96,7 +94,6 @@ public final class AutoFarmHack extends Hack
 		fortuneBlocks.add(Blocks.NETHER_WART);
 		fortuneBlocks.add(Blocks.MELON);
 	}
-
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
@@ -187,7 +184,7 @@ public final class AutoFarmHack extends Hack
 		// replant and harvest
 		if(harvestFirst.isChecked())
 			harvest(blocksToHarvest);
-
+		
 		boolean replanting = false;
 		if(currentlyHarvesting == null)
 			replanting = replant(blocksToReplant);
@@ -244,9 +241,10 @@ public final class AutoFarmHack extends Hack
 		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
 		
-		if(Collections.binarySearch(excluded.getBlockNames(), BlockUtils.getName(pos)) >= 0)
+		if(Collections.binarySearch(excluded.getBlockNames(),
+			BlockUtils.getName(pos)) >= 0)
 			return false;
-    
+		
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
 		
@@ -343,7 +341,7 @@ public final class AutoFarmHack extends Hack
 					BlockPlacer.getBlockPlacingParams(pos);
 				if(params == null || params.distanceSq() > range.getValueSq())
 					continue;
-          
+				
 				if(checkLOS.isChecked() && !params.lineOfSight())
 					continue;
 				
@@ -407,32 +405,46 @@ public final class AutoFarmHack extends Hack
 		
 		for(BlockPos pos : blocksToHarvest)
 		{
-			boolean findSilkTouch = silkTouch.isChecked() && BlockUtils.getBlock(pos) == Blocks.MELON;
-			boolean findFortune = fortune.isChecked() && fortuneBlocks.contains(BlockUtils.getBlock(pos));
+			boolean findSilkTouch = silkTouch.isChecked()
+				&& BlockUtils.getBlock(pos) == Blocks.MELON;
+			boolean findFortune = fortune.isChecked()
+				&& fortuneBlocks.contains(BlockUtils.getBlock(pos));
 			ItemStack held = MC.player.getMainHandStack();
 			if(findSilkTouch)
 			{
-				if(EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, held) == 0
-					|| !(held.getItem() instanceof AxeItem))
+				if(EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH,
+					held) == 0 || !(held.getItem() instanceof AxeItem))
 				{
-					int slot = InventoryUtils.indexOf(stack -> stack.getItem() instanceof AxeItem 
-						&& EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
+					int slot = InventoryUtils
+						.indexOf(stack -> stack.getItem() instanceof AxeItem
+							&& EnchantmentHelper
+								.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
 					if(slot == -1)
-						slot = InventoryUtils.indexOf(stack -> EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
+						slot = InventoryUtils.indexOf(stack -> EnchantmentHelper
+							.getLevel(Enchantments.SILK_TOUCH, stack) > 0);
 					InventoryUtils.selectItem(slot);
 				}
 			}else if(findFortune)
 			{
-				int[] slots = InventoryUtils.indicesOf(stack -> EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0
-					&& EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack) > 0, 36, false);
-
+				int[] slots =
+					InventoryUtils
+						.indicesOf(
+							stack -> EnchantmentHelper
+								.getLevel(Enchantments.SILK_TOUCH, stack) == 0
+								&& EnchantmentHelper
+									.getLevel(Enchantments.FORTUNE, stack) > 0,
+							36, false);
+				
 				int selected = -1;
-				int level = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, held) > 0 ? 0
-					: EnchantmentHelper.getLevel(Enchantments.FORTUNE, held);
+				int level = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH,
+					held) > 0 ? 0
+						: EnchantmentHelper.getLevel(Enchantments.FORTUNE,
+							held);
 				for(int slot : slots)
 				{
-					int curLevel = EnchantmentHelper.getLevel(Enchantments.FORTUNE,
-						MC.player.getInventory().getStack(slot));
+					int curLevel =
+						EnchantmentHelper.getLevel(Enchantments.FORTUNE,
+							MC.player.getInventory().getStack(slot));
 					if(curLevel > level)
 					{
 						selected = slot;
