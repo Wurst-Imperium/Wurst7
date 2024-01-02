@@ -179,6 +179,7 @@ public abstract class MinecraftClientMixin
 		UserApiService userApiService = authenticationService
 			.createUserApiService(session.getAccessToken());
 		UUID uuid = wurstSession.getUuidOrNull();
-		wurstProfileKeys = ProfileKeys.create(userApiService, session, runDirectory.toPath());
+		wurstProfileKeys =
+			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}
 }
