@@ -37,7 +37,8 @@ import net.wurstclient.util.RenderUtils;
 public final class AutoFishDebugDraw
 {
 	private final CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring and where they will be detected. Useful for optimizing your 'Valid range' setting.",
+		"Shows where bites are occurring and where they will be detected."
+			+ " Useful for optimizing your 'Valid range' setting.",
 		false);
 	
 	private final ColorSetting ddColor = new ColorSetting("DD color",

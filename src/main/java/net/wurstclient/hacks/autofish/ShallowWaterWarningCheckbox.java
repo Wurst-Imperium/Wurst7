@@ -29,8 +29,9 @@ public class ShallowWaterWarningCheckbox extends CheckboxSetting
 		hasAlreadyWarned = false;
 	}
 	
-	public void checkWaterAround(FishingBobberEntity bobber)
+	public void checkWaterType()
 	{
+		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
 		if(bobber.isOpenOrWaterAround(bobber.getBlockPos()))
 		{
 			hasAlreadyWarned = false;

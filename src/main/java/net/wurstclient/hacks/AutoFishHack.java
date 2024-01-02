@@ -9,10 +9,10 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -61,6 +61,7 @@ public final class AutoFishHack extends Hack
 	
 	private int castRodTimer;
 	private int reelInTimer;
+	private boolean biteDetected;
 	
 	public AutoFishHack()
 	{
@@ -90,6 +91,7 @@ public final class AutoFishHack extends Hack
 	{
 		castRodTimer = 0;
 		reelInTimer = 0;
+		biteDetected = false;
 		rodSelector.reset();
 		debugDraw.reset();
 		shallowWaterWarning.reset();
@@ -132,11 +134,18 @@ public final class AutoFishHack extends Hack
 			return;
 		}
 		
-		// if an entity got hooked, reel in immediately
-		if(MC.player.fishHook.getHookedEntity() != null)
-			reelInTimer = 0;
+		// if a bite was detected, check water type and reel in
+		if(biteDetected)
+		{
+			shallowWaterWarning.checkWaterType();
+			reelInTimer = catchDelay.getValueI();
+			biteDetected = false;
+			
+			// also reel in if an entity was hooked
+		}else if(MC.player.fishHook.getHookedEntity() != null)
+			reelInTimer = catchDelay.getValueI();
 		
-		// otherwise, reel in when it's time
+		// otherwise, reel in when the timer runs out
 		if(reelInTimer == 0)
 		{
 			MC.doItemUse();
@@ -161,23 +170,17 @@ public final class AutoFishHack extends Hack
 		if(!isFishing())
 			return;
 		
-		// check if player is holding a fishing rod
-		ClientPlayerEntity player = MC.player;
-		if(!player.getMainHandStack().isOf(Items.FISHING_ROD))
-			return;
-		
+		// register sound position
 		debugDraw.updateSoundPos(sound);
 		
-		// check sound position
-		FishingBobberEntity bobber = player.fishHook;
-		if(Math.abs(sound.getX() - bobber.getX()) > validRange.getValue()
-			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
+		// check sound position (Chebyshev distance)
+		Vec3d bobber = MC.player.fishHook.getPos();
+		double dx = Math.abs(sound.getX() - bobber.getX());
+		double dz = Math.abs(sound.getZ() - bobber.getZ());
+		if(Math.max(dx, dz) > validRange.getValue())
 			return;
 		
-		shallowWaterWarning.checkWaterAround(bobber);
-		
-		// catch fish
-		reelInTimer = catchDelay.getValueI();
+		biteDetected = true;
 	}
 	
 	@Override
@@ -190,6 +193,7 @@ public final class AutoFishHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		return player != null && player.fishHook != null
-			&& !player.fishHook.isRemoved();
+			&& !player.fishHook.isRemoved()
+			&& player.getMainHandStack().isOf(Items.FISHING_ROD);
 	}
 }
