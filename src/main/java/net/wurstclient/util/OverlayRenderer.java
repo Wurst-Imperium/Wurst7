@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,7 +38,7 @@ public final class OverlayRenderer
 	public void updateProgress()
 	{
 		prevProgress = progress;
-		progress = IMC.getInteractionManager().getCurrentBreakingProgress();
+		progress = MC.interactionManager.currentBreakingProgress;
 		
 		if(progress < prevProgress)
 			prevProgress = progress;
@@ -64,14 +64,12 @@ public final class OverlayRenderer
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		// set position
-		matrixStack.translate(pos.getX() - regionX, pos.getY(),
-			pos.getZ() - regionZ);
+		matrixStack.translate(pos.getX() - region.x(), pos.getY(),
+			pos.getZ() - region.z());
 		
 		// get interpolated progress
 		boolean breaksInstantly = MC.player.getAbilities().creativeMode

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,7 +23,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -32,6 +31,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
@@ -79,17 +79,15 @@ public final class AutoFishDebugDraw
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
 		if(bobber != null)
-			drawValidRange(matrixStack, partialTicks, bobber, regionX, regionZ);
+			drawValidRange(matrixStack, partialTicks, bobber, region);
 		
 		if(lastSoundPos != null)
-			drawLastBite(matrixStack, regionX, regionZ);
+			drawLastBite(matrixStack, region);
 		
 		matrixStack.pop();
 		
@@ -100,12 +98,12 @@ public final class AutoFishDebugDraw
 	}
 	
 	private void drawValidRange(MatrixStack matrixStack, float partialTicks,
-		FishingBobberEntity bobber, int regionX, int regionZ)
+		FishingBobberEntity bobber, RegionPos region)
 	{
 		matrixStack.push();
-		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks);
-		matrixStack.translate(pos.getX() - regionX, pos.getY(),
-			pos.getZ() - regionZ);
+		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
@@ -117,7 +115,7 @@ public final class AutoFishDebugDraw
 		matrixStack.pop();
 	}
 	
-	private void drawLastBite(MatrixStack matrixStack, int regionX, int regionZ)
+	private void drawLastBite(MatrixStack matrixStack, RegionPos region)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
@@ -125,8 +123,8 @@ public final class AutoFishDebugDraw
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		matrixStack.push();
-		matrixStack.translate(lastSoundPos.x - regionX, lastSoundPos.y,
-			lastSoundPos.z - regionZ);
+		matrixStack.translate(lastSoundPos.x - region.x(), lastSoundPos.y,
+			lastSoundPos.z - region.z());
 		
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);

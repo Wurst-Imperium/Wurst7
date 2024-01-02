@@ -96,7 +96,7 @@
   "description.wurst.hack.killpotion": "Создает зелье которое убивает практически кого угодно, даже тех кто в креативе. Не работает на нежити потому что они и так мертвы лол.\n\nДля работы требуется креатив.",
   "description.wurst.hack.liquids": "Позволяет ставить блоки прямо в жидкостях.",
   "description.wurst.hack.lsd": "Провоцирует тяжелые галлюцинации.",
-  "description.wurst.hack.masstpa": "Отправляет запрос на телепортацию всем игрокам.\nОстанавливается если кто-то примет.",
+  "description.wurst.hack.masstpa": "Отправляет запрос на телепортацию всем игрокам.",
   "description.wurst.hack.mileycyrus": "Заставляет Вас тверкать.",
   "description.wurst.hack.mobesp": "Подсвечивает мобов неподалеку.",
   "description.wurst.hack.mobspawnesp": "Показывает места в которых могут заспавниться мобы.\n§eжёлтым§r - мобы могут заспавниться ночью\n§cкрасным§r - мобы могут заспавниться когда угодно",
@@ -135,7 +135,6 @@
   "description.wurst.hack.safewalk": "Не даёт вам упасть с края блоков.",
   "description.wurst.hack.scaffoldwalk": "Автоматически ставит блоки под ноги.",
   "description.wurst.hack.search": "Помогает найти заданные блоки подсвечивая их всеми цветами радуги.",
-  "description.wurst.hack.servercrasher": "Создает вещь которая может крашить свервера на версиях 1.15.x .\n§oРаботает только в креативе.§r",
   "description.wurst.hack.skinderp": "Переключает видимость слоёв скина в случайном порядке.",
   "description.wurst.hack.sneak": "Заставляет Вас автоматически приседать.",
   "description.wurst.hack.snowshoe": "Позволяет ходить по рыхлому снегу.",
@@ -183,5 +182,6 @@
   "button.wurst.nochatreports.signatures_status": "Подписи: ",
   "description.wurst.nochatreports.message_is_reportable": "Это сообщение имеет действительную подпись и поэтому уязвимо для заведомо ложных чат-репортов.",
   "gui.wurst.generic.allcaps_blocked": "ЗАБЛОКИРОВАНО",
-  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО"
+  "gui.wurst.generic.allcaps_allowed": "РАЗРЕШЕНО",
+  "key.wurst.zoom": "Приблизить"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,10 +22,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.hacks.autofish.AutoFishRodSelector;
 import net.wurstclient.hacks.autofish.ShallowWaterWarningCheckbox;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"AutoFishing", "auto fishing", "AutoFisher", "auto fisher",
 	"AFKFishBot", "afk fish bot", "AFKFishingBot", "afk fishing bot",
@@ -41,21 +39,17 @@ public final class AutoFishHack extends Hack
 	
 	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
 		"How long AutoFish will wait after a bite before reeling in.", 0, 0, 60,
-		1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		1, ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting retryDelay = new SliderSetting("Retry delay",
 		"If casting or reeling in the fishing rod fails, this is how long"
 			+ " AutoFish will wait before trying again.",
-		15, 0, 100, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		15, 0, 100, 1,
+		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting patience = new SliderSetting("Patience",
 		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
 		60, 10, 120, 1, ValueDisplay.INTEGER.withSuffix("s"));
-	
-	private final CheckboxSetting stopWhenInvFull = new CheckboxSetting(
-		"Stop when inv full",
-		"If enabled, AutoFish will turn itself off when your inventory is full.",
-		false);
 	
 	private final ShallowWaterWarningCheckbox shallowWaterWarning =
 		new ShallowWaterWarningCheckbox();
@@ -79,14 +73,13 @@ public final class AutoFishHack extends Hack
 		addSetting(patience);
 		debugDraw.getSettings().forEach(this::addSetting);
 		rodSelector.getSettings().forEach(this::addSetting);
-		addSetting(stopWhenInvFull);
 		addSetting(shallowWaterWarning);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		if(!rodSelector.hasARod())
+		if(rodSelector.isOutOfRods())
 			return getName() + " [out of rods]";
 		
 		return getName();
@@ -95,8 +88,6 @@ public final class AutoFishHack extends Hack
 	@Override
 	public void onEnable()
 	{
-		WURST.getHax().airPlaceHack.setEnabled(false);
-		
 		castRodTimer = 0;
 		reelInTimer = 0;
 		rodSelector.reset();
@@ -125,22 +116,9 @@ public final class AutoFishHack extends Hack
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
-		// check if inventory is full
-		if(stopWhenInvFull.isChecked()
-			&& MC.player.getInventory().getEmptySlot() == -1)
-		{
-			ChatUtils.message(
-				"AutoFish has stopped because your inventory is full.");
-			setEnabled(false);
+		// update inventory
+		if(!rodSelector.update())
 			return;
-		}
-		
-		// select fishing rod
-		if(!rodSelector.isBestRodAlreadySelected())
-		{
-			rodSelector.selectBestRod();
-			return;
-		}
 		
 		// if not fishing, cast rod
 		if(!isFishing())
@@ -148,16 +126,20 @@ public final class AutoFishHack extends Hack
 			if(castRodTimer > 0)
 				return;
 			
-			IMC.rightClick();
+			MC.doItemUse();
 			castRodTimer = retryDelay.getValueI();
 			reelInTimer = 20 * patience.getValueI();
 			return;
 		}
 		
+		// if an entity got hooked, reel in immediately
+		if(MC.player.fishHook.getHookedEntity() != null)
+			reelInTimer = 0;
+		
 		// otherwise, reel in when it's time
 		if(reelInTimer == 0)
 		{
-			IMC.rightClick();
+			MC.doItemUse();
 			reelInTimer = retryDelay.getValueI();
 			castRodTimer = retryDelay.getValueI();
 		}

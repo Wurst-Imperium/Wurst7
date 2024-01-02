@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,11 +19,12 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.util.RegionPos;
 
 public final class PathRenderer
 {
 	public static void renderArrow(MatrixStack matrixStack, BlockPos start,
-		BlockPos end, int regionX, int regionZ)
+		BlockPos end, RegionPos region)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -31,13 +32,13 @@ public final class PathRenderer
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
-		int startX = start.getX() - regionX;
+		int startX = start.getX() - region.x();
 		int startY = start.getY();
-		int startZ = start.getZ() - regionZ;
+		int startZ = start.getZ() - region.z();
 		
-		int endX = end.getX() - regionX;
+		int endX = end.getX() - region.x();
 		int endY = end.getY();
-		int endZ = end.getZ() - regionZ;
+		int endZ = end.getZ() - region.z();
 		
 		matrixStack.push();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -99,12 +100,12 @@ public final class PathRenderer
 	}
 	
 	public static void renderNode(MatrixStack matrixStack, BlockPos pos,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		matrixStack.push();
 		
-		matrixStack.translate(pos.getX() - regionX, pos.getY(),
-			pos.getZ() - regionZ);
+		matrixStack.translate(pos.getX() - region.x(), pos.getY(),
+			pos.getZ() - region.z());
 		matrixStack.scale(0.1F, 0.1F, 0.1F);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();

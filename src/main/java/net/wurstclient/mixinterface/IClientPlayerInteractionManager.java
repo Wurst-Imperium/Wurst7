@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,10 +16,6 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IClientPlayerInteractionManager
 {
-	public float getCurrentBreakingProgress();
-	
-	public void setBreakingBlock(boolean breakingBlock);
-	
 	public void windowClick_PICKUP(int slot);
 	
 	public void windowClick_QUICK_MOVE(int slot);
@@ -30,9 +26,6 @@ public interface IClientPlayerInteractionManager
 	
 	public void rightClickItem();
 	
-	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec,
-		Hand hand);
-	
 	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec);
 	
 	public void sendPlayerActionC2SPacket(PlayerActionC2SPacket.Action action,
@@ -40,6 +33,4 @@ public interface IClientPlayerInteractionManager
 	
 	public void sendPlayerInteractBlockPacket(Hand hand,
 		BlockHitResult blockHitResult);
-	
-	public void setBlockHitDelay(int delay);
 }

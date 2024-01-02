@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -174,8 +173,7 @@ public final class SpeedNukerHack extends Hack
 		
 		// check pos
 		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-		if(pos == null
-			|| BlockUtils.getState(pos).getMaterial() == Material.AIR)
+		if(pos == null || BlockUtils.getBlock(pos) == Blocks.AIR)
 			return;
 		
 		// set id

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,6 +16,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -39,7 +40,12 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
 	
-	private final SliderSetting totems = new SliderSetting("Totems",
+	private final CheckboxSetting disableAutoReconnect = new CheckboxSetting(
+		"Disable AutoReconnect", "Automatically turns off AutoReconnect when"
+			+ " AutoLeave makes you leave the server.",
+		true);
+  
+  private final SliderSetting totems = new SliderSetting("Totems",
 		"Effectively disables AutoLeave until the number of totems you have is at or below this value.\n"
 			+ "Drag the slider to the right to turn off this feature.",
 		11, 0, 11, 1, ValueDisplay.INTEGER.withSuffix(" totems")
@@ -48,11 +54,11 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
-		
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
-		addSetting(totems);
+		addSetting(disableAutoReconnect);
+  	addSetting(totems);
 	}
 	
 	@Override
@@ -86,7 +92,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// check health
-		if(MC.player.getHealth() > health.getValueF() * 2F)
+		float currentHealth = MC.player.getHealth();
+		if(currentHealth <= 0F || currentHealth > health.getValueF() * 2F)
 			return;
 		
 		// check totems
@@ -118,6 +125,9 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		// disable
 		setEnabled(false);
+		
+		if(disableAutoReconnect.isChecked())
+			WURST.getHax().autoReconnectHack.setEnabled(false);
 	}
 	
 	private int countTotems(PlayerInventory inventory)

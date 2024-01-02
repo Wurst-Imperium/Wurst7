@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -37,8 +37,8 @@ public abstract class ClientConnectionMixin
 		ordinal = 0),
 		method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
 		cancellable = true)
-	private void onChannelRead0(ChannelHandlerContext channelHandlerContext,
-		Packet<?> packet, CallbackInfo ci)
+	private void onChannelRead0(ChannelHandlerContext context, Packet<?> packet,
+		CallbackInfo ci)
 	{
 		PacketInputEvent event = new PacketInputEvent(packet);
 		EventManager.fire(event);

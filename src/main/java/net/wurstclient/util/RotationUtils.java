@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.RotationFaker;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 public enum RotationUtils
 {
@@ -29,16 +28,16 @@ public enum RotationUtils
 			player.getZ());
 	}
 	
-	public static Vec3d getClientLookVec()
+	public static Vec3d getClientLookVec(float partialTicks)
 	{
 		ClientPlayerEntity player = WurstClient.MC.player;
 		float f = 0.017453292F;
 		float pi = (float)Math.PI;
 		
-		float f1 = MathHelper.cos(-player.getYaw() * f - pi);
-		float f2 = MathHelper.sin(-player.getYaw() * f - pi);
-		float f3 = -MathHelper.cos(-player.getPitch() * f);
-		float f4 = MathHelper.sin(-player.getPitch() * f);
+		float f1 = MathHelper.cos(-player.getYaw(partialTicks) * f - pi);
+		float f2 = MathHelper.sin(-player.getYaw(partialTicks) * f - pi);
+		float f3 = -MathHelper.cos(-player.getPitch(partialTicks) * f);
+		float f4 = MathHelper.sin(-player.getPitch(partialTicks) * f);
 		
 		return new Vec3d(f2 * f3, f4, f1 * f3);
 	}
@@ -90,9 +89,9 @@ public enum RotationUtils
 	{
 		Rotation needed = getNeededRotations(vec);
 		
-		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
-		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
-		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
+		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
 		
 		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw);
 		float diffPitch =
@@ -106,9 +105,9 @@ public enum RotationUtils
 		float yaw = MathHelper.wrapDegrees(rotation.getYaw());
 		float pitch = MathHelper.wrapDegrees(rotation.getPitch());
 		
-		IClientPlayerEntity player = WurstClient.IMC.getPlayer();
-		float lastReportedYaw = MathHelper.wrapDegrees(player.getLastYaw());
-		float lastReportedPitch = MathHelper.wrapDegrees(player.getLastPitch());
+		ClientPlayerEntity player = WurstClient.MC.player;
+		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
+		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
 		
 		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - yaw);
 		float diffPitch = MathHelper.wrapDegrees(lastReportedPitch - pitch);
