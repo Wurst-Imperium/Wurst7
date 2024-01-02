@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,8 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -41,13 +43,13 @@ public final class EditBlockScreen extends Screen
 	public void init()
 	{
 		int x1 = width / 2 - 100;
-		int y1 = 60;
+		int y1 = 59;
 		int y2 = height / 3 * 2;
 		
 		TextRenderer tr = client.textRenderer;
 		String valueString = setting.getBlockName();
 		
-		blockField = new TextFieldWidget(tr, x1, y1, 178, 18, Text.literal(""));
+		blockField = new TextFieldWidget(tr, x1, y1, 178, 20, Text.literal(""));
 		blockField.setText(valueString);
 		blockField.setSelectionStart(0);
 		blockField.setMaxLength(256);
@@ -90,23 +92,20 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		blockField.tick();
-	}
-	
-	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY,
+	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(matrixStack);
-		drawCenteredTextWithShadow(matrixStack, tr, setting.getName(),
-			width / 2, 20, 0xFFFFFF);
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		context.drawCenteredTextWithShadow(tr, setting.getName(), width / 2, 20,
+			0xFFFFFF);
 		
-		blockField.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		blockField.render(context, mouseX, mouseY, partialTicks);
+		
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
@@ -118,20 +117,15 @@ public final class EditBlockScreen extends Screen
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		drawTextWithShadow(matrixStack, tr, lblText, lblX, lblY, lblColor);
+		context.drawTextWithShadow(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
 		
-		fill(matrixStack, 48, -56, 64, -36, border);
-		fill(matrixStack, 49, -55, 64, -37, black);
-		fill(matrixStack, 214, -56, 244, -55, border);
-		fill(matrixStack, 214, -37, 244, -36, border);
-		fill(matrixStack, 244, -56, 246, -36, border);
-		fill(matrixStack, 214, -55, 243, -52, black);
-		fill(matrixStack, 214, -40, 243, -37, black);
-		fill(matrixStack, 215, -55, 216, -37, black);
-		fill(matrixStack, 242, -55, 245, -37, black);
+		context.fill(48, -56, 64, -36, border);
+		context.fill(49, -55, 65, -37, black);
+		context.fill(242, -56, 246, -36, border);
+		context.fill(241, -55, 245, -37, black);
 		
 		matrixStack.pop();
 		
@@ -141,7 +135,7 @@ public final class EditBlockScreen extends Screen
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
 		
-		RenderUtils.drawItem(matrixStack, new ItemStack(blockToAdd),
+		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	

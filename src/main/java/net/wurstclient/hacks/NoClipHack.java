@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,6 @@ import net.wurstclient.events.PlayerMoveListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @SearchTags({"no clip"})
 public final class NoClipHack extends Hack
@@ -77,9 +76,9 @@ public final class NoClipHack extends Hack
 	}
 	
 	@Override
-	public void onPlayerMove(IClientPlayerEntity player)
+	public void onPlayerMove()
 	{
-		player.setNoClip(true);
+		MC.player.noClip = true;
 	}
 	
 	@Override

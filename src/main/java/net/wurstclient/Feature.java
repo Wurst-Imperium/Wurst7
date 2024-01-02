@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,18 +10,15 @@ package net.wurstclient;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.ChatUtils;
 
 public abstract class Feature
 {
@@ -48,14 +45,7 @@ public abstract class Feature
 	
 	public String getWrappedDescription(int width)
 	{
-		List<StringVisitable> lines = MC.textRenderer.getTextHandler()
-			.wrapLines(getDescription(), width, Style.EMPTY);
-		
-		StringJoiner joiner = new StringJoiner("\n");
-		lines.stream().map(StringVisitable::getString)
-			.forEach(s -> joiner.add(s));
-		
-		return joiner.toString();
+		return ChatUtils.wrapText(getDescription(), width);
 	}
 	
 	public Category getCategory()

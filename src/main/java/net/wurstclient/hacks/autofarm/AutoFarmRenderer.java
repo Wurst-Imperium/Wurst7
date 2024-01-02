@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -53,10 +53,7 @@ public final class AutoFarmRenderer
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
@@ -101,10 +98,7 @@ public final class AutoFarmRenderer
 		BufferBuilder bufferBuilder =
 			RenderSystem.renderThreadTesselator().getBuffer();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		Vec3d regionOffset = new Vec3d(-regionX, 0, -regionZ);
+		Vec3d regionOffset = RenderUtils.getCameraRegion().negate().toVec3d();
 		
 		double boxMin = 1 / 16.0;
 		double boxMax = 15 / 16.0;
@@ -122,7 +116,7 @@ public final class AutoFarmRenderer
 		if(greenBuffer != null)
 			greenBuffer.close();
 		
-		greenBuffer = new VertexBuffer();
+		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -144,7 +138,7 @@ public final class AutoFarmRenderer
 		if(cyanBuffer != null)
 			cyanBuffer.close();
 		
-		cyanBuffer = new VertexBuffer();
+		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		
@@ -166,7 +160,7 @@ public final class AutoFarmRenderer
 		if(redBuffer != null)
 			redBuffer.close();
 		
-		redBuffer = new VertexBuffer();
+		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		

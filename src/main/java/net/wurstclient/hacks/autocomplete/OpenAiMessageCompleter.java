@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -65,8 +65,8 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	{
 		// get the API URL
 		URL url = modelSettings.openAiModel.getSelected().isChatModel()
-			? new URL("https://api.openai.com/v1/chat/completions")
-			: new URL("https://api.openai.com/v1/completions");
+			? new URL(modelSettings.openaiChatEndpoint.getValue())
+			: new URL(modelSettings.openaiLegacyEndpoint.getValue());
 		
 		// set up the API request
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();

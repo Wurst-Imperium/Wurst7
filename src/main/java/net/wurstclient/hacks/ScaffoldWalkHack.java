@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -56,7 +56,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		BlockPos belowPlayer = BlockPos.ofFloored(MC.player.getPos()).down();
 		
 		// check if block is already placed
-		if(!BlockUtils.getState(belowPlayer).getMaterial().isReplaceable())
+		if(!BlockUtils.getState(belowPlayer).isReplaceable())
 			return;
 		
 		// search blocks in hotbar
@@ -163,7 +163,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			
 			return true;
 		}

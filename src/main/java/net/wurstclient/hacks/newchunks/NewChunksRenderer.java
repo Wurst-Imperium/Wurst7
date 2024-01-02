@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -41,7 +41,7 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
-		vertexBuffers[i] = new VertexBuffer();
+		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);
 		VertexBuffer.unbind();

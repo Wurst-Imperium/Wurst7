@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -110,6 +111,21 @@ public final class ItemListSetting extends Setting
 	{
 		JsonArray json = new JsonArray();
 		itemNames.forEach(s -> json.add(s));
+		return json;
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "ItemList");
+		
+		JsonArray defaultItems = new JsonArray();
+		Arrays.stream(defaultNames).forEachOrdered(s -> defaultItems.add(s));
+		json.add("defaultItems", defaultItems);
+		
 		return json;
 	}
 	

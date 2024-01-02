@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,18 +33,17 @@ public enum BlockVertexCompiler
 	}
 	
 	public static ArrayList<int[]> compile(HashSet<BlockPos> blocks,
-		int regionX, int regionZ)
+		RegionPos region)
 	{
 		return blocks.parallelStream().flatMap(pos -> getVertices(pos, blocks))
-			.map(v -> applyRegionOffset(v, regionX, regionZ))
+			.map(v -> applyRegionOffset(v, region))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
-	private static int[] applyRegionOffset(int[] vertex, int regionX,
-		int regionZ)
+	private static int[] applyRegionOffset(int[] vertex, RegionPos region)
 	{
-		vertex[0] -= regionX;
-		vertex[2] -= regionZ;
+		vertex[0] -= region.x();
+		vertex[2] -= region.z();
 		return vertex;
 	}
 	

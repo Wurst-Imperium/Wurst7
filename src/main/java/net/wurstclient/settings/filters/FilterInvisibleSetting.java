@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,6 +25,12 @@ public final class FilterInvisibleSetting extends EntityFilterCheckbox
 	public static FilterInvisibleSetting genericCombat(boolean checked)
 	{
 		return new FilterInvisibleSetting("Won't attack invisible entities.",
+			checked);
+	}
+	
+	public static FilterInvisibleSetting genericVision(boolean checked)
+	{
+		return new FilterInvisibleSetting("Won't show invisible entities.",
 			checked);
 	}
 }

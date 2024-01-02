@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -50,7 +50,7 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 		throws IOException, JsonException
 	{
 		// set up the API request
-		URL url = new URL("http://127.0.0.1:5000/api/v1/generate");
+		URL url = new URL(modelSettings.oobaboogaEndpoint.getValue());
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/json");

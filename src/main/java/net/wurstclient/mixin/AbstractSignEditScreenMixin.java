@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,14 +25,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen
 {
 	@Shadow
 	@Final
-	private String[] text;
+	private String[] messages;
 	
-	private AbstractSignEditScreenMixin(WurstClient wurst, Text text_1)
+	private AbstractSignEditScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"init()V"})
+	@Inject(at = @At("HEAD"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
@@ -42,15 +42,15 @@ public abstract class AbstractSignEditScreenMixin extends Screen
 			return;
 		
 		for(int i = 0; i < 4; i++)
-			text[i] = autoSignText[i];
+			messages[i] = autoSignText[i];
 		
 		finishEditing();
 	}
 	
-	@Inject(at = {@At("HEAD")}, method = {"finishEditing()V"})
+	@Inject(at = @At("HEAD"), method = "finishEditing()V")
 	private void onFinishEditing(CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(text);
+		WurstClient.INSTANCE.getHax().autoSignHack.setSignText(messages);
 	}
 	
 	@Shadow

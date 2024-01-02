@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,7 +10,9 @@ package net.wurstclient.settings;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
@@ -110,6 +112,23 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 	public JsonElement toJson()
 	{
 		return new JsonPrimitive(selected.toString());
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "Enum");
+		
+		JsonArray values = new JsonArray();
+		for(T value : this.values)
+			values.add(value.toString());
+		json.add("values", values);
+		json.addProperty("defaultValue", defaultSelected.toString());
+		
+		return json;
 	}
 	
 	@Override

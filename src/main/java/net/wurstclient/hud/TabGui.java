@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -121,8 +122,9 @@ public final class TabGui implements KeyPressListener
 			}
 	}
 	
-	public void render(MatrixStack matrixStack, float partialTicks)
+	public void render(DrawContext context, float partialTicks)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		if(tabGuiOtf.isHidden())
 			return;
 		
@@ -156,8 +158,8 @@ public final class TabGui implements KeyPressListener
 			if(i == selected)
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
-			WurstClient.MC.textRenderer.draw(matrixStack, tabName, 2, textY,
-				txtColor);
+			context.drawText(WurstClient.MC.textRenderer, tabName, 2, textY,
+				txtColor, false);
 			textY += 10;
 		}
 		GL11.glEnable(GL11.GL_BLEND);
@@ -191,8 +193,8 @@ public final class TabGui implements KeyPressListener
 				if(i == tab.selected)
 					fName = ">" + fName;
 				
-				WurstClient.MC.textRenderer.draw(matrixStack, fName, 2,
-					tabTextY, txtColor);
+				context.drawText(WurstClient.MC.textRenderer, fName, 2,
+					tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
 			GL11.glEnable(GL11.GL_BLEND);
