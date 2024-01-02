@@ -44,12 +44,12 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		"Disable AutoReconnect", "Automatically turns off AutoReconnect when"
 			+ " AutoLeave makes you leave the server.",
 		true);
-  
-  private final SliderSetting totems = new SliderSetting("Totems",
+	
+	private final SliderSetting totems = new SliderSetting("Totems",
 		"Effectively disables AutoLeave until the number of totems you have is at or below this value.\n"
 			+ "Drag the slider to the right to turn off this feature.",
-		11, 0, 11, 1, ValueDisplay.INTEGER.withSuffix(" totems")
-			.withLabel(11, "unlimited"));
+		11, 0, 11, 1,
+		ValueDisplay.INTEGER.withSuffix(" totems").withLabel(11, "unlimited"));
 	
 	public AutoLeaveHack()
 	{
@@ -58,7 +58,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		addSetting(health);
 		addSetting(mode);
 		addSetting(disableAutoReconnect);
-  	addSetting(totems);
+		addSetting(totems);
 	}
 	
 	@Override
@@ -97,7 +97,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// check totems
-		if(totems.getValueI() != 11 && countTotems(MC.player.getInventory()) > totems.getValueI())
+		if(totems.getValueI() != 11
+			&& countTotems(MC.player.getInventory()) > totems.getValueI())
 			return;
 		
 		// leave server
@@ -137,7 +138,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		for(int slot = 0; slot <= 36; slot++)
 			if(inventory.getStack(slot).getItem() == Items.TOTEM_OF_UNDYING)
 				totems++;
-		
+			
 		ItemStack offhandStack = inventory.getStack(40);
 		if(offhandStack.getItem() == Items.TOTEM_OF_UNDYING)
 			totems++;
