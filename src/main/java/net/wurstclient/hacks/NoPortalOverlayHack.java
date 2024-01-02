@@ -19,6 +19,6 @@ public final class NoPortalOverlayHack extends Hack
 		super("NoPortalOverlay");
 		setCategory(Category.RENDER);
 	}
-
+	
 	// See IngameHudMixin.onRenderPortalOverlay()
 }
