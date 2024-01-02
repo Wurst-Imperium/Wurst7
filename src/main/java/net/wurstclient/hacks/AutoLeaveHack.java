@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,6 +13,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -36,13 +37,18 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ "Bypasses both CombatLog and NoCheat+.",
 		Mode.values(), Mode.QUIT);
 	
+	private final CheckboxSetting disableAutoReconnect = new CheckboxSetting(
+		"Disable AutoReconnect", "Automatically turns off AutoReconnect when"
+			+ " AutoLeave makes you leave the server.",
+		true);
+	
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
-		
 		setCategory(Category.COMBAT);
 		addSetting(health);
 		addSetting(mode);
+		addSetting(disableAutoReconnect);
 	}
 	
 	@Override
@@ -76,7 +82,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// check health
-		if(MC.player.getHealth() > health.getValueF() * 2F)
+		float currentHealth = MC.player.getHealth();
+		if(currentHealth <= 0F || currentHealth > health.getValueF() * 2F)
 			return;
 		
 		// leave server
@@ -104,6 +111,9 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		// disable
 		setEnabled(false);
+		
+		if(disableAutoReconnect.isChecked())
+			WURST.getHax().autoReconnectHack.setEnabled(false);
 	}
 	
 	public static enum Mode

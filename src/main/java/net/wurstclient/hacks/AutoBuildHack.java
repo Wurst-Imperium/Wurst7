@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,7 +26,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
@@ -41,6 +40,7 @@ import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.DefaultAutoBuildTemplates;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -198,7 +198,7 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(!fastPlace.isChecked() && IMC.getItemUseCooldown() > 0)
+		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
 		placeNextBlock();
@@ -252,11 +252,8 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			// check line of sight
-			if(checkLOS.isChecked() && MC.world
-				.raycast(new RaycastContext(eyesPos, hitVec,
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() != HitResult.Type.MISS)
+			if(checkLOS.isChecked()
+				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
 			// face block
@@ -270,7 +267,7 @@ public final class AutoBuildHack extends Hack
 			IMC.getInteractionManager().rightClickBlock(neighbor,
 				side.getOpposite(), hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			return true;
 		}
 		
@@ -362,10 +359,8 @@ public final class AutoBuildHack extends Hack
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		int blocksDrawn = 0;
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
@@ -377,8 +372,8 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			matrixStack.push();
-			matrixStack.translate(pos.getX() - regionX, pos.getY(),
-				pos.getZ() - regionZ);
+			matrixStack.translate(pos.getX() - region.x(), pos.getY(),
+				pos.getZ() - region.z());
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			

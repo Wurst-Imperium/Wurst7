@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.GridWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
@@ -41,14 +41,14 @@ public class DisconnectedScreenMixin extends Screen
 	private Screen parent;
 	@Shadow
 	@Final
-	private final GridWidget grid = new GridWidget();
+	private DirectionalLayoutWidget grid;
 	
 	private DisconnectedScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -76,12 +76,12 @@ public class DisconnectedScreenMixin extends Screen
 		ButtonWidget reconnectButton = grid.add(
 			ButtonWidget.builder(Text.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(parent)).build(),
-			3, 0, 1, 1, grid.copyPositioner().margin(2).marginTop(-6));
+			grid.copyPositioner().margin(2).marginTop(-6));
 		
 		autoReconnectButton = grid.add(
 			ButtonWidget.builder(Text.literal("AutoReconnect"),
 				b -> pressAutoReconnect()).build(),
-			4, 0, 1, 1, grid.copyPositioner().margin(2));
+			grid.copyPositioner().margin(2));
 		
 		grid.refreshPositions();
 		Stream.of(reconnectButton, autoReconnectButton)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -44,7 +44,8 @@ public final class FlightHack extends Hack
 		new SliderSetting("Anti-Kick Interval",
 			"How often Anti-Kick should prevent you from getting kicked.\n"
 				+ "Most servers will kick you after 80 ticks.",
-			30, 5, 80, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+			30, 5, 80, 1,
+			ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting antiKickDistance = new SliderSetting(
 		"Anti-Kick Distance",

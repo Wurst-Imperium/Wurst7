@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,16 +13,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
@@ -47,16 +48,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	implements IClientPlayerEntity
 {
 	@Shadow
-	private float lastYaw;
-	@Shadow
-	private float lastPitch;
-	@Shadow
-	private ClientPlayNetworkHandler networkHandler;
-	@Shadow
 	@Final
 	protected MinecraftClient client;
 	
 	private Screen tempCurrentScreen;
+	private boolean hideNextItemUse;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
 		GameProfile profile)
@@ -72,15 +68,63 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
-	@Redirect(at = @At(value = "INVOKE",
+	/**
+	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
+	 */
+	@WrapOperation(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z",
+			ordinal = 0),
+		method = "tickMovement()V")
+	private boolean wrapHasForwardMovement(Input input,
+		Operation<Boolean> original)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
+			return input.getMovementInput().length() > 1e-5F;
+		
+		return original.call(input);
+	}
+	
+	/**
+	 * This mixin runs just before the tickMovement() method calls
+	 * isUsingItem(), so that the onIsUsingItem() mixin knows which
+	 * call to intercept.
+	 */
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
 		ordinal = 0), method = "tickMovement()V")
-	private boolean wurstIsUsingItem(ClientPlayerEntity player)
+	private void onTickMovementItemUse(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
-			return false;
+			hideNextItemUse = true;
+	}
+	
+	/**
+	 * Pretends that the player is not using an item when instructed to do so by
+	 * the onTickMovement() mixin.
+	 */
+	@Inject(at = @At("HEAD"), method = "isUsingItem()Z", cancellable = true)
+	private void onIsUsingItem(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(!hideNextItemUse)
+			return;
 		
-		return player.isUsingItem();
+		cir.setReturnValue(false);
+		hideNextItemUse = false;
+	}
+	
+	/**
+	 * This mixin is injected into a random field access later in the
+	 * tickMovement() method to ensure that hideNextItemUse is always reset
+	 * after the item use slowdown calculation.
+	 */
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksToNextAutojump:I",
+		opcode = Opcodes.GETFIELD,
+		ordinal = 0), method = "tickMovement()V")
+	private void afterIsUsingItem(CallbackInfo ci)
+	{
+		hideNextItemUse = false;
 	}
 	
 	@Inject(at = @At("HEAD"), method = "sendMovementPackets()V")
@@ -99,8 +143,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
 	{
-		PlayerMoveEvent event = new PlayerMoveEvent(this);
-		EventManager.fire(event);
+		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -144,6 +187,17 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	/**
+	 * This mixin allows AutoSprint to enable sprinting even when the player is
+	 * too hungry.
+	 */
+	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
+	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
+			cir.setReturnValue(true);
 	}
 	
 	/**
@@ -247,30 +301,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			&& hax.noLevitationHack.isEnabled())
 			return false;
 		
+		if(effect == StatusEffects.DARKNESS && hax.antiBlindHack.isEnabled())
+			return false;
+		
 		return super.hasStatusEffect(effect);
-	}
-	
-	@Override
-	public void setNoClip(boolean noClip)
-	{
-		this.noClip = noClip;
-	}
-	
-	@Override
-	public float getLastYaw()
-	{
-		return lastYaw;
-	}
-	
-	@Override
-	public float getLastPitch()
-	{
-		return lastPitch;
-	}
-	
-	@Override
-	public void setMovementMultiplier(Vec3d movementMultiplier)
-	{
-		this.movementMultiplier = movementMultiplier;
 	}
 }

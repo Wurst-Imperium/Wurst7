@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,10 +9,10 @@ package net.wurstclient.hacks.autolibrarian;
 
 import java.util.Objects;
 
+import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.ILanguageManager;
 
 public record BookOffer(String id, int level, int price)
@@ -31,24 +31,19 @@ public record BookOffer(String id, int level, int price)
 	
 	public String getEnchantmentName()
 	{
-		ILanguageManager languageManager = WurstClient.IMC.getLanguageManager();
+		TranslationStorage english = ILanguageManager.getEnglish();
 		Enchantment enchantment = getEnchantment();
-		String trKey = enchantment.getTranslationKey();
-		String name = languageManager.getEnglish().get(trKey);
-		
-		return name;
+		return english.get(enchantment.getTranslationKey());
 	}
 	
 	public String getEnchantmentNameWithLevel()
 	{
-		ILanguageManager languageManager = WurstClient.IMC.getLanguageManager();
+		TranslationStorage english = ILanguageManager.getEnglish();
 		Enchantment enchantment = getEnchantment();
-		String trKey = enchantment.getTranslationKey();
-		String name = languageManager.getEnglish().get(trKey);
+		String name = english.get(enchantment.getTranslationKey());
 		
 		if(enchantment.getMaxLevel() > 1)
-			name += " " + languageManager.getEnglish()
-				.get("enchantment.level." + level);
+			name += " " + english.get("enchantment.level." + level);
 		
 		return name;
 	}

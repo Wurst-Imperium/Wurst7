@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,9 +32,10 @@ public final class LiquidsHack extends Hack implements HitResultRayTraceListener
 	}
 	
 	@Override
-	public void onHitResultRayTrace(float float_1)
+	public void onHitResultRayTrace(float partialTicks)
 	{
-		MC.crosshairTarget = MC.getCameraEntity()
-			.raycast(MC.interactionManager.getReachDistance(), float_1, true);
+		float reach = MC.interactionManager.getReachDistance();
+		MC.crosshairTarget =
+			MC.getCameraEntity().raycast(reach, partialTicks, true);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,8 +17,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -26,7 +26,6 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.mixinterface.IScreen;
 import net.wurstclient.util.RenderUtils;
 
 public class NavigatorRemoveKeybindScreen extends NavigatorScreen
@@ -146,10 +145,11 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
+		boolean noButtons = Screens.getButtons(this).isEmpty();
+		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
 		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2,
-			bgy2 - (((IScreen)this).getButtons().isEmpty() ? 0 : 24));
+		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -208,13 +208,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		// buttons below scissor box
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(ClickableWidget button : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
-				continue;
-			
-			ClickableWidget button = (ClickableWidget)d;
-			
 			// positions
 			int x1 = button.getX();
 			int x2 = x1 + button.getWidth();

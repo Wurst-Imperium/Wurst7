@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,6 +12,10 @@ import java.util.stream.Stream;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.Chunk;
@@ -28,6 +32,32 @@ public enum ChunkUtils
 	{
 		return getLoadedChunks()
 			.flatMap(chunk -> chunk.getBlockEntities().values().stream());
+	}
+	
+	public static int getManhattanDistance(ChunkPos a, ChunkPos b)
+	{
+		return Math.abs(a.x - b.x) + Math.abs(a.z - b.z);
+	}
+	
+	/**
+	 * Returns the position of the chunk affected by the given
+	 * {@link BlockUpdateS2CPacket}, {@link ChunkDeltaUpdateS2CPacket}, or
+	 * {@link ChunkDataS2CPacket}.
+	 *
+	 * <p>
+	 * Returns <code>null</code> if the given packet is of a different type than
+	 * the ones listed above.
+	 */
+	public static ChunkPos getAffectedChunk(Packet<?> packet)
+	{
+		if(packet instanceof BlockUpdateS2CPacket p)
+			return new ChunkPos(p.getPos());
+		if(packet instanceof ChunkDeltaUpdateS2CPacket p)
+			return p.sectionPos.toChunkPos();
+		if(packet instanceof ChunkDataS2CPacket p)
+			return new ChunkPos(p.getChunkX(), p.getChunkZ());
+		
+		return null;
 	}
 	
 	public static Stream<WorldChunk> getLoadedChunks()

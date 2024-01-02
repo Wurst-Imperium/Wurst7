@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -80,15 +80,15 @@ public final class PotionCmd extends Command
 		{
 			NbtCompound effect = new NbtCompound();
 			
-			effect.putInt("Id", parseEffectId(args[1 + i * 3]));
-			effect.putInt("Amplifier", parseInt(args[2 + i * 3]) - 1);
-			effect.putInt("Duration", parseInt(args[3 + i * 3]) * 20);
+			effect.putInt("id", parseEffectId(args[1 + i * 3]));
+			effect.putInt("amplifier", parseInt(args[2 + i * 3]) - 1);
+			effect.putInt("duration", parseInt(args[3 + i * 3]) * 20);
 			
 			effects.add(effect);
 		}
 		
 		NbtCompound nbt = new NbtCompound();
-		nbt.put("CustomPotionEffects", effects);
+		nbt.put("custom_potion_effects", effects);
 		stack.setNbt(nbt);
 		ChatUtils.message("Potion modified.");
 	}
@@ -103,10 +103,10 @@ public final class PotionCmd extends Command
 		{
 			NbtCompound tag = new NbtCompound();
 			
-			int id = StatusEffect.getRawId(effect.getEffectType());
-			tag.putInt("Id", id);
-			tag.putInt("Amplifier", effect.getAmplifier());
-			tag.putInt("Duration", effect.getDuration());
+			int id = Registries.STATUS_EFFECT.getRawId(effect.getEffectType());
+			tag.putInt("id", id);
+			tag.putInt("amplifier", effect.getAmplifier());
+			tag.putInt("duration", effect.getDuration());
 			
 			nbt.add(tag);
 		}
@@ -127,20 +127,21 @@ public final class PotionCmd extends Command
 		NbtList newEffects = new NbtList();
 		for(StatusEffectInstance oldEffect : oldEffects)
 		{
-			int oldId = StatusEffect.getRawId(oldEffect.getEffectType());
+			int oldId =
+				Registries.STATUS_EFFECT.getRawId(oldEffect.getEffectType());
 			
 			if(oldId == id)
 				continue;
 			
 			NbtCompound effect = new NbtCompound();
-			effect.putInt("Id", oldId);
-			effect.putInt("Amplifier", oldEffect.getAmplifier());
-			effect.putInt("Duration", oldEffect.getDuration());
+			effect.putInt("id", oldId);
+			effect.putInt("amplifier", oldEffect.getAmplifier());
+			effect.putInt("duration", oldEffect.getDuration());
 			newEffects.add(effect);
 		}
 		
 		NbtCompound nbt = new NbtCompound();
-		nbt.put("CustomPotionEffects", newEffects);
+		nbt.put("custom_potion_effects", newEffects);
 		stack.setNbt(nbt);
 		ChatUtils.message("Effect removed.");
 	}
@@ -157,7 +158,7 @@ public final class PotionCmd extends Command
 				Identifier identifier = new Identifier(input);
 				StatusEffect effect = Registries.STATUS_EFFECT.get(identifier);
 				
-				id = StatusEffect.getRawId(effect);
+				id = Registries.STATUS_EFFECT.getRawId(effect);
 				
 			}catch(InvalidIdentifierException e)
 			{

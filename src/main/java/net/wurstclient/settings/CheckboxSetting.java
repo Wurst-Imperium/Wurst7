@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
@@ -100,6 +101,17 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	public final JsonElement toJson()
 	{
 		return new JsonPrimitive(checked);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "Checkbox");
+		json.addProperty("checkedByDefault", checkedByDefault);
+		return json;
 	}
 	
 	@Override

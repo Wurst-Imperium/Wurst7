@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashSet;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.minecraft.util.math.MathHelper;
@@ -83,6 +84,15 @@ public class SliderSetting extends Setting implements SliderLock
 	public final int getValueCeil()
 	{
 		return MathHelper.ceil(getValue());
+	}
+	
+	/**
+	 * Returns the actual value of a logarithmic slider,<br>
+	 * calculated as <code>10 ^ {@link #getValueI()}</code>.
+	 */
+	public final int getValueLog()
+	{
+		return (int)Math.pow(10, getValueI());
 	}
 	
 	public final double getDefaultValue()
@@ -255,6 +265,22 @@ public class SliderSetting extends Setting implements SliderLock
 	public final JsonElement toJson()
 	{
 		return new JsonPrimitive(Math.round(value * 1e6) / 1e6);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "Slider");
+		
+		json.addProperty("defaultValue", defaultValue);
+		json.addProperty("minimum", minimum);
+		json.addProperty("maximum", maximum);
+		json.addProperty("increment", increment);
+		
+		return json;
 	}
 	
 	@Override

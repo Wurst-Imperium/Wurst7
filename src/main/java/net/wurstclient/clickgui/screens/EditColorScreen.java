@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -156,21 +157,12 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
-	{
-		hexValueField.tick();
-		redValueField.tick();
-		greenValueField.tick();
-		blueValueField.tick();
-	}
-	
-	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
 		
@@ -217,7 +209,8 @@ public final class EditColorScreen extends Screen
 		context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
 			color.getRGB());
 		
-		super.render(context, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

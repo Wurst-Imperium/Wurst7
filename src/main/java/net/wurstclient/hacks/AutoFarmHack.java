@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -95,7 +95,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentlyHarvesting != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentlyHarvesting = null;
 		}
@@ -206,7 +206,7 @@ public final class AutoFarmHack extends Hack
 		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
-		if(block instanceof GourdBlock)
+		if(block == Blocks.PUMPKIN || block == Blocks.MELON)
 			return true;
 		
 		if(block instanceof SugarCaneBlock)
@@ -266,7 +266,7 @@ public final class AutoFarmHack extends Hack
 	private boolean replant(List<BlockPos> blocksToReplant)
 	{
 		// check cooldown
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return false;
 		
 		// check if already holding one of the seeds needed for blocksToReplant
@@ -307,7 +307,7 @@ public final class AutoFarmHack extends Hack
 						.sendPacket(new HandSwingC2SPacket(hand));
 				
 				// reset cooldown
-				IMC.setItemUseCooldown(4);
+				MC.itemUseCooldown = 4;
 				return true;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,14 +14,12 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RaycastContext;
 import net.wurstclient.WurstClient;
 
 public enum BlockBreaker
@@ -59,6 +57,18 @@ public enum BlockBreaker
 	 */
 	public static BlockBreakingParams getBlockBreakingParams(BlockPos pos)
 	{
+		return getBlockBreakingParams(RotationUtils.getEyesPos(), pos);
+	}
+	
+	/**
+	 * Returns everything you need to break a block at the given position, such
+	 * as which side to face, the exact hit vector to face that side, the
+	 * squared distance to that hit vector, and whether or not there is line of
+	 * sight to that hit vector.
+	 */
+	public static BlockBreakingParams getBlockBreakingParams(Vec3d eyes,
+		BlockPos pos)
+	{
 		Direction[] sides = Direction.values();
 		
 		BlockState state = BlockUtils.getState(pos);
@@ -66,7 +76,6 @@ public enum BlockBreaker
 		if(shape.isEmpty())
 			return null;
 		
-		Vec3d eyesPos = RotationUtils.getEyesPos();
 		Box box = shape.getBoundingBox();
 		Vec3d halfSize = new Vec3d(box.maxX - box.minX, box.maxY - box.minY,
 			box.maxZ - box.minZ).multiply(0.5);
@@ -81,24 +90,20 @@ public enum BlockBreaker
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		double distanceSqToCenter = eyesPos.squaredDistanceTo(center);
+		double distanceSqToCenter = eyes.squaredDistanceTo(center);
 		double[] distancesSq = new double[sides.length];
 		boolean[] linesOfSight = new boolean[sides.length];
 		
 		for(int i = 0; i < sides.length; i++)
 		{
-			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
+			distancesSq[i] = eyes.squaredDistanceTo(hitVecs[i]);
 			
 			// no need to raytrace the rear sides,
 			// they can't possibly have line of sight
 			if(distancesSq[i] >= distanceSqToCenter)
 				continue;
 			
-			linesOfSight[i] = MC.world
-				.raycast(new RaycastContext(eyesPos, hitVecs[i],
-					RaycastContext.ShapeType.COLLIDER,
-					RaycastContext.FluidHandling.NONE, MC.player))
-				.getType() == HitResult.Type.MISS;
+			linesOfSight[i] = BlockUtils.hasLineOfSight(eyes, hitVecs[i]);
 		}
 		
 		Direction side = sides[0];

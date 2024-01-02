@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -27,10 +27,12 @@ import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.hacks.RadarHack;
+import net.wurstclient.util.EntityUtils;
 
 public final class RadarComponent extends Component
 {
@@ -127,6 +129,7 @@ public final class RadarComponent extends Component
 		
 		matrixStack.pop();
 		matrix = matrixStack.peek().getPositionMatrix();
+		Vec3d lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);
 		
 		// points
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -135,14 +138,9 @@ public final class RadarComponent extends Component
 			VertexFormats.POSITION_COLOR);
 		for(Entity e : hack.getEntities())
 		{
-			double diffX =
-				e.lastRenderX + (e.getX() - e.lastRenderX) * partialTicks
-					- (player.lastRenderX
-						+ (player.getX() - player.lastRenderX) * partialTicks);
-			double diffZ =
-				e.lastRenderZ + (e.getZ() - e.lastRenderZ) * partialTicks
-					- (player.lastRenderZ
-						+ (player.getZ() - player.lastRenderZ) * partialTicks);
+			Vec3d lerpedEntityPos = EntityUtils.getLerpedPos(e, partialTicks);
+			double diffX = lerpedEntityPos.x - lerpedPlayerPos.x;
+			double diffZ = lerpedEntityPos.z - lerpedPlayerPos.z;
 			double distance = Math.sqrt(diffX * diffX + diffZ * diffZ)
 				* (getWidth() * 0.5 / hack.getRadius());
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));
@@ -159,7 +157,9 @@ public final class RadarComponent extends Component
 				continue;
 			
 			int color;
-			if(e instanceof PlayerEntity)
+			if(WurstClient.INSTANCE.getFriends().isFriend(e))
+				color = 0x0000FF;
+			else if(e instanceof PlayerEntity)
 				color = 0xFF0000;
 			else if(e instanceof Monster)
 				color = 0xFF8000;
