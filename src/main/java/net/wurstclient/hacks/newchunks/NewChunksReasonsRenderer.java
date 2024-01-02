@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksReasonsRenderer
@@ -47,10 +48,8 @@ public final class NewChunksReasonsRenderer
 	private void renderBlocks(List<BlockPos> blocks,
 		BufferBuilder bufferBuilder)
 	{
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		ChunkPos camChunkPos = new ChunkPos(camPos);
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
+		ChunkPos camChunkPos = new ChunkPos(RenderUtils.getCameraBlockPos());
+		RegionPos region = RegionPos.of(camChunkPos);
 		int drawDistance = this.drawDistance.getValueI();
 		
 		for(BlockPos pos : blocks)
@@ -59,7 +58,7 @@ public final class NewChunksReasonsRenderer
 			if(chunkPos.getChebyshevDistance(camChunkPos) > drawDistance)
 				continue;
 			
-			Box bb = new Box(pos).offset(-regionX, 0, -regionZ);
+			Box bb = new Box(pos).offset(-region.x(), 0, -region.z());
 			float minX = (float)bb.minX;
 			float minY = (float)bb.minY;
 			float minZ = (float)bb.minZ;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -33,24 +33,12 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	
 	private ButtonWidget lastServerButton;
 	
-	private MultiplayerScreenMixin(WurstClient wurst, Text text_1)
+	private MultiplayerScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Override
-	public MultiplayerServerListWidget getServerListSelector()
-	{
-		return serverListWidget;
-	}
-	
-	@Override
-	public void connectToServer(ServerInfo server)
-	{
-		connect(server);
-	}
-	
-	@Inject(at = {@At("TAIL")}, method = {"init()V"})
+	@Inject(at = @At("TAIL"), method = "init()V")
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -67,17 +55,17 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 				.builder(Text.literal("Server Finder"),
 					b -> client.setScreen(new ServerFinderScreen(
 						(MultiplayerScreen)(Object)this)))
-				.dimensions(width / 2 + 154 + 4, height - 52, 100, 20).build());
+				.dimensions(width / 2 + 154 + 4, height - 54, 100, 20).build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Clean Up"),
 				b -> client.setScreen(
 					new CleanUpScreen((MultiplayerScreen)(Object)this)))
-			.dimensions(width / 2 + 154 + 4, height - 28, 100, 20).build());
+			.dimensions(width / 2 + 154 + 4, height - 30, 100, 20).build());
 	}
 	
-	@Inject(at = {@At("TAIL")}, method = {"tick()V"})
-	public void onTick(CallbackInfo ci)
+	@Inject(at = @At("TAIL"), method = "tick()V")
+	private void onTick(CallbackInfo ci)
 	{
 		if(lastServerButton == null)
 			return;
@@ -85,11 +73,23 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"connect(Lnet/minecraft/client/network/ServerInfo;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "connect(Lnet/minecraft/client/network/ServerInfo;)V")
 	private void onConnect(ServerInfo entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
+	}
+	
+	@Override
+	public MultiplayerServerListWidget getServerListSelector()
+	{
+		return serverListWidget;
+	}
+	
+	@Override
+	public void connectToServer(ServerInfo server)
+	{
+		connect(server);
 	}
 	
 	@Shadow

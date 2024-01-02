@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,14 +34,14 @@ import net.wurstclient.options.WurstOptionsScreen;
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
-	private static final Identifier wurstTexture =
+	private static final Identifier WURST_TEXTURE =
 		new Identifier("wurst", "wurst_128.png");
 	
 	private ButtonWidget wurstOptionsButton;
 	
-	private GameMenuScreenMixin(WurstClient wurst, Text text_1)
+	private GameMenuScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
 	@Inject(at = @At("TAIL"), method = "initWidgets()V")
@@ -51,6 +51,32 @@ public abstract class GameMenuScreenMixin extends Screen
 			return;
 		
 		addWurstOptionsButton();
+	}
+	
+	@Inject(at = @At("TAIL"),
+		method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	private void onRender(DrawContext context, int mouseX, int mouseY,
+		float partialTicks, CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
+			return;
+		
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		
+		int x = wurstOptionsButton.getX() + 34;
+		int y = wurstOptionsButton.getY() + 2;
+		int w = 63;
+		int h = 16;
+		int fw = 63;
+		int fh = 16;
+		float u = 0;
+		float v = 0;
+		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
 	}
 	
 	private void addWurstOptionsButton()
@@ -89,6 +115,11 @@ public abstract class GameMenuScreenMixin extends Screen
 		buttons.add(wurstOptionsButton);
 	}
 	
+	private void openWurstOptions()
+	{
+		client.setScreen(new WurstOptionsScreen(this));
+	}
+	
 	private boolean isFeedbackButton(ClickableWidget button)
 	{
 		return hasTrKey(button, "menu.sendFeedback");
@@ -103,36 +134,5 @@ public abstract class GameMenuScreenMixin extends Screen
 	{
 		String message = button.getMessage().getString();
 		return message != null && message.equals(I18n.translate(key));
-	}
-	
-	private void openWurstOptions()
-	{
-		client.setScreen(new WurstOptionsScreen(this));
-	}
-	
-	@Inject(at = @At("TAIL"),
-		method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
-	private void onRender(DrawContext context, int mouseX, int mouseY,
-		float partialTicks, CallbackInfo ci)
-	{
-		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
-			return;
-		
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		int x = wurstOptionsButton.getX() + 34;
-		int y = wurstOptionsButton.getY() + 2;
-		int w = 63;
-		int h = 16;
-		int fw = 63;
-		int fh = 16;
-		float u = 0;
-		float v = 0;
-		context.drawTexture(wurstTexture, x, y, u, v, w, h, fw, fh);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public class PathFinder
@@ -562,10 +563,8 @@ public class PathFinder
 		
 		matrixStack.push();
 		
-		BlockPos camPos = RenderUtils.getCameraBlockPos();
-		int regionX = (camPos.getX() >> 9) * 512;
-		int regionZ = (camPos.getZ() >> 9) * 512;
-		RenderUtils.applyRegionalRenderOffset(matrixStack, regionX, regionZ);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		matrixStack.translate(0.5, 0.5, 0.5);
 		
@@ -580,7 +579,7 @@ public class PathFinder
 				if(renderedThings >= 5000)
 					break;
 				
-				PathRenderer.renderNode(matrixStack, element, regionX, regionZ);
+				PathRenderer.renderNode(matrixStack, element, region);
 				renderedThings++;
 			}
 			
@@ -596,7 +595,7 @@ public class PathFinder
 					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
 				
 				PathRenderer.renderArrow(matrixStack, entry.getValue(),
-					entry.getKey(), regionX, regionZ);
+					entry.getKey(), region);
 				renderedThings++;
 			}
 		}
@@ -608,7 +607,7 @@ public class PathFinder
 			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
 		for(int i = 0; i < path.size() - 1; i++)
 			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1),
-				regionX, regionZ);
+				region);
 		
 		matrixStack.pop();
 		

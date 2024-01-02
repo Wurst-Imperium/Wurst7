@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -56,25 +56,25 @@ public final class AutoFarmHack extends Hack
 	private final CheckboxSetting harvestFirst = new CheckboxSetting(
 		"Harvest first", "Harvest all crops first before replanting.",
 		false);
-	
+
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
 		"Makes sure that you don't reach through walls when breaking or replanting.",
 		false);
-	
+
 	private final CheckboxSetting fortune = new CheckboxSetting(
 		"Choose fortune tool",
 		"Chooses a fortune tool to harvest crops.",
 		false);
-	
+
 	private final CheckboxSetting silkTouch = new CheckboxSetting(
 		"Choose silk touch tool",
 		"Chooses a silk touch tool to harvest melons. Axes will be prioritized.",
 		false);
-	
+
 	private final BlockListSetting excluded = new BlockListSetting("Excluded Crops",
 		"List of crops that will not be harvested.");
-	
+  
 	private final HashMap<Block, Item> seeds = new HashMap<>();
 	{
 		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
@@ -86,8 +86,8 @@ public final class AutoFarmHack extends Hack
 		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
 		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
 	}
-	
-	private final HashSet<Block> fortuneBlocks = new HashSet<>();
+  
+  private final HashSet<Block> fortuneBlocks = new HashSet<>();
 	{
 		fortuneBlocks.add(Blocks.WHEAT);
 		fortuneBlocks.add(Blocks.CARROTS);
@@ -96,6 +96,7 @@ public final class AutoFarmHack extends Hack
 		fortuneBlocks.add(Blocks.NETHER_WART);
 		fortuneBlocks.add(Blocks.MELON);
 	}
+
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
@@ -137,7 +138,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentlyHarvesting != null)
 		{
-			IMC.getInteractionManager().setBreakingBlock(true);
+			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
 			currentlyHarvesting = null;
 		}
@@ -186,7 +187,7 @@ public final class AutoFarmHack extends Hack
 		// replant and harvest
 		if(harvestFirst.isChecked())
 			harvest(blocksToHarvest);
-		
+
 		boolean replanting = false;
 		if(currentlyHarvesting == null)
 			replanting = replant(blocksToReplant);
@@ -245,7 +246,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(Collections.binarySearch(excluded.getBlockNames(), BlockUtils.getName(pos)) >= 0)
 			return false;
-		
+    
 		if(block instanceof CropBlock)
 			return ((CropBlock)block).isMature(state);
 		
@@ -255,7 +256,7 @@ public final class AutoFarmHack extends Hack
 		if(block instanceof CocoaBlock)
 			return state.get(CocoaBlock.AGE) >= 2;
 		
-		if(block instanceof GourdBlock)
+		if(block == Blocks.PUMPKIN || block == Blocks.MELON)
 			return true;
 		
 		if(block instanceof SugarCaneBlock)
@@ -315,7 +316,7 @@ public final class AutoFarmHack extends Hack
 	private boolean replant(List<BlockPos> blocksToReplant)
 	{
 		// check cooldown
-		if(IMC.getItemUseCooldown() > 0)
+		if(MC.itemUseCooldown > 0)
 			return false;
 		
 		// check if already holding one of the seeds needed for blocksToReplant
@@ -342,7 +343,7 @@ public final class AutoFarmHack extends Hack
 					BlockPlacer.getBlockPlacingParams(pos);
 				if(params == null || params.distanceSq() > range.getValueSq())
 					continue;
-				
+          
 				if(checkLOS.isChecked() && !params.lineOfSight())
 					continue;
 				
@@ -359,7 +360,7 @@ public final class AutoFarmHack extends Hack
 						.sendPacket(new HandSwingC2SPacket(hand));
 				
 				// reset cooldown
-				IMC.setItemUseCooldown(4);
+				MC.itemUseCooldown = 4;
 				return true;
 			}
 		}
@@ -424,7 +425,7 @@ public final class AutoFarmHack extends Hack
 			{
 				int[] slots = InventoryUtils.indicesOf(stack -> EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0
 					&& EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack) > 0, 36, false);
-				
+
 				int selected = -1;
 				int level = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, held) > 0 ? 0
 					: EnchantmentHelper.getLevel(Enchantments.FORTUNE, held);

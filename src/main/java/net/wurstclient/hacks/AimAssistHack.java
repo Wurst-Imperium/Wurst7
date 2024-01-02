@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,14 +15,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
@@ -42,18 +45,32 @@ public final class AimAssistHack extends Hack
 			+ "360\u00b0 = aims at entities all around you.",
 		120, 30, 360, 10, ValueDisplay.DEGREES);
 	
+	private final CheckboxSetting checkLOS = new CheckboxSetting(
+		"Check line of sight", "Won't aim at entities behind blocks.", true);
+	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
-			FilterMonstersSetting.genericCombat(false),
-			FilterPigmenSetting.genericCombat(false),
-			FilterEndermenSetting.genericCombat(false),
-			FilterAnimalsSetting.genericCombat(true),
+			FilterHostileSetting.genericCombat(false),
+			FilterNeutralSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericCombat(true),
+			FilterPassiveWaterSetting.genericCombat(true),
 			FilterBabiesSetting.genericCombat(true),
+			FilterBatsSetting.genericCombat(true),
+			FilterSlimesSetting.genericCombat(true),
 			FilterPetsSetting.genericCombat(true),
-			FilterTradersSetting.genericCombat(true),
+			FilterVillagersSetting.genericCombat(true),
+			FilterZombieVillagersSetting.genericCombat(true),
 			FilterGolemsSetting.genericCombat(false),
+			FilterPiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
 			FilterShulkerBulletSetting.genericCombat(false),
@@ -72,6 +89,7 @@ public final class AimAssistHack extends Hack
 		addSetting(range);
 		addSetting(rotationSpeed);
 		addSetting(fov);
+		addSetting(checkLOS);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -87,7 +105,6 @@ public final class AimAssistHack extends Hack
 		WURST.getHax().killauraLegitHack.setEnabled(false);
 		WURST.getHax().multiAuraHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
-		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
@@ -126,7 +143,14 @@ public final class AimAssistHack extends Hack
 		if(target == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		Vec3d hitVec = target.getBoundingBox().getCenter();
+		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
+		{
+			target = null;
+			return;
+		}
+		
+		WURST.getHax().autoSwordHack.setSlot(target);
 		faceEntityClient(target);
 	}
 	

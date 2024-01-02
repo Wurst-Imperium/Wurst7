@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,7 +22,7 @@ public class WorldRendererMixin
 	@Inject(at = @At("HEAD"),
 		method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z",
 		cancellable = true)
-	private void onHasBlindnessOrDarknessEffect(Camera camera,
+	private void onHasBlindnessOrDarkness(Camera camera,
 		CallbackInfoReturnable<Boolean> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())

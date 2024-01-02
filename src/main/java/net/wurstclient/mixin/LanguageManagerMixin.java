@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,19 +24,19 @@ import net.wurstclient.mixinterface.ILanguageManager;
 public abstract class LanguageManagerMixin
 	implements SynchronousResourceReloader, ILanguageManager
 {
-	private TranslationStorage english;
+	private TranslationStorage wurstEnglish;
 	
-	@Inject(at = {@At("HEAD")},
-		method = {"reload(Lnet/minecraft/resource/ResourceManager;)V"})
+	@Inject(at = @At("HEAD"),
+		method = "reload(Lnet/minecraft/resource/ResourceManager;)V")
 	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
-		english = TranslationStorage.load(manager, Lists.newArrayList("en_us"),
-			false);
+		wurstEnglish = TranslationStorage.load(manager,
+			Lists.newArrayList("en_us"), false);
 	}
 	
 	@Override
-	public TranslationStorage getEnglish()
+	public TranslationStorage wurst_getEnglish()
 	{
-		return english;
+		return wurstEnglish;
 	}
 }
