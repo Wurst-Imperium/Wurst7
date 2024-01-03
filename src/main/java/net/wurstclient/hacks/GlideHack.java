@@ -19,6 +19,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
@@ -26,6 +27,12 @@ import net.wurstclient.util.BlockUtils;
 public final class GlideHack extends Hack
 	implements UpdateListener, AirStrafingSpeedListener
 {
+	private final CheckboxSetting doSneakFall =
+		new CheckboxSetting("Temporary Disable",
+			"Temporarily disable this hack using your crouch button.\n"
+				+ "Turn off if you want to glide while crouching.",
+			true);
+	
 	private final SliderSetting fallSpeed = new SliderSetting("Fall speed",
 		0.125, 0.005, 0.25, 0.005, ValueDisplay.DECIMAL);
 	
@@ -42,6 +49,7 @@ public final class GlideHack extends Hack
 		super("Glide");
 		
 		setCategory(Category.MOVEMENT);
+		addSetting(doSneakFall);
 		addSetting(fallSpeed);
 		addSetting(moveSpeed);
 		addSetting(minHeight);
@@ -64,6 +72,9 @@ public final class GlideHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		if(doSneakFall.isChecked() && MC.player.isSneaking())
+			return;
+		
 		ClientPlayerEntity player = MC.player;
 		Vec3d v = player.getVelocity();
 		
