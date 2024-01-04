@@ -29,6 +29,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"TpAura", "tp aura", "EnderAura", "Ender-Aura", "ender aura"})
@@ -127,11 +128,11 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// attack entity
-		RotationUtils.Rotation rotations = RotationUtils
+		Rotation rotations = RotationUtils
 			.getNeededRotations(entity.getBoundingBox().getCenter());
-		WurstClient.MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
-				rotations.getPitch(), MC.player.isOnGround()));
+		WurstClient.MC.player.networkHandler
+			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(rotations.yaw(),
+				rotations.pitch(), MC.player.isOnGround()));
 		
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, entity);

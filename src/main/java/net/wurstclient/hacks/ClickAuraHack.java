@@ -27,8 +27,8 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"click aura", "ClickAimbot", "click aimbot"})
 public final class ClickAuraHack extends Hack
@@ -137,8 +137,8 @@ public final class ClickAuraHack extends Hack
 		Rotation rotation = RotationUtils
 			.getNeededRotations(target.getBoundingBox().getCenter());
 		PlayerMoveC2SPacket.LookAndOnGround packet =
-			new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-				rotation.getPitch(), MC.player.isOnGround());
+			new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
+				rotation.pitch(), MC.player.isOnGround());
 		MC.player.networkHandler.sendPacket(packet);
 		
 		// attack entity

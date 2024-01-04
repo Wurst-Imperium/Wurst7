@@ -13,8 +13,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
 {
@@ -58,8 +58,8 @@ public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
 		SPAM("Packet spam", v -> {
 			Rotation rotation = RotationUtils.getNeededRotations(v);
 			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
+					rotation.pitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 		});
 		

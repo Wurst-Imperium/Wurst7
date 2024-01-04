@@ -25,8 +25,8 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"scaffold walk", "BridgeWalk", "bridge walk", "AutoBridge",
 	"auto bridge", "tower"})
@@ -157,8 +157,8 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			// place block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
+					rotation.pitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);

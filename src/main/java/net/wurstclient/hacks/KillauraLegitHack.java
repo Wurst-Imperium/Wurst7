@@ -41,8 +41,8 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 public final class KillauraLegitHack extends Hack
 	implements UpdateListener, RenderListener
@@ -207,8 +207,8 @@ public final class KillauraLegitHack extends Hack
 		// turn towards center of boundingBox
 		Rotation next = RotationUtils.slowlyTurnTowards(needed,
 			rotationSpeed.getValueI() / 20F);
-		nextYaw = next.getYaw();
-		nextPitch = next.getPitch();
+		nextYaw = next.yaw();
+		nextPitch = next.pitch();
 		
 		// check if facing center
 		if(RotationUtils.isAlreadyFacing(needed))

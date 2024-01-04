@@ -79,8 +79,8 @@ public enum RotationUtils
 		float currentYaw = MathHelper.wrapDegrees(player.getYaw());
 		float currentPitch = MathHelper.wrapDegrees(player.getPitch());
 		
-		float diffYaw = MathHelper.wrapDegrees(currentYaw - needed.yaw);
-		float diffPitch = MathHelper.wrapDegrees(currentPitch - needed.pitch);
+		float diffYaw = MathHelper.wrapDegrees(currentYaw - needed.yaw());
+		float diffPitch = MathHelper.wrapDegrees(currentPitch - needed.pitch());
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
@@ -93,17 +93,17 @@ public enum RotationUtils
 		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
 		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
 		
-		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw);
+		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw());
 		float diffPitch =
-			MathHelper.wrapDegrees(lastReportedPitch - needed.pitch);
+			MathHelper.wrapDegrees(lastReportedPitch - needed.pitch());
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
 	
 	public static double getAngleToLastReportedLookVec(Rotation rotation)
 	{
-		float yaw = MathHelper.wrapDegrees(rotation.getYaw());
-		float pitch = MathHelper.wrapDegrees(rotation.getPitch());
+		float yaw = MathHelper.wrapDegrees(rotation.yaw());
+		float pitch = MathHelper.wrapDegrees(rotation.pitch());
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
@@ -139,7 +139,7 @@ public enum RotationUtils
 	{
 		Rotation needed = getNeededRotations(vec);
 		return MathHelper.wrapDegrees(WurstClient.MC.player.getYaw())
-			- needed.yaw;
+			- needed.yaw();
 	}
 	
 	/**
@@ -152,8 +152,8 @@ public enum RotationUtils
 		Entity player = WurstClient.MC.player;
 		float startYaw = player.prevYaw;
 		float startPitch = player.prevPitch;
-		float endYaw = end.getYaw();
-		float endPitch = end.getPitch();
+		float endYaw = end.yaw();
+		float endPitch = end.pitch();
 		
 		float yawChange = Math.abs(MathHelper.wrapDegrees(endYaw - startYaw));
 		float pitchChange =
@@ -213,33 +213,5 @@ public enum RotationUtils
 		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
 		
 		return current + change;
-	}
-	
-	public static final class Rotation
-	{
-		private final float yaw;
-		private final float pitch;
-		
-		public Rotation(float yaw, float pitch)
-		{
-			this.yaw = yaw;
-			this.pitch = pitch;
-		}
-		
-		public static Rotation wrapped(float yaw, float pitch)
-		{
-			return new Rotation(MathHelper.wrapDegrees(yaw),
-				MathHelper.wrapDegrees(pitch));
-		}
-		
-		public float getYaw()
-		{
-			return yaw;
-		}
-		
-		public float getPitch()
-		{
-			return pitch;
-		}
 	}
 }

@@ -36,14 +36,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.AutoBuildTemplate;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.DefaultAutoBuildTemplates;
-import net.wurstclient.util.RegionPos;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
+import net.wurstclient.util.*;
 import net.wurstclient.util.json.JsonException;
 
 public final class AutoBuildHack extends Hack
@@ -259,8 +252,8 @@ public final class AutoBuildHack extends Hack
 			// face block
 			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
 			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-					rotation.getPitch(), MC.player.isOnGround());
+				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
+					rotation.pitch(), MC.player.isOnGround());
 			MC.player.networkHandler.sendPacket(packet);
 			
 			// place block
