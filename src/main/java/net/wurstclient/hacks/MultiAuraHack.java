@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -25,7 +24,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"multi aura", "ForceField", "force field"})
@@ -116,12 +114,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			Rotation rotation = RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter());
-			
-			player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
-					rotation.pitch(), MC.player.isOnGround()));
+			RotationUtils
+				.getNeededRotations(entity.getBoundingBox().getCenter())
+				.sendPlayerLookPacket();
 			
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);

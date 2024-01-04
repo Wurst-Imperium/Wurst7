@@ -14,7 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,7 +24,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"scaffold walk", "BridgeWalk", "bridge walk", "AutoBridge",
@@ -129,9 +127,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	
 	private boolean placeBlock(BlockPos pos)
 	{
-		Vec3d eyesPos = new Vec3d(MC.player.getX(),
-			MC.player.getY() + MC.player.getEyeHeight(MC.player.getPose()),
-			MC.player.getZ());
+		Vec3d eyesPos = RotationUtils.getEyesPos();
 		
 		for(Direction side : Direction.values())
 		{
@@ -155,11 +151,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 				continue;
 			
 			// place block
-			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
-					rotation.pitch(), MC.player.isOnGround());
-			MC.player.networkHandler.sendPacket(packet);
+			RotationUtils.getNeededRotations(hitVec).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);

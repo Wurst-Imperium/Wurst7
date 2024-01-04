@@ -9,11 +9,11 @@ package net.wurstclient.hacks;
 
 import java.util.Random;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.Rotation;
 
 @SearchTags({"Retarded"})
 public final class DerpHack extends Hack implements UpdateListener
@@ -48,8 +48,6 @@ public final class DerpHack extends Hack implements UpdateListener
 		float yaw = MC.player.getYaw() + random.nextFloat() * 360F - 180F;
 		float pitch = random.nextFloat() * 180F - 90F;
 		
-		MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
-				MC.player.isOnGround()));
+		new Rotation(yaw, pitch).sendPlayerLookPacket();
 	}
 }

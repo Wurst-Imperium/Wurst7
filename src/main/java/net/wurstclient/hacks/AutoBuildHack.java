@@ -19,7 +19,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -36,7 +35,13 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.*;
+import net.wurstclient.util.AutoBuildTemplate;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.DefaultAutoBuildTemplates;
+import net.wurstclient.util.RegionPos;
+import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.json.JsonException;
 
 public final class AutoBuildHack extends Hack
@@ -250,11 +255,7 @@ public final class AutoBuildHack extends Hack
 				continue;
 			
 			// face block
-			Rotation rotation = RotationUtils.getNeededRotations(hitVec);
-			PlayerMoveC2SPacket.LookAndOnGround packet =
-				new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
-					rotation.pitch(), MC.player.isOnGround());
-			MC.player.networkHandler.sendPacket(packet);
+			RotationUtils.getNeededRotations(hitVec).sendPlayerLookPacket();
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,

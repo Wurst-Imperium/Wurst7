@@ -12,7 +12,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -20,6 +19,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.Rotation;
 
 @SearchTags({"AutoPotion", "auto potion", "AutoSplashPotion",
 	"auto splash potion"})
@@ -77,16 +77,13 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			
 			// throw potion in hotbar
 			MC.player.getInventory().selectedSlot = potionInHotbar;
-			MC.player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(), 90,
-					MC.player.isOnGround()));
+			new Rotation(MC.player.getYaw(), 90).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
 			MC.player.getInventory().selectedSlot = oldSlot;
-			MC.player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(),
-					MC.player.getPitch(), MC.player.isOnGround()));
+			new Rotation(MC.player.getYaw(), MC.player.getPitch())
+				.sendPlayerLookPacket();
 			
 			// reset timer
 			timer = 10;

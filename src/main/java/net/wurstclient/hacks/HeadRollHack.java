@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.Rotation;
 
 @SearchTags({"head roll", "nodding", "yes"})
 public final class HeadRollHack extends Hack implements UpdateListener
@@ -45,8 +45,6 @@ public final class HeadRollHack extends Hack implements UpdateListener
 		float timer = MC.player.age % 20 / 10F;
 		float pitch = MathHelper.sin(timer * (float)Math.PI) * 90F;
 		
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(), pitch,
-				MC.player.isOnGround()));
+		new Rotation(MC.player.getYaw(), pitch).sendPlayerLookPacket();
 	}
 }
