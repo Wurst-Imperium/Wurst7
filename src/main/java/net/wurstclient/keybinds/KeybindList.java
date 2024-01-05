@@ -117,7 +117,6 @@ public final class KeybindList
 	{
 		Set<Keybind> set = new LinkedHashSet<>();
 		addKB(set, "b", "fastplace;fastbreak");
-		addKB(set, "b", "fastplace;fastbreak");
 		addKB(set, "c", "fullbright");
 		addKB(set, "g", "flight");
 		addKB(set, "semicolon", "speednuker");
