@@ -7,8 +7,8 @@
  */
 package net.wurstclient.util;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -19,100 +19,56 @@ public enum RotationUtils
 {
 	;
 	
+	private static final MinecraftClient MC = WurstClient.MC;
+	
 	public static Vec3d getEyesPos()
 	{
-		ClientPlayerEntity player = WurstClient.MC.player;
-		
-		return new Vec3d(player.getX(),
-			player.getY() + player.getEyeHeight(player.getPose()),
-			player.getZ());
+		ClientPlayerEntity player = MC.player;
+		float eyeHeight = player.getEyeHeight(player.getPose());
+		return player.getPos().add(0, eyeHeight, 0);
 	}
 	
 	public static Vec3d getClientLookVec(float partialTicks)
 	{
-		ClientPlayerEntity player = WurstClient.MC.player;
-		float f = 0.017453292F;
-		float pi = (float)Math.PI;
-		
-		float f1 = MathHelper.cos(-player.getYaw(partialTicks) * f - pi);
-		float f2 = MathHelper.sin(-player.getYaw(partialTicks) * f - pi);
-		float f3 = -MathHelper.cos(-player.getPitch(partialTicks) * f);
-		float f4 = MathHelper.sin(-player.getPitch(partialTicks) * f);
-		
-		return new Vec3d(f2 * f3, f4, f1 * f3);
+		float yaw = MC.player.getYaw(partialTicks);
+		float pitch = MC.player.getPitch(partialTicks);
+		return new Rotation(yaw, pitch).toLookVec();
 	}
 	
 	public static Vec3d getServerLookVec()
 	{
-		RotationFaker rotationFaker = WurstClient.INSTANCE.getRotationFaker();
-		float serverYaw = rotationFaker.getServerYaw();
-		float serverPitch = rotationFaker.getServerPitch();
-		
-		float f = MathHelper.cos(-serverYaw * 0.017453292F - (float)Math.PI);
-		float f1 = MathHelper.sin(-serverYaw * 0.017453292F - (float)Math.PI);
-		float f2 = -MathHelper.cos(-serverPitch * 0.017453292F);
-		float f3 = MathHelper.sin(-serverPitch * 0.017453292F);
-		return new Vec3d(f1 * f2, f3, f * f2);
+		RotationFaker rf = WurstClient.INSTANCE.getRotationFaker();
+		return new Rotation(rf.getServerYaw(), rf.getServerPitch()).toLookVec();
 	}
 	
 	public static Rotation getNeededRotations(Vec3d vec)
 	{
-		Vec3d eyesPos = getEyesPos();
+		Vec3d eyes = getEyesPos();
 		
-		double diffX = vec.x - eyesPos.x;
-		double diffY = vec.y - eyesPos.y;
-		double diffZ = vec.z - eyesPos.z;
+		double diffX = vec.x - eyes.x;
+		double diffZ = vec.z - eyes.z;
+		double yaw = Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F;
 		
+		double diffY = vec.y - eyes.y;
 		double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
+		double pitch = -Math.toDegrees(Math.atan2(diffY, diffXZ));
 		
-		float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F;
-		float pitch = (float)-Math.toDegrees(Math.atan2(diffY, diffXZ));
-		
-		return Rotation.wrapped(yaw, pitch);
+		return Rotation.wrapped((float)yaw, (float)pitch);
 	}
 	
 	public static double getAngleToLookVec(Vec3d vec)
 	{
+		ClientPlayerEntity player = MC.player;
+		Rotation current = new Rotation(player.getYaw(), player.getPitch());
 		Rotation needed = getNeededRotations(vec);
-		
-		ClientPlayerEntity player = WurstClient.MC.player;
-		float currentYaw = MathHelper.wrapDegrees(player.getYaw());
-		float currentPitch = MathHelper.wrapDegrees(player.getPitch());
-		
-		float diffYaw = MathHelper.wrapDegrees(currentYaw - needed.yaw());
-		float diffPitch = MathHelper.wrapDegrees(currentPitch - needed.pitch());
-		
-		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+		return current.getAngleTo(needed);
 	}
 	
-	public static double getAngleToLastReportedLookVec(Vec3d vec)
+	public static float getHorizontalAngleToLookVec(Vec3d vec)
 	{
-		Rotation needed = getNeededRotations(vec);
-		
-		ClientPlayerEntity player = WurstClient.MC.player;
-		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
-		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
-		
-		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - needed.yaw());
-		float diffPitch =
-			MathHelper.wrapDegrees(lastReportedPitch - needed.pitch());
-		
-		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
-	}
-	
-	public static double getAngleToLastReportedLookVec(Rotation rotation)
-	{
-		float yaw = MathHelper.wrapDegrees(rotation.yaw());
-		float pitch = MathHelper.wrapDegrees(rotation.pitch());
-		
-		ClientPlayerEntity player = WurstClient.MC.player;
-		float lastReportedYaw = MathHelper.wrapDegrees(player.lastYaw);
-		float lastReportedPitch = MathHelper.wrapDegrees(player.lastPitch);
-		
-		float diffYaw = MathHelper.wrapDegrees(lastReportedYaw - yaw);
-		float diffPitch = MathHelper.wrapDegrees(lastReportedPitch - pitch);
-		
-		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+		float currentYaw = MathHelper.wrapDegrees(MC.player.getYaw());
+		float neededYaw = getNeededRotations(vec).yaw();
+		return MathHelper.wrapDegrees(currentYaw - neededYaw);
 	}
 	
 	/**
@@ -122,6 +78,19 @@ public enum RotationUtils
 	public static boolean isAlreadyFacing(Rotation rotation)
 	{
 		return getAngleToLastReportedLookVec(rotation) <= 1.0;
+	}
+	
+	public static double getAngleToLastReportedLookVec(Vec3d vec)
+	{
+		Rotation needed = getNeededRotations(vec);
+		return getAngleToLastReportedLookVec(needed);
+	}
+	
+	public static double getAngleToLastReportedLookVec(Rotation rotation)
+	{
+		ClientPlayerEntity player = MC.player;
+		Rotation lastReported = new Rotation(player.lastYaw, player.lastPitch);
+		return lastReported.getAngleTo(rotation);
 	}
 	
 	/**
@@ -135,13 +104,6 @@ public enum RotationUtils
 		return box.raycast(start, end).isPresent();
 	}
 	
-	public static float getHorizontalAngleToLookVec(Vec3d vec)
-	{
-		Rotation needed = getNeededRotations(vec);
-		return MathHelper.wrapDegrees(WurstClient.MC.player.getYaw())
-			- needed.yaw();
-	}
-	
 	/**
 	 * Returns the next rotation that the player should be facing in order to
 	 * slowly turn towards the specified end rotation, at a rate of roughly
@@ -149,9 +111,8 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		Entity player = WurstClient.MC.player;
-		float startYaw = player.prevYaw;
-		float startPitch = player.prevPitch;
+		float startYaw = MC.player.prevYaw;
+		float startPitch = MC.player.prevPitch;
 		float endYaw = end.yaw();
 		float endPitch = end.pitch();
 		
