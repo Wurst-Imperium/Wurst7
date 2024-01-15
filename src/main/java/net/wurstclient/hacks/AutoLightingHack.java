@@ -329,9 +329,9 @@ public final class AutoLightingHack extends Hack
 		MC.player.getInventory().selectedSlot = newSlot;
 		
 		var rotation = RotationUtils.getNeededRotations(hitVec);
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-				rotation.getPitch(), MC.player.isOnGround()));
+		MC.player.networkHandler
+			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw(),
+				rotation.pitch(), MC.player.isOnGround()));
 		IMC.getInteractionManager().rightClickBlock(down, up, hitVec);
 		MC.player.swingHand(Hand.MAIN_HAND);
 		MC.itemUseCooldown = 4;
