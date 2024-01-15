@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,11 +38,13 @@ public final class ModelSettings
 	public enum OpenAiModel
 	{
 		GPT_3_5_TURBO("gpt-3.5-turbo", true),
+		GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106", true),
 		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
 		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
 		GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", true),
 		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
 		GPT_4("gpt-4", true),
+		GPT_4_1106_PREVIEW("gpt-4-1106-preview", true),
 		GPT_4_0613("gpt-4-0613", true),
 		GPT_4_0314("gpt-4-0314", true),
 		GPT_4_32K("gpt-4-32k", true),

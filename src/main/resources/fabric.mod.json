@@ -29,9 +29,9 @@
   "accessWidener" : "wurst.accesswidener",
 
   "depends": {
-    "fabricloader": ">=0.14.22",
-    "fabric-api": ">=0.88.4",
-    "minecraft": "~1.20.2-beta.4",
+    "fabricloader": ">=0.15.0",
+    "fabric-api": ">=0.91.1",
+    "minecraft": "~1.20.3-beta.3",
     "java": ">=17"
   },
   "suggests": {
@@ -39,7 +39,8 @@
   },
   "breaks": {
     "wi_zoom": "*",
-    "wi-zoom": "*"
+    "wi-zoom": "*",
+    "vulkanmod": "*"
   },
   "custom": {
     "modmenu": {

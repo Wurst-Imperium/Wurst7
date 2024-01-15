@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,14 +9,19 @@ package net.wurstclient.hacks.treebot;
 
 import java.util.ArrayList;
 
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -65,10 +70,43 @@ public class Tree implements AutoCloseable
 		VertexBuffer.unbind();
 	}
 	
+	public void draw(MatrixStack matrixStack)
+	{
+		if(vertexBuffer == null)
+			return;
+		
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		
+		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
+		
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, RegionPos.of(stump));
+		
+		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+		ShaderProgram shader = RenderSystem.getShader();
+		
+		vertexBuffer.bind();
+		vertexBuffer.draw(viewMatrix, projMatrix, shader);
+		VertexBuffer.unbind();
+		
+		matrixStack.pop();
+		
+		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_BLEND);
+	}
+	
 	@Override
 	public void close()
 	{
 		vertexBuffer.close();
+		vertexBuffer = null;
 	}
 	
 	public BlockPos getStump()
@@ -79,10 +117,5 @@ public class Tree implements AutoCloseable
 	public ArrayList<BlockPos> getLogs()
 	{
 		return logs;
-	}
-	
-	public VertexBuffer getVertexBuffer()
-	{
-		return vertexBuffer;
 	}
 }

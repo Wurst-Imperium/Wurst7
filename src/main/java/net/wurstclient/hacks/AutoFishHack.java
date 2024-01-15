@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,10 +9,10 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -22,10 +22,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofish.AutoFishDebugDraw;
 import net.wurstclient.hacks.autofish.AutoFishRodSelector;
 import net.wurstclient.hacks.autofish.ShallowWaterWarningCheckbox;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"AutoFishing", "auto fishing", "AutoFisher", "auto fisher",
 	"AFKFishBot", "afk fish bot", "AFKFishingBot", "afk fishing bot",
@@ -41,21 +39,17 @@ public final class AutoFishHack extends Hack
 	
 	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
 		"How long AutoFish will wait after a bite before reeling in.", 0, 0, 60,
-		1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		1, ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting retryDelay = new SliderSetting("Retry delay",
 		"If casting or reeling in the fishing rod fails, this is how long"
 			+ " AutoFish will wait before trying again.",
-		15, 0, 100, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
+		15, 0, 100, 1,
+		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting patience = new SliderSetting("Patience",
 		"How long AutoFish will wait if it doesn't get a bite before reeling in.",
 		60, 10, 120, 1, ValueDisplay.INTEGER.withSuffix("s"));
-	
-	private final CheckboxSetting stopWhenInvFull = new CheckboxSetting(
-		"Stop when inv full",
-		"If enabled, AutoFish will turn itself off when your inventory is full.",
-		false);
 	
 	private final ShallowWaterWarningCheckbox shallowWaterWarning =
 		new ShallowWaterWarningCheckbox();
@@ -67,6 +61,7 @@ public final class AutoFishHack extends Hack
 	
 	private int castRodTimer;
 	private int reelInTimer;
+	private boolean biteDetected;
 	
 	public AutoFishHack()
 	{
@@ -79,14 +74,13 @@ public final class AutoFishHack extends Hack
 		addSetting(patience);
 		debugDraw.getSettings().forEach(this::addSetting);
 		rodSelector.getSettings().forEach(this::addSetting);
-		addSetting(stopWhenInvFull);
 		addSetting(shallowWaterWarning);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		if(!rodSelector.hasARod())
+		if(rodSelector.isOutOfRods())
 			return getName() + " [out of rods]";
 		
 		return getName();
@@ -97,6 +91,7 @@ public final class AutoFishHack extends Hack
 	{
 		castRodTimer = 0;
 		reelInTimer = 0;
+		biteDetected = false;
 		rodSelector.reset();
 		debugDraw.reset();
 		shallowWaterWarning.reset();
@@ -123,22 +118,9 @@ public final class AutoFishHack extends Hack
 		if(reelInTimer > 0)
 			reelInTimer--;
 		
-		// check if inventory is full
-		if(stopWhenInvFull.isChecked()
-			&& MC.player.getInventory().getEmptySlot() == -1)
-		{
-			ChatUtils.message(
-				"AutoFish has stopped because your inventory is full.");
-			setEnabled(false);
+		// update inventory
+		if(!rodSelector.update())
 			return;
-		}
-		
-		// select fishing rod
-		if(!rodSelector.isBestRodAlreadySelected())
-		{
-			rodSelector.selectBestRod();
-			return;
-		}
 		
 		// if not fishing, cast rod
 		if(!isFishing())
@@ -152,7 +134,18 @@ public final class AutoFishHack extends Hack
 			return;
 		}
 		
-		// otherwise, reel in when it's time
+		// if a bite was detected, check water type and reel in
+		if(biteDetected)
+		{
+			shallowWaterWarning.checkWaterType();
+			reelInTimer = catchDelay.getValueI();
+			biteDetected = false;
+			
+			// also reel in if an entity was hooked
+		}else if(MC.player.fishHook.getHookedEntity() != null)
+			reelInTimer = catchDelay.getValueI();
+		
+		// otherwise, reel in when the timer runs out
 		if(reelInTimer == 0)
 		{
 			MC.doItemUse();
@@ -177,23 +170,17 @@ public final class AutoFishHack extends Hack
 		if(!isFishing())
 			return;
 		
-		// check if player is holding a fishing rod
-		ClientPlayerEntity player = MC.player;
-		if(!player.getMainHandStack().isOf(Items.FISHING_ROD))
-			return;
-		
+		// register sound position
 		debugDraw.updateSoundPos(sound);
 		
-		// check sound position
-		FishingBobberEntity bobber = player.fishHook;
-		if(Math.abs(sound.getX() - bobber.getX()) > validRange.getValue()
-			|| Math.abs(sound.getZ() - bobber.getZ()) > validRange.getValue())
+		// check sound position (Chebyshev distance)
+		Vec3d bobber = MC.player.fishHook.getPos();
+		double dx = Math.abs(sound.getX() - bobber.getX());
+		double dz = Math.abs(sound.getZ() - bobber.getZ());
+		if(Math.max(dx, dz) > validRange.getValue())
 			return;
 		
-		shallowWaterWarning.checkWaterAround(bobber);
-		
-		// catch fish
-		reelInTimer = catchDelay.getValueI();
+		biteDetected = true;
 	}
 	
 	@Override
@@ -206,6 +193,7 @@ public final class AutoFishHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		return player != null && player.fishHook != null
-			&& !player.fishHook.isRemoved();
+			&& !player.fishHook.isRemoved()
+			&& player.getMainHandStack().isOf(Items.FISHING_ROD);
 	}
 }

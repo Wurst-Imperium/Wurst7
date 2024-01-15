@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -49,12 +49,6 @@ public enum DefaultAutoBuildTemplates
 		new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {0, 3, 0}, {0, 4, 0},
 			{0, 5, 0}, {0, 6, 0}}),
 	
-	SWASTIKA("Swastika",
-		new int[][]{{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {0, 1, 0}, {0, 2, 0},
-			{1, 2, 0}, {2, 2, 0}, {2, 3, 0}, {2, 4, 0}, {0, 3, 0}, {0, 4, 0},
-			{-1, 4, 0}, {-2, 4, 0}, {-1, 2, 0}, {-2, 2, 0}, {-2, 1, 0},
-			{-2, 0, 0}}),
-	
 	TREE("Tree", new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {0, 3, 0},
 		{0, 4, 0}, {0, 3, -1}, {0, 3, 1}, {-1, 3, 0}, {1, 3, 0}, {0, 5, 0},
 		{0, 4, -1}, {0, 4, 1}, {-1, 4, 0}, {1, 4, 0}, {0, 3, -2}, {-1, 3, -1},
@@ -96,19 +90,23 @@ public enum DefaultAutoBuildTemplates
 	{
 		for(DefaultAutoBuildTemplates template : DefaultAutoBuildTemplates
 			.values())
+			createFile(folder, template);
+	}
+	
+	private static void createFile(Path folder,
+		DefaultAutoBuildTemplates template)
+	{
+		JsonObject json = toJson(template);
+		Path path = folder.resolve(template.name + ".json");
+		
+		try
 		{
-			JsonObject json = toJson(template);
-			Path path = folder.resolve(template.name + ".json");
+			JsonUtils.toJson(json, path);
 			
-			try
-			{
-				JsonUtils.toJson(json, path);
-				
-			}catch(IOException | JsonException e)
-			{
-				System.out.println("Couldn't save " + path.getFileName());
-				e.printStackTrace();
-			}
+		}catch(IOException | JsonException e)
+		{
+			System.out.println("Couldn't save " + path.getFileName());
+			e.printStackTrace();
 		}
 	}
 	
