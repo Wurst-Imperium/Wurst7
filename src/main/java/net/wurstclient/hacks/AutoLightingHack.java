@@ -46,7 +46,10 @@ import java.util.stream.Stream;
 
 @SearchTags({"auto lighting", "AutoLighting", "auto torch", "AutoTorch"})
 public final class AutoLightingHack extends Hack implements UpdateListener, RenderListener {
+    /**Maps each light level to the maximum number of blocks it can illuminate.*/
     private static final int[] lvl2blocks = new int[16];
+
+    /**Maps items to their corresponding light levels.*/
     private static final ConcurrentHashMap<Item, Integer> item2lvl = new ConcurrentHashMap<>();
 
     static {
@@ -54,46 +57,47 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         item2lvl.put(Items.TORCH, 14);
     }
 
-    /**
-     * Placement range. Only blocks will be placed within this range. <br/>
-     * 放置范围。只会在此范围内放置方块。
-     */
+    /**Defines the maximum distance for placing blocks.*/
     private final SliderSetting range1 =
         new SliderSetting("RangePlace", 4.25, 1, 6, 0.05, SliderSetting.ValueDisplay.DECIMAL);
-    /**
-     * Search range. The placement position will be calculated within this range.<br/>
-     * 搜索范围。会在此范围内计算放置位置。
-     */
+
+    /**Determines the distance within which the searches for potential block placement locations.*/
     private final SliderSetting range2 =
         new SliderSetting("RangeSearch", 8, 1, 10, 0.05, SliderSetting.ValueDisplay.DECIMAL);
-    /**
-     * Include range. Use this range to calculate the newly illuminated blocks.<br/>
-     * 包含范围。用此范围计算可新照亮的方块。
-     */
+
+    /**Sets the range to include for calculating the effect of newly placed light sources.*/
     private final SliderSetting range3 =
         new SliderSetting("RangeInclude", 30, 10, 15 * 4, 0.05, SliderSetting.ValueDisplay.DECIMAL);
+
+    /**Toggles the output of debug messages.*/
     private final CheckboxSetting debug = new CheckboxSetting("debug", "Output Debug Message", false);
+
+    /**Option to compare positions within the placement range.*/
     private final CheckboxSetting crp = new CheckboxSetting("Compare RP", "Compare Pos with RangePlace", false);
-    /**
-     * Forward path radius. Set to 0 to calculate only within the RangeSearch range. Otherwise, Search is calculated as:
-     * the range with a radius less than RangePlace +
-     * starts from the player eye forward (ignoring the pitch, only keeping yaw) to radius less than RangeSearch.<br/>
-     * 向前路径半径。设为0则只在RangeSearch范围内计算。否则Search计算为：
-     * 半径小于RangePlace的范围 + 玩家从眼睛开始向前（忽略pitch，只保留yaw）到半径小于RangeSearch。
-     */
+
+    /**Specifies the radius in front of the player for block placement calculations.*/
     private final SliderSetting frontpath =
         new SliderSetting("Front Path Distance", 3, 0, 6, 0.05, SliderSetting.ValueDisplay.DECIMAL);
-    /**
-     * The cooling time after placing a torch once (seconds). The minimum unit is 1 tick (i.e. 0.05 seconds).<br/>
-     * 放置一次火把后的冷却时长（秒）。最小单位为1tick（即0.05秒）。
-     */
+
+    /**Sets the cooldown time after each torch placement.*/
     private final SliderSetting cooldown =
-        new SliderSetting("Place Cooldown(s)", 0.25, 1.0 / 2, 2, 1.0 / 20, SliderSetting.ValueDisplay.DECIMAL);
+        new SliderSetting("Place Cooldown (s)", 0.25, 1.0 / 2, 2, 1.0 / 20, SliderSetting.ValueDisplay.DECIMAL);
+
+    /**A executor service for handling asynchronous tasks.*/
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    /**Future task for the current search operation for block placement.*/
     private Future<BlockPos> currentSearchTask = null;
+
+    /**Stores the position where a block needs to be placed next.*/
     private @Nullable BlockPos putPos = null;
+
+    /**Tracks the current status of the mod (e.g., idle, waiting, placing).*/
     private Status status = Status.Idle;
+
+    /**Counter for cooldown time when the mod is in idle state.*/
     private int idleCooldown = 0;
+
 
     public AutoLightingHack() {
         super("AutoLighting");
@@ -109,9 +113,9 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
     }
 
     /**
-     * 获取光照等级为v的光源最多能点亮多少方块
+     * Calculates the maximum number of blocks that can be illuminated by a light source with a brightness level of v.
      *
-     * @return 最大光照方块
+     * @return the maximum number of illuminated blocks
      */
     public static int getMaxLight(int v) {
         if (v < lvl2blocks.length) {
@@ -126,24 +130,27 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
     }
 
     /**
-     * 获取光照等级为v的光源最多能点亮多少方块
+     * Retrieves the maximum number of blocks that can be illuminated by a light source with a light level corresponding to item 'v'.
      *
-     * @return 最大光照方块
+     * @return The maximum number of blocks that can be illuminated
      */
     public static int getMaxLight(Item v) {
         return getMaxLight(item2lvl.getOrDefault(v, 14));
     }
 
     /**
-     * 获取能够点亮的方块数量
+     * Calculates the illuminated blocks in a certain area based on a given light level and position.
+     * This method can operate in two modes: real and theoretical. In real mode, it checks actual light levels in the world;
+     * in theoretical mode, it assumes no obstructions to light.
      *
-     * @param x 光源位置
-     * @param y 光源位置
-     * @param z 光源位置
-     * @param v 光源位置
-     * @return 能够照亮几个方块
+     * @param x       the x-coordinate of the light source
+     * @param y       the y-coordinate of the light source
+     * @param z       the z-coordinate of the light source
+     * @param v       the light level of the source
+     * @param needs   a set of block positions to specifically check for illumination (optional, null for theoretical mode)
+     * @return        a list of BlockPos objects representing all blocks illuminated by the light source
+     * @implNote      This method is marked as pure, meaning it doesn't modify any state and returns a new object.
      */
-
     @Contract(value = "_,_,_,_,_->new", pure = true)
     private static @NotNull ArrayList<BlockPos> getLight(int x, int y, int z, int v, @Nullable Set<BlockPos> needs) {
         if (v <= 0) return new ArrayList<>();
@@ -202,6 +209,12 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         return super.getRenderName() + " [" + this.status.name() + "]";
     }
 
+    /**
+     * Searches the player's inventory for a torch and returns its slot index.
+     * Iterates through the first 9 inventory slots (the hotbar) to find a torch item.
+     *
+     * @return the index of the torch in the player's hotbar, or -1 if no torch is found.
+     */
     private int getTorch() {
         var inv = Objects.requireNonNull(MC.player.getInventory());
         for (int i = 0; i < 9; i++) {
@@ -213,9 +226,13 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
     }
 
     /**
-     * 尝试放置方块
+     * Attempts to place a block at a predetermined position.
+     * This method first checks if there is a suitable position to place a block.
+     * If a torch is available in the inventory, it uses it for block placement.
+     * Adjusts player's aim and sends necessary packets to execute the block placement.
      *
-     * @return 是否要刷新
+     * @return true if a block placement attempt is made, false otherwise.
+     * @implNote Adjusts the player's inventory selection and triggers network packets for block placement.
      */
     private boolean placeBlock() {
         if (this.putPos == null) return false;
@@ -301,6 +318,15 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         return Vec3d.add(place, 0.5, 0, 0.5);
     }
 
+    /**
+     * Searches for the optimal block position to place a light source based on various criteria.
+     * The method evaluates blocks within a defined range, considering light levels and entity spawning conditions.
+     * Prioritizes blocks based on their distance, visibility, and potential to illuminate the area effectively.
+     *
+     * @return the optimal BlockPos for placing a light source, or null if no suitable position is found.
+     * @implNote Considers multiple ranges and conditions (e.g., line of sight, block state, entity spawning)
+     *           to determine the best placement location.
+     */
     private @Nullable BlockPos search() {
         final int level = 14 - 1;
         final double range1 = this.range1.getValue();
@@ -311,7 +337,7 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
         final double frontpathSq = MathHelper.square(frontpath);
         Vec3d eyesVec = RotationUtils.getEyesPos();
         ClientWorld world = Objects.requireNonNull(MC.world);
-        @SuppressWarnings("all") Stream<BlockPos> stream =//
+        Stream<BlockPos> stream =//
             BlockUtils.getAllInBoxStream(BlockPos.ofFloored(eyesVec), range3.getValueCeil())//
                 .filter(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)) <= range3Sq)//
                 .sorted(Comparator.comparingDouble(pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos))))//
@@ -353,13 +379,12 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
                 }
                 if (eyesVec.squaredDistanceTo(btn) < range2Sq) {
                     final var v = btn.subtract(rayStart);
-                    // 计算点到射线的投影向量
+                    // Compute point-to-ray projection vector
                     double dotProduct = v.dotProduct(rayDir);
                     if (dotProduct < 0) return false;
                     Vec3d projection = rayDir.multiply(dotProduct / rayDir.dotProduct(rayDir));
-                    // 计算垂线的长度（点到射线的距离）
+                    // Calculate the length of the vertical line (distance from point to ray)
                     double distance = v.subtract(projection).lengthSquared();
-                    //在远端应该仍然可以直接到达
                     return distance < frontpathSq;
                 }
                 return false;
@@ -390,13 +415,6 @@ public final class AutoLightingHack extends Hack implements UpdateListener, Rend
 
         if (bestPos != null) message("Search done " + bestPos, true);
         return bestPos;
-        /*
-         * 如果周围全都是刷怪区，那么就放在脚下
-         * 如果距离更大的能覆盖更多，且在r1范围不可点亮区不减少，则选择更远的。
-         *
-         *
-         */
-
     }
 
     @Override
