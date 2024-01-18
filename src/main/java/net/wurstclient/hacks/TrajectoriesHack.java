@@ -279,6 +279,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		if(!(item instanceof RangedWeaponItem))
 			return 1.5;
 		
+		//use a static 3.15 value for crossbow
+		if (item instanceof CrossbowItem)
+                return 3.15;
+		
 		// calculate bow power
 		float bowPower = (72000 - MC.player.getItemUseTimeLeft()) / 20F;
 		bowPower = bowPower * bowPower + bowPower * 2F;
