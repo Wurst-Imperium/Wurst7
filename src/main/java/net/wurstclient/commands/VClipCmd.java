@@ -23,7 +23,7 @@ public final class VClipCmd extends Command
 	{
 		super("vclip",
 			"Lets you clip through blocks vertically.\n"
-				+ "The maximum distance is 10 blocks.",
+				+ "The maximum distance is ±9,223,372,036,854,775,807 blocks.",
 			".vclip <height>", ".vclip (up|down)");
 	}
 	
