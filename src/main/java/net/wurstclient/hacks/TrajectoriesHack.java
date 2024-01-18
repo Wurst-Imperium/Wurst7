@@ -275,8 +275,13 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	
 	private double getThrowPower(Item item)
 	{
+
+		//use a static 3.15 value for crossbow
+		if (item instanceof CrossbowItem)
+                return 3.15;
+		
 		// use a static 1.5x for snowballs and such
-		if(!(item instanceof RangedWeaponItem))
+		if(!(item instanceof RangedWeaponItem) || MC.player == null)
 			return 1.5;
 		
 		// calculate bow power
