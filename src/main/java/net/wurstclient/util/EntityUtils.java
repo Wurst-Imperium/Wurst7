@@ -17,6 +17,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -39,7 +40,8 @@ public enum EntityUtils
 		&& !e.isRemoved()
 		&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
 			|| e instanceof EndCrystalEntity
-			|| e instanceof ShulkerBulletEntity)
+			|| e instanceof ShulkerBulletEntity
+		        || e instanceof FireballEntity)
 		&& e != MC.player && !(e instanceof FakePlayerEntity)
 		&& !WURST.getFriends().isFriend(e);
 	
