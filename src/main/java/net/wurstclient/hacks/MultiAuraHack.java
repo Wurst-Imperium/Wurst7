@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
@@ -30,13 +32,15 @@ import net.wurstclient.util.RotationUtils;
 public final class MultiAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Range", 5, 1, 512, 0.05, ValueDisplay.DECIMAL);
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+
+	private final CheckboxSetting longrange = new CheckboxSetting("Increase range", "Increase MultiAura range by send move packet", true);
 	
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(false);
@@ -52,6 +56,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(fov);
+		addSetting(longrange);
 		addSetting(pauseOnContainers);
 		
 		entityFilters.forEach(this::addSetting);
@@ -92,6 +97,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			return;
 		
 		ClientPlayerEntity player = MC.player;
+		ClientPlayNetworkHandler netHandler = player.networkHandler;
 		
 		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
@@ -119,6 +125,12 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.sendPlayerLookPacket();
 			
 			WURST.getHax().criticalsHack.doCritical();
+
+			if (longrange.isChecked())
+                        {
+                         netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(entity.getX(), entity.getY(), entity.getZ(), entity.isOnGround()));
+                        }
+			
 			MC.interactionManager.attackEntity(player, entity);
 		}
 		
