@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityGroup;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -156,8 +156,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			return ItemUtils.getAttackSpeed(item);
 			
 			case DAMAGE:
-			EntityGroup group = entity instanceof LivingEntity le
-				? le.getGroup() : EntityGroup.DEFAULT;
+			EntityType<?> group = entity.getType();
 			float dmg = EnchantmentHelper.getAttackDamage(stack, group);
 			if(item instanceof SwordItem sword)
 				dmg += sword.getAttackDamage();

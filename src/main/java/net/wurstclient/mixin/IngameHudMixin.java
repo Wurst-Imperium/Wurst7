@@ -32,8 +32,8 @@ public class IngameHudMixin
 	// runs after renderScoreboardSidebar()
 	// and before playerListHud.setVisible()
 	@Inject(at = @At("HEAD"),
-		method = "method_55804(Lnet/minecraft/client/gui/DrawContext;F)V")
-	private void onMethod_55804(DrawContext context, float tickDelta,
+		method = "renderPlayerList(Lnet/minecraft/client/gui/DrawContext;F)V")
+	private void onRenderPlayerList(DrawContext context, float tickDelta,
 		CallbackInfo ci)
 	{
 		if(debugHud.shouldShowDebugHud())

@@ -15,15 +15,19 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
-import net.wurstclient.events.HitResultRayTraceListener.HitResultRayTraceEvent;
 import net.wurstclient.events.RenderListener.RenderEvent;
 import net.wurstclient.hacks.FullbrightHack;
 
@@ -104,14 +108,21 @@ public abstract class GameRendererMixin implements AutoCloseable
 			.changeFovBasedOnZoom(cir.getReturnValueD()));
 	}
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/Entity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;",
-		opcode = Opcodes.INVOKEVIRTUAL,
-		ordinal = 0), method = "updateTargetedEntity(F)V")
-	private void onHitResultRayTrace(float tickDelta, CallbackInfo ci)
+	/**
+	 * This is the part that makes Liquids work.
+	 */
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;",
+		ordinal = 0),
+		method = "findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;")
+	private HitResult liquidsRaycast(Entity instance, double maxDistance,
+		float tickDelta, boolean includeFluids, Operation<HitResult> original)
 	{
-		HitResultRayTraceEvent event = new HitResultRayTraceEvent(tickDelta);
-		EventManager.fire(event);
+		if(!WurstClient.INSTANCE.getHax().liquidsHack.isEnabled())
+			return original.call(instance, maxDistance, tickDelta,
+				includeFluids);
+		
+		return original.call(instance, maxDistance, tickDelta, true);
 	}
 	
 	@Redirect(
