@@ -297,22 +297,22 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	// getter for GENERIC_BLOCK_INTERACTION_RANGE
 	@Override
-	public double method_55754()
+	public double getBlockInteractionRange()
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.reachHack.isEnabled())
-			return super.method_55754();
+			return super.getBlockInteractionRange();
 		
 		return hax.reachHack.getReachDistance();
 	}
 	
 	// getter for GENERIC_ENTITY_INTERACTION_RANGE
 	@Override
-	public double method_55755()
+	public double getEntityInteractionRange()
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.reachHack.isEnabled())
-			return super.method_55755();
+			return super.getEntityInteractionRange();
 		
 		return hax.reachHack.getReachDistance();
 	}
