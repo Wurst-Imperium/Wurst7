@@ -48,6 +48,10 @@ public final class AimAssistHack extends Hack
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight", "Won't aim at entities behind blocks.", true);
 	
+	private final CheckboxSetting onlyAllowWhileClicking =
+		new CheckboxSetting("Only allow while clicking",
+			"Won't aim at entities while not clicking.", false);
+	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
@@ -90,6 +94,7 @@ public final class AimAssistHack extends Hack
 		addSetting(rotationSpeed);
 		addSetting(fov);
 		addSetting(checkLOS);
+		addSetting(onlyAllowWhileClicking);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -126,6 +131,12 @@ public final class AimAssistHack extends Hack
 		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
+		if(onlyAllowWhileClicking.isChecked()
+			&& !MC.options.attackKey.isPressed())
+		{
+			return;
+		}
+		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
@@ -156,6 +167,7 @@ public final class AimAssistHack extends Hack
 	
 	private boolean faceEntityClient(Entity entity)
 	{
+		
 		// get needed rotation
 		Box box = entity.getBoundingBox();
 		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
@@ -179,7 +191,11 @@ public final class AimAssistHack extends Hack
 	{
 		if(target == null)
 			return;
-			
+		if(onlyAllowWhileClicking.isChecked()
+			&& !MC.options.attackKey.isPressed())
+		{
+			return;
+		}
 		// Not actually rendering anything, just using this method to rotate
 		// more smoothly.
 		float oldYaw = MC.player.prevYaw;
