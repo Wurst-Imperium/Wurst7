@@ -19,6 +19,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -37,7 +38,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
-	
+
+	private final CheckboxSetting swingHandOption = new CheckboxSetting(
+			"SwingHandOption",
+			"Decide whether to swing your hand during an attack.",
+			true
+	);
+
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(false);
 	
@@ -49,12 +56,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
-		addSetting(range);
-		addSetting(speed);
-		addSetting(fov);
-		addSetting(pauseOnContainers);
+		addSetting(this.range);
+		addSetting(this.speed);
+		addSetting(this.fov);
+		addSetting(this.swingHandOption);
+		addSetting(this.pauseOnContainers);
 		
-		entityFilters.forEach(this::addSetting);
+		this.entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
@@ -71,7 +79,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		
-		speed.resetTimer();
+		this.speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
@@ -84,25 +92,25 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		speed.updateTimer();
-		if(!speed.isTimeToAttack())
+		this.speed.updateTimer();
+		if(!this.speed.isTimeToAttack())
 			return;
 		
-		if(pauseOnContainers.shouldPause())
+		if(this.pauseOnContainers.shouldPause())
 			return;
 		
 		ClientPlayerEntity player = MC.player;
 		
 		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = Math.pow(this.range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
-		if(fov.getValue() < 360.0)
+		if(this.fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
+				e.getBoundingBox().getCenter()) <= this.fov.getValue() / 2.0);
 		
-		stream = entityFilters.applyTo(stream);
+		stream = this.entityFilters.applyTo(stream);
 		
 		ArrayList<Entity> entities =
 			stream.collect(Collectors.toCollection(ArrayList::new));
@@ -121,8 +129,10 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
-		
-		player.swingHand(Hand.MAIN_HAND);
-		speed.resetTimer();
+
+		if (this.swingHandOption.isChecked())
+			player.swingHand(Hand.MAIN_HAND);
+
+		this.speed.resetTimer();
 	}
 }
