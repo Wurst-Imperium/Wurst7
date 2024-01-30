@@ -39,9 +39,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 
-	private final CheckboxSetting swingHandOption = new CheckboxSetting(
-			"SwingHandOption",
-			"Decide whether to swing your hand during an attack.",
+	private final CheckboxSetting swingHandAndLookOption = new CheckboxSetting(
+			"SwingHandAndLookOption",
+			"Decide whether to swing your hand And Look Target during an attack.",
 			true
 	);
 
@@ -59,7 +59,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(this.range);
 		addSetting(this.speed);
 		addSetting(this.fov);
-		addSetting(this.swingHandOption);
+		addSetting(this.swingHandAndLookOption);
 		addSetting(this.pauseOnContainers);
 		
 		this.entityFilters.forEach(this::addSetting);
@@ -122,15 +122,17 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter())
-				.sendPlayerLookPacket();
-			
+			if (this.swingHandAndLookOption.isChecked())
+				RotationUtils
+					.getNeededRotations(entity.getBoundingBox().getCenter())
+					.sendPlayerLookPacket();
+			else RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter());
+
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
 
-		if (this.swingHandOption.isChecked())
+		if (this.swingHandAndLookOption.isChecked())
 			player.swingHand(Hand.MAIN_HAND);
 
 		this.speed.resetTimer();
