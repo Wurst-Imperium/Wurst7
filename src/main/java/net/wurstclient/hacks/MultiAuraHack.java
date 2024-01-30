@@ -13,12 +13,14 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -30,33 +32,40 @@ import net.wurstclient.util.RotationUtils;
 public final class MultiAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
-	
+			new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+
 	private final AttackSpeedSliderSetting speed =
-		new AttackSpeedSliderSetting();
-	
+			new AttackSpeedSliderSetting();
+
 	private final SliderSetting fov =
-		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
-	
+			new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+
+	private final CheckboxSetting swingHandAndLookOption = new CheckboxSetting(
+			"SwingHandAndLookOption",
+			"Decide whether to swing your hand And Look Target during an attack.",
+			true
+	);
+
 	private final PauseAttackOnContainersSetting pauseOnContainers =
-		new PauseAttackOnContainersSetting(false);
-	
+			new PauseAttackOnContainersSetting(false);
+
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
-	
+			EntityFilterList.genericCombat();
+
 	public MultiAuraHack()
 	{
 		super("MultiAura");
 		setCategory(Category.COMBAT);
-		
-		addSetting(range);
-		addSetting(speed);
-		addSetting(fov);
-		addSetting(pauseOnContainers);
-		
-		entityFilters.forEach(this::addSetting);
+
+		addSetting(this.range);
+		addSetting(this.speed);
+		addSetting(this.fov);
+		addSetting(this.swingHandAndLookOption);
+		addSetting(this.pauseOnContainers);
+
+		this.entityFilters.forEach(this::addSetting);
 	}
-	
+
 	@Override
 	public void onEnable()
 	{
@@ -70,59 +79,63 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
-		
-		speed.resetTimer();
+
+		this.speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
-		speed.updateTimer();
-		if(!speed.isTimeToAttack())
+		this.speed.updateTimer();
+		if(!this.speed.isTimeToAttack())
 			return;
-		
-		if(pauseOnContainers.shouldPause())
+
+		if(this.pauseOnContainers.shouldPause())
 			return;
-		
+
 		ClientPlayerEntity player = MC.player;
-		
+
 		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = Math.pow(this.range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
-		
-		if(fov.getValue() < 360.0)
+
+		if(this.fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
-		
-		stream = entityFilters.applyTo(stream);
-		
+					e.getBoundingBox().getCenter()) <= this.fov.getValue() / 2.0);
+
+		stream = this.entityFilters.applyTo(stream);
+
 		ArrayList<Entity> entities =
-			stream.collect(Collectors.toCollection(ArrayList::new));
+				stream.collect(Collectors.toCollection(ArrayList::new));
 		if(entities.isEmpty())
 			return;
-		
+
 		WURST.getHax().autoSwordHack.setSlot(entities.get(0));
-		
+
 		// attack entities
 		for(Entity entity : entities)
 		{
-			RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter())
-				.sendPlayerLookPacket();
-			
+			if (this.swingHandAndLookOption.isChecked())
+				RotationUtils
+						.getNeededRotations(entity.getBoundingBox().getCenter())
+						.sendPlayerLookPacket();
+			else RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter());
+
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
-		
-		player.swingHand(Hand.MAIN_HAND);
-		speed.resetTimer();
+
+		if (this.swingHandAndLookOption.isChecked())
+			player.swingHand(Hand.MAIN_HAND);
+
+		this.speed.resetTimer();
 	}
 }
