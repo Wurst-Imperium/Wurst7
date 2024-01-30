@@ -19,6 +19,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -37,7 +38,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
-	
+
+	private final CheckboxSetting swingHandAndLookOption = new CheckboxSetting(
+			"SwingHandAndLookOption",
+			"Decide whether to swing your hand And Look Target during an attack.",
+			true
+	);
+
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(false);
 	
@@ -53,6 +60,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(speed);
 		addSetting(fov);
 		addSetting(pauseOnContainers);
+		addSetting(swingHandAndLookOption);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -114,15 +122,19 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter())
-				.sendPlayerLookPacket();
+			if (this.swingHandAndLookOption.isChecked())
+				RotationUtils
+						.getNeededRotations(entity.getBoundingBox().getCenter())
+						.sendPlayerLookPacket();
+			else RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter());
 			
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
-		
-		player.swingHand(Hand.MAIN_HAND);
-		speed.resetTimer();
+
+		if (this.swingHandAndLookOption.isChecked())
+			player.swingHand(Hand.MAIN_HAND);
+
+		this.speed.resetTimer();
 	}
 }
