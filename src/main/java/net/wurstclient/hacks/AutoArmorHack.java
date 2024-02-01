@@ -175,8 +175,8 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)item.toughness;
-		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
+		int armorToughness = (int)item.getToughness();
+		int armorType = item.getMaterial().value().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
