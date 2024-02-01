@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.Rotation;
 
 public final class TiredHack extends Hack implements UpdateListener
 {
@@ -39,8 +39,7 @@ public final class TiredHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(),
-				MC.player.age % 100, MC.player.isOnGround()));
+		new Rotation(MC.player.getYaw(), MC.player.age % 100)
+			.sendPlayerLookPacket();
 	}
 }

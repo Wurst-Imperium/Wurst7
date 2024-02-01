@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,7 +12,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.wurstclient.Category;
@@ -21,6 +20,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.Rotation;
 
 @SearchTags({"AutoPotion", "auto potion", "AutoSplashPotion",
 	"auto splash potion"})
@@ -78,16 +78,13 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			
 			// throw potion in hotbar
 			MC.player.getInventory().selectedSlot = potionInHotbar;
-			MC.player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(), 90,
-					MC.player.isOnGround()));
+			new Rotation(MC.player.getYaw(), 90).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
 			MC.player.getInventory().selectedSlot = oldSlot;
-			MC.player.networkHandler.sendPacket(
-				new PlayerMoveC2SPacket.LookAndOnGround(MC.player.getYaw(),
-					MC.player.getPitch(), MC.player.isOnGround()));
+			new Rotation(MC.player.getYaw(), MC.player.getPitch())
+				.sendPlayerLookPacket();
 			
 			// reset timer
 			timer = 10;
