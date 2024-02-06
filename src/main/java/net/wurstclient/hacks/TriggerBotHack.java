@@ -37,6 +37,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		"Whether or not to attack while blocking with a shield / using items.",
 		false);
 	
+	private final CheckboxSetting attackWhileBreaking =
+		new CheckboxSetting("Attack while breaking",
+			"Whether or not to attack while breaking blocks.", false);
+	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
 	
@@ -48,6 +52,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(attackWhileBlocking);
+		addSetting(attackWhileBreaking);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -88,6 +93,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		ClientPlayerEntity player = MC.player;
 		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+			return;
+		
+		if(MC.interactionManager.isBreakingBlock()
+			&& !attackWhileBreaking.isChecked())
 			return;
 		
 		if(MC.crosshairTarget == null
