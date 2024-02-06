@@ -37,9 +37,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		"Allows attacking enemies even while you're using a shield or other items for defense. Normally, you can't attack in these situations, but this setting enables it, giving you more flexibility during combat.",
 		false);
 	
-	private final CheckboxSetting attackWhileBreaking =
-		new CheckboxSetting("Attack while breaking",
-			"Allows attacking enemies while you're actively breaking blocks. Enable this to multitask during combat and mining activities.", false);
+	private final CheckboxSetting attackWhileBreaking = new CheckboxSetting(
+		"Attack while breaking",
+		"Allows attacking enemies while you're actively breaking blocks. Enable this to multitask during combat and mining activities.",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
