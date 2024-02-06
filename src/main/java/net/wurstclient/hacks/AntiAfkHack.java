@@ -61,6 +61,8 @@ public final class AntiAfkHack extends Hack
 		pathFinder = new RandomPathFinder(start);
 		creativeFlying = MC.player.getAbilities().flying;
 		
+		WURST.getHax().autoFishHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
