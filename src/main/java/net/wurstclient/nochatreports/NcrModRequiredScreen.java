@@ -43,12 +43,12 @@ public final class NcrModRequiredScreen extends Screen
 	
 	public NcrModRequiredScreen(Screen prevScreen)
 	{
-		super(Text.literal(ChatUtils.WURST_PREFIX).append(
-			Text.translatable("gui.wurst.nochatreports.ncr_mod_server.title")));
+		super(Text.literal(ChatUtils.WURST_PREFIX + WurstClient.INSTANCE
+			.translate("gui.wurst.nochatreports.ncr_mod_server.title")));
 		this.prevScreen = prevScreen;
 		
-		reason =
-			Text.translatable("gui.wurst.nochatreports.ncr_mod_server.message");
+		reason = Text.literal(WurstClient.INSTANCE
+			.translate("gui.wurst.nochatreports.ncr_mod_server.message"));
 		
 		OtfList otfs = WurstClient.INSTANCE.getOtfs();
 		
