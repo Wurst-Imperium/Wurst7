@@ -86,14 +86,15 @@ public final class AltManagerScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, altManager.getList());
+		WurstClient wurst = WurstClient.INSTANCE;
 		
 		Exception folderException = altManager.getFolderException();
 		if(folderException != null && shouldAsk)
 		{
-			Text title =
-				Text.translatable("gui.wurst.altmanager.folder_error.title");
-			Text message = Text.translatable(
-				"gui.wurst.altmanager.folder_error.message", folderException);
+			Text title = Text.literal(
+				wurst.translate("gui.wurst.altmanager.folder_error.title"));
+			Text message = Text.literal(wurst.translate(
+				"gui.wurst.altmanager.folder_error.message", folderException));
 			Text buttonText = Text.translatable("gui.done");
 			
 			// This just sets shouldAsk to false and closes the message.
@@ -105,9 +106,10 @@ public final class AltManagerScreen extends Screen
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
 		{
-			Text title = Text.translatable("gui.wurst.altmanager.empty.title");
-			Text message =
-				Text.translatable("gui.wurst.altmanager.empty.message");
+			Text title = Text
+				.literal(wurst.translate("gui.wurst.altmanager.empty.title"));
+			Text message = Text
+				.literal(wurst.translate("gui.wurst.altmanager.empty.message"));
 			BooleanConsumer callback = this::confirmGenerate;
 			
 			ConfirmScreen screen = new ConfirmScreen(callback, title, message);

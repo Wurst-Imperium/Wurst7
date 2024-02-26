@@ -46,7 +46,8 @@ public abstract class ClientPlayNetworkHandlerMixin
 	public void onOnServerMetadata(ServerMetadataS2CPacket packet,
 		CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
+		WurstClient wurst = WurstClient.INSTANCE;
+		if(!wurst.isEnabled())
 			return;
 		
 		// Remove Mojang's dishonest warning toast on safe servers
@@ -58,10 +59,10 @@ public abstract class ClientPlayNetworkHandlerMixin
 		}
 		
 		// Add an honest warning toast on unsafe servers
-		MutableText title = Text.literal(ChatUtils.WURST_PREFIX).append(
-			Text.translatable("toast.wurst.nochatreports.unsafe_server.title"));
-		MutableText message = Text
-			.translatable("toast.wurst.nochatreports.unsafe_server.message");
+		MutableText title = Text.literal(ChatUtils.WURST_PREFIX
+			+ wurst.translate("toast.wurst.nochatreports.unsafe_server.title"));
+		MutableText message = Text.literal(
+			wurst.translate("toast.wurst.nochatreports.unsafe_server.message"));
 		
 		SystemToast systemToast = SystemToast.create(client,
 			SystemToast.Type.UNSECURE_SERVER_WARNING, title, message);
