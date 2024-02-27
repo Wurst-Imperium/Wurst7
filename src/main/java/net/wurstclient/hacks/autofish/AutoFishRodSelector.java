@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -32,8 +32,12 @@ public final class AutoFishRodSelector
 		"If enabled, AutoFish will turn itself off when it runs out of fishing rods.",
 		false);
 	
+	private final CheckboxSetting stopWhenInvFull = new CheckboxSetting(
+		"Stop when inv full",
+		"If enabled, AutoFish will turn itself off when your inventory is full.",
+		false);
+	
 	private final AutoFishHack autoFish;
-	private int bestRodValue;
 	private int bestRodSlot;
 	
 	public AutoFishRodSelector(AutoFishHack autoFish)
@@ -43,28 +47,33 @@ public final class AutoFishRodSelector
 	
 	public Stream<Setting> getSettings()
 	{
-		return Stream.of(stopWhenOutOfRods);
+		return Stream.of(stopWhenOutOfRods, stopWhenInvFull);
 	}
 	
 	public void reset()
 	{
-		bestRodValue = -1;
 		bestRodSlot = -1;
 	}
 	
-	public boolean hasARod()
+	public boolean isOutOfRods()
 	{
-		return bestRodSlot != -1;
+		return bestRodSlot == -1;
 	}
 	
-	public boolean isBestRodAlreadySelected()
+	/**
+	 * Reevaluates the player's fishing rods, checks for any inventory-related
+	 * issues and updates the selected rod if necessary.
+	 *
+	 * @return true if it's OK to proceed with fishing in the same tick
+	 */
+	public boolean update()
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		int selectedSlot = inventory.selectedSlot;
 		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
 		// evaluate selected rod (or lack thereof)
-		bestRodValue = getRodValue(selectedStack);
+		int bestRodValue = getRodValue(selectedStack);
 		bestRodSlot = bestRodValue > -1 ? selectedSlot : -1;
 		
 		// create a stream of all slots that we want to search
@@ -84,20 +93,34 @@ public final class AutoFishRodSelector
 			}
 		}
 		
-		// return true if selected rod is best rod
-		return bestRodSlot == selectedSlot;
-	}
-	
-	public void selectBestRod()
-	{
-		if(bestRodSlot == -1 && stopWhenOutOfRods.isChecked())
+		// wait for AutoEat to finish eating
+		if(WurstClient.INSTANCE.getHax().autoEatHack.isEating())
+			return false;
+		
+		// stop if out of rods
+		if(stopWhenOutOfRods.isChecked() && bestRodSlot == -1)
 		{
 			ChatUtils.message("AutoFish has run out of fishing rods.");
 			autoFish.setEnabled(false);
-			return;
+			return false;
 		}
 		
+		// stop if inventory is full
+		if(stopWhenInvFull.isChecked() && inventory.getEmptySlot() == -1)
+		{
+			ChatUtils.message(
+				"AutoFish has stopped because your inventory is full.");
+			autoFish.setEnabled(false);
+			return false;
+		}
+		
+		// check if selected rod is still the best one
+		if(MC.player.getInventory().selectedSlot == bestRodSlot)
+			return true;
+		
+		// change selected rod and wait until the next tick
 		InventoryUtils.selectItem(bestRodSlot);
+		return false;
 	}
 	
 	private int getRodValue(ItemStack stack)
