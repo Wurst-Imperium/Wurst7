@@ -134,7 +134,7 @@ public final class FightBotHack extends Hack
 		if(entity == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		WURST.getHax().autoSwordHack.setSlot(entity);
 		
 		if(useAi.isChecked())
 		{

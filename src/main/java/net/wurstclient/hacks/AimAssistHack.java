@@ -150,7 +150,7 @@ public final class AimAssistHack extends Hack
 			return;
 		}
 		
-		WURST.getHax().autoSwordHack.setSlot();
+		WURST.getHax().autoSwordHack.setSlot(target);
 		faceEntityClient(target);
 	}
 	
