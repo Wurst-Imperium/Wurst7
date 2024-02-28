@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -28,7 +27,6 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
 @SearchTags({"click aura", "ClickAimbot", "click aimbot"})
 public final class ClickAuraHack extends Hack
@@ -134,12 +132,8 @@ public final class ClickAuraHack extends Hack
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
 		// face entity
-		Rotation rotation = RotationUtils
-			.getNeededRotations(target.getBoundingBox().getCenter());
-		PlayerMoveC2SPacket.LookAndOnGround packet =
-			new PlayerMoveC2SPacket.LookAndOnGround(rotation.getYaw(),
-				rotation.getPitch(), MC.player.isOnGround());
-		MC.player.networkHandler.sendPacket(packet);
+		RotationUtils.getNeededRotations(target.getBoundingBox().getCenter())
+			.sendPlayerLookPacket();
 		
 		// attack entity
 		WURST.getHax().criticalsHack.doCritical();
