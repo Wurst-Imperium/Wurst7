@@ -27,11 +27,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
-import net.wurstclient.settings.filters.FilterAnimalsSetting;
-import net.wurstclient.settings.filters.FilterInvisibleSetting;
-import net.wurstclient.settings.filters.FilterMonstersSetting;
-import net.wurstclient.settings.filters.FilterPlayersSetting;
-import net.wurstclient.settings.filters.FilterSleepingSetting;
+import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"MiniMap", "mini map"})
@@ -45,12 +41,15 @@ public final class RadarHack extends Hack implements UpdateListener
 	private final CheckboxSetting rotate =
 		new CheckboxSetting("Rotate with player", true);
 	
-	private final EntityFilterList entityFilters = new EntityFilterList(
-		new FilterPlayersSetting("Won't show other players.", false),
-		new FilterSleepingSetting("Won't show sleeping players.", false),
-		new FilterMonstersSetting("Won't show zombies, creepers, etc.", false),
-		new FilterAnimalsSetting("Won't show pigs, cows, etc.", false),
-		new FilterInvisibleSetting("Won't show invisible entities.", false));
+	private final EntityFilterList entityFilters =
+		new EntityFilterList(FilterPlayersSetting.genericVision(false),
+			FilterSleepingSetting.genericVision(false),
+			FilterHostileSetting.genericVision(false),
+			FilterPassiveSetting.genericVision(false),
+			FilterPassiveWaterSetting.genericVision(false),
+			FilterBatsSetting.genericVision(true),
+			FilterSlimesSetting.genericVision(false),
+			FilterInvisibleSetting.genericVision(false));
 	
 	public RadarHack()
 	{
