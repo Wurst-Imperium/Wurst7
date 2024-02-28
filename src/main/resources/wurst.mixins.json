@@ -24,6 +24,7 @@
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
+    "ControlsListWidgetMixin",
     "CreativeInventoryScreenMixin",
     "CustomPayloadC2SPacketAccessor",
     "DeathScreenMixin",
@@ -40,6 +41,7 @@
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
+    "KeybindTextContentMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
     "LivingEntityRendererMixin",
@@ -62,6 +64,7 @@
     "TelemetryManagerMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
+    "TranslatableTextContentMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],
