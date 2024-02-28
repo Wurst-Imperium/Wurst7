@@ -20,7 +20,6 @@ import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -81,15 +80,15 @@ public final class NoChatReportsOtf extends OtherFeature
 	public MessageIndicator modifyIndicator(Text message,
 		MessageSignatureData signature, MessageIndicator indicator)
 	{
-		if(!WurstClient.INSTANCE.isEnabled() || MC.isInSingleplayer())
+		if(!WURST.isEnabled() || MC.isInSingleplayer())
 			return indicator;
 		
 		if(indicator != null || signature == null)
 			return indicator;
 		
 		return new MessageIndicator(0xE84F58, Icon.CHAT_MODIFIED,
-			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - ")
-				.append(Text.translatable(
+			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - "
+				+ WURST.translate(
 					"description.wurst.nochatreports.message_is_reportable")),
 			"Reportable");
 	}
@@ -102,8 +101,7 @@ public final class NoChatReportsOtf extends OtherFeature
 	
 	public boolean isActive()
 	{
-		return isEnabled() && WurstClient.INSTANCE.isEnabled()
-			&& !MC.isInSingleplayer();
+		return isEnabled() && WURST.isEnabled() && !MC.isInSingleplayer();
 	}
 	
 	@Override
