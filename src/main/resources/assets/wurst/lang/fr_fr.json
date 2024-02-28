@@ -132,7 +132,6 @@
   "description.wurst.hack.safewalk": "Vous empêche de tomber des bords.",
   "description.wurst.hack.scaffoldwalk": "Place automatiquement des blocs sous vos pieds.",
   "description.wurst.hack.search": "Vous aide à trouver des blocs spécifiques en les mettant en évidence en couleur arc-en-ciel.",
-  "description.wurst.hack.servercrasher": "Génère un élément qui peut planter les serveurs 1.15.x.\n§oMode Créatif uniquement.§r",
   "description.wurst.hack.skinderp": "Bascule aléatoirement des parties de votre skin.",
   "description.wurst.hack.sneak": "Vous fait vous s'accroupir automatiquement.",
   "description.wurst.hack.snowshoe": "Permet de marcher sur de la poudreuse.",

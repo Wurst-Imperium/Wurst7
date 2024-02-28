@@ -140,7 +140,6 @@
   "description.wurst.hack.safewalk": "ブロックの端からの落下を防ぐ。",
   "description.wurst.hack.scaffoldwalk": "足元に自動でブロックを設置する。",
   "description.wurst.hack.search": "特定のブロックを虹色でハイライト表示し、探しやすくする。",
-  "description.wurst.hack.servercrasher": "バージョン 1.15.* のサーバーをクラッシュさせることができるアイテムを生成する。\n§oクリエイティブモードのみ。§r",
   "description.wurst.hack.skinderp": "スキンのパーツの表示/非表示をランダムに切り替える。",
   "description.wurst.hack.sneak": "自動でしゃがむ。",
   "description.wurst.hack.snowshoe": "粉雪ブロックの上を歩くことができるようになる。",

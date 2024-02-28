@@ -12,14 +12,19 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto sprint"})
 public final class AutoSprintHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting hungry = new CheckboxSetting("Hungry Sprint",
+		"Sprint even on low hunger.", false);
+	
 	public AutoSprintHack()
 	{
 		super("AutoSprint");
 		setCategory(Category.MOVEMENT);
+		addSetting(hungry);
 	}
 	
 	@Override
@@ -47,5 +52,10 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 		
 		if(player.forwardSpeed > 0)
 			player.setSprinting(true);
+	}
+	
+	public boolean shouldSprintHungry()
+	{
+		return isEnabled() && hungry.isChecked();
 	}
 }
