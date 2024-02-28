@@ -76,6 +76,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			FilterShulkersSetting.genericVision(false),
 			FilterAllaysSetting.genericVision(false),
 			FilterInvisibleSetting.genericVision(false),
+			FilterNamedSetting.genericVision(false),
 			FilterArmorStandsSetting.genericVision(true));
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();

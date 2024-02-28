@@ -7,10 +7,16 @@
  */
 package net.wurstclient.util;
 
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -55,5 +61,27 @@ public enum ItemUtils
 		return (float)item.getAttributeModifiers(EquipmentSlot.MAINHAND)
 			.get(EntityAttributes.GENERIC_ATTACK_SPEED).stream().findFirst()
 			.orElseThrow().getValue();
+	}
+	
+	/**
+	 * Adds the specified enchantment to the specified item stack. Unlike
+	 * {@link ItemStack#addEnchantment(Enchantment, int)}, this method doesn't
+	 * limit the level to 127.
+	 */
+	public static void addEnchantment(ItemStack stack, Enchantment enchantment,
+		int level)
+	{
+		Identifier id = EnchantmentHelper.getEnchantmentId(enchantment);
+		NbtList nbt = getOrCreateNbtList(stack, ItemStack.ENCHANTMENTS_KEY);
+		nbt.add(EnchantmentHelper.createNbt(id, level));
+	}
+	
+	public static NbtList getOrCreateNbtList(ItemStack stack, String key)
+	{
+		NbtCompound nbt = stack.getOrCreateNbt();
+		if(!nbt.contains(key, NbtElement.LIST_TYPE))
+			nbt.put(key, new NbtList());
+		
+		return nbt.getList(key, NbtElement.COMPOUND_TYPE);
 	}
 }

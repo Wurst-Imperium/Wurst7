@@ -96,7 +96,7 @@
   "description.wurst.hack.killpotion": "生成一个能杀死绝大多数生物（包括创造模式的玩家）的药水，但对那些不死的生物或者已死生物无效。\n\n需要在创造模式下。",
   "description.wurst.hack.liquids": "取消无法把方块直接放置在水中的限制，允许你直接在水方块中放置方块。",
   "description.wurst.hack.lsd": "让你像吃了云南蘑菇一样。",
-  "description.wurst.hack.masstpa": "给每个人发送 TPA 请求。\n直到有人接受就会停止\n\n§c§l警告：§r当在国内服务器使用会因为 Wurst 无法判断中文返回消息而导致 TPA 请求继续。",
+  "description.wurst.hack.masstpa": "给每个人发送 TPA 请求。\n\n§c§l警告：§r当在国内服务器使用会因为 Wurst 无法判断中文返回消息而导致 TPA 请求继续。",
   "description.wurst.hack.mileycyrus": "类似疯狂按 Shift 潜行。",
   "description.wurst.hack.mobesp": "高亮附近的生物。",
   "description.wurst.hack.mobspawnesp": "高亮生物可以生成的区域。\n§e黄色§r 可以在夜间生成\n§c红色§r - 可以在任意时候生成",
