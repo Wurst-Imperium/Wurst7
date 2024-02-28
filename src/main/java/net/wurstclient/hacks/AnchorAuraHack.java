@@ -30,13 +30,13 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -46,6 +46,7 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.RotationUtils.Rotation;
 
@@ -186,7 +187,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		if(!selectItem(item -> item != Items.GLOWSTONE))
+		InventoryUtils.selectItem(Items.GLOWSTONE,
+			takeItemsFrom.getSelected().maxInvSlot);
+		if(!MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
 		boolean shouldSwing = false;
@@ -204,7 +207,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(isSneaking())
 			return;
 		
-		if(!selectItem(item -> item == Items.GLOWSTONE))
+		InventoryUtils.selectItem(Items.GLOWSTONE,
+			takeItemsFrom.getSelected().maxInvSlot);
+		if(!MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
 		boolean shouldSwing = false;
@@ -215,39 +220,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			
 		if(shouldSwing)
 			MC.player.swingHand(Hand.MAIN_HAND);
-	}
-	
-	private boolean selectItem(Predicate<Item> item)
-	{
-		PlayerInventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
-		
-		for(int slot = 0; slot < maxInvSlot; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-			if(!item.test(stack.getItem()))
-				continue;
-			
-			if(slot < 9)
-				inventory.selectedSlot = slot;
-			else if(inventory.getEmptySlot() < 9)
-				im.windowClick_QUICK_MOVE(slot);
-			else if(inventory.getEmptySlot() != -1)
-			{
-				im.windowClick_QUICK_MOVE(inventory.selectedSlot + 36);
-				im.windowClick_QUICK_MOVE(slot);
-			}else
-			{
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-				im.windowClick_PICKUP(slot);
-				im.windowClick_PICKUP(inventory.selectedSlot + 36);
-			}
-			
-			return true;
-		}
-		
-		return false;
 	}
 	
 	private boolean hasItem(Predicate<Item> item)
@@ -307,7 +279,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private boolean placeAnchor(BlockPos pos)
 	{
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		Vec3d posVec = Vec3d.ofCenter(pos);
 		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
 		
@@ -337,7 +309,9 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				.getType() != HitResult.Type.MISS)
 				continue;
 			
-			if(!selectItem(item -> item == Items.RESPAWN_ANCHOR))
+			InventoryUtils.selectItem(Items.RESPAWN_ANCHOR,
+				takeItemsFrom.getSelected().maxInvSlot);
+			if(!MC.player.isHolding(Items.RESPAWN_ANCHOR))
 				return false;
 			
 			faceBlocks.getSelected().face(hitVec);
@@ -355,19 +329,15 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private ArrayList<BlockPos> getNearbyAnchors()
 	{
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeD = range.getValue();
-		int rangeI = (int)Math.ceil(rangeD);
-		double rangeSq = Math.pow(rangeD + 0.5, 2);
-		
 		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
+		int rangeI = range.getValueCeil();
+		double rangeSq = MathHelper.square(range.getValue() + 0.5);
 		
 		Comparator<BlockPos> furthestFromPlayer =
 			Comparator.<BlockPos> comparingDouble(
 				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))).reversed();
 		
-		return BlockUtils.getAllInBoxStream(min, max)
+		return BlockUtils.getAllInBoxStream(center, rangeI)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(pos -> BlockUtils.getBlock(pos) == Blocks.RESPAWN_ANCHOR)
 			.sorted(furthestFromPlayer)
@@ -376,7 +346,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<Entity> getNearbyTargets()
 	{
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		
 		Comparator<Entity> furthestFromPlayer = Comparator
 			.<Entity> comparingDouble(e -> MC.player.squaredDistanceTo(e))
@@ -401,15 +371,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
 	{
 		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeD = range.getValue();
-		double rangeSq = Math.pow(rangeD + 0.5, 2);
-		int rangeI = 2;
+		double rangeSq = MathHelper.square(range.getValue() + 0.5);
 		
 		BlockPos center = target.getBlockPos();
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		Box targetBB = target.getBoundingBox();
+		int rangeI = 2;
 		
+		Box targetBB = target.getBoundingBox();
 		Vec3d targetEyesVec =
 			target.getPos().add(0, target.getEyeHeight(target.getPose()), 0);
 		
@@ -417,7 +384,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			Comparator.<BlockPos> comparingDouble(
 				pos -> targetEyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)));
 		
-		return BlockUtils.getAllInBoxStream(min, max)
+		return BlockUtils.getAllInBoxStream(center, rangeI)
 			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
 			.filter(this::isReplaceable).filter(this::hasClickableNeighbor)
 			.filter(pos -> !targetBB.intersects(new Box(pos)))
@@ -447,14 +414,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean isChargedAnchor(BlockPos pos)
 	{
-		try
-		{
-			return BlockUtils.getState(pos).get(RespawnAnchorBlock.CHARGES) > 0;
-			
-		}catch(IllegalArgumentException e)
-		{
-			return false;
-		}
+		return BlockUtils.getState(pos).getOrEmpty(RespawnAnchorBlock.CHARGES)
+			.orElse(0) > 0;
 	}
 	
 	private boolean isSneaking()

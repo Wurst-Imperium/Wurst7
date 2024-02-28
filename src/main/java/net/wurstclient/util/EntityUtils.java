@@ -45,7 +45,7 @@ public enum EntityUtils
 	public static Stream<AnimalEntity> getValidAnimals()
 	{
 		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(e -> e instanceof AnimalEntity).map(e -> (AnimalEntity)e)
+			.filter(AnimalEntity.class::isInstance).map(e -> (AnimalEntity)e)
 			.filter(IS_VALID_ANIMAL);
 	}
 	

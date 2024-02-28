@@ -92,7 +92,7 @@ public final class RadarHack extends Hack implements UpdateListener
 			StreamSupport.stream(world.getEntities().spliterator(), true)
 				.filter(e -> !e.isRemoved() && e != player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(e -> e instanceof LivingEntity)
+				.filter(LivingEntity.class::isInstance)
 				.filter(e -> ((LivingEntity)e).getHealth() > 0);
 		
 		stream = entityFilters.applyTo(stream);

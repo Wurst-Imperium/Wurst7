@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
@@ -161,6 +162,21 @@ public final class FileSetting extends Setting
 	public JsonElement toJson()
 	{
 		return new JsonPrimitive(selectedFile);
+	}
+	
+	@Override
+	public JsonObject exportWikiData()
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("name", getName());
+		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("type", "File");
+		
+		Path mcFolder = WurstClient.INSTANCE.getWurstFolder().getParent();
+		if(folder.startsWith(mcFolder))
+			json.addProperty("folder", mcFolder.relativize(folder).toString());
+		
+		return json;
 	}
 	
 	@Override
