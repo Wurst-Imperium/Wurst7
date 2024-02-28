@@ -1,7 +1,10 @@
-<!--NOTE: If you are contributing multiple unrelated features, please create a separate pull request for each feature. Squeezing everything into one giant pull request makes it very difficult for me to add your features, as I have to test, validate and add them one by one. Thank you for your understanding - and thanks again for taking the time to contribute!!-->
+<!--NOTE: Please make sure to read the contributing guidelines before submitting your pull request. There is a high chance your PR will be rejected or take a long time to be merged if you don't follow the guidelines. Thank you for your understanding - and thanks for taking the time to contribute!!-->
 
 ## Description
 > What have you added and what does it do? (Alternatively, what have you fixed and how does it work?)
 
-## (Optional) screenshots / videos
-> If applicable, add screenshots or videos to help explain your pull request.
+## Testing
+> How have you tested your changes? Any testing tips for the reviewer?
+
+## References
+> List any related issues, forum posts, videos and such here.
