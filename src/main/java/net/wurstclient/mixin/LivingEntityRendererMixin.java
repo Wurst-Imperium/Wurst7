@@ -61,7 +61,7 @@ public abstract class LivingEntityRendererMixin
 		ordinal = 0),
 		method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z",
 		cancellable = true)
-	private void shouldForceLabel(LivingEntity e,
+	private void shouldForceLabel(LivingEntity entity,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		// return true immediately after the distance check

@@ -25,10 +25,10 @@ public abstract class CreativeInventoryScreenMixin
 	extends AbstractInventoryScreen<CreativeScreenHandler>
 {
 	private CreativeInventoryScreenMixin(WurstClient wurst,
-		CreativeScreenHandler screenHandler, PlayerInventory playerInventory,
-		Text text)
+		CreativeScreenHandler screenHandler, PlayerInventory inventory,
+		Text title)
 	{
-		super(screenHandler, playerInventory, text);
+		super(screenHandler, inventory, title);
 	}
 	
 	@Inject(at = @At("HEAD"),

@@ -163,7 +163,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
 			MC.player.swingHand(Hand.MAIN_HAND);
-			IMC.setItemUseCooldown(4);
+			MC.itemUseCooldown = 4;
 			
 			return true;
 		}

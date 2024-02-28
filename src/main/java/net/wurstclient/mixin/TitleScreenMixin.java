@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -22,7 +23,6 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.screens.AltManagerScreen;
-import net.wurstclient.mixinterface.IScreen;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
@@ -30,23 +30,22 @@ public abstract class TitleScreenMixin extends Screen
 	private ClickableWidget realmsButton = null;
 	private ButtonWidget altsButton;
 	
-	private TitleScreenMixin(WurstClient wurst, Text text_1)
+	private TitleScreenMixin(WurstClient wurst, Text title)
 	{
-		super(text_1);
+		super(title);
 	}
 	
-	@Inject(at = {@At("RETURN")}, method = {"init()V"})
+	@Inject(at = @At("RETURN"), method = "init()V")
 	private void onInitWidgetsNormal(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		for(Drawable d : ((IScreen)this).getButtons())
+		for(Drawable d : Screens.getButtons(this))
 		{
-			if(!(d instanceof ClickableWidget))
+			if(!(d instanceof ClickableWidget button))
 				continue;
 			
-			ClickableWidget button = (ClickableWidget)d;
 			if(!button.getMessage().getString()
 				.equals(I18n.translate("menu.online")))
 				continue;
@@ -69,7 +68,7 @@ public abstract class TitleScreenMixin extends Screen
 			.dimensions(width / 2 + 2, realmsButton.getY(), 98, 20).build());
 	}
 	
-	@Inject(at = {@At("RETURN")}, method = {"tick()V"})
+	@Inject(at = @At("RETURN"), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
 		if(realmsButton == null || altsButton == null)
