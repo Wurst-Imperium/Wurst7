@@ -179,6 +179,7 @@ public final class EditItemListScreen extends Screen
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		super.render(context, mouseX, mouseY, partialTicks);
 		
+		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
@@ -194,13 +195,13 @@ public final class EditItemListScreen extends Screen
 		int black = 0xff000000;
 		
 		context.fill(48, height - 56, 64, height - 36, border);
-		context.fill(49, height - 55, 64, height - 37, black);
+		context.fill(49, height - 55, 65, height - 37, black);
 		context.fill(214, height - 56, 244, height - 55, border);
 		context.fill(214, height - 37, 244, height - 36, border);
 		context.fill(244, height - 56, 246, height - 36, border);
-		context.fill(214, height - 55, 243, height - 52, black);
-		context.fill(214, height - 40, 243, height - 37, black);
-		context.fill(215, height - 55, 216, height - 37, black);
+		context.fill(213, height - 55, 243, height - 52, black);
+		context.fill(213, height - 40, 243, height - 37, black);
+		context.fill(213, height - 55, 216, height - 37, black);
 		context.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.pop();
@@ -208,6 +209,8 @@ public final class EditItemListScreen extends Screen
 		RenderUtils.drawItem(context,
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
+		
+		matrixStack.pop();
 	}
 	
 	@Override

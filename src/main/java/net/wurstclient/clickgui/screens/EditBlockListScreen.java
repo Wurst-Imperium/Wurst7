@@ -177,6 +177,7 @@ public final class EditBlockListScreen extends Screen
 		blockNameField.render(context, mouseX, mouseY, partialTicks);
 		super.render(context, mouseX, mouseY, partialTicks);
 		
+		matrixStack.push();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
@@ -201,6 +202,8 @@ public final class EditBlockListScreen extends Screen
 		RenderUtils.drawItem(context,
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
+		
+		matrixStack.pop();
 	}
 	
 	@Override

@@ -89,8 +89,8 @@ public final class AutoLibrarianHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FacingSetting facing =
-		new FacingSetting("How to face the villager and job site.\n\n"
+	private final FacingSetting facing = FacingSetting
+		.withoutPacketSpam("How to face the villager and job site.\n\n"
 			+ "\u00a7lOff\u00a7r - Don't face the villager at all. Will be"
 			+ " detected by anti-cheat plugins.\n\n"
 			+ "\u00a7lServer-side\u00a7r - Face the villager on the"
