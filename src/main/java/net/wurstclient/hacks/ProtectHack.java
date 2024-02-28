@@ -272,7 +272,7 @@ public final class ProtectHack extends Hack
 		
 		if(target == enemy)
 		{
-			WURST.getHax().autoSwordHack.setSlot();
+			WURST.getHax().autoSwordHack.setSlot(enemy);
 			
 			// check cooldown
 			if(!speed.isTimeToAttack())
