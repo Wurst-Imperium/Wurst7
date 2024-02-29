@@ -67,8 +67,9 @@ public class DisconnectedScreenMixin extends Screen
 			client.setScreen(new NcrModRequiredScreen(parent));
 			return;
 		}
-		
-		addReconnectButtons();
+
+		if (WurstClient.INSTANCE.getHax().autoReconnectHack.shouldShowButtons())
+			addReconnectButtons();
 	}
 	
 	private void addReconnectButtons()
