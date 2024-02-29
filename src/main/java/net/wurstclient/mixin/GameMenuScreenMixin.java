@@ -78,7 +78,18 @@ public abstract class GameMenuScreenMixin extends Screen
 		float v = 0;
 		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
 	}
-	
+
+	private  boolean isModMenuInstalled() {
+		try {
+			// Attempt to load a class or interface from the other mod
+			Class.forName("com.terraformersmc.modmenu.ModMenu");
+			return true; // The class was found, indicating that the other mod is installed
+		} catch (ClassNotFoundException e) {
+			return false; // The class was not found, indicating that the other mod is not installed
+		}
+	}
+
+
 	private void addWurstOptionsButton()
 	{
 		List<ClickableWidget> buttons = Screens.getButtons(this);
@@ -107,11 +118,11 @@ public abstract class GameMenuScreenMixin extends Screen
 			throw new CrashException(
 				CrashReport.create(new IllegalStateException(),
 					"Someone deleted the Feedback button!"));
-		
+
 		wurstOptionsButton = ButtonWidget
-			.builder(Text.literal("Sweet Options"),
+			.builder(Text.literal("Secret Options"),
 				b -> openWurstOptions())
-			.dimensions(width / 2 - 102, buttonY, 204, 20).build();
+			.dimensions(width / 2 - 102, buttonY, isModMenuInstalled() ? 98 : 204, 20).build();
 		buttons.add(wurstOptionsButton);
 	}
 	
