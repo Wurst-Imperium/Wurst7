@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -47,12 +47,13 @@ public final class ForcedChatReportsScreen extends Screen
 	
 	public ForcedChatReportsScreen(Screen prevScreen)
 	{
-		super(Text.literal(ChatUtils.WURST_PREFIX).append(
-			Text.translatable("gui.wurst.nochatreports.unsafe_server.title")));
+		super(Text.literal(ChatUtils.WURST_PREFIX)
+			.append(Text.literal(WurstClient.INSTANCE
+				.translate("gui.wurst.nochatreports.unsafe_server.title"))));
 		this.prevScreen = prevScreen;
 		
-		reason =
-			Text.translatable("gui.wurst.nochatreports.unsafe_server.message");
+		reason = Text.literal(WurstClient.INSTANCE
+			.translate("gui.wurst.nochatreports.unsafe_server.message"));
 		
 		NoChatReportsOtf ncr = WurstClient.INSTANCE.getOtfs().noChatReportsOtf;
 		sigButtonMsg = () -> WurstClient.INSTANCE
