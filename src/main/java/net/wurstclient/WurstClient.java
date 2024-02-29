@@ -15,6 +15,7 @@ import java.util.IllegalFormatException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -156,6 +157,12 @@ public enum WurstClient
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
+		
+	}
+	
+	public final boolean isTradeCylingPresent()
+	{
+		return FabricLoader.getInstance().isModLoaded("trade_cycling");
 	}
 	
 	private Path createWurstFolder()
@@ -354,4 +361,5 @@ public enum WurstClient
 	{
 		return altManager;
 	}
+	
 }

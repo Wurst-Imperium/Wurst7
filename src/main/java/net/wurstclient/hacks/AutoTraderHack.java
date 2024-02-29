@@ -1,6 +1,17 @@
 package net.wurstclient.hacks;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import net.wurstclient.hacks.autotrader.ItemOffer;
+import net.wurstclient.hacks.autotrader.UpdateItemsSetting;
+import net.wurstclient.settings.*;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.maxhenkel.tradecycling.FabricTradeCyclingClientMod;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -27,17 +38,14 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hacks.autolibrarian.BookOffer;
-import net.wurstclient.hacks.autolibrarian.UpdateBooksSetting;
-import net.wurstclient.mixinterface.IKeyBinding;
-import net.wurstclient.settings.*;
-import net.wurstclient.util.*;
-import org.lwjgl.opengl.GL11;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.*;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
+import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
+
+import de.maxhenkel.tradecycling.FabricTradeCyclingClientMod;
 
 @SearchTags({"auto librarian", "AutoVillager", "auto villager",
         "VillagerTrainer", "villager trainer", "LibrarianTrainer",
@@ -45,8 +53,7 @@ import java.util.stream.StreamSupport;
 public final class AutoTraderHack extends Hack
         implements UpdateListener, RenderListener
 {
-
-    private final BookOffersSetting wantedBooks = new BookOffersSetting(
+    private final ItemOffersSetting wantedBooks = new ItemOffersSetting(
             "Wanted books",
             "A list of enchanted books that you want your villagers to sell.\n\n"
                     + "AutoLibrarian will stop training the current villager"
@@ -73,7 +80,7 @@ public final class AutoTraderHack extends Hack
             new CheckboxSetting("TradeCycles",
                     "Whether to use the Trade Cycles Mod (Must be Installed)", false);
 
-    private final UpdateBooksSetting updateBooks = new UpdateBooksSetting();
+    private final UpdateItemsSetting updateBooks = new UpdateItemsSetting();
 
     private final SliderSetting range =
             new SliderSetting("Range", 5, 1, 6, 0.05, SliderSetting.ValueDisplay.DECIMAL);
@@ -115,9 +122,9 @@ public final class AutoTraderHack extends Hack
     private boolean placingJobSite;
     private boolean breakingJobSite;
 
-    public AutoLibrarianHack()
+    public AutoTraderHack()
     {
-        super("AutoLibrarian");
+        super("AutoTrader");
         setCategory(Category.OTHER);
         addSetting(wantedBooks);
         addSetting(lockInTrade);
@@ -215,7 +222,7 @@ public final class AutoTraderHack extends Hack
             }
 
             // check which book the villager is selling
-            BookOffer bookOffer = findEnchantedBookOffer(
+            ItemOffer bookOffer = findEnchantedBookOffer(
                     tradeScreen.getScreenHandler().getRecipes());
 
             if(bookOffer == null)
@@ -281,7 +288,7 @@ public final class AutoTraderHack extends Hack
                 return;
             }
 
-            BookOffer bookOffer = findEnchantedBookOffer(
+            ItemOffer bookOffer = findEnchantedBookOffer(
                     tradeScreen.getScreenHandler().getRecipes());
 
             if(bookOffer == null)
@@ -467,7 +474,7 @@ public final class AutoTraderHack extends Hack
         MC.itemUseCooldown = 4;
     }
 
-    private BookOffer findEnchantedBookOffer(TradeOfferList tradeOffers)
+    private ItemOffer findEnchantedBookOffer(TradeOfferList tradeOffers)
     {
         for(TradeOffer tradeOffer : tradeOffers)
         {
@@ -483,7 +490,7 @@ public final class AutoTraderHack extends Hack
             String enchantment = bookNbt.getCompound(0).getString("id");
             int level = bookNbt.getCompound(0).getInt("lvl");
             int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
-            BookOffer bookOffer = new BookOffer(enchantment, level, price);
+            ItemOffer bookOffer = new ItemOffer(enchantment, level, price);
 
             if(!bookOffer.isValid())
             {

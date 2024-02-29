@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -55,12 +55,15 @@ import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 
+import de.maxhenkel.tradecycling.FabricTradeCyclingClientMod;
+
 @SearchTags({"auto librarian", "AutoVillager", "auto villager",
 	"VillagerTrainer", "villager trainer", "LibrarianTrainer",
 	"librarian trainer", "AutoHmmm", "auto hmmm"})
 public final class AutoLibrarianHack extends Hack
 	implements UpdateListener, RenderListener
 {
+	
 	private final BookOffersSetting wantedBooks = new BookOffersSetting(
 		"Wanted books",
 		"A list of enchanted books that you want your villagers to sell.\n\n"
@@ -83,6 +86,10 @@ public final class AutoLibrarianHack extends Hack
 			+ " inventory when using this feature. Alternatively, 1 book and"
 			+ " 64 emeralds will also work.",
 		false);
+	
+	private final CheckboxSetting useTradeCycle =
+		new CheckboxSetting("TradeCycles",
+			"Whether to use the Trade Cycles Mod (Must be Installed)", false);
 	
 	private final UpdateBooksSetting updateBooks = new UpdateBooksSetting();
 	
@@ -132,6 +139,7 @@ public final class AutoLibrarianHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(wantedBooks);
 		addSetting(lockInTrade);
+		addSetting(useTradeCycle);
 		addSetting(updateBooks);
 		addSetting(range);
 		addSetting(facing);
@@ -170,6 +178,7 @@ public final class AutoLibrarianHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		
 		if(villager == null)
 		{
 			setTargetVillager();
@@ -185,90 +194,153 @@ public final class AutoLibrarianHack extends Hack
 		if(placingJobSite && breakingJobSite)
 			throw new IllegalStateException(
 				"Trying to place and break job site at the same time. Something is wrong.");
-		
-		if(placingJobSite)
+		if(!(useTradeCycle.isChecked()))
 		{
-			placeJobSite();
-			return;
-		}
-		
-		if(breakingJobSite)
-		{
-			breakJobSite();
-			return;
-		}
-		
-		if(!(MC.currentScreen instanceof MerchantScreen tradeScreen))
-		{
-			openTradeScreen();
-			return;
-		}
-		
-		// Can't see experience until the trade screen is open, so we have to
-		// check it here and start over if the villager is already experienced.
-		int experience = tradeScreen.getScreenHandler().getExperience();
-		if(experience > 0)
-		{
-			ChatUtils.warning("Villager at "
-				+ villager.getBlockPos().toShortString()
-				+ " is already experienced, meaning it can't be trained anymore.");
-			ChatUtils.message("Looking for another villager...");
-			experiencedVillagers.add(villager);
-			villager = null;
-			jobSite = null;
-			closeTradeScreen();
-			return;
-		}
-		
-		// check which book the villager is selling
-		BookOffer bookOffer =
-			findEnchantedBookOffer(tradeScreen.getScreenHandler().getRecipes());
-		
-		if(bookOffer == null)
-		{
-			ChatUtils.message("Villager is not selling an enchanted book.");
-			closeTradeScreen();
-			breakingJobSite = true;
-			System.out.println("Breaking job site...");
-			return;
-		}
-		
-		ChatUtils.message(
-			"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
-				+ " for " + bookOffer.getFormattedPrice() + ".");
-		
-		// if wrong enchantment, break job site and start over
-		if(!wantedBooks.isWanted(bookOffer))
-		{
-			breakingJobSite = true;
-			System.out.println("Breaking job site...");
-			closeTradeScreen();
-			return;
-		}
-		
-		// lock in the trade, if enabled
-		if(lockInTrade.isChecked())
-		{
-			// select the first valid trade
-			tradeScreen.getScreenHandler().setRecipeIndex(0);
-			tradeScreen.getScreenHandler().switchTo(0);
-			MC.getNetworkHandler()
-				.sendPacket(new SelectMerchantTradeC2SPacket(0));
+			if(placingJobSite)
+			{
+				placeJobSite();
+				return;
+			}
 			
-			// buy whatever the villager is selling
-			MC.interactionManager.clickSlot(
-				tradeScreen.getScreenHandler().syncId, 2, 0,
-				SlotActionType.PICKUP, MC.player);
+			if(breakingJobSite)
+			{
+				breakJobSite();
+				return;
+			}
 			
-			// close the trade screen
-			closeTradeScreen();
+			if(!(MC.currentScreen instanceof MerchantScreen tradeScreen))
+			{
+				openTradeScreen();
+				return;
+			}
+			
+			// Can't see experience until the trade screen is open, so we have
+			// to
+			// check it here and start over if the villager is already
+			// experienced.
+			int experience = tradeScreen.getScreenHandler().getExperience();
+			if(experience > 0)
+			{
+				ChatUtils.warning("Villager at "
+					+ villager.getBlockPos().toShortString()
+					+ " is already experienced, meaning it can't be trained anymore.");
+				ChatUtils.message("Looking for another villager...");
+				experiencedVillagers.add(villager);
+				villager = null;
+				jobSite = null;
+				closeTradeScreen();
+				return;
+			}
+			
+			// check which book the villager is selling
+			BookOffer bookOffer = findEnchantedBookOffer(
+				tradeScreen.getScreenHandler().getRecipes());
+			
+			if(bookOffer == null)
+			{
+				ChatUtils.message("Villager is not selling an enchanted book.");
+				closeTradeScreen();
+				breakingJobSite = true;
+				System.out.println("Breaking job site...");
+				return;
+			}
+			
+			ChatUtils.message(
+				"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
+					+ " for " + bookOffer.getFormattedPrice() + ".");
+			
+			// if wrong enchantment, break job site and start over
+			if(!wantedBooks.isWanted(bookOffer))
+			{
+				breakingJobSite = true;
+				System.out.println("Breaking job site...");
+				closeTradeScreen();
+				return;
+			}
+			
+			// lock in the trade, if enabled
+			if(lockInTrade.isChecked())
+			{
+				// select the first valid trade
+				tradeScreen.getScreenHandler().setRecipeIndex(0);
+				tradeScreen.getScreenHandler().switchTo(0);
+				MC.getNetworkHandler()
+					.sendPacket(new SelectMerchantTradeC2SPacket(0));
+				
+				// buy whatever the villager is selling
+				MC.interactionManager.clickSlot(
+					tradeScreen.getScreenHandler().syncId, 2, 0,
+					SlotActionType.PICKUP, MC.player);
+				
+				// close the trade screen
+				closeTradeScreen();
+			}
+			
+			// update wanted books based on the user's settings
+			updateBooks.getSelected().update(wantedBooks, bookOffer);
+		}else
+		{
+			if(!(MC.currentScreen instanceof MerchantScreen tradeScreen))
+			{
+				openTradeScreen();
+				return;
+			}
+			int experience = tradeScreen.getScreenHandler().getExperience();
+			if(experience > 0)
+			{
+				ChatUtils.warning("Villager at "
+					+ villager.getBlockPos().toShortString()
+					+ " is already experienced, meaning it can't be trained anymore.");
+				ChatUtils.message("Looking for another villager...");
+				experiencedVillagers.add(villager);
+				villager = null;
+				jobSite = null;
+				closeTradeScreen();
+				return;
+			}
+			
+			BookOffer bookOffer = findEnchantedBookOffer(
+				tradeScreen.getScreenHandler().getRecipes());
+			
+			if(bookOffer == null)
+			{
+				ChatUtils.message("Villager is not selling an enchanted book.");
+				FabricTradeCyclingClientMod.sendCycleTradesPacket();
+				return;
+			}
+			ChatUtils.message(
+				"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
+					+ " for " + bookOffer.getFormattedPrice() + ".");
+			
+			// if wrong enchantment, refresh and start over
+			if(!wantedBooks.isWanted(bookOffer))
+			{
+				FabricTradeCyclingClientMod.sendCycleTradesPacket();
+				return;
+			}
+			
+			if(lockInTrade.isChecked())
+			{
+				// select the first valid trade
+				tradeScreen.getScreenHandler().setRecipeIndex(0);
+				tradeScreen.getScreenHandler().switchTo(0);
+				MC.getNetworkHandler()
+					.sendPacket(new SelectMerchantTradeC2SPacket(0));
+				
+				// buy whatever the villager is selling
+				MC.interactionManager.clickSlot(
+					tradeScreen.getScreenHandler().syncId, 2, 0,
+					SlotActionType.PICKUP, MC.player);
+				
+				// close the trade screen
+				closeTradeScreen();
+			}
+			// update wanted books based on the user's settings
+			updateBooks.getSelected().update(wantedBooks, bookOffer);
 		}
-		
-		// update wanted books based on the user's settings
-		updateBooks.getSelected().update(wantedBooks, bookOffer);
-		
 		ChatUtils.message("Done!");
 		setEnabled(false);
+		
 	}
 	
 	private void breakJobSite()
@@ -556,4 +628,5 @@ public final class AutoLibrarianHack extends Hack
 		if(breakingJobSite)
 			overlay.render(matrixStack, partialTicks, jobSite);
 	}
+	
 }
