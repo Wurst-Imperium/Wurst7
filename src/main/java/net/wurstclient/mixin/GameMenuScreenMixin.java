@@ -78,7 +78,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		float v = 0;
 		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
 	}
-
+	
 	private void addWurstOptionsButton()
 	{
 		List<ClickableWidget> buttons = Screens.getButtons(this);
