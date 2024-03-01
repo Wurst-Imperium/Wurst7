@@ -68,7 +68,8 @@ public class DisconnectedScreenMixin extends Screen
 			return;
 		}
 		
-		addReconnectButtons();
+		if(WurstClient.INSTANCE.getHax().autoReconnectHack.shouldShowButtons())
+			addReconnectButtons();
 	}
 	
 	private void addReconnectButtons()
