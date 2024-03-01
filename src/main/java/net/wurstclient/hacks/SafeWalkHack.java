@@ -21,6 +21,18 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"safe walk"})
 public final class SafeWalkHack extends Hack
 {
+	private final SliderSetting minDepth = new SliderSetting("Min depth",
+		"Won't sneak if it isn't at least this deep.\n"
+			+ "Increase to stop SafeWalk from stucking on stairs.\n"
+			+ "Decrease to make SafeWalk sneak even at the edge of carpets.",
+		2.0, 0.1, 10, 0.1, ValueDisplay.DECIMAL.withSuffix("m"));
+	
+	private final SliderSetting motionPrediction = new SliderSetting(
+		"Motion prediction",
+		"Predict your motion to sneak earlier.\n"
+			+ "If not stopping at edges, increase; If not stopping near a wall, decrease.",
+		2.0, 1, 5, 0.5, ValueDisplay.DECIMAL.withSuffix("x"));
+	
 	private final CheckboxSetting sneak =
 		new CheckboxSetting("Sneak at edges", "Visibly sneak at edges.", false);
 	
@@ -36,6 +48,8 @@ public final class SafeWalkHack extends Hack
 	{
 		super("SafeWalk");
 		setCategory(Category.MOVEMENT);
+		addSetting(minDepth);
+		addSetting(motionPrediction);
 		addSetting(sneak);
 		addSetting(edgeDistance);
 	}
@@ -54,8 +68,23 @@ public final class SafeWalkHack extends Hack
 			setSneaking(false);
 	}
 	
-	public void onClipAtLedge(boolean clipping)
+	public boolean shouldClip()
 	{
+		ClientPlayerEntity player = MC.player;
+		
+		Box box = player.getBoundingBox();
+		Box adjustedBox = box
+			.offset(player.getVelocity().multiply(motionPrediction.getValue()))
+			.stretch(0, -minDepth.getValue(), 0)
+			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
+		
+		return this.isEnabled() && MC.world.isSpaceEmpty(player, adjustedBox);
+	}
+	
+	public void onClipAtLedge()
+	{
+		boolean clipping = false;
+		
 		ClientPlayerEntity player = MC.player;
 		
 		if(!isEnabled() || !sneak.isChecked() || !player.isOnGround())
@@ -67,7 +96,7 @@ public final class SafeWalkHack extends Hack
 		}
 		
 		Box box = player.getBoundingBox();
-		Box adjustedBox = box.stretch(0, -player.stepHeight, 0)
+		Box adjustedBox = box.stretch(0, -minDepth.getValue(), 0)
 			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
 		if(MC.world.isSpaceEmpty(player, adjustedBox))
