@@ -19,10 +19,16 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.util.EntityNbtProcessor;
 
 @SearchTags({"EasyElytra", "extra elytra", "easy elytra"})
 public final class ExtraElytraHack extends Hack implements UpdateListener
 {
+	private final CheckboxSetting trinketsSupport = new CheckboxSetting(
+		"Trinkets support", "Check for trinkets \"back\" slot.\n"
+			+ "Involves in NBT processing, may affect performance.",
+		false);
+	
 	private final CheckboxSetting instantFly = new CheckboxSetting(
 		"Instant fly", "Jump to fly, no weird double-jump needed!", true);
 	
@@ -71,8 +77,25 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(jumpTimer > 0)
 			jumpTimer--;
 		
+		boolean elytraEquipped = false;
+		
 		ItemStack chest = MC.player.getEquippedStack(EquipmentSlot.CHEST);
-		if(chest.getItem() != Items.ELYTRA)
+		if(chest.getItem() == Items.ELYTRA)
+			elytraEquipped = true;
+		
+		if(trinketsSupport.isChecked())
+		{
+			EntityNbtProcessor processor = new EntityNbtProcessor(MC.player);
+			String capeItemName = (String)processor
+				.compound("cardinal_components").compound("trinkets:trinkets")
+				.compound("chest").compound("cape")
+				.list("Items", EntityNbtProcessor.NbtType.COMPOUND).at(0)
+				.string("id").value();
+			if(capeItemName.equals("minecraft:elytra"))
+				elytraEquipped = true;
+		}
+		
+		if(!elytraEquipped)
 			return;
 		
 		if(MC.player.isFallFlying())
