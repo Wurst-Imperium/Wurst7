@@ -8,6 +8,7 @@ accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
+accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBindingEntry	bindingName	Lnet/minecraft/text/Text;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
 accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastPitch	F
