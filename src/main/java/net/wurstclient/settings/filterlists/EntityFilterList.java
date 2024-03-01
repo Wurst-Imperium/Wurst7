@@ -72,6 +72,7 @@ public class EntityFilterList
 			FilterBabiesSetting.genericCombat(false),
 			FilterBatsSetting.genericCombat(false),
 			FilterSlimesSetting.genericCombat(false),
+			FilterHoglinsSetting.genericCombat(false),
 			FilterPetsSetting.genericCombat(false),
 			FilterVillagersSetting.genericCombat(false),
 			FilterZombieVillagersSetting.genericCombat(false),
