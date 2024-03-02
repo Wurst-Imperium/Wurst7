@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,7 +58,7 @@ public enum WurstClient
 	public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.41";
+	public static final String VERSION = "7.41.1";
 	public static final String MC_VERSION = "1.20.4";
 	
 	private WurstAnalytics analytics;
@@ -175,18 +176,29 @@ public enum WurstClient
 		return wurstFolder;
 	}
 	
-	public String translate(String key)
+	public String translate(String key, Object... args)
 	{
 		if(otfs.translationsOtf.getForceEnglish().isChecked())
-			return ILanguageManager.getEnglish().get(key);
+		{
+			String string = ILanguageManager.getEnglish().get(key);
 			
+			try
+			{
+				return String.format(string, args);
+				
+			}catch(IllegalFormatException e)
+			{
+				return key;
+			}
+		}
+		
 		// This extra check is necessary because I18n.translate() doesn't
 		// always return the key when the translation is missing. If the key
 		// contains a '%', it will return "Format Error: key" instead.
 		if(!I18n.hasTranslation(key))
 			return key;
 		
-		return I18n.translate(key);
+		return I18n.translate(key, args);
 	}
 	
 	public WurstAnalytics getAnalytics()
