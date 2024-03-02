@@ -24,7 +24,7 @@ public class MurderMysteryCmd extends Command
 			stat();
 			return;
 		}
-
+		
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
