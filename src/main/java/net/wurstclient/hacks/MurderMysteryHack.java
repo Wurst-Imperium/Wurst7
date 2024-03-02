@@ -94,7 +94,7 @@ public final class MurderMysteryHack extends Hack
 	{
 		String s = murderers.stream().map(m -> m.getName().getString())
 			.collect(Collectors.joining(", "));
-		return "§cMurders:§r " + (s.isEmpty() ? "§o<Empty>§r" : s);
+		return "§cMurderers:§r " + (s.isEmpty() ? "§o<Empty>§r" : s);
 	}
 	
 	private final ArrayList<PlayerEntity> detectives = new ArrayList<>();

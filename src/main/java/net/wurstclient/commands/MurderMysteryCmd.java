@@ -11,7 +11,7 @@ public class MurderMysteryCmd extends Command
 	public MurderMysteryCmd()
 	{
 		super("mm",
-			"Manages current MurderMystery session statistics and information about detected murders and detectives.",
+			"Manages current MurderMystery session statistics and information about detected murderers and detectives.",
 			"", "Statistics: .mm [stat]",
 			"Clear list(-s): .mm clear [all|m|d]");
 	}
