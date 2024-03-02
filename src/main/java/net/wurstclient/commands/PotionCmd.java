@@ -8,14 +8,13 @@
 package net.wurstclient.commands;
 
 import java.util.List;
-
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -97,7 +96,7 @@ public final class PotionCmd extends Command
 	{
 		NbtList nbt = new NbtList();
 		List<StatusEffectInstance> effects =
-			PotionUtil.getCustomPotionEffects(stack);
+			PotionContentsComponent.getCustomPotionEffects(stack);
 		
 		for(StatusEffectInstance effect : effects)
 		{
@@ -123,7 +122,7 @@ public final class PotionCmd extends Command
 		String id = parseEffectId(args[1]);
 		
 		List<StatusEffectInstance> oldEffects =
-			PotionUtil.getCustomPotionEffects(stack);
+			PotionContentsComponent.getCustomPotionEffects(stack);
 		
 		NbtList newEffects = new NbtList();
 		for(StatusEffectInstance oldEffect : oldEffects)

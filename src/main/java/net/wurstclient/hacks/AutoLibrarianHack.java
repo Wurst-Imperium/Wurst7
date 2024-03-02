@@ -428,7 +428,7 @@ public final class AutoLibrarianHack extends Hack
 			NbtList bookNbt = EnchantedBookItem.getEnchantmentNbt(stack);
 			String enchantment = bookNbt.getCompound(0).getString("id");
 			int level = bookNbt.getCompound(0).getInt("lvl");
-			int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
+			int price = tradeOffer.getDisplayedFirstBuyItem().getCount();
 			BookOffer bookOffer = new BookOffer(enchantment, level, price);
 			
 			if(!bookOffer.isValid())

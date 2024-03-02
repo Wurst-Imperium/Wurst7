@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -122,7 +122,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	private boolean hasEffect(ItemStack stack,
 		RegistryEntry<StatusEffect> effect)
 	{
-		for(StatusEffectInstance effectInstance : PotionUtil
+		for(StatusEffectInstance effectInstance : PotionContentsComponent
 			.getPotionEffects(stack))
 		{
 			if(effectInstance.getEffectType() != effect)
