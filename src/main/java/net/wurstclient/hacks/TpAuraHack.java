@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,11 +15,9 @@ import java.util.stream.Stream;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
@@ -127,11 +125,8 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// attack entity
-		RotationUtils.Rotation rotations = RotationUtils
-			.getNeededRotations(entity.getBoundingBox().getCenter());
-		WurstClient.MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(rotations.getYaw(),
-				rotations.getPitch(), MC.player.isOnGround()));
+		RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter())
+			.sendPlayerLookPacket();
 		
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, entity);
