@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -22,14 +23,13 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.*;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,15 +43,18 @@ public final class MurderMysteryHack extends Hack
 		"How large the texture indicators above players heads should be.", 1,
 		0.5, 2, 0.01, SliderSetting.ValueDisplay.PERCENTAGE);
 	
-	private final TextFieldSetting murdererItems = new TextFieldSetting(
-		"List of murderer's items",
-		"A space-separated string of Minecraft item IDs (without specifying the 'minecraft:' namespace) which describes all possible items that murderer can use as a sword.",
-		"wooden_sword stone_sword iron_sword diamond_sword golden_sword netherite_sword shears");
+	private final ItemListSetting murdererItemsList =
+		new ItemListSetting("List of murderer's items",
+			"All possible items that murderer can use as a sword.",
+			"minecraft:wooden_sword", "minecraft:stone_sword",
+			"minecraft:iron_sword", "minecraft:diamond_sword",
+			"minecraft:golden_sword", "minecraft:netherite_sword",
+			"minecraft:shears");
 	
-	private final TextFieldSetting detectiveItems = new TextFieldSetting(
-		"List of detective's items",
-		"A space-separated string of Minecraft item IDs (without specifying the 'minecraft:' namespace) which describes all possible items that detective can use as a bow.",
-		"bow crossbow");
+	private final ItemListSetting detectiveItemsList =
+		new ItemListSetting("List of detective's items",
+			"All possible items that detective can use as a bow.",
+			"minecraft:bow", "minecraft:crossbow");
 	
 	private final CheckboxSetting showSwordIndicators = new CheckboxSetting(
 		"Show sword indicators",
@@ -124,8 +127,8 @@ public final class MurderMysteryHack extends Hack
 		super("MurderMystery");
 		setCategory(Category.RENDER);
 		addSetting(scale);
-		addSetting(murdererItems);
-		addSetting(detectiveItems);
+		addSetting(murdererItemsList);
+		addSetting(detectiveItemsList);
 		addSetting(showSwordIndicators);
 		addSetting(showBowIndicators);
 		addSetting(reportMurderers);
@@ -284,14 +287,15 @@ public final class MurderMysteryHack extends Hack
 			if(pair.getFirst() != EquipmentSlot.MAINHAND)
 				continue;
 			
-			Item item = pair.getSecond().getItem();
 			for(PlayerEntity pe : players)
 			{
 				if(pe.getId() != equip.getId())
 					continue;
 				
-				if(Arrays.asList(murdererItems.getValue().strip().split("\\s+"))
-					.contains(item.toString()))
+				Item item = pair.getSecond().getItem();
+				String itemName = Registries.ITEM.getId(item).toString();
+				
+				if(murdererItemsList.getItemNames().contains(itemName))
 				{
 					if(murderers.contains(pe))
 						break;
@@ -302,9 +306,7 @@ public final class MurderMysteryHack extends Hack
 					break;
 				}
 				
-				if(Arrays
-					.asList(detectiveItems.getValue().strip().split("\\s+"))
-					.contains(item.toString()))
+				if(detectiveItemsList.getItemNames().contains(itemName))
 				{
 					if(detectives.contains(pe))
 						break;
