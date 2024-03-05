@@ -7,13 +7,19 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -104,25 +110,24 @@ public final class TrollPotionHack extends Hack
 		{
 			ItemStack stack = new ItemStack(item);
 			
-			NbtList effects = new NbtList();
+			ArrayList<StatusEffectInstance> effects = new ArrayList<>();
 			for(int i = 1; i <= 23; i++)
 			{
-				String id = Registries.STATUS_EFFECT.getEntry(i).get().getKey()
-					.get().getValue().toString();
+				StatusEffect effect =
+					Registries.STATUS_EFFECT.getEntry(i).get().value();
+				RegistryEntry<StatusEffect> entry =
+					Registries.STATUS_EFFECT.getEntry(effect);
 				
-				NbtCompound effect = new NbtCompound();
-				effect.putInt("amplifier", Integer.MAX_VALUE);
-				effect.putInt("duration", Integer.MAX_VALUE);
-				effect.putString("id", id);
-				effects.add(effect);
+				effects.add(new StatusEffectInstance(entry, Integer.MAX_VALUE,
+					Integer.MAX_VALUE));
 			}
 			
-			NbtCompound nbt = new NbtCompound();
-			nbt.put("custom_potion_effects", effects);
-			stack.setNbt(nbt);
+			stack.set(DataComponentTypes.POTION_CONTENTS,
+				new PotionContentsComponent(Optional.empty(), Optional.empty(),
+					effects));
 			
 			String name = "\u00a7f" + itemName + " of Trolling";
-			stack.setCustomName(Text.literal(name));
+			stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name));
 			
 			return stack;
 		}
