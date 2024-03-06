@@ -65,8 +65,7 @@ public enum ItemUtils
 				AttributeModifiersComponent.DEFAULT)
 			.modifiers().stream()
 			.filter(modifier -> modifier.attribute() == attribute)
-			.mapToDouble(modifier -> modifier.modifier().getValue())
-			.findFirst();
+			.mapToDouble(modifier -> modifier.modifier().value()).findFirst();
 	}
 	
 	public static boolean hasEffect(ItemStack stack,
