@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +26,6 @@ import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
-import net.minecraft.client.session.ProfileKeysImpl;
 import net.minecraft.client.session.Session;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -57,7 +55,7 @@ public abstract class MinecraftClientMixin
 	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
-	private ProfileKeysImpl wurstProfileKeys;
+	private ProfileKeys wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
@@ -180,8 +178,7 @@ public abstract class MinecraftClientMixin
 		
 		UserApiService userApiService = authenticationService
 			.createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getUuidOrNull();
 		wurstProfileKeys =
-			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
+			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}
 }
