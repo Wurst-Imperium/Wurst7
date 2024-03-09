@@ -19,7 +19,7 @@ import net.wurstclient.settings.SliderSetting;
 public final class NoOverlayHack extends Hack
 {
 	private final SliderSetting fireOffSet =
-			new SliderSetting("Offset", "The amount to lower the fire overlay by.",
+			new SliderSetting("Offset", "The amount to lower the fire overlay.",
 					0.6, 0.01, 0.6, 0.01, SliderSetting.ValueDisplay.DECIMAL);
 
 	public final SliderSetting blockingOffset =
@@ -44,6 +44,11 @@ public final class NoOverlayHack extends Hack
 	// See CameraMixin.onGetSubmersionType() and
 	// InGameOverlayRendererMixin.onRenderUnderwaterOverlay()
 
+	public float getOverlayOffset()
+	{
+		return isEnabled() ? this.fireOffSet.getValueF() : 0;
+	}
+
 	public void adjustShieldPosition(MatrixStack matrixStack, boolean blocking)
 	{
 		if(!isEnabled())
@@ -54,10 +59,4 @@ public final class NoOverlayHack extends Hack
 		else
 			matrixStack.translate(0, -this.nonBlockingOffset.getValue(), 0);
 	}
-
-	public float getOverlayOffset()
-	{
-		return isEnabled() ? this.fireOffSet.getValueF() : 0;
-	}
-
 }
