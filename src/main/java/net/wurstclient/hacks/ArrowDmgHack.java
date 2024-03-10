@@ -26,12 +26,12 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 {
 	private final SliderSetting packets = new SliderSetting("Packets",
-		"description.wurst.setting.arrowdmg.packets", 200, 2, 7000, 20,
+		"wurst.hack.arrowdmg.setting.packets.description", 200, 2, 7000, 20,
 		ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting yeetTridents =
 		new CheckboxSetting("Trident yeet mode",
-			"description.wurst.setting.arrowdmg.trident_yeet_mode", false);
+			"wurst.hack.arrowdmg.setting.trident_yeet_mode.description", false);
 	
 	public ArrowDmgHack()
 	{

@@ -150,7 +150,7 @@ public enum WurstClient
 		Path encFolder = Encryption.chooseEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
 		
-		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
+		zoomKey = new KeyBinding("wurst.key.zoom", InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, KeyBinding.MISC_CATEGORY);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
@@ -185,20 +185,40 @@ public enum WurstClient
 			try
 			{
 				return String.format(string, args);
-				
 			}catch(IllegalFormatException e)
 			{
 				return key;
 			}
 		}
 		
-		// This extra check is necessary because I18n.translate() doesn't
+		// This extra check is necessary because `I18n.translate()` doesn't
 		// always return the key when the translation is missing. If the key
 		// contains a '%', it will return "Format Error: key" instead.
+		// But after implementing `LocalesGenerator`, which will be run every
+		// build for filling missing values with `DEFAULT_UNTRANSLATED_VALUE` in
+		// all locales depending on `DEFAULT_LOCALE` file, this will probably
+		// never be `true`.
 		if(!I18n.hasTranslation(key))
 			return key;
 		
-		return I18n.translate(key, args);
+		String translated = I18n.translate(key, args);
+		
+		if(!translated
+			.equals(LocalesGenerator.Settings.DEFAULT_UNTRANSLATED_VALUE))
+			return translated;
+		
+		if(!otfs.translationsOtf.getFallbackToEnglish().isChecked())
+			return key;
+		
+		String string = ILanguageManager.getEnglish().get(key);
+		
+		try
+		{
+			return String.format(string, args);
+		}catch(IllegalFormatException e)
+		{
+			return key;
+		}
 	}
 	
 	public WurstAnalytics getAnalytics()

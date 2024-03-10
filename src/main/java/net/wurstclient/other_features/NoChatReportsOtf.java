@@ -43,7 +43,7 @@ public final class NoChatReportsOtf extends OtherFeature
 	
 	public NoChatReportsOtf()
 	{
-		super("NoChatReports", "description.wurst.other_feature.nochatreports");
+		super("NoChatReports", "wurst.other_feature.nochatreports.description");
 		addSetting(disableSignatures);
 		
 		ClientLoginConnectionEvents.INIT.register(this::onLoginStart);
@@ -89,7 +89,7 @@ public final class NoChatReportsOtf extends OtherFeature
 		return new MessageIndicator(0xE84F58, Icon.CHAT_MODIFIED,
 			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - "
 				+ WURST.translate(
-					"description.wurst.nochatreports.message_is_reportable")),
+					"wurst.nochatreports.message_is_reportable.description")),
 			"Reportable");
 	}
 	
@@ -107,7 +107,7 @@ public final class NoChatReportsOtf extends OtherFeature
 	@Override
 	public String getPrimaryAction()
 	{
-		return WURST.translate("button.wurst.nochatreports."
+		return WURST.translate("wurst.nochatreports.button."
 			+ (isEnabled() ? "re-enable_signatures" : "disable_signatures"));
 	}
 	
