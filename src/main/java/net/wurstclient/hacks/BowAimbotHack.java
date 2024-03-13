@@ -182,7 +182,7 @@ public final class BowAimbotHack extends Hack
 		float velocityPow4 = velocitySq * velocitySq;
 		float a = velocityPow4 - g * (g * hDistanceSq + 2F * (float)posY * velocitySq);
 		float neededPitch = (float)-Math.toDegrees(Math.atan((velocitySq - Math
-			.sqrt(Math.max(a, 0F)) / (g * hDistance)));
+			.sqrt(Math.max(a, 0F))) / (g * hDistance)));
 		
 		// set pitch
 		MC.player.setPitch(neededPitch);
