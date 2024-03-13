@@ -155,6 +155,8 @@ public final class BowAimbotHack extends Hack
 		velocity = (velocity * velocity + velocity * 2) / 3;
 		if(velocity > 1)
 			velocity = 1;
+		if(velocity < 0.1F)
+			return;
 		
 		// set position to aim at
 		double d = RotationUtils.getEyesPos().distanceTo(
@@ -178,16 +180,12 @@ public final class BowAimbotHack extends Hack
 		float g = 0.006F;
 		float velocitySq = velocity * velocity;
 		float velocityPow4 = velocitySq * velocitySq;
+		float a = velocityPow4 - g * (g * hDistanceSq + 2F * (float)posY * velocitySq);
 		float neededPitch = (float)-Math.toDegrees(Math.atan((velocitySq - Math
-			.sqrt(velocityPow4 - g * (g * hDistanceSq + 2 * posY * velocitySq)))
-			/ (g * hDistance)));
+			.sqrt(Math.max(a, 0F)) / (g * hDistance)));
 		
 		// set pitch
-		if(Float.isNaN(neededPitch))
-			WURST.getRotationFaker()
-				.faceVectorClient(target.getBoundingBox().getCenter());
-		else
-			MC.player.setPitch(neededPitch);
+		MC.player.setPitch(neededPitch);
 	}
 	
 	private Entity filterEntities(Stream<Entity> s)
