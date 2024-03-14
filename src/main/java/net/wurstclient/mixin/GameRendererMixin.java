@@ -77,8 +77,9 @@ public abstract class GameRendererMixin implements AutoCloseable
 	 * after the view-bobbing call.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "renderHand(Lnet/minecraft/client/render/Camera;F)V")
-	private void onRenderHand(Camera camera, float tickDelta, CallbackInfo ci)
+		method = "renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V")
+	private void onRenderHand(Camera camera, float tickDelta, Matrix4f matrix4f,
+		CallbackInfo ci)
 	{
 		cancelNextBobView = false;
 	}
