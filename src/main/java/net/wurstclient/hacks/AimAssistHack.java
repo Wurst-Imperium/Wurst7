@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
@@ -47,6 +48,16 @@ public final class AimAssistHack extends Hack
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight", "Won't aim at entities behind blocks.", true);
+	
+	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
+		"Attack while blocking",
+		"Allows attacking enemies even while you're using a shield or other items for defense. Normally, you can't attack in these situations, but this setting enables it, giving you more flexibility during combat.",
+		false);
+	
+	private final CheckboxSetting attackWhileBreaking = new CheckboxSetting(
+		"Attack while breaking",
+		"Allows attacking enemies while you're actively breaking blocks. Enable this to multitask during combat and mining activities.",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
@@ -90,6 +101,8 @@ public final class AimAssistHack extends Hack
 		addSetting(rotationSpeed);
 		addSetting(fov);
 		addSetting(checkLOS);
+		addSetting(attackWhileBlocking);
+		addSetting(attackWhileBreaking);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -127,6 +140,14 @@ public final class AimAssistHack extends Hack
 		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
+		ClientPlayerEntity player = MC.player;
+		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+			return;
+		// isUsingItem() doesnt work if we are breaking blocks make another
+		// method to check if we are breaking blocks
+		if(MC.interactionManager.isBreakingBlock()
+			&& !attackWhileBreaking.isChecked())
+			return;
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
@@ -157,6 +178,7 @@ public final class AimAssistHack extends Hack
 	
 	private boolean faceEntityClient(Entity entity)
 	{
+		
 		// get needed rotation
 		Box box = entity.getBoundingBox();
 		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
@@ -180,8 +202,14 @@ public final class AimAssistHack extends Hack
 	{
 		if(target == null)
 			return;
-			
+		
+		ClientPlayerEntity player = MC.player;
+		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+			return;
 		// Not actually rendering anything, just using this method to rotate
+		if(MC.interactionManager.isBreakingBlock()
+			&& !attackWhileBreaking.isChecked())
+			return;
 		// more smoothly.
 		float oldYaw = MC.player.prevYaw;
 		float oldPitch = MC.player.prevPitch;
