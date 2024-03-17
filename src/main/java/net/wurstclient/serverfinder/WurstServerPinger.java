@@ -68,11 +68,6 @@ public class WurstServerPinger
 		return !failed;
 	}
 	
-	public boolean isOtherVersion()
-	{
-		return server.protocolVersion != 47;
-	}
-	
 	public String getServerIP()
 	{
 		return server.address;
