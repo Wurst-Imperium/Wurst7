@@ -323,6 +323,9 @@ public class SliderSetting extends Setting implements SliderLock
 		
 		public static final ValueDisplay DEGREES = INTEGER.withSuffix("\u00b0");
 		
+		public static final ValueDisplay ROUNDING_PRECISION =
+			v -> (int)v == 0 ? "1" : "0." + "0".repeat((int)v - 1) + "1";
+		
 		public static final ValueDisplay NONE = v -> "";
 		
 		public String getValueString(double value);

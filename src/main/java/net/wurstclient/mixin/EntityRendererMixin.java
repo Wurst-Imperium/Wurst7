@@ -23,6 +23,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
@@ -44,7 +45,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		// add HealthTags info
 		if(entity instanceof LivingEntity)
 			text = WurstClient.INSTANCE.getHax().healthTagsHack
-				.addHealth((LivingEntity)entity, text);
+				.addHealth((LivingEntity)entity, (MutableText)text);
 		
 		// do NameTags adjustments
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
