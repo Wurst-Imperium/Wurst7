@@ -35,7 +35,7 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+
 	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
 	// which uses javax.annotation.concurrent.Immutable, which is part of
 	// the JSR305 library.
@@ -51,7 +51,7 @@ loom {
 
 processResources {
 	inputs.property "version", project.version
-	
+
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
@@ -92,7 +92,7 @@ publishing {
 			from components.java
 		}
 	}
-	
+
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
 		// Add repositories to publish to here.
@@ -121,13 +121,13 @@ task github(dependsOn: moveDevLibs) {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
 		def ghVersion = version.substring(0, version.indexOf("-"))
-		
+
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
 			ghRelease = releaseBuilder.create()
 		}
-		
+
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
