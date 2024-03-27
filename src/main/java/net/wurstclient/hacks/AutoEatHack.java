@@ -16,6 +16,9 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
+import net.minecraft.component.type.FoodComponent.StatusEffectEntry;
+import net.minecraft.component.type.FoodComponents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
@@ -23,9 +26,6 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.FoodComponent.StatusEffectEntry;
-import net.minecraft.item.FoodComponents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.hit.BlockHitResult;
@@ -230,7 +230,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			if(!isAllowedFood(food))
 				continue;
 			
-			if(maxPoints >= 0 && food.hunger() > maxPoints)
+			if(maxPoints >= 0 && food.nutrition() > maxPoints)
 				continue;
 			
 			// compare to previously found food
@@ -274,7 +274,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(!allowChorus.isChecked() && food == FoodComponents.CHORUS_FRUIT)
 			return false;
 		
-		for(StatusEffectEntry entry : food.statusEffects())
+		for(StatusEffectEntry entry : food.effects())
 		{
 			RegistryEntry<StatusEffect> effect = entry.effect().getEffectType();
 			
