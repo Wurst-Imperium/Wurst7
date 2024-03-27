@@ -44,16 +44,16 @@ public final class NcrModRequiredScreen extends Screen
 	public NcrModRequiredScreen(Screen prevScreen)
 	{
 		super(Text.literal(ChatUtils.WURST_PREFIX + WurstClient.INSTANCE
-			.translate("gui.wurst.nochatreports.ncr_mod_server.title")));
+			.translate("wurst.nochatreports.gui.ncr_mod_server.title")));
 		this.prevScreen = prevScreen;
 		
 		reason = Text.literal(WurstClient.INSTANCE
-			.translate("gui.wurst.nochatreports.ncr_mod_server.message"));
+			.translate("wurst.nochatreports.gui.ncr_mod_server.message"));
 		
 		OtfList otfs = WurstClient.INSTANCE.getOtfs();
 		
 		sigButtonMsg = () -> WurstClient.INSTANCE
-			.translate("button.wurst.nochatreports.signatures_status")
+			.translate("wurst.nochatreports.button.signatures_status")
 			+ blockedOrAllowed(otfs.noChatReportsOtf.isEnabled());
 		
 		vsButtonMsg =
@@ -69,7 +69,7 @@ public final class NcrModRequiredScreen extends Screen
 	private String blockedOrAllowed(boolean blocked)
 	{
 		return WurstClient.INSTANCE.translate(
-			"gui.wurst.generic.allcaps_" + (blocked ? "blocked" : "allowed"));
+			"wurst.generic.gui.allcaps_" + (blocked ? "blocked" : "allowed"));
 	}
 	
 	@Override

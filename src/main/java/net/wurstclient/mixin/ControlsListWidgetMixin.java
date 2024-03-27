@@ -49,7 +49,7 @@ public abstract class ControlsListWidgetMixin
 			.getContent() instanceof TranslatableTextContent trContent))
 			return original.call(instance, entry);
 		
-		if(!"key.wurst.zoom".equals(trContent.getKey()))
+		if(!"wurst.key.zoom".equals(trContent.getKey()))
 			return original.call(instance, entry);
 		
 		return 0;

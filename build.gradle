@@ -49,7 +49,20 @@ loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }
 
+task localesGenerate(dependsOn: compileJava) {
+	description = "Generate JSON translation files (locales)"
+	doLast {
+		javaexec {
+			classpath = sourceSets.main.runtimeClasspath
+			mainClass = "net.wurstclient.LocalesGenerator"
+			jvmArgs = ["-Dfile.encoding=UTF-8"]
+		}
+	}
+}
+
 processResources {
+	dependsOn("localesGenerate")
+
 	inputs.property "version", project.version
 	
 	filesMatching("fabric.mod.json") {
