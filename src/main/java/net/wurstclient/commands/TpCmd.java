@@ -45,7 +45,7 @@ public final class TpCmd extends Command
 		if(disableFreecam.isChecked() && WURST.getHax().freecamHack.isEnabled())
 			WURST.getHax().freecamHack.setEnabled(false);
 		
-		MC.player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		MC.player.setPosition(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -89,15 +89,18 @@ public final class TpCmd extends Command
 		int[] pos = new int[3];
 		
 		for(int i = 0; i < 3; i++)
-			if(MathUtils.isInteger(xyz[i]))
-				pos[i] = Integer.parseInt(xyz[i]);
-			else if(xyz[i].equals("~"))
-				pos[i] = player[i];
-			else if(xyz[i].startsWith("~")
-				&& MathUtils.isInteger(xyz[i].substring(1)))
-				pos[i] = player[i] + Integer.parseInt(xyz[i].substring(1));
-			else
-				throw new CmdSyntaxError("Invalid coordinates.");
+		if(MathUtils.isInteger(xyz[i]))
+			pos[i] = Integer.parseInt(xyz[i]);
+	        if (MathUtils.isDouble(xyz[i]))
+			pos[i] = Double.parseDouble(xyz[i]);
+ 		else if(xyz[i].equals("~"))
+			pos[i] = player[i];
+		else if(xyz[i].startsWith("~") && MathUtils.isInteger(xyz[i].substring(1)))
+			pos[i] = player[i] + Integer.parseInt(xyz[i].substring(1));
+		else if (xyz[i].startsWith("~") && MathUtils.isDouble(xyz[i].substring(1)))
+			pos[i] = player[i] + Double.parseDouble(xyz[i].substring(1));
+		else
+			throw new CmdSyntaxError("Invalid coordinates.");
 			
 		return new BlockPos(pos[0], pos[1], pos[2]);
 	}
