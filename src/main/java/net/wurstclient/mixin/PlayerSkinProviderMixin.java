@@ -7,8 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,19 +16,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.texture.PlayerSkinProvider.Textures;
 import net.minecraft.client.util.SkinTextures;
+import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 @Mixin(PlayerSkinProvider.class)
 public abstract class PlayerSkinProviderMixin
 {
-	private static JsonObject capes;
+	private static HashMap<String, String> capes;
 	private MinecraftProfileTexture currentCape;
 	
 	@Inject(at = @At("HEAD"),
@@ -45,14 +44,14 @@ public abstract class PlayerSkinProviderMixin
 			if(capes == null)
 				setupWurstCapes();
 			
-			if(capes.has(name))
+			if(capes.containsKey(name))
 			{
-				String capeURL = capes.get(name).getAsString();
+				String capeURL = capes.get(name);
 				currentCape = new MinecraftProfileTexture(capeURL, null);
 				
-			}else if(capes.has(uuid))
+			}else if(capes.containsKey(uuid))
 			{
-				String capeURL = capes.get(uuid).getAsString();
+				String capeURL = capes.get(uuid);
 				currentCape = new MinecraftProfileTexture(capeURL, null);
 				
 			}else
@@ -86,12 +85,11 @@ public abstract class PlayerSkinProviderMixin
 	{
 		try
 		{
-			// TODO: download capes to file
-			URL url = new URL("https://www.wurstclient.net/api/v1/capes.json");
+			// download cape list from wurstclient.net
+			WsonObject rawCapes = JsonUtils.parseURLToObject(
+				"https://www.wurstclient.net/api/v1/capes.json");
 			
-			capes =
-				JsonParser.parseReader(new InputStreamReader(url.openStream()))
-					.getAsJsonObject();
+			capes = rawCapes.getAllStrings();
 			
 		}catch(Exception e)
 		{
