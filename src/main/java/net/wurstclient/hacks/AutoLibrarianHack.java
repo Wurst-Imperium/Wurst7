@@ -418,7 +418,7 @@ public final class AutoLibrarianHack extends Hack
 		for(TradeOffer tradeOffer : tradeOffers)
 		{
 			ItemStack stack = tradeOffer.getSellItem();
-			if(!(stack.getItem() instanceof EnchantedBookItem book))
+			if(!(stack.getItem() instanceof EnchantedBookItem))
 				continue;
 			
 			NbtList enchantmentNbt = EnchantedBookItem.getEnchantmentNbt(stack);
