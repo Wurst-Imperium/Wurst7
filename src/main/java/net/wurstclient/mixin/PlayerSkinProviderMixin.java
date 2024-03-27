@@ -7,8 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
@@ -22,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecurePublicKeyException;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -35,6 +31,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 @Mixin(PlayerSkinProvider.class)
 public abstract class PlayerSkinProviderMixin
@@ -43,7 +41,7 @@ public abstract class PlayerSkinProviderMixin
 	@Final
 	private MinecraftSessionService sessionService;
 	
-	private static JsonObject capes;
+	private static HashMap<String, String> capes;
 	
 	@Inject(at = @At("HEAD"),
 		method = "loadSkin(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/texture/PlayerSkinProvider$SkinTextureAvailableCallback;Z)V",
@@ -116,14 +114,14 @@ public abstract class PlayerSkinProviderMixin
 			if(capes == null)
 				setupWurstCapes();
 			
-			if(capes.has(name))
+			if(capes.containsKey(name))
 			{
-				String capeURL = capes.get(name).getAsString();
+				String capeURL = capes.get(name);
 				map.put(Type.CAPE, new MinecraftProfileTexture(capeURL, null));
 				
-			}else if(capes.has(uuid))
+			}else if(capes.containsKey(uuid))
 			{
-				String capeURL = capes.get(uuid).getAsString();
+				String capeURL = capes.get(uuid);
 				map.put(Type.CAPE, new MinecraftProfileTexture(capeURL, null));
 			}
 			
@@ -140,12 +138,11 @@ public abstract class PlayerSkinProviderMixin
 	{
 		try
 		{
-			// TODO: download capes to file
-			URL url = new URL("https://www.wurstclient.net/api/v1/capes.json");
+			// download cape list from wurstclient.net
+			WsonObject rawCapes = JsonUtils.parseURLToObject(
+				"https://www.wurstclient.net/api/v1/capes.json");
 			
-			capes =
-				JsonParser.parseReader(new InputStreamReader(url.openStream()))
-					.getAsJsonObject();
+			capes = rawCapes.getAllStrings();
 			
 		}catch(Exception e)
 		{
