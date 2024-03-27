@@ -61,14 +61,17 @@ public final class PotionCmd extends Command
 		
 		// get effects to start with
 		ArrayList<StatusEffectInstance> effects;
+		Potion potion;
 		switch(args[0].toLowerCase())
 		{
 			case "add":
 			effects = new ArrayList<>(PotionUtil.getCustomPotionEffects(stack));
+			potion = PotionUtil.getPotion(stack);
 			break;
 			
 			case "set":
 			effects = new ArrayList<>();
+			potion = Potions.EMPTY;
 			break;
 			
 			default:
@@ -85,6 +88,7 @@ public final class PotionCmd extends Command
 			effects.add(new StatusEffectInstance(effect, duration, amplifier));
 		}
 		
+		PotionUtil.setPotion(stack, potion);
 		setCustomPotionEffects(stack, effects);
 		ChatUtils.message("Potion modified.");
 	}
