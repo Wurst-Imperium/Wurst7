@@ -8,9 +8,12 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.item.*;
+import net.wurstclient.settings.CheckboxSetting;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -61,7 +64,13 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		new FilterSleepingSetting("Won't show sleeping players.", false),
 		new FilterInvisibleSetting("Won't show invisible players.", false));
 	
+	private final CheckboxSetting markTeammates = new CheckboxSetting(
+		"Mark teammates",
+		"Uses light blue color to mark players with at least one matching dyed armor piece.",
+		true);
+	
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
+	private final HashSet<Integer> armorColors = new HashSet<>();
 	
 	public PlayerEspHack()
 	{
@@ -70,6 +79,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		
 		addSetting(style);
 		addSetting(boxSize);
+		addSetting(markTeammates);
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -105,6 +115,18 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		stream = entityFilters.applyTo(stream);
 		
 		players.addAll(stream.collect(Collectors.toList()));
+		
+		armorColors.clear();
+		if(!markTeammates.isChecked())
+			return;
+		
+		for(ItemStack s : player.getArmorItems())
+		{
+			Item item = s.getItem();
+			if(item instanceof DyeableArmorItem)
+				armorColors.add(((DyeableArmorItem)item).getColor(s));
+		}
+		armorColors.remove(DyeableArmorItem.DEFAULT_COLOR);
 	}
 	
 	@Override
@@ -162,6 +184,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			// set color
 			if(WURST.getFriends().contains(e.getName().getString()))
 				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
+			else if(isInTeam(e))
+				RenderSystem.setShaderColor(0.4F, 0.7F, 1, 0.5F);
 			else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
@@ -204,7 +228,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				r = 0;
 				g = 0;
 				b = 1;
-				
+			}else if(isInTeam(e))
+			{
+				r = 0.4F;
+				g = 0.7F;
+				b = 1;
 			}else
 			{
 				float f = MC.player.distanceTo(e) / 20F;
@@ -223,5 +251,21 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 		
 		tessellator.draw();
+	}
+	
+	private boolean isInTeam(PlayerEntity otherPlayer)
+	{
+		if(armorColors.isEmpty() || !markTeammates.isChecked())
+			return false;
+		
+		for(ItemStack s : otherPlayer.getArmorItems())
+		{
+			Item item = s.getItem();
+			if(item instanceof DyeableArmorItem
+				&& armorColors.contains(((DyeableArmorItem)item).getColor(s)))
+				return true;
+		}
+		
+		return false;
 	}
 }
