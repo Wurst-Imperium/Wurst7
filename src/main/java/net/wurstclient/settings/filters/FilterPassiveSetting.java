@@ -10,6 +10,7 @@ package net.wurstclient.settings.filters;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.Angerable;
+import net.minecraft.entity.mob.Hoglin;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PufferfishEntity;
@@ -28,7 +29,8 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 	public boolean test(Entity e)
 	{
 		// never filter out neutral mobs (including pufferfish)
-		if(e instanceof Angerable || e instanceof PufferfishEntity)
+		// never hoglins, too!
+		if (e instanceof Angerable || e instanceof PufferfishEntity || e instanceof Hoglin)
 			return true;
 		
 		return !(e instanceof AnimalEntity || e instanceof AmbientEntity
