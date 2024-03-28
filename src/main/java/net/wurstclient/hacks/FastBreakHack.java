@@ -94,6 +94,9 @@ public final class FastBreakHack extends Hack
 			return;
 		
 		BlockPos blockPos = event.getBlockPos();
+		if(MC.world.getBlockState(blockPos).getBlock().getHardness() < 0)
+			return;
+		
 		if(!blockPos.equals(lastBlockPos))
 		{
 			lastBlockPos = blockPos;
