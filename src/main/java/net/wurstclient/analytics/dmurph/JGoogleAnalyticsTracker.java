@@ -30,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.SocketAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -532,7 +533,7 @@ public class JGoogleAnalyticsTracker
 	{
 		try
 		{
-			URL url = new URL(argURL);
+			URL url = URI.create(argURL).toURL();
 			HttpURLConnection connection =
 				(HttpURLConnection)url.openConnection(proxy);
 			connection.setRequestMethod("GET");
