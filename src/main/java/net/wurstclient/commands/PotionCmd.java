@@ -7,15 +7,15 @@
  */
 package net.wurstclient.commands;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
+import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -60,15 +60,18 @@ public final class PotionCmd extends Command
 			throw new CmdSyntaxError();
 		
 		// get effects to start with
-		NbtList effects;
+		ArrayList<StatusEffectInstance> effects;
+		Potion potion;
 		switch(args[0].toLowerCase())
 		{
 			case "add":
-			effects = convertEffectsToNbt(stack);
+			effects = new ArrayList<>(PotionUtil.getCustomPotionEffects(stack));
+			potion = PotionUtil.getPotion(stack);
 			break;
 			
 			case "set":
-			effects = new NbtList();
+			effects = new ArrayList<>();
+			potion = Potions.EMPTY;
 			break;
 			
 			default:
@@ -78,40 +81,16 @@ public final class PotionCmd extends Command
 		// add new effects
 		for(int i = 0; i < (args.length - 1) / 3; i++)
 		{
-			NbtCompound effect = new NbtCompound();
+			StatusEffect effect = parseEffect(args[1 + i * 3]);
+			int amplifier = parseInt(args[2 + i * 3]) - 1;
+			int duration = parseInt(args[3 + i * 3]) * 20;
 			
-			effect.putInt("id", parseEffectId(args[1 + i * 3]));
-			effect.putInt("amplifier", parseInt(args[2 + i * 3]) - 1);
-			effect.putInt("duration", parseInt(args[3 + i * 3]) * 20);
-			
-			effects.add(effect);
+			effects.add(new StatusEffectInstance(effect, duration, amplifier));
 		}
 		
-		NbtCompound nbt = new NbtCompound();
-		nbt.put("custom_potion_effects", effects);
-		stack.setNbt(nbt);
+		PotionUtil.setPotion(stack, potion);
+		setCustomPotionEffects(stack, effects);
 		ChatUtils.message("Potion modified.");
-	}
-	
-	private NbtList convertEffectsToNbt(ItemStack stack)
-	{
-		NbtList nbt = new NbtList();
-		List<StatusEffectInstance> effects =
-			PotionUtil.getCustomPotionEffects(stack);
-		
-		for(StatusEffectInstance effect : effects)
-		{
-			NbtCompound tag = new NbtCompound();
-			
-			int id = Registries.STATUS_EFFECT.getRawId(effect.getEffectType());
-			tag.putInt("id", id);
-			tag.putInt("amplifier", effect.getAmplifier());
-			tag.putInt("duration", effect.getDuration());
-			
-			nbt.add(tag);
-		}
-		
-		return nbt;
 	}
 	
 	private void remove(ItemStack stack, String[] args) throws CmdSyntaxError
@@ -119,56 +98,58 @@ public final class PotionCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		int id = parseEffectId(args[1]);
+		StatusEffect targetEffect = parseEffect(args[1]);
 		
-		List<StatusEffectInstance> oldEffects =
-			PotionUtil.getCustomPotionEffects(stack);
+		Potion oldPotion = PotionUtil.getPotion(stack);
+		boolean mainPotionContainsTargetEffect = oldPotion.getEffects().stream()
+			.anyMatch(effect -> effect.getEffectType() == targetEffect);
 		
-		NbtList newEffects = new NbtList();
-		for(StatusEffectInstance oldEffect : oldEffects)
-		{
-			int oldId =
-				Registries.STATUS_EFFECT.getRawId(oldEffect.getEffectType());
-			
-			if(oldId == id)
-				continue;
-			
-			NbtCompound effect = new NbtCompound();
-			effect.putInt("id", oldId);
-			effect.putInt("amplifier", oldEffect.getAmplifier());
-			effect.putInt("duration", oldEffect.getDuration());
-			newEffects.add(effect);
-		}
+		ArrayList<StatusEffectInstance> newEffects = new ArrayList<>();
+		if(mainPotionContainsTargetEffect)
+			PotionUtil.getPotionEffects(stack).forEach(newEffects::add);
+		else
+			PotionUtil.getCustomPotionEffects(stack).forEach(newEffects::add);
+		newEffects.removeIf(effect -> effect.getEffectType() == targetEffect);
 		
-		NbtCompound nbt = new NbtCompound();
-		nbt.put("custom_potion_effects", newEffects);
-		stack.setNbt(nbt);
+		Potion newPotion =
+			mainPotionContainsTargetEffect ? Potions.EMPTY : oldPotion;
+		
+		PotionUtil.setPotion(stack, newPotion);
+		setCustomPotionEffects(stack, newEffects);
 		ChatUtils.message("Effect removed.");
 	}
 	
-	private int parseEffectId(String input) throws CmdSyntaxError
+	private StatusEffect parseEffect(String input) throws CmdSyntaxError
 	{
-		int id = 0;
+		StatusEffect effect;
 		
 		if(MathUtils.isInteger(input))
-			id = Integer.parseInt(input);
+			effect = Registries.STATUS_EFFECT.get(Integer.parseInt(input));
 		else
 			try
 			{
 				Identifier identifier = new Identifier(input);
-				StatusEffect effect = Registries.STATUS_EFFECT.get(identifier);
-				
-				id = Registries.STATUS_EFFECT.getRawId(effect);
+				effect = Registries.STATUS_EFFECT.get(identifier);
 				
 			}catch(InvalidIdentifierException e)
 			{
 				throw new CmdSyntaxError("Invalid effect: " + input);
 			}
 		
-		if(id < 1)
-			throw new CmdSyntaxError();
+		if(effect == null)
+			throw new CmdSyntaxError("Invalid effect: " + input);
 		
-		return id;
+		return Registries.STATUS_EFFECT.getEntry(effect).value();
+	}
+	
+	private void setCustomPotionEffects(ItemStack stack,
+		ArrayList<StatusEffectInstance> effects)
+	{
+		// PotionUtil doesn't remove effects when passing an empty list to it
+		if(effects.isEmpty())
+			stack.removeSubNbt("custom_potion_effects");
+		else
+			PotionUtil.setCustomPotionEffects(stack, effects);
 	}
 	
 	private int parseInt(String s) throws CmdSyntaxError

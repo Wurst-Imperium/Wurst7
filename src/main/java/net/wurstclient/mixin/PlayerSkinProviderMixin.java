@@ -7,10 +7,11 @@
  */
 package net.wurstclient.mixin;
 
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,18 +19,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.util.SkinTextures;
+import net.minecraft.util.Uuids;
+import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonObject;
 
 @Mixin(PlayerSkinProvider.class)
 public abstract class PlayerSkinProviderMixin
 {
-	private static JsonObject capes;
+	private static HashMap<String, String> capes;
 	private MinecraftProfileTexture currentCape;
 	
 	@Inject(at = @At("HEAD"),
@@ -45,9 +47,9 @@ public abstract class PlayerSkinProviderMixin
 			if(capes == null)
 				setupWurstCapes();
 			
-			if(capes.has(uuidString))
+			if(capes.containsKey(uuidString))
 			{
-				String capeURL = capes.get(uuidString).getAsString();
+				String capeURL = capes.get(uuidString);
 				currentCape = new MinecraftProfileTexture(capeURL, null);
 				
 			}else
@@ -81,12 +83,32 @@ public abstract class PlayerSkinProviderMixin
 	{
 		try
 		{
-			// TODO: download capes to file
-			URL url = new URL("https://www.wurstclient.net/api/v1/capes.json");
+			// download cape list from wurstclient.net
+			WsonObject rawCapes = JsonUtils.parseURLToObject(
+				"https://www.wurstclient.net/api/v1/capes.json");
 			
-			capes =
-				JsonParser.parseReader(new InputStreamReader(url.openStream()))
-					.getAsJsonObject();
+			Pattern uuidPattern = Pattern.compile(
+				"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+			
+			// convert names to offline UUIDs
+			capes = new HashMap<>();
+			for(Entry<String, String> entry : rawCapes.getAllStrings()
+				.entrySet())
+			{
+				String name = entry.getKey();
+				String capeURL = entry.getValue();
+				
+				// check if name is already a UUID
+				if(uuidPattern.matcher(name).matches())
+				{
+					capes.put(name, capeURL);
+					continue;
+				}
+				
+				// convert name to offline UUID
+				String offlineUUID = "" + Uuids.getOfflinePlayerUuid(name);
+				capes.put(offlineUUID, capeURL);
+			}
 			
 		}catch(Exception e)
 		{
