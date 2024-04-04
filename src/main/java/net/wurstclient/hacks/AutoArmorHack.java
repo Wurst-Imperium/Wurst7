@@ -63,7 +63,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
@@ -71,7 +71,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketOutputListener.class, this);

@@ -92,7 +92,7 @@ public final class SpeedNukerHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other nukers
 		WURST.getHax().autoMineHack.setEnabled(false);
@@ -107,7 +107,7 @@ public final class SpeedNukerHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove listeners
 		EVENTS.remove(LeftClickListener.class, this);

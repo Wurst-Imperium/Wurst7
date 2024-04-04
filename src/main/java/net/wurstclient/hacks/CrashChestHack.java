@@ -28,7 +28,7 @@ public final class CrashChestHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		if(!MC.player.getAbilities().creativeMode)
 		{
