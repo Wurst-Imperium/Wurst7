@@ -57,13 +57,13 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		super("MultiAura");
 		setCategory(Category.COMBAT);
 
-		addSetting(this.range);
-		addSetting(this.speed);
-		addSetting(this.fov);
-		addSetting(this.swingHandAndLookOption);
-		addSetting(this.pauseOnContainers);
+		addSetting(range);
+		addSetting(speed);
+		addSetting(fov);
+		addSetting(swingHandAndLookOption);
+		addSetting(pauseOnContainers);
 
-		this.entityFilters.forEach(this::addSetting);
+		entityFilters.forEach(this::addSetting);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		WURST.getHax().triggerBotHack.setEnabled(false);
 
-		this.speed.resetTimer();
+		speed.resetTimer();
 		EVENTS.add(UpdateListener.class, this);
 	}
 
@@ -93,25 +93,25 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		this.speed.updateTimer();
-		if(!this.speed.isTimeToAttack())
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
 			return;
 
-		if(this.pauseOnContainers.shouldPause())
+		if(pauseOnContainers.shouldPause())
 			return;
 
 		ClientPlayerEntity player = MC.player;
 
 		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(this.range.getValue(), 2);
+		double rangeSq = Math.pow(range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 
-		if(this.fov.getValue() < 360.0)
+		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-					e.getBoundingBox().getCenter()) <= this.fov.getValue() / 2.0);
+					e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
 
-		stream = this.entityFilters.applyTo(stream);
+		stream = entityFilters.applyTo(stream);
 
 		ArrayList<Entity> entities =
 				stream.collect(Collectors.toCollection(ArrayList::new));
@@ -123,19 +123,18 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			if (this.swingHandAndLookOption.isChecked())
+			if (!swingHandAndLookOption.isChecked())
 				RotationUtils
 						.getNeededRotations(entity.getBoundingBox().getCenter())
 						.sendPlayerLookPacket();
-			else RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter());
 
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
 
-		if (this.swingHandAndLookOption.isChecked())
+		if (swingHandAndLookOption.isChecked())
 			player.swingHand(Hand.MAIN_HAND);
 
-		this.speed.resetTimer();
+		speed.resetTimer();
 	}
 }
