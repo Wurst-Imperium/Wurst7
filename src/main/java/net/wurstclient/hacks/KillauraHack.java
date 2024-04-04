@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -36,6 +35,8 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
@@ -66,6 +67,16 @@ public final class KillauraHack extends Hack
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How Killaura should swing your hand when attacking.\n\n"
+			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
+			+ " by anti-cheat plugins.\n\n"
+			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
+			+ " without playing the animation on the client-side.\n\n"
+			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
+			+ " This is the most legit option.",
+		SwingHand.CLIENT);
+	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
 		"Renders a colored box within the target, inversely proportional to its remaining health.",
@@ -95,6 +106,7 @@ public final class KillauraHack extends Hack
 		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(swingHand);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
 		addSetting(checkLOS);
@@ -177,9 +189,8 @@ public final class KillauraHack extends Hack
 			return;
 		
 		WURST.getHax().criticalsHack.doCritical();
-		ClientPlayerEntity player = MC.player;
-		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
+		MC.interactionManager.attackEntity(MC.player, target);
+		swingHand.swing(Hand.MAIN_HAND);
 		
 		target = null;
 		speed.resetTimer();
