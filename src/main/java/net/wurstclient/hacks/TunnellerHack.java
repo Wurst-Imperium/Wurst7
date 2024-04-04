@@ -112,7 +112,7 @@ public final class TunnellerHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
@@ -143,7 +143,7 @@ public final class TunnellerHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove listeners
 		EVENTS.remove(UpdateListener.class, this);

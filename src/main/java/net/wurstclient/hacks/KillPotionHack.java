@@ -42,7 +42,7 @@ public final class KillPotionHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// check gamemode
 		if(!MC.player.getAbilities().creativeMode)

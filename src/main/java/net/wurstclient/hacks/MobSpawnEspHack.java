@@ -77,7 +77,7 @@ public final class MobSpawnEspHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		pool = MinPriorityThreadFactory.newFixedThreadPool();
 		
@@ -87,7 +87,7 @@ public final class MobSpawnEspHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, this);

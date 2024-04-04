@@ -42,7 +42,7 @@ public final class TrollPotionHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// check gamemode
 		if(!MC.player.getAbilities().creativeMode)
