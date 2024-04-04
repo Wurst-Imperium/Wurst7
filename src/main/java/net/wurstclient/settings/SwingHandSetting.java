@@ -34,6 +34,11 @@ public final class SwingHandSetting
 		super(name, description, SwingHand.values(), selected);
 	}
 	
+	public void swing(Hand hand)
+	{
+		getSelected().swing(hand);
+	}
+	
 	public enum SwingHand
 	{
 		OFF("Off", hand -> {}),
@@ -44,8 +49,8 @@ public final class SwingHandSetting
 		
 		CLIENT("Client-side", hand -> MC.player.swingHand(hand));
 		
-		private String name;
-		private Consumer<Hand> swing;
+		private final String name;
+		private final Consumer<Hand> swing;
 		
 		private SwingHand(String name, Consumer<Hand> swing)
 		{
