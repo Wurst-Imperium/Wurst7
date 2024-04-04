@@ -126,10 +126,6 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 					.getNeededRotations(entity.getBoundingBox().getCenter())
 					.sendPlayerLookPacket();
 			
-			else
-				RotationUtils
-					.getNeededRotations(entity.getBoundingBox().getCenter());
-			
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(player, entity);
 		}
