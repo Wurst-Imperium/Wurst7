@@ -297,7 +297,7 @@ public final class AutoLibrarianHack extends Hack
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(jobSite,
 			params.side()))
-			swingHand.getSelected().swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
@@ -359,7 +359,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(result.isAccepted() && result.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// reset sneak
 		((IKeyBinding)MC.options.sneakKey).resetPressedState();
@@ -401,7 +401,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// set cooldown
 		MC.itemUseCooldown = 4;

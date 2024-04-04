@@ -250,7 +250,7 @@ public final class TreeBotHack extends Hack
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(pos,
 			params.side()))
-			swingHand.getSelected().swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
