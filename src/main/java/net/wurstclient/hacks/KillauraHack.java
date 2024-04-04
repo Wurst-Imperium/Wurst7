@@ -68,13 +68,7 @@ public final class KillauraHack extends Hack
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How Killaura should swing your hand when attacking.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.",
+		"How Killaura should swing your hand when attacking.",
 		SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
