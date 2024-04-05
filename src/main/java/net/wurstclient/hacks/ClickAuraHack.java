@@ -65,7 +65,7 @@ public final class ClickAuraHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().aimAssistHack.setEnabled(false);
@@ -84,7 +84,7 @@ public final class ClickAuraHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(LeftClickListener.class, this);

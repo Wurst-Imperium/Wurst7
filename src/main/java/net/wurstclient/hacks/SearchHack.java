@@ -95,7 +95,7 @@ public final class SearchHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		lastBlock = block.getBlock();
 		coordinator.setTargetBlock(lastBlock);
@@ -112,7 +112,7 @@ public final class SearchHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);

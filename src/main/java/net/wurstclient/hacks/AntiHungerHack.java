@@ -24,13 +24,13 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(PacketOutputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(PacketOutputListener.class, this);
 	}

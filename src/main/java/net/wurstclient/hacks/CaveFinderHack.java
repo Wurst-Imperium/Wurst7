@@ -96,7 +96,7 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		prevLimit = limit.getValueI();
 		notify = true;
@@ -111,7 +111,7 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);

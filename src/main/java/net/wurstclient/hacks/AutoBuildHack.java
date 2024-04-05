@@ -117,7 +117,7 @@ public final class AutoBuildHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RightClickListener.class, this);
@@ -125,7 +125,7 @@ public final class AutoBuildHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RightClickListener.class, this);
