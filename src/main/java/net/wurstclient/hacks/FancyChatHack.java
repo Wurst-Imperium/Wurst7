@@ -24,13 +24,13 @@ public final class FancyChatHack extends Hack implements ChatOutputListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(ChatOutputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(ChatOutputListener.class, this);
 	}
