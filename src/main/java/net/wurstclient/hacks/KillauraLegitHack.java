@@ -19,8 +19,10 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -43,6 +45,7 @@ import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.FakePlayerEntity;
 
 public final class KillauraLegitHack extends Hack
 	implements UpdateListener, RenderListener
@@ -73,6 +76,8 @@ public final class KillauraLegitHack extends Hack
 		"Damage indicator",
 		"Renders a colored box within the target, inversely proportional to its remaining health.",
 		true);
+
+	private final CheckboxSetting checkBot = new CheckboxSetting("Bot Check", false);
 	
 	// same filters as in Killaura, but with stricter defaults
 	private final EntityFilterList entityFilters =
@@ -120,6 +125,7 @@ public final class KillauraLegitHack extends Hack
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(damageIndicator);
+		addSetting(checkBot);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -177,6 +183,12 @@ public final class KillauraLegitHack extends Hack
 		target = stream.min(priority.getSelected().comparator).orElse(null);
 		if(target == null)
 			return;
+
+		if (isNPC(target) && checkBot.isChecked())
+                {
+                  target = null;
+                  return;
+                }
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
@@ -308,4 +320,26 @@ public final class KillauraLegitHack extends Hack
 			return name;
 		}
 	}
+	
+public boolean isNPC(Entity entity) {
+if (entity instanceof PlayerEntity player)
+{
+if (MC.player == null) {
+            return true;
+        }
+        if (player instanceof FakePlayerEntity) {
+            return false;
+        }
+        try {
+            PlayerListEntry p = MC.player.networkHandler.getPlayerListEntry(player.getUuid());
+            if (p.getGameMode().isSurvivalLike() || p.getGameMode().isCreative()) {
+                return false;
+            }
+        } catch (Exception e) {
+            return true;
+        }
+  }
+ return false;     
+ }
+	
 }
