@@ -11,7 +11,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@main
+      - uses: actions/stale@v9
         with:
           stale-issue-message: |
             This issue has been open for a while with no recent activity. If this issue is still important to you, please add a comment within the next 7 days to keep it open. Otherwise, the issue will be automatically closed to free up time for other tasks.
@@ -31,7 +31,9 @@ jobs:
             - They have bugs or conflicts that won't be resolved
           days-before-stale: 60
           days-before-close: 7
+          exempt-issue-labels: "status:never-stale"
+          exempt-pr-labels: "status:never-stale"
           stale-issue-label: "status:stale"
           stale-pr-label: "status:stale"
-          operations-per-run: 50
+          operations-per-run: 200
           enable-statistics: true

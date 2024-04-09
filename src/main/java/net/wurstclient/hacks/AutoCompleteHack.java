@@ -75,7 +75,7 @@ public final class AutoCompleteHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(ChatOutputListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);

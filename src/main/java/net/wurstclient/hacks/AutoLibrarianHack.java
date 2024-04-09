@@ -102,13 +102,7 @@ public final class AutoLibrarianHack extends Hack
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting("How to swing your hand when interacting with the"
-			+ " villager and job site.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.");
+			+ " villager and job site.");
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"
@@ -297,7 +291,7 @@ public final class AutoLibrarianHack extends Hack
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(jobSite,
 			params.side()))
-			swingHand.getSelected().swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
@@ -359,7 +353,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(result.isAccepted() && result.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// reset sneak
 		((IKeyBinding)MC.options.sneakKey).resetPressedState();
@@ -401,7 +395,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// set cooldown
 		MC.itemUseCooldown = 4;
@@ -418,7 +412,7 @@ public final class AutoLibrarianHack extends Hack
 		for(TradeOffer tradeOffer : tradeOffers)
 		{
 			ItemStack stack = tradeOffer.getSellItem();
-			if(!(stack.getItem() instanceof EnchantedBookItem book))
+			if(!(stack.getItem() instanceof EnchantedBookItem))
 				continue;
 			
 			NbtList enchantmentNbt = EnchantedBookItem.getEnchantmentNbt(stack);
