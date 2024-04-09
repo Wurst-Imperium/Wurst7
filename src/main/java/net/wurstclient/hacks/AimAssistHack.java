@@ -50,12 +50,12 @@ public final class AimAssistHack extends Hack
 		"Check line of sight", "Won't aim at entities behind blocks.", true);
 	
 	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
-		"Attack while blocking",
+		"Aim while blocking",
 		"Allows attacking enemies even while you're using a shield or other items for defense. Normally, you can't attack in these situations, but this setting enables it, giving you more flexibility during combat.",
 		false);
 	
 	private final CheckboxSetting attackWhileBreaking = new CheckboxSetting(
-		"Attack while breaking",
+		"Aim while breaking",
 		"Allows attacking enemies while you're actively breaking blocks. Enable this to multitask during combat and mining activities.",
 		false);
 	
@@ -207,10 +207,10 @@ public final class AimAssistHack extends Hack
 		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
 			return;
 		// Not actually rendering anything, just using this method to rotate
+		// more smoothly.
 		if(MC.interactionManager.isBreakingBlock()
 			&& !attackWhileBreaking.isChecked())
 			return;
-		// more smoothly.
 		float oldYaw = MC.player.prevYaw;
 		float oldPitch = MC.player.prevPitch;
 		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
