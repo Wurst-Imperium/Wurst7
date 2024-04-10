@@ -5,9 +5,9 @@ buildscript {
 }
 
 plugins {
-	id 'com.diffplug.spotless' version '6.23.3'
 	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.diffplug.spotless' version '6.23.3'
 }
 
 def ENV = System.getenv()
