@@ -109,6 +109,7 @@ public final class HackList implements UpdateListener
 	public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	public final HighJumpHack highJumpHack = new HighJumpHack();
 	public final InfiniChatHack infiniChatHack = new InfiniChatHack();
+	public final InfinityAuraHack infinityAuraHack = new InfinityAuraHack();
 	public final InstantBunkerHack instantBunkerHack = new InstantBunkerHack();
 	public final InvWalkHack invWalkHack = new InvWalkHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
@@ -139,8 +140,7 @@ public final class HackList implements UpdateListener
 	public final NoLevitationHack noLevitationHack = new NoLevitationHack();
 	public final NoOverlayHack noOverlayHack = new NoOverlayHack();
 	public final NoPumpkinHack noPumpkinHack = new NoPumpkinHack();
-	public final NoShieldOverlayHack noShieldOverlayHack =
-		new NoShieldOverlayHack();
+	public final NoShieldOverlayHack noShieldOverlayHack = new NoShieldOverlayHack();
 	public final NoSlowdownHack noSlowdownHack = new NoSlowdownHack();
 	public final NoWeatherHack noWeatherHack = new NoWeatherHack();
 	public final NoWebHack noWebHack = new NoWebHack();
@@ -171,6 +171,7 @@ public final class HackList implements UpdateListener
 	public final SpeedNukerHack speedNukerHack = new SpeedNukerHack();
 	public final SpiderHack spiderHack = new SpiderHack();
 	public final StepHack stepHack = new StepHack();
+	public final TelekinesisHack telekinesisHack = new TelekinesisHack();
 	public final ThrowHack throwHack = new ThrowHack();
 	public final TillauraHack tillauraHack = new TillauraHack();
 	public final TimerHack timerHack = new TimerHack();
