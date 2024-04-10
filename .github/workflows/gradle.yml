@@ -35,10 +35,6 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
 
-    - name: Apply style with Spotless
-      id: spotless_apply
-      run: /gradlew spotlessApply
-
     - name: Check code style with Spotless
       id: spotless_check
       run: ./gradlew spotlessCheck
