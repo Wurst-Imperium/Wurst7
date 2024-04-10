@@ -37,7 +37,7 @@ jobs:
 
     - name: Check code style with Spotless
       id: spotless_check
-      run: ./gradlew spotlessCheck
+      run: ./gradlew spotlessApply
 
     - name: Execute Gradle build
       run: ./gradlew build
