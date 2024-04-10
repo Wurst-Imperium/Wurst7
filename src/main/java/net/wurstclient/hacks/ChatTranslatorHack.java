@@ -39,13 +39,13 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(ChatInputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
 	}

@@ -23,7 +23,7 @@ public final class LsdHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		if(!(MC.getCameraEntity() instanceof PlayerEntity))
 		{
@@ -39,7 +39,7 @@ public final class LsdHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		if(MC.gameRenderer.getPostProcessor() != null)
 			MC.gameRenderer.disablePostProcessor();

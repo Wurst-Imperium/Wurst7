@@ -75,13 +75,7 @@ public final class BuildRandomHack extends Hack
 			+ " can be VERY disorienting to look at.");
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How BuildRandom should swing your hand when placing blocks.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.");
+		"How BuildRandom should swing your hand when placing blocks.");
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
@@ -122,14 +116,14 @@ public final class BuildRandomHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		lastPos = null;
 		EVENTS.remove(UpdateListener.class, this);

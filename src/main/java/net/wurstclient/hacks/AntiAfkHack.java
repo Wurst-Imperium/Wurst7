@@ -54,19 +54,21 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		start = BlockPos.ofFloored(MC.player.getPos());
 		nextBlock = null;
 		pathFinder = new RandomPathFinder(start);
 		creativeFlying = MC.player.getAbilities().flying;
 		
+		WURST.getHax().autoFishHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);

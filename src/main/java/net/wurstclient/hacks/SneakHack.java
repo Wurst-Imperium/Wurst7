@@ -52,14 +52,14 @@ public final class SneakHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(PreMotionListener.class, this);
 		EVENTS.add(PostMotionListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(PostMotionListener.class, this);

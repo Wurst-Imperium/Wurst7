@@ -45,11 +45,14 @@ public final class AutoFishDebugDraw
 		"Color of the debug draw, if enabled.", Color.RED);
 	
 	private final SliderSetting validRange;
+	private final FishingSpotManager fishingSpots;
 	private Vec3d lastSoundPos;
 	
-	public AutoFishDebugDraw(SliderSetting validRange)
+	public AutoFishDebugDraw(SliderSetting validRange,
+		FishingSpotManager fishingSpots)
 	{
 		this.validRange = validRange;
+		this.fishingSpots = fishingSpots;
 	}
 	
 	public Stream<Setting> getSettings()
@@ -69,7 +72,7 @@ public final class AutoFishDebugDraw
 	
 	public void render(MatrixStack matrixStack, float partialTicks)
 	{
-		if(!debugDraw.isChecked())
+		if(!debugDraw.isChecked() && !fishingSpots.isMcmmoMode())
 			return;
 		
 		// GL settings
@@ -83,12 +86,20 @@ public final class AutoFishDebugDraw
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
-		if(bobber != null)
-			drawValidRange(matrixStack, partialTicks, bobber, region);
+		if(debugDraw.isChecked())
+		{
+			FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
+			if(bobber != null)
+				drawValidRange(matrixStack, partialTicks, bobber, region);
+			
+			if(lastSoundPos != null)
+				drawLastBite(matrixStack, region);
+			
+			drawFishingSpots(matrixStack, region);
+		}
 		
-		if(lastSoundPos != null)
-			drawLastBite(matrixStack, region);
+		if(fishingSpots.isMcmmoMode())
+			drawMcmmoRange(matrixStack, region);
 		
 		matrixStack.pop();
 		
@@ -137,6 +148,68 @@ public final class AutoFishDebugDraw
 		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F).next();
 		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F).next();
 		tessellator.draw();
+		
+		matrixStack.pop();
+	}
+	
+	private void drawFishingSpots(MatrixStack matrixStack, RegionPos region)
+	{
+		Box headBox = new Box(-0.25, 0, -0.25, 0.25, 0.5, 0.25);
+		Box noseBox =
+			headBox.offset(0.125, 0.125, 0.5).shrink(0.25, 0.35, 0.45);
+		
+		float[] colorF = ddColor.getColorF();
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		
+		for(FishingSpot spot : fishingSpots.getFishingSpots())
+		{
+			Vec3d playerPos = spot.input().pos().subtract(region.toVec3d());
+			Vec3d bobberPos = spot.bobberPos().subtract(region.toVec3d());
+			
+			matrixStack.push();
+			matrixStack.translate(playerPos.x, playerPos.y, playerPos.z);
+			
+			matrixStack.push();
+			matrixStack.multiply(spot.input().rotation().toQuaternion());
+			
+			RenderUtils.drawOutlinedBox(headBox, matrixStack);
+			RenderUtils.drawOutlinedBox(noseBox, matrixStack);
+			if(!spot.openWater())
+				RenderUtils.drawCrossBox(headBox, matrixStack);
+			
+			matrixStack.pop();
+			
+			RenderUtils.drawArrow(Vec3d.ZERO, bobberPos.subtract(playerPos),
+				matrixStack);
+			
+			matrixStack.pop();
+		}
+	}
+	
+	private void drawMcmmoRange(MatrixStack matrixStack, RegionPos region)
+	{
+		FishingSpot lastSpot = fishingSpots.getLastSpot();
+		if(lastSpot == null)
+			return;
+		
+		// only draw range during setup, or if debug draw is enabled
+		if(fishingSpots.isSetupDone() && !debugDraw.isChecked())
+			return;
+		
+		Vec3d bobberPos = lastSpot.bobberPos().subtract(region.toVec3d());
+		
+		matrixStack.push();
+		matrixStack.translate(bobberPos.x, bobberPos.y, bobberPos.z);
+		
+		int mcmmoRange = fishingSpots.getRange();
+		Box rangeBox =
+			new Box(0, 0, 0, 0, 0, 0).expand(mcmmoRange, 1, mcmmoRange);
+		RenderSystem.setShaderColor(1, 0, 0, 0.25F);
+		RenderUtils.drawSolidBox(rangeBox, matrixStack);
+		
+		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
+		RenderUtils.drawOutlinedBox(rangeBox, matrixStack);
+		RenderUtils.drawOutlinedBox(rangeBox.contract(0, 1, 0), matrixStack);
 		
 		matrixStack.pop();
 	}

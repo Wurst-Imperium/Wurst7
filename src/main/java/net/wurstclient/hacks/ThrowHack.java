@@ -35,13 +35,13 @@ public final class ThrowHack extends Hack implements RightClickListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(RightClickListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(RightClickListener.class, this);
 	}
