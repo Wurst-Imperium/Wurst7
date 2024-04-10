@@ -29,6 +29,11 @@ public enum EntityUtils
 	
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final MinecraftClient MC = WurstClient.MC;
+
+	public static Stream<Entity> getEntities()
+	{
+		return StreamSupport.stream(MC.world.getEntities().spliterator(), true);
+	}
 	
 	public static Stream<Entity> getAttackableEntities()
 	{
