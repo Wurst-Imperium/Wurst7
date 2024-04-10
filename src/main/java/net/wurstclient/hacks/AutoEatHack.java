@@ -216,7 +216,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			.forEach(i -> slots.add(i));
 		
 		Comparator<FoodComponent> comparator =
-			Comparator.comparingDouble(FoodComponent::saturationModifier);
+			Comparator.comparingDouble(FoodComponent::saturation);
 		
 		for(int slot : slots)
 		{
