@@ -25,7 +25,7 @@ public final class AutoSignHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		signText = null;
 	}

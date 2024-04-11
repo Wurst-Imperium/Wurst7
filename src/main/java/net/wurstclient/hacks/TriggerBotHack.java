@@ -53,7 +53,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
@@ -70,7 +70,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}

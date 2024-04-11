@@ -68,7 +68,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		nextTickSlot = -1;
 		totems = 0;
@@ -78,7 +78,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
