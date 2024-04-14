@@ -20,6 +20,8 @@ import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 
@@ -31,6 +33,10 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How TriggerBot should swing your hand when attacking.",
+		SwingHand.CLIENT);
 	
 	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
 		"Attack while blocking",
@@ -47,8 +53,8 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(swingHand);
 		addSetting(attackWhileBlocking);
-		
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -102,7 +108,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
+		swingHand.swing(Hand.MAIN_HAND);
 		speed.resetTimer();
 	}
 	
