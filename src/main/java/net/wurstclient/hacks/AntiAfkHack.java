@@ -60,10 +60,6 @@ public final class AntiAfkHack extends Hack
 		setCategory(Category.OTHER);
 		addSetting(useAi);
 		addSetting(movetime);
-		if(movetime.getValue() == 0)
-		{
-			ValueDisplay.DECIMAL.withLabel(0, "random");
-		}
 	}
 	
 	@Override
