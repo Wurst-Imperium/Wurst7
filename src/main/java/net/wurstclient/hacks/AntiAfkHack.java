@@ -28,15 +28,23 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"anti afk", "AFKBot", "afk bot"})
 @DontSaveState
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
+	private final SliderSetting movetime =
+		new SliderSetting("Time between movements in ticks",
+			"Time between movements in ticks. If set to 0, it will be random.",
+			0, 0, 350, 5,
+			ValueDisplay.DECIMAL.withSuffix(" Ticks").withLabel(0, "Random"));
+
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
-	private int timer;
+	private float timer;
 	private Random random = new Random();
 	private BlockPos start;
 	private BlockPos nextBlock;
@@ -51,6 +59,11 @@ public final class AntiAfkHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
+		addSetting(movetime);
+		if(movetime.getValue() == 0)
+		{
+			ValueDisplay.DECIMAL.withLabel(0, "random");
+		}
 	}
 	
 	@Override
@@ -81,6 +94,17 @@ public final class AntiAfkHack extends Hack
 		PathProcessor.releaseControls();
 	}
 	
+	private void updateMovementValue()
+	{
+		if(movetime.getValueF() == 0)
+		{
+			timer= 40 + random.nextInt(21);
+		}else
+		{
+			timer= movetime.getValueF();
+		}
+	}
+	
 	@Override
 	public void onUpdate()
 	{
@@ -95,31 +119,25 @@ public final class AntiAfkHack extends Hack
 		
 		if(useAi.isChecked())
 		{
-			// update timer
-			if(timer > 0)
+			if(timer> 0)
 			{
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
 					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
-			
-			// find path
+			// set path
 			if(!pathFinder.isDone() && !pathFinder.isFailed())
 			{
 				PathProcessor.lockControls();
-				
 				pathFinder.think();
-				
 				if(!pathFinder.isDone() && !pathFinder.isFailed())
 					return;
 				
 				pathFinder.formatPath();
-				
 				// set processor
 				processor = pathFinder.getProcessor();
 			}
-			
 			// check path
 			if(processor != null
 				&& !pathFinder.isPathStillValid(processor.getIndex()))
@@ -127,7 +145,6 @@ public final class AntiAfkHack extends Hack
 				pathFinder = new RandomPathFinder(pathFinder);
 				return;
 			}
-			
 			// process path
 			if(!processor.isDone())
 				processor.process();
@@ -138,34 +155,30 @@ public final class AntiAfkHack extends Hack
 			if(processor.isDone())
 			{
 				PathProcessor.releaseControls();
-				timer = 40 + random.nextInt(21);
+				updateMovementValue();
 			}
 		}else
 		{
-			// set next block
-			if(timer <= 0 || nextBlock == null)
+			
+			if(timer<= 0 || nextBlock == null)
 			{
 				nextBlock =
 					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-				timer = 40 + random.nextInt(21);
+				updateMovementValue();
 			}
-			
 			// face block
 			WURST.getRotationFaker()
 				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
-			
-			// walk
+			//walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
 				MC.options.forwardKey.setPressed(true);
 			else
 				MC.options.forwardKey.setPressed(false);
-			
 			// swim up
 			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 			
-			// update timer
-			if(timer > 0)
-				timer--;
+			if(timer> 0)
+			timer--;
 		}
 	}
 	
