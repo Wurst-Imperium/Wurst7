@@ -40,11 +40,11 @@ public final class AntiAfkHack extends Hack
 		new SliderSetting("Time between movements in ticks",
 			"Time between movements in ticks. If set to 0, it will be random.",
 			0, 0, 350, 5,
-			ValueDisplay.DECIMAL.withSuffix(" Ticks").withLabel(0, "Random"));
+			ValueDisplay.DECIMAL.withSuffix(" ticks").withLabel(0, "random"));
 	
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
-	private float timer;
+	private int timer;
 	private Random random = new Random();
 	private BlockPos start;
 	private BlockPos nextBlock;
@@ -90,14 +90,14 @@ public final class AntiAfkHack extends Hack
 		PathProcessor.releaseControls();
 	}
 	
-	private void updateMovementValue()
+	private void setTimer()
 	{
-		if(movetime.getValueF() == 0)
+		if(movetime.getValueI() == 0)
 		{
 			timer = 40 + random.nextInt(21);
 		}else
 		{
-			timer = movetime.getValueF();
+			timer = movetime.getValueI();
 		}
 	}
 	
@@ -115,6 +115,7 @@ public final class AntiAfkHack extends Hack
 		
 		if(useAi.isChecked())
 		{
+			// update timer
 			if(timer > 0)
 			{
 				timer--;
@@ -122,18 +123,19 @@ public final class AntiAfkHack extends Hack
 					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
-			// set path
+			
+			// find path
 			if(!pathFinder.isDone() && !pathFinder.isFailed())
 			{
 				PathProcessor.lockControls();
 				pathFinder.think();
 				if(!pathFinder.isDone() && !pathFinder.isFailed())
 					return;
-				
 				pathFinder.formatPath();
 				// set processor
 				processor = pathFinder.getProcessor();
 			}
+			
 			// check path
 			if(processor != null
 				&& !pathFinder.isPathStillValid(processor.getIndex()))
@@ -141,38 +143,45 @@ public final class AntiAfkHack extends Hack
 				pathFinder = new RandomPathFinder(pathFinder);
 				return;
 			}
+			
 			// process path
 			if(!processor.isDone())
-				processor.process();
-			else
-				pathFinder = new RandomPathFinder(start);
-			
-			// wait 2 - 3 seconds (40 - 60 ticks)
-			if(processor.isDone())
 			{
-				PathProcessor.releaseControls();
-				updateMovementValue();
+				processor.process();
+			}else
+			{
+				pathFinder = new RandomPathFinder(start);
+				// wait 2 - 3 seconds (40 - 60 ticks)
+				if(processor.isDone())
+				{
+					PathProcessor.releaseControls();
+					setTimer();
+				}
 			}
 		}else
 		{
-			
+			// set next block
 			if(timer <= 0 || nextBlock == null)
 			{
 				nextBlock =
 					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-				updateMovementValue();
+				setTimer();
 			}
+			
 			// face block
 			WURST.getRotationFaker()
 				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
+			
 			// walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
 				MC.options.forwardKey.setPressed(true);
 			else
 				MC.options.forwardKey.setPressed(false);
+			
 			// swim up
 			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 			
+			// update timer
 			if(timer > 0)
 				timer--;
 		}
