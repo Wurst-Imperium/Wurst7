@@ -41,7 +41,7 @@ public final class AntiAfkHack extends Hack
 			"Time between movements in ticks. If set to 0, it will be random.",
 			0, 0, 350, 5,
 			ValueDisplay.DECIMAL.withSuffix(" Ticks").withLabel(0, "Random"));
-
+	
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
 	private float timer;
@@ -98,10 +98,10 @@ public final class AntiAfkHack extends Hack
 	{
 		if(movetime.getValueF() == 0)
 		{
-			timer= 40 + random.nextInt(21);
+			timer = 40 + random.nextInt(21);
 		}else
 		{
-			timer= movetime.getValueF();
+			timer = movetime.getValueF();
 		}
 	}
 	
@@ -119,7 +119,7 @@ public final class AntiAfkHack extends Hack
 		
 		if(useAi.isChecked())
 		{
-			if(timer> 0)
+			if(timer > 0)
 			{
 				timer--;
 				if(!WURST.getHax().jesusHack.isEnabled())
@@ -160,7 +160,7 @@ public final class AntiAfkHack extends Hack
 		}else
 		{
 			
-			if(timer<= 0 || nextBlock == null)
+			if(timer <= 0 || nextBlock == null)
 			{
 				nextBlock =
 					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
@@ -169,7 +169,7 @@ public final class AntiAfkHack extends Hack
 			// face block
 			WURST.getRotationFaker()
 				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
-			//walk
+			// walk
 			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
 				MC.options.forwardKey.setPressed(true);
 			else
@@ -177,8 +177,8 @@ public final class AntiAfkHack extends Hack
 			// swim up
 			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 			
-			if(timer> 0)
-			timer--;
+			if(timer > 0)
+				timer--;
 		}
 	}
 	
