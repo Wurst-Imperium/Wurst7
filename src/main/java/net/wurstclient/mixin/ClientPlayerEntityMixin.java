@@ -245,7 +245,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	public boolean isSpectator()
 	{
 		return super.isSpectator()
-			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
+		|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled()
+		|| WurstClient.INSTANCE.getHax().noClipHack.isEnabled();
 	}
 	
 	@Override
