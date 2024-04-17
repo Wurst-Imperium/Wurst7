@@ -93,12 +93,9 @@ public final class AntiAfkHack extends Hack
 	private void setTimer()
 	{
 		if(movetime.getValueI() == 0)
-		{
 			timer = 40 + random.nextInt(21);
-		}else
-		{
+		else
 			timer = movetime.getValueI();
-		}
 	}
 	
 	@Override
@@ -128,10 +125,14 @@ public final class AntiAfkHack extends Hack
 			if(!pathFinder.isDone() && !pathFinder.isFailed())
 			{
 				PathProcessor.lockControls();
+				
 				pathFinder.think();
+				
 				if(!pathFinder.isDone() && !pathFinder.isFailed())
 					return;
+				
 				pathFinder.formatPath();
+				
 				// set processor
 				processor = pathFinder.getProcessor();
 			}
@@ -146,17 +147,15 @@ public final class AntiAfkHack extends Hack
 			
 			// process path
 			if(!processor.isDone())
-			{
 				processor.process();
-			}else
-			{
+			else
 				pathFinder = new RandomPathFinder(start);
-				// wait 2 - 3 seconds (40 - 60 ticks)
-				if(processor.isDone())
-				{
-					PathProcessor.releaseControls();
-					setTimer();
-				}
+			
+			// wait 2 - 3 seconds (40 - 60 ticks)
+			if(processor.isDone())
+			{
+				PathProcessor.releaseControls();
+				setTimer();
 			}
 		}else
 		{
