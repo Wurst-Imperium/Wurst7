@@ -11,54 +11,49 @@ on:
       - '**.java'
       - 'gradle**'
       - 'build.gradle'
-  # Makes it possible to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Validate Gradle wrapper
-      uses: gradle/actions/wrapper-validation@v3
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
 
-    - name: Set up Java 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'microsoft'
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'microsoft'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
 
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@v3
-      with:
-        build-scan-publish: true
-        build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
-        build-scan-terms-of-use-agree: "yes"
+      - name: Check code style with Spotless
+        id: spotless_check
+        run: ./gradlew spotlessCheck
 
-    - name: Check code style with Spotless
-      id: spotless_check
-      run: ./gradlew spotlessCheck
+      - name: Execute Gradle build
+        run: ./gradlew build
 
-    - name: Execute Gradle build
-      run: ./gradlew build
+      - name: Submit dependency graph
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: dependency-graph
+          path: /home/runner/work/Wurst7/Wurst7/dependency-graph-reports/java_ci_with_gradle-build.json
 
-    - name: VirusTotal scan
-      if: ${{ github.event_name == 'push' }}
-      uses: crazy-max/ghaction-virustotal@v4
-      with:
-        vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
-        files: |
-          ./build/libs/*.jar
-      continue-on-error: true
+      - name: VirusTotal scan
+        if: ${{ github.event_name == 'push' }}
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
+          files: |
+            ./build/libs/*.jar
+        continue-on-error: true
