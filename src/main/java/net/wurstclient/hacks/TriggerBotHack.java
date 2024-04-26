@@ -25,7 +25,8 @@ import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 
-@SearchTags({"trigger bot"})
+@SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
+	"auto clicker"})
 public final class TriggerBotHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
