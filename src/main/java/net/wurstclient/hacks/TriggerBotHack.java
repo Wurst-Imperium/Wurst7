@@ -38,10 +38,11 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		"How TriggerBot should swing your hand when attacking.",
 		SwingHand.CLIENT);
 	
-	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
-		"Attack while blocking",
-		"Whether or not to attack while blocking with a shield / using items.",
-		false);
+	private final CheckboxSetting attackWhileBlocking =
+		new CheckboxSetting("Attack while blocking",
+			"Attacks even while you're blocking with a shield or using items."
+				+ " This would not be possible in vanilla.",
+			false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
@@ -55,6 +56,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		addSetting(speed);
 		addSetting(swingHand);
 		addSetting(attackWhileBlocking);
+		
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -93,7 +95,7 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+		if(!attackWhileBlocking.isChecked() && player.isUsingItem())
 			return;
 		
 		if(MC.crosshairTarget == null
