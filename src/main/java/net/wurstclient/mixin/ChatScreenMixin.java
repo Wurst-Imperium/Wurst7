@@ -46,32 +46,36 @@ public abstract class ChatScreenMixin extends Screen
 	public void onSendMessage(String message, boolean addToHistory,
 		CallbackInfoReturnable<Boolean> cir)
 	{
+		// Ignore empty messages just like vanilla
 		if((message = normalize(message)).isEmpty())
 			return;
 		
+		// Create and fire the chat output event
 		ChatOutputEvent event = new ChatOutputEvent(message);
 		EventManager.fire(event);
 		
-		if(event.isCancelled())
-		{
-			cir.setReturnValue(true);
-			return;
-		}
-		
-		if(!event.isModified())
+		// If the event hasn't been modified or cancelled,
+		// let the vanilla method handle the message
+		boolean cancelled = event.isCancelled();
+		if(!cancelled && !event.isModified())
 			return;
 		
+		// Otherwise, cancel the vanilla method and handle the message here
+		cir.setReturnValue(true);
+		
+		// Add the message to history, even if it was cancelled
+		// Otherwise the up/down arrows won't work correctly
 		String newMessage = event.getMessage();
 		if(addToHistory)
 			client.inGameHud.getChatHud().addToMessageHistory(newMessage);
 		
-		if(newMessage.startsWith("/"))
-			client.player.networkHandler
-				.sendChatCommand(newMessage.substring(1));
-		else
-			client.player.networkHandler.sendChatMessage(newMessage);
-		
-		cir.setReturnValue(true);
+		// If the event isn't cancelled, send the modified message
+		if(!cancelled)
+			if(newMessage.startsWith("/"))
+				client.player.networkHandler
+					.sendChatCommand(newMessage.substring(1));
+			else
+				client.player.networkHandler.sendChatMessage(newMessage);
 	}
 	
 	@Shadow
