@@ -14,7 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
@@ -27,7 +27,7 @@ import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
 	"auto clicker"})
-public final class TriggerBotHack extends Hack implements UpdateListener
+public final class TriggerBotHack extends Hack implements PostMotionListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -75,17 +75,17 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		speed.resetTimer();
-		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PostMotionListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PostMotionListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
+	public void onPostMotion()
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
