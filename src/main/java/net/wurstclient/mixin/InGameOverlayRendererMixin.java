@@ -27,8 +27,8 @@ public class InGameOverlayRendererMixin
 		constant = @Constant(floatValue = -0.3F))
 	private static float getFireOffset(float original)
 	{
-		return original - WurstClient.INSTANCE.getHax().noOverlayHack
-			.getOverlayOffset();
+		return original
+			- WurstClient.INSTANCE.getHax().noOverlayHack.getOverlayOffset();
 	}
 	
 	@Inject(at = @At("HEAD"),
