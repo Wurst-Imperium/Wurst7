@@ -11,23 +11,23 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
+import net.minecraft.component.type.FoodComponent.StatusEffectEntry;
+import net.minecraft.component.type.FoodComponents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.FoodComponents;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -216,21 +216,21 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			.forEach(i -> slots.add(i));
 		
 		Comparator<FoodComponent> comparator =
-			Comparator.comparingDouble(FoodComponent::getSaturationModifier);
+			Comparator.comparingDouble(FoodComponent::saturation);
 		
 		for(int slot : slots)
 		{
-			Item item = inventory.getStack(slot).getItem();
+			ItemStack stack = inventory.getStack(slot);
 			
 			// filter out non-food items
-			if(!item.isFood())
+			if(!stack.contains(DataComponentTypes.FOOD))
 				continue;
 			
-			FoodComponent food = item.getFoodComponent();
+			FoodComponent food = stack.get(DataComponentTypes.FOOD);
 			if(!isAllowedFood(food))
 				continue;
 			
-			if(maxPoints >= 0 && food.getHunger() > maxPoints)
+			if(maxPoints >= 0 && food.nutrition() > maxPoints)
 				continue;
 			
 			// compare to previously found food
@@ -274,9 +274,9 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(!allowChorus.isChecked() && food == FoodComponents.CHORUS_FRUIT)
 			return false;
 		
-		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
+		for(StatusEffectEntry entry : food.effects())
 		{
-			StatusEffect effect = pair.getFirst().getEffectType();
+			RegistryEntry<StatusEffect> effect = entry.effect().getEffectType();
 			
 			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
 				return false;

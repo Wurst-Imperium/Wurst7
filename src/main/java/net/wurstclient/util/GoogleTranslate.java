@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -69,7 +70,7 @@ public enum GoogleTranslate
 				"https://translate.google.com/m?hl=en&sl=%s&tl=%s&ie=UTF-8&prev=_m&q=%s",
 				langFrom, langTo, encodedText);
 			
-			return new URL(urlString);
+			return URI.create(urlString).toURL();
 			
 		}catch(MalformedURLException | UnsupportedEncodingException e)
 		{

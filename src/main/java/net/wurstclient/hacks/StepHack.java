@@ -48,23 +48,15 @@ public final class StepHack extends Hack implements UpdateListener
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		MC.player.stepHeight = 0.5F;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		if(mode.getSelected() == Mode.SIMPLE)
-		{
-			// simple mode
-			MC.player.stepHeight = height.getValueF();
 			return;
-		}
 		
-		// legit mode
 		ClientPlayerEntity player = MC.player;
-		player.stepHeight = 0.5F;
-		
 		if(!player.horizontalCollision)
 			return;
 		
@@ -80,7 +72,6 @@ public final class StepHack extends Hack implements UpdateListener
 			return;
 		
 		Box box = player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
-		
 		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
 			return;
 		
@@ -104,6 +95,14 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		player.setPosition(player.getX(), player.getY() + stepHeight,
 			player.getZ());
+	}
+	
+	public float adjustStepHeight(float stepHeight)
+	{
+		if(isEnabled() && mode.getSelected() == Mode.SIMPLE)
+			return height.getValueF();
+		
+		return stepHeight;
 	}
 	
 	public boolean isAutoJumpAllowed()

@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -37,11 +37,11 @@ import net.wurstclient.hacks.HandNoClipHack;
 @Mixin(AbstractBlockState.class)
 public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 {
-	private AbstractBlockStateMixin(WurstClient wurst, Block object,
-		ImmutableMap<Property<?>, Comparable<?>> immutableMap,
-		MapCodec<BlockState> mapCodec)
+	private AbstractBlockStateMixin(WurstClient wurst, Block owner,
+		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
+		MapCodec<BlockState> codec)
 	{
-		super(object, immutableMap, mapCodec);
+		super(owner, propertyMap, codec);
 	}
 	
 	@Inject(at = @At("TAIL"),

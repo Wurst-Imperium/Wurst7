@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -16,17 +17,21 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.SelectMerchantTradeC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -415,20 +420,23 @@ public final class AutoLibrarianHack extends Hack
 			if(!(stack.getItem() instanceof EnchantedBookItem))
 				continue;
 			
-			NbtList enchantmentNbt = EnchantedBookItem.getEnchantmentNbt(stack);
-			if(enchantmentNbt.isEmpty())
+			Set<Entry<RegistryEntry<Enchantment>>> enchantmentLevelMap =
+				EnchantmentHelper.getEnchantments(stack).getEnchantmentsMap();
+			if(enchantmentLevelMap.isEmpty())
 				continue;
 			
-			NbtList bookNbt = EnchantedBookItem.getEnchantmentNbt(stack);
-			String enchantment = bookNbt.getCompound(0).getString("id");
-			int level = bookNbt.getCompound(0).getInt("lvl");
-			int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
+			Object2IntMap.Entry<RegistryEntry<Enchantment>> firstEntry =
+				enchantmentLevelMap.stream().findFirst().orElseThrow();
+			
+			String enchantment = firstEntry.getKey().getIdAsString();
+			int level = firstEntry.getIntValue();
+			int price = tradeOffer.getDisplayedFirstBuyItem().getCount();
 			BookOffer bookOffer = new BookOffer(enchantment, level, price);
 			
 			if(!bookOffer.isValid())
 			{
 				System.out.println("Found invalid enchanted book offer.\n"
-					+ "NBT data: " + stack.getNbt());
+					+ "Component data: " + enchantmentLevelMap);
 				continue;
 			}
 			

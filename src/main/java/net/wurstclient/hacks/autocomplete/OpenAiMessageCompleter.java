@@ -10,6 +10,7 @@ package net.wurstclient.hacks.autocomplete;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 import com.google.gson.JsonArray;
@@ -64,9 +65,10 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 		throws IOException, JsonException
 	{
 		// get the API URL
-		URL url = modelSettings.openAiModel.getSelected().isChatModel()
-			? new URL(modelSettings.openaiChatEndpoint.getValue())
-			: new URL(modelSettings.openaiLegacyEndpoint.getValue());
+		URL url =
+			URI.create(modelSettings.openAiModel.getSelected().isChatModel()
+				? modelSettings.openaiChatEndpoint.getValue()
+				: modelSettings.openaiLegacyEndpoint.getValue()).toURL();
 		
 		// set up the API request
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();

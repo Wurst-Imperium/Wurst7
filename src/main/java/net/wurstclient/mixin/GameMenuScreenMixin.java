@@ -77,6 +77,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		float u = 0;
 		float v = 0;
 		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
+		
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	private void addWurstOptionsButton()

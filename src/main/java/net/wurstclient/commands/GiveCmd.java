@@ -11,6 +11,8 @@ import java.util.Arrays;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -83,7 +85,7 @@ public final class GiveCmd extends Command
 			try
 			{
 				NbtCompound tag = StringNbtReader.parse(nbt);
-				stack.setNbt(tag);
+				NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, tag);
 				
 			}catch(CommandSyntaxException e)
 			{

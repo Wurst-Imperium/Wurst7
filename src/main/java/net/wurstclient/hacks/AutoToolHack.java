@@ -191,7 +191,7 @@ public final class AutoToolHack extends Hack
 	
 	private boolean isDamageable(ItemStack stack)
 	{
-		return !stack.isEmpty() && stack.getItem().isDamageable();
+		return !stack.isEmpty() && stack.isDamageable();
 	}
 	
 	private boolean isTooDamaged(ItemStack stack, int repairMode)
