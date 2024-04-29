@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -197,7 +198,7 @@ public enum MicrosoftLoginManager
 		
 		try
 		{
-			URL url = new URL(urlPost);
+			URL url = URI.create(urlPost).toURL();
 			HttpURLConnection connection =
 				(HttpURLConnection)url.openConnection();
 			
@@ -504,7 +505,7 @@ public enum MicrosoftLoginManager
 	{
 		try
 		{
-			return new URL(url);
+			return URI.create(url).toURL();
 			
 		}catch(MalformedURLException e)
 		{

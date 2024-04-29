@@ -21,18 +21,21 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public abstract class ListWidget extends AbstractParentElement
 	implements Drawable
 {
+	private static final Identifier MENU_LIST_BACKGROUND_TEXTURE =
+		new Identifier("textures/gui/menu_list_background.png");
+	
 	protected final MinecraftClient client;
 	protected int width;
 	protected int height;
@@ -144,7 +147,8 @@ public abstract class ListWidget extends AbstractParentElement
 			capYPosition();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.enableBlend();
+			RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -167,7 +171,9 @@ public abstract class ListWidget extends AbstractParentElement
 			if(renderHeader)
 				renderHeader(k, l, tessellator);
 			
+			context.enableScissor(left, top, right, bottom);
 			renderList(context, k, l, mouseX, mouseY, delta);
+			context.disableScissor();
 			RenderSystem.disableDepthTest();
 			renderHoleBackground(0, top, 255, 255);
 			renderHoleBackground(bottom, height, 255, 255);
@@ -175,9 +181,6 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA,
 				GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
 				GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-			// RenderSystem.disableAlphaTest();
-			// RenderSystem.shadeModel(7425);
-			// RenderSystem.disableTexture();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION_TEXTURE_COLOR);
@@ -246,9 +249,6 @@ public abstract class ListWidget extends AbstractParentElement
 			}
 			
 			renderDecorations(mouseX, mouseY);
-			// RenderSystem.enableTexture();
-			// RenderSystem.shadeModel(7424);
-			// RenderSystem.enableAlphaTest();
 			RenderSystem.disableBlend();
 		}
 	}
@@ -392,7 +392,6 @@ public abstract class ListWidget extends AbstractParentElement
 			{
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
-				// RenderSystem.disableTexture();
 				float g = isFocused() ? 1.0F : 0.5F;
 				RenderSystem.setShaderColor(g, g, g, 1.0F);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -410,7 +409,6 @@ public abstract class ListWidget extends AbstractParentElement
 				bufferBuilder.vertex(r - 1, o - 1, 0.0D).next();
 				bufferBuilder.vertex(q + 1, o - 1, 0.0D).next();
 				tessellator.draw();
-				// RenderSystem.enableTexture();
 			}
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -435,7 +433,8 @@ public abstract class ListWidget extends AbstractParentElement
 	{
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.enableBlend();
+		RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,

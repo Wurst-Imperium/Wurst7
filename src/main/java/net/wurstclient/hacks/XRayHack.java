@@ -42,12 +42,12 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
 			+ " - you can add any block you want.\n\n"
 			+ "Remember to restart X-Ray when changing this setting.",
-		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
-		"minecraft:bone_block", "minecraft:bookshelf",
-		"minecraft:brewing_stand", "minecraft:chain_command_block",
-		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
-		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
-		"minecraft:crafter", "minecraft:crafting_table",
+		"minecraft:amethyst_cluster", "minecraft:ancient_debris",
+		"minecraft:anvil", "minecraft:beacon", "minecraft:bone_block",
+		"minecraft:bookshelf", "minecraft:brewing_stand",
+		"minecraft:chain_command_block", "minecraft:chest", "minecraft:clay",
+		"minecraft:coal_block", "minecraft:coal_ore", "minecraft:command_block",
+		"minecraft:copper_ore", "minecraft:crafter", "minecraft:crafting_table",
 		"minecraft:decorated_pot", "minecraft:deepslate_coal_ore",
 		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
 		"minecraft:deepslate_emerald_ore", "minecraft:deepslate_gold_ore",
@@ -68,7 +68,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:redstone_ore", "minecraft:repeating_command_block",
 		"minecraft:spawner", "minecraft:suspicious_gravel",
 		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
-		"minecraft:trapped_chest", "minecraft:water");
+		"minecraft:trapped_chest", "minecraft:trial_spawner", "minecraft:vault",
+		"minecraft:water");
 	
 	private final CheckboxSetting onlyExposed = new CheckboxSetting(
 		"Only show exposed",

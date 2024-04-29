@@ -16,7 +16,6 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ItemUtils;
 
 public final class EnchantCmd extends Command
 {
@@ -71,7 +70,7 @@ public final class EnchantCmd extends Command
 				continue;
 			}
 			
-			ItemUtils.addEnchantment(stack, enchantment, level);
+			stack.addEnchantment(enchantment, level);
 		}
 	}
 	

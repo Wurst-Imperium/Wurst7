@@ -18,6 +18,4 @@ accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	bre
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	currentBreakingProgress	F
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	movementMultiplier	Lnet/minecraft/util/math/Vec3d;
-accessible	field	net/minecraft/entity/Entity	stepHeight	F
-accessible	field	net/minecraft/item/ArmorItem	toughness	F
 accessible	field	net/minecraft/network/packet/s2c/play/ChunkDeltaUpdateS2CPacket	sectionPos	Lnet/minecraft/util/math/ChunkSectionPos;
