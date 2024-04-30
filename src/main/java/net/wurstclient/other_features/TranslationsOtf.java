@@ -23,6 +23,12 @@ public final class TranslationsOtf extends OtherFeature
 		"Displays the Wurst Client in English, even if Minecraft is set to a different language.",
 		true);
 	
+	private final CheckboxSetting fallbackToEnglish = new CheckboxSetting(
+		"Fallback to English",
+		"Display untranslated strings in English (instead of translation key names), "
+			+ "if some of them are currently unavailable for your language.",
+		true);
+	
 	public TranslationsOtf()
 	{
 		super("Translations", "Allows text in Wurst to be displayed"
@@ -30,10 +36,16 @@ public final class TranslationsOtf extends OtherFeature
 			+ " that Minecraft is set to.\n\n"
 			+ "This is an experimental feature!");
 		addSetting(forceEnglish);
+		addSetting(fallbackToEnglish);
 	}
 	
 	public CheckboxSetting getForceEnglish()
 	{
 		return forceEnglish;
+	}
+	
+	public CheckboxSetting getFallbackToEnglish()
+	{
+		return fallbackToEnglish;
 	}
 }

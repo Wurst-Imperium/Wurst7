@@ -49,22 +49,22 @@ public final class ForcedChatReportsScreen extends Screen
 	{
 		super(Text.literal(ChatUtils.WURST_PREFIX)
 			.append(Text.literal(WurstClient.INSTANCE
-				.translate("gui.wurst.nochatreports.unsafe_server.title"))));
+				.translate("wurst.nochatreports.gui.unsafe_server.title"))));
 		this.prevScreen = prevScreen;
 		
 		reason = Text.literal(WurstClient.INSTANCE
-			.translate("gui.wurst.nochatreports.unsafe_server.message"));
+			.translate("wurst.nochatreports.gui.unsafe_server.message"));
 		
 		NoChatReportsOtf ncr = WurstClient.INSTANCE.getOtfs().noChatReportsOtf;
 		sigButtonMsg = () -> WurstClient.INSTANCE
-			.translate("button.wurst.nochatreports.signatures_status")
+			.translate("wurst.nochatreports.button.signatures_status")
 			+ blockedOrAllowed(ncr.isEnabled());
 	}
 	
 	private String blockedOrAllowed(boolean blocked)
 	{
 		return WurstClient.INSTANCE.translate(
-			"gui.wurst.generic.allcaps_" + (blocked ? "blocked" : "allowed"));
+			"wurst.generic.gui.allcaps_" + (blocked ? "blocked" : "allowed"));
 	}
 	
 	@Override
