@@ -7,16 +7,24 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Optional;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -180,10 +188,18 @@ public final class AutoToolHack extends Hack
 		
 		if(speed > 1)
 		{
-			int efficiency =
-				EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
-			if(efficiency > 0 && !stack.isEmpty())
-				speed += efficiency * efficiency + 1;
+			DynamicRegistryManager drm =
+				WurstClient.MC.world.getRegistryManager();
+			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			
+			Optional<Reference<Enchantment>> efficiency =
+				registry.getEntry(Enchantments.EFFICIENCY);
+			int effLvl = efficiency
+				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
+				.orElse(0);
+			
+			if(effLvl > 0 && !stack.isEmpty())
+				speed += effLvl * effLvl + 1;
 		}
 		
 		return speed;

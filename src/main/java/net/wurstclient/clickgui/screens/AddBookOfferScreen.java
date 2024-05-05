@@ -24,10 +24,16 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.util.ListWidget;
@@ -352,8 +358,11 @@ public final class AddBookOfferScreen extends Screen
 			super(mc, screen.width, screen.height, 32, screen.height - 80, 30);
 			this.mc = mc;
 			this.screen = screen;
-			list = Registries.ENCHANTMENT.stream().map(BookOffer::create)
-				.filter(BookOffer::isValid).sorted()
+			DynamicRegistryManager drm =
+				WurstClient.MC.world.getRegistryManager();
+			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			list = registry.stream().map(BookOffer::create)
+				.filter(BookOffer::isFullyValid).sorted()
 				.collect(Collectors.toList());
 		}
 		
@@ -410,16 +419,18 @@ public final class AddBookOfferScreen extends Screen
 			
 			TextRenderer tr = mc.textRenderer;
 			BookOffer bookOffer = list.get(index);
-			Enchantment enchantment = bookOffer.getEnchantment();
+			RegistryEntry<Enchantment> enchantment =
+				bookOffer.getEnchantmentEntry().get();
 			
 			String name = bookOffer.getEnchantmentName();
-			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
+			int nameColor =
+				enchantment.isIn(EnchantmentTags.CURSE) ? 0xff5555 : 0xf0f0f0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
 			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
 				false);
 			
-			int maxLevel = enchantment.getMaxLevel();
+			int maxLevel = enchantment.value().getMaxLevel();
 			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
 			context.drawText(tr, levels, x + 28, y + 18, 0xa0a0a0, false);
 		}

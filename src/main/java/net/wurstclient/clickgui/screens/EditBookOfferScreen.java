@@ -21,6 +21,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
@@ -126,7 +128,7 @@ public final class EditBookOfferScreen extends Screen
 		
 		addDrawableChild(
 			saveButton = ButtonWidget.builder(Text.literal("Save"), b -> {
-				if(offerToSave == null || !offerToSave.isValid())
+				if(offerToSave == null || !offerToSave.isFullyValid())
 					return;
 				
 				bookOffers.replace(index, offerToSave);
@@ -274,8 +276,10 @@ public final class EditBookOfferScreen extends Screen
 		BookOffer bookOffer = offerToSave;
 		String name = bookOffer.getEnchantmentNameWithLevel();
 		
-		Enchantment enchantment = bookOffer.getEnchantment();
-		int nameColor = enchantment.isCursed() ? 0xff5555 : 0xffffff;
+		RegistryEntry<Enchantment> enchantment =
+			bookOffer.getEnchantmentEntry().get();
+		int nameColor =
+			enchantment.isIn(EnchantmentTags.CURSE) ? 0xff5555 : 0xffffff;
 		context.drawTextWithShadow(tr, name, x + 28, y, nameColor);
 		
 		context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0, false);

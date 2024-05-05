@@ -19,8 +19,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BookOffersEditButton;
@@ -41,10 +39,10 @@ public final class BookOffersSetting extends Setting
 	{
 		super(name, description);
 		
-		Arrays.stream(enchantments)
-			.map(s -> Registries.ENCHANTMENT.get(new Identifier(s)))
-			.filter(Objects::nonNull).map(BookOffer::create)
-			.filter(BookOffer::isValid).distinct().sorted()
+		Arrays.stream(enchantments).filter(Objects::nonNull).map(s -> {
+			String[] parts = s.split(";");
+			return new BookOffer(parts[0], Integer.parseInt(parts[1]), 64);
+		}).filter(BookOffer::isMostlyValid).distinct().sorted()
 			.forEach(offers::add);
 		defaultOffers = offers.toArray(new BookOffer[0]);
 	}
@@ -79,7 +77,7 @@ public final class BookOffersSetting extends Setting
 	public void add(BookOffer offer)
 	{
 		// check if offer is valid
-		if(offer == null || !offer.isValid())
+		if(offer == null || !offer.isFullyValid())
 			return;
 		
 		// check if an equal offer is already in the list
@@ -112,7 +110,7 @@ public final class BookOffersSetting extends Setting
 			return;
 		
 		// check if new offer is valid
-		if(offer == null || !offer.isValid())
+		if(offer == null || !offer.isFullyValid())
 			return;
 		
 		// check if new offer is different and already in the list
@@ -152,8 +150,8 @@ public final class BookOffersSetting extends Setting
 			offers.clear();
 			
 			wson.getAllObjects().parallelStream().map(this::loadOffer)
-				.filter(Objects::nonNull).filter(BookOffer::isValid).distinct()
-				.sorted().forEachOrdered(offers::add);
+				.filter(Objects::nonNull).filter(BookOffer::isMostlyValid)
+				.distinct().sorted().forEachOrdered(offers::add);
 			
 		}catch(JsonException e)
 		{
