@@ -29,6 +29,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
@@ -294,7 +295,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean hasStatusEffect(StatusEffect effect)
+	public boolean hasStatusEffect(RegistryEntry<StatusEffect> effect)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
@@ -310,5 +311,34 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
+	}
+	
+	@Override
+	public float getStepHeight()
+	{
+		return WurstClient.INSTANCE.getHax().stepHack
+			.adjustStepHeight(super.getStepHeight());
+	}
+	
+	// getter for GENERIC_BLOCK_INTERACTION_RANGE
+	@Override
+	public double getBlockInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getBlockInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
+	}
+	
+	// getter for GENERIC_ENTITY_INTERACTION_RANGE
+	@Override
+	public double getEntityInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getEntityInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
 	}
 }

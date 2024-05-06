@@ -131,7 +131,7 @@ public final class BaseFinderHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// reset timer
 		messageTimer = 0;
@@ -142,7 +142,7 @@ public final class BaseFinderHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);

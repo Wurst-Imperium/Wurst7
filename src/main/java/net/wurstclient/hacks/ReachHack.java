@@ -13,6 +13,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
+// TODO: Remove this hack in 1.20.5, as it seems to be patched.
 @SearchTags({"range"})
 public final class ReachHack extends Hack
 {
@@ -26,11 +27,11 @@ public final class ReachHack extends Hack
 		addSetting(range);
 	}
 	
-	public float getReachDistance()
+	public double getReachDistance()
 	{
-		return range.getValueF();
+		return range.getValue();
 	}
 	
-	// See ClientPlayerInteractionManagerMixin.onGetReachDistance() and
-	// ClientPlayerInteractionManagerMixin.hasExtendedReach()
+	// See ClientPlayerEntityMixin.method_55754() and
+	// ClientPlayerEntityMixin.method_55755()
 }

@@ -7,18 +7,16 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.Rotation;
 
 @SearchTags({"AutoPotion", "auto potion", "AutoSplashPotion",
@@ -40,13 +38,13 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		timer = 0;
@@ -111,24 +109,10 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 				continue;
 			
 			// search for instant health effects
-			if(hasEffect(stack, StatusEffects.INSTANT_HEALTH))
+			if(ItemUtils.hasEffect(stack, StatusEffects.INSTANT_HEALTH))
 				return i;
 		}
 		
 		return -1;
-	}
-	
-	private boolean hasEffect(ItemStack stack, StatusEffect effect)
-	{
-		for(StatusEffectInstance effectInstance : PotionUtil
-			.getPotionEffects(stack))
-		{
-			if(effectInstance.getEffectType() != effect)
-				continue;
-			
-			return true;
-		}
-		
-		return false;
 	}
 }
