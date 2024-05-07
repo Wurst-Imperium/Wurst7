@@ -47,7 +47,10 @@ public final class AntiAfkHack extends Hack
 			0.5, 0, 60, 0.05,
 			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
 	
-	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
+	private final CheckboxSetting useAi = new CheckboxSetting("Use AI",
+		"Uses a pathfinding AI to move around naturally and avoid hazards.\n"
+			+ "Can sometimes get stuck.",
+		true);
 	
 	private int timer;
 	private Random random = new Random();
