@@ -18,38 +18,65 @@ public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
 	private static final MinecraftClient MC = WurstClient.MC;
+	private static final String DESCRIPTION_SUFFIX = buildDescriptionSuffix();
 	
 	public SwingHandSetting(String description)
 	{
-		super("Swing hand", description, SwingHand.values(), SwingHand.SERVER);
+		this(description, SwingHand.SERVER);
 	}
 	
 	public SwingHandSetting(String description, SwingHand selected)
 	{
-		super("Swing hand", description, SwingHand.values(), selected);
+		this("Swing hand", description, selected);
 	}
 	
 	public SwingHandSetting(String name, String description, SwingHand selected)
 	{
-		super(name, description, SwingHand.values(), selected);
+		super(name, description + DESCRIPTION_SUFFIX, SwingHand.values(),
+			selected);
+	}
+	
+	public void swing(Hand hand)
+	{
+		getSelected().swing(hand);
+	}
+	
+	private static String buildDescriptionSuffix()
+	{
+		StringBuilder builder = new StringBuilder("\n\n");
+		
+		for(SwingHand value : SwingHand.values())
+			builder.append("\u00a7l").append(value.name).append("\u00a7r - ")
+				.append(value.description).append("\n\n");
+		
+		return builder.toString();
 	}
 	
 	public enum SwingHand
 	{
-		OFF("Off", hand -> {}),
+		OFF("Off",
+			"Don't swing your hand at all. Will be detected by anti-cheat"
+				+ " plugins.",
+			hand -> {}),
 		
 		SERVER("Server-side",
+			"Swing your hand on the server-side, without playing the animation"
+				+ " on the client-side.",
 			hand -> MC.player.networkHandler
 				.sendPacket(new HandSwingC2SPacket(hand))),
 		
-		CLIENT("Client-side", hand -> MC.player.swingHand(hand));
+		CLIENT("Client-side",
+			"Swing your hand on the client-side. This is the most legit option.",
+			hand -> MC.player.swingHand(hand));
 		
-		private String name;
-		private Consumer<Hand> swing;
+		private final String name;
+		private final String description;
+		private final Consumer<Hand> swing;
 		
-		private SwingHand(String name, Consumer<Hand> swing)
+		private SwingHand(String name, String description, Consumer<Hand> swing)
 		{
 			this.name = name;
+			this.description = description;
 			this.swing = swing;
 		}
 		

@@ -60,7 +60,7 @@ public final class AutoToolHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(BlockBreakingProgressListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -68,7 +68,7 @@ public final class AutoToolHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(BlockBreakingProgressListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
@@ -191,7 +191,7 @@ public final class AutoToolHack extends Hack
 	
 	private boolean isDamageable(ItemStack stack)
 	{
-		return !stack.isEmpty() && stack.getItem().isDamageable();
+		return !stack.isEmpty() && stack.isDamageable();
 	}
 	
 	private boolean isTooDamaged(ItemStack stack, int repairMode)

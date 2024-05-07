@@ -167,6 +167,8 @@ public final class EditItemListScreen extends Screen
 		float partialTicks)
 	{
 		MatrixStack matrixStack = context.getMatrices();
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,

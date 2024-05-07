@@ -54,7 +54,7 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		start = BlockPos.ofFloored(MC.player.getPos());
 		nextBlock = null;
@@ -68,7 +68,7 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);

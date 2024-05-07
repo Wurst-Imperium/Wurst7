@@ -8,6 +8,8 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.wurstclient.SearchTags;
@@ -34,17 +36,19 @@ public final class ViewNbtCmd extends Command
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		NbtCompound tag = stack.getNbt();
-		String nbt = tag == null ? "" : tag.asString();
+		NbtCompound tag = stack
+			.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
+			.copyNbt();
+		String nbtString = tag.asString();
 		
 		switch(String.join(" ", args).toLowerCase())
 		{
 			case "":
-			ChatUtils.message("NBT: " + nbt);
+			ChatUtils.message("NBT: " + nbtString);
 			break;
 			
 			case "copy":
-			MC.keyboard.setClipboard(nbt);
+			MC.keyboard.setClipboard(nbtString);
 			ChatUtils.message("NBT data copied to clipboard.");
 			break;
 			
