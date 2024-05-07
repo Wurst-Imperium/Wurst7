@@ -94,14 +94,15 @@ public final class FastBreakHack extends Hack
 			return;
 		
 		BlockPos blockPos = event.getBlockPos();
-		if(MC.world.getBlockState(blockPos).getBlock().getHardness() < 0)
-			return;
-		
 		if(!blockPos.equals(lastBlockPos))
 		{
 			lastBlockPos = blockPos;
 			fastBreakBlock = random.nextDouble() <= activationChance.getValue();
 		}
+		
+		// Ignore unbreakable blocks to avoid slowdown issue
+		if(MC.world.getBlockState(blockPos).getBlock().getHardness() < 0)
+			return;
 		
 		if(!fastBreakBlock)
 			return;
