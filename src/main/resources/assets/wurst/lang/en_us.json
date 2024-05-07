@@ -2,7 +2,7 @@
   "description.wurst.hack.aimassist": "Helps you aim at nearby entities.",
   "description.wurst.hack.airplace": "Allows you to place blocks in mid-air.",
   "description.wurst.hack.anchoraura": "Automatically places (optional), charges, and detonates respawn anchors to kill entities around you.",
-  "description.wurst.hack.antiafk": "Walks around randomly to hide you from AFK detectors.\nNeeds at least 3x3 blocks of free space.",
+  "description.wurst.hack.antiafk": "Walks around randomly to hide you from AFK detectors.",
   "description.wurst.hack.antiblind": "Prevents blindness and darkness effects.\nIncompatible with OptiFine.",
   "description.wurst.hack.anticactus": "Protects you from cactus damage.",
   "description.wurst.hack.antientitypush": "Prevents you from getting pushed by players and mobs.",

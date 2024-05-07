@@ -2,7 +2,7 @@
   "description.wurst.hack.aimassist": "近くの存在を狙うのに役立ちます。",
   "description.wurst.hack.airplace": "空中にブロックを設置できるようになる。",
   "description.wurst.hack.anchoraura": "リスポーンアンカーを自動で設置（任意）、チャージ、爆発させ、付近にいるエンティティを倒す。",
-  "description.wurst.hack.antiafk": "離席を検知されないよう、辺りをランダムに歩き回る。\n最低3×3の広さの自由なスペースが必要。",
+  "description.wurst.hack.antiafk": "離席を検知されないよう、辺りをランダムに歩き回る。",
   "description.wurst.hack.antiblind": "盲目や暗闇の効果を防ぎます。\nOptiFineとの互換性はありません。",
   "description.wurst.hack.anticactus": "サボテンのダメージを無効化する。",
   "description.wurst.hack.antientitypush": "プレイヤーやモブに押されるのを防ぎます。",
