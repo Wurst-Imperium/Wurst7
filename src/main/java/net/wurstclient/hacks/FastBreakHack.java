@@ -100,6 +100,10 @@ public final class FastBreakHack extends Hack
 			fastBreakBlock = random.nextDouble() <= activationChance.getValue();
 		}
 		
+		// Ignore unbreakable blocks to avoid slowdown issue
+		if(MC.world.getBlockState(blockPos).getBlock().getHardness() < 0)
+			return;
+		
 		if(!fastBreakBlock)
 			return;
 		
