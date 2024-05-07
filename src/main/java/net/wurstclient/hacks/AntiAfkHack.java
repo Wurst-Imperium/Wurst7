@@ -36,11 +36,16 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final SliderSetting movetime =
-		new SliderSetting("Time between movements in ticks",
-			"Time between movements in ticks. If set to 0, it will be random.",
-			0, 0, 350, 5,
-			ValueDisplay.DECIMAL.withSuffix(" ticks").withLabel(0, "random"));
+	private final SliderSetting waitTime =
+		new SliderSetting("Wait time", "Time between movements in seconds.",
+			2.5, 0, 60, 0.05, ValueDisplay.DECIMAL.withSuffix("s"));
+	
+	private final SliderSetting waitTimeRand =
+		new SliderSetting("Wait time randomization",
+			"How much time can be randomly added or subtracted from the wait"
+				+ " time, in seconds.",
+			0.5, 0, 60, 0.05,
+			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
 	
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
@@ -59,7 +64,8 @@ public final class AntiAfkHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
-		addSetting(movetime);
+		addSetting(waitTime);
+		addSetting(waitTimeRand);
 	}
 	
 	@Override
@@ -92,10 +98,11 @@ public final class AntiAfkHack extends Hack
 	
 	private void setTimer()
 	{
-		if(movetime.getValueI() == 0)
-			timer = 40 + random.nextInt(21);
-		else
-			timer = movetime.getValueI();
+		int baseTime = (int)(waitTime.getValue() * 20);
+		int randTime = (int)(waitTimeRand.getValue() * 20);
+		int randOffset = random.nextInt(randTime * 2 + 1) - randTime;
+		randOffset = Math.max(randOffset, -baseTime);
+		timer = baseTime + randOffset;
 	}
 	
 	@Override
