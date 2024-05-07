@@ -28,12 +28,25 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"anti afk", "AFKBot", "afk bot"})
 @DontSaveState
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
+	private final SliderSetting waitTime =
+		new SliderSetting("Wait time", "Time between movements in seconds.",
+			2.5, 0, 60, 0.05, ValueDisplay.DECIMAL.withSuffix("s"));
+	
+	private final SliderSetting waitTimeRand =
+		new SliderSetting("Wait time randomization",
+			"How much time can be randomly added or subtracted from the wait"
+				+ " time, in seconds.",
+			0.5, 0, 60, 0.05,
+			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
+	
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
 	
 	private int timer;
@@ -51,6 +64,8 @@ public final class AntiAfkHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
+		addSetting(waitTime);
+		addSetting(waitTimeRand);
 	}
 	
 	@Override
@@ -79,6 +94,15 @@ public final class AntiAfkHack extends Hack
 		pathFinder = null;
 		processor = null;
 		PathProcessor.releaseControls();
+	}
+	
+	private void setTimer()
+	{
+		int baseTime = (int)(waitTime.getValue() * 20);
+		int randTime = (int)(waitTimeRand.getValue() * 20);
+		int randOffset = random.nextInt(randTime * 2 + 1) - randTime;
+		randOffset = Math.max(randOffset, -baseTime);
+		timer = baseTime + randOffset;
 	}
 	
 	@Override
@@ -138,7 +162,7 @@ public final class AntiAfkHack extends Hack
 			if(processor.isDone())
 			{
 				PathProcessor.releaseControls();
-				timer = 40 + random.nextInt(21);
+				setTimer();
 			}
 		}else
 		{
@@ -147,7 +171,7 @@ public final class AntiAfkHack extends Hack
 			{
 				nextBlock =
 					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-				timer = 40 + random.nextInt(21);
+				setTimer();
 			}
 			
 			// face block
