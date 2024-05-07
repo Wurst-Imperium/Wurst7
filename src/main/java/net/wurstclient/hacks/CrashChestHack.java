@@ -8,6 +8,8 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -51,8 +53,8 @@ public final class CrashChestHack extends Hack
 		for(int i = 0; i < 40000; i++)
 			nbtList.add(new NbtList());
 		nbtCompound.put("www.wurstclient.net", nbtList);
-		stack.setNbt(nbtCompound);
-		stack.setCustomName(Text.literal("Copy Me"));
+		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
+		stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Copy Me"));
 		
 		// give item
 		MC.player.getInventory().armor.set(0, stack);

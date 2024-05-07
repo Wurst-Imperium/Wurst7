@@ -67,7 +67,7 @@ public final class SafeWalkHack extends Hack
 		}
 		
 		Box box = player.getBoundingBox();
-		Box adjustedBox = box.stretch(0, -player.stepHeight, 0)
+		Box adjustedBox = box.stretch(0, -player.getStepHeight(), 0)
 			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
 		if(MC.world.isSpaceEmpty(player, adjustedBox))

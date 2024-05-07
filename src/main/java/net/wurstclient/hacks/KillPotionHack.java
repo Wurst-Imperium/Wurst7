@@ -7,11 +7,16 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.List;
+import java.util.Optional;
+
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
@@ -106,21 +111,18 @@ public final class KillPotionHack extends Hack
 		{
 			ItemStack stack = new ItemStack(item);
 			
-			NbtCompound effect = new NbtCompound();
-			effect.putInt("amplifier", 125);
-			effect.putInt("duration", 2000);
-			effect.putString("id", "instant_health");
+			StatusEffectInstance effect = new StatusEffectInstance(
+				StatusEffects.INSTANT_HEALTH, 2000, 125);
 			
-			NbtList effects = new NbtList();
-			effects.add(effect);
+			PotionContentsComponent potionContents =
+				new PotionContentsComponent(Optional.empty(), Optional.empty(),
+					List.of(effect));
 			
-			NbtCompound nbt = new NbtCompound();
-			nbt.put("custom_potion_effects", effects);
-			stack.setNbt(nbt);
+			stack.set(DataComponentTypes.POTION_CONTENTS, potionContents);
 			
 			String name =
 				"\u00a7f" + itemName + " of \u00a74\u00a7lINSTANT DEATH";
-			stack.setCustomName(Text.literal(name));
+			stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name));
 			
 			return stack;
 		}
