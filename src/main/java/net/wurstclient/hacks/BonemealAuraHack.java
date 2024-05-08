@@ -32,7 +32,8 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"bonemeal aura", "bone meal aura", "AutoBone", "auto bone"})
+@SearchTags({"bonemeal aura", "bone meal aura", "AutoBonemeal", "auto bonemeal",
+	"auto bone meal", "fertilizer"})
 public final class BonemealAuraHack extends Hack implements UpdateListener
 {
 	private final SliderSetting range =
@@ -63,12 +64,10 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	public BonemealAuraHack()
 	{
 		super("BonemealAura");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
 		addSetting(automationLevel);
-		
 		addSetting(saplings);
 		addSetting(crops);
 		addSetting(stems);
