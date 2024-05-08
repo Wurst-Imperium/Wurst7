@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import net.minecraft.block.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -108,8 +107,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// check held item
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
-		if(stack.isEmpty() || stack.getItem() != Items.BONE_MEAL)
+		if(!MC.player.isHolding(Items.BONE_MEAL))
 		{
 			InventoryUtils.selectItem(Items.BONE_MEAL,
 				automationLevel.getSelected().maxInvSlot);
