@@ -16,7 +16,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -26,7 +25,11 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
+import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -194,67 +197,34 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
-		
-		for(Direction side : Direction.values())
-		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
-			
-			// check if hitVec is within range (4.25 blocks)
-			if(distanceSqHitVec > 18.0625)
-				continue;
-			
-			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
-				continue;
-			
-			// check line of sight
-			if(!BlockUtils.hasLineOfSight(eyesPos, hitVec))
-				continue;
-			
-			// face block
-			WURST.getRotationFaker().faceVectorPacket(hitVec);
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			MC.itemUseCooldown = 4;
-			
+		// if breaking or riding, stop and don't try other blocks
+		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
 			return true;
-		}
 		
-		return false;
+		// if this block is unreachable, try the next one
+		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
+		if(params == null || params.distanceSq() > range.getValueSq()
+			|| !params.lineOfSight())
+			return false;
+		
+		// face and right click the block
+		MC.itemUseCooldown = 4;
+		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+		InteractionSimulator.rightClickBlock(params.toHitResult());
+		return true;
 	}
 	
 	private boolean rightClickBlockSimple(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		// if this block is unreachable, try the next one
+		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
+		if(params == null)
+			return false;
 		
-		for(Direction side : Direction.values())
-		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
-			
-			// check if hitVec is within range (6 blocks)
-			if(distanceSqHitVec > 36)
-				continue;
-			
-			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
-				continue;
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
-			
-			return true;
-		}
-		
-		return false;
+		// right click the block
+		InteractionSimulator.rightClickBlock(params.toHitResult(),
+			SwingHand.OFF);
+		return true;
 	}
 	
 	private enum Mode
