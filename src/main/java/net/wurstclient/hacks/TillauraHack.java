@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.HoeItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -89,8 +88,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 			return;
 		
 		// check held item
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof HoeItem))
+		if(!MC.player.isHolding(stack -> stack.getItem() instanceof HoeItem))
 			return;
 		
 		// get valid blocks
