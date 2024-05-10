@@ -195,13 +195,13 @@ public final class AutoArmorHack extends Hack
 				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
 				.orElse(0);
 			
-			// TODO: Only the server can calculate protection amount as of
-			// 24w18a. Might change back in later snapshots.
-			
 			// ClientPlayerEntity player = MC.player;
 			// DamageSource dmgSource =
 			// player.getDamageSources().playerAttack(player);
 			// prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
+			
+			// Only the server can calculate protection amount as of
+			// 24w18a (1.21). Related bug: MC-196250
 			prtPoints = prtLvl;
 		}
 		

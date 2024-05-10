@@ -154,10 +154,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
 				.orElseThrow();
 			
-			// TODO: Client-side item-specific attack damage calculation no
-			// longer exists as of 24w18a. Seems to be a bug, as this would make
-			// the damage tooltip inaccurate. Check if they add it back in later
-			// snapshots.
+			// Client-side item-specific attack damage calculation no
+			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
 			// EntityType<?> group = entity.getType();
 			float dmg = (float)ItemUtils
