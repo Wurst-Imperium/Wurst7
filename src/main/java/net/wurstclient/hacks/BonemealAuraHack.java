@@ -146,7 +146,7 @@ public final class BonemealAuraHack extends Hack implements UpdateListener
 	private ArrayList<BlockPos> getValidBlocks()
 	{
 		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
