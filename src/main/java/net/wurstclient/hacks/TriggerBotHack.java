@@ -100,16 +100,16 @@ public final class TriggerBotHack extends Hack implements PostMotionListener
 			return;
 		
 		if(MC.crosshairTarget == null
-			|| !(MC.crosshairTarget instanceof EntityHitResult))
+			|| !(MC.crosshairTarget instanceof EntityHitResult eResult))
 			return;
 		
-		Entity target = ((EntityHitResult)MC.crosshairTarget).getEntity();
+		Entity target = eResult.getEntity();
 		if(!isCorrectEntity(target))
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
-		
 		WURST.getHax().criticalsHack.doCritical();
+		
 		MC.interactionManager.attackEntity(player, target);
 		swingHand.swing(Hand.MAIN_HAND);
 		speed.resetTimer();
