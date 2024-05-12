@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -79,12 +78,12 @@ public final class SafeWalkHack extends Hack
 	
 	private void setSneaking(boolean sneaking)
 	{
-		KeyBinding sneakKey = MC.options.sneakKey;
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
 		
 		if(sneaking)
 			sneakKey.setPressed(true);
 		else
-			((IKeyBinding)sneakKey).resetPressedState();
+			sneakKey.resetPressedState();
 		
 		this.sneaking = sneaking;
 	}

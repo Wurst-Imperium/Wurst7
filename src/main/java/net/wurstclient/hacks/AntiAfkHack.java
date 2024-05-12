@@ -104,8 +104,8 @@ public final class AntiAfkHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		((IKeyBinding)MC.options.forwardKey).resetPressedState();
-		((IKeyBinding)MC.options.jumpKey).resetPressedState();
+		IKeyBinding.get(MC.options.forwardKey).resetPressedState();
+		IKeyBinding.get(MC.options.jumpKey).resetPressedState();
 		
 		pathFinder = null;
 		processor = null;
