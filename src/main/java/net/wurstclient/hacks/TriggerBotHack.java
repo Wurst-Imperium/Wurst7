@@ -15,7 +15,9 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -27,7 +29,8 @@ import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
 	"auto clicker"})
-public final class TriggerBotHack extends Hack implements PostMotionListener
+public final class TriggerBotHack extends Hack
+	implements PreMotionListener, PostMotionListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -36,17 +39,32 @@ public final class TriggerBotHack extends Hack implements PostMotionListener
 		new AttackSpeedSliderSetting();
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How TriggerBot should swing your hand when attacking.",
+		"How TriggerBot should swing your hand when attacking.\n\n"
+			+ "This setting will be ignored if \"Simulate mouse click\" is"
+			+ " enabled.",
 		SwingHand.CLIENT);
 	
 	private final CheckboxSetting attackWhileBlocking =
 		new CheckboxSetting("Attack while blocking",
-			"Attacks even while you're blocking with a shield or using items."
-				+ " This would not be possible in vanilla.",
+			"Attacks even while you're blocking with a shield or using"
+				+ " items.\n\n"
+				+ "This would not be possible in vanilla and won't work if"
+				+ " \"Simulate mouse click\" is enabled.",
 			false);
+	
+	private final CheckboxSetting simulateMouseClick = new CheckboxSetting(
+		"Simulate mouse click",
+		"Simulates an actual mouse click (or key press) when attacking. Can be"
+			+ " used to trick CPS measuring tools into thinking that you're"
+			+ " attacking manually.\n\n"
+			+ "The \"Swing hand\" and \"Attack while blocking\" settings will"
+			+ " not work while this option is enabled.",
+		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
+	
+	private boolean simulatingMouseClick;
 	
 	public TriggerBotHack()
 	{
@@ -57,6 +75,7 @@ public final class TriggerBotHack extends Hack implements PostMotionListener
 		addSetting(speed);
 		addSetting(swingHand);
 		addSetting(attackWhileBlocking);
+		addSetting(simulateMouseClick);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -75,13 +94,31 @@ public final class TriggerBotHack extends Hack implements PostMotionListener
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		speed.resetTimer();
+		EVENTS.add(PreMotionListener.class, this);
 		EVENTS.add(PostMotionListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
+		if(simulatingMouseClick)
+		{
+			IKeyBinding.get(MC.options.attackKey).simulatePress(false);
+			simulatingMouseClick = false;
+		}
+		
+		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(PostMotionListener.class, this);
+	}
+	
+	@Override
+	public void onPreMotion()
+	{
+		if(!simulatingMouseClick)
+			return;
+		
+		IKeyBinding.get(MC.options.attackKey).simulatePress(false);
+		simulatingMouseClick = false;
 	}
 	
 	@Override
@@ -110,8 +147,17 @@ public final class TriggerBotHack extends Hack implements PostMotionListener
 		WURST.getHax().autoSwordHack.setSlot(target);
 		WURST.getHax().criticalsHack.doCritical();
 		
-		MC.interactionManager.attackEntity(player, target);
-		swingHand.swing(Hand.MAIN_HAND);
+		if(simulateMouseClick.isChecked())
+		{
+			IKeyBinding.get(MC.options.attackKey).simulatePress(true);
+			simulatingMouseClick = true;
+			
+		}else
+		{
+			MC.interactionManager.attackEntity(player, target);
+			swingHand.swing(Hand.MAIN_HAND);
+		}
+		
 		speed.resetTimer();
 	}
 	

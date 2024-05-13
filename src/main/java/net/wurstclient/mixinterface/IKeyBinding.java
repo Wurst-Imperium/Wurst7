@@ -21,10 +21,14 @@ public interface IKeyBinding
 	}
 	
 	/**
-	 * @deprecated Use {@link #resetPressedState()} instead.
+	 * Simulates the user pressing this key on their keyboard or mouse. This is
+	 * much more aggressive than using {@link #setPressed(boolean)} and should
+	 * be used sparingly.
 	 */
-	@Deprecated
-	public void wurst_resetPressedState();
+	public default void simulatePress(boolean pressed)
+	{
+		wurst_simulatePress(pressed);
+	}
 	
 	public default void setPressed(boolean pressed)
 	{
@@ -44,4 +48,16 @@ public interface IKeyBinding
 	{
 		return (IKeyBinding)kb;
 	}
+	
+	/**
+	 * @deprecated Use {@link #resetPressedState()} instead.
+	 */
+	@Deprecated
+	public void wurst_resetPressedState();
+	
+	/**
+	 * @deprecated Use {@link #simulatePress()} instead.
+	 */
+	@Deprecated
+	public void wurst_simulatePress(boolean pressed);
 }
