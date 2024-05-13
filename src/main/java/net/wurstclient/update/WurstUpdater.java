@@ -96,13 +96,22 @@ public final class WurstUpdater implements UpdateListener
 		if(!outdated)
 			return;
 		
-		String textPart1 = "Wurst " + latestVersion + " MC"
-			+ WurstClient.MC_VERSION + " is now available.";
-		String text =
-			textPart1 + " Click \u00a7nhere\u00a7r to download the update.";
-		String url =
-			"https://www.wurstclient.net/download/?utm_source=Wurst+Client&utm_medium=WurstUpdater+chat+message&utm_content="
-				+ URLEncoder.encode(textPart1, StandardCharsets.UTF_8);
+		String text = "Wurst " + latestVersion
+			+ " is now available for Minecraft " + WurstClient.MC_VERSION
+			+ ". \u00a7nUpdate now\u00a7r to benefit from new features and/or bugfixes!";
+		
+		String currentVersionEncoded = URLEncoder.encode(
+			"Wurst " + currentVersion + " MC" + WurstClient.MC_VERSION,
+			StandardCharsets.UTF_8);
+		
+		String baseUrl = "https://www.wurstclient.net/download/";
+		String utmSource = "Wurst+Client";
+		String utmMedium = "WurstUpdater+chat+message";
+		String utmContent = currentVersionEncoded + "+update+chat+message";
+		
+		String url = baseUrl + "?utm_source=" + utmSource + "&utm_medium="
+			+ utmMedium + "&utm_content=" + utmContent;
+		
 		showLink(text, url);
 	}
 	
