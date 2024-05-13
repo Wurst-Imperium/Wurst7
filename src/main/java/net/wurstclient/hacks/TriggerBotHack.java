@@ -57,8 +57,10 @@ public final class TriggerBotHack extends Hack
 		"Simulates an actual mouse click (or key press) when attacking. Can be"
 			+ " used to trick CPS measuring tools into thinking that you're"
 			+ " attacking manually.\n\n"
-			+ "The \"Swing hand\" and \"Attack while blocking\" settings will"
-			+ " not work while this option is enabled.",
+			+ "\u00a7c\u00a7lWARNING:\u00a7r Simulating mouse clicks can lead"
+			+ " to unexpected behavior, like in-game menus clicking themselves."
+			+ " Also, the \"Swing hand\" and \"Attack while blocking\" settings"
+			+ " will not work while this option is enabled.",
 		false);
 	
 	private final EntityFilterList entityFilters =
