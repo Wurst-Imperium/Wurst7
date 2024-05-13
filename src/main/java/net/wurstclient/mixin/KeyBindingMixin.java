@@ -26,6 +26,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	
 	@Override
 	@Unique
+	@Deprecated // use IKeyBinding.resetPressedState() instead
 	public void wurst_resetPressedState()
 	{
 		long handle = WurstClient.MC.getWindow().getHandle();
@@ -35,6 +36,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	
 	@Override
 	@Unique
+	@Deprecated // use IKeyBinding.simulatePress() instead
 	public void wurst_simulatePress(boolean pressed)
 	{
 		MinecraftClient mc = WurstClient.MC;
