@@ -404,6 +404,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			{
 				int yc1 = window.getChild(i).getY();
 				int yc2 = yc1 - 2;
+				if(yc1 < bgy1 - windowY1)
+					continue;
+				if(yc2 > bgy3 - windowY1)
+					break;
+				
 				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
 				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
 				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
@@ -431,8 +436,16 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
-			window.getChild(i).render(context, mouseX - bgx1, mouseY - windowY1,
+		{
+			Component child = window.getChild(i);
+			if(child.getY() + child.getHeight() < bgy1 - windowY1)
+				continue;
+			if(child.getY() > bgy3 - windowY1)
+				break;
+			
+			child.render(context, mouseX - bgx1, mouseY - windowY1,
 				partialTicks);
+		}
 		matrixStack.pop();
 		
 		// buttons
