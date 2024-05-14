@@ -74,7 +74,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
@@ -82,7 +82,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);

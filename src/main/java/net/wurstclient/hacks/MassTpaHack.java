@@ -75,7 +75,7 @@ public final class MassTpaHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// reset state
 		players.clear();
@@ -111,7 +111,7 @@ public final class MassTpaHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);

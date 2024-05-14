@@ -40,13 +40,13 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(LeftClickListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(LeftClickListener.class, this);
 	}

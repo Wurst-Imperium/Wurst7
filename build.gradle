@@ -1,13 +1,13 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.135'
+		classpath 'org.kohsuke:github-api:1.321'
 	}
 }
 
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
-	id 'com.diffplug.spotless' version '6.23.3'
+	id 'com.diffplug.spotless' version '6.25.0'
 }
 
 def ENV = System.getenv()
@@ -88,7 +88,7 @@ spotless {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create("mavenJava", MavenPublication) {
 			from components.java
 		}
 	}

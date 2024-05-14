@@ -39,13 +39,13 @@ public final class StepHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		MC.player.stepHeight = 0.5F;

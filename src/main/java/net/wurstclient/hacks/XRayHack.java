@@ -98,7 +98,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// cache block names in case the setting changes while X-Ray is enabled
 		oreNamesCache = new ArrayList<>(ores.getBlockNames());
@@ -119,7 +119,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove event listeners
 		EVENTS.remove(UpdateListener.class, this);

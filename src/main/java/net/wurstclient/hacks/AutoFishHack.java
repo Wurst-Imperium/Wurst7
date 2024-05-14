@@ -89,7 +89,7 @@ public final class AutoFishHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		castRodTimer = 0;
 		reelInTimer = 0;
@@ -108,7 +108,7 @@ public final class AutoFishHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, this);

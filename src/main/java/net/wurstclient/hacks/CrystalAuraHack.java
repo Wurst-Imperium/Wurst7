@@ -90,7 +90,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().aimAssistHack.setEnabled(false);
@@ -107,7 +107,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
