@@ -28,7 +28,7 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected JsonObject buildParams(String prompt)
+	protected JsonObject buildParams(String prompt, int maxSuggestions)
 	{
 		JsonObject params = new JsonObject();
 		params.addProperty("prompt", prompt);
@@ -47,7 +47,7 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected WsonObject requestCompletion(JsonObject parameters)
+	protected WsonObject requestCompletions(JsonObject parameters)
 		throws IOException, JsonException
 	{
 		// set up the API request
@@ -70,7 +70,8 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected String extractCompletion(WsonObject response) throws JsonException
+	protected String[] extractCompletions(WsonObject response)
+		throws JsonException
 	{
 		// extract completion from response
 		String completion =
@@ -79,6 +80,6 @@ public final class OobaboogaMessageCompleter extends MessageCompleter
 		// remove newlines
 		completion = completion.replace("\n", " ");
 		
-		return completion;
+		return new String[]{completion};
 	}
 }

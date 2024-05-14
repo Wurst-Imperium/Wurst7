@@ -14,6 +14,7 @@ import java.util.function.BiConsumer;
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -22,11 +23,11 @@ public final class SuggestionHandler
 {
 	private final ArrayList<String> suggestions = new ArrayList<>();
 	
-	private final SliderSetting maxSuggestionPerDraft =
+	private final SliderSetting maxSuggestionsPerDraft =
 		new SliderSetting("Max suggestions per draft",
 			"How many suggestions the AI is allowed to generate for the same"
 				+ " draft message.",
-			1, 1, 10, 1, ValueDisplay.INTEGER);
+			3, 1, 10, 1, ValueDisplay.INTEGER);
 	
 	private final SliderSetting maxSuggestionsKept = new SliderSetting(
 		"Max suggestions kept", "Maximum number of suggestions kept in memory.",
@@ -40,7 +41,7 @@ public final class SuggestionHandler
 			+ " on your screen resolution and GUI scale.",
 		5, 1, 10, 1, ValueDisplay.INTEGER);
 	
-	private final List<Setting> settings = Arrays.asList(maxSuggestionPerDraft,
+	private final List<Setting> settings = Arrays.asList(maxSuggestionsPerDraft,
 		maxSuggestionsKept, maxSuggestionsShown);
 	
 	public List<Setting> getSettings()
@@ -48,13 +49,15 @@ public final class SuggestionHandler
 		return settings;
 	}
 	
-	public boolean hasEnoughSuggestionFor(String draftMessage)
+	public int getMaxSuggestionsFor(String draftMessage)
 	{
 		synchronized(suggestions)
 		{
-			return suggestions.stream().map(String::toLowerCase)
-				.filter(s -> s.startsWith(draftMessage.toLowerCase()))
-				.count() >= maxSuggestionPerDraft.getValue();
+			int existing = (int)suggestions.stream().map(String::toLowerCase)
+				.filter(s -> s.startsWith(draftMessage.toLowerCase())).count();
+			int maxPerDraft = maxSuggestionsPerDraft.getValueI();
+			
+			return MathHelper.clamp(maxPerDraft - existing, 0, maxPerDraft);
 		}
 	}
 	

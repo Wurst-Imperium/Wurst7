@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,7 +29,7 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected JsonObject buildParams(String prompt)
+	protected JsonObject buildParams(String prompt, int maxSuggestions)
 	{
 		// build the request parameters
 		JsonObject params = new JsonObject();
@@ -43,6 +44,7 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 			modelSettings.presencePenalty.getValue());
 		params.addProperty("frequency_penalty",
 			modelSettings.frequencyPenalty.getValue());
+		params.addProperty("n", maxSuggestions);
 		
 		// add the prompt, depending on the model
 		if(modelSettings.openAiModel.getSelected().isChatModel())
@@ -67,7 +69,7 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected WsonObject requestCompletion(JsonObject parameters)
+	protected WsonObject requestCompletions(JsonObject parameters)
 		throws IOException, JsonException
 	{
 		// get the API URL
@@ -96,20 +98,31 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 	}
 	
 	@Override
-	protected String extractCompletion(WsonObject response) throws JsonException
+	protected String[] extractCompletions(WsonObject response)
+		throws JsonException
 	{
-		// extract completion from response
-		String completion;
+		ArrayList<String> completions = new ArrayList<>();
+		
+		// extract choices from response
+		ArrayList<WsonObject> choices =
+			response.getArray("choices").getAllObjects();
+		
+		// extract completions from choices
 		if(modelSettings.openAiModel.getSelected().isChatModel())
-			completion = response.getArray("choices").getObject(0)
-				.getObject("message").getString("content");
+			for(WsonObject choice : choices)
+			{
+				WsonObject message = choice.getObject("message");
+				String content = message.getString("content");
+				completions.add(content);
+			}
 		else
-			completion =
-				response.getArray("choices").getObject(0).getString("text");
-		
+			for(WsonObject choice : choices)
+				completions.add(choice.getString("text"));
+			
 		// remove newlines
-		completion = completion.replace("\n", " ");
+		for(String completion : completions)
+			completion = completion.replace("\n", " ");
 		
-		return completion;
+		return completions.toArray(new String[completions.size()]);
 	}
 }

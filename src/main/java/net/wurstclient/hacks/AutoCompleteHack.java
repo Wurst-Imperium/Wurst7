@@ -117,7 +117,9 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if we already have a suggestion for the current draft message
-		if(suggestionHandler.hasEnoughSuggestionFor(draftMessage))
+		int maxSuggestions =
+			suggestionHandler.getMaxSuggestionsFor(draftMessage);
+		if(maxSuggestions < 1)
 			return;
 			
 		// copy fields to local variables, in case they change
@@ -129,14 +131,21 @@ public final class AutoCompleteHack extends Hack
 		// build thread
 		apiCallThread = new Thread(() -> {
 			
-			// get suggestion
-			String suggestion = completer.completeChatMessage(draftMessage2);
-			if(suggestion.isEmpty())
+			// get suggestions
+			String[] suggestions =
+				completer.completeChatMessage(draftMessage2, maxSuggestions);
+			if(suggestions.length < 1)
 				return;
 			
-			// apply suggestion
-			suggestionHandler.addSuggestion(suggestion, draftMessage2,
-				suggestionsUpdater2);
+			for(String suggestion : suggestions)
+			{
+				if(suggestion.isEmpty())
+					continue;
+				
+				// apply suggestion
+				suggestionHandler.addSuggestion(suggestion, draftMessage2,
+					suggestionsUpdater2);
+			}
 		});
 		apiCallThread.setName("AutoComplete API Call");
 		apiCallThread.setPriority(Thread.MIN_PRIORITY);
