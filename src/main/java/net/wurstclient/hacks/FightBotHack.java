@@ -55,7 +55,7 @@ public final class FightBotHack extends Hack
 	
 	private final SliderSetting safedistance = new SliderSetting("Safe Distance",
 		"At what distance to retreat from the target.",
-		3, 0, 6, 0.01, ValueDisplay.DECIMAL);
+			3, 0, 6, 0.01, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
