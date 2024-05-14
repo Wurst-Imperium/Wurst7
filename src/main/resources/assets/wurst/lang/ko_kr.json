@@ -12,7 +12,7 @@
   "description.wurst.setting.arrowdmg.packets": "전송할 패킷 수.\n패킷이 많을수록 공격력이 높아집니다.",
   "description.wurst.hack.autoarmor": "자동으로 방어구를 관리합니다.",
   "description.wurst.hack.autobuild": "자동으로 건물을 건설합니다.\n한 개의 블록을 놓으면 건설을 시작합니다.",
-  "description.wurst.hack.autocomplete": "대형 언어 모델을 사용하여 채팅 메시지를 자동 완성합니다. OpenAI 계정 API 접근 권한이나 지역적으로 설치된 oobabooga 웹 UI가 필요합니다.",
+  "description.wurst.hack.autocomplete": "대형 언어 모델을 사용하여 채팅 메시지를 자동 완성합니다. OpenAI 계정 API 접근 권한 또는 OpenAI와 호환되는 다른 언어 모델 API가 필요합니다.",
   "description.wurst.hack.autodrop": "원하지 않는 아이템을 자동으로 버립니다.",
   "description.wurst.hack.autoleave": "체력이 낮을 때 자동으로 서버에서 나갑니다.",
   "description.wurst.hack.autolibrarian": "특정 인챈트된 책을 판매하는 마을 주민을 자동으로 훈련합니다. 이 핵을 사용하면 전체 거래 구간을 짧은 시간 내에 설정할 수 있습니다.",

@@ -16,7 +16,7 @@
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "有効時、トライデントがより遠くまで飛ばせるようになる。ダメージ量や激流エンチャントには影響しない模様。\n\n§c§l注意: §rこのオプションを有効化した場合、トライデントをロストしやすくなる。",
   "description.wurst.hack.autoarmor": "防具を自動で管理する。",
   "description.wurst.hack.autobuild": "自動で建築を行う。\nブロックを一つ設置することで建築が開始される。",
-  "description.wurst.hack.autocomplete": "大規模な言語モデルを使用してチャット メッセージをオートコンプリートします。 API アクセスのある OpenAI アカウント、または oobabooga Web UI を使用してローカルにインストールされた言語モデルのいずれかが必要です。",
+  "description.wurst.hack.autocomplete": "大規模な言語モデルを使用してチャット メッセージをオートコンプリートします。 API アクセス権を持つ OpenAI アカウント、または OpenAI 互換の他の言語モデル API が必要です。",
   "description.wurst.hack.autodrop": "必要のないアイテムを自動で捨てる。",
   "description.wurst.hack.autoleave": "残り体力が少なくなるとに自動的にサーバーから切断する。",
   "description.wurst.hack.autolibrarian": "村人を自動的に訓練して、特定の魔法の本を販売する司書にします。 このハックを使用すると、すぐに取引ホール全体をセットアップできます。",
