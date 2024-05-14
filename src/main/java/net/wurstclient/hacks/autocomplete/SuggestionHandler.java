@@ -22,14 +22,11 @@ public final class SuggestionHandler
 {
 	private final ArrayList<String> suggestions = new ArrayList<>();
 	
-	private final SliderSetting maxSuggestionPerDraft = new SliderSetting(
-		"Max suggestions per draft",
-		"How many suggestions the AI is allowed to generate for the same draft"
-			+ " message.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r Higher values can use up a lot of"
-			+ " tokens. Definitely limit this to 1 for expensive models like"
-			+ " GPT-4.",
-		3, 1, 10, 1, ValueDisplay.INTEGER);
+	private final SliderSetting maxSuggestionPerDraft =
+		new SliderSetting("Max suggestions per draft",
+			"How many suggestions the AI is allowed to generate for the same"
+				+ " draft message.",
+			1, 1, 10, 1, ValueDisplay.INTEGER);
 	
 	private final SliderSetting maxSuggestionsKept = new SliderSetting(
 		"Max suggestions kept", "Maximum number of suggestions kept in memory.",

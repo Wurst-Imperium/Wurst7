@@ -24,41 +24,32 @@ public final class ModelSettings
 	public final EnumSetting<OpenAiModel> openAiModel = new EnumSetting<>(
 		"OpenAI model",
 		"The model to use for OpenAI API calls.\n\n"
-			+ "\u00a7lText-Davinci-003\u00a7r (better known as GPT-3) is an"
-			+ " older model that's less censored than ChatGPT, but it's also"
-			+ " 10x more expensive to use.\n\n"
-			+ "\u00a7lGPT-3.5-Turbo\u00a7r (better known as ChatGPT) is"
-			+ " recommended for most use cases, as it's relatively cheap and"
-			+ " powerful.\n\n"
-			+ "\u00a7lGPT-4\u00a7r is more powerful, but only works if OpenAI"
-			+ " has chosen you to be a beta tester. It can be anywhere from"
-			+ " 15x to 60x more expensive than ChatGPT.",
-		OpenAiModel.values(), OpenAiModel.GPT_3_5_TURBO);
+			+ "\u00a7lGPT-3.5-Turbo-Instruct\u00a7r is an older, non-chat model"
+			+ " based on GPT-3.5 that works well for auto-completion tasks.\n\n"
+			+ "\u00a7lGPT-4o-2024-05-13\u00a7r is the world's smartest model at"
+			+ " the time of writing, but it's optimized to be an assistant"
+			+ " rather than an auto-completion system. You will get some weird"
+			+ " results if you use it. Basically, it will reply to your"
+			+ " messages rather than completing them.",
+		OpenAiModel.values(), OpenAiModel.GPT_3_5_TURBO_INSTRUCT);
 	
 	public enum OpenAiModel
 	{
-		GPT_3_5_TURBO("gpt-3.5-turbo", true),
-		GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106", true),
-		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
-		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
-		GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", true),
-		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
-		GPT_4("gpt-4", true),
+		GPT_4O_2024_05_13("gpt-4o-2024-05-13", true),
+		GPT_4_TURBO_2024_04_09("gpt-4-turbo-2024-04-09", true),
+		GPT_4_0125_PREVIEW("gpt-4-0125-preview", true),
 		GPT_4_1106_PREVIEW("gpt-4-1106-preview", true),
 		GPT_4_0613("gpt-4-0613", true),
 		GPT_4_0314("gpt-4-0314", true),
-		GPT_4_32K("gpt-4-32k", true),
 		GPT_4_32K_0613("gpt-4-32k-0613", true),
-		TEXT_DAVINCI_003("text-davinci-003", false),
-		TEXT_DAVINCI_002("text-davinci-002", false),
-		TEXT_DAVINCI_001("text-davinci-001", false),
-		DAVINCI("davinci", false),
-		TEXT_CURIE_001("text-curie-001", false),
-		CURIE("curie", false),
-		TEXT_BABBAGE_001("text-babbage-001", false),
-		BABBAGE("babbage", false),
-		TEXT_ADA_001("text-ada-001", false),
-		ADA("ada", false);
+		GPT_3_5_TURBO_0125("gpt-3.5-turbo-0125", true),
+		GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106", true),
+		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
+		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
+		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
+		GPT_3_5_TURBO_INSTRUCT("gpt-3.5-turbo-instruct", false),
+		DAVINCI_002("davinci-002", false),
+		BABBAGE_002("babbage-002", false);
 		
 		private final String name;
 		private final boolean chat;
