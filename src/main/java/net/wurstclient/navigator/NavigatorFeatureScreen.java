@@ -271,7 +271,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			return;
 		}
 		
-		Rectangle area = new Rectangle(width / 2 - 154, 60, 308, height - 103);
+		boolean noButtons = Screens.getButtons(this).isEmpty();
+		Rectangle area = new Rectangle(width / 2 - 154, 60, 308,
+			height - 60 - (noButtons ? 43 : 67));
 		if(!area.contains(x, y))
 			return;
 		
