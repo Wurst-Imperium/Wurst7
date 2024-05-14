@@ -83,7 +83,7 @@ public final class ModelSettings
 		"Controls the model's creativity and randomness. A higher value will"
 			+ " result in more creative and sometimes nonsensical completions,"
 			+ " while a lower value will result in more boring completions.",
-		0.7, 0, 2, 0.01, ValueDisplay.DECIMAL);
+		1, 0, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting topP = new SliderSetting("Top P",
 		"An alternative to temperature. Makes the model less random by only"
@@ -110,7 +110,7 @@ public final class ModelSettings
 				+ " talk about different topics. Negative values encourage the"
 				+ " model to repeat existing chat messages.\n\n"
 				+ "Only works with OpenAI models.",
-			0.6, -2, 2, 0.01, ValueDisplay.DECIMAL);
+			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting repetitionPenalty =
 		new SliderSetting("Repetition penalty",
