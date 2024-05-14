@@ -98,8 +98,7 @@ public final class ModelSettings
 				+ " history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat the same word over and over again.\n\n"
-				+ "Only works with OpenAI models.",
+				+ " model to repeat the same word over and over again.",
 			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting frequencyPenalty =
@@ -108,25 +107,8 @@ public final class ModelSettings
 				+ " appears in the chat history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat existing chat messages.\n\n"
-				+ "Only works with OpenAI models.",
+				+ " model to repeat existing chat messages.",
 			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
-	
-	public final SliderSetting repetitionPenalty =
-		new SliderSetting("Repetition penalty",
-			"Similar to presence penalty, but uses a different algorithm.\n\n"
-				+ "1.0 means no penalty, negative values are not possible and"
-				+ " 1.5 is the maximum value.\n\n"
-				+ "Only works with the oobabooga web UI.",
-			1, 1, 1.5, 0.01, ValueDisplay.DECIMAL);
-	
-	public final SliderSetting encoderRepetitionPenalty =
-		new SliderSetting("Encoder repetition penalty",
-			"Similar to frequency penalty, but uses a different algorithm.\n\n"
-				+ "1.0 means no penalty, 0.8 behaves like a negative value and"
-				+ " 1.5 is the maximum value.\n\n"
-				+ "Only works with the oobabooga web UI.",
-			1, 0.8, 1.5, 0.01, ValueDisplay.DECIMAL);
 	
 	public final EnumSetting<StopSequence> stopSequence = new EnumSetting<>(
 		"Stop sequence",
@@ -170,7 +152,7 @@ public final class ModelSettings
 			+ " predictions.\n\n"
 			+ "Higher values improve the quality of predictions, but also"
 			+ " increase the time it takes to generate them, as well as cost"
-			+ " (for OpenAI API users) or RAM usage (for oobabooga users).",
+			+ " (for APIs like OpenAI) or RAM usage (for self-hosted models).",
 		10, 0, 100, 1, ValueDisplay.INTEGER);
 	
 	public final CheckboxSetting filterServerMessages =
@@ -182,6 +164,47 @@ public final class ModelSettings
 				+ " etc.",
 			false);
 	
+	public final TextFieldSetting customModel = new TextFieldSetting(
+		"Custom model",
+		"If set, this model will be used instead of the one specified in the"
+			+ " \"OpenAI model\" setting.\n\n"
+			+ "Use this if you have a fine-tuned OpenAI model or if you are"
+			+ " using a custom endpoint that is OpenAI-compatible but offers"
+			+ " different models.",
+		"");
+	
+	public final EnumSetting<CustomModelType> customModelType =
+		new EnumSetting<>("Custom model type", "Whether the custom"
+			+ " model should use the chat endpoint or the legacy endpoint.\n\n"
+			+ "If \"Custom model\" is left blank, this setting is ignored.",
+			CustomModelType.values(), CustomModelType.CHAT);
+	
+	public enum CustomModelType
+	{
+		CHAT("Chat", true),
+		LEGACY("Legacy", false);
+		
+		private final String name;
+		private final boolean chat;
+		
+		private CustomModelType(String name, boolean chat)
+		{
+			this.name = name;
+			this.chat = chat;
+		}
+		
+		public boolean isChat()
+		{
+			return chat;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
 	public final TextFieldSetting openaiChatEndpoint = new TextFieldSetting(
 		"OpenAI chat endpoint", "Endpoint for OpenAI's chat completion API.",
 		"https://api.openai.com/v1/chat/completions");
@@ -191,19 +214,11 @@ public final class ModelSettings
 			"Endpoint for OpenAI's legacy completion API.",
 			"https://api.openai.com/v1/completions");
 	
-	public final TextFieldSetting oobaboogaEndpoint =
-		new TextFieldSetting("Oobabooga endpoint",
-			"Endpoint for your Oobabooga web UI instance.\n"
-				+ "Remember to start the Oobabooga server with the"
-				+ " \u00a7e--extensions api\u00a7r flag.",
-			"http://127.0.0.1:5000/api/v1/generate");
-	
 	private final List<Setting> settings =
 		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
-			temperature, topP, presencePenalty, frequencyPenalty,
-			repetitionPenalty, encoderRepetitionPenalty, stopSequence,
-			contextLength, filterServerMessages, openaiChatEndpoint,
-			openaiLegacyEndpoint, oobaboogaEndpoint));
+			temperature, topP, presencePenalty, frequencyPenalty, stopSequence,
+			contextLength, filterServerMessages, customModel, customModelType,
+			openaiChatEndpoint, openaiLegacyEndpoint));
 	
 	public void forEach(Consumer<Setting> action)
 	{

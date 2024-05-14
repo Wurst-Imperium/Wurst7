@@ -17,10 +17,8 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hacks.autocomplete.ApiProviderSetting;
 import net.wurstclient.hacks.autocomplete.MessageCompleter;
 import net.wurstclient.hacks.autocomplete.ModelSettings;
-import net.wurstclient.hacks.autocomplete.OobaboogaMessageCompleter;
 import net.wurstclient.hacks.autocomplete.OpenAiMessageCompleter;
 import net.wurstclient.hacks.autocomplete.SuggestionHandler;
 import net.wurstclient.util.ChatUtils;
@@ -32,7 +30,6 @@ public final class AutoCompleteHack extends Hack
 {
 	private final ModelSettings modelSettings = new ModelSettings();
 	private final SuggestionHandler suggestionHandler = new SuggestionHandler();
-	private final ApiProviderSetting apiProvider = new ApiProviderSetting();
 	
 	private MessageCompleter completer;
 	private String draftMessage;
@@ -47,7 +44,6 @@ public final class AutoCompleteHack extends Hack
 		super("AutoComplete");
 		setCategory(Category.CHAT);
 		
-		addSetting(apiProvider);
 		modelSettings.forEach(this::addSetting);
 		suggestionHandler.getSettings().forEach(this::addSetting);
 	}
@@ -55,11 +51,7 @@ public final class AutoCompleteHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		completer = switch(apiProvider.getSelected())
-		{
-			case OPENAI -> new OpenAiMessageCompleter(modelSettings);
-			case OOBABOOGA -> new OobaboogaMessageCompleter(modelSettings);
-		};
+		completer = new OpenAiMessageCompleter(modelSettings);
 		
 		if(completer instanceof OpenAiMessageCompleter
 			&& System.getenv("WURST_OPENAI_KEY") == null)

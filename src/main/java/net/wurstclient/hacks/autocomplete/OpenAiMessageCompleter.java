@@ -35,8 +35,6 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 		JsonObject params = new JsonObject();
 		params.addProperty("stop",
 			modelSettings.stopSequence.getSelected().getSequence());
-		params.addProperty("model",
-			"" + modelSettings.openAiModel.getSelected());
 		params.addProperty("max_tokens", modelSettings.maxTokens.getValueI());
 		params.addProperty("temperature", modelSettings.temperature.getValue());
 		params.addProperty("top_p", modelSettings.topP.getValue());
@@ -46,8 +44,19 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 			modelSettings.frequencyPenalty.getValue());
 		params.addProperty("n", maxSuggestions);
 		
-		// add the prompt, depending on the model
-		if(modelSettings.openAiModel.getSelected().isChatModel())
+		// determine model name and type
+		boolean customModel = !modelSettings.customModel.getValue().isBlank();
+		String modelName = customModel ? modelSettings.customModel.getValue()
+			: "" + modelSettings.openAiModel.getSelected();
+		boolean chatModel =
+			customModel ? modelSettings.customModelType.getSelected().isChat()
+				: modelSettings.openAiModel.getSelected().isChatModel();
+		
+		// add the model name
+		params.addProperty("model", modelName);
+		
+		// add the prompt, depending on model type
+		if(chatModel)
 		{
 			JsonArray messages = new JsonArray();
 			JsonObject systemMessage = new JsonObject();
