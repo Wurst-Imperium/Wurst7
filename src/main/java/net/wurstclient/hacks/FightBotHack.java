@@ -200,8 +200,9 @@ public final class FightBotHack extends Hack
 			
 			// follow entity
 			MC.options.forwardKey.setPressed(
-			MC.player.distanceTo(entity) > distance.getValueF());
-			MC.options.backKey.setPressed(MC.player.distanceTo(entity) < safedistance.getValueF());
+				MC.player.distanceTo(entity) > distance.getValueF());
+			MC.options.backKey.setPressed(
+				MC.player.distanceTo(entity) < safedistance.getValueF());
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 		}
