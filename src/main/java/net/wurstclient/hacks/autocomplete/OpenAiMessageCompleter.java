@@ -48,6 +48,12 @@ public final class OpenAiMessageCompleter extends MessageCompleter
 		if(modelSettings.openAiModel.getSelected().isChatModel())
 		{
 			JsonArray messages = new JsonArray();
+			JsonObject systemMessage = new JsonObject();
+			systemMessage.addProperty("role", "system");
+			systemMessage.addProperty("content",
+				"Complete the following text. Reply only with the completion."
+					+ " You are not an assistant.");
+			messages.add(systemMessage);
 			JsonObject promptMessage = new JsonObject();
 			promptMessage.addProperty("role", "user");
 			promptMessage.addProperty("content", prompt);
