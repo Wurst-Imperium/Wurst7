@@ -53,9 +53,9 @@ public final class FightBotHack extends Hack
 			+ "This should be set to a lower value than Range.",
 		3, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-  	private final SliderSetting safedistance = new SliderSetting("Safe Distance",
-		"At what distance to retreat from the target.",
-		3, 0, 6, 0.01, ValueDisplay.DECIMAL);
+			private final SliderSetting safedistance = new SliderSetting("Safe Distance",
+			"At what distance to retreat from the target.",
+			3, 0, 6, 0.01, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
@@ -200,7 +200,7 @@ public final class FightBotHack extends Hack
 			
 			// follow entity
 			MC.options.forwardKey.setPressed(
-				MC.player.distanceTo(entity) > distance.getValueF());
+			MC.player.distanceTo(entity) > distance.getValueF());
 			MC.options.backKey.setPressed(
 				MC.player.distanceTo(entity) < safedistance.getValueF());
 			WURST.getRotationFaker()
