@@ -21,6 +21,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -42,8 +43,9 @@ public abstract class GameRendererMixin implements AutoCloseable
 	 */
 	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V",
-		ordinal = 0), method = "renderWorld(FJ)V")
-	private void onRenderWorldViewBobbing(float tickDelta, long limitTime,
+		ordinal = 0),
+		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
+	private void onRenderWorldViewBobbing(RenderTickCounter tickCounter,
 		CallbackInfo ci)
 	{
 		CameraTransformViewBobbingEvent event =
@@ -89,9 +91,10 @@ public abstract class GameRendererMixin implements AutoCloseable
 			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
-		method = "renderWorld(FJ)V")
-	private void onRenderWorld(float tickDelta, long limitTime, CallbackInfo ci,
-		@Local(ordinal = 1) Matrix4f matrix4f2)
+		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
+	private void onRenderWorldHandRendering(RenderTickCounter tickCounter,
+		CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2,
+		@Local(ordinal = 1) float tickDelta)
 	{
 		MatrixStack matrixStack = new MatrixStack();
 		matrixStack.multiplyPositionMatrix(matrix4f2);
@@ -130,8 +133,8 @@ public abstract class GameRendererMixin implements AutoCloseable
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F",
 			ordinal = 0),
-		method = "renderWorld(FJ)V")
-	private float wurstNauseaLerp(float delta, float start, float end,
+		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
+	private float onRenderWorldNauseaLerp(float delta, float start, float end,
 		Operation<Float> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())

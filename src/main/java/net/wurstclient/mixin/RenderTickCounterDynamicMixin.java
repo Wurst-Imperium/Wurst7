@@ -17,14 +17,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.render.RenderTickCounter;
 import net.wurstclient.WurstClient;
 
-@Mixin(RenderTickCounter.class)
-public abstract class RenderTickCounterMixin
+@Mixin(RenderTickCounter.Dynamic.class)
+public abstract class RenderTickCounterDynamicMixin
 {
 	@Shadow
 	public float lastFrameDuration;
 	
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/RenderTickCounter;prevTimeMillis:J",
+		target = "Lnet/minecraft/client/render/RenderTickCounter$Dynamic;prevTimeMillis:J",
 		opcode = Opcodes.PUTFIELD,
 		ordinal = 0), method = "beginRenderTick(J)I")
 	public void onBeginRenderTick(long timeMillis,
