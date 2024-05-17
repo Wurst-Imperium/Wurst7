@@ -7,16 +7,57 @@
  */
 package net.wurstclient.mixinterface;
 
+import net.minecraft.client.option.KeyBinding;
+
 public interface IKeyBinding
 {
-	/**
-	 * @return true if the user is actually pressing this key on their keyboard.
-	 */
-	public boolean isActallyPressed();
-	
 	/**
 	 * Resets the pressed state to whether or not the user is actually pressing
 	 * this key on their keyboard.
 	 */
-	public void resetPressedState();
+	public default void resetPressedState()
+	{
+		wurst_resetPressedState();
+	}
+	
+	/**
+	 * Simulates the user pressing this key on their keyboard or mouse. This is
+	 * much more aggressive than using {@link #setPressed(boolean)} and should
+	 * be used sparingly.
+	 */
+	public default void simulatePress(boolean pressed)
+	{
+		wurst_simulatePress(pressed);
+	}
+	
+	public default void setPressed(boolean pressed)
+	{
+		asVanilla().setPressed(pressed);
+	}
+	
+	public default KeyBinding asVanilla()
+	{
+		return (KeyBinding)this;
+	}
+	
+	/**
+	 * Returns the given KeyBinding object as an IKeyBinding, allowing you to
+	 * access the resetPressedState() method.
+	 */
+	public static IKeyBinding get(KeyBinding kb)
+	{
+		return (IKeyBinding)kb;
+	}
+	
+	/**
+	 * @deprecated Use {@link #resetPressedState()} instead.
+	 */
+	@Deprecated
+	public void wurst_resetPressedState();
+	
+	/**
+	 * @deprecated Use {@link #simulatePress()} instead.
+	 */
+	@Deprecated
+	public void wurst_simulatePress(boolean pressed);
 }

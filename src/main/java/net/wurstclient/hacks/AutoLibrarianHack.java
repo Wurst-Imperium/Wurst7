@@ -337,7 +337,8 @@ public final class AutoLibrarianHack extends Hack
 			? Hand.MAIN_HAND : Hand.OFF_HAND;
 		
 		// sneak-place to avoid activating trapdoors/chests/etc.
-		MC.options.sneakKey.setPressed(true);
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
+		sneakKey.setPressed(true);
 		if(!MC.player.isSneaking())
 			return;
 		
@@ -345,7 +346,7 @@ public final class AutoLibrarianHack extends Hack
 		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(jobSite);
 		if(params == null)
 		{
-			((IKeyBinding)MC.options.sneakKey).resetPressedState();
+			sneakKey.resetPressedState();
 			return;
 		}
 		
@@ -361,7 +362,7 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.swing(hand);
 		
 		// reset sneak
-		((IKeyBinding)MC.options.sneakKey).resetPressedState();
+		sneakKey.resetPressedState();
 	}
 	
 	private void openTradeScreen()

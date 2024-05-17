@@ -41,6 +41,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
 
     - name: Generate and submit dependency graph
+      if: ${{ github.event_name == 'push' }}
       uses: gradle/actions/dependency-submission@v3
       with:
         build-scan-publish: true

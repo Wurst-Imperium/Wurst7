@@ -23,42 +23,33 @@ public final class ModelSettings
 {
 	public final EnumSetting<OpenAiModel> openAiModel = new EnumSetting<>(
 		"OpenAI model",
-		"The model to use for OpenAI API calls.\n\n"
-			+ "\u00a7lText-Davinci-003\u00a7r (better known as GPT-3) is an"
-			+ " older model that's less censored than ChatGPT, but it's also"
-			+ " 10x more expensive to use.\n\n"
-			+ "\u00a7lGPT-3.5-Turbo\u00a7r (better known as ChatGPT) is"
-			+ " recommended for most use cases, as it's relatively cheap and"
-			+ " powerful.\n\n"
-			+ "\u00a7lGPT-4\u00a7r is more powerful, but only works if OpenAI"
-			+ " has chosen you to be a beta tester. It can be anywhere from"
-			+ " 15x to 60x more expensive than ChatGPT.",
-		OpenAiModel.values(), OpenAiModel.GPT_3_5_TURBO);
+		"The model to use for OpenAI API calls.\nRecommended models:\n\n"
+			+ "\u00a7lGPT-4o-2024-05-13\u00a7r is the world's smartest model at"
+			+ " the time of writing and will often produce the best completions."
+			+ " However, it's meant to be an assistant rather than an"
+			+ " auto-completion system, so you will see it produce some odd"
+			+ " completions at times.\n\n"
+			+ "\u00a7lGPT-3.5-Turbo-Instruct\u00a7r is an older, non-chat model"
+			+ " based on GPT-3.5 that works well for auto-completion tasks.",
+		OpenAiModel.values(), OpenAiModel.GPT_4O_2024_05_13);
 	
 	public enum OpenAiModel
 	{
-		GPT_3_5_TURBO("gpt-3.5-turbo", true),
-		GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106", true),
-		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
-		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
-		GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", true),
-		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
-		GPT_4("gpt-4", true),
+		GPT_4O_2024_05_13("gpt-4o-2024-05-13", true),
+		GPT_4_TURBO_2024_04_09("gpt-4-turbo-2024-04-09", true),
+		GPT_4_0125_PREVIEW("gpt-4-0125-preview", true),
 		GPT_4_1106_PREVIEW("gpt-4-1106-preview", true),
 		GPT_4_0613("gpt-4-0613", true),
 		GPT_4_0314("gpt-4-0314", true),
-		GPT_4_32K("gpt-4-32k", true),
 		GPT_4_32K_0613("gpt-4-32k-0613", true),
-		TEXT_DAVINCI_003("text-davinci-003", false),
-		TEXT_DAVINCI_002("text-davinci-002", false),
-		TEXT_DAVINCI_001("text-davinci-001", false),
-		DAVINCI("davinci", false),
-		TEXT_CURIE_001("text-curie-001", false),
-		CURIE("curie", false),
-		TEXT_BABBAGE_001("text-babbage-001", false),
-		BABBAGE("babbage", false),
-		TEXT_ADA_001("text-ada-001", false),
-		ADA("ada", false);
+		GPT_3_5_TURBO_0125("gpt-3.5-turbo-0125", true),
+		GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106", true),
+		GPT_3_5_TURBO_0613("gpt-3.5-turbo-0613", true),
+		GPT_3_5_TURBO_16K_0613("gpt-3.5-turbo-16k-0613", true),
+		GPT_3_5_TURBO_0301("gpt-3.5-turbo-0301", true),
+		GPT_3_5_TURBO_INSTRUCT("gpt-3.5-turbo-instruct", false),
+		DAVINCI_002("davinci-002", false),
+		BABBAGE_002("babbage-002", false);
 		
 		private final String name;
 		private final boolean chat;
@@ -92,7 +83,7 @@ public final class ModelSettings
 		"Controls the model's creativity and randomness. A higher value will"
 			+ " result in more creative and sometimes nonsensical completions,"
 			+ " while a lower value will result in more boring completions.",
-		0.7, 0, 2, 0.01, ValueDisplay.DECIMAL);
+		1, 0, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting topP = new SliderSetting("Top P",
 		"An alternative to temperature. Makes the model less random by only"
@@ -107,8 +98,7 @@ public final class ModelSettings
 				+ " history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat the same word over and over again.\n\n"
-				+ "Only works with OpenAI models.",
+				+ " model to repeat the same word over and over again.",
 			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final SliderSetting frequencyPenalty =
@@ -117,25 +107,8 @@ public final class ModelSettings
 				+ " appears in the chat history.\n\n"
 				+ "Positive values encourage the model to use synonyms and"
 				+ " talk about different topics. Negative values encourage the"
-				+ " model to repeat existing chat messages.\n\n"
-				+ "Only works with OpenAI models.",
-			0.6, -2, 2, 0.01, ValueDisplay.DECIMAL);
-	
-	public final SliderSetting repetitionPenalty =
-		new SliderSetting("Repetition penalty",
-			"Similar to presence penalty, but uses a different algorithm.\n\n"
-				+ "1.0 means no penalty, negative values are not possible and"
-				+ " 1.5 is the maximum value.\n\n"
-				+ "Only works with the oobabooga web UI.",
-			1, 1, 1.5, 0.01, ValueDisplay.DECIMAL);
-	
-	public final SliderSetting encoderRepetitionPenalty =
-		new SliderSetting("Encoder repetition penalty",
-			"Similar to frequency penalty, but uses a different algorithm.\n\n"
-				+ "1.0 means no penalty, 0.8 behaves like a negative value and"
-				+ " 1.5 is the maximum value.\n\n"
-				+ "Only works with the oobabooga web UI.",
-			1, 0.8, 1.5, 0.01, ValueDisplay.DECIMAL);
+				+ " model to repeat existing chat messages.",
+			0, -2, 2, 0.01, ValueDisplay.DECIMAL);
 	
 	public final EnumSetting<StopSequence> stopSequence = new EnumSetting<>(
 		"Stop sequence",
@@ -179,7 +152,7 @@ public final class ModelSettings
 			+ " predictions.\n\n"
 			+ "Higher values improve the quality of predictions, but also"
 			+ " increase the time it takes to generate them, as well as cost"
-			+ " (for OpenAI API users) or RAM usage (for oobabooga users).",
+			+ " (for APIs like OpenAI) or RAM usage (for self-hosted models).",
 		10, 0, 100, 1, ValueDisplay.INTEGER);
 	
 	public final CheckboxSetting filterServerMessages =
@@ -191,6 +164,47 @@ public final class ModelSettings
 				+ " etc.",
 			false);
 	
+	public final TextFieldSetting customModel = new TextFieldSetting(
+		"Custom model",
+		"If set, this model will be used instead of the one specified in the"
+			+ " \"OpenAI model\" setting.\n\n"
+			+ "Use this if you have a fine-tuned OpenAI model or if you are"
+			+ " using a custom endpoint that is OpenAI-compatible but offers"
+			+ " different models.",
+		"");
+	
+	public final EnumSetting<CustomModelType> customModelType =
+		new EnumSetting<>("Custom model type", "Whether the custom"
+			+ " model should use the chat endpoint or the legacy endpoint.\n\n"
+			+ "If \"Custom model\" is left blank, this setting is ignored.",
+			CustomModelType.values(), CustomModelType.CHAT);
+	
+	public enum CustomModelType
+	{
+		CHAT("Chat", true),
+		LEGACY("Legacy", false);
+		
+		private final String name;
+		private final boolean chat;
+		
+		private CustomModelType(String name, boolean chat)
+		{
+			this.name = name;
+			this.chat = chat;
+		}
+		
+		public boolean isChat()
+		{
+			return chat;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+	}
+	
 	public final TextFieldSetting openaiChatEndpoint = new TextFieldSetting(
 		"OpenAI chat endpoint", "Endpoint for OpenAI's chat completion API.",
 		"https://api.openai.com/v1/chat/completions");
@@ -200,19 +214,11 @@ public final class ModelSettings
 			"Endpoint for OpenAI's legacy completion API.",
 			"https://api.openai.com/v1/completions");
 	
-	public final TextFieldSetting oobaboogaEndpoint =
-		new TextFieldSetting("Oobabooga endpoint",
-			"Endpoint for your Oobabooga web UI instance.\n"
-				+ "Remember to start the Oobabooga server with the"
-				+ " \u00a7e--extensions api\u00a7r flag.",
-			"http://127.0.0.1:5000/api/v1/generate");
-	
 	private final List<Setting> settings =
 		Collections.unmodifiableList(Arrays.asList(openAiModel, maxTokens,
-			temperature, topP, presencePenalty, frequencyPenalty,
-			repetitionPenalty, encoderRepetitionPenalty, stopSequence,
-			contextLength, filterServerMessages, openaiChatEndpoint,
-			openaiLegacyEndpoint, oobaboogaEndpoint));
+			temperature, topP, presencePenalty, frequencyPenalty, stopSequence,
+			contextLength, filterServerMessages, customModel, customModelType,
+			openaiChatEndpoint, openaiLegacyEndpoint));
 	
 	public void forEach(Consumer<Setting> action)
 	{

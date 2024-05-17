@@ -8,34 +8,34 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.HoeItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
+import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"till aura", "HoeAura", "hoe aura", "FarmlandAura",
 	"farmland aura", "farm land aura", "AutoTill", "auto till", "AutoHoe",
 	"auto hoe"})
-public final class TillauraHack extends Hack implements UpdateListener
+public final class TillauraHack extends Hack implements PostMotionListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far Tillaura will reach to till blocks.", 5, 1, 6, 0.05,
@@ -51,7 +51,7 @@ public final class TillauraHack extends Hack implements UpdateListener
 				+ "Good for NoCheat+ servers, but unnecessary in vanilla.",
 			true);
 	
-	private final List<Block> tillableBlocks = Arrays.asList(Blocks.GRASS_BLOCK,
+	private final List<Block> tillableBlocks = List.of(Blocks.GRASS_BLOCK,
 		Blocks.DIRT_PATH, Blocks.DIRT, Blocks.COARSE_DIRT);
 	
 	public TillauraHack()
@@ -67,30 +67,32 @@ public final class TillauraHack extends Hack implements UpdateListener
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PostMotionListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PostMotionListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
+	public void onPostMotion()
 	{
 		// wait for right click timer
 		if(MC.itemUseCooldown > 0)
 			return;
 		
+		// don't till while breaking or riding
+		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+			return;
+		
 		// check held item
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
-		if(stack.isEmpty() || !(stack.getItem() instanceof HoeItem))
+		if(!MC.player.isHolding(stack -> stack.getItem() instanceof HoeItem))
 			return;
 		
 		// get valid blocks
-		ArrayList<BlockPos> validBlocks =
-			getValidBlocks(range.getValue(), this::isCorrectBlock);
+		ArrayList<BlockPos> validBlocks = getValidBlocks();
 		
 		if(multiTill.isChecked())
 		{
@@ -111,22 +113,18 @@ public final class TillauraHack extends Hack implements UpdateListener
 					break;
 	}
 	
-	private ArrayList<BlockPos> getValidBlocks(double range,
-		Predicate<BlockPos> validator)
+	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeSq = Math.pow(range + 0.5, 2);
-		int rangeI = (int)Math.ceil(range);
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = range.getValueSq();
+		int blockRange = range.getValueCeil();
 		
-		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		
-		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(this::isCorrectBlock)
+			.sorted(Comparator
+				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -143,69 +141,32 @@ public final class TillauraHack extends Hack implements UpdateListener
 	
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
-		double rangeSq = Math.pow(range.getValue(), 2);
+		// if this block is unreachable, try the next one
+		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
+		if(params == null || params.distanceSq() > range.getValueSq())
+			return false;
+		if(checkLOS.isChecked() && !params.lineOfSight())
+			return false;
 		
-		for(Direction side : Direction.values())
-		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
-			
-			// check if hitVec is within range
-			if(distanceSqHitVec > rangeSq)
-				continue;
-			
-			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
-				continue;
-			
-			if(checkLOS.isChecked()
-				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
-				continue;
-			
-			// face block
-			WURST.getRotationFaker().faceVectorPacket(hitVec);
-			
-			// right click block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			MC.itemUseCooldown = 4;
-			return true;
-		}
-		
-		return false;
+		// face and right click the block
+		MC.itemUseCooldown = 4;
+		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+		InteractionSimulator.rightClickBlock(params.toHitResult());
+		return true;
 	}
 	
 	private boolean rightClickBlockSimple(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
-		double rangeSq = Math.pow(range.getValue(), 2);
+		// if this block is unreachable, try the next one
+		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
+		if(params == null || params.distanceSq() > range.getValueSq())
+			return false;
+		if(checkLOS.isChecked() && !params.lineOfSight())
+			return false;
 		
-		for(Direction side : Direction.values())
-		{
-			Vec3d hitVec = posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
-			double distanceSqHitVec = eyesPos.squaredDistanceTo(hitVec);
-			
-			// check if hitVec is within range
-			if(distanceSqHitVec > rangeSq)
-				continue;
-			
-			// check if side is facing towards player
-			if(distanceSqHitVec >= distanceSqPosVec)
-				continue;
-			
-			if(checkLOS.isChecked()
-				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
-				continue;
-			
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
-			return true;
-		}
-		
-		return false;
+		// right click the block
+		InteractionSimulator.rightClickBlock(params.toHitResult(),
+			SwingHand.OFF);
+		return true;
 	}
 }
