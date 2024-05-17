@@ -17,8 +17,13 @@ import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
@@ -32,6 +37,7 @@ import net.wurstclient.command.Command;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.GUIRenderListener;
+import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
@@ -154,8 +160,25 @@ public enum WurstClient
 			GLFW.GLFW_KEY_V, KeyBinding.MISC_CATEGORY);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
+		if(FabricLoader.getInstance().isModLoaded("connectormod"))
+		{
+			System.out.println("[Wurst] Applying fixes for Sinytra Connector");
+			HudRenderCallback.EVENT.register(this::onHudRender);
+		}
+		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
+	}
+	
+	// Alternative HUD rendering when using Sinytra Connector
+	private void onHudRender(DrawContext context, float tickDelta)
+	{
+		if(MC.options.debugEnabled)
+			return;
+		
+		RenderSystem.disableBlend();
+		EventManager.fire(new GUIRenderEvent(context, tickDelta));
+		RenderSystem.disableBlend();
 	}
 	
 	private Path createWurstFolder()
