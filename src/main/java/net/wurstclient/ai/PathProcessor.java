@@ -77,6 +77,6 @@ public abstract class PathProcessor
 	{
 		// reset keys
 		for(KeyBinding key : CONTROLS)
-			((IKeyBinding)key).resetPressedState();
+			IKeyBinding.get(key).resetPressedState();
 	}
 }

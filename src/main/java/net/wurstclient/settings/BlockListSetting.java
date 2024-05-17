@@ -18,6 +18,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
@@ -29,7 +30,6 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
-import net.wurstclient.util.json.WsonArray;
 
 public final class BlockListSetting extends Setting
 {
@@ -90,10 +90,17 @@ public final class BlockListSetting extends Setting
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.getAsArray(json);
 			blockNames.clear();
 			
-			wson.getAllStrings().parallelStream()
+			// if string "default", load default blocks
+			if(JsonUtils.getAsString(json, "nope").equals("default"))
+			{
+				blockNames.addAll(Arrays.asList(defaultNames));
+				return;
+			}
+			
+			// otherwise, load the blocks in the JSON array
+			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
 				.map(s -> Registries.BLOCK.get(new Identifier(s)))
 				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 				.sorted().forEachOrdered(s -> blockNames.add(s));
@@ -108,6 +115,10 @@ public final class BlockListSetting extends Setting
 	@Override
 	public JsonElement toJson()
 	{
+		// if blockNames is the same as defaultNames, save string "default"
+		if(blockNames.equals(Arrays.asList(defaultNames)))
+			return new JsonPrimitive("default");
+		
 		JsonArray json = new JsonArray();
 		blockNames.forEach(s -> json.add(s));
 		return json;
