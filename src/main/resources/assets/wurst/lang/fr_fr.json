@@ -1,6 +1,6 @@
 {
   "description.wurst.hack.anchoraura": "Place automatiquement (optionnel), charge et fait exploser les ancres de réapparition pour tuer les entités autour de vous.",
-  "description.wurst.hack.antiafk": "Marche au hasard pour vous cacher des détecteurs d'AFK.\nNécessite au moins 3x3 blocs d'espace libre.",
+  "description.wurst.hack.antiafk": "Marche au hasard pour vous cacher des détecteurs d'AFK.",
   "description.wurst.hack.antiblind": "Empêche l'effet cécité et d'obscurité.\nIncompatible avec OptiFine.",
   "description.wurst.hack.anticactus": "Vous protège des dommages causés par les cactus.",
   "description.wurst.hack.antiknockback": "Vous empêche d'être poussé par les joueurs et les mobs.",

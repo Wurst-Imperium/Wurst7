@@ -35,7 +35,7 @@ public final class LsdHack extends Hack
 			MC.gameRenderer.disablePostProcessor();
 		
 		MC.gameRenderer
-			.loadPostProcessor(new Identifier("shaders/post/wobble.json"));
+			.loadPostProcessor(new Identifier("shaders/post/lsd.json"));
 	}
 	
 	@Override

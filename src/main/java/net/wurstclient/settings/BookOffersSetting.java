@@ -18,6 +18,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -26,7 +27,6 @@ import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
-import net.wurstclient.util.json.WsonArray;
 import net.wurstclient.util.json.WsonObject;
 
 public final class BookOffersSetting extends Setting
@@ -146,12 +146,20 @@ public final class BookOffersSetting extends Setting
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.getAsArray(json);
 			offers.clear();
 			
-			wson.getAllObjects().parallelStream().map(this::loadOffer)
-				.filter(Objects::nonNull).filter(BookOffer::isMostlyValid)
-				.distinct().sorted().forEachOrdered(offers::add);
+			// if string "default", load default offers
+			if(JsonUtils.getAsString(json, "nope").equals("default"))
+			{
+				offers.addAll(Arrays.asList(defaultOffers));
+				return;
+			}
+			
+			// otherwise, load the offers in the JSON array
+			JsonUtils.getAsArray(json).getAllObjects().parallelStream()
+				.map(this::loadOffer).filter(Objects::nonNull)
+				.filter(BookOffer::isMostlyValid).distinct().sorted()
+				.forEachOrdered(offers::add);
 			
 		}catch(JsonException e)
 		{
@@ -181,6 +189,10 @@ public final class BookOffersSetting extends Setting
 	@Override
 	public JsonElement toJson()
 	{
+		// if offers is the same as defaultOffers, save string "default"
+		if(offers.equals(Arrays.asList(defaultOffers)))
+			return new JsonPrimitive("default");
+		
 		JsonArray json = new JsonArray();
 		
 		offers.forEach(offer -> {

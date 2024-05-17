@@ -18,6 +18,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -28,7 +29,6 @@ import net.wurstclient.clickgui.components.ItemListEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
-import net.wurstclient.util.json.WsonArray;
 
 public final class ItemListSetting extends Setting
 {
@@ -90,10 +90,17 @@ public final class ItemListSetting extends Setting
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.getAsArray(json);
 			itemNames.clear();
 			
-			wson.getAllStrings().parallelStream()
+			// if string "default", load default items
+			if(JsonUtils.getAsString(json, "nope").equals("default"))
+			{
+				itemNames.addAll(Arrays.asList(defaultNames));
+				return;
+			}
+			
+			// otherwise, load the items in the JSON array
+			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
 				.map(s -> Registries.ITEM.get(new Identifier(s)))
 				.filter(Objects::nonNull)
 				.map(i -> Registries.ITEM.getId(i).toString()).distinct()
@@ -109,6 +116,10 @@ public final class ItemListSetting extends Setting
 	@Override
 	public JsonElement toJson()
 	{
+		// if itemNames is the same as defaultNames, save string "default"
+		if(itemNames.equals(Arrays.asList(defaultNames)))
+			return new JsonPrimitive("default");
+		
 		JsonArray json = new JsonArray();
 		itemNames.forEach(s -> json.add(s));
 		return json;
