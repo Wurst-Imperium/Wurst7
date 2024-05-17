@@ -7,9 +7,12 @@
  */
 package net.wurstclient.mixin;
 
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.WurstClient;
@@ -22,19 +25,47 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	private InputUtil.Key boundKey;
 	
 	@Override
-	public boolean isActallyPressed()
+	@Unique
+	@Deprecated // use IKeyBinding.resetPressedState() instead
+	public void wurst_resetPressedState()
 	{
 		long handle = WurstClient.MC.getWindow().getHandle();
 		int code = boundKey.getCode();
-		return InputUtil.isKeyPressed(handle, code);
+		setPressed(InputUtil.isKeyPressed(handle, code));
 	}
 	
 	@Override
-	public void resetPressedState()
+	@Unique
+	@Deprecated // use IKeyBinding.simulatePress() instead
+	public void wurst_simulatePress(boolean pressed)
 	{
-		setPressed(isActallyPressed());
+		MinecraftClient mc = WurstClient.MC;
+		long window = mc.getWindow().getHandle();
+		int action = pressed ? 1 : 0;
+		
+		switch(boundKey.getCategory())
+		{
+			case KEYSYM:
+			mc.keyboard.onKey(window, boundKey.getCode(), 0, action, 0);
+			break;
+			
+			case SCANCODE:
+			mc.keyboard.onKey(window, GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(),
+				action, 0);
+			break;
+			
+			case MOUSE:
+			mc.mouse.onMouseButton(window, boundKey.getCode(), action, 0);
+			break;
+			
+			default:
+			System.out
+				.println("Unknown keybinding type: " + boundKey.getCategory());
+			break;
+		}
 	}
 	
+	@Override
 	@Shadow
 	public abstract void setPressed(boolean pressed);
 }

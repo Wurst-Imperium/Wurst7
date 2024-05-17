@@ -18,11 +18,21 @@ public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
 	private static final MinecraftClient MC = WurstClient.MC;
-	private static final String DESCRIPTION_SUFFIX = buildDescriptionSuffix();
+	private static final String FULL_DESCRIPTION_SUFFIX =
+		buildDescriptionSuffix(true);
+	private static final String REDUCED_DESCRIPTION_SUFFIX =
+		buildDescriptionSuffix(false);
 	
-	public SwingHandSetting(String description)
+	private SwingHandSetting(String name, String description,
+		SwingHand[] values, SwingHand selected)
 	{
-		this(description, SwingHand.SERVER);
+		super(name, description, values, selected);
+	}
+	
+	public SwingHandSetting(String name, String description, SwingHand selected)
+	{
+		this(name, description + FULL_DESCRIPTION_SUFFIX, SwingHand.values(),
+			selected);
 	}
 	
 	public SwingHandSetting(String description, SwingHand selected)
@@ -30,10 +40,23 @@ public final class SwingHandSetting
 		this("Swing hand", description, selected);
 	}
 	
-	public SwingHandSetting(String name, String description, SwingHand selected)
+	public SwingHandSetting(String description)
 	{
-		super(name, description + DESCRIPTION_SUFFIX, SwingHand.values(),
-			selected);
+		this(description, SwingHand.SERVER);
+	}
+	
+	public static SwingHandSetting withoutOffOption(String name,
+		String description, SwingHand selected)
+	{
+		SwingHand[] values = {SwingHand.SERVER, SwingHand.CLIENT};
+		return new SwingHandSetting(name,
+			description + REDUCED_DESCRIPTION_SUFFIX, values, selected);
+	}
+	
+	public static SwingHandSetting withoutOffOption(String description,
+		SwingHand selected)
+	{
+		return withoutOffOption("Swing hand", description, selected);
 	}
 	
 	public void swing(Hand hand)
@@ -41,11 +64,13 @@ public final class SwingHandSetting
 		getSelected().swing(hand);
 	}
 	
-	private static String buildDescriptionSuffix()
+	private static String buildDescriptionSuffix(boolean includeOff)
 	{
 		StringBuilder builder = new StringBuilder("\n\n");
+		SwingHand[] values = includeOff ? SwingHand.values()
+			: new SwingHand[]{SwingHand.SERVER, SwingHand.CLIENT};
 		
-		for(SwingHand value : SwingHand.values())
+		for(SwingHand value : values)
 			builder.append("\u00a7l").append(value.name).append("\u00a7r - ")
 				.append(value.description).append("\n\n");
 		

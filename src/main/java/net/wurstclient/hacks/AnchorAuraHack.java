@@ -35,6 +35,8 @@ import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.FacingSetting.Facing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.AnchorAuraFilterList;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
@@ -69,6 +71,11 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			+ "Slower but can help with anti-cheat plugins.",
 		false);
 	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How AnchorAura should swing your hand when placing, charging and"
+			+ " detonating respawn anchors.",
+		SwingHand.CLIENT);
+	
 	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
 		"Take items from", "Where to look for respawn anchors and glowstone.",
 		TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
@@ -85,6 +92,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		addSetting(autoPlace);
 		addSetting(faceBlocks);
 		addSetting(checkLOS);
+		addSetting(swingHand);
 		addSetting(takeItemsFrom);
 		
 		entityFilters.forEach(this::addSetting);
@@ -174,7 +182,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(shouldSwing)
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		return newAnchors;
 	}
@@ -196,7 +204,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				shouldSwing = true;
 			
 		if(shouldSwing)
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 	}
 	
 	private void charge(ArrayList<BlockPos> unchargedAnchors)
@@ -216,7 +224,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				shouldSwing = true;
 			
 		if(shouldSwing)
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 	}
 	
 	private boolean rightClickBlock(BlockPos pos)
