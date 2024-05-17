@@ -19,8 +19,9 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 
-@SearchTags({"ArrayList", "ModList", "CheatList", "mod list", "array list",
-	"hack list", "cheat list"})
+@SearchTags({"hack list", "HakList", "hak list", "HacksList", "hacks list",
+	"HaxList", "hax list", "ArrayList", "array list", "ModList", "mod list",
+	"CheatList", "cheat list"})
 @DontBlock
 public final class HackListOtf extends OtherFeature
 {

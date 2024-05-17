@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.airplace": "Pozwala stawiać bloki w powietrzu.",
   "description.wurst.hack.anchoraura": "Automatycznie umieszcza (opcjonalnie), ładuje i wysadza kotwice odrodzenia, aby zabijać otaczające cię istoty.",
-  "description.wurst.hack.antiafk": "Spaceruje losowo dookoła, aby ukryć cię przed wykrywaczami AFK.\nWymaga co najmniej 3x3 bloków wolnego miejsca.",
+  "description.wurst.hack.antiafk": "Spaceruje losowo dookoła, aby ukryć cię przed wykrywaczami AFK.",
   "description.wurst.hack.antiblind": "Zapobiega efektom oślepienia i ciemności.\nNiekompatybilny z OptiFine.",
   "description.wurst.hack.anticactus": "Ochrania cię przed obrażeniami od kaktusa.",
   "description.wurst.hack.antihunger": "Spowalnia głód podczas chodzenia.",
