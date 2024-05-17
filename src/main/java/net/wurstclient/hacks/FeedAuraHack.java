@@ -67,9 +67,8 @@ public final class FeedAuraHack extends Hack
 	private final CheckboxSetting filterHorses = new CheckboxSetting(
 		"Filter horse-like animals",
 		"Won't feed horses, llamas, donkeys, etc.\n"
-			+ "Recommended in Minecraft versions before 1.20.3 due to MC-233276,"
-			+ "which causes these animals to consume items indefinitely.",
-		false);
+			+ "Recommended due to Minecraft bug MC-233276, which causes these animals to consume items indefinitely.",
+		true);
 	
 	private final Random random = new Random();
 	private AnimalEntity target;
