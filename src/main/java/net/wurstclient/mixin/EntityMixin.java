@@ -30,11 +30,17 @@ import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 {
+	/**
+	 * This mixin makes the VelocityFromFluidEvent work, which is used by
+	 * AntiWaterPush. It's set to require 0 because it doesn't work in Forge,
+	 * when using Sinytra Connector.
+	 */
 	@WrapWithCondition(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
 		opcode = Opcodes.INVOKEVIRTUAL,
 		ordinal = 0),
-		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z")
+		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z",
+		require = 0)
 	private boolean shouldSetVelocity(Entity instance, Vec3d velocity)
 	{
 		VelocityFromFluidEvent event = new VelocityFromFluidEvent(instance);
