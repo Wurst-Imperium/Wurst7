@@ -7,16 +7,18 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttributes;
+import java.util.OptionalDouble;
+
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 
@@ -55,32 +57,28 @@ public enum ItemUtils
 		}
 	}
 	
-	public static float getAttackSpeed(Item item)
+	public static OptionalDouble getAttribute(Item item,
+		RegistryEntry<EntityAttribute> attribute)
 	{
-		return (float)item.getAttributeModifiers(EquipmentSlot.MAINHAND)
-			.get(EntityAttributes.GENERIC_ATTACK_SPEED).stream().findFirst()
-			.orElseThrow().getValue();
+		return item.getComponents()
+			.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS,
+				AttributeModifiersComponent.DEFAULT)
+			.modifiers().stream()
+			.filter(modifier -> modifier.attribute() == attribute)
+			.mapToDouble(modifier -> modifier.modifier().value()).findFirst();
 	}
 	
-	/**
-	 * Adds the specified enchantment to the specified item stack. Unlike
-	 * {@link ItemStack#addEnchantment(Enchantment, int)}, this method doesn't
-	 * limit the level to 127.
-	 */
-	public static void addEnchantment(ItemStack stack, Enchantment enchantment,
-		int level)
+	public static boolean hasEffect(ItemStack stack,
+		RegistryEntry<StatusEffect> effect)
 	{
-		Identifier id = EnchantmentHelper.getEnchantmentId(enchantment);
-		NbtList nbt = getOrCreateNbtList(stack, ItemStack.ENCHANTMENTS_KEY);
-		nbt.add(EnchantmentHelper.createNbt(id, level));
-	}
-	
-	public static NbtList getOrCreateNbtList(ItemStack stack, String key)
-	{
-		NbtCompound nbt = stack.getOrCreateNbt();
-		if(!nbt.contains(key, NbtElement.LIST_TYPE))
-			nbt.put(key, new NbtList());
+		PotionContentsComponent potionContents = stack.getComponents()
+			.getOrDefault(DataComponentTypes.POTION_CONTENTS,
+				PotionContentsComponent.DEFAULT);
 		
-		return nbt.getList(key, NbtElement.COMPOUND_TYPE);
+		for(StatusEffectInstance effectInstance : potionContents.getEffects())
+			if(effectInstance.getEffectType() == effect)
+				return true;
+			
+		return false;
 	}
 }

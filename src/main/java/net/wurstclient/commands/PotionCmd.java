@@ -8,15 +8,17 @@
 package net.wurstclient.commands;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.wurstclient.command.CmdError;
@@ -59,19 +61,23 @@ public final class PotionCmd extends Command
 		if((args.length - 1) % 3 != 0)
 			throw new CmdSyntaxError();
 		
+		PotionContentsComponent oldContents = stack.getComponents()
+			.getOrDefault(DataComponentTypes.POTION_CONTENTS,
+				PotionContentsComponent.DEFAULT);
+		
 		// get effects to start with
 		ArrayList<StatusEffectInstance> effects;
-		Potion potion;
+		Optional<RegistryEntry<Potion>> potion;
 		switch(args[0].toLowerCase())
 		{
 			case "add":
-			effects = new ArrayList<>(PotionUtil.getCustomPotionEffects(stack));
-			potion = PotionUtil.getPotion(stack);
+			effects = new ArrayList<>(oldContents.customEffects());
+			potion = oldContents.potion();
 			break;
 			
 			case "set":
 			effects = new ArrayList<>();
-			potion = Potions.EMPTY;
+			potion = Optional.empty();
 			break;
 			
 			default:
@@ -81,15 +87,16 @@ public final class PotionCmd extends Command
 		// add new effects
 		for(int i = 0; i < (args.length - 1) / 3; i++)
 		{
-			StatusEffect effect = parseEffect(args[1 + i * 3]);
+			RegistryEntry<StatusEffect> effect = parseEffect(args[1 + i * 3]);
 			int amplifier = parseInt(args[2 + i * 3]) - 1;
 			int duration = parseInt(args[3 + i * 3]) * 20;
 			
 			effects.add(new StatusEffectInstance(effect, duration, amplifier));
 		}
 		
-		PotionUtil.setPotion(stack, potion);
-		setCustomPotionEffects(stack, effects);
+		stack.set(DataComponentTypes.POTION_CONTENTS,
+			new PotionContentsComponent(potion, oldContents.customColor(),
+				effects));
 		ChatUtils.message("Potion modified.");
 	}
 	
@@ -98,28 +105,36 @@ public final class PotionCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		StatusEffect targetEffect = parseEffect(args[1]);
+		RegistryEntry<StatusEffect> targetEffect = parseEffect(args[1]);
 		
-		Potion oldPotion = PotionUtil.getPotion(stack);
-		boolean mainPotionContainsTargetEffect = oldPotion.getEffects().stream()
-			.anyMatch(effect -> effect.getEffectType() == targetEffect);
+		PotionContentsComponent oldContents = stack.getComponents()
+			.getOrDefault(DataComponentTypes.POTION_CONTENTS,
+				PotionContentsComponent.DEFAULT);
+		
+		boolean mainPotionContainsTargetEffect =
+			oldContents.potion().isPresent()
+				&& oldContents.potion().get().value().getEffects().stream()
+					.anyMatch(effect -> effect.getEffectType() == targetEffect);
 		
 		ArrayList<StatusEffectInstance> newEffects = new ArrayList<>();
 		if(mainPotionContainsTargetEffect)
-			PotionUtil.getPotionEffects(stack).forEach(newEffects::add);
+			oldContents.getEffects().forEach(newEffects::add);
 		else
-			PotionUtil.getCustomPotionEffects(stack).forEach(newEffects::add);
+			oldContents.customEffects().forEach(newEffects::add);
 		newEffects.removeIf(effect -> effect.getEffectType() == targetEffect);
 		
-		Potion newPotion =
-			mainPotionContainsTargetEffect ? Potions.EMPTY : oldPotion;
+		Optional<RegistryEntry<Potion>> newPotion =
+			mainPotionContainsTargetEffect ? Optional.empty()
+				: oldContents.potion();
+		stack.set(DataComponentTypes.POTION_CONTENTS,
+			new PotionContentsComponent(newPotion, oldContents.customColor(),
+				newEffects));
 		
-		PotionUtil.setPotion(stack, newPotion);
-		setCustomPotionEffects(stack, newEffects);
 		ChatUtils.message("Effect removed.");
 	}
 	
-	private StatusEffect parseEffect(String input) throws CmdSyntaxError
+	private RegistryEntry<StatusEffect> parseEffect(String input)
+		throws CmdSyntaxError
 	{
 		StatusEffect effect;
 		
@@ -139,17 +154,7 @@ public final class PotionCmd extends Command
 		if(effect == null)
 			throw new CmdSyntaxError("Invalid effect: " + input);
 		
-		return Registries.STATUS_EFFECT.getEntry(effect).value();
-	}
-	
-	private void setCustomPotionEffects(ItemStack stack,
-		ArrayList<StatusEffectInstance> effects)
-	{
-		// PotionUtil doesn't remove effects when passing an empty list to it
-		if(effects.isEmpty())
-			stack.removeSubNbt("custom_potion_effects");
-		else
-			PotionUtil.setCustomPotionEffects(stack, effects);
+		return Registries.STATUS_EFFECT.getEntry(effect);
 	}
 	
 	private int parseInt(String s) throws CmdSyntaxError
