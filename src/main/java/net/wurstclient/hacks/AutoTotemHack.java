@@ -84,11 +84,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		finishMovingTotem();
 		
-		PlayerInventory inventory = MC.player.getInventory();
-		int nextTotemSlot = searchForTotems(inventory);
+		int nextTotemSlot = searchForTotems();
 		
-		ItemStack offhandStack = inventory.getStack(40);
-		if(isTotem(offhandStack))
+		if(isTotem(MC.player.getOffHandStack()))
 		{
 			totems++;
 			wasTotemInOffhand = true;
@@ -101,15 +99,16 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			wasTotemInOffhand = false;
 		}
 		
+		if(nextTotemSlot == -1)
+			return;
+		
 		float healthF = health.getValueF();
 		if(healthF > 0 && MC.player.getHealth() > healthF * 2F)
 			return;
 		
+		// don't move items while a container is open
 		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
-			return;
-		
-		if(nextTotemSlot == -1)
 			return;
 		
 		if(timer > 0)
@@ -118,19 +117,19 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		moveTotem(nextTotemSlot, offhandStack);
+		moveToOffhand(nextTotemSlot);
 	}
 	
-	private void moveTotem(int nextTotemSlot, ItemStack offhandStack)
+	private void moveToOffhand(int itemSlot)
 	{
-		boolean offhandEmpty = offhandStack.isEmpty();
+		boolean offhandEmpty = MC.player.getOffHandStack().isEmpty();
 		
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		im.windowClick_PICKUP(nextTotemSlot);
+		im.windowClick_PICKUP(itemSlot);
 		im.windowClick_PICKUP(45);
 		
 		if(!offhandEmpty)
-			nextTickSlot = nextTotemSlot;
+			nextTickSlot = itemSlot;
 	}
 	
 	private void finishMovingTotem()
@@ -143,10 +142,11 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		nextTickSlot = -1;
 	}
 	
-	private int searchForTotems(PlayerInventory inventory)
+	private int searchForTotems()
 	{
-		totems = 0;
+		PlayerInventory inventory = MC.player.getInventory();
 		int nextTotemSlot = -1;
+		totems = 0;
 		
 		for(int slot = 0; slot <= 36; slot++)
 		{
