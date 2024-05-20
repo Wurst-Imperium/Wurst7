@@ -172,7 +172,7 @@ public enum InventoryUtils
 		return true;
 	}
 	
-	private static int toNetworkSlot(int slot)
+	public static int toNetworkSlot(int slot)
 	{
 		// hotbar
 		if(slot >= 0 && slot < 9)

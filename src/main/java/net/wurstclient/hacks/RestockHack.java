@@ -25,6 +25,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"AutoRestock", "auto-restock", "auto restock"})
 public final class RestockHack extends Hack implements UpdateListener
@@ -106,10 +107,10 @@ public final class RestockHack extends Hack implements UpdateListener
 				searchSlotsWithItem(itemName, hotbarSlot);
 			for(int itemIndex : searchResult)
 			{
-				int pickupIndex = dataSlotToNetworkSlot(itemIndex);
+				int pickupIndex = InventoryUtils.toNetworkSlot(itemIndex);
 				
 				im.windowClick_PICKUP(pickupIndex);
-				im.windowClick_PICKUP(dataSlotToNetworkSlot(hotbarSlot));
+				im.windowClick_PICKUP(InventoryUtils.toNetworkSlot(hotbarSlot));
 				if(!MC.player.playerScreenHandler.getCursorStack().isEmpty())
 					im.windowClick_PICKUP(pickupIndex);
 				
@@ -135,7 +136,7 @@ public final class RestockHack extends Hack implements UpdateListener
 				if(stack.isEmpty() || !stack.isDamageable())
 				{
 					IMC.getInteractionManager().windowClick_SWAP(i,
-						dataSlotToNetworkSlot(hotbarSlot));
+						InventoryUtils.toNetworkSlot(hotbarSlot));
 					break;
 				}
 			}
@@ -145,22 +146,6 @@ public final class RestockHack extends Hack implements UpdateListener
 	{
 		return stack.getMaxDamage() - stack.getDamage() <= repairMode
 			.getValueI();
-	}
-	
-	private int dataSlotToNetworkSlot(int index)
-	{
-		// hotbar
-		if(index >= 0 && index <= 8)
-			return index + 36;
-		
-		// main inventory
-		if(index >= 9 && index <= 35)
-			return index;
-		
-		if(index == OFFHAND_ID)
-			return OFFHAND_PKT_ID;
-		
-		throw new IllegalArgumentException("unimplemented data slot");
 	}
 	
 	private List<Integer> searchSlotsWithItem(String itemName, int slotToSkip)

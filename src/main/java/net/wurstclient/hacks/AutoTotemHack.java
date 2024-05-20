@@ -20,6 +20,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto totem", "offhand", "off-hand"})
 public final class AutoTotemHack extends Hack implements UpdateListener
@@ -156,7 +157,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			totems++;
 			
 			if(nextTotemSlot == -1)
-				nextTotemSlot = slot < 9 ? slot + 36 : slot;
+				nextTotemSlot = InventoryUtils.toNetworkSlot(slot);
 		}
 		
 		return nextTotemSlot;
