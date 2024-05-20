@@ -118,7 +118,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			// Check if the swing hand option is not set to 'OFF' before proceeding
+			// Check if the swing hand option is not set to 'OFF' before
+			// proceeding
 			if(swingHand.getCurrentSwingHandOption().getOptionCode() != 1)
 				RotationUtils
 					.getNeededRotations(entity.getBoundingBox().getCenter())

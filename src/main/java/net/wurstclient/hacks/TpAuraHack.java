@@ -129,7 +129,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		// check cooldown
 		if(player.getAttackCooldownProgress(0) < 1)
 			return;
-		
+			
 		// attack entity
 		// Check if the swing hand option is not set to 'OFF' before proceeding
 		if(swingHand.getCurrentSwingHandOption().getOptionCode() != 1)
