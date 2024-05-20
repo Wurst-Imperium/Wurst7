@@ -131,6 +131,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// attack entity
+		// Check if the swing hand option is not set to 'OFF' before proceeding
 		if(swingHand.getCurrentSwingHandOption().getOptionCode() != 1)
 			RotationUtils
 				.getNeededRotations(entity.getBoundingBox().getCenter())
