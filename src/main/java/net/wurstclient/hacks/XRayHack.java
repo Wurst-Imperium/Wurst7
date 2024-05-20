@@ -42,9 +42,10 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
 			+ " - you can add any block you want.\n\n"
 			+ "Remember to restart X-Ray when changing this setting.",
-		"minecraft:ancient_debris", "minecraft:anvil", "minecraft:beacon",
-		"minecraft:bone_block", "minecraft:bookshelf",
-		"minecraft:brewing_stand", "minecraft:chain_command_block",
+		"minecraft:amethyst_cluster", "minecraft:ancient_debris",
+		"minecraft:anvil", "minecraft:beacon", "minecraft:bone_block",
+		"minecraft:bookshelf", "minecraft:brewing_stand",
+		"minecraft:budding_amethyst", "minecraft:chain_command_block",
 		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
 		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
 		"minecraft:crafter", "minecraft:crafting_table",
@@ -66,9 +67,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
 		"minecraft:raw_iron_block", "minecraft:redstone_block",
 		"minecraft:redstone_ore", "minecraft:repeating_command_block",
-		"minecraft:spawner", "minecraft:suspicious_gravel",
-		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
-		"minecraft:trapped_chest", "minecraft:water");
+		"minecraft:sculk_catalyst", "minecraft:sculk_sensor",
+		"minecraft:sculk_shrieker", "minecraft:spawner",
+		"minecraft:suspicious_gravel", "minecraft:suspicious_sand",
+		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
+		"minecraft:trial_spawner", "minecraft:vault", "minecraft:water");
 	
 	private final CheckboxSetting onlyExposed = new CheckboxSetting(
 		"Only show exposed",
@@ -99,7 +102,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// cache block names in case the setting changes while X-Ray is enabled
 		oreNamesCache = new ArrayList<>(ores.getBlockNames());
@@ -120,7 +123,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove event listeners
 		EVENTS.remove(UpdateListener.class, this);

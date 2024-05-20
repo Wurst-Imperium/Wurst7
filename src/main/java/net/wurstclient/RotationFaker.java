@@ -11,6 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 public final class RotationFaker
@@ -49,33 +50,33 @@ public final class RotationFaker
 	
 	public void faceVectorPacket(Vec3d vec)
 	{
-		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
+		Rotation needed = RotationUtils.getNeededRotations(vec);
 		ClientPlayerEntity player = WurstClient.MC.player;
 		
 		fakeRotation = true;
 		serverYaw =
-			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw());
-		serverPitch = needed.getPitch();
+			RotationUtils.limitAngleChange(player.getYaw(), needed.yaw());
+		serverPitch = needed.pitch();
 	}
 	
 	public void faceVectorClient(Vec3d vec)
 	{
-		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
+		Rotation needed = RotationUtils.getNeededRotations(vec);
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
 		player.setYaw(
-			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw()));
-		player.setPitch(needed.getPitch());
+			RotationUtils.limitAngleChange(player.getYaw(), needed.yaw()));
+		player.setPitch(needed.pitch());
 	}
 	
 	public void faceVectorClientIgnorePitch(Vec3d vec)
 	{
-		RotationUtils.Rotation needed = RotationUtils.getNeededRotations(vec);
+		Rotation needed = RotationUtils.getNeededRotations(vec);
 		
 		ClientPlayerEntity player = WurstClient.MC.player;
-		WurstClient.MC.player.setYaw(
-			RotationUtils.limitAngleChange(player.getYaw(), needed.getYaw()));
-		WurstClient.MC.player.setPitch(0);
+		player.setYaw(
+			RotationUtils.limitAngleChange(player.getYaw(), needed.yaw()));
+		player.setPitch(0);
 	}
 	
 	public float getServerYaw()

@@ -91,7 +91,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable conflicting hacks
 		WURST.getHax().autoMineHack.setEnabled(false);
@@ -110,7 +110,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);

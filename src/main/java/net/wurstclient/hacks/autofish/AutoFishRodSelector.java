@@ -93,6 +93,10 @@ public final class AutoFishRodSelector
 			}
 		}
 		
+		// wait for AutoEat to finish eating
+		if(WurstClient.INSTANCE.getHax().autoEatHack.isEating())
+			return false;
+		
 		// stop if out of rods
 		if(stopWhenOutOfRods.isChecked() && bestRodSlot == -1)
 		{

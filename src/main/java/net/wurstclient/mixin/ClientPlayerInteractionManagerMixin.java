@@ -31,12 +31,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
-import net.wurstclient.hack.HackList;
-import net.wurstclient.hacks.ReachHack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -55,32 +52,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		EventManager.fire(new BlockBreakingProgressEvent(pos, direction));
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "getReachDistance()F",
-		cancellable = true)
-	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null)
-			return;
-		
-		ReachHack reach = hax.reachHack;
-		if(reach.isEnabled())
-			ci.setReturnValue(reach.getReachDistance());
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "hasExtendedReach()Z",
-		cancellable = true)
-	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return;
-		
-		cir.setReturnValue(true);
 	}
 	
 	@Inject(at = @At("HEAD"),

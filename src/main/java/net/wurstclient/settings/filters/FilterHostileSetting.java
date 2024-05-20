@@ -27,7 +27,7 @@ public final class FilterHostileSetting extends EntityFilterCheckbox
 	{
 		// never filter out neutral mobs (including piglins)
 		if(e instanceof Angerable || e instanceof PiglinEntity)
-			return false;
+			return true;
 		
 		return !(e instanceof Monster);
 	}

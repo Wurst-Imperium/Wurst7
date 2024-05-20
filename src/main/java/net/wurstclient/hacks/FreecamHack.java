@@ -69,7 +69,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketOutputListener.class, this);
@@ -83,16 +83,16 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		fakePlayer = new FakePlayerEntity();
 		
-		GameOptions gs = MC.options;
-		KeyBinding[] bindings = {gs.forwardKey, gs.backKey, gs.leftKey,
-			gs.rightKey, gs.jumpKey, gs.sneakKey};
+		GameOptions opt = MC.options;
+		KeyBinding[] bindings = {opt.forwardKey, opt.backKey, opt.leftKey,
+			opt.rightKey, opt.jumpKey, opt.sneakKey};
 		
 		for(KeyBinding binding : bindings)
-			((IKeyBinding)binding).resetPressedState();
+			IKeyBinding.get(binding).resetPressedState();
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketOutputListener.class, this);

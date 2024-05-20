@@ -9,12 +9,11 @@ package net.wurstclient.hacks;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityGroup;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
 import net.minecraft.util.hit.EntityHitResult;
@@ -62,14 +61,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		oldSlot = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		resetSlot();
@@ -153,18 +152,16 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			return ItemUtils.getAttackSpeed(item);
+			return (float)ItemUtils
+				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
+				.orElseThrow();
 			
 			case DAMAGE:
-			EntityGroup group = entity instanceof LivingEntity le
-				? le.getGroup() : EntityGroup.DEFAULT;
-			float dmg = EnchantmentHelper.getAttackDamage(stack, group);
-			if(item instanceof SwordItem sword)
-				dmg += sword.getAttackDamage();
-			if(item instanceof MiningToolItem tool)
-				dmg += tool.getAttackDamage();
-			if(item instanceof TridentItem)
-				dmg += TridentItem.ATTACK_DAMAGE;
+			EntityType<?> group = entity.getType();
+			float dmg = (float)ItemUtils
+				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
+				.orElseThrow();
+			dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
 		
