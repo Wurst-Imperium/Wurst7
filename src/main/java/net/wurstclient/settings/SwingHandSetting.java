@@ -22,7 +22,7 @@ public final class SwingHandSetting
 		buildDescriptionSuffix(true);
 	private static final String REDUCED_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix(false);
-	
+
 	private SwingHandSetting(String name, String description,
 		SwingHand[] values, SwingHand selected)
 	{
@@ -58,6 +58,11 @@ public final class SwingHandSetting
 	{
 		return withoutOffOption("Swing hand", description, selected);
 	}
+
+	public SwingHand getCurrentSwingHandOption()
+	{
+		return super.getSelected();
+	}
 	
 	public void swing(Hand hand)
 	{
@@ -80,27 +85,32 @@ public final class SwingHandSetting
 	public enum SwingHand
 	{
 		OFF("Off",
+			1,
 			"Don't swing your hand at all. Will be detected by anti-cheat"
 				+ " plugins.",
 			hand -> {}),
-		
+
 		SERVER("Server-side",
+			2,
 			"Swing your hand on the server-side, without playing the animation"
 				+ " on the client-side.",
 			hand -> MC.player.networkHandler
 				.sendPacket(new HandSwingC2SPacket(hand))),
 		
 		CLIENT("Client-side",
+			3,
 			"Swing your hand on the client-side. This is the most legit option.",
 			hand -> MC.player.swingHand(hand));
 		
 		private final String name;
-		private final String description;
+		private final int optionCode;
 		private final Consumer<Hand> swing;
-		
-		private SwingHand(String name, String description, Consumer<Hand> swing)
+		private final String description;
+
+		private SwingHand(String name, int optionCode, String description, Consumer<Hand> swing)
 		{
 			this.name = name;
+			this.optionCode = optionCode;
 			this.description = description;
 			this.swing = swing;
 		}
@@ -109,7 +119,12 @@ public final class SwingHandSetting
 		{
 			swing.accept(hand);
 		}
-		
+
+		public int getOptionCode()
+		{
+			return optionCode;
+		}
+
 		@Override
 		public String toString()
 		{
