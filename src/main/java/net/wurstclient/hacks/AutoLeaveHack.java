@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
@@ -42,6 +45,12 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			+ " AutoLeave makes you leave the server.",
 		true);
 	
+	private final SliderSetting totems = new SliderSetting("Totems",
+		"Effectively disables AutoLeave until the number of totems you have is at or below this value.\n"
+			+ "Drag the slider to the right to turn off this feature.",
+		11, 0, 11, 1,
+		ValueDisplay.INTEGER.withSuffix(" totems").withLabel(11, "unlimited"));
+	
 	public AutoLeaveHack()
 	{
 		super("AutoLeave");
@@ -49,6 +58,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		addSetting(health);
 		addSetting(mode);
 		addSetting(disableAutoReconnect);
+		addSetting(totems);
 	}
 	
 	@Override
@@ -86,6 +96,10 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		if(currentHealth <= 0F || currentHealth > health.getValueF() * 2F)
 			return;
 		
+		// check totems
+		if(totems.getValueI() < 11 && countTotems() > totems.getValueI())
+			return;
+		
 		// leave server
 		switch(mode.getSelected())
 		{
@@ -114,6 +128,22 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		if(disableAutoReconnect.isChecked())
 			WURST.getHax().autoReconnectHack.setEnabled(false);
+	}
+	
+	private int countTotems()
+	{
+		ClientPlayerEntity player = MC.player;
+		PlayerInventory inventory = player.getInventory();
+		int totems = 0;
+		
+		for(int slot = 0; slot <= 36; slot++)
+			if(inventory.getStack(slot).isOf(Items.TOTEM_OF_UNDYING))
+				totems++;
+			
+		if(player.getOffHandStack().isOf(Items.TOTEM_OF_UNDYING))
+			totems++;
+		
+		return totems;
 	}
 	
 	public static enum Mode
