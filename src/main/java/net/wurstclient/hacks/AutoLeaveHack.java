@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.wurstclient.Category;
@@ -19,6 +17,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto leave", "AutoDisconnect", "auto disconnect", "AutoQuit",
 	"auto quit"})
@@ -96,7 +95,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			return;
 		
 		// check totems
-		if(totems.getValueI() < 11 && countTotems() > totems.getValueI())
+		if(totems.getValueI() < 11 && InventoryUtils
+			.count(Items.TOTEM_OF_UNDYING, 40, true) > totems.getValueI())
 			return;
 		
 		// leave server
@@ -107,22 +107,6 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		if(disableAutoReconnect.isChecked())
 			WURST.getHax().autoReconnectHack.setEnabled(false);
-	}
-	
-	private int countTotems()
-	{
-		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.getInventory();
-		int totems = 0;
-		
-		for(int slot = 0; slot <= 36; slot++)
-			if(inventory.getStack(slot).isOf(Items.TOTEM_OF_UNDYING))
-				totems++;
-			
-		if(player.getOffHandStack().isOf(Items.TOTEM_OF_UNDYING))
-			totems++;
-		
-		return totems;
 	}
 	
 	public static enum Mode

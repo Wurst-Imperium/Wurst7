@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.wurstclient.Category;
@@ -89,7 +88,6 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		
 		if(isTotem(MC.player.getOffHandStack()))
 		{
-			totems++;
 			wasTotemInOffhand = true;
 			return;
 		}
@@ -145,26 +143,16 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	
 	private int searchForTotems()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		int nextTotemSlot = -1;
-		totems = 0;
+		totems = InventoryUtils.count(this::isTotem, 40, true);
+		if(totems <= 0)
+			return -1;
 		
-		for(int slot = 0; slot <= 40; slot++)
-		{
-			if(!isTotem(inventory.getStack(slot)))
-				continue;
-			
-			totems++;
-			
-			if(nextTotemSlot == -1)
-				nextTotemSlot = InventoryUtils.toNetworkSlot(slot);
-		}
-		
-		return nextTotemSlot;
+		int totemSlot = InventoryUtils.indexOf(this::isTotem, 40);
+		return InventoryUtils.toNetworkSlot(totemSlot);
 	}
 	
 	private boolean isTotem(ItemStack stack)
 	{
-		return stack.getItem() == Items.TOTEM_OF_UNDYING;
+		return stack.isOf(Items.TOTEM_OF_UNDYING);
 	}
 }
