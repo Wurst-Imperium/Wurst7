@@ -32,10 +32,10 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		ValueDisplay.INTEGER);
 	
 	private final SliderSetting health = new SliderSetting("Health",
-		"Effectively disables AutoTotem until your health reaches this value or falls below it.\n"
-			+ "0 = always active",
-		0, 0, 10, 0.5,
-		ValueDisplay.DECIMAL.withSuffix(" hearts").withLabel(0, "ignore"));
+		"Won't equip a totem until your health reaches this value or falls"
+			+ " below it.\n" + "0 = always active",
+		0, 0, 10, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts")
+			.withLabel(1, "1 heart").withLabel(0, "ignore"));
 	
 	private int nextTickSlot;
 	private int totems;
@@ -57,14 +57,10 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		if(!showCounter.isChecked())
 			return getName();
 		
-		switch(totems)
-		{
-			case 1:
+		if(totems == 1)
 			return getName() + " [1 totem]";
-			
-			default:
-			return getName() + " [" + totems + " totems]";
-		}
+		
+		return getName() + " [" + totems + " totems]";
 	}
 	
 	@Override
