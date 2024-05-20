@@ -149,7 +149,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		int nextTotemSlot = -1;
 		totems = 0;
 		
-		for(int slot = 0; slot <= 36; slot++)
+		for(int slot = 0; slot <= 40; slot++)
 		{
 			if(!isTotem(inventory.getStack(slot)))
 				continue;
