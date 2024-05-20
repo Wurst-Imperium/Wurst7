@@ -58,13 +58,13 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
@@ -93,7 +93,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 			keys.add(MC.options.jumpKey);
 		
 		for(KeyBinding key : keys)
-			((IKeyBinding)key).resetPressedState();
+			IKeyBinding.get(key).resetPressedState();
 	}
 	
 	private boolean isAllowedScreen(Screen screen)

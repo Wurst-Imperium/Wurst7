@@ -132,13 +132,18 @@ public enum BlockUtils
 		return getState(pos).isOpaqueFullCube(MC.world, pos);
 	}
 	
-	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	public static BlockHitResult raycast(Vec3d from, Vec3d to,
+		RaycastContext.FluidHandling fluidHandling)
 	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
+		RaycastContext context = new RaycastContext(from, to,
+			RaycastContext.ShapeType.COLLIDER, fluidHandling, MC.player);
 		
 		return MC.world.raycast(context);
+	}
+	
+	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	{
+		return raycast(from, to, RaycastContext.FluidHandling.NONE);
 	}
 	
 	public static boolean hasLineOfSight(Vec3d from, Vec3d to)

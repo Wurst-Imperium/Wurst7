@@ -95,6 +95,7 @@ public final class KeybindList
 		try(Stream<Path> files = Files.list(profilesFolder))
 		{
 			return files.filter(Files::isRegularFile)
+				.filter(path -> path.getFileName().toString().endsWith(".json"))
 				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)
@@ -116,7 +117,6 @@ public final class KeybindList
 	private static Set<Keybind> createDefaultKeybinds()
 	{
 		Set<Keybind> set = new LinkedHashSet<>();
-		addKB(set, "b", "fastplace;fastbreak");
 		addKB(set, "b", "fastplace;fastbreak");
 		addKB(set, "c", "fullbright");
 		addKB(set, "g", "flight");

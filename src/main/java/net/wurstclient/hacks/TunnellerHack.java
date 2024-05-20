@@ -112,7 +112,7 @@ public final class TunnellerHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
@@ -143,7 +143,7 @@ public final class TunnellerHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove listeners
 		EVENTS.remove(UpdateListener.class, this);
@@ -713,7 +713,6 @@ public final class TunnellerHack extends Hack
 	
 	private class PlaceTorchTask extends Task
 	{
-		@SuppressWarnings("deprecation")
 		@Override
 		public boolean canRun()
 		{
@@ -755,10 +754,9 @@ public final class TunnellerHack extends Hack
 			BlockState state = BlockUtils.getState(nextTorch);
 			if(!state.isReplaceable())
 				return false;
-				
-			// Can't see why canPlaceAt() is deprecated. Still seems to be
-			// widely used with no replacement.
-			return Blocks.TORCH.canPlaceAt(state, MC.world, nextTorch);
+			
+			return Blocks.TORCH.getDefaultState().canPlaceAt(MC.world,
+				nextTorch);
 		}
 		
 		@Override

@@ -36,13 +36,13 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(RenderListener.class, this);
 	}

@@ -1,6 +1,6 @@
 {
   "description.wurst.hack.anchoraura": "Автоматично ставить (якщо прийнято), заряджає і підриває якоря відродження, щоб убити сутності навколо.",
-  "description.wurst.hack.antiafk": "Ходить у випадковому напрямку, щоб сервер не знав, що ви є АФК.\nДля роботи необхідний простір хоча б 3х3 блоку.",
+  "description.wurst.hack.antiafk": "Ходить у випадковому напрямку, щоб сервер не знав, що ви є АФК.",
   "description.wurst.hack.antiblind": "Запобігає ефекту сліпоти та темряви.\nНесумісний з OptiFine.",
   "description.wurst.hack.anticactus": "Захищає вас від урону від зіткнення з кактусами.",
   "description.wurst.hack.antiknockback": "Запобігає відкиданням при отриманні урону.",

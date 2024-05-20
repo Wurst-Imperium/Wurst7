@@ -32,13 +32,13 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(ChatInputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
 	}
@@ -135,7 +135,17 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		}
 		
 		if(spamCounter > 1)
-			event.setComponent(((MutableText)event.getComponent())
-				.append(" [x" + spamCounter + "]"));
+		{
+			// Someone, somewhere, is creating a MutableText object with an
+			// immutable List<Text> siblings parameter, which causes the game to
+			// crash when calling append(). So we always have to create a new
+			// MutableText object to avoid that.
+			MutableText oldText = (MutableText)event.getComponent();
+			MutableText newText = MutableText.of(oldText.getContent());
+			newText.setStyle(oldText.getStyle());
+			oldText.getSiblings().forEach(newText::append);
+			
+			event.setComponent(newText.append(" [x" + spamCounter + "]"));
+		}
 	}
 }

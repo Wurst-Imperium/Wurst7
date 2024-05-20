@@ -52,7 +52,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		tickCounter = 0;
 		
@@ -63,7 +63,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
@@ -124,9 +124,9 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	
 	private void restoreKeyPresses()
 	{
-		KeyBinding[] bindings = {MC.options.jumpKey, MC.options.sneakKey};
+		KeyBinding[] keys = {MC.options.jumpKey, MC.options.sneakKey};
 		
-		for(KeyBinding binding : bindings)
-			((IKeyBinding)binding).resetPressedState();
+		for(KeyBinding key : keys)
+			IKeyBinding.get(key).resetPressedState();
 	}
 }

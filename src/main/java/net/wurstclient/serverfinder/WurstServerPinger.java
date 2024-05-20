@@ -41,7 +41,7 @@ public class WurstServerPinger
 		
 		try
 		{
-			pinger.add(server, () -> {});
+			pinger.add(server, () -> {}, () -> {});
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)
@@ -67,11 +67,6 @@ public class WurstServerPinger
 	public boolean isWorking()
 	{
 		return !failed;
-	}
-	
-	public boolean isOtherVersion()
-	{
-		return server.protocolVersion != 47;
 	}
 	
 	public String getServerIP()

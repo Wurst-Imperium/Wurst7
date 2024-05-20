@@ -96,7 +96,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		groupsUpToDate = false;
 		
@@ -109,7 +109,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);

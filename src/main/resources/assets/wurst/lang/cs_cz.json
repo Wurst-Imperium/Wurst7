@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.airplace": "Umožňuje umístit bloky do prázdného prostoru.",
   "description.wurst.hack.anchoraura": "Automaticky umísťí (volitelně), nabije a odpalí kotvy oživení k zabití entit kolem vás.",
-  "description.wurst.hack.antiafk": "Prochází se náhodně, aby vás skryl před AFK detektory.\nPotřebuje alespoň 3x3 bloků volného místa.",
+  "description.wurst.hack.antiafk": "Prochází se náhodně, aby vás skryl před AFK detektory.",
   "description.wurst.hack.antiblind": "Zabraňuje blindness a efekty tmy.\nNekompatibilní s OptiFinem.",
   "description.wurst.hack.anticactus": "Chrání vás před poškozením kaktusem.",
   "description.wurst.hack.antihunger": "Zpomalí váš hlad, když chodíte.",

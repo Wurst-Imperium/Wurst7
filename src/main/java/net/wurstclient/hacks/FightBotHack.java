@@ -34,6 +34,8 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 
@@ -47,6 +49,10 @@ public final class FightBotHack extends Hack
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How FightBot should swing your hand when attacking.",
+		SwingHand.CLIENT);
 	
 	private final SliderSetting distance = new SliderSetting("Distance",
 		"How closely to follow the target.\n"
@@ -73,6 +79,7 @@ public final class FightBotHack extends Hack
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(speed);
+		addSetting(swingHand);
 		addSetting(distance);
 		addSetting(useAi);
 		addSetting(pauseOnContainers);
@@ -81,7 +88,7 @@ public final class FightBotHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().aimAssistHack.setEnabled(false);
@@ -103,7 +110,7 @@ public final class FightBotHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove listener
 		EVENTS.remove(UpdateListener.class, this);
@@ -211,7 +218,7 @@ public final class FightBotHack extends Hack
 		// attack entity
 		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, entity);
-		MC.player.swingHand(Hand.MAIN_HAND);
+		swingHand.swing(Hand.MAIN_HAND);
 		speed.resetTimer();
 	}
 	

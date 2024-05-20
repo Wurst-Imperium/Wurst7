@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.airplace": "允許你在半空中放置方塊。",
   "description.wurst.hack.anchoraura": "自動放置（可選），充能並引爆重生錨並擊殺你附近的實體。",
-  "description.wurst.hack.antiafk": "隨機走動，用於避免伺服器掛機檢測。\n需要至少有3x3的區域可以走動。",
+  "description.wurst.hack.antiafk": "隨機走動，用於避免伺服器掛機檢測。",
   "description.wurst.hack.antiblind": "防止失明和黑暗效果。\n與 OptiFine不相容。",
   "description.wurst.hack.anticactus": "保護你免受仙人掌傷害。",
   "description.wurst.hack.antihunger": "走路時減緩你的飢餓度。",
