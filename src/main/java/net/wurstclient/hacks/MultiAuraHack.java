@@ -118,7 +118,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			if (swingHand.equals(SwingHand.CLIENT))
+			if(swingHand.equals(SwingHand.CLIENT))
 				RotationUtils
 					.getNeededRotations(entity.getBoundingBox().getCenter())
 					.sendPlayerLookPacket();
