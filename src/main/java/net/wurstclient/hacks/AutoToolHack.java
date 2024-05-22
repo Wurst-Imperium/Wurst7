@@ -46,7 +46,7 @@ public final class AutoToolHack extends Hack
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents tools from being used when their durability reaches the given"
 			+ " threshold, so you can repair them before they break.\n"
-			+ "Can be adjusted from 0 (off) to 100.",
+			+ "Can be adjusted from 0 (off) to 100 remaining uses.",
 		0, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
