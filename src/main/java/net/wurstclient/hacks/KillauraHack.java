@@ -150,8 +150,7 @@ public final class KillauraHack extends Hack
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= range.getValueSq());
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
