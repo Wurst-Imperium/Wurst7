@@ -52,7 +52,7 @@ public final class AutoToolHack extends Hack
 	private final CheckboxSetting switchBack = new CheckboxSetting(
 		"Switch back", "After using a tool, automatically switches back to the"
 			+ " previously selected slot.",
-		true);
+		false);
 	
 	private int prevSelectedSlot;
 	
