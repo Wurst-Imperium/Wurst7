@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,10 +24,12 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto tool", "AutoSwitch", "auto switch"})
 public final class AutoToolHack extends Hack
@@ -123,20 +128,15 @@ public final class AutoToolHack extends Hack
 		if(player.getAbilities().creativeMode)
 			return;
 		
+		ItemStack heldItem = player.getMainHandStack();
+		boolean heldItemDamageable = isDamageable(heldItem);
+		if(heldItemDamageable && isTooDamaged(heldItem, repairMode))
+			putAwayDamagedTool();
+		
 		int bestSlot = getBestSlot(pos, useSwords, repairMode);
 		if(bestSlot == -1)
 		{
-			ItemStack heldItem = player.getMainHandStack();
-			if(!isDamageable(heldItem))
-				return;
-			
-			if(isTooDamaged(heldItem, repairMode))
-			{
-				selectFallbackSlot();
-				return;
-			}
-			
-			if(useHands && isWrongTool(heldItem, pos))
+			if(useHands && heldItemDamageable && isWrongTool(heldItem, pos))
 				selectFallbackSlot();
 			
 			return;
@@ -204,6 +204,46 @@ public final class AutoToolHack extends Hack
 	private boolean isTooDamaged(ItemStack stack, int repairMode)
 	{
 		return stack.getMaxDamage() - stack.getDamage() <= repairMode;
+	}
+	
+	private void putAwayDamagedTool()
+	{
+		PlayerInventory inv = MC.player.getInventory();
+		int selectedSlot = inv.selectedSlot;
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		// If there's an empty slot in the main inventory,
+		// shift-click the damaged item out of the hotbar
+		OptionalInt emptySlot = IntStream.range(9, 36)
+			.filter(i -> !inv.getStack(i).isEmpty()).findFirst();
+		if(emptySlot.isPresent())
+		{
+			im.windowClick_QUICK_MOVE(
+				InventoryUtils.toNetworkSlot(selectedSlot));
+			return;
+		}
+		
+		// Failing that, swap with a non-damageable item
+		OptionalInt nonDamageableSlot = IntStream.range(9, 36)
+			.filter(i -> !isDamageable(inv.getStack(i))).findFirst();
+		if(nonDamageableSlot.isPresent())
+		{
+			im.windowClick_SWAP(nonDamageableSlot.getAsInt(), selectedSlot);
+			return;
+		}
+		
+		// Failing that, swap with a less damaged item
+		OptionalInt notTooDamagedSlot = IntStream.range(9, 36)
+			.filter(i -> !isTooDamaged(inv.getStack(i), 0)).findFirst();
+		if(notTooDamagedSlot.isPresent())
+		{
+			im.windowClick_SWAP(notTooDamagedSlot.getAsInt(), selectedSlot);
+			return;
+		}
+		
+		// Failing all of the above (whole inventory full of damaged tools),
+		// just swap with the top-left slot
+		im.windowClick_SWAP(0, selectedSlot);
 	}
 	
 	private boolean isWrongTool(ItemStack heldItem, BlockPos pos)
