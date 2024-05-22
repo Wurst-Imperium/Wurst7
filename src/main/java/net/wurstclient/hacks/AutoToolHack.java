@@ -33,17 +33,19 @@ public final class AutoToolHack extends Hack
 		"Uses swords to break leaves, cobwebs, etc.", false);
 	
 	private final CheckboxSetting useHands = new CheckboxSetting("Use hands",
-		"Uses an empty hand or a non-damageable item when no applicable tool is found.",
+		"Uses an empty hand or a non-damageable item when no applicable tool is"
+			+ " found.",
 		true);
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
-		"Prevents tools from being used when their durability reaches the given threshold, so you can repair them before they break.\n"
+		"Prevents tools from being used when their durability reaches the given"
+			+ " threshold, so you can repair them before they break.\n"
 			+ "Can be adjusted from 0 (off) to 100.",
 		0, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back",
-		"After using a tool, automatically switches back to the previously selected slot.",
+		"Switch back", "After using a tool, automatically switches back to the"
+			+ " previously selected slot.",
 		true);
 	
 	private int prevSelectedSlot;
