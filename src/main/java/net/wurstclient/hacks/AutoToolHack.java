@@ -14,6 +14,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -94,6 +95,10 @@ public final class AutoToolHack extends Hack
 	public void onUpdate()
 	{
 		if(prevSelectedSlot == -1 || MC.interactionManager.isBreakingBlock())
+			return;
+		
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK)
 			return;
 		
 		if(switchBack.isChecked())
