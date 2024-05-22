@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -197,7 +198,7 @@ public enum MicrosoftLoginManager
 		
 		try
 		{
-			URL url = new URL(urlPost);
+			URL url = URI.create(urlPost).toURL();
 			HttpURLConnection connection =
 				(HttpURLConnection)url.openConnection();
 			
@@ -504,7 +505,7 @@ public enum MicrosoftLoginManager
 	{
 		try
 		{
-			return new URL(url);
+			return URI.create(url).toURL();
 			
 		}catch(MalformedURLException e)
 		{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -30,6 +30,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
@@ -41,6 +43,9 @@ public final class ProtectHack extends Hack
 {
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How Protect should swing your hand when attacking.", SwingHand.CLIENT);
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
@@ -94,6 +99,7 @@ public final class ProtectHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(speed);
+		addSetting(swingHand);
 		addSetting(useAi);
 		addSetting(pauseOnContainers);
 		
@@ -109,7 +115,7 @@ public final class ProtectHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		WURST.getHax().followHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
@@ -149,7 +155,7 @@ public final class ProtectHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
@@ -281,7 +287,7 @@ public final class ProtectHack extends Hack
 			// attack enemy
 			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(MC.player, enemy);
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 			speed.resetTimer();
 		}
 	}

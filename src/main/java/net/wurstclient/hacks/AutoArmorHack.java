@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -63,7 +63,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
@@ -71,7 +71,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketOutputListener.class, this);
@@ -175,8 +175,8 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)item.toughness;
-		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
+		int armorToughness = (int)item.getToughness();
+		int armorType = item.getMaterial().value().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -77,6 +77,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		float u = 0;
 		float v = 0;
 		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
+		
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	private void addWurstOptionsButton()

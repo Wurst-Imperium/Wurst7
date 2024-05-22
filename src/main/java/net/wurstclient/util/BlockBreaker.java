@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,6 +14,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -126,13 +127,18 @@ public enum BlockBreaker
 				side = sides[i];
 		}
 		
-		return new BlockBreakingParams(side, hitVecs[side.ordinal()],
+		return new BlockBreakingParams(pos, side, hitVecs[side.ordinal()],
 			distancesSq[side.ordinal()], linesOfSight[side.ordinal()]);
 	}
 	
-	public static record BlockBreakingParams(Direction side, Vec3d hitVec,
-		double distanceSq, boolean lineOfSight)
-	{}
+	public static record BlockBreakingParams(BlockPos pos, Direction side,
+		Vec3d hitVec, double distanceSq, boolean lineOfSight)
+	{
+		public BlockHitResult toHitResult()
+		{
+			return new BlockHitResult(hitVec, side, pos, false);
+		}
+	}
 	
 	public static void breakBlocksWithPacketSpam(Iterable<BlockPos> blocks)
 	{

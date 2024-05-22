@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -34,8 +34,12 @@ public abstract class TitleScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("RETURN"), method = "init()V")
-	private void onInitWidgetsNormal(CallbackInfo ci)
+	/**
+	 * Adds the AltManager button to the title screen. This mixin must not
+	 * run in demo mode, as the Realms button doesn't exist there.
+	 */
+	@Inject(at = @At("RETURN"), method = "initWidgetsNormal(II)V")
+	private void onInitWidgetsNormal(int y, int spacingY, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;

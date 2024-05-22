@@ -1,7 +1,7 @@
 {
   "description.wurst.hack.airplace": "Permette di posizionare blocchi in mezz'aria.",
   "description.wurst.hack.anchoraura": "Posiziona automaticamente (opzionale), carica e fa esplodere le ancore di rigenerazione per uccidere le entità intorno a te.",
-  "description.wurst.hack.antiafk": "Cammina randomicamente per nasconderti dai detector di player AFK.\nHa bisogno di almeno un 3x3 di spazio libero.",
+  "description.wurst.hack.antiafk": "Cammina randomicamente per nasconderti dai detector di player AFK.",
   "description.wurst.hack.antiblind": "Previene la cecità ed effetti oscurità.\nIncompatibile con OptiFine.",
   "description.wurst.hack.anticactus": "Ti protegge dai danni causati dai cactus.",
   "description.wurst.hack.antihunger": "Rallenta la tua fame quando cammini.",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,6 +35,8 @@ import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.FacingSetting.Facing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.CrystalAuraFilterList;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
@@ -68,6 +70,11 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			+ "Slower but can help with anti-cheat plugins.",
 		false);
 	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		"How CrystalAura should swing your hand when placing and detonating"
+			+ " end crystals.",
+		SwingHand.CLIENT);
+	
 	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
 		new EnumSetting<>("Take items from", "Where to look for end crystals.",
 			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
@@ -84,13 +91,14 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		addSetting(autoPlace);
 		addSetting(faceBlocks);
 		addSetting(checkLOS);
+		addSetting(swingHand);
 		addSetting(takeItemsFrom);
 		
 		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().aimAssistHack.setEnabled(false);
@@ -107,7 +115,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
@@ -155,7 +163,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(shouldSwing)
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		return newCrystals;
 	}
@@ -169,7 +177,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(!crystals.isEmpty())
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 	}
 	
 	private boolean placeCrystal(BlockPos pos)

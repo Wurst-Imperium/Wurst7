@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -29,13 +29,12 @@ public class IngameHudMixin
 	@Final
 	private DebugHud debugHud;
 	
-	@Inject(
-		at = @At(value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
-			remap = false,
-			ordinal = 3),
-		method = "render(Lnet/minecraft/client/gui/DrawContext;F)V")
-	private void onRender(DrawContext context, float tickDelta, CallbackInfo ci)
+	// runs after renderScoreboardSidebar()
+	// and before playerListHud.setVisible()
+	@Inject(at = @At("HEAD"),
+		method = "renderPlayerList(Lnet/minecraft/client/gui/DrawContext;F)V")
+	private void onRenderPlayerList(DrawContext context, float tickDelta,
+		CallbackInfo ci)
 	{
 		if(debugHud.shouldShowDebugHud())
 			return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,11 +35,11 @@ public abstract class EntityRendererMixin<T extends Entity>
 	protected EntityRenderDispatcher dispatcher;
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+		method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
 		cancellable = true)
 	private void onRenderLabelIfPresent(T entity, Text text,
 		MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-		int i, CallbackInfo ci)
+		int i, float tickDelta, CallbackInfo ci)
 	{
 		// add HealthTags info
 		if(entity instanceof LivingEntity)
@@ -48,7 +48,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		
 		// do NameTags adjustments
 		wurstRenderLabelIfPresent(entity, text, matrixStack,
-			vertexConsumerProvider, i);
+			vertexConsumerProvider, i, tickDelta);
 		ci.cancel();
 	}
 	
@@ -57,7 +57,8 @@ public abstract class EntityRendererMixin<T extends Entity>
 	 * an infinite loop. Also makes it easier to modify.
 	 */
 	protected void wurstRenderLabelIfPresent(T entity, Text text,
-		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
+		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
+		float tickDelta)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
@@ -77,7 +78,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 		matrices.multiply(dispatcher.getRotation());
 		
 		// adjust scale if NameTags is enabled
-		float scale = 0.025F;
+		float scale = 0.025F * nameTags.getScale();
 		if(nameTags.isEnabled())
 		{
 			double distance = WurstClient.MC.player.distanceTo(entity);
@@ -93,15 +94,15 @@ public abstract class EntityRendererMixin<T extends Entity>
 		TextRenderer tr = getTextRenderer();
 		float labelX = -tr.getWidth(text) / 2;
 		
-		// draw background
-		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
-			vertexConsumers,
-			notSneaky ? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL,
-			bgColor, light);
-		
-		// use the see-through layer for text if configured in NameTags
+		// adjust layers if using NameTags in see-through mode
+		TextLayerType bgLayer = notSneaky && !nameTags.isSeeThrough()
+			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
 		TextLayerType textLayer = nameTags.isSeeThrough()
 			? TextLayerType.SEE_THROUGH : TextLayerType.NORMAL;
+		
+		// draw background
+		tr.draw(text, labelX, labelY, 0x20FFFFFF, false, matrix,
+			vertexConsumers, bgLayer, bgColor, light);
 		
 		// draw text
 		if(notSneaky)
