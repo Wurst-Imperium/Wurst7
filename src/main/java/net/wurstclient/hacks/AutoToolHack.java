@@ -131,7 +131,7 @@ public final class AutoToolHack extends Hack
 		ItemStack heldItem = player.getMainHandStack();
 		boolean heldItemDamageable = isDamageable(heldItem);
 		if(heldItemDamageable && isTooDamaged(heldItem, repairMode))
-			putAwayDamagedTool();
+			putAwayDamagedTool(repairMode);
 		
 		BlockState state = BlockUtils.getState(pos);
 		int bestSlot = getBestSlot(state, useSwords, repairMode);
@@ -206,7 +206,7 @@ public final class AutoToolHack extends Hack
 		return stack.getMaxDamage() - stack.getDamage() <= repairMode;
 	}
 	
-	private void putAwayDamagedTool()
+	private void putAwayDamagedTool(int repairMode)
 	{
 		PlayerInventory inv = MC.player.getInventory();
 		int selectedSlot = inv.selectedSlot;
@@ -234,7 +234,8 @@ public final class AutoToolHack extends Hack
 		
 		// Failing that, swap with a less damaged item
 		OptionalInt notTooDamagedSlot = IntStream.range(9, 36)
-			.filter(i -> !isTooDamaged(inv.getStack(i), 0)).findFirst();
+			.filter(i -> !isTooDamaged(inv.getStack(i), repairMode))
+			.findFirst();
 		if(notTooDamagedSlot.isPresent())
 		{
 			im.windowClick_SWAP(notTooDamagedSlot.getAsInt(), selectedSlot);
