@@ -133,10 +133,11 @@ public final class AutoToolHack extends Hack
 		if(heldItemDamageable && isTooDamaged(heldItem, repairMode))
 			putAwayDamagedTool();
 		
-		int bestSlot = getBestSlot(pos, useSwords, repairMode);
+		BlockState state = BlockUtils.getState(pos);
+		int bestSlot = getBestSlot(state, useSwords, repairMode);
 		if(bestSlot == -1)
 		{
-			if(useHands && heldItemDamageable && isWrongTool(heldItem, pos))
+			if(useHands && heldItemDamageable && isWrongTool(heldItem, state))
 				selectFallbackSlot();
 			
 			return;
@@ -145,13 +146,12 @@ public final class AutoToolHack extends Hack
 		player.getInventory().selectedSlot = bestSlot;
 	}
 	
-	private int getBestSlot(BlockPos pos, boolean useSwords, int repairMode)
+	private int getBestSlot(BlockState state, boolean useSwords, int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		PlayerInventory inventory = player.getInventory();
 		ItemStack heldItem = MC.player.getMainHandStack();
 		
-		BlockState state = BlockUtils.getState(pos);
 		float bestSpeed = getMiningSpeed(heldItem, state);
 		if(isTooDamaged(heldItem, repairMode))
 			bestSpeed = 1;
@@ -246,9 +246,8 @@ public final class AutoToolHack extends Hack
 		im.windowClick_SWAP(0, selectedSlot);
 	}
 	
-	private boolean isWrongTool(ItemStack heldItem, BlockPos pos)
+	private boolean isWrongTool(ItemStack heldItem, BlockState state)
 	{
-		BlockState state = BlockUtils.getState(pos);
 		return getMiningSpeed(heldItem, state) <= 1;
 	}
 	
