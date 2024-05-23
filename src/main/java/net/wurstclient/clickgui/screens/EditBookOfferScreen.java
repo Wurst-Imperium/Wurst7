@@ -269,7 +269,7 @@ public final class EditBookOfferScreen extends Screen
 		int x = width / 2 - 100;
 		int y = 64;
 		
-		Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
+		Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
 		ItemStack stack = new ItemStack(item);
 		RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 		

@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -131,7 +132,6 @@ public final class AutoFishDebugDraw
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		matrixStack.push();
@@ -141,13 +141,13 @@ public final class AutoFishDebugDraw
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F).next();
-		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F).next();
-		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F).next();
-		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
+		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
+		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);
+		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
 		
 		matrixStack.pop();
 	}

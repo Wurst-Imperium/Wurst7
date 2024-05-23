@@ -13,8 +13,8 @@ import java.util.Set;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.class_9801;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -26,15 +26,13 @@ import net.wurstclient.util.RenderUtils;
 public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 {
 	@Override
-	public BuiltBuffer buildBuffer(Set<ChunkPos> chunks, int drawDistance)
+	public class_9801 buildBuffer(Set<ChunkPos> chunks, int drawDistance)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderChunks(new ArrayList<>(chunks), drawDistance, bufferBuilder);
-		return bufferBuilder.end();
+		return bufferBuilder.method_60800();
 	}
 	
 	private void renderChunks(List<ChunkPos> chunks, int drawDistance,
@@ -55,10 +53,10 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 			float z1 = blockPos.getZ() + 0.5F;
 			float z2 = z1 + 15;
 			
-			bufferBuilder.vertex(x1, 0, z1).next();
-			bufferBuilder.vertex(x2, 0, z1).next();
-			bufferBuilder.vertex(x2, 0, z2).next();
-			bufferBuilder.vertex(x1, 0, z2).next();
+			bufferBuilder.vertex(x1, 0, z1);
+			bufferBuilder.vertex(x2, 0, z1);
+			bufferBuilder.vertex(x2, 0, z2);
+			bufferBuilder.vertex(x1, 0, z2);
 		}
 	}
 }

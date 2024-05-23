@@ -41,7 +41,7 @@ public final class BlockListSetting extends Setting
 		super(name, description);
 		
 		Arrays.stream(blocks).parallel()
-			.map(s -> Registries.BLOCK.get(new Identifier(s)))
+			.map(s -> Registries.BLOCK.get(Identifier.of(s)))
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
@@ -101,7 +101,7 @@ public final class BlockListSetting extends Setting
 			
 			// otherwise, load the blocks in the JSON array
 			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
-				.map(s -> Registries.BLOCK.get(new Identifier(s)))
+				.map(s -> Registries.BLOCK.get(Identifier.of(s)))
 				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 				.sorted().forEachOrdered(s -> blockNames.add(s));
 			

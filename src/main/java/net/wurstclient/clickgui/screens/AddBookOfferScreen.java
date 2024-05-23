@@ -413,7 +413,7 @@ public final class AddBookOfferScreen extends Screen
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
-			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
+			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			

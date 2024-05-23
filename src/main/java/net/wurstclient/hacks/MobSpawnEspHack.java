@@ -17,11 +17,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.class_9801;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -299,26 +299,25 @@ public final class MobSpawnEspHack extends Hack
 			
 			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-				VertexFormats.POSITION_COLOR);
+			BufferBuilder bufferBuilder =
+				tessellator.method_60827(VertexFormat.DrawMode.DEBUG_LINES,
+					VertexFormats.POSITION_COLOR);
 			
 			new ArrayList<>(red).stream().filter(Objects::nonNull)
 				.map(pos -> new BlockPos(pos.getX() - region.x(), pos.getY(),
 					pos.getZ() - region.z()))
 				.forEach(pos -> {
 					bufferBuilder
-						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ())
-						.color(1, 0, 0, 0.5F).next();
-					bufferBuilder.vertex(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ() + 1).color(1, 0, 0, 0.5F).next();
+						.vertex(pos.getX(), pos.getY() + 0.01F, pos.getZ())
+						.color(1, 0, 0, 0.5F);
+					bufferBuilder.vertex(pos.getX() + 1, pos.getY() + 0.01F,
+						pos.getZ() + 1).color(1, 0, 0, 0.5F);
 					bufferBuilder
-						.vertex(pos.getX() + 1, pos.getY() + 0.01, pos.getZ())
-						.color(1, 0, 0, 0.5F).next();
+						.vertex(pos.getX() + 1, pos.getY() + 0.01F, pos.getZ())
+						.color(1, 0, 0, 0.5F);
 					bufferBuilder
-						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ() + 1)
-						.color(1, 0, 0, 0.5F).next();
+						.vertex(pos.getX(), pos.getY() + 0.01F, pos.getZ() + 1)
+						.color(1, 0, 0, 0.5F);
 				});
 			
 			new ArrayList<>(yellow).stream().filter(Objects::nonNull)
@@ -326,19 +325,19 @@ public final class MobSpawnEspHack extends Hack
 					pos.getZ() - region.z()))
 				.forEach(pos -> {
 					bufferBuilder
-						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ())
-						.color(1, 1, 0, 0.5F).next();
-					bufferBuilder.vertex(pos.getX() + 1, pos.getY() + 0.01,
-						pos.getZ() + 1).color(1, 1, 0, 0.5F).next();
+						.vertex(pos.getX(), pos.getY() + 0.01F, pos.getZ())
+						.color(1, 1, 0, 0.5F);
+					bufferBuilder.vertex(pos.getX() + 1, pos.getY() + 0.01F,
+						pos.getZ() + 1).color(1, 1, 0, 0.5F);
 					bufferBuilder
-						.vertex(pos.getX() + 1, pos.getY() + 0.01, pos.getZ())
-						.color(1, 1, 0, 0.5F).next();
+						.vertex(pos.getX() + 1, pos.getY() + 0.01F, pos.getZ())
+						.color(1, 1, 0, 0.5F);
 					bufferBuilder
-						.vertex(pos.getX(), pos.getY() + 0.01, pos.getZ() + 1)
-						.color(1, 1, 0, 0.5F).next();
+						.vertex(pos.getX(), pos.getY() + 0.01F, pos.getZ() + 1)
+						.color(1, 1, 0, 0.5F);
 				});
 			
-			BuiltBuffer buffer = bufferBuilder.end();
+			class_9801 buffer = bufferBuilder.method_60800();
 			vertexBuffer.bind();
 			vertexBuffer.upload(buffer);
 			VertexBuffer.unbind();

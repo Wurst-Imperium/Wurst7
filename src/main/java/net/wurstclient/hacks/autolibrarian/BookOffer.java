@@ -41,7 +41,7 @@ public record BookOffer(String id, int level, int price)
 		
 		DynamicRegistryManager drm = WurstClient.MC.world.getRegistryManager();
 		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
-		return registry.getEntry(new Identifier(id));
+		return registry.getEntry(Identifier.of(id));
 	}
 	
 	public Enchantment getEnchantment()

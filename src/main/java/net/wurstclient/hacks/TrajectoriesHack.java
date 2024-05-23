@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -119,24 +120,24 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	private void drawLine(MatrixStack matrixStack, ArrayList<Vec3d> path,
 		ColorSetting color)
 	{
+		if(path.isEmpty())
+			return;
+		
 		Vec3d camPos = RenderUtils.getCameraPos();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
 		
 		for(Vec3d point : path)
-			bufferBuilder
-				.vertex(matrix, (float)(point.x - camPos.x),
-					(float)(point.y - camPos.y), (float)(point.z - camPos.z))
-				.next();
+			bufferBuilder.vertex(matrix, (float)(point.x - camPos.x),
+				(float)(point.y - camPos.y), (float)(point.z - camPos.z));
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
 	}
 	
 	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end,

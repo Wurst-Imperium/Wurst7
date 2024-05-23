@@ -17,11 +17,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.class_9801;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
@@ -95,9 +96,7 @@ public final class AutoFarmRenderer
 	public void updateVertexBuffers(List<BlockPos> blocksToHarvest,
 		Set<BlockPos> plants, List<BlockPos> blocksToReplant)
 	{
-		BufferBuilder bufferBuilder =
-			RenderSystem.renderThreadTesselator().getBuffer();
-		
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		Vec3d regionOffset = RenderUtils.getCameraRegion().negate().toVec3d();
 		
 		double boxMin = 1 / 16.0;
@@ -105,20 +104,20 @@ public final class AutoFarmRenderer
 		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
 		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		
-		updateGreenBuffer(blocksToHarvest, bufferBuilder, box, regionOffset);
-		updateCyanBuffer(plants, bufferBuilder, node, regionOffset);
-		updateRedBuffer(blocksToReplant, bufferBuilder, box, regionOffset);
+		updateGreenBuffer(blocksToHarvest, tessellator, box, regionOffset);
+		updateCyanBuffer(plants, tessellator, node, regionOffset);
+		updateRedBuffer(blocksToReplant, tessellator, box, regionOffset);
 	}
 	
 	private void updateGreenBuffer(List<BlockPos> blocksToHarvest,
-		BufferBuilder bufferBuilder, Box box, Vec3d regionOffset)
+		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(greenBuffer != null)
 			greenBuffer.close();
 		
 		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToHarvest)
 		{
@@ -126,21 +125,21 @@ public final class AutoFarmRenderer
 			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
 		}
 		
-		BuiltBuffer buffer = bufferBuilder.end();
+		class_9801 buffer = bufferBuilder.method_60800();
 		greenBuffer.bind();
 		greenBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
-	private void updateCyanBuffer(Set<BlockPos> plants,
-		BufferBuilder bufferBuilder, Box node, Vec3d regionOffset)
+	private void updateCyanBuffer(Set<BlockPos> plants, Tessellator tessellator,
+		Box node, Vec3d regionOffset)
 	{
 		if(cyanBuffer != null)
 			cyanBuffer.close();
 		
 		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : plants)
 		{
@@ -148,21 +147,21 @@ public final class AutoFarmRenderer
 			RenderUtils.drawNode(renderNode, bufferBuilder);
 		}
 		
-		BuiltBuffer buffer = bufferBuilder.end();
+		class_9801 buffer = bufferBuilder.method_60800();
 		cyanBuffer.bind();
 		cyanBuffer.upload(buffer);
 		VertexBuffer.unbind();
 	}
 	
 	private void updateRedBuffer(List<BlockPos> blocksToReplant,
-		BufferBuilder bufferBuilder, Box box, Vec3d regionOffset)
+		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(redBuffer != null)
 			redBuffer.close();
 		
 		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToReplant)
 		{
@@ -170,7 +169,7 @@ public final class AutoFarmRenderer
 			RenderUtils.drawOutlinedBox(renderBox, bufferBuilder);
 		}
 		
-		BuiltBuffer buffer = bufferBuilder.end();
+		class_9801 buffer = bufferBuilder.method_60800();
 		redBuffer.bind();
 		redBuffer.upload(buffer);
 		VertexBuffer.unbind();

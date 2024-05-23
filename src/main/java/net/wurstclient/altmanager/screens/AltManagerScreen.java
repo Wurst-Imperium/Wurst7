@@ -38,6 +38,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -422,7 +423,6 @@ public final class AltManagerScreen extends Screen
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
@@ -459,13 +459,13 @@ public final class AltManagerScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, height, 0).next();
-			bufferBuilder.vertex(matrix, 0, height, 0).next();
-			tessellator.draw();
+			BufferBuilder bufferBuilder = tessellator.method_60827(
+				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0);
+			bufferBuilder.vertex(matrix, width, 0, 0);
+			bufferBuilder.vertex(matrix, width, height, 0);
+			bufferBuilder.vertex(matrix, 0, height, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
@@ -646,7 +646,6 @@ public final class AltManagerScreen extends Screen
 			MatrixStack matrixStack = context.getMatrices();
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// green glow when logged in
@@ -661,13 +660,14 @@ public final class AltManagerScreen extends Screen
 				
 				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION);
-				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
-				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
-				tessellator.draw();
+				BufferBuilder bufferBuilder = tessellator.method_60827(
+					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, x - 2, y - 2, 0);
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0);
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0);
+				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0);
+				BufferRenderer
+					.drawWithGlobalProgram(bufferBuilder.method_60800());
 				
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);

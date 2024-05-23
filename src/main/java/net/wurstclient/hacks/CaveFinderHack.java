@@ -20,11 +20,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.class_9801;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -255,16 +255,15 @@ public final class CaveFinderHack extends Hack
 	private void setBufferFromTask()
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		
 		RegionPos region = RenderUtils.getCameraRegion();
 		for(int[] vertex : compileVerticesTask.join())
 			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-				vertex[2] - region.z()).next();
+				vertex[2] - region.z());
 		
-		BuiltBuffer buffer = bufferBuilder.end();
+		class_9801 buffer = bufferBuilder.method_60800();
 		
 		if(vertexBuffer != null)
 			vertexBuffer.close();

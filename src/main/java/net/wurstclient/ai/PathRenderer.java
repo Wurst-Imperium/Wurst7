@@ -13,6 +13,7 @@ import org.joml.Vector3f;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -27,10 +28,9 @@ public final class PathRenderer
 		BlockPos end, RegionPos region)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		int startX = start.getX() - region.x();
 		int startY = start.getY();
@@ -44,8 +44,8 @@ public final class PathRenderer
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		// main line
-		bufferBuilder.vertex(matrix, startX, startY, startZ).next();
-		bufferBuilder.vertex(matrix, endX, endY, endZ).next();
+		bufferBuilder.vertex(matrix, startX, startY, startZ);
+		bufferBuilder.vertex(matrix, endX, endY, endZ);
 		
 		matrixStack.translate(endX, endY, endZ);
 		
@@ -64,39 +64,39 @@ public final class PathRenderer
 		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		// arrow head
-		bufferBuilder.vertex(matrix, 0, 2, 1).next();
-		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1);
+		bufferBuilder.vertex(matrix, -1, 2, 0);
 		
-		bufferBuilder.vertex(matrix, -1, 2, 0).next();
-		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, -1, 2, 0);
+		bufferBuilder.vertex(matrix, 0, 2, -1);
 		
-		bufferBuilder.vertex(matrix, 0, 2, -1).next();
-		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 2, -1);
+		bufferBuilder.vertex(matrix, 1, 2, 0);
 		
-		bufferBuilder.vertex(matrix, 1, 2, 0).next();
-		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0);
+		bufferBuilder.vertex(matrix, 0, 2, 1);
 		
-		bufferBuilder.vertex(matrix, 1, 2, 0).next();
-		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 1, 2, 0);
+		bufferBuilder.vertex(matrix, -1, 2, 0);
 		
-		bufferBuilder.vertex(matrix, 0, 2, 1).next();
-		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, 0, 2, 1);
+		bufferBuilder.vertex(matrix, 0, 2, -1);
 		
-		bufferBuilder.vertex(matrix, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, 1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, 1, 2, 0);
 		
-		bufferBuilder.vertex(matrix, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, -1, 2, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, -1, 2, 0);
 		
-		bufferBuilder.vertex(matrix, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, 0, 2, -1).next();
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, 0, 2, -1);
 		
-		bufferBuilder.vertex(matrix, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, 0, 2, 1).next();
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, 0, 2, 1);
 		
 		matrixStack.pop();
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
 	}
 	
 	public static void renderNode(MatrixStack matrixStack, BlockPos pos,
@@ -110,52 +110,51 @@ public final class PathRenderer
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator.method_60827(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		// middle part
-		bufferBuilder.vertex(matrix, 0, 0, 1).next();
-		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, 1);
+		bufferBuilder.vertex(matrix, -1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, -1, 0, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		bufferBuilder.vertex(matrix, -1, 0, 0);
+		bufferBuilder.vertex(matrix, 0, 0, -1);
 		
-		bufferBuilder.vertex(matrix, 0, 0, -1).next();
-		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 0, -1);
+		bufferBuilder.vertex(matrix, 1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, 1, 0, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		bufferBuilder.vertex(matrix, 1, 0, 0);
+		bufferBuilder.vertex(matrix, 0, 0, 1);
 		
 		// top part
-		bufferBuilder.vertex(matrix, 0, 1, 0).next();
-		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 1, 0);
+		bufferBuilder.vertex(matrix, 1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, 0, 1, 0).next();
-		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, 1, 0);
+		bufferBuilder.vertex(matrix, -1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, 0, 1, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		bufferBuilder.vertex(matrix, 0, 1, 0);
+		bufferBuilder.vertex(matrix, 0, 0, -1);
 		
-		bufferBuilder.vertex(matrix, 0, 1, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		bufferBuilder.vertex(matrix, 0, 1, 0);
+		bufferBuilder.vertex(matrix, 0, 0, 1);
 		
 		// bottom part
-		bufferBuilder.vertex(matrix, 0, -1, 0).next();
-		bufferBuilder.vertex(matrix, 1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, -1, 0);
+		bufferBuilder.vertex(matrix, 1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, 0, -1, 0).next();
-		bufferBuilder.vertex(matrix, -1, 0, 0).next();
+		bufferBuilder.vertex(matrix, 0, -1, 0);
+		bufferBuilder.vertex(matrix, -1, 0, 0);
 		
-		bufferBuilder.vertex(matrix, 0, -1, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, -1).next();
+		bufferBuilder.vertex(matrix, 0, -1, 0);
+		bufferBuilder.vertex(matrix, 0, 0, -1);
 		
-		bufferBuilder.vertex(matrix, 0, -1, 0).next();
-		bufferBuilder.vertex(matrix, 0, 0, 1).next();
+		bufferBuilder.vertex(matrix, 0, -1, 0);
+		bufferBuilder.vertex(matrix, 0, 0, 1);
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
 		
 		matrixStack.pop();
 	}
