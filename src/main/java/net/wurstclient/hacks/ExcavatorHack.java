@@ -455,6 +455,10 @@ public final class ExcavatorHack extends Hack
 	
 	private void excavate()
 	{
+		// wait for AutoEat to finish eating
+		if(WURST.getHax().autoEatHack.isEating())
+			return;
+		
 		boolean legit = mode.getSelected() == Mode.LEGIT;
 		currentBlock = null;
 		
