@@ -492,6 +492,7 @@ public final class ExcavatorHack extends Hack
 			// break next block
 			for(BlockPos pos : validBlocks)
 			{
+				WURST.getHax().autoToolHack.equipIfEnabled(pos);
 				if(!BlockBreaker.breakOneBlock(pos))
 					continue;
 				
