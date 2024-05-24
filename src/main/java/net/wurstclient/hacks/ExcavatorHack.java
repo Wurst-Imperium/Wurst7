@@ -487,10 +487,8 @@ public final class ExcavatorHack extends Hack
 			// find closest valid block
 			for(BlockPos pos : blocks)
 			{
-				boolean successful;
-				
 				// break block
-				successful = BlockBreaker.breakOneBlock(pos);
+				boolean successful = BlockBreaker.breakOneBlock(pos);
 				
 				// set currentBlock if successful
 				if(successful)
@@ -506,9 +504,11 @@ public final class ExcavatorHack extends Hack
 		}
 		
 		// get remaining blocks
-		Predicate<BlockPos> pClickable = BlockUtils::canBeClicked;
+		Predicate<BlockPos> pBreakable = MC.player.isCreative()
+			? BlockUtils::canBeClicked : pos -> BlockUtils.canBeClicked(pos)
+				&& !BlockUtils.isUnbreakable(pos);
 		area.remainingBlocks =
-			(int)area.blocksList.parallelStream().filter(pClickable).count();
+			(int)area.blocksList.parallelStream().filter(pBreakable).count();
 		
 		if(area.remainingBlocks == 0)
 		{
@@ -523,7 +523,7 @@ public final class ExcavatorHack extends Hack
 			Comparator<BlockPos> cAltitude =
 				Comparator.comparingInt(pos -> -pos.getY());
 			BlockPos closestBlock =
-				area.blocksList.parallelStream().filter(pClickable)
+				area.blocksList.parallelStream().filter(pBreakable)
 					.min(cAltitude.thenComparing(cDistance)).get();
 			
 			pathFinder = new ExcavatorPathFinder(closestBlock);
