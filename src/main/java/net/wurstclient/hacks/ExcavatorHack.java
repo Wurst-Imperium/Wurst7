@@ -569,7 +569,8 @@ public final class ExcavatorHack extends Hack
 		
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-			.filter(BlockUtils::canBeClicked).filter(area.blocksSet::contains)
+			.filter(area.blocksSet::contains).filter(BlockUtils::canBeClicked)
+			.filter(pos -> !BlockUtils.isUnbreakable(pos))
 			.sorted(Comparator
 				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
