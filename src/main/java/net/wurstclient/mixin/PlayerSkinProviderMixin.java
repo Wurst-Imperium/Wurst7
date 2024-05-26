@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -31,7 +32,10 @@ import net.wurstclient.util.json.WsonObject;
 @Mixin(PlayerSkinProvider.class)
 public abstract class PlayerSkinProviderMixin
 {
+	@Unique
 	private static HashMap<String, String> capes;
+	
+	@Unique
 	private MinecraftProfileTexture currentCape;
 	
 	@Inject(at = @At("HEAD"),
@@ -79,6 +83,7 @@ public abstract class PlayerSkinProviderMixin
 		return result;
 	}
 	
+	@Unique
 	private void setupWurstCapes()
 	{
 		try
