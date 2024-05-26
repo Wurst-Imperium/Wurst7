@@ -88,15 +88,16 @@ public abstract class PlayerSkinProviderMixin
 	{
 		try
 		{
+			// assign map first to prevent endless retries if download fails
+			capes = new HashMap<>();
+			Pattern uuidPattern = Pattern.compile(
+				"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+			
 			// download cape list from wurstclient.net
 			WsonObject rawCapes = JsonUtils.parseURLToObject(
 				"https://www.wurstclient.net/api/v1/capes.json");
 			
-			Pattern uuidPattern = Pattern.compile(
-				"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-			
 			// convert names to offline UUIDs
-			capes = new HashMap<>();
 			for(Entry<String, String> entry : rawCapes.getAllStrings()
 				.entrySet())
 			{
