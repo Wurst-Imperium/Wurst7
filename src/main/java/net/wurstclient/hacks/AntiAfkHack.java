@@ -162,7 +162,8 @@ public final class AntiAfkHack extends Hack
 			
 			// check path
 			if(processor != null
-				&& !pathFinder.isPathStillValid(processor.getIndex()))
+				&& !pathFinder.isPathStillValid(processor.getIndex())
+				|| processor.getTicksOffPath() > 20)
 			{
 				pathFinder = new RandomPathFinder(pathFinder);
 				return;
