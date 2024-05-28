@@ -31,20 +31,7 @@ import net.wurstclient.util.RenderUtils;
 
 public class PathFinder
 {
-	private final WurstClient wurst = WurstClient.INSTANCE;
-	
-	private final boolean invulnerable =
-		WurstClient.MC.player.getAbilities().creativeMode;
-	private final boolean creativeFlying =
-		WurstClient.MC.player.getAbilities().flying;
-	protected final boolean flying =
-		creativeFlying || wurst.getHax().flightHack.isEnabled();
-	private final boolean immuneToFallDamage =
-		invulnerable || wurst.getHax().noFallHack.isEnabled();
-	private final boolean noWaterSlowdown =
-		wurst.getHax().antiWaterPushHack.isPreventingSlowdown();
-	private final boolean jesus = wurst.getHax().jesusHack.isEnabled();
-	private final boolean spider = wurst.getHax().spiderHack.isEnabled();
+	private final PlayerAbilities abilities = PlayerAbilities.get();
 	protected boolean fallingAllowed = true;
 	protected boolean divingAllowed = true;
 	
@@ -285,8 +272,8 @@ public class PathFinder
 		Block block = state.getBlock();
 		
 		return state.blocksMovement() && !(block instanceof AbstractSignBlock)
-			|| block instanceof LadderBlock
-			|| jesus && (block == Blocks.WATER || block == Blocks.LAVA);
+			|| block instanceof LadderBlock || abilities.jesus()
+				&& (block == Blocks.WATER || block == Blocks.LAVA);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -310,7 +297,7 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!invulnerable
+		if(!abilities.invulnerable()
 			&& (block == Blocks.LAVA || block instanceof AbstractFireBlock))
 			return false;
 		
@@ -337,7 +324,7 @@ public class PathFinder
 		// check if safe
 		BlockState state = BlockUtils.getState(pos);
 		Fluid fluid = state.getFluidState().getFluid();
-		if(!invulnerable && (state.getBlock() instanceof CactusBlock
+		if(!abilities.invulnerable() && (state.getBlock() instanceof CactusBlock
 			|| fluid instanceof LavaFluid))
 			return false;
 		
@@ -356,7 +343,7 @@ public class PathFinder
 			return false;
 		
 		// check if fall damage is off
-		if(immuneToFallDamage && fallingAllowed)
+		if(abilities.immuneToFallDamage() && fallingAllowed)
 			return true;
 		
 		// check if fall ends with slime block
@@ -395,15 +382,15 @@ public class PathFinder
 	
 	private boolean canFlyAt(BlockPos pos)
 	{
-		return flying
-			|| !noWaterSlowdown && BlockUtils.getBlock(pos) == Blocks.WATER;
+		return abilities.flying() || !abilities.noWaterSlowdown()
+			&& BlockUtils.getBlock(pos) == Blocks.WATER;
 	}
 	
 	private boolean canClimbUpAt(BlockPos pos)
 	{
 		// check if this block works for climbing
 		Block block = BlockUtils.getBlock(pos);
-		if(!spider && !(block instanceof LadderBlock)
+		if(!abilities.spider() && !(block instanceof LadderBlock)
 			&& !(block instanceof VineBlock))
 			return false;
 		
@@ -448,7 +435,7 @@ public class PathFinder
 			Block block = BlockUtils.getBlock(pos);
 			
 			// liquids
-			if(block == Blocks.WATER && !noWaterSlowdown)
+			if(block == Blocks.WATER && !abilities.noWaterSlowdown())
 				costs[i] *= 1.3164437838225804F;
 			else if(block == Blocks.LAVA)
 				costs[i] *= 4.539515393656079F;
@@ -624,15 +611,7 @@ public class PathFinder
 			throw new IllegalStateException("Path is not formatted!");
 		
 		// check player abilities
-		if(invulnerable != WurstClient.MC.player.getAbilities().creativeMode
-			|| flying != (creativeFlying
-				|| wurst.getHax().flightHack.isEnabled())
-			|| immuneToFallDamage != (invulnerable
-				|| wurst.getHax().noFallHack.isEnabled())
-			|| noWaterSlowdown != wurst.getHax().antiWaterPushHack
-				.isPreventingSlowdown()
-			|| jesus != wurst.getHax().jesusHack.isEnabled()
-			|| spider != wurst.getHax().spiderHack.isEnabled())
+		if(!abilities.equals(PlayerAbilities.get()))
 			return false;
 		
 		// if index is zero, check if first pos is safe
@@ -654,8 +633,8 @@ public class PathFinder
 	
 	public PathProcessor getProcessor()
 	{
-		if(flying)
-			return new FlyPathProcessor(path, creativeFlying);
+		if(abilities.flying())
+			return new FlyPathProcessor(path, abilities.creativeFlying());
 		
 		return new WalkPathProcessor(path);
 	}
