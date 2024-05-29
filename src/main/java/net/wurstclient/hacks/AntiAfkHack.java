@@ -62,6 +62,10 @@ public final class AntiAfkHack extends Hack
 			0.5, 0, 60, 0.05,
 			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
 	
+	private final CheckboxSetting showWaitTime =
+		new CheckboxSetting("Show wait time",
+			"Displays the remaining wait time in the HackList.", true);
+	
 	private int timer;
 	private Random random = Random.createLocal();
 	private BlockPos start;
@@ -81,6 +85,16 @@ public final class AntiAfkHack extends Hack
 		addSetting(nonAiRange);
 		addSetting(waitTime);
 		addSetting(waitTimeRand);
+		addSetting(showWaitTime);
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		if(showWaitTime.isChecked() && timer > 0)
+			return getName() + " [" + timer * 50 + "ms]";
+		
+		return getName();
 	}
 	
 	@Override
