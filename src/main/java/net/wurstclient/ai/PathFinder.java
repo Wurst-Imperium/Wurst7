@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.LavaFluid;
@@ -31,6 +32,8 @@ import net.wurstclient.util.RenderUtils;
 
 public class PathFinder
 {
+	private static final MinecraftClient MC = WurstClient.MC;
+	
 	private final PlayerAbilities abilities = PlayerAbilities.get();
 	protected boolean fallingAllowed = true;
 	protected boolean divingAllowed = true;
@@ -53,13 +56,11 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		if(WurstClient.MC.player.isOnGround())
-			start = new PathPos(BlockPos.ofFloored(WurstClient.MC.player.getX(),
-				WurstClient.MC.player.getY() + 0.5,
-				WurstClient.MC.player.getZ()));
+		if(MC.player.isOnGround())
+			start = new PathPos(BlockPos.ofFloored(MC.player.getX(),
+				MC.player.getY() + 0.5, MC.player.getZ()));
 		else
-			start =
-				new PathPos(BlockPos.ofFloored(WurstClient.MC.player.getPos()));
+			start = new PathPos(BlockPos.ofFloored(MC.player.getPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);
@@ -183,7 +184,7 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < WurstClient.MC.world.getTopY() && canGoThrough(up.up())
+		if(pos.getY() < MC.world.getTopY() && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)
@@ -192,7 +193,7 @@ public class PathFinder
 			neighbors.add(new PathPos(up, onGround));
 		
 		// down
-		if(pos.getY() > WurstClient.MC.world.getBottomY() && canGoThrough(down)
+		if(pos.getY() > MC.world.getBottomY() && canGoThrough(down)
 			&& canGoAbove(down.down()) && (flying || canFallBelow(pos))
 			&& (divingAllowed || BlockUtils.getBlock(pos) != Blocks.WATER))
 			neighbors.add(new PathPos(down));
@@ -282,7 +283,7 @@ public class PathFinder
 		// check if loaded
 		// Can't see why isChunkLoaded() is deprecated. Still seems to be widely
 		// used with no replacement.
-		if(!WurstClient.MC.world.isChunkLoaded(pos))
+		if(!MC.world.isChunkLoaded(pos))
 			return false;
 		
 		// check if solid
