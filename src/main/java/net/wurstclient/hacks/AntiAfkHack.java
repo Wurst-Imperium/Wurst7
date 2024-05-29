@@ -26,7 +26,6 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -117,13 +116,9 @@ public final class AntiAfkHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		IKeyBinding.get(MC.options.forwardKey).resetPressedState();
-		IKeyBinding.get(MC.options.jumpKey).resetPressedState();
-		
+		PathProcessor.releaseControls();
 		pathFinder = null;
 		processor = null;
-		PathProcessor.releaseControls();
 	}
 	
 	@Override
