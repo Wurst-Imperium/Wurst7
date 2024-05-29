@@ -16,8 +16,6 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,6 +27,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -272,7 +271,7 @@ public final class TunnellerHack extends Hack
 		vertexBuffers[0] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		RegionPos region = RenderUtils.getCameraRegion();
@@ -288,7 +287,7 @@ public final class TunnellerHack extends Hack
 			.multiply(Math.max(0.5, length)).add(offset);
 		RenderUtils.drawArrow(arrowStart, arrowEnd, bufferBuilder);
 		
-		class_9801 buffer = bufferBuilder.method_60800();
+		BuiltBuffer buffer = bufferBuilder.end();
 		vertexBuffers[0].bind();
 		vertexBuffers[0].upload(buffer);
 		VertexBuffer.unbind();
@@ -393,7 +392,7 @@ public final class TunnellerHack extends Hack
 				.offset(region.negate().toVec3d());
 			
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 			
 			currentBlock = null;
@@ -412,7 +411,7 @@ public final class TunnellerHack extends Hack
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			}
 			
-			class_9801 buffer = bufferBuilder.method_60800();
+			BuiltBuffer buffer = bufferBuilder.end();
 			vertexBuffers[1].bind();
 			vertexBuffers[1].upload(buffer);
 			VertexBuffer.unbind();
@@ -503,13 +502,13 @@ public final class TunnellerHack extends Hack
 				.offset(region.negate().toVec3d());
 			
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 			
 			for(BlockPos pos : blocks)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			class_9801 buffer = bufferBuilder.method_60800();
+			BuiltBuffer buffer = bufferBuilder.end();
 			vertexBuffers[2].bind();
 			vertexBuffers[2].upload(buffer);
 			VertexBuffer.unbind();
@@ -644,13 +643,13 @@ public final class TunnellerHack extends Hack
 				.offset(region.negate().toVec3d());
 			
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 			
 			for(BlockPos pos : liquids)
 				RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 			
-			class_9801 buffer = bufferBuilder.method_60800();
+			BuiltBuffer buffer = bufferBuilder.end();
 			
 			vertexBuffers[3].bind();
 			vertexBuffers[3].upload(buffer);

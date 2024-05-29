@@ -206,7 +206,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 		
 		Vec3d regionVec = region.toVec3d();
@@ -231,6 +231,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 				.color(r, g, 0, 0.5F);
 		}
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

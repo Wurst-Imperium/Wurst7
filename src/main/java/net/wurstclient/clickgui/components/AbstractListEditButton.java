@@ -94,32 +94,32 @@ public abstract class AbstractListEditButton extends Component
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// box
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hBox ? opacity * 1.5F : opacity);
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);

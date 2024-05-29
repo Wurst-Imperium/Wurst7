@@ -565,23 +565,23 @@ public final class ClickGui
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			ttOpacity);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0);
 		bufferBuilder.vertex(matrix, xt1, yt2, 0);
 		bufferBuilder.vertex(matrix, xt2, yt2, 0);
 		bufferBuilder.vertex(matrix, xt2, yt1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0);
 		bufferBuilder.vertex(matrix, xt1, yt2, 0);
 		bufferBuilder.vertex(matrix, xt2, yt2, 0);
 		bufferBuilder.vertex(matrix, xt2, yt1, 0);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -676,7 +676,7 @@ public final class ClickGui
 				RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 					opacity);
 				
-				BufferBuilder bufferBuilder = tessellator.method_60827(
+				BufferBuilder bufferBuilder = tessellator.begin(
 					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 				bufferBuilder.vertex(matrix, xs2, ys1, 0);
 				bufferBuilder.vertex(matrix, xs2, ys2, 0);
@@ -691,7 +691,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs2, ys2, 0);
 				bufferBuilder.vertex(matrix, xs2, ys4, 0);
 				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.method_60800());
+					.drawWithGlobalProgram(bufferBuilder.end());
 				
 				boolean hovering = mouseX >= xs1 && mouseY >= ys3
 					&& mouseX < xs2 && mouseY < ys4;
@@ -700,20 +700,20 @@ public final class ClickGui
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					hovering ? opacity * 1.5F : opacity);
 				
-				bufferBuilder = tessellator.method_60827(
+				bufferBuilder = tessellator.begin(
 					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 				bufferBuilder.vertex(matrix, xs1, ys3, 0);
 				bufferBuilder.vertex(matrix, xs1, ys4, 0);
 				bufferBuilder.vertex(matrix, xs2, ys4, 0);
 				bufferBuilder.vertex(matrix, xs2, ys3, 0);
 				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.method_60800());
+					.drawWithGlobalProgram(bufferBuilder.end());
 				
 				// outline
 				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 					0.5F);
 				
-				bufferBuilder = tessellator.method_60827(
+				bufferBuilder = tessellator.begin(
 					VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 					VertexFormats.POSITION);
 				bufferBuilder.vertex(matrix, xs1, ys3, 0);
@@ -722,7 +722,7 @@ public final class ClickGui
 				bufferBuilder.vertex(matrix, xs2, ys3, 0);
 				bufferBuilder.vertex(matrix, xs1, ys3, 0);
 				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.method_60800());
+					.drawWithGlobalProgram(bufferBuilder.end());
 			}
 			
 			int x3 = x1 + 2;
@@ -735,7 +735,7 @@ public final class ClickGui
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
 			
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0);
 			bufferBuilder.vertex(matrix, x1, y2, 0);
@@ -745,7 +745,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x5, y2, 0);
 			bufferBuilder.vertex(matrix, x4, y2, 0);
 			bufferBuilder.vertex(matrix, x4, y3, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			net.minecraft.client.util.Window sr = MC.getWindow();
 			int sf = (int)sr.getScaleFactor();
@@ -759,7 +759,7 @@ public final class ClickGui
 			
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				opacity);
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			
 			// window background
@@ -793,7 +793,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xc2, yc1, 0);
 			bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// render children
 			int cMouseX = mouseX - x1;
@@ -813,23 +813,23 @@ public final class ClickGui
 		// window outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		if(!window.isMinimized())
 		{
 			// title bar outline
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0);
 			bufferBuilder.vertex(matrix, x2, y3, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		}
 		
 		// title bar buttons
@@ -868,7 +868,7 @@ public final class ClickGui
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 			opacity);
 		
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y4, 0);
@@ -878,17 +878,17 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, x3, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y5, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// title bar background
 		// behind title
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y3, 0);
 		bufferBuilder.vertex(matrix, x3, y3, 0);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// window title
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -912,34 +912,34 @@ public final class ClickGui
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hovering ? opacity * 1.5F : opacity);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// background between buttons
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 			opacity);
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// button outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void renderMinimizeButton(MatrixStack matrixStack, int x1, int y1,
@@ -970,22 +970,22 @@ public final class ClickGui
 		}
 		
 		// arrow
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
 		bufferBuilder.vertex(matrix, xa3, ya1, 0);
 		bufferBuilder.vertex(matrix, xa2, ya2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
 		bufferBuilder.vertex(matrix, xa3, ya1, 0);
 		bufferBuilder.vertex(matrix, xa2, ya2, 0);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void renderPinButton(MatrixStack matrixStack, int x1, int y1,
@@ -1009,7 +1009,7 @@ public final class ClickGui
 			
 			// knob
 			RenderSystem.setShaderColor(h, 0, 0, 0.5F);
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
 			bufferBuilder.vertex(matrix, xk2, yk1, 0);
@@ -1019,7 +1019,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk4, yk2, 0);
 			bufferBuilder.vertex(matrix, xk4, yk3, 0);
 			bufferBuilder.vertex(matrix, xk3, yk3, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			float xn1 = x1 + 3.5F;
 			float xn2 = x2 - 3.5F;
@@ -1028,40 +1028,40 @@ public final class ClickGui
 			
 			// needle
 			RenderSystem.setShaderColor(h, h, h, 1);
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn2, 0);
 			bufferBuilder.vertex(matrix, xn1, yn2, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
 			bufferBuilder.vertex(matrix, xk2, yk1, 0);
 			bufferBuilder.vertex(matrix, xk2, yk2, 0);
 			bufferBuilder.vertex(matrix, xk1, yk2, 0);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
-			bufferBuilder = tessellator.method_60827(
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk3, yk2, 0);
 			bufferBuilder.vertex(matrix, xk4, yk2, 0);
 			bufferBuilder.vertex(matrix, xk4, yk3, 0);
 			bufferBuilder.vertex(matrix, xk3, yk3, 0);
 			bufferBuilder.vertex(matrix, xk3, yk2, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
-			bufferBuilder = tessellator.method_60827(
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn2, 0);
 			bufferBuilder.vertex(matrix, xn1, yn2, 0);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 		}else
 		{
@@ -1082,7 +1082,7 @@ public final class ClickGui
 			
 			// knob
 			RenderSystem.setShaderColor(0, h, 0, 1);
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
 			bufferBuilder.vertex(matrix, xk2, yk2, 0);
@@ -1092,7 +1092,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, xk6, yk6, 0);
 			bufferBuilder.vertex(matrix, xk3, yk7, 0);
 			bufferBuilder.vertex(matrix, xk7, yk4, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			float xn1 = x1 + 3;
 			float xn2 = x1 + 4;
@@ -1103,38 +1103,38 @@ public final class ClickGui
 			
 			// needle
 			RenderSystem.setShaderColor(h, h, h, 1);
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn2, 0);
 			bufferBuilder.vertex(matrix, xn3, yn3, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// outlines
 			RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-			bufferBuilder = tessellator.method_60827(
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
 			bufferBuilder.vertex(matrix, xk2, yk2, 0);
 			bufferBuilder.vertex(matrix, xk3, yk3, 0);
 			bufferBuilder.vertex(matrix, xk4, yk4, 0);
 			bufferBuilder.vertex(matrix, xk1, yk1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
-			bufferBuilder = tessellator.method_60827(
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xk5, yk5, 0);
 			bufferBuilder.vertex(matrix, xk6, yk6, 0);
 			bufferBuilder.vertex(matrix, xk3, yk7, 0);
 			bufferBuilder.vertex(matrix, xk7, yk4, 0);
 			bufferBuilder.vertex(matrix, xk5, yk5, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
-			bufferBuilder = tessellator.method_60827(
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
 			bufferBuilder.vertex(matrix, xn2, yn2, 0);
 			bufferBuilder.vertex(matrix, xn3, yn3, 0);
 			bufferBuilder.vertex(matrix, xn1, yn1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		}
 	}
 	
@@ -1164,7 +1164,7 @@ public final class ClickGui
 		// cross
 		RenderSystem.setShaderColor(hovering ? 1 : 0.85F, 0, 0, 1);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xc1, yc1, 0);
 		bufferBuilder.vertex(matrix, xc2, yc2, 0);
 		bufferBuilder.vertex(matrix, xc3, yc3, 0);
@@ -1177,11 +1177,11 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc5, yc6, 0);
 		bufferBuilder.vertex(matrix, xc1, yc3, 0);
 		bufferBuilder.vertex(matrix, xc2, yc4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xc1, yc1, 0);
 		bufferBuilder.vertex(matrix, xc2, yc2, 0);
@@ -1195,7 +1195,7 @@ public final class ClickGui
 		bufferBuilder.vertex(matrix, xc2, yc4, 0);
 		bufferBuilder.vertex(matrix, xc1, yc3, 0);
 		bufferBuilder.vertex(matrix, xc5, yc6, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public float[] getBgColor()

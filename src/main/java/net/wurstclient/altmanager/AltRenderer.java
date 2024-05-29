@@ -67,14 +67,14 @@ public final class AltRenderer
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().method_60827(
+		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(
 			VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh);
 		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh);
 		bufferBuilder.vertex(matrix4f, x2, y2, z).texture(uPlusWOverFw,
 			vPlusHOverFh);
 		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public static void drawAltFace(DrawContext context, String name, int x,

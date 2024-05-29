@@ -178,7 +178,7 @@ public final class SliderComponent extends Component
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y4, 0);
@@ -200,7 +200,7 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y5, 0);
 		bufferBuilder.vertex(matrix, x2, y4, 0);
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawRail(MatrixStack matrixStack, int x3, int x4, int y4,
@@ -226,7 +226,7 @@ public final class SliderComponent extends Component
 		RenderSystem.setShaderColor(1, 0, 0,
 			hSlider ? opacity * 1.5F : opacity);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y4, 0);
 		bufferBuilder.vertex(matrix, x3, y5, 0);
 		bufferBuilder.vertex(matrix, xl1, y5, 0);
@@ -235,29 +235,29 @@ public final class SliderComponent extends Component
 		bufferBuilder.vertex(matrix, xl2, y5, 0);
 		bufferBuilder.vertex(matrix, x4, y5, 0);
 		bufferBuilder.vertex(matrix, x4, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			hSlider ? opacity * 1.5F : opacity);
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xl1, y4, 0);
 		bufferBuilder.vertex(matrix, xl1, y5, 0);
 		bufferBuilder.vertex(matrix, xl2, y5, 0);
 		bufferBuilder.vertex(matrix, xl2, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y4, 0);
 		bufferBuilder.vertex(matrix, x3, y5, 0);
 		bufferBuilder.vertex(matrix, x4, y5, 0);
 		bufferBuilder.vertex(matrix, x4, y4, 0);
 		bufferBuilder.vertex(matrix, x3, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawKnob(MatrixStack matrixStack, int x1, int x2, int y2,
@@ -281,23 +281,23 @@ public final class SliderComponent extends Component
 			RenderSystem.setShaderColor(c[0], c[1], c[2], hSlider ? 1 : 0.75F);
 		}
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xk1, yk1, 0);
 		bufferBuilder.vertex(matrix, xk1, yk2, 0);
 		bufferBuilder.vertex(matrix, xk2, yk2, 0);
 		bufferBuilder.vertex(matrix, xk2, yk1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xk1, yk1, 0);
 		bufferBuilder.vertex(matrix, xk1, yk2, 0);
 		bufferBuilder.vertex(matrix, xk2, yk2, 0);
 		bufferBuilder.vertex(matrix, xk2, yk1, 0);
 		bufferBuilder.vertex(matrix, xk1, yk1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1,

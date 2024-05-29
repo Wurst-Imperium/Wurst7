@@ -11,10 +11,9 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.settings.ColorSetting;
@@ -39,7 +38,7 @@ public final class NewChunksRenderer
 		this.oldChunksColor = oldChunksColor;
 	}
 	
-	public void updateBuffer(int i, class_9801 buffer)
+	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
 		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();

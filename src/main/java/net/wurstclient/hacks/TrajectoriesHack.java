@@ -128,7 +128,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		float[] colorF = color.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
@@ -137,7 +137,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			bufferBuilder.vertex(matrix, (float)(point.x - camPos.x),
 				(float)(point.y - camPos.y), (float)(point.z - camPos.z));
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end,

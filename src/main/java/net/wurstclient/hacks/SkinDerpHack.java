@@ -8,8 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.Random;
-
-import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.entity.player.PlayerModelPart;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;

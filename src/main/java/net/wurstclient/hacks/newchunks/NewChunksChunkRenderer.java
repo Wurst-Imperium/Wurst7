@@ -8,11 +8,10 @@
 package net.wurstclient.hacks.newchunks;
 
 import java.util.Set;
-
-import net.minecraft.class_9801;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.ChunkPos;
 
 public interface NewChunksChunkRenderer
 {
-	public class_9801 buildBuffer(Set<ChunkPos> chunks, int drawDistance);
+	public BuiltBuffer buildBuffer(Set<ChunkPos> chunks, int drawDistance);
 }

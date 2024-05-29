@@ -86,7 +86,7 @@ public final class PortalEspRenderer
 		float[] colorF = group.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(Box box : group.getBoxes())
@@ -100,7 +100,7 @@ public final class PortalEspRenderer
 				(float)end.z);
 		}
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public static void prepareBuffers()

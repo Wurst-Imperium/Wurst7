@@ -286,12 +286,12 @@ public final class BowAimbotHack extends Hack
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, 0, 0, 0);
 		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0);
 		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0);
 		bufferBuilder.vertex(matrix, 0, 10, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);

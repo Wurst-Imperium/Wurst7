@@ -114,13 +114,13 @@ public final class ColorComponent extends Component
 			opacity);
 		
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawBox(MatrixStack matrixStack, int x1, int x2, int y2,
@@ -137,23 +137,23 @@ public final class ColorComponent extends Component
 			hovering ? 1F : opacity);
 		
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x1, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x1, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y3, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1)

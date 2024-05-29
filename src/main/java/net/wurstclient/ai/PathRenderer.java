@@ -29,7 +29,7 @@ public final class PathRenderer
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		int startX = start.getX() - region.x();
@@ -96,7 +96,7 @@ public final class PathRenderer
 		
 		matrixStack.pop();
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public static void renderNode(MatrixStack matrixStack, BlockPos pos,
@@ -112,7 +112,7 @@ public final class PathRenderer
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		// middle part
@@ -154,7 +154,7 @@ public final class PathRenderer
 		bufferBuilder.vertex(matrix, 0, -1, 0);
 		bufferBuilder.vertex(matrix, 0, 0, 1);
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		matrixStack.pop();
 	}

@@ -384,13 +384,13 @@ public abstract class AltEditorScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, 0, 0, 0);
 			bufferBuilder.vertex(matrix, width, 0, 0);
 			bufferBuilder.vertex(matrix, width, height, 0);
 			bufferBuilder.vertex(matrix, 0, height, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);

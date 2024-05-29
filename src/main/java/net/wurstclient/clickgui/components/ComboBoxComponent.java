@@ -158,12 +158,12 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 			opacity);
 		
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
 		bufferBuilder.vertex(matrix, x1, y2, 0);
 		bufferBuilder.vertex(matrix, x4, y2, 0);
 		bufferBuilder.vertex(matrix, x4, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawBox(MatrixStack matrixStack, int x2, int x4, int y1,
@@ -181,23 +181,23 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			bgAlpha);
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x4, y1, 0);
 		bufferBuilder.vertex(matrix, x4, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x4, y1, 0);
 		bufferBuilder.vertex(matrix, x4, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
 		bufferBuilder.vertex(matrix, x4, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
@@ -205,11 +205,11 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawArrow(MatrixStack matrixStack, int x2, int x3, int y1,
@@ -238,22 +238,22 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		}
 		
 		// arrow
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
 		bufferBuilder.vertex(matrix, xa3, ya1, 0);
 		bufferBuilder.vertex(matrix, xa2, ya2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
 		bufferBuilder.vertex(matrix, xa3, ya1, 0);
 		bufferBuilder.vertex(matrix, xa2, ya2, 0);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawNameAndValue(DrawContext context, int x1, int x4, int y1)

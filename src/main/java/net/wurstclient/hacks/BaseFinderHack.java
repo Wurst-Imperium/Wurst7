@@ -16,11 +16,10 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -206,14 +205,14 @@ public final class BaseFinderHack extends Hack
 			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.method_60827(
+			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			
 			for(int[] vertex : vertices)
 				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
 					vertex[2] - region.z());
 			
-			class_9801 buffer = bufferBuilder.method_60800();
+			BuiltBuffer buffer = bufferBuilder.end();
 			
 			vertexBuffer.bind();
 			vertexBuffer.upload(buffer);

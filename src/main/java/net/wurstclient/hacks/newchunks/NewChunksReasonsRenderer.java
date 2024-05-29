@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -34,13 +33,13 @@ public final class NewChunksReasonsRenderer
 		this.drawDistance = drawDistance;
 	}
 	
-	public class_9801 buildBuffer(Set<BlockPos> reasons)
+	public BuiltBuffer buildBuffer(Set<BlockPos> reasons)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderBlocks(new ArrayList<>(reasons), bufferBuilder);
-		return bufferBuilder.method_60800();
+		return bufferBuilder.end();
 	}
 	
 	private void renderBlocks(List<BlockPos> blocks,

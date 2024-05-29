@@ -226,14 +226,14 @@ public final class TabGui implements KeyPressListener
 		
 		// box
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		{
 			bufferBuilder.vertex(matrix, x1, y1, 0);
 			bufferBuilder.vertex(matrix, x2, y1, 0);
 			bufferBuilder.vertex(matrix, x2, y2, 0);
 			bufferBuilder.vertex(matrix, x1, y2, 0);
 		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline positions
 		float xi1 = x1 - 0.1F;
@@ -244,7 +244,7 @@ public final class TabGui implements KeyPressListener
 		// outline
 		GL11.glLineWidth(1);
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder = tessellator.method_60827(
+		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		{
 			bufferBuilder.vertex(matrix, xi1, yi1, 0);
@@ -253,7 +253,7 @@ public final class TabGui implements KeyPressListener
 			bufferBuilder.vertex(matrix, xi1, yi2, 0);
 			bufferBuilder.vertex(matrix, xi1, yi1, 0);
 		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -265,7 +265,7 @@ public final class TabGui implements KeyPressListener
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		// top left
-		bufferBuilder = tessellator.method_60827(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		
 		// top
@@ -300,7 +300,7 @@ public final class TabGui implements KeyPressListener
 		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
 			acColor[2], 0.75F);
 		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.method_60800());
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private static final class Tab

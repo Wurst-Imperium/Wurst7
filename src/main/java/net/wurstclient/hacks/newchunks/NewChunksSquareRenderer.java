@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -26,13 +25,13 @@ import net.wurstclient.util.RenderUtils;
 public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 {
 	@Override
-	public class_9801 buildBuffer(Set<ChunkPos> chunks, int drawDistance)
+	public BuiltBuffer buildBuffer(Set<ChunkPos> chunks, int drawDistance)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator
-			.method_60827(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderChunks(new ArrayList<>(chunks), drawDistance, bufferBuilder);
-		return bufferBuilder.method_60800();
+		return bufferBuilder.end();
 	}
 	
 	private void renderChunks(List<ChunkPos> chunks, int drawDistance,

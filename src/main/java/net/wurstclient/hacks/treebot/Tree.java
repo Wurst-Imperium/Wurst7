@@ -13,11 +13,10 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.class_9801;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -55,7 +54,7 @@ public class Tree implements AutoCloseable
 			.offset(regionOffset);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.method_60827(
+		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		RenderUtils.drawCrossBox(box.offset(stump), bufferBuilder);
@@ -63,7 +62,7 @@ public class Tree implements AutoCloseable
 		for(BlockPos log : logs)
 			RenderUtils.drawOutlinedBox(box.offset(log), bufferBuilder);
 		
-		class_9801 buffer = bufferBuilder.method_60800();
+		BuiltBuffer buffer = bufferBuilder.end();
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
