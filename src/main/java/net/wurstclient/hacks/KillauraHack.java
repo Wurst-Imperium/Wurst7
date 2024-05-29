@@ -57,6 +57,15 @@ public final class KillauraHack extends Hack
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
+	private final SliderSetting speedRandMS =
+		new SliderSetting("Speed randomization",
+			"Helps you bypass anti-cheat plugins by varying the delay between"
+				+ " attacks.\n\n" + "\u00b1100ms is recommended for Vulcan.\n\n"
+				+ "0 (off) is fine for NoCheat+, AAC, Grim, Verus, Spartan, and"
+				+ " vanilla servers.",
+			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
+				.withSuffix("ms").withLabel(0, "off"));
+	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
 			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
@@ -98,6 +107,7 @@ public final class KillauraHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(speedRandMS);
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(swingHand);
@@ -122,7 +132,7 @@ public final class KillauraHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -187,7 +197,7 @@ public final class KillauraHack extends Hack
 		swingHand.swing(Hand.MAIN_HAND);
 		
 		target = null;
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	@Override
