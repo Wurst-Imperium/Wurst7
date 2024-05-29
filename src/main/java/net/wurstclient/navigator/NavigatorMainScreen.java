@@ -303,8 +303,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			// background
 			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 				0.75F);
-			BufferBuilder bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xt1, yt1, 0);
 			bufferBuilder.vertex(matrix, xt1, yt2, 0);
 			bufferBuilder.vertex(matrix, xt2, yt2, 0);
@@ -428,8 +428,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		int by2 = by1 + area.height - 4;
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, bx1, by1, 0);
 		bufferBuilder.vertex(matrix, bx1, by2, 0);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
@@ -449,8 +449,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// arrow
 		RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLES,
+			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, ax1, ay1, 0);
 		bufferBuilder.vertex(matrix, ax2, ay1, 0);
 		bufferBuilder.vertex(matrix, ax3, ay2, 0);

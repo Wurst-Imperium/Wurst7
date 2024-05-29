@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
@@ -31,7 +32,7 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderChunks(new ArrayList<>(chunks), drawDistance, bufferBuilder);
-		return bufferBuilder.end();
+		return bufferBuilder.endNullable();
 	}
 	
 	private void renderChunks(List<ChunkPos> chunks, int drawDistance,

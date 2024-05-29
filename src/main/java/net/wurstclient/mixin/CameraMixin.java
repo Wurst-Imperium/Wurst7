@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.Camera;
 import net.wurstclient.WurstClient;
@@ -42,7 +43,7 @@ public abstract class CameraMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getSubmersionType()Lnet/minecraft/client/render/CameraSubmersionType;",
+		method = "getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;",
 		cancellable = true)
 	private void onGetSubmersionType(
 		CallbackInfoReturnable<CameraSubmersionType> cir)

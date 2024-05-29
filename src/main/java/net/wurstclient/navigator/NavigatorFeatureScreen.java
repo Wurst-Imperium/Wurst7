@@ -380,8 +380,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			// window background
 			// left & right
 			setColorToBackground();
-			BufferBuilder bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, x1, y3, 0);
 			bufferBuilder.vertex(matrix, x1, y2, 0);
 			bufferBuilder.vertex(matrix, x3, y2, 0);
@@ -393,8 +393,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			setColorToBackground();
-			bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
 			
 			// window background
 			// between children

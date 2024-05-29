@@ -12,6 +12,7 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
@@ -232,8 +233,8 @@ public enum RenderUtils
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		float minX = (float)bb.minX;
 		float minY = (float)bb.minY;
@@ -284,8 +285,8 @@ public enum RenderUtils
 	public static void drawOutlinedBox(Box bb, VertexBuffer vertexBuffer)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawOutlinedBox(bb, bufferBuilder);
 		BuiltBuffer buffer = bufferBuilder.end();
 		
@@ -351,8 +352,8 @@ public enum RenderUtils
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		bufferBuilder.vertex(matrix, minX, minY, minZ);
 		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
@@ -396,8 +397,8 @@ public enum RenderUtils
 	public static void drawCrossBox(Box bb, VertexBuffer vertexBuffer)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawCrossBox(bb, bufferBuilder);
 		BuiltBuffer buffer = bufferBuilder.end();
 		
@@ -462,8 +463,8 @@ public enum RenderUtils
 		double midY = (bb.minY + bb.maxY) / 2;
 		double midZ = (bb.minZ + bb.maxZ) / 2;
 		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		bufferBuilder.vertex(matrix, (float)midX, (float)midY, (float)bb.maxZ);
 		bufferBuilder.vertex(matrix, (float)bb.minX, (float)midY, (float)midZ);
@@ -507,8 +508,8 @@ public enum RenderUtils
 	public static void drawNode(Box bb, VertexBuffer vertexBuffer)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawNode(bb, bufferBuilder);
 		BuiltBuffer buffer = bufferBuilder.end();
 		
@@ -571,8 +572,8 @@ public enum RenderUtils
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		double startX = from.x;
 		double startY = from.y;
@@ -642,8 +643,8 @@ public enum RenderUtils
 		VertexBuffer vertexBuffer)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawArrow(from, to, bufferBuilder);
 		BuiltBuffer buffer = bufferBuilder.end();
 		

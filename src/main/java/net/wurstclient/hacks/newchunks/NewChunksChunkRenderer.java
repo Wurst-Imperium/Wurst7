@@ -8,6 +8,7 @@
 package net.wurstclient.hacks.newchunks;
 
 import java.util.Set;
+
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.ChunkPos;
 

@@ -16,6 +16,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -112,11 +113,17 @@ public final class AutoFarmRenderer
 		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(greenBuffer != null)
+		{
 			greenBuffer.close();
+			greenBuffer = null;
+		}
+		
+		if(blocksToHarvest.isEmpty())
+			return;
 		
 		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToHarvest)
 		{
@@ -134,11 +141,17 @@ public final class AutoFarmRenderer
 		Box node, Vec3d regionOffset)
 	{
 		if(cyanBuffer != null)
+		{
 			cyanBuffer.close();
+			cyanBuffer = null;
+		}
+		
+		if(plants.isEmpty())
+			return;
 		
 		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : plants)
 		{
@@ -156,11 +169,17 @@ public final class AutoFarmRenderer
 		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(redBuffer != null)
+		{
 			redBuffer.close();
+			redBuffer = null;
+		}
+		
+		if(blocksToReplant.isEmpty())
+			return;
 		
 		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToReplant)
 		{

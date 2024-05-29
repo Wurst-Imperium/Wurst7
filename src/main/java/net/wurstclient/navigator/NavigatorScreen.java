@@ -341,8 +341,8 @@ public abstract class NavigatorScreen extends Screen
 		// outline
 		float yi1 = y1 + 0.1F;
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, yi1, 0);
 		bufferBuilder.vertex(matrix, x2, yi1, 0);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());

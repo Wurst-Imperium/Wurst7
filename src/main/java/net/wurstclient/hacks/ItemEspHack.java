@@ -172,8 +172,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		for(ItemEntity e : items)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()

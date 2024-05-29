@@ -187,9 +187,8 @@ public abstract class ListWidget extends AbstractParentElement
 				GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
 				GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			bufferBuilder =
-				tessellator.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION_TEXTURE_COLOR);
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, top + 4, 0).texture(0, 1).color(0, 0, 0,
 				0);
 			bufferBuilder.vertex(right, top + 4, 0).texture(1, 1).color(0, 0, 0,
@@ -199,9 +198,8 @@ public abstract class ListWidget extends AbstractParentElement
 			bufferBuilder.vertex(left, top, 0).texture(0, 0).color(0, 0, 0,
 				255);
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-			bufferBuilder =
-				tessellator.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION_TEXTURE_COLOR);
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex(left, bottom, 0).texture(0, 1).color(0, 0, 0,
 				255);
 			bufferBuilder.vertex(right, bottom, 0).texture(1, 1).color(0, 0, 0,
@@ -222,31 +220,28 @@ public abstract class ListWidget extends AbstractParentElement
 					p = top;
 				
 				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-				bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, bottom, 0).color(0, 0, 0, 255);
 				bufferBuilder.vertex(j, bottom, 0).color(0, 0, 0, 255);
 				bufferBuilder.vertex(j, top, 0).color(0, 0, 0, 255);
 				bufferBuilder.vertex(i, top, 0).color(0, 0, 0, 255);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
-				bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, p + o, 0).color(128, 128, 128, 255);
 				bufferBuilder.vertex(j, p + o, 0).color(128, 128, 128, 255);
 				bufferBuilder.vertex(j, p, 0).color(128, 128, 128, 255);
 				bufferBuilder.vertex(i, p, 0).color(128, 128, 128, 255);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
-				bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, p + o - 1, 0).color(192, 192, 192, 255);
 				bufferBuilder.vertex(j - 1, p + o - 1, 0).color(192, 192, 192,
 					255);
 				bufferBuilder.vertex(j - 1, p, 0).color(192, 192, 192, 255);
 				bufferBuilder.vertex(i, p, 0).color(192, 192, 192, 255);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			}
 			
 			renderDecorations(mouseX, mouseY);
@@ -394,23 +389,21 @@ public abstract class ListWidget extends AbstractParentElement
 				int r = left + width / 2 + getRowWidth() / 2;
 				float g = isFocused() ? 1 : 0.5F;
 				RenderSystem.setShaderColor(g, g, g, 1);
-				BufferBuilder bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				BufferBuilder bufferBuilder = tessellator
+					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 				bufferBuilder.vertex(q, o + p + 2, 0);
 				bufferBuilder.vertex(r, o + p + 2, 0);
 				bufferBuilder.vertex(r, o - 2, 0);
 				bufferBuilder.vertex(q, o - 2, 0);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 				RenderSystem.setShaderColor(0, 0, 0, 1);
-				bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+					VertexFormats.POSITION);
 				bufferBuilder.vertex(q + 1, o + p + 1, 0);
 				bufferBuilder.vertex(r - 1, o + p + 1, 0);
 				bufferBuilder.vertex(r - 1, o - 1, 0);
 				bufferBuilder.vertex(q + 1, o - 1, 0);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			}
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);

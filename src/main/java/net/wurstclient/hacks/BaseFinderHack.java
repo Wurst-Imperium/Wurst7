@@ -16,6 +16,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -200,23 +201,28 @@ public final class BaseFinderHack extends Hack
 		if(modulo == 0 || !region.equals(lastRegion))
 		{
 			if(vertexBuffer != null)
+			{
 				vertexBuffer.close();
+				vertexBuffer = null;
+			}
 			
-			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-			
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			
-			for(int[] vertex : vertices)
-				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-					vertex[2] - region.z());
-			
-			BuiltBuffer buffer = bufferBuilder.end();
-			
-			vertexBuffer.bind();
-			vertexBuffer.upload(buffer);
-			VertexBuffer.unbind();
+			if(!vertices.isEmpty())
+			{
+				Tessellator tessellator = RenderSystem.renderThreadTesselator();
+				BufferBuilder bufferBuilder = tessellator
+					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				
+				for(int[] vertex : vertices)
+					bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+						vertex[2] - region.z());
+				
+				BuiltBuffer buffer = bufferBuilder.end();
+				
+				vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+				vertexBuffer.bind();
+				vertexBuffer.upload(buffer);
+				VertexBuffer.unbind();
+			}
 			
 			lastRegion = region;
 		}

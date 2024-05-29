@@ -384,8 +384,8 @@ public abstract class AltEditorScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			BufferBuilder bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, 0, 0, 0);
 			bufferBuilder.vertex(matrix, width, 0, 0);
 			bufferBuilder.vertex(matrix, width, height, 0);

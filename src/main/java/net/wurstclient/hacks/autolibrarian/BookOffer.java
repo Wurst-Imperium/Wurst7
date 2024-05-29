@@ -102,7 +102,7 @@ public record BookOffer(String id, int level, int price)
 	 */
 	public boolean isMostlyValid()
 	{
-		return Identifier.isValid(id) && level >= 1 && price >= 1
+		return Identifier.tryParse(id) != null && level >= 1 && price >= 1
 			&& price <= 64;
 	}
 	

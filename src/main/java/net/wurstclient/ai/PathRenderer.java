@@ -29,8 +29,8 @@ public final class PathRenderer
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		int startX = start.getX() - region.x();
 		int startY = start.getY();
@@ -112,8 +112,8 @@ public final class PathRenderer
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		// middle part
 		bufferBuilder.vertex(matrix, 0, 0, 1);

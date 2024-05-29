@@ -235,8 +235,8 @@ public final class FeatureButton extends Component
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		// separator
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		bufferBuilder.vertex(matrix, x3, y2, 0);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
@@ -268,8 +268,8 @@ public final class FeatureButton extends Component
 		}
 		
 		// arrow
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);
 		bufferBuilder.vertex(matrix, xa3, ya1, 0);
 		bufferBuilder.vertex(matrix, xa2, ya2, 0);

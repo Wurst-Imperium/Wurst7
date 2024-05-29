@@ -215,8 +215,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
 			(float)start.z);
 		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z);

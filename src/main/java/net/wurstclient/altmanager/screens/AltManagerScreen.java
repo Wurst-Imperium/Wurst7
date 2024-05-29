@@ -459,8 +459,8 @@ public final class AltManagerScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			BufferBuilder bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, 0, 0, 0);
 			bufferBuilder.vertex(matrix, width, 0, 0);
 			bufferBuilder.vertex(matrix, width, height, 0);
@@ -660,14 +660,13 @@ public final class AltManagerScreen extends Screen
 				
 				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				BufferBuilder bufferBuilder = tessellator.begin(
-					VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				BufferBuilder bufferBuilder = tessellator
+					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 				bufferBuilder.vertex(matrix, x - 2, y - 2, 0);
 				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0);
 				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0);
 				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0);
-				BufferRenderer
-					.drawWithGlobalProgram(bufferBuilder.end());
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 				
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);

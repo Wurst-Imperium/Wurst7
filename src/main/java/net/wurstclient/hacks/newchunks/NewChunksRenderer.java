@@ -11,6 +11,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BuiltBuffer;
@@ -40,6 +41,12 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
+		if(buffer == null)
+		{
+			vertexBuffers[i] = null;
+			return;
+		}
+		
 		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);

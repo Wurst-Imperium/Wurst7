@@ -7,7 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -16,6 +22,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
@@ -294,15 +301,17 @@ public final class MobSpawnEspHack extends Hack
 			RegionPos region = RegionPos.of(chunk.getPos());
 			
 			if(vertexBuffer != null)
+			{
 				vertexBuffer.close();
+				vertexBuffer = null;
+			}
 			
-			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			BufferBuilder bufferBuilder =
 				tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES,
 					VertexFormats.POSITION_COLOR);
 			
-			new ArrayList<>(red).stream().filter(Objects::nonNull)
+			new ArrayList<>(red).stream()
 				.map(pos -> new BlockPos(pos.getX() - region.x(), pos.getY(),
 					pos.getZ() - region.z()))
 				.forEach(pos -> {
@@ -319,7 +328,7 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 0, 0, 0.5F);
 				});
 			
-			new ArrayList<>(yellow).stream().filter(Objects::nonNull)
+			new ArrayList<>(yellow).stream()
 				.map(pos -> new BlockPos(pos.getX() - region.x(), pos.getY(),
 					pos.getZ() - region.z()))
 				.forEach(pos -> {
@@ -336,10 +345,14 @@ public final class MobSpawnEspHack extends Hack
 						.color(1, 1, 0, 0.5F);
 				});
 			
-			BuiltBuffer buffer = bufferBuilder.end();
-			vertexBuffer.bind();
-			vertexBuffer.upload(buffer);
-			VertexBuffer.unbind();
+			BuiltBuffer buffer = bufferBuilder.endNullable();
+			if(buffer != null)
+			{
+				vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+				vertexBuffer.bind();
+				vertexBuffer.upload(buffer);
+				VertexBuffer.unbind();
+			}
 			
 			doneCompiling = true;
 		}

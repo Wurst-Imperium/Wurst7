@@ -141,8 +141,8 @@ public final class AutoFishDebugDraw
 		float[] colorF = ddColor.getColorF();
 		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
 		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
 		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
 		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);

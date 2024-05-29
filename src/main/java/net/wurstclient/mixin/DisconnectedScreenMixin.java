@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -35,7 +36,7 @@ public class DisconnectedScreenMixin extends Screen
 	
 	@Shadow
 	@Final
-	private DisconnectionInfo field_52131;// reason container thing
+	private DisconnectionInfo info;
 	@Shadow
 	@Final
 	private Screen parent;
@@ -54,7 +55,7 @@ public class DisconnectedScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		Text reason = field_52131.reason();
+		Text reason = info.reason();
 		System.out.println("Disconnected: " + reason);
 		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
