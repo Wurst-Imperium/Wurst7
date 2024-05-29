@@ -150,7 +150,7 @@ public final class KillauraHack extends Hack
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = range.getValueSq();
+			double rangeSq = range.getValueSq();
 		stream = stream
 			.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
