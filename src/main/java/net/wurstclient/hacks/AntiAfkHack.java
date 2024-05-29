@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -16,6 +15,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.ai.PathFinder;
@@ -63,7 +63,7 @@ public final class AntiAfkHack extends Hack
 			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
 	
 	private int timer;
-	private Random random = new Random();
+	private Random random = Random.createLocal();
 	private BlockPos start;
 	private BlockPos nextBlock;
 	
@@ -110,15 +110,6 @@ public final class AntiAfkHack extends Hack
 		pathFinder = null;
 		processor = null;
 		PathProcessor.releaseControls();
-	}
-	
-	private void setTimer()
-	{
-		int baseTime = (int)(waitTime.getValue() * 20);
-		int randTime = (int)(waitTimeRand.getValue() * 20);
-		int randOffset = random.nextInt(randTime * 2 + 1) - randTime;
-		randOffset = Math.max(randOffset, -baseTime);
-		timer = baseTime + randOffset;
 	}
 	
 	@Override
@@ -176,7 +167,7 @@ public final class AntiAfkHack extends Hack
 				pathFinder = new RandomPathFinder(
 					randomize(start, aiRange.getValueI(), true));
 			
-			// wait 2 - 3 seconds (40 - 60 ticks)
+			// wait for timer
 			if(processor.isDone())
 			{
 				PathProcessor.releaseControls();
@@ -220,6 +211,15 @@ public final class AntiAfkHack extends Hack
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 			pathCmd.isDepthTest());
+	}
+	
+	private void setTimer()
+	{
+		int baseTime = (int)(waitTime.getValue() * 20);
+		double randTime = waitTimeRand.getValue() * 20;
+		int randOffset = (int)(random.nextGaussian() * randTime);
+		randOffset = Math.max(randOffset, -baseTime);
+		timer = baseTime + randOffset;
 	}
 	
 	private BlockPos randomize(BlockPos pos, int range, boolean includeY)
