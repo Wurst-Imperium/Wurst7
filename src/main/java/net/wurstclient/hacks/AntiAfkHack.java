@@ -178,13 +178,11 @@ public final class AntiAfkHack extends Hack
 			if(!processor.isDone())
 				processor.process();
 			else
+			{
+				// reset and wait for timer
+				PathProcessor.releaseControls();
 				pathFinder = new RandomPathFinder(
 					randomize(start, aiRange.getValueI(), true));
-			
-			// wait for timer
-			if(processor.isDone())
-			{
-				PathProcessor.releaseControls();
 				setTimer();
 			}
 		}else
