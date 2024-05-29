@@ -140,12 +140,18 @@ public final class AntiAfkHack extends Hack
 		
 		if(useAi.isChecked())
 		{
+			// prevent drowning
+			if(MC.player.isSubmergedInWater()
+				&& !WURST.getHax().jesusHack.isEnabled())
+			{
+				MC.options.jumpKey.setPressed(true);
+				return;
+			}
+			
 			// update timer
 			if(timer > 0)
 			{
 				timer--;
-				if(!WURST.getHax().jesusHack.isEnabled())
-					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
