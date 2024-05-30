@@ -15,19 +15,19 @@ import net.wurstclient.event.Listener;
 
 /**
  * Fired at the beginning of {@link MinecraftClient#handleInputEvents()}.
- * This is the ideal time to simulate mouse and keyboard input.
+ * This is the ideal time to simulate keyboard input.
  */
 public interface HandleInputListener extends Listener
 {
 	/**
 	 * Fired at the beginning of {@link MinecraftClient#handleInputEvents()}.
-	 * This is the ideal time to simulate mouse and keyboard input.
+	 * This is the ideal time to simulate keyboard input.
 	 */
 	public void onHandleInput();
 	
 	/**
 	 * Fired at the beginning of {@link MinecraftClient#handleInputEvents()}.
-	 * This is the ideal time to simulate mouse and keyboard input.
+	 * This is the ideal time to simulate keyboard input.
 	 */
 	public static class HandleInputEvent extends Event<HandleInputListener>
 	{
