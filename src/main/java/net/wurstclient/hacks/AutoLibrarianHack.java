@@ -423,7 +423,8 @@ public final class AutoLibrarianHack extends Hack
 				continue;
 			
 			Set<Entry<RegistryEntry<Enchantment>>> enchantmentLevelMap =
-				EnchantmentHelper.getEnchantments(stack).getEnchantmentsMap();
+				EnchantmentHelper.getEnchantments(stack)
+					.getEnchantmentEntries();
 			if(enchantmentLevelMap.isEmpty())
 				continue;
 			
