@@ -38,6 +38,10 @@ public final class AimAssistHack extends Hack
 	private final SliderSetting rotationSpeed =
 		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
 			ValueDisplay.DEGREES.withSuffix("/s"));
+
+	private final SliderSetting sensitivity =
+		new SliderSetting("Sensitivity", 10, 0, 20, 0.01,
+			ValueDisplay.DECIMAL);
 	
 	private final SliderSetting fov = new SliderSetting("FOV",
 		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
@@ -92,6 +96,7 @@ public final class AimAssistHack extends Hack
 		
 		addSetting(range);
 		addSetting(rotationSpeed);
+		addSetting(sensitivity)
 		addSetting(fov);
 		addSetting(checkLOS);
 		addSetting(aimWhileBlocking);
@@ -196,7 +201,7 @@ public final class AimAssistHack extends Hack
 		if(MathHelper.abs(diffYaw) < 1 && MathHelper.abs(diffPitch) < 1)
 			return;
 		
-		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
-		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
+		event.setDeltaX(event.getDefaultDeltaX() + diffYaw * sensitivity.getValueF());
+		event.setDeltaY(event.getDefaultDeltaY() + diffPitch * sensitivity.getValueF());
 	}
 }
