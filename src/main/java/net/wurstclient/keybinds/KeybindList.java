@@ -117,20 +117,8 @@ public final class KeybindList
 	private static Set<Keybind> createDefaultKeybinds()
 	{
 		Set<Keybind> set = new LinkedHashSet<>();
-		addKB(set, "b", "fastplace;fastbreak");
-		addKB(set, "c", "fullbright");
-		addKB(set, "g", "flight");
-		addKB(set, "semicolon", "speednuker");
-		addKB(set, "h", "say /home");
-		addKB(set, "j", "jesus");
-		addKB(set, "k", "multiaura");
-		addKB(set, "n", "nuker");
-		addKB(set, "r", "killaura");
 		addKB(set, "right.shift", "navigator");
 		addKB(set, "right.control", "clickgui");
-		addKB(set, "u", "freecam");
-		addKB(set, "x", "x-ray");
-		addKB(set, "y", "sneak");
 		return Collections.unmodifiableSet(set);
 	}
 	
