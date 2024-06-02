@@ -11,13 +11,12 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.MouseUpdateListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -31,7 +30,7 @@ import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 public final class AimAssistHack extends Hack
-	implements UpdateListener, RenderListener
+	implements UpdateListener, MouseUpdateListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.5, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -115,14 +114,14 @@ public final class AimAssistHack extends Hack
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(MouseUpdateListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
+		EVENTS.remove(MouseUpdateListener.class, this);
 		target = null;
 	}
 	
@@ -187,16 +186,17 @@ public final class AimAssistHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onMouseUpdate(MouseUpdateEvent event)
 	{
-		if(target == null)
+		if(target == null || MC.player == null)
 			return;
-			
-		// Not actually rendering anything, just using this method to rotate
-		// more smoothly.
-		float oldYaw = MC.player.prevYaw;
-		float oldPitch = MC.player.prevPitch;
-		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
-		MC.player.setPitch(MathHelper.lerp(partialTicks, oldPitch, nextPitch));
+		
+		int diffYaw = (int)(nextYaw - MC.player.getYaw());
+		int diffPitch = (int)(nextPitch - MC.player.getPitch());
+		if(MathHelper.abs(diffYaw) < 1 && MathHelper.abs(diffPitch) < 1)
+			return;
+		
+		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
+		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
 	}
 }
