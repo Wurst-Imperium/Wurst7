@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.MouseUpdateListener;
@@ -189,10 +188,19 @@ public final class AimAssistHack extends Hack
 		if(target == null || MC.player == null)
 			return;
 		
-		int diffYaw = (int)(nextYaw - MC.player.getYaw());
-		int diffPitch = (int)(nextPitch - MC.player.getPitch());
-		if(MathHelper.abs(diffYaw) < 1 && MathHelper.abs(diffPitch) < 1)
-			return;
+		float curYaw = MC.player.getYaw();
+		float curPitch = MC.player.getPitch();
+		int diffYaw = (int)(nextYaw - curYaw);
+		int diffPitch = (int)(nextPitch - curPitch);
+		
+		// If we are <1 degree off but still missing the hitbox,
+		// slightly exaggerate the difference to fix that.
+		if(diffYaw == 0 && diffPitch == 0 && !RotationUtils
+			.isFacingBox(target.getBoundingBox(), range.getValue()))
+		{
+			diffYaw = nextYaw < curYaw ? -1 : 1;
+			diffPitch = nextPitch < curPitch ? -1 : 1;
+		}
 		
 		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
 		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
