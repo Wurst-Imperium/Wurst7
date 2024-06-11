@@ -32,7 +32,7 @@ public final class NewChunksOutlineRenderer implements NewChunksChunkRenderer
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		renderChunks(new ArrayList<>(chunks), drawDistance, bufferBuilder);
-		return bufferBuilder.end();
+		return bufferBuilder.endNullable();
 	}
 	
 	private void renderChunks(List<ChunkPos> chunks, int drawDistance,
