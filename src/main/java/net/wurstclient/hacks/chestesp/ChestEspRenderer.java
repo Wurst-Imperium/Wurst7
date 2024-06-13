@@ -80,6 +80,9 @@ public final class ChestEspRenderer
 	
 	public void renderLines(ChestEspGroup group)
 	{
+		if(group.getBoxes().isEmpty())
+			return;
+		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		

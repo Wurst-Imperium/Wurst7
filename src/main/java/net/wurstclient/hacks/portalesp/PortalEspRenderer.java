@@ -80,6 +80,9 @@ public final class PortalEspRenderer
 	
 	public void renderLines(PortalEspBlockGroup group)
 	{
+		if(group.getBoxes().isEmpty())
+			return;
+		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		

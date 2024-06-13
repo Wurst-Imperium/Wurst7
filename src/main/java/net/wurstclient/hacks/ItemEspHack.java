@@ -159,6 +159,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
+		if(items.isEmpty())
+			return;
+		
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		float[] colorF = color.getColorF();
