@@ -26,6 +26,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -374,26 +375,25 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// window background
 			// left & right
 			setColorToBackground();
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, x1, y3, 0).next();
-			bufferBuilder.vertex(matrix, x1, y2, 0).next();
-			bufferBuilder.vertex(matrix, x3, y2, 0).next();
-			bufferBuilder.vertex(matrix, x3, y3, 0).next();
-			bufferBuilder.vertex(matrix, x5, y3, 0).next();
-			bufferBuilder.vertex(matrix, x5, y2, 0).next();
-			bufferBuilder.vertex(matrix, x2, y2, 0).next();
-			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			tessellator.draw();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0);
+			bufferBuilder.vertex(matrix, x1, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y3, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			setColorToBackground();
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION);
 			
 			// window background
@@ -409,10 +409,10 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				if(yc2 > bgy3 - windowY1)
 					break;
 				
-				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
-				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
-				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
-				bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+				bufferBuilder.vertex(matrix, xc1, yc2, 0);
+				bufferBuilder.vertex(matrix, xc1, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			}
 			
 			// window background
@@ -427,12 +427,12 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				yc1 = lastChild.getY() + lastChild.getHeight();
 			}
 			int yc2 = yc1 + 2;
-			bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
-			bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
-			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
-			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+			bufferBuilder.vertex(matrix, xc1, yc2, 0);
+			bufferBuilder.vertex(matrix, xc1, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			
-			tessellator.draw();
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)

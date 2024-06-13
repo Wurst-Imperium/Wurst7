@@ -18,6 +18,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -212,17 +213,14 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder
-			.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-			.next();
-		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-			.next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
+			(float)start.z);
+		bufferBuilder.vertex(matrix, (float)end.x, (float)end.y, (float)end.z);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		matrixStack.pop();
 		

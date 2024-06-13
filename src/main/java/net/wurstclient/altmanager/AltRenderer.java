@@ -67,17 +67,13 @@ public final class AltRenderer
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_TEXTURE);
-		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh)
-			.next();
-		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh)
-			.next();
-		bufferBuilder.vertex(matrix4f, x2, y2, z)
-			.texture(uPlusWOverFw, vPlusHOverFh).next();
-		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh)
-			.next();
+		BufferBuilder bufferBuilder = Tessellator.getInstance()
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh);
+		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh);
+		bufferBuilder.vertex(matrix4f, x2, y2, z).texture(uPlusWOverFw,
+			vPlusHOverFh);
+		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	

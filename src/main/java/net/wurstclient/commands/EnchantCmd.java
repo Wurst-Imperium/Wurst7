@@ -10,7 +10,11 @@ package net.wurstclient.commands;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -53,24 +57,27 @@ public final class EnchantCmd extends Command
 	
 	private void enchant(ItemStack stack, int level)
 	{
-		for(Enchantment enchantment : Registries.ENCHANTMENT)
+		DynamicRegistryManager drm = MC.world.getRegistryManager();
+		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		
+		for(RegistryEntry<Enchantment> entry : registry.getIndexedEntries())
 		{
 			// Skip curses
-			if(enchantment.isCursed())
+			if(entry.isIn(EnchantmentTags.CURSE))
 				continue;
 			
 			// Skip Silk Touch so it doesn't remove Fortune
-			if(enchantment == Enchantments.SILK_TOUCH)
+			if(entry.getKey().orElse(null) == Enchantments.SILK_TOUCH)
 				continue;
 			
 			// Limit Quick Charge to level 5 so it doesn't break
-			if(enchantment == Enchantments.QUICK_CHARGE)
+			if(entry.getKey().orElse(null) == Enchantments.QUICK_CHARGE)
 			{
-				stack.addEnchantment(enchantment, Math.min(level, 5));
+				stack.addEnchantment(entry, Math.min(level, 5));
 				continue;
 			}
 			
-			stack.addEnchantment(enchantment, level);
+			stack.addEnchantment(entry, level);
 		}
 	}
 	

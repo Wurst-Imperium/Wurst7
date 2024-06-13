@@ -143,7 +143,7 @@ public final class PotionCmd extends Command
 		else
 			try
 			{
-				Identifier identifier = new Identifier(input);
+				Identifier identifier = Identifier.of(input);
 				effect = Registries.STATUS_EFFECT.get(identifier);
 				
 			}catch(InvalidIdentifierException e)
