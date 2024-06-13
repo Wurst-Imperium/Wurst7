@@ -14,7 +14,7 @@ import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -37,10 +37,8 @@ public final class NewChunksReasonsRenderer
 	public BuiltBuffer buildBuffer(Set<BlockPos> reasons)
 	{
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderBlocks(new ArrayList<>(reasons), bufferBuilder);
 		return bufferBuilder.end();
 	}
@@ -66,35 +64,35 @@ public final class NewChunksReasonsRenderer
 			float maxY = (float)bb.maxY;
 			float maxZ = (float)bb.maxZ;
 			
-			bufferBuilder.vertex(minX, minY, minZ).next();
-			bufferBuilder.vertex(maxX, minY, minZ).next();
-			bufferBuilder.vertex(maxX, minY, maxZ).next();
-			bufferBuilder.vertex(minX, minY, maxZ).next();
+			bufferBuilder.vertex(minX, minY, minZ);
+			bufferBuilder.vertex(maxX, minY, minZ);
+			bufferBuilder.vertex(maxX, minY, maxZ);
+			bufferBuilder.vertex(minX, minY, maxZ);
 			
-			bufferBuilder.vertex(minX, maxY, minZ).next();
-			bufferBuilder.vertex(minX, maxY, maxZ).next();
-			bufferBuilder.vertex(maxX, maxY, maxZ).next();
-			bufferBuilder.vertex(maxX, maxY, minZ).next();
+			bufferBuilder.vertex(minX, maxY, minZ);
+			bufferBuilder.vertex(minX, maxY, maxZ);
+			bufferBuilder.vertex(maxX, maxY, maxZ);
+			bufferBuilder.vertex(maxX, maxY, minZ);
 			
-			bufferBuilder.vertex(minX, minY, minZ).next();
-			bufferBuilder.vertex(minX, maxY, minZ).next();
-			bufferBuilder.vertex(maxX, maxY, minZ).next();
-			bufferBuilder.vertex(maxX, minY, minZ).next();
+			bufferBuilder.vertex(minX, minY, minZ);
+			bufferBuilder.vertex(minX, maxY, minZ);
+			bufferBuilder.vertex(maxX, maxY, minZ);
+			bufferBuilder.vertex(maxX, minY, minZ);
 			
-			bufferBuilder.vertex(maxX, minY, minZ).next();
-			bufferBuilder.vertex(maxX, maxY, minZ).next();
-			bufferBuilder.vertex(maxX, maxY, maxZ).next();
-			bufferBuilder.vertex(maxX, minY, maxZ).next();
+			bufferBuilder.vertex(maxX, minY, minZ);
+			bufferBuilder.vertex(maxX, maxY, minZ);
+			bufferBuilder.vertex(maxX, maxY, maxZ);
+			bufferBuilder.vertex(maxX, minY, maxZ);
 			
-			bufferBuilder.vertex(minX, minY, maxZ).next();
-			bufferBuilder.vertex(maxX, minY, maxZ).next();
-			bufferBuilder.vertex(maxX, maxY, maxZ).next();
-			bufferBuilder.vertex(minX, maxY, maxZ).next();
+			bufferBuilder.vertex(minX, minY, maxZ);
+			bufferBuilder.vertex(maxX, minY, maxZ);
+			bufferBuilder.vertex(maxX, maxY, maxZ);
+			bufferBuilder.vertex(minX, maxY, maxZ);
 			
-			bufferBuilder.vertex(minX, minY, minZ).next();
-			bufferBuilder.vertex(minX, minY, maxZ).next();
-			bufferBuilder.vertex(minX, maxY, maxZ).next();
-			bufferBuilder.vertex(minX, maxY, minZ).next();
+			bufferBuilder.vertex(minX, minY, minZ);
+			bufferBuilder.vertex(minX, minY, maxZ);
+			bufferBuilder.vertex(minX, maxY, maxZ);
+			bufferBuilder.vertex(minX, maxY, minZ);
 		}
 	}
 }

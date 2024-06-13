@@ -53,7 +53,7 @@
     "PlayerInventoryMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
-    "RenderTickCounterMixin",
+    "RenderTickCounterDynamicMixin",
     "ScreenMixin",
     "ShulkerBoxScreenMixin",
     "SimpleOptionMixin",

@@ -24,7 +24,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -254,25 +254,31 @@ public final class CaveFinderHack extends Hack
 	
 	private void setBufferFromTask()
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		
+		ArrayList<int[]> vertices = compileVerticesTask.join();
 		RegionPos region = RenderUtils.getCameraRegion();
-		for(int[] vertex : compileVerticesTask.join())
-			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-				vertex[2] - region.z()).next();
-		
-		BuiltBuffer buffer = bufferBuilder.end();
-		
 		if(vertexBuffer != null)
+		{
 			vertexBuffer.close();
+			vertexBuffer = null;
+		}
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
+		if(!vertices.isEmpty())
+		{
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			
+			for(int[] vertex : vertices)
+				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+					vertex[2] - region.z());
+			
+			BuiltBuffer buffer = bufferBuilder.end();
+			
+			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+			vertexBuffer.bind();
+			vertexBuffer.upload(buffer);
+			VertexBuffer.unbind();
+		}
 		
 		bufferUpToDate = true;
 		bufferRegion = region;

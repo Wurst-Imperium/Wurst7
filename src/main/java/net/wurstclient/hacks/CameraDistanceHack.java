@@ -26,7 +26,7 @@ public final class CameraDistanceHack extends Hack
 		addSetting(distance);
 	}
 	
-	public double getDistance()
+	public float getDistance()
 	{
 		return distance.getValueF();
 	}

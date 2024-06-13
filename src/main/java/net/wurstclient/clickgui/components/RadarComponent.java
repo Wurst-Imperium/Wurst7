@@ -15,6 +15,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -68,7 +70,6 @@ public final class RadarComponent extends Component
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// tooltip
@@ -78,13 +79,13 @@ public final class RadarComponent extends Component
 		// background
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		float middleX = (x1 + x2) / 2.0F;
 		float middleY = (y1 + y2) / 2.0F;
@@ -108,24 +109,24 @@ public final class RadarComponent extends Component
 		// arrow
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
 			opacity);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
-		tessellator.draw();
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		bufferBuilder.vertex(matrix, xa1, ya3, 0);
+		bufferBuilder.vertex(matrix, xa3, ya2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.vertex(matrix, xa1, ya3, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya2, 0).next();
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		bufferBuilder.vertex(matrix, xa1, ya3, 0);
+		bufferBuilder.vertex(matrix, xa3, ya2, 0);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		matrixStack.pop();
 		matrix = matrixStack.peek().getPositionMatrix();
@@ -134,7 +135,7 @@ public final class RadarComponent extends Component
 		// points
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		for(Entity e : hack.getEntities())
 		{
@@ -176,21 +177,23 @@ public final class RadarComponent extends Component
 			bufferBuilder
 				.vertex(matrix, middleX + (float)renderX - 0.5F,
 					middleY + (float)renderY - 0.5F, 0)
-				.color(red, green, blue, alpha).next();
+				.color(red, green, blue, alpha);
 			bufferBuilder
 				.vertex(matrix, middleX + (float)renderX + 0.5F,
 					middleY + (float)renderY - 0.5F, 0)
-				.color(red, green, blue, alpha).next();
+				.color(red, green, blue, alpha);
 			bufferBuilder
 				.vertex(matrix, middleX + (float)renderX + 0.5F,
 					middleY + (float)renderY + 0.5F, 0)
-				.color(red, green, blue, alpha).next();
+				.color(red, green, blue, alpha);
 			bufferBuilder
 				.vertex(matrix, middleX + (float)renderX - 0.5F,
 					middleY + (float)renderY + 0.5F, 0)
-				.color(red, green, blue, alpha).next();
+				.color(red, green, blue, alpha);
 		}
-		tessellator.draw();
+		BuiltBuffer buffer = bufferBuilder.endNullable();
+		if(buffer != null)
+			BufferRenderer.drawWithGlobalProgram(buffer);
 	}
 	
 	@Override

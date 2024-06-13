@@ -7,15 +7,17 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.StewItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -123,11 +125,14 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 	
 	private int findSoup(int startSlot, int endSlot)
 	{
+		List<Item> stews = List.of(Items.MUSHROOM_STEW, Items.RABBIT_STEW,
+			Items.BEETROOT_SOUP);
+		
 		for(int i = startSlot; i < endSlot; i++)
 		{
 			ItemStack stack = MC.player.getInventory().getStack(i);
 			
-			if(stack != null && stack.getItem() instanceof StewItem)
+			if(stack != null && stews.contains(stack.getItem()))
 				return i;
 		}
 		

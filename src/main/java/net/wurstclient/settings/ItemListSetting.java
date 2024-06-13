@@ -40,7 +40,7 @@ public final class ItemListSetting extends Setting
 		super(name, description);
 		
 		Arrays.stream(items).parallel()
-			.map(s -> Registries.ITEM.get(new Identifier(s)))
+			.map(s -> Registries.ITEM.get(Identifier.of(s)))
 			.filter(Objects::nonNull)
 			.map(i -> Registries.ITEM.getId(i).toString()).distinct().sorted()
 			.forEachOrdered(s -> itemNames.add(s));
@@ -101,7 +101,7 @@ public final class ItemListSetting extends Setting
 			
 			// otherwise, load the items in the JSON array
 			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
-				.map(s -> Registries.ITEM.get(new Identifier(s)))
+				.map(s -> Registries.ITEM.get(Identifier.of(s)))
 				.filter(Objects::nonNull)
 				.map(i -> Registries.ITEM.getId(i).toString()).distinct()
 				.sorted().forEachOrdered(s -> itemNames.add(s));

@@ -48,7 +48,7 @@ public enum ItemUtils
 		
 		try
 		{
-			return Registries.ITEM.getOrEmpty(new Identifier(nameOrId))
+			return Registries.ITEM.getOrEmpty(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)

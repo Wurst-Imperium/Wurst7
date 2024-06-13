@@ -7,15 +7,22 @@
  */
 package net.wurstclient.hacks.autofish;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoFishHack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -128,14 +135,31 @@ public final class AutoFishRodSelector
 		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
 			return -1;
 		
-		int luckOTSLvl =
-			EnchantmentHelper.getLevel(Enchantments.LUCK_OF_THE_SEA, stack);
-		int lureLvl = EnchantmentHelper.getLevel(Enchantments.LURE, stack);
-		int unbreakingLvl =
-			EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
-		int mendingBonus =
-			EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
-		int noVanishBonus = EnchantmentHelper.hasVanishingCurse(stack) ? 0 : 1;
+		DynamicRegistryManager drm = MC.world.getRegistryManager();
+		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		
+		Optional<Reference<Enchantment>> luckOTS =
+			registry.getEntry(Enchantments.LUCK_OF_THE_SEA);
+		int luckOTSLvl = luckOTS
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> lure =
+			registry.getEntry(Enchantments.LURE);
+		int lureLvl = lure
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> unbreaking =
+			registry.getEntry(Enchantments.UNBREAKING);
+		int unbreakingLvl = unbreaking
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> mending =
+			registry.getEntry(Enchantments.MENDING);
+		int mendingBonus = mending
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		int noVanishBonus = EnchantmentHelper.hasAnyEnchantmentsWith(stack,
+			EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP) ? 0 : 1;
 		
 		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
 			+ noVanishBonus;
