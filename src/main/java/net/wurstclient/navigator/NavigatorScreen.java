@@ -17,6 +17,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -242,16 +243,15 @@ public abstract class NavigatorScreen extends Screen
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	protected final void drawBoxShadow(MatrixStack matrixStack, int x1, int y1,
@@ -268,19 +268,18 @@ public abstract class NavigatorScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xi1, yi1, 0);
+		bufferBuilder.vertex(matrix, xi2, yi1, 0);
+		bufferBuilder.vertex(matrix, xi2, yi2, 0);
+		bufferBuilder.vertex(matrix, xi1, yi2, 0);
+		bufferBuilder.vertex(matrix, xi1, yi1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -291,42 +290,42 @@ public abstract class NavigatorScreen extends Screen
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		
 		// top
-		bufferBuilder.vertex(matrix, x1, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
 		
 		// left
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
+		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
 		
 		// right
-		bufferBuilder.vertex(matrix, x2, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
 		
 		// bottom
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
+		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	protected final void drawDownShadow(MatrixStack matrixStack, int x1, int y1,
@@ -337,30 +336,29 @@ public abstract class NavigatorScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
 		float yi1 = y1 + 0.1F;
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, yi1, 0).next();
-		bufferBuilder.vertex(matrix, x2, yi1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, yi1, 0);
+		bufferBuilder.vertex(matrix, x2, yi1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// shadow
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix, x1, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).color(0, 0, 0, 0).next();
-		tessellator.draw();
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0).color(0, 0, 0, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	protected final void drawBox(MatrixStack matrixStack, int x1, int y1,

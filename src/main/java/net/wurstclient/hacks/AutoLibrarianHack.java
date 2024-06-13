@@ -74,10 +74,11 @@ public final class AutoLibrarianHack extends Hack
 			+ "You can also set a maximum price for each book, in case you"
 			+ " already have a villager selling it but you want it for a"
 			+ " cheaper price.",
-		"minecraft:depth_strider", "minecraft:efficiency",
-		"minecraft:feather_falling", "minecraft:fortune", "minecraft:looting",
-		"minecraft:mending", "minecraft:protection", "minecraft:respiration",
-		"minecraft:sharpness", "minecraft:silk_touch", "minecraft:unbreaking");
+		"minecraft:depth_strider;3", "minecraft:efficiency;5",
+		"minecraft:feather_falling;4", "minecraft:fortune;3",
+		"minecraft:looting;3", "minecraft:mending;1", "minecraft:protection;4",
+		"minecraft:respiration;3", "minecraft:sharpness;5",
+		"minecraft:silk_touch;1", "minecraft:unbreaking;3");
 	
 	private final CheckboxSetting lockInTrade = new CheckboxSetting(
 		"Lock in trade",
@@ -422,7 +423,8 @@ public final class AutoLibrarianHack extends Hack
 				continue;
 			
 			Set<Entry<RegistryEntry<Enchantment>>> enchantmentLevelMap =
-				EnchantmentHelper.getEnchantments(stack).getEnchantmentsMap();
+				EnchantmentHelper.getEnchantments(stack)
+					.getEnchantmentEntries();
 			if(enchantmentLevelMap.isEmpty())
 				continue;
 			
@@ -434,7 +436,7 @@ public final class AutoLibrarianHack extends Hack
 			int price = tradeOffer.getDisplayedFirstBuyItem().getCount();
 			BookOffer bookOffer = new BookOffer(enchantment, level, price);
 			
-			if(!bookOffer.isValid())
+			if(!bookOffer.isFullyValid())
 			{
 				System.out.println("Found invalid enchanted book offer.\n"
 					+ "Component data: " + enchantmentLevelMap);
