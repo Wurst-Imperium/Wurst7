@@ -33,8 +33,8 @@ public class MouseMixin
 		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 	
-	@Inject(at = @At("HEAD"), method = "tick()V")
-	private void onTick(CallbackInfo ci)
+	@Inject(at = @At("HEAD"), method = "updateMouse()V")
+	private void onUpdateMouse(CallbackInfo ci)
 	{
 		MouseUpdateEvent event =
 			new MouseUpdateEvent(cursorDeltaX, cursorDeltaY);
