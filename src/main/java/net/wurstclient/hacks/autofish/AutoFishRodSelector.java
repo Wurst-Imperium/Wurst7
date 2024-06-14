@@ -122,7 +122,7 @@ public final class AutoFishRodSelector
 		}
 		
 		// check if selected rod is still the best one
-		if(MC.player.getInventory().selectedSlot == bestRodSlot)
+		if(selectedSlot == bestRodSlot)
 			return true;
 		
 		// change selected rod and wait until the next tick

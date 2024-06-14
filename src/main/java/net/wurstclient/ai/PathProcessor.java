@@ -70,7 +70,7 @@ public abstract class PathProcessor
 			key.setPressed(false);
 		
 		// disable sprinting
-		WurstClient.MC.player.setSprinting(false);
+		MC.player.setSprinting(false);
 	}
 	
 	public static final void releaseControls()
