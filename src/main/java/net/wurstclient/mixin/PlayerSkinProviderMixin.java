@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -41,6 +42,7 @@ public abstract class PlayerSkinProviderMixin
 	@Final
 	private MinecraftSessionService sessionService;
 	
+	@Unique
 	private static HashMap<String, String> capes;
 	
 	@Inject(at = @At("HEAD"),
@@ -134,14 +136,19 @@ public abstract class PlayerSkinProviderMixin
 		}
 	}
 	
+	@Unique
 	private void setupWurstCapes()
 	{
 		try
 		{
+			// assign map first to prevent endless retries if download fails
+			capes = new HashMap<>();
+			
 			// download cape list from wurstclient.net
 			WsonObject rawCapes = JsonUtils.parseURLToObject(
 				"https://www.wurstclient.net/api/v1/capes.json");
 			
+			// assign capes
 			capes = rawCapes.getAllStrings();
 			
 		}catch(Exception e)

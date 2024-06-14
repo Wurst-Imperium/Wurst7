@@ -36,6 +36,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -67,6 +68,12 @@ public abstract class MinecraftClientMixin
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
 		super(name);
+	}
+	
+	@Inject(at = @At("HEAD"), method = "handleInputEvents()V")
+	private void onHandleInputEvents(CallbackInfo ci)
+	{
+		EventManager.fire(HandleInputEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At(value = "FIELD",
