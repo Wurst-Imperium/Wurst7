@@ -107,7 +107,7 @@ public final class AutoLibrarianHack extends Hack
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"
 			+ " the given threshold, so you can repair it before it breaks.\n"
-			+ "Can be adjusted from 0 (off) to 100.",
+			+ "Can be adjusted from 0 (off) to 100 remaining uses.",
 		1, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final OverlayRenderer overlay = new OverlayRenderer();
