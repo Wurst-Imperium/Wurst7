@@ -112,6 +112,11 @@ public enum BlockUtils
 		return getState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos);
 	}
 	
+	public static boolean isUnbreakable(BlockPos pos)
+	{
+		return getBlock(pos).getHardness() < 0;
+	}
+	
 	private static VoxelShape getOutlineShape(BlockPos pos)
 	{
 		return getState(pos).getOutlineShape(MC.world, pos);

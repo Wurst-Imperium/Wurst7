@@ -21,6 +21,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"FastMine", "SpeedMine", "SpeedyGonzales", "fast break",
 	"fast mine", "speed mine", "speedy gonzales", "NoBreakDelay",
@@ -101,7 +102,7 @@ public final class FastBreakHack extends Hack
 		}
 		
 		// Ignore unbreakable blocks to avoid slowdown issue
-		if(MC.world.getBlockState(blockPos).getBlock().getHardness() < 0)
+		if(BlockUtils.isUnbreakable(blockPos))
 			return;
 		
 		if(!fastBreakBlock)
