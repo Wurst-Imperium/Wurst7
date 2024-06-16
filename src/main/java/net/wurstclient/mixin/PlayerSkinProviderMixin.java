@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -31,7 +32,10 @@ import net.wurstclient.util.json.WsonObject;
 @Mixin(PlayerSkinProvider.class)
 public abstract class PlayerSkinProviderMixin
 {
+	@Unique
 	private static HashMap<String, String> capes;
+	
+	@Unique
 	private MinecraftProfileTexture currentCape;
 	
 	@Inject(at = @At("HEAD"),
@@ -79,19 +83,21 @@ public abstract class PlayerSkinProviderMixin
 		return result;
 	}
 	
+	@Unique
 	private void setupWurstCapes()
 	{
 		try
 		{
+			// assign map first to prevent endless retries if download fails
+			capes = new HashMap<>();
+			Pattern uuidPattern = Pattern.compile(
+				"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+			
 			// download cape list from wurstclient.net
 			WsonObject rawCapes = JsonUtils.parseURLToObject(
 				"https://www.wurstclient.net/api/v1/capes.json");
 			
-			Pattern uuidPattern = Pattern.compile(
-				"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-			
 			// convert names to offline UUIDs
-			capes = new HashMap<>();
 			for(Entry<String, String> entry : rawCapes.getAllStrings()
 				.entrySet())
 			{

@@ -71,7 +71,6 @@ public final class ExcavatorHack extends Hack
 	public ExcavatorHack()
 	{
 		super("Excavator");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
@@ -83,10 +82,13 @@ public final class ExcavatorHack extends Hack
 		String name = getName();
 		
 		if(step == Step.EXCAVATE && area != null)
-			name += " "
-				+ (int)((float)(area.blocksList.size() - area.remainingBlocks)
-					/ (float)area.blocksList.size() * 100)
-				+ "%";
+		{
+			int totalBlocks = area.blocksList.size();
+			double brokenBlocks = totalBlocks - area.remainingBlocks;
+			double progress = brokenBlocks / totalBlocks;
+			int percentage = (int)(progress * 100);
+			name += " " + percentage + "%";
+		}
 		
 		return name;
 	}
@@ -347,10 +349,9 @@ public final class ExcavatorHack extends Hack
 		else
 			message = step.message;
 		
-		TextRenderer tr = MC.textRenderer;
-		
 		// translate to center
 		Window sr = MC.getWindow();
+		TextRenderer tr = MC.textRenderer;
 		int msgWidth = tr.getWidth(message);
 		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
 			sr.getScaledHeight() / 2 + 1, 0);
@@ -455,14 +456,23 @@ public final class ExcavatorHack extends Hack
 	
 	private void excavate()
 	{
-		boolean legit = mode.getSelected() == Mode.LEGIT;
-		currentBlock = null;
+		// wait for AutoEat to finish eating
+		if(WURST.getHax().autoEatHack.isEating())
+			return;
+		
+		// prioritize the closest block from the top layer
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		Comparator<BlockPos> cNextTargetBlock =
+			Comparator.comparingInt(BlockPos::getY).reversed()
+				.thenComparingDouble(pos -> pos.getSquaredDistance(eyesVec));
 		
 		// get valid blocks
-		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
-			pos -> area.blocksSet.contains(pos));
+		ArrayList<BlockPos> validBlocks = getValidBlocks();
+		validBlocks.sort(cNextTargetBlock);
+		currentBlock = null;
 		
 		// nuke all
+		boolean legit = mode.getSelected() == Mode.LEGIT;
 		if(MC.player.getAbilities().creativeMode && !legit)
 		{
 			MC.interactionManager.cancelBlockBreaking();
@@ -479,25 +489,15 @@ public final class ExcavatorHack extends Hack
 			
 		}else
 		{
-			ArrayList<BlockPos> blocks = new ArrayList<>();
+			// break next block
 			for(BlockPos pos : validBlocks)
-				blocks.add(pos);
-			blocks.sort(Comparator.comparingInt((BlockPos pos) -> -pos.getY()));
-			
-			// find closest valid block
-			for(BlockPos pos : blocks)
 			{
-				boolean successful;
+				WURST.getHax().autoToolHack.equipIfEnabled(pos);
+				if(!BlockBreaker.breakOneBlock(pos))
+					continue;
 				
-				// break block
-				successful = BlockBreaker.breakOneBlock(pos);
-				
-				// set currentBlock if successful
-				if(successful)
-				{
-					currentBlock = pos;
-					break;
-				}
+				currentBlock = pos;
+				break;
 			}
 			
 			// reset if no block was found
@@ -506,9 +506,11 @@ public final class ExcavatorHack extends Hack
 		}
 		
 		// get remaining blocks
-		Predicate<BlockPos> pClickable = BlockUtils::canBeClicked;
+		Predicate<BlockPos> pBreakable = MC.player.isCreative()
+			? BlockUtils::canBeClicked : pos -> BlockUtils.canBeClicked(pos)
+				&& !BlockUtils.isUnbreakable(pos);
 		area.remainingBlocks =
-			(int)area.blocksList.parallelStream().filter(pClickable).count();
+			(int)area.blocksList.parallelStream().filter(pBreakable).count();
 		
 		if(area.remainingBlocks == 0)
 		{
@@ -518,13 +520,8 @@ public final class ExcavatorHack extends Hack
 		
 		if(pathFinder == null)
 		{
-			Comparator<BlockPos> cDistance = Comparator.comparingDouble(
-				pos -> MC.player.squaredDistanceTo(Vec3d.ofCenter(pos)));
-			Comparator<BlockPos> cAltitude =
-				Comparator.comparingInt(pos -> -pos.getY());
-			BlockPos closestBlock =
-				area.blocksList.parallelStream().filter(pClickable)
-					.min(cAltitude.thenComparing(cDistance)).get();
+			BlockPos closestBlock = area.blocksList.parallelStream()
+				.filter(pBreakable).min(cNextTargetBlock).get();
 			
 			pathFinder = new ExcavatorPathFinder(closestBlock);
 		}
@@ -564,22 +561,19 @@ public final class ExcavatorHack extends Hack
 		}
 	}
 	
-	private ArrayList<BlockPos> getValidBlocks(double range,
-		Predicate<BlockPos> validator)
+	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeSq = Math.pow(range + 0.5, 2);
-		int rangeI = (int)Math.ceil(range);
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = Math.pow(range.getValue() + 0.5, 2);
+		int blockRange = range.getValueCeil();
 		
-		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		
-		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(BlockUtils::canBeClicked).filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(area.blocksSet::contains).filter(BlockUtils::canBeClicked)
+			.filter(pos -> !BlockUtils.isUnbreakable(pos))
+			.sorted(Comparator
+				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
