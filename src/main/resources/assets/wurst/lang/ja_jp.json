@@ -46,6 +46,7 @@
   "description.wurst.hack.autotool": "ブロックを破壊する際、自動でホットバー内の適したツールの中で最速のツールに切り替える。",
   "description.wurst.hack.autototem": "不死のトーテムを自動で利き手と逆の手に移動させる。",
   "description.wurst.hack.autowalk": "自動で歩く。",
+  "description.wurst.hack.barrieresp": "近くのバリアブロックを表示します。",
   "description.wurst.hack.basefinder": "人工的なブロックを検知し、プレイヤーの拠点を捜索する。\n検知したブロックは選択された色でハイライト表示する。\nグループの拠点などの発見に有用。",
   "description.wurst.hack.blink": "有効化されている間、モーションの更新をすべて停止する。",
   "description.wurst.hack.boatfly": "ボートや他の車両で飛行することができます。\nスプリントキー（走る）を押すと、より速く降下することができます。",
@@ -114,10 +115,12 @@
   "description.wurst.hack.nocomcrash": "「Nocom」と呼ばれる脆弱性を利用しサーバーにラグを発生させ、クラッシュさせる。\nPaperサーバーでは使用不可。バニラ、Spigot、Fabricサーバーでは動作確認済み。一部のAntiCheatでは対策されている可能性あり。",
   "description.wurst.hack.nofall": "落下ダメージを無効化する。",
   "description.wurst.hack.nofireoverlay": "燃えている時の画面上のエフェクトを無効化する。\n\n§c§l注意: §r燃えていることに気づかずに焼死する可能性あり。",
+  "description.wurst.hack.nofog": "ワールドから距離フォグを取り除く。",
   "description.wurst.hack.nohurtcam": "ダメージを受けた時の画面の揺れを無効化する。",
   "description.wurst.hack.nolevitation": "シュルカーの弾に当たったときの浮遊効果を無効にします。\n\n§c§l注意:§r 浮遊効果が既にアクティブになっているときにこれを有効にすると落下します！",
   "description.wurst.hack.nooverlay": "水と溶岩のオーバーレイを無効化する。",
   "description.wurst.hack.nopumpkin": "カボチャを頭に装着している時のオーバーレイを無効化する。",
+  "description.wurst.hack.noshieldoverlay": "盾を下げ、画面を覆う面積を減らす。",
   "description.wurst.hack.noslowdown": "はちみつやソウルサンド、そしてアイテムの使用時に発生する移動速度低下を無効化する。",
   "description.wurst.hack.noweather": "自分視点での天気、時間や月の形の変更ができる。",
   "description.wurst.hack.noweb": "クモの巣による移動速度低下を無効化する。",
@@ -128,6 +131,7 @@
   "description.wurst.hack.panic": "使用しているすべてのハックを瞬時にOFFにする。\n誤操作に注意！",
   "description.wurst.hack.parkour": "ブロックの端に到達した際に自動でジャンプする。\nパルクールなどに有用。",
   "description.wurst.hack.playeresp": "付近のプレイヤーをハイライト表示する。\nフレンドのESPボックスは青色で表示される。",
+  "description.wurst.hack.portalesp": "近くのポータルをハイライトする。",
   "description.wurst.hack.portalgui": "ネザーポータルの中にいてもメニューを開けるようになる。",
   "description.wurst.hack.potionsaver": "静止中にすべてのポーションの効果を停止させる。",
   "description.wurst.hack.prophuntesp": "Prophuntで偽物のブロックを見破ることができる。\nMineplexサーバーのミニゲーム「Prophunt」用。他サーバーでは動作しない可能性あり。",
@@ -187,5 +191,6 @@
   "button.wurst.nochatreports.signatures_status": "署名: ",
   "description.wurst.nochatreports.message_is_reportable": "このメッセージには有効な署名があるため、不正なチャット レポートに対して脆弱です。",
   "gui.wurst.generic.allcaps_blocked": "ブロックされました",
-  "gui.wurst.generic.allcaps_allowed": "許可された"
+  "gui.wurst.generic.allcaps_allowed": "許可された",
+  "key.wurst.zoom": "拡大"
 }
