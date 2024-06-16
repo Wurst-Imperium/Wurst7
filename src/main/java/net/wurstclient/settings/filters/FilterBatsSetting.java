@@ -25,13 +25,13 @@ public final class FilterBatsSetting extends EntityFilterCheckbox
 	
 	public static FilterBatsSetting genericCombat(boolean checked)
 	{
-		return new FilterBatsSetting("Won't attack bats and any other"
-			+ " \"ambient\" mobs that might be added by mods.", checked);
+		return new FilterBatsSetting(
+			"description.wurst.setting.generic.filter_bats_combat", checked);
 	}
 	
 	public static FilterBatsSetting genericVision(boolean checked)
 	{
-		return new FilterBatsSetting("Won't show bats and any other"
-			+ " \"ambient\" mobs that might be added by mods.", checked);
+		return new FilterBatsSetting(
+			"description.wurst.setting.generic.filter_bats_vision", checked);
 	}
 }

@@ -24,13 +24,15 @@ public final class FilterInvisibleSetting extends EntityFilterCheckbox
 	
 	public static FilterInvisibleSetting genericCombat(boolean checked)
 	{
-		return new FilterInvisibleSetting("Won't attack invisible entities.",
+		return new FilterInvisibleSetting(
+			"description.wurst.setting.generic.filter_invisible_combat",
 			checked);
 	}
 	
 	public static FilterInvisibleSetting genericVision(boolean checked)
 	{
-		return new FilterInvisibleSetting("Won't show invisible entities.",
+		return new FilterInvisibleSetting(
+			"description.wurst.setting.generic.filter_invisible_vision",
 			checked);
 	}
 }
