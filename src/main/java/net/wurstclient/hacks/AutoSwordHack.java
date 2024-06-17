@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
+import net.minecraft.item.MaceItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -144,7 +145,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private float getValue(ItemStack stack, Entity entity)
 	{
 		Item item = stack.getItem();
-		if(!(item instanceof ToolItem || item instanceof TridentItem))
+		if(!(item instanceof ToolItem || item instanceof TridentItem
+			|| item instanceof MaceItem))
 			return Integer.MIN_VALUE;
 		
 		switch(priority.getSelected())
@@ -161,6 +163,13 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			float dmg = (float)ItemUtils
 				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
 				.orElseThrow();
+			
+			// Check for mace, get bonus damage from fall
+			if(item instanceof MaceItem)
+			{
+				dmg = ((MaceItem)item).getBonusAttackDamage(MC.player, dmg,
+					entity.getDamageSources().playerAttack(MC.player));
+			}
 			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
