@@ -11,6 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.AirStrafingSpeedListener;
+import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PlayerMoveListener;
 import net.wurstclient.events.SetOpaqueCubeListener;
@@ -20,7 +21,7 @@ import net.wurstclient.hack.Hack;
 @SearchTags({"no clip"})
 public final class NoClipHack extends Hack
 	implements UpdateListener, PlayerMoveListener, IsNormalCubeListener,
-	SetOpaqueCubeListener, AirStrafingSpeedListener
+	SetOpaqueCubeListener, AirStrafingSpeedListener, PacketOutputListener
 {
 	public NoClipHack()
 	{
@@ -32,6 +33,7 @@ public final class NoClipHack extends Hack
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PacketOutputListener.class, this);
 		EVENTS.add(PlayerMoveListener.class, this);
 		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
@@ -42,6 +44,7 @@ public final class NoClipHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PacketOutputListener.class, this);
 		EVENTS.remove(PlayerMoveListener.class, this);
 		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
@@ -68,7 +71,14 @@ public final class NoClipHack extends Hack
 		if(MC.options.sneakKey.isPressed())
 			player.addVelocity(0, -speed, 0);
 	}
-	
+
+	@Override
+	public void onSentPacket(PacketOutputEvent event)
+	{
+		if(event.getPacket() instanceof PlayerMoveC2SPacket)
+			event.cancel();
+	}
+
 	@Override
 	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
 	{
