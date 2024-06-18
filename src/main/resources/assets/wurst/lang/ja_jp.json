@@ -12,7 +12,6 @@
   "description.wurst.hack.antiwaterpush": "水に流されるのを防ぐ。",
   "description.wurst.hack.antiwobble": "吐き気やポータルによって引き起こされる視界のゆがみを無効化する。",
   "description.wurst.hack.arrowdmg": "矢のダメージを大幅に増加させるが、満腹度を大量に消費し、精度も低下する。\n\nクロスボウでは使用不可&Paperサーバーでは対策済みの模様。",
-  "description.wurst.setting.arrowdmg.packets": "送信するパケットの量。\nパケットの量を増やすと、ダメージも増加する。",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "有効時、トライデントがより遠くまで飛ばせるようになる。ダメージ量や激流エンチャントには影響しない模様。\n\n§c§l注意: §rこのオプションを有効化した場合、トライデントをロストしやすくなる。",
   "description.wurst.hack.autoarmor": "防具を自動で管理する。",
   "description.wurst.hack.autobuild": "自動で建築を行う。\nブロックを一つ設置することで建築が開始される。",

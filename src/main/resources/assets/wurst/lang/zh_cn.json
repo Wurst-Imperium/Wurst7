@@ -12,7 +12,6 @@
   "description.wurst.hack.antiwaterpush": "防止你被水流推动。",
   "description.wurst.hack.antiwobble": "禁用由反胃和传送门动画引起的视觉扭曲。",
   "description.wurst.hack.arrowdmg": "大幅增加箭的伤害，但也会消耗大量饥饿值并降低准确性。\n\n不适用于弩，并且似乎已在Paper类服务器上修复。",
-  "description.wurst.setting.arrowdmg.packets": "发送数据包的数量。\n更多的数据包意味着更高的伤害。",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "打开之后，三叉戟将飞得更远。似乎不影响伤害以及“激流”魔咒。\n\n§c§l警告：§r打开这个选项之后你很容易弄丢你的三叉戟！",
   "description.wurst.hack.autoarmor": "自动管理你的盔甲。",
   "description.wurst.hack.autobuild": "自动建筑东西。\n放一个方块就开始自动建造。",

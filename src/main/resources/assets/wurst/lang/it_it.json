@@ -10,7 +10,6 @@
   "description.wurst.hack.antiwaterpush": "Non permette all'acqua di spingerti.",
   "description.wurst.hack.antiwobble": "Disattiva l'effetto oscillante causato dalla nausea e dai portali.",
   "description.wurst.hack.arrowdmg": "Aumenta significativamente il danno da frecce, ma consuma anche un sacco di fame e riduce la mira.\n\nNon funziona con le balestre e sembra essere cionco nei server con il Paper.",
-  "description.wurst.setting.arrowdmg.packets": "Numero di pacchetti da inviare.\nPiù pacchetti = più danno.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Quando abilitato, i tridenti volano molto più lontano. Non sembra influire sul danno o sullo Risacca.\n\n§c§lATTENZIONE:§r Puoi facilmente perdere il tuo tridente abilitando questa opzione!",
   "description.wurst.hack.autoarmor": "Gestisce la tua armatura automaticamente.",
   "description.wurst.hack.autobuild": "Costruisce cose automaticamente.\nPiazza un blocco per cominciare a costruire.",

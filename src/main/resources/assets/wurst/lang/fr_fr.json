@@ -8,7 +8,6 @@
   "description.wurst.hack.antiwaterpush": "Vous empêche d'être poussé par l'eau.",
   "description.wurst.hack.antiwobble": "Désactive l'effet d'oscillation causé par la nausée et les portails.",
   "description.wurst.hack.arrowdmg": "Augmente massivement les dégâts des flèches, mais consomme également beaucoup de faim et réduit la précision. \n\nNe fonctionne pas avec les arbalètes et semble être corrigé sur les serveurs Paper.",
-  "description.wurst.setting.arrowdmg.packets": "Quantité de paquets à envoyer.\nPlus de paquets = plus de dégâts.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Lorsqu'il est activé, les tridents volent beaucoup plus loin. Ne semble pas affecter les dégâts ou l'impulsion.\n\n§c§lATTENTION:§r Vous pouvez facilement perdre votre trident en activant cette option !",
   "description.wurst.hack.autoarmor": "Gère votre armure automatiquement.",
   "description.wurst.hack.autobuild": "Construit les choses automatiquement.\nPlacez un seul bloc pour commencer à construire.",

@@ -8,7 +8,6 @@
   "description.wurst.hack.antiwaterpush": "Вас більше не зносить течією води.",
   "description.wurst.hack.antiwobble": "Вимикає похитування екрана від порталу та ефекту нудоти.",
   "description.wurst.hack.arrowdmg": "Суттєво збільшує ушкодження від стріл, але також споживає багато голоду та знижує точність.\n\nНе працює з арбалетами і, здається, виправлено на серверах Paper.",
-  "description.wurst.setting.arrowdmg.packets": "Кількість пакетів для відправки.\nБільше пакетів = більша шкода.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Коли ввімкнено, тризуби летять набагато далі. Здається, не впливає на пошкодження чи Riptide.\n\n§c§lПОПЕРЕДЖЕННЯ:§r Ви можете легко втратити свій тризуб, увімкнувши цю опцію!",
   "description.wurst.hack.autoarmor": "Автоматично екіпірує найкращу броню.",
   "description.wurst.hack.autobuild": "Автоматично будує об'єкти.\nПоставте блок, щоб почати будівництво.",

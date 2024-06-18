@@ -12,7 +12,7 @@
   "description.wurst.hack.antiwaterpush": "Prevents you from getting pushed by water.",
   "description.wurst.hack.antiwobble": "Disables the wobble effect caused by nausea and portals.",
   "description.wurst.hack.arrowdmg": "Massively increases arrow damage, but also consumes a lot of hunger and reduces accuracy.\n\nDoes not work with crossbows and seems to be patched on Paper servers.",
-  "description.wurst.setting.arrowdmg.packets": "Amount of packets to send.\nMore packets = higher damage.",
+  "description.wurst.setting.arrowdmg.strength": "Strength of the effect. 10 is the highest possible as of Minecraft 1.21.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "When enabled, tridents fly much further. Doesn't seem to affect damage or Riptide.\n\n§c§lWARNING:§r You can easily lose your trident by enabling this option!",
   "description.wurst.hack.autoarmor": "Manages your armor automatically.",
   "description.wurst.hack.autobuild": "Builds things automatically.\nPlace a single block to start building.",
