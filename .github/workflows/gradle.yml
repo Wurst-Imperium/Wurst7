@@ -53,7 +53,7 @@ jobs:
       run: ./gradlew spotlessCheck
 
     - name: Execute Gradle build
-      run: ./gradlew build
+      run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: VirusTotal scan
       if: ${{ github.event_name == 'push' }}
