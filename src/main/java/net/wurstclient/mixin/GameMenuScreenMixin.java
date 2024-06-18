@@ -106,9 +106,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		}
 		
 		if(buttonY == -1 || buttonI == -1)
-			throw new CrashException(
-				CrashReport.create(new IllegalStateException(),
-					"Someone deleted the Feedback button!"));
+			return;
+			//throw new CrashException(CrashReport.create(new IllegalStateException(), "Someone deleted the Feedback button!"));
 		
 		wurstOptionsButton = ButtonWidget
 			.builder(Text.literal("            Options"),
