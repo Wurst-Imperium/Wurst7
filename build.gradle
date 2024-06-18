@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "1.6-SNAPSHOT"
+	id "fabric-loom" version "1.7-SNAPSHOT"
 	id "com.diffplug.spotless" version "6.25.0"
 }
 
