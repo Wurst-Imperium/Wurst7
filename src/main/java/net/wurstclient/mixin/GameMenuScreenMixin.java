@@ -26,8 +26,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
 import net.wurstclient.WurstClient;
 import net.wurstclient.options.WurstOptionsScreen;
 
