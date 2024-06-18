@@ -32,10 +32,9 @@ import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
-
 @SearchTags({"air place"})
-public final class AirPlaceHack extends Hack implements RightClickListener,
-	UpdateListener, RenderListener
+public final class AirPlaceHack extends Hack
+	implements RightClickListener, UpdateListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -94,7 +93,8 @@ public final class AirPlaceHack extends Hack implements RightClickListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if (guide.isChecked() && bp != null) {
+		if(guide.isChecked() && bp != null)
+		{
 			// GL settings
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -121,27 +121,29 @@ public final class AirPlaceHack extends Hack implements RightClickListener,
 		RegionPos region)
 	{
 		matrixStack.push();
-			
+		
 		float[] colorF = color.getColorF();
 		matrixStack.translate(bp.getX(), bp.getY(), bp.getZ());
-
-	    RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.2F);
-   
-	    Box bb = new Box(0, 0, 0, 1, 1, 1);
-	        
-	    RenderUtils.drawSolidBox(bb, matrixStack);
-        RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1F);
-        RenderUtils.drawOutlinedBox(bb, matrixStack);
-        
-        matrixStack.pop();
+		
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.2F);
+		
+		Box bb = new Box(0, 0, 0, 1, 1, 1);
+		
+		RenderUtils.drawSolidBox(bb, matrixStack);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1F);
+		RenderUtils.drawOutlinedBox(bb, matrixStack);
+		
+		matrixStack.pop();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		HitResult hitResult = MC.player.raycast(range.getValue(), 0, false);
-		if(hitResult.getType() != HitResult.Type.MISS) {
-			bp = null; // dont draw if looking at non-airplace location like ground
+		if(hitResult.getType() != HitResult.Type.MISS)
+		{
+			bp = null; // dont draw if looking at non-airplace location like
+						// ground
 			return;
 		}
 		
