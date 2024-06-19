@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -39,21 +40,21 @@ public final class AirPlaceHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final ColorSetting color = new ColorSetting("Color",
-		"Block placing guide will be highlighted in this color.", Color.RED);
-	
 	private final CheckboxSetting guide = new CheckboxSetting("Guide",
-		"Shows a guide for where blocks will place", true);
+		"Shows a guide for where blocks will be placed.", true);
 	
-	private BlockPos bp;
+	private final ColorSetting guideColor = new ColorSetting("Guide color",
+		"Color of the block placing guide, if enabled.", Color.RED);
+	
+	private BlockPos renderPos;
 	
 	public AirPlaceHack()
 	{
 		super("AirPlace");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		addSetting(color);
 		addSetting(guide);
+		addSetting(guideColor);
 	}
 	
 	@Override
@@ -62,6 +63,7 @@ public final class AirPlaceHack extends Hack
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(RightClickListener.class, this);
+		renderPos = null;
 	}
 	
 	@Override
@@ -75,81 +77,81 @@ public final class AirPlaceHack extends Hack
 	@Override
 	public void onRightClick(RightClickEvent event)
 	{
-		HitResult hitResult = MC.player.raycast(range.getValue(), 0, false);
-		if(hitResult.getType() != HitResult.Type.MISS)
-			return;
-		
-		if(!(hitResult instanceof BlockHitResult blockHitResult))
+		BlockHitResult hitResult = getHitResultIfMissed();
+		if(hitResult == null)
 			return;
 		
 		MC.itemUseCooldown = 4;
 		if(MC.player.isRiding())
 			return;
 		
-		InteractionSimulator.rightClickBlock(blockHitResult);
+		InteractionSimulator.rightClickBlock(hitResult);
 		event.cancel();
-	}
-	
-	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		if(guide.isChecked() && bp != null)
-		{
-			// GL settings
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GL11.glDisable(GL11.GL_CULL_FACE);
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			
-			matrixStack.push();
-			
-			RegionPos region = RenderUtils.getCameraRegion();
-			RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-			
-			renderBoxes(matrixStack, partialTicks, region);
-			
-			matrixStack.pop();
-			
-			// GL resets
-			RenderSystem.setShaderColor(1, 1, 1, 1);
-			GL11.glEnable(GL11.GL_DEPTH_TEST);
-			GL11.glDisable(GL11.GL_BLEND);
-		}
-	}
-	
-	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
-	{
-		matrixStack.push();
-		
-		float[] colorF = color.getColorF();
-		matrixStack.translate(bp.getX(), bp.getY(), bp.getZ());
-		
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.2F);
-		
-		Box bb = new Box(0, 0, 0, 1, 1, 1);
-		
-		RenderUtils.drawSolidBox(bb, matrixStack);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 1F);
-		RenderUtils.drawOutlinedBox(bb, matrixStack);
-		
-		matrixStack.pop();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		renderPos = null;
+		
+		if(!guide.isChecked())
+			return;
+		
+		if(MC.player.getMainHandStack().isEmpty()
+			&& MC.player.getOffHandStack().isEmpty())
+			return;
+		
+		if(MC.player.isRiding())
+			return;
+		
+		BlockHitResult hitResult = getHitResultIfMissed();
+		if(hitResult != null)
+			renderPos = hitResult.getBlockPos();
+	}
+	
+	private BlockHitResult getHitResultIfMissed()
+	{
 		HitResult hitResult = MC.player.raycast(range.getValue(), 0, false);
 		if(hitResult.getType() != HitResult.Type.MISS)
-		{
-			bp = null; // dont draw if looking at non-airplace location like
-						// ground
-			return;
-		}
+			return null;
 		
 		if(!(hitResult instanceof BlockHitResult blockHitResult))
+			return null;
+		
+		return blockHitResult;
+	}
+	
+	@Override
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		if(renderPos == null)
 			return;
 		
-		bp = blockHitResult.getBlockPos();
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		
+		matrixStack.push();
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		
+		Box box = new Box(renderPos.subtract(region.toBlockPos()));
+		float[] colorF = guideColor.getColorF();
+		
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.1F);
+		RenderUtils.drawSolidBox(box, matrixStack);
+		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		RenderUtils.drawOutlinedBox(box, matrixStack);
+		
+		matrixStack.pop();
+		
+		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 }
