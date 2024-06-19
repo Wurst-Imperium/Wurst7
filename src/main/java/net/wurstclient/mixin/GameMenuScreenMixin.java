@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,12 +19,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.crash.CrashException;
@@ -34,9 +37,11 @@ import net.wurstclient.options.WurstOptionsScreen;
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
+	@Unique
 	private static final Identifier WURST_TEXTURE =
 		Identifier.of("wurst", "wurst_128.png");
 	
+	@Unique
 	private ButtonWidget wurstOptionsButton;
 	
 	private GameMenuScreenMixin(WurstClient wurst, Text title)
@@ -81,62 +86,83 @@ public abstract class GameMenuScreenMixin extends Screen
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
+	@Unique
 	private void addWurstOptionsButton()
 	{
 		List<ClickableWidget> buttons = Screens.getButtons(this);
 		
+		int buttonX = width / 2 - 102;
 		int buttonY = -1;
-		int buttonI = -1;
+		int buttonWidth = 204;
+		int buttonHeight = 20;
 		
-		for(int i = 0; i < buttons.size(); i++)
+		// Find the first row containing a feedback or ModMenu button
+		for(ClickableWidget button : buttons)
 		{
-			ClickableWidget button = buttons.get(i);
+			if(!isFeedbackButton(button))
+				continue;
 			
-			// insert Wurst button in place of feedback/report row
-			if(isFeedbackButton(button))
-			{
-				buttonY = button.getY();
-				buttonI = i;
-			}
-			
-			// make feedback/report buttons invisible
-			// (removing them completely would break ModMenu)
-			if(isFeedbackButton(button) || isBugReportButton(button))
-				button.visible = false;
+			buttonY = button.getY();
+			break;
 		}
 		
-		if(buttonY == -1 || buttonI == -1)
-			throw new CrashException(
-				CrashReport.create(new IllegalStateException(),
-					"Someone deleted the Feedback button!"));
+		// Crash if ModMenu can't behave itself again
+		if(buttonY == -1)
+			throw new CrashException(CrashReport.create(
+				new IllegalStateException(
+					"Someone deleted the Feedback button."),
+				"I bet ModMenu is breaking stuff again!"));
+			
+		// Make any conflicting feedback/report/ModMenu buttons invisible
+		// We don't remove them completely, because unlike ModMenu, we care
+		// about compatibility with other mods here
+		for(ClickableWidget button : buttons)
+		{
+			if(button.getRight() < buttonX
+				|| button.getX() > buttonX + buttonWidth
+				|| button.getBottom() < buttonY
+				|| button.getY() > buttonY + buttonHeight)
+				continue;
+			
+			button.visible = false;
+		}
 		
+		// Add the Wurst Options button
+		MutableText buttonText = Text.literal("            Options");
 		wurstOptionsButton = ButtonWidget
-			.builder(Text.literal("            Options"),
-				b -> openWurstOptions())
-			.dimensions(width / 2 - 102, buttonY, 204, 20).build();
+			.builder(buttonText, b -> openWurstOptions())
+			.dimensions(buttonX, buttonY, buttonWidth, buttonHeight).build();
 		buttons.add(wurstOptionsButton);
 	}
 	
+	@Unique
 	private void openWurstOptions()
 	{
 		client.setScreen(new WurstOptionsScreen(this));
 	}
 	
+	@Unique
 	private boolean isFeedbackButton(ClickableWidget button)
 	{
-		return hasTrKey(button, "menu.sendFeedback")
-			|| hasTrKey(button, "menu.feedback");
+		if(FabricLoader.getInstance().isModLoaded("modmenu")
+			&& containsTrKey(button, "modmenu.title"))
+			return true;
+		
+		return isTrKey(button, "menu.sendFeedback")
+			|| isTrKey(button, "menu.feedback");
 	}
 	
-	private boolean isBugReportButton(ClickableWidget button)
-	{
-		return hasTrKey(button, "menu.reportBugs")
-			|| hasTrKey(button, "menu.server_links");
-	}
-	
-	private boolean hasTrKey(ClickableWidget button, String key)
+	@Unique
+	private boolean isTrKey(ClickableWidget button, String key)
 	{
 		String message = button.getMessage().getString();
 		return message != null && message.equals(I18n.translate(key));
+	}
+	
+	@Unique
+	private boolean containsTrKey(ClickableWidget button, String key)
+	{
+		String message = button.getMessage().getString();
+		return message != null && message.contains(I18n.translate(key));
 	}
 }
