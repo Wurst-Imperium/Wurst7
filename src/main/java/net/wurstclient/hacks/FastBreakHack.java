@@ -35,6 +35,8 @@ public final class FastBreakHack extends Hack
 			+ " which makes it harder for anti-cheat plugins to detect.\n\n"
 			+ "This setting does nothing if Legit mode is enabled.",
 		1, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+
+	private final SliderSetting breakProgress = new SliderSetting("Break Progress", 1, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final CheckboxSetting legitMode = new CheckboxSetting("Legit mode",
 		"Only removes the delay between breaking blocks, without speeding up"
@@ -53,6 +55,7 @@ public final class FastBreakHack extends Hack
 		super("FastBreak");
 		setCategory(Category.BLOCKS);
 		addSetting(activationChance);
+		addSetting(breakProgress);
 		addSetting(legitMode);
 	}
 	
@@ -91,9 +94,6 @@ public final class FastBreakHack extends Hack
 		if(legitMode.isChecked())
 			return;
 		
-		if(MC.interactionManager.currentBreakingProgress >= 1)
-			return;
-		
 		BlockPos blockPos = event.getBlockPos();
 		if(!blockPos.equals(lastBlockPos))
 		{
@@ -107,10 +107,9 @@ public final class FastBreakHack extends Hack
 		
 		if(!fastBreakBlock)
 			return;
-		
-		Action action = PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK;
-		Direction direction = event.getDirection();
-		IMC.getInteractionManager().sendPlayerActionC2SPacket(action, blockPos,
-			direction);
+
+		float bProgress = breakProgress.getValueF();
+		if (MC.interactionManager.currentBreakingProgress >= bProgress)
+			MC.interactionManager.currentBreakingProgress = 1F;
 	}
 }
