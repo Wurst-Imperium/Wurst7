@@ -1,6 +1,8 @@
 {
   "description.wurst.hack.aimassist": "Helps you aim at nearby entities.",
   "description.wurst.hack.airplace": "Allows you to place blocks in mid-air.",
+  "description.wurst.setting.airplace.guide": "Shows a guide for where blocks will be placed.",
+  "description.wurst.setting.airplace.guide_color": "Color of the block placing guide, if enabled.",
   "description.wurst.hack.anchoraura": "Automatically places (optional), charges, and detonates respawn anchors to kill entities around you.",
   "description.wurst.hack.antiafk": "Walks around randomly to hide you from AFK detectors.",
   "description.wurst.hack.antiblind": "Prevents blindness and darkness effects.\nIncompatible with OptiFine.",

@@ -41,10 +41,10 @@ public final class AirPlaceHack extends Hack
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting guide = new CheckboxSetting("Guide",
-		"Shows a guide for where blocks will be placed.", true);
+		"description.wurst.setting.airplace.guide", true);
 	
 	private final ColorSetting guideColor = new ColorSetting("Guide color",
-		"Color of the block placing guide, if enabled.", Color.RED);
+		"description.wurst.setting.airplace.guide_color", Color.RED);
 	
 	private BlockPos renderPos;
 	
