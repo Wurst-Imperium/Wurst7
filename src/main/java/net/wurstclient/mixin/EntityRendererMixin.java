@@ -22,8 +22,10 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAttachmentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
@@ -67,14 +69,19 @@ public abstract class EntityRendererMixin<T extends Entity>
 		if(distanceSq > 4096 && !nameTags.isUnlimitedRange())
 			return;
 		
+		// get attachment point
+		Vec3d attVec = entity.getAttachments().getPointNullable(
+			EntityAttachmentType.NAME_TAG, 0, entity.getYaw(tickDelta));
+		if(attVec == null)
+			return;
+		
 		// disable sneaking changes if NameTags is enabled
 		boolean notSneaky = !entity.isSneaky() || nameTags.isEnabled();
 		
-		float matrixY = entity.getHeight() + 0.5F;
 		int labelY = "deadmau5".equals(text.getString()) ? -10 : 0;
 		
 		matrices.push();
-		matrices.translate(0, matrixY, 0);
+		matrices.translate(attVec.x, attVec.y + 0.5, attVec.z);
 		matrices.multiply(dispatcher.getRotation());
 		
 		// adjust scale if NameTags is enabled
@@ -85,7 +92,7 @@ public abstract class EntityRendererMixin<T extends Entity>
 			if(distance > 10)
 				scale *= distance / 10;
 		}
-		matrices.scale(-scale, -scale, scale);
+		matrices.scale(scale, -scale, scale);
 		
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
 		float bgOpacity =
