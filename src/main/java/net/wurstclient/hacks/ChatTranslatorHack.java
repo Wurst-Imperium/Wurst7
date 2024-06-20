@@ -63,6 +63,13 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener,
 		if (!sendTranslationChat.isChecked())
 			return;
 
+//		Command Skip
+		if (event.getMessage().contains("/"))
+			return;
+
+//		translate
+		event.cancel();
+
 		new Thread(() -> {
 			String message = event.getMessage();
 			String translated = GoogleTranslate.translate(message,
