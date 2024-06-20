@@ -64,7 +64,8 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener,
 			return;
 
 //		Command Skip
-		if (event.getMessage().contains("/"))
+		String eventMsg = event.getMessage();
+		if (eventMsg.contains("/") || eventMsg.contains("."))
 			return;
 
 //		translate
@@ -75,8 +76,8 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener,
 			String translated = GoogleTranslate.translate(message,
 					langTo.getSelected().value, langFrom.getSelected().value);
 
-			if (translated == null)
-				return;
+//			if (translated == null) {
+//				return;
 
 			MC.getNetworkHandler().sendChatMessage(translated);
 		},"Translated Send Chat").start();
@@ -88,6 +89,9 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener,
 		new Thread(() -> {
 			try
 			{
+				System.out.println(event.getComponent().getString());
+				System.out.println(MC.player.getName());
+
 				translate(event);
 				
 			}catch(Exception e)
