@@ -124,12 +124,14 @@ public abstract class GameMenuScreenMixin extends Screen
 	
 	private boolean isFeedbackButton(ClickableWidget button)
 	{
-		return hasTrKey(button, "menu.sendFeedback");
+		return hasTrKey(button, "menu.sendFeedback")
+			|| hasTrKey(button, "menu.feedback");
 	}
 	
 	private boolean isBugReportButton(ClickableWidget button)
 	{
-		return hasTrKey(button, "menu.reportBugs");
+		return hasTrKey(button, "menu.reportBugs")
+			|| hasTrKey(button, "menu.server_links");
 	}
 	
 	private boolean hasTrKey(ClickableWidget button, String key)

@@ -40,7 +40,7 @@ public final class NewChunksReasonsRenderer
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderBlocks(new ArrayList<>(reasons), bufferBuilder);
-		return bufferBuilder.end();
+		return bufferBuilder.endNullable();
 	}
 	
 	private void renderBlocks(List<BlockPos> blocks,
