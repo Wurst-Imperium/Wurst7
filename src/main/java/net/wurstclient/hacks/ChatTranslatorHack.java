@@ -11,7 +11,9 @@ import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
+import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.GoogleTranslate;
@@ -21,14 +23,17 @@ import net.wurstclient.util.GoogleTranslate;
 	"AutoTranslator", "auto translator", "AutoTranslation", "auto translation",
 	"GoogleTranslate", "google translate", "GoogleTranslator",
 	"google translator", "GoogleTranslation", "google translation"})
-public final class ChatTranslatorHack extends Hack implements ChatInputListener
+public final class ChatTranslatorHack extends Hack implements ChatInputListener, ChatOutputListener
 {
 	private final EnumSetting<FromLanguage> langFrom = new EnumSetting<>(
 		"Translate from", FromLanguage.values(), FromLanguage.AUTO_DETECT);
-	
+
 	private final EnumSetting<ToLanguage> langTo = new EnumSetting<>(
 		"Translate to", ToLanguage.values(), ToLanguage.ENGLISH);
-	
+
+	private final CheckboxSetting sendTranslationChat = new CheckboxSetting("Send Translation Chat",
+			"Language To -> Language From", false);
+
 	public ChatTranslatorHack()
 	{
 		super("ChatTranslator");
@@ -36,20 +41,40 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 		
 		addSetting(langFrom);
 		addSetting(langTo);
+		addSetting(sendTranslationChat);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
 		EVENTS.add(ChatInputListener.class, this);
+		EVENTS.add(ChatOutputListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
+		EVENTS.remove(ChatOutputListener.class, this);
 	}
-	
+
+	@Override
+	public void onSentMessage(ChatOutputEvent event) {
+		if (!sendTranslationChat.isChecked())
+			return;
+
+		new Thread(() -> {
+			String message = event.getMessage();
+			String translated = GoogleTranslate.translate(message,
+					langTo.getSelected().value, langFrom.getSelected().value);
+
+			if (translated == null)
+				return;
+
+			MC.getNetworkHandler().sendChatMessage(translated);
+		},"Translated Send Chat").start();
+	}
+
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
@@ -62,7 +87,7 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 			{
 				e.printStackTrace();
 			}
-		}, "ChatTranslator").start();
+		}, "Get Translated Chat").start();
 	}
 	
 	private void translate(ChatInputEvent event)
