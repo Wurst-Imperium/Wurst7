@@ -23,17 +23,18 @@ import net.wurstclient.util.GoogleTranslate;
 	"AutoTranslator", "auto translator", "AutoTranslation", "auto translation",
 	"GoogleTranslate", "google translate", "GoogleTranslator",
 	"google translator", "GoogleTranslation", "google translation"})
-public final class ChatTranslatorHack extends Hack implements ChatInputListener, ChatOutputListener
+public final class ChatTranslatorHack extends Hack
+	implements ChatInputListener, ChatOutputListener
 {
 	private final EnumSetting<FromLanguage> langFrom = new EnumSetting<>(
 		"Translate from", FromLanguage.values(), FromLanguage.AUTO_DETECT);
-
+	
 	private final EnumSetting<ToLanguage> langTo = new EnumSetting<>(
 		"Translate to", ToLanguage.values(), ToLanguage.ENGLISH);
-
-	private final CheckboxSetting sendTranslationChat = new CheckboxSetting("Send Translation Chat",
-			"Language To -> Language From", false);
-
+	
+	private final CheckboxSetting sendTranslationChat = new CheckboxSetting(
+		"Send Translation Chat", "Language To -> Language From", false);
+	
 	public ChatTranslatorHack()
 	{
 		super("ChatTranslator");
@@ -57,43 +58,40 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener,
 		EVENTS.remove(ChatInputListener.class, this);
 		EVENTS.remove(ChatOutputListener.class, this);
 	}
-
+	
 	@Override
-	public void onSentMessage(ChatOutputEvent event) {
-		if (!sendTranslationChat.isChecked())
+	public void onSentMessage(ChatOutputEvent event)
+	{
+		if(!sendTranslationChat.isChecked())
 			return;
-
-//		Command Skip
+		
+		// Command Skip
 		String eventMsg = event.getMessage();
-		if (eventMsg.contains("/") || eventMsg.contains("."))
+		if(eventMsg.contains("/"))
 			return;
-
-//		translate
+		
+		// translate
 		event.cancel();
-
+		
 		new Thread(() -> {
 			String message = event.getMessage();
 			String translated = GoogleTranslate.translate(message,
-					langTo.getSelected().value, langFrom.getSelected().value);
-
-//			if (translated == null) {
-//				return;
-
+				langTo.getSelected().value, langFrom.getSelected().value);
+			
+			if(translated == null)
+				translated = message;
+			
 			MC.getNetworkHandler().sendChatMessage(translated);
-		},"Translated Send Chat").start();
+		}, "Translated Send Chat").start();
 	}
-
+	
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
 		new Thread(() -> {
 			try
 			{
-				System.out.println(event.getComponent().getString());
-				System.out.println(MC.player.getName());
-
 				translate(event);
-				
 			}catch(Exception e)
 			{
 				e.printStackTrace();
