@@ -36,34 +36,28 @@ public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final CheckboxSetting useAi = new CheckboxSetting("Use AI",
-		"Uses a pathfinding AI to move around naturally and avoid hazards.\n"
-			+ "Can sometimes get stuck.",
-		true);
+		"description.wurst.setting.antiafk.use_ai", true);
 	
 	private final SliderSetting aiRange = new SliderSetting("AI range",
-		"The area in which AntiAFK can move when Use AI is turned on.", 16, 1,
-		64, 1, ValueDisplay.AREA_FROM_RADIUS);
+		"description.wurst.setting.antiafk.ai_range", 16, 1, 64, 1,
+		ValueDisplay.AREA_FROM_RADIUS);
 	
 	private final SliderSetting nonAiRange = new SliderSetting("Non-AI range",
-		"The area in which AntiAFK can move when Use AI is turned off.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r This area must be completely"
-			+ " unobstructed and free of hazards.",
-		1, 1, 64, 1, ValueDisplay.AREA_FROM_RADIUS);
+		"description.wurst.setting.antiafk.non-ai_range", 1, 1, 64, 1,
+		ValueDisplay.AREA_FROM_RADIUS);
 	
-	private final SliderSetting waitTime =
-		new SliderSetting("Wait time", "Time between movements in seconds.",
-			2.5, 0, 60, 0.05, ValueDisplay.DECIMAL.withSuffix("s"));
+	private final SliderSetting waitTime = new SliderSetting("Wait time",
+		"description.wurst.setting.antiafk.wait_time", 2.5, 0, 60, 0.05,
+		ValueDisplay.DECIMAL.withSuffix("s"));
 	
-	private final SliderSetting waitTimeRand =
-		new SliderSetting("Wait time randomization",
-			"How much time can be randomly added or subtracted from the wait"
-				+ " time, in seconds.",
-			0.5, 0, 60, 0.05,
-			ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
+	private final SliderSetting waitTimeRand = new SliderSetting(
+		"Wait time randomization",
+		"description.wurst.setting.antiafk.wait_time_randomization", 0.5, 0, 60,
+		0.05, ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
 	
 	private final CheckboxSetting showWaitTime =
 		new CheckboxSetting("Show wait time",
-			"Displays the remaining wait time in the HackList.", true);
+			"description.wurst.setting.antiafk.show_wait_time", true);
 	
 	private int timer;
 	private Random random = Random.createLocal();
