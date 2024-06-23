@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - '**.java'
+      - '**.json'
       - 'gradle**'
       - 'build.gradle'
   pull_request:
     paths:
       - '**.java'
+      - '**.json'
       - 'gradle**'
       - 'build.gradle'
   # Makes it possible to run this workflow manually from the Actions tab
