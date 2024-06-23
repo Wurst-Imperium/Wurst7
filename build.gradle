@@ -41,7 +41,7 @@ dependencies {
 	//
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
-	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 loom {
@@ -73,17 +73,21 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename {"${it}_${project.base.archivesName.get()}"}
 	}
 }
 
 spotless {
+	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
 		indentWithTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
-		lineEndings('WINDOWS')
+	}
+	json {
+		target "src/**/*.json"
+		gson().indentWithSpaces(2).version("2.10.1")
 	}
 }
 
