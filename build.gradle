@@ -1,11 +1,11 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.321"
+		classpath "org.kohsuke:github-api:1.322"
 	}
 }
 
 plugins {
-	id "fabric-loom" version "1.6-SNAPSHOT"
+	id "fabric-loom" version "1.7-SNAPSHOT"
 	id "com.diffplug.spotless" version "6.25.0"
 }
 
