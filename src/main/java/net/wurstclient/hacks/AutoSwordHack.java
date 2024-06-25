@@ -12,9 +12,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.MaceItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
-import net.minecraft.item.MaceItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -165,11 +165,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 				.orElseThrow();
 			
 			// Check for mace, get bonus damage from fall
-			if(item instanceof MaceItem)
-			{
-				dmg = ((MaceItem)item).getBonusAttackDamage(MC.player, dmg,
+			if(item instanceof MaceItem mace)
+				dmg = mace.getBonusAttackDamage(MC.player, dmg,
 					entity.getDamageSources().playerAttack(MC.player));
-			}
 			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
