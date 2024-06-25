@@ -147,6 +147,7 @@
   "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.setting.nofall.allow_elytra": "Also tries to prevent fall damage while you are flying with an elytra.\n\n§c§lWARNING:§r This can sometimes cause you to stop flying unexpectedly.",
+  "description.wurst.setting.nofall.pause_for_mace": "Pauses NoFall when holding a mace, so that you can take advantage of the mace's fall distance bonus.\n\n§c§lWARNING:§r You will not be protected from fall damage while you are holding a mace. Also, switching to or away from a mace while you are already falling will interrupt your fall, potentially causing you to take damage.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nofog": "Removes distance fog from the world.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",

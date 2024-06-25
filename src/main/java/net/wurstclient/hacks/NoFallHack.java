@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.OnGroundOnly;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -21,11 +22,16 @@ public final class NoFallHack extends Hack implements UpdateListener
 	private final CheckboxSetting allowElytra = new CheckboxSetting(
 		"Allow elytra", "description.wurst.setting.nofall.allow_elytra", false);
 	
+	private final CheckboxSetting pauseForMace =
+		new CheckboxSetting("Pause for mace",
+			"description.wurst.setting.nofall.pause_for_mace", false);
+	
 	public NoFallHack()
 	{
 		super("NoFall");
 		setCategory(Category.MOVEMENT);
 		addSetting(allowElytra);
+		addSetting(pauseForMace);
 	}
 	
 	@Override
@@ -39,6 +45,9 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return getName() + " (paused)";
 		
 		if(player.isCreative())
+			return getName() + " (paused)";
+		
+		if(pauseForMace.isChecked() && isHoldingMace(player))
 			return getName() + " (paused)";
 		
 		return getName();
@@ -68,6 +77,10 @@ public final class NoFallHack extends Hack implements UpdateListener
 		boolean fallFlying = player.isFallFlying();
 		if(fallFlying && !allowElytra.isChecked())
 			return;
+		
+		// pause when holding a mace, if enabled
+		if(pauseForMace.isChecked() && isHoldingMace(player))
+			return;
 			
 		// ignore small falls that can't cause damage,
 		// unless CreativeFlight is enabled in survival mode
@@ -83,6 +96,11 @@ public final class NoFallHack extends Hack implements UpdateListener
 		
 		// send packet to stop fall damage
 		player.networkHandler.sendPacket(new OnGroundOnly(true));
+	}
+	
+	private boolean isHoldingMace(ClientPlayerEntity player)
+	{
+		return player.getMainHandStack().isOf(Items.MACE);
 	}
 	
 	private boolean isFallingFastEnoughToCauseDamage(ClientPlayerEntity player)
