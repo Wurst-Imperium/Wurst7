@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -53,11 +54,8 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	{
 		ClientPlayerInteractionManager im = MC.interactionManager;
 		
-		if(MC.attackCooldown > 0)
-		{
-			im.cancelBlockBreaking();
-			return;
-		}
+		// Ignore the attack cooldown because opening any screen
+		// will set it to 10k ticks.
 		
 		if(MC.player.isRiding())
 		{
@@ -91,6 +89,7 @@ public final class AutoMineHack extends Hack implements UpdateListener
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
 			MC.particleManager.addBlockBreakingParticles(pos, side);
+			MC.player.swingHand(Hand.MAIN_HAND);
 			MC.options.attackKey.setPressed(true);
 		}
 	}
