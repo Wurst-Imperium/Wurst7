@@ -35,6 +35,7 @@ import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.hacks.RadarHack;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class RadarComponent extends Component
 {
@@ -77,8 +78,7 @@ public final class RadarComponent extends Component
 			gui.setTooltip("");
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
@@ -107,8 +107,7 @@ public final class RadarComponent extends Component
 		float ya3 = 1;
 		
 		// arrow
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-			opacity);
+		RenderUtils.setShaderColor(acColor, opacity);
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xa1, ya1, 0);

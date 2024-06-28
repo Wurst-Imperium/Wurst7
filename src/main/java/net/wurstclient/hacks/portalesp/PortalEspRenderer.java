@@ -64,12 +64,12 @@ public final class PortalEspRenderer
 			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 			ShaderProgram shader = RenderSystem.getShader();
 			
-			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.25F);
+			RenderUtils.setShaderColor(colorF, 0.25F);
 			solidBox.bind();
 			solidBox.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
 			
-			RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+			RenderUtils.setShaderColor(colorF, 0.5F);
 			outlinedBox.bind();
 			outlinedBox.draw(viewMatrix, projMatrix, shader);
 			VertexBuffer.unbind();
@@ -87,7 +87,7 @@ public final class PortalEspRenderer
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		float[] colorF = group.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		RenderUtils.setShaderColor(colorF, 0.5F);
 		
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
