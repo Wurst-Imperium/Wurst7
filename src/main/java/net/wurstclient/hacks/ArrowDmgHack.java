@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -66,15 +66,25 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		netHandler.sendPacket(
 			new ClientCommandC2SPacket(player, Mode.START_SPRINTING));
 		
-		Vec3d lookVec = player.getRotationVec(1).multiply(strength.getValue());
 		double x = player.getX();
 		double y = player.getY();
 		double z = player.getZ();
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-			x - lookVec.x, y - 1e-10, z - lookVec.z, true));
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x,
-			y + 1e-10, z, false));
+		// See ServerPlayNetworkHandler.onPlayerMove()
+		// for why it's using these numbers.
+		// Also, let me know if you find a way to bypass that check in 1.21.
+		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(500);
+		Vec3d lookVec = player.getRotationVec(1).multiply(adjustedStrength);
+		for(int i = 0; i < 4; i++)
+			sendPos(x, y, z, true);
+		sendPos(x - lookVec.x, y, z - lookVec.z, true);
+		sendPos(x, y, z, false);
+	}
+	
+	private void sendPos(double x, double y, double z, boolean onGround)
+	{
+		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
+		netHandler.sendPacket(new PositionAndOnGround(x, y, z, onGround));
 	}
 	
 	private boolean isValidItem(Item item)
