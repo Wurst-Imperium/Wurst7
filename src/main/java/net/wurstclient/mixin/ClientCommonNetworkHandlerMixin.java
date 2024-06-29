@@ -9,10 +9,10 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.network.ClientCommonNetworkHandler;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.wurstclient.event.EventManager;
@@ -22,15 +22,15 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientCommonNetworkHandlerMixin
 	implements ClientCommonPacketListener
 {
-	@Inject(at = @At("HEAD"),
-		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
-		cancellable = true)
-	private void onSendPacket(Packet<?> packet, CallbackInfo ci)
+	@Redirect(method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
+		at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"))
+	private void onSendPacket(ClientConnection connection, Packet<?> packet)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);
 		EventManager.fire(event);
 		
-		if(event.isCancelled())
-			ci.cancel();
+		if(!event.isCancelled())
+			connection.send(event.getPacket());
 	}
 }
