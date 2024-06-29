@@ -24,7 +24,7 @@ public abstract class ClientCommonNetworkHandlerMixin
 {
 	@Redirect(method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"))
+			target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"))
 	private void onSendPacket(ClientConnection connection, Packet<?> packet)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);
