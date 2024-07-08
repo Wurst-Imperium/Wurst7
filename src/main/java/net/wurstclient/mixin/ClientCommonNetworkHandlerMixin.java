@@ -9,7 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.network.ClientConnection;
@@ -22,15 +24,17 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientCommonNetworkHandlerMixin
 	implements ClientCommonPacketListener
 {
-	@Redirect(method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
+	@WrapOperation(
+		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"))
-	private void onSendPacket(ClientConnection connection, Packet<?> packet)
+	private void wrapSendPacket(ClientConnection connection, Packet<?> packet,
+		Operation<Void> original)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);
 		EventManager.fire(event);
 		
 		if(!event.isCancelled())
-			connection.send(event.getPacket());
+			original.call(connection, event.getPacket());
 	}
 }
