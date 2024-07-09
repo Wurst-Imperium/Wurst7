@@ -7,22 +7,21 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Arrays;
-
+import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.mixinterface.IKeyBinding;
 
 @SearchTags({"auto mine", "AutoBreak", "auto break"})
 public final class AutoMineHack extends Hack implements UpdateListener
 {
-	private BlockPos currentBlock;
-	
 	public AutoMineHack()
 	{
 		super("AutoMine");
@@ -45,46 +44,54 @@ public final class AutoMineHack extends Hack implements UpdateListener
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		stopMiningAndResetProgress();
+		IKeyBinding.get(MC.options.attackKey).resetPressedState();
+		MC.interactionManager.cancelBlockBreaking();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		setCurrentBlockFromHitResult();
+		ClientPlayerInteractionManager im = MC.interactionManager;
 		
-		if(currentBlock != null)
-			breakCurrentBlock();
-	}
-	
-	private void setCurrentBlockFromHitResult()
-	{
-		if(MC.crosshairTarget == null || MC.crosshairTarget.getPos() == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK
-			|| !(MC.crosshairTarget instanceof BlockHitResult))
+		if(MC.attackCooldown > 0)
 		{
-			stopMiningAndResetProgress();
+			im.cancelBlockBreaking();
 			return;
 		}
 		
-		currentBlock = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-	}
-	
-	private void breakCurrentBlock()
-	{
-		if(MC.player.getAbilities().creativeMode)
-			BlockBreaker.breakBlocksWithPacketSpam(Arrays.asList(currentBlock));
-		else
-			BlockBreaker.breakOneBlock(currentBlock);
-	}
-	
-	private void stopMiningAndResetProgress()
-	{
-		if(currentBlock == null)
+		if(MC.player.isRiding())
+		{
+			im.cancelBlockBreaking();
+			return;
+		}
+		
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
+			|| !(hitResult instanceof BlockHitResult bHitResult))
+		{
+			im.cancelBlockBreaking();
+			return;
+		}
+		
+		BlockPos pos = bHitResult.getBlockPos();
+		BlockState state = MC.world.getBlockState(pos);
+		Direction side = bHitResult.getSide();
+		if(state.isAir())
+		{
+			im.cancelBlockBreaking();
+			return;
+		}
+		
+		WURST.getHax().autoToolHack.equipIfEnabled(pos);
+		
+		if(MC.player.isUsingItem())
+			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return;
 		
-		MC.interactionManager.breakingBlock = true;
-		MC.interactionManager.cancelBlockBreaking();
-		currentBlock = null;
+		if(im.updateBlockBreakingProgress(pos, side))
+		{
+			MC.particleManager.addBlockBreakingParticles(pos, side);
+			MC.options.attackKey.setPressed(true);
+		}
 	}
 }

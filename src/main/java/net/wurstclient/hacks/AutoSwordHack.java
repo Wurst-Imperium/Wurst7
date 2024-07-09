@@ -7,9 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
@@ -156,12 +154,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
 				.orElseThrow();
 			
+			// Client-side item-specific attack damage calculation no
+			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
-			EntityType<?> group = entity.getType();
+			// EntityType<?> group = entity.getType();
 			float dmg = (float)ItemUtils
 				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
 				.orElseThrow();
-			dmg += EnchantmentHelper.getAttackDamage(stack, group);
+			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
 		

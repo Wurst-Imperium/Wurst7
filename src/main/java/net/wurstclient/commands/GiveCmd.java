@@ -103,7 +103,7 @@ public final class GiveCmd extends Command
 	{
 		try
 		{
-			return Registries.ITEM.get(new Identifier(id));
+			return Registries.ITEM.get(Identifier.of(id));
 			
 		}catch(InvalidIdentifierException e)
 		{

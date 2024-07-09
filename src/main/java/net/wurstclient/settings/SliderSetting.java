@@ -303,8 +303,10 @@ public class SliderSetting extends Setting implements SliderLock
 	{
 		public static final ValueDisplay INTEGER = v -> (int)v + "";
 		
-		public static final ValueDisplay DECIMAL =
-			v -> Math.round(v * 1e6) / 1e6 + "";
+		public static final ValueDisplay DECIMAL = v -> {
+			String s = Math.round(v * 1e6) / 1e6 + "";
+			return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
+		};
 		
 		public static final ValueDisplay PERCENTAGE =
 			v -> (int)(Math.round(v * 1e8) / 1e6) + "%";

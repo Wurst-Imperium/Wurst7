@@ -7,10 +7,12 @@
  */
 package net.wurstclient.settings;
 
+import net.minecraft.util.math.random.Random;
 import net.wurstclient.WurstClient;
 
 public final class AttackSpeedSliderSetting extends SliderSetting
 {
+	private final Random random = Random.createLocal();
 	private int tickTimer;
 	
 	public AttackSpeedSliderSetting()
@@ -35,19 +37,43 @@ public final class AttackSpeedSliderSetting extends SliderSetting
 	
 	public void resetTimer()
 	{
-		tickTimer = 0;
+		double value = getValue();
+		if(value <= 0)
+			tickTimer = -1;
+		else
+			tickTimer = (int)(1000 / value);
+	}
+	
+	public void resetTimer(double maxRandMS)
+	{
+		if(maxRandMS <= 0)
+		{
+			resetTimer();
+			return;
+		}
+		
+		double value = getValue();
+		double rand = random.nextGaussian();
+		int randOffset = (int)(rand * maxRandMS);
+		
+		if(value <= 0)
+			tickTimer = randOffset;
+		else
+			tickTimer = (int)(1000 / value) + randOffset;
 	}
 	
 	public void updateTimer()
 	{
-		tickTimer += 50;
+		if(tickTimer >= 0)
+			tickTimer -= 50;
 	}
 	
 	public boolean isTimeToAttack()
 	{
-		if(getValue() > 0)
-			return tickTimer >= 1000 / getValue();
+		double value = getValue();
+		if(value <= 0 && WurstClient.MC.player.getAttackCooldownProgress(0) < 1)
+			return false;
 		
-		return WurstClient.MC.player.getAttackCooldownProgress(0) >= 1;
+		return tickTimer <= 0;
 	}
 }

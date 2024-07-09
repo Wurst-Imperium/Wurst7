@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.settings.ColorSetting;
@@ -41,6 +41,12 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
+		if(buffer == null)
+		{
+			vertexBuffers[i] = null;
+			return;
+		}
+		
 		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);

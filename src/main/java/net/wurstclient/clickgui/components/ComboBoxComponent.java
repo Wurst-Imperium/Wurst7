@@ -19,6 +19,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -152,18 +153,17 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x4, y2, 0).next();
-		bufferBuilder.vertex(matrix, x4, y1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x4, y2, 0);
+		bufferBuilder.vertex(matrix, x4, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawBox(MatrixStack matrixStack, int x2, int x4, int y1,
@@ -175,43 +175,41 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		// background
 		float bgAlpha = hBox ? opacity * 1.5F : opacity;
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			bgAlpha);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x4, y1, 0).next();
-		bufferBuilder.vertex(matrix, x4, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x4, y1, 0);
+		bufferBuilder.vertex(matrix, x4, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x4, y1, 0).next();
-		bufferBuilder.vertex(matrix, x4, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.vertex(matrix, x4, y1, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x4, y1, 0);
+		bufferBuilder.vertex(matrix, x4, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		bufferBuilder.vertex(matrix, x4, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawArrow(MatrixStack matrixStack, int x2, int x3, int y1,
@@ -219,7 +217,6 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		float xa1 = x3 + 1;
 		float xa2 = (x3 + x2) / 2.0F;
@@ -241,22 +238,22 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		}
 		
 		// arrow
-		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa3, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa3, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawNameAndValue(DrawContext context, int x1, int x4, int y1)

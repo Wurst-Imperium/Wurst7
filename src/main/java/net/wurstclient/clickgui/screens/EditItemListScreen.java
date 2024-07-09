@@ -276,7 +276,7 @@ public final class EditItemListScreen extends Screen
 			int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registries.ITEM.get(new Identifier(name));
+			Item item = Registries.ITEM.get(Identifier.of(name));
 			ItemStack stack = new ItemStack(item);
 			TextRenderer tr = mc.textRenderer;
 			

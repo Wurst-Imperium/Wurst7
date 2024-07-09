@@ -14,7 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
@@ -30,13 +30,22 @@ import net.wurstclient.util.EntityUtils;
 @SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
 	"auto clicker"})
 public final class TriggerBotHack extends Hack
-	implements PreMotionListener, PostMotionListener
+	implements PreMotionListener, HandleInputListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SliderSetting speedRandMS =
+		new SliderSetting("Speed randomization",
+			"Helps you bypass anti-cheat plugins by varying the delay between"
+				+ " attacks.\n\n" + "\u00b1100ms is recommended for Vulcan.\n\n"
+				+ "0 (off) is fine for NoCheat+, AAC, Grim, Verus, Spartan, and"
+				+ " vanilla servers.",
+			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
+				.withSuffix("ms").withLabel(0, "off"));
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
 		"How TriggerBot should swing your hand when attacking.\n\n"
@@ -75,6 +84,7 @@ public final class TriggerBotHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(speedRandMS);
 		addSetting(swingHand);
 		addSetting(attackWhileBlocking);
 		addSetting(simulateMouseClick);
@@ -95,9 +105,9 @@ public final class TriggerBotHack extends Hack
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(PreMotionListener.class, this);
-		EVENTS.add(PostMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 	}
 	
 	@Override
@@ -110,7 +120,7 @@ public final class TriggerBotHack extends Hack
 		}
 		
 		EVENTS.remove(PreMotionListener.class, this);
-		EVENTS.remove(PostMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 	}
 	
 	@Override
@@ -124,7 +134,7 @@ public final class TriggerBotHack extends Hack
 	}
 	
 	@Override
-	public void onPostMotion()
+	public void onHandleInput()
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
@@ -160,7 +170,7 @@ public final class TriggerBotHack extends Hack
 			swingHand.swing(Hand.MAIN_HAND);
 		}
 		
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	private boolean isCorrectEntity(Entity entity)

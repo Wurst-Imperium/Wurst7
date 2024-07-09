@@ -24,6 +24,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
@@ -262,7 +264,7 @@ public final class EditBookOffersScreen extends Screen
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
-			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
+			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
@@ -270,8 +272,10 @@ public final class EditBookOffersScreen extends Screen
 			BookOffer bookOffer = list.get(index);
 			String name = bookOffer.getEnchantmentNameWithLevel();
 			
-			Enchantment enchantment = bookOffer.getEnchantment();
-			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
+			RegistryEntry<Enchantment> enchantment =
+				bookOffer.getEnchantmentEntry().get();
+			int nameColor =
+				enchantment.isIn(EnchantmentTags.CURSE) ? 0xff5555 : 0xf0f0f0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
 			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,

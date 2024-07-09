@@ -11,15 +11,13 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.MouseUpdateListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -31,7 +29,7 @@ import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 public final class AimAssistHack extends Hack
-	implements UpdateListener, RenderListener
+	implements UpdateListener, MouseUpdateListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.5, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -44,6 +42,9 @@ public final class AimAssistHack extends Hack
 		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
 			+ "360\u00b0 = aims at entities all around you.",
 		120, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final AimAtSetting aimAt = new AimAtSetting(
+		"What point in the target's hitbox AimAssist should aim at.");
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight", "Won't aim at entities behind blocks.", true);
@@ -94,6 +95,7 @@ public final class AimAssistHack extends Hack
 		addSetting(range);
 		addSetting(rotationSpeed);
 		addSetting(fov);
+		addSetting(aimAt);
 		addSetting(checkLOS);
 		addSetting(aimWhileBlocking);
 		
@@ -115,14 +117,14 @@ public final class AimAssistHack extends Hack
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(MouseUpdateListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
+		EVENTS.remove(MouseUpdateListener.class, this);
 		target = null;
 	}
 	
@@ -138,24 +140,11 @@ public final class AimAssistHack extends Hack
 		if(!aimWhileBlocking.isChecked() && MC.player.isUsingItem())
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
-		
-		if(fov.getValue() < 360.0)
-			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
-		
-		stream = entityFilters.applyTo(stream);
-		
-		target = stream
-			.min(Comparator.comparingDouble(e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())))
-			.orElse(null);
+		chooseTarget();
 		if(target == null)
 			return;
 		
-		Vec3d hitVec = target.getBoundingBox().getCenter();
+		Vec3d hitVec = aimAt.getAimPoint(target);
 		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
 		{
 			target = null;
@@ -163,40 +152,57 @@ public final class AimAssistHack extends Hack
 		}
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
-		faceEntityClient(target);
-	}
-	
-	private boolean faceEntityClient(Entity entity)
-	{
+		
 		// get needed rotation
-		Box box = entity.getBoundingBox();
-		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
+		Rotation needed = RotationUtils.getNeededRotations(hitVec);
 		
 		// turn towards center of boundingBox
 		Rotation next = RotationUtils.slowlyTurnTowards(needed,
 			rotationSpeed.getValueI() / 20F);
 		nextYaw = next.yaw();
 		nextPitch = next.pitch();
+	}
+	
+	private void chooseTarget()
+	{
+		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		
-		// check if facing center
-		if(RotationUtils.isAlreadyFacing(needed))
-			return true;
+		double rangeSq = range.getValueSq();
+		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
-		// if not facing center, check if facing anything in boundingBox
-		return RotationUtils.isFacingBox(box, range.getValue());
+		if(fov.getValue() < 360.0)
+			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
+				aimAt.getAimPoint(e)) <= fov.getValue() / 2.0);
+		
+		stream = entityFilters.applyTo(stream);
+		
+		target = stream
+			.min(Comparator.comparingDouble(
+				e -> RotationUtils.getAngleToLookVec(aimAt.getAimPoint(e))))
+			.orElse(null);
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onMouseUpdate(MouseUpdateEvent event)
 	{
-		if(target == null)
+		if(target == null || MC.player == null)
 			return;
-			
-		// Not actually rendering anything, just using this method to rotate
-		// more smoothly.
-		float oldYaw = MC.player.prevYaw;
-		float oldPitch = MC.player.prevPitch;
-		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
-		MC.player.setPitch(MathHelper.lerp(partialTicks, oldPitch, nextPitch));
+		
+		float curYaw = MC.player.getYaw();
+		float curPitch = MC.player.getPitch();
+		int diffYaw = (int)(nextYaw - curYaw);
+		int diffPitch = (int)(nextPitch - curPitch);
+		
+		// If we are <1 degree off but still missing the hitbox,
+		// slightly exaggerate the difference to fix that.
+		if(diffYaw == 0 && diffPitch == 0 && !RotationUtils
+			.isFacingBox(target.getBoundingBox(), range.getValue()))
+		{
+			diffYaw = nextYaw < curYaw ? -1 : 1;
+			diffPitch = nextPitch < curPitch ? -1 : 1;
+		}
+		
+		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
+		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
 	}
 }

@@ -16,6 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -108,19 +109,18 @@ public final class ColorComponent extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
 			opacity);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawBox(MatrixStack matrixStack, int x1, int x2, int y2,
@@ -132,29 +132,28 @@ public final class ColorComponent extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		RenderSystem.setShaderColor(color[0], color[1], color[2],
 			hovering ? 1F : opacity);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y3, 0).next();
-		bufferBuilder.vertex(matrix, x2, y3, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y3, 0);
+		bufferBuilder.vertex(matrix, x2, y3, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y3, 0).next();
-		bufferBuilder.vertex(matrix, x2, y3, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y3, 0);
+		bufferBuilder.vertex(matrix, x2, y3, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1)

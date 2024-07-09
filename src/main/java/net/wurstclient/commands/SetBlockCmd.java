@@ -87,7 +87,7 @@ public final class SetBlockCmd extends Command
 		
 		try
 		{
-			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
