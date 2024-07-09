@@ -24,10 +24,9 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientCommonNetworkHandlerMixin
 	implements ClientCommonPacketListener
 {
-	@WrapOperation(
-		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"))
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"),
+		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V")
 	private void wrapSendPacket(ClientConnection connection, Packet<?> packet,
 		Operation<Void> original)
 	{
