@@ -40,7 +40,6 @@
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
     "KeyBindingMixin",
-    "KeybindTextContentMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
     "LivingEntityRendererMixin",
@@ -63,7 +62,6 @@
     "TelemetryManagerMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "TranslatableTextContentMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],
