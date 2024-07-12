@@ -49,24 +49,16 @@ public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 	
 	public static FilterNeutralSetting genericCombat(Mode selected)
 	{
-		return new FilterNeutralSetting("When set to \u00a7lOn\u00a7r,"
-			+ " neutral mobs won't be attacked at all.\n\n"
-			+ "When set to \u00a7lIf calm\u00a7r, neutral mobs won't be"
-			+ " attacked until they attack first. Be warned that this filter"
-			+ " cannot detect if the neutral mobs are attacking you or someone"
-			+ " else.\n\n"
-			+ "When set to \u00a7lOff\u00a7r, this filter does nothing and"
-			+ " neutral mobs can be attacked.", selected);
+		return new FilterNeutralSetting(
+			"description.wurst.setting.generic.filter_neutral_combat",
+			selected);
 	}
 	
 	public static FilterNeutralSetting genericVision(Mode selected)
 	{
-		return new FilterNeutralSetting("When set to \u00a7lOn\u00a7r,"
-			+ " neutral mobs won't be shown at all.\n\n"
-			+ "When set to \u00a7lIf calm\u00a7r, neutral mobs won't be shown"
-			+ " until they attack something.\n\n"
-			+ "When set to \u00a7lOff\u00a7r, this filter does nothing and"
-			+ " neutral mobs can be shown.", selected);
+		return new FilterNeutralSetting(
+			"description.wurst.setting.generic.filter_neutral_vision",
+			selected);
 	}
 	
 	public static FilterNeutralSetting onOffOnly(String description,

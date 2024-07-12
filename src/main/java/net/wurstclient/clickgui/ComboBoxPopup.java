@@ -23,6 +23,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.util.RenderUtils;
 
 public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 {
@@ -117,7 +118,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		float[] acColor = gui.getAcColor();
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		
 		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
@@ -138,7 +139,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2], alpha);
+		RenderUtils.setShaderColor(bgColor, alpha);
 		
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);

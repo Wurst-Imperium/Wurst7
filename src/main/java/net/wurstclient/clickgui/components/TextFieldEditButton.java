@@ -31,6 +31,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditTextFieldScreen;
 import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class TextFieldEditButton extends Component
 {
@@ -99,8 +100,7 @@ public final class TextFieldEditButton extends Component
 			gui.setTooltip(ChatUtils.wrapText(setting.getValue(), 200));
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);
@@ -110,8 +110,7 @@ public final class TextFieldEditButton extends Component
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// box
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			hBox ? opacity * 1.5F : opacity);
+		RenderUtils.setShaderColor(bgColor, hBox ? opacity * 1.5F : opacity);
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y3, 0);
@@ -119,7 +118,7 @@ public final class TextFieldEditButton extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0);
 		bufferBuilder.vertex(matrix, x2, y3, 0);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y3, 0);

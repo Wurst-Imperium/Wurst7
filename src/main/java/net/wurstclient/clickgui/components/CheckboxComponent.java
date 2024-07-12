@@ -26,6 +26,7 @@ import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.util.RenderUtils;
 
 public final class CheckboxComponent extends Component
 {
@@ -119,8 +120,7 @@ public final class CheckboxComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0);
@@ -140,7 +140,7 @@ public final class CheckboxComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		RenderUtils.setShaderColor(bgColor,
 			hovering ? opacity * 1.5F : opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -150,7 +150,7 @@ public final class CheckboxComponent extends Component
 		bufferBuilder.vertex(matrix, x3, y1, 0);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);

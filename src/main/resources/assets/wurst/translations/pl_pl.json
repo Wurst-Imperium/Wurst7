@@ -10,7 +10,6 @@
   "description.wurst.hack.antiwaterpush": "Zapobiega popychaniu cię przez wodę.",
   "description.wurst.hack.antiwobble": "Wyłącza efekt chwiania wywołany przez mdłości i portale.",
   "description.wurst.hack.arrowdmg": "Znacznie zwiększa obrażenia zadawane przez strzały, jednak jednocześnie pochłania mnóstwo głodu i zmniejsza celność.\n\nNie działa z kuszami i wygląda na to, że jest spatchowany na serwerach Paper.",
-  "description.wurst.setting.arrowdmg.packets": "Ilość wysłanych pakietów.\nWięcej pakietów = więcej obrażeń.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Po aktywacji, trójzęby lecą znacznie dalej. Wygląda na to, że nie wpływa to na obrażenia i zaklęcie Torpeda/Riptide.\n\n§c§lOSTRZEŻENIE:§r Przez tą opcję możesz łatwo zgubić trójząb!",
   "description.wurst.hack.autoarmor": "Automatycznie zarządza twoją zbroją.",
   "description.wurst.hack.autobuild": "Automatycznie buduje rzeczy.\nUmieść pojedynczy blok, aby rozpocząć budowanie.",

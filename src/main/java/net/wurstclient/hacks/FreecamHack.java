@@ -192,8 +192,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		color.setAsShaderColor(0.5F);
 		
 		// box
 		matrixStack.push();

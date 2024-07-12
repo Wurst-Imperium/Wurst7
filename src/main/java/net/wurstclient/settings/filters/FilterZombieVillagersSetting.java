@@ -26,12 +26,14 @@ public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 	public static FilterZombieVillagersSetting genericCombat(boolean checked)
 	{
 		return new FilterZombieVillagersSetting(
-			"Won't attack zombified villagers.", checked);
+			"description.wurst.setting.generic.filter_zombie_villagers_combat",
+			checked);
 	}
 	
 	public static FilterZombieVillagersSetting genericVision(boolean checked)
 	{
 		return new FilterZombieVillagersSetting(
-			"Won't show zombified villagers.", checked);
+			"description.wurst.setting.generic.filter_zombie_villagers_vision",
+			checked);
 	}
 }

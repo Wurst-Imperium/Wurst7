@@ -82,8 +82,6 @@ public final class NewChunksRenderer
 		ShaderProgram shader = RenderSystem.getShader();
 		
 		float alpha = opacity.getValueF();
-		float[] newColorF = newChunksColor.getColorF();
-		float[] oldColorF = oldChunksColor.getColorF();
 		double altitudeD = altitude.getValue();
 		
 		for(int i = 0; i < vertexBuffers.length; i++)
@@ -97,11 +95,9 @@ public final class NewChunksRenderer
 				matrixStack.translate(0, altitudeD, 0);
 			
 			if(i < 2)
-				RenderSystem.setShaderColor(newColorF[0], newColorF[1],
-					newColorF[2], alpha);
+				newChunksColor.setAsShaderColor(alpha);
 			else
-				RenderSystem.setShaderColor(oldColorF[0], oldColorF[1],
-					oldColorF[2], alpha);
+				oldChunksColor.setAsShaderColor(alpha);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			buffer.bind();

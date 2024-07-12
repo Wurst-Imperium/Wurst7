@@ -301,8 +301,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// background
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				0.75F);
+			RenderUtils.setShaderColor(bgColor, 0.75F);
 			BufferBuilder bufferBuilder = tessellator
 				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xt1, yt1, 0);
@@ -312,8 +311,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// outline
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
+			RenderUtils.setShaderColor(acColor, 0.5F);
 			bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 			bufferBuilder.vertex(matrix, xt1, yt1, 0);
@@ -397,7 +395,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShaderColor(0, 1, 0,
 				renderAsHovered ? opacity * 1.5F : opacity);
 		else
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			RenderUtils.setShaderColor(bgColor,
 				renderAsHovered ? opacity * 1.5F : opacity);
 		
 		// tooltip
@@ -427,7 +425,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		int by1 = area.y + 2;
 		int by2 = by1 + area.height - 4;
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, bx1, by1, 0);

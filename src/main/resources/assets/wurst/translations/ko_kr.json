@@ -9,7 +9,6 @@
   "description.wurst.hack.antiknockback": "플레이어나 몹으로부터 넉백을 받지 않도록 합니다.",
   "description.wurst.hack.antispam": "반복된 메시지에 카운터를 추가하여 채팅 스팸을 차단합니다.",
   "description.wurst.hack.antiwaterpush": "물에 밀리는 것을 방지합니다.",
-  "description.wurst.setting.arrowdmg.packets": "전송할 패킷 수.\n패킷이 많을수록 공격력이 높아집니다.",
   "description.wurst.hack.autoarmor": "자동으로 방어구를 관리합니다.",
   "description.wurst.hack.autobuild": "자동으로 건물을 건설합니다.\n한 개의 블록을 놓으면 건설을 시작합니다.",
   "description.wurst.hack.autocomplete": "대형 언어 모델을 사용하여 채팅 메시지를 자동 완성합니다. OpenAI 계정 API 접근 권한 또는 OpenAI와 호환되는 다른 언어 모델 API가 필요합니다.",

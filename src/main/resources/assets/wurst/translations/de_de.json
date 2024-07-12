@@ -11,7 +11,7 @@
   "description.wurst.hack.antiwaterpush": "Verhindert dass du von fließendem Wasser weggeschubst wirst.",
   "description.wurst.hack.antiwobble": "Entfernt den Wabbel-Effekt von Übelkeit und Netherportalen.",
   "description.wurst.hack.arrowdmg": "Erhöht massiv den Schaden von Pfeilen, verbraucht aber auch jede Menge Hunger und reduziert die Zielgenauigkeit.\n\nFunktioniert nicht mit Armbrüsten und scheint auf Paper-Servern gepatcht zu sein.",
-  "description.wurst.setting.arrowdmg.packets": "Menge der Packets, die gesendet werden.\nMehr Packets = mehr Schaden.",
+  "description.wurst.setting.arrowdmg.strength": "Intensität des Effekts. 10 ist seit Minecraft 1.21 der höchstmögliche Wert.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Wenn aktiviert, fliegen Dreizacke viel weiter. Scheint den Schaden und die Sog/Riptide-Verzauberung nicht zu beeinflussen.\n\n§c§lWARNUNG:§r Du kannst durch diese Option sehr einfach deinen Dreizack verlieren!",
   "description.wurst.hack.autoarmor": "Zieht automatisch deine beste Rüstung an.",
   "description.wurst.hack.autobuild": "Baut die ausgewählte Vorlage (Template) automatisch.\nPlatziere manuell einen Block, um Bauprozess zu starten.",

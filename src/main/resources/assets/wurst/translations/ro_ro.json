@@ -8,7 +8,6 @@
   "description.wurst.hack.antiwaterpush": "Te previne din a fi impins de catre apa.",
   "description.wurst.hack.antiwobble": "Opreste efectul wobble cauzat de greata si portale.",
   "description.wurst.hack.arrowdmg": "O crestere semnificativa de damage cu arcul, dar consuma mult hunger si scade din acuratete.\n\nNu functioneaza cu arbalete si nu pare sa functioneze pe serverele Paper.",
-  "description.wurst.setting.arrowdmg.packets": "Cantitatea de pachete de retea de trimis.\nMai multe pachete = mai mult damage.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Odata activat, tridentele zboara mult mai departe. Nu pare sa afecteze damage-ul sau Riptide-ul.\n\n§c§lATENTIE:§r Poti sa iti pierzi tridentul cu usurinta prin activarea acestei optiuni.",
   "description.wurst.hack.autoarmor": "Armura ta este administrata instant.",
   "description.wurst.hack.autobuild": "Construieste lucruri automat.\nPlaseaza un singur block pentru a incepe.",

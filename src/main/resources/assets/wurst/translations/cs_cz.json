@@ -10,7 +10,6 @@
   "description.wurst.hack.antiwaterpush": "Zabraňuje posouvání vodou.",
   "description.wurst.hack.antiwobble": "Zabraňuje viklavému efektu způsobenému nevolností a portály.",
   "description.wurst.hack.arrowdmg": "Masivně zvyšuje poškození šípem, ale také spotřebovává hodně hladu a snižuje přesnost.\n\nNefunguje s kušemi a zdá se nefunkční na Paper serverech.",
-  "description.wurst.setting.arrowdmg.packets": "Množství odeslaných paketů.\nVíce paketů = větší poškození.",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "Povolením, trojzubce létají mnohem dál. Nezdá se, že by to mělo vliv na poškození nebo Mocný záběr.\n\n§c§lUPOZORNĚNÍ:§r Povolením této možnosti můžete snadno přijít o trojzubec!",
   "description.wurst.hack.autoarmor": "Automaticky přehazuje vaše brnění.",
   "description.wurst.hack.autobuild": "Automaticky staví.\nUmístěte blok k započatí stavby.",
