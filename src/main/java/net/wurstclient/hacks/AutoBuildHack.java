@@ -210,27 +210,22 @@ public final class AutoBuildHack extends Hack
 	
 	private void placeNextBlock()
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		
 		for(BlockPos pos : remainingBlocks)
-			if(tryToPlace(pos, eyesPos, rangeSq))
-				break;
-	}
-	
-	private boolean tryToPlace(BlockPos pos, Vec3d eyesPos, double rangeSq)
-	{
-		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-		if(params == null || params.distanceSq() > rangeSq)
-			return false;
-		if(checkLOS.isChecked() && !params.lineOfSight())
-			return false;
-		
-		MC.itemUseCooldown = 4;
-		RotationUtils.getNeededRotations(params.hitVec())
-			.sendPlayerLookPacket();
-		InteractionSimulator.rightClickBlock(params.toHitResult());
-		return true;
+		{
+			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+			if(params == null || params.distanceSq() > rangeSq)
+				continue;
+			if(checkLOS.isChecked() && !params.lineOfSight())
+				continue;
+			
+			MC.itemUseCooldown = 4;
+			RotationUtils.getNeededRotations(params.hitVec())
+				.sendPlayerLookPacket();
+			InteractionSimulator.rightClickBlock(params.toHitResult());
+			break;
+		}
 	}
 	
 	@Override
