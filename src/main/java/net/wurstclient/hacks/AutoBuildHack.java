@@ -287,16 +287,16 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.BUILDING)
 			return;
 		
-		float scale = 1F * 7F / 8F;
-		double offset = (1D - scale) / 2D;
+		float scale = 7F / 8F;
+		double offset = (1.0 - scale) / 2.0;
 		Vec3d eyesPos = RotationUtils.getEyesPos();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		
 		matrixStack.push();
 		
@@ -339,11 +339,11 @@ public final class AutoBuildHack extends Hack
 	private void drawGreenBox(MatrixStack matrixStack)
 	{
 		GL11.glDepthMask(false);
-		RenderSystem.setShaderColor(0F, 1F, 0F, 0.15F);
+		RenderSystem.setShaderColor(0, 1, 0, 0.15F);
 		RenderUtils.drawSolidBox(matrixStack);
 		GL11.glDepthMask(true);
 		
-		RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		RenderUtils.drawOutlinedBox(matrixStack);
 	}
 	
