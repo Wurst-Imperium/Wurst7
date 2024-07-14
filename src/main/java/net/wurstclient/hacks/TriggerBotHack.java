@@ -136,6 +136,9 @@ public final class TriggerBotHack extends Hack
 	@Override
 	public void onHandleInput()
 	{
+		if(MC.player == null)
+			return;
+		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
 			return;
