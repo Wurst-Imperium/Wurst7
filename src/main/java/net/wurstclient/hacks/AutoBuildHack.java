@@ -19,7 +19,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -30,18 +29,13 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.AutoBuildTemplate;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.DefaultAutoBuildTemplates;
-import net.wurstclient.util.RegionPos;
-import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
+import net.wurstclient.util.*;
+import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.json.JsonException;
 
 public final class AutoBuildHack extends Hack
@@ -226,46 +220,17 @@ public final class AutoBuildHack extends Hack
 	
 	private boolean tryToPlace(BlockPos pos, Vec3d eyesPos, double rangeSq)
 	{
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+		if(params == null || params.distanceSq() > rangeSq)
+			return false;
+		if(checkLOS.isChecked() && !params.lineOfSight())
+			return false;
 		
-		for(Direction side : Direction.values())
-		{
-			BlockPos neighbor = pos.offset(side);
-			
-			// check if neighbor can be right clicked
-			if(!BlockUtils.canBeClicked(neighbor)
-				|| BlockUtils.getState(neighbor).isReplaceable())
-				continue;
-			
-			Vec3d dirVec = Vec3d.of(side.getVector());
-			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
-			
-			// check if hitVec is within range
-			if(eyesPos.squaredDistanceTo(hitVec) > rangeSq)
-				continue;
-			
-			// check if side is visible (facing away from player)
-			if(distanceSqPosVec > eyesPos.squaredDistanceTo(posVec.add(dirVec)))
-				continue;
-			
-			// check line of sight
-			if(checkLOS.isChecked()
-				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
-				continue;
-			
-			// face block
-			RotationUtils.getNeededRotations(hitVec).sendPlayerLookPacket();
-			
-			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			MC.itemUseCooldown = 4;
-			return true;
-		}
-		
-		return false;
+		MC.itemUseCooldown = 4;
+		RotationUtils.getNeededRotations(params.hitVec())
+			.sendPlayerLookPacket();
+		InteractionSimulator.rightClickBlock(params.toHitResult());
+		return true;
 	}
 	
 	@Override
@@ -298,37 +263,19 @@ public final class AutoBuildHack extends Hack
 	
 	private void buildInstantly()
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		
 		for(BlockPos pos : remainingBlocks)
 		{
 			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
-			Vec3d posVec = Vec3d.ofCenter(pos);
+			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+			if(params == null || params.distanceSq() > rangeSq)
+				continue;
 			
-			for(Direction side : Direction.values())
-			{
-				BlockPos neighbor = pos.offset(side);
-				
-				// check if neighbor can be right-clicked
-				if(!BlockUtils.canBeClicked(neighbor))
-					continue;
-				
-				Vec3d sideVec = Vec3d.of(side.getVector());
-				Vec3d hitVec = posVec.add(sideVec.multiply(0.5));
-				
-				// check if hitVec is within range
-				if(eyesPos.squaredDistanceTo(hitVec) > rangeSq)
-					continue;
-				
-				// place block
-				im.rightClickBlock(neighbor, side.getOpposite(), hitVec);
-				
-				break;
-			}
+			InteractionSimulator.rightClickBlock(params.toHitResult(),
+				SwingHand.OFF);
 		}
 		
 		remainingBlocks.clear();
