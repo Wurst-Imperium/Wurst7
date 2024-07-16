@@ -24,7 +24,7 @@ public final class ModelSettings
 	public final EnumSetting<OpenAiModel> openAiModel = new EnumSetting<>(
 		"OpenAI model",
 		"The model to use for OpenAI API calls.\nRecommended models:\n\n"
-			+ "\u00a7lGPT-4o-2024-05-13\u00a7r is the world's smartest model at"
+			+ "\u00a7lGPT-4o-2024-05-13\u00a7r is one of the smartest models at"
 			+ " the time of writing and will often produce the best completions."
 			+ " However, it's meant to be an assistant rather than an"
 			+ " auto-completion system, so you will see it produce some odd"
