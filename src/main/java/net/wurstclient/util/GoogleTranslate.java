@@ -23,12 +23,16 @@ public enum GoogleTranslate
 {
 	;
 	
+	private static final Pattern ALL_WHITESPACE = Pattern.compile("\\s+");
+	
 	public static String translate(String text, String langFrom, String langTo)
 	{
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
 		
-		if(text.equalsIgnoreCase(translated))
+		// Detect if Google translate returned the original text, maybe with
+		// some whitespace or capitalization changes, and return null if so
+		if(simplify(text).equals(simplify(translated)))
 			return null;
 		
 		return translated;
@@ -96,14 +100,20 @@ public enum GoogleTranslate
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		
 		Matcher matcher = pattern.matcher(html);
-		matcher.find();
-		String match = matcher.group(1);
+		if(!matcher.find())
+			return null;
 		
+		String match = matcher.group(1);
 		if(match == null || match.isEmpty())
 			return null;
 			
 		// deprecated in favor of org.apache.commons.text.StringEscapeUtils,
 		// which isn't bundled with Minecraft
 		return org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(match);
+	}
+	
+	private static String simplify(String text)
+	{
+		return ALL_WHITESPACE.matcher(text).replaceAll("").toLowerCase();
 	}
 }
