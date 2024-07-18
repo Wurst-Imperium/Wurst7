@@ -100,9 +100,10 @@ public enum GoogleTranslate
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		
 		Matcher matcher = pattern.matcher(html);
-		matcher.find();
-		String match = matcher.group(1);
+		if(!matcher.find())
+			return null;
 		
+		String match = matcher.group(1);
 		if(match == null || match.isEmpty())
 			return null;
 			
