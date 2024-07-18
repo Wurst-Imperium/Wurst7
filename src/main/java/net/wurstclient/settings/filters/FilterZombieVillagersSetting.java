@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -26,12 +26,14 @@ public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 	public static FilterZombieVillagersSetting genericCombat(boolean checked)
 	{
 		return new FilterZombieVillagersSetting(
-			"Won't attack zombified villagers.", checked);
+			"description.wurst.setting.generic.filter_zombie_villagers_combat",
+			checked);
 	}
 	
 	public static FilterZombieVillagersSetting genericVision(boolean checked)
 	{
 		return new FilterZombieVillagersSetting(
-			"Won't show zombified villagers.", checked);
+			"description.wurst.setting.generic.filter_zombie_villagers_vision",
+			checked);
 	}
 }

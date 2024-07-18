@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,7 +16,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -27,6 +26,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.events.HandleInputListener;
+import net.wurstclient.events.MouseUpdateListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -35,23 +36,34 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
-import net.wurstclient.util.RotationUtils.Rotation;
 
-public final class KillauraLegitHack extends Hack
-	implements UpdateListener, RenderListener
+public final class KillauraLegitHack extends Hack implements UpdateListener,
+	HandleInputListener, MouseUpdateListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SliderSetting speedRandMS =
+		new SliderSetting("Speed randomization",
+			"Helps you bypass anti-cheat plugins by varying the delay between"
+				+ " attacks.\n\n" + "\u00b1100ms is recommended for Vulcan.\n\n"
+				+ "0 (off) is fine for NoCheat+, AAC, Grim, Verus, Spartan, and"
+				+ " vanilla servers.",
+			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
+				.withSuffix("ms").withLabel(0, "off"));
 	
 	private final SliderSetting rotationSpeed =
 		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
@@ -68,6 +80,11 @@ public final class KillauraLegitHack extends Hack
 		"Field Of View - how far away from your crosshair an entity can be before it's ignored.\n"
 			+ "360\u00b0 = entities can be attacked all around you.",
 		360, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final SwingHandSetting swingHand =
+		SwingHandSetting.withoutOffOption(
+			"How KillauraLegit should swing your hand when attacking.",
+			SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -116,9 +133,11 @@ public final class KillauraLegitHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(speedRandMS);
 		addSetting(rotationSpeed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(swingHand);
 		addSetting(damageIndicator);
 		
 		entityFilters.forEach(this::addSetting);
@@ -138,8 +157,10 @@ public final class KillauraLegitHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
+		EVENTS.add(MouseUpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -147,6 +168,8 @@ public final class KillauraLegitHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
+		EVENTS.remove(MouseUpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		target = null;
 	}
@@ -154,18 +177,14 @@ public final class KillauraLegitHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		speed.updateTimer();
-		if(!speed.isTimeToAttack())
-			return;
+		target = null;
 		
 		// don't attack when a container/inventory screen is open
 		if(MC.currentScreen instanceof HandledScreen)
 			return;
 		
-		ClientPlayerEntity player = MC.player;
-		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
@@ -178,8 +197,6 @@ public final class KillauraLegitHack extends Hack
 		if(target == null)
 			return;
 		
-		WURST.getHax().autoSwordHack.setSlot();
-		
 		// check line of sight
 		if(!BlockUtils.hasLineOfSight(target.getBoundingBox().getCenter()))
 		{
@@ -188,14 +205,29 @@ public final class KillauraLegitHack extends Hack
 		}
 		
 		// face entity
-		if(!faceEntityClient(target))
+		WURST.getHax().autoSwordHack.setSlot(target);
+		faceEntityClient(target);
+	}
+	
+	@Override
+	public void onHandleInput()
+	{
+		if(target == null)
+			return;
+		
+		speed.updateTimer();
+		if(!speed.isTimeToAttack())
+			return;
+		
+		if(!RotationUtils.isFacingBox(target.getBoundingBox(),
+			range.getValue()))
 			return;
 		
 		// attack entity
 		WURST.getHax().criticalsHack.doCritical();
-		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
-		speed.resetTimer();
+		MC.interactionManager.attackEntity(MC.player, target);
+		swingHand.swing(Hand.MAIN_HAND);
+		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	private boolean faceEntityClient(Entity entity)
@@ -207,8 +239,8 @@ public final class KillauraLegitHack extends Hack
 		// turn towards center of boundingBox
 		Rotation next = RotationUtils.slowlyTurnTowards(needed,
 			rotationSpeed.getValueI() / 20F);
-		nextYaw = next.getYaw();
-		nextPitch = next.getPitch();
+		nextYaw = next.yaw();
+		nextPitch = next.pitch();
 		
 		// check if facing center
 		if(RotationUtils.isAlreadyFacing(needed))
@@ -219,17 +251,24 @@ public final class KillauraLegitHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onMouseUpdate(MouseUpdateEvent event)
 	{
-		if(target == null)
+		if(target == null || MC.player == null)
 			return;
 		
-		float oldYaw = MC.player.prevYaw;
-		float oldPitch = MC.player.prevPitch;
-		MC.player.setYaw(MathHelper.lerp(partialTicks, oldYaw, nextYaw));
-		MC.player.setPitch(MathHelper.lerp(partialTicks, oldPitch, nextPitch));
+		int diffYaw = (int)(nextYaw - MC.player.getYaw());
+		int diffPitch = (int)(nextPitch - MC.player.getPitch());
+		if(MathHelper.abs(diffYaw) < 1 && MathHelper.abs(diffPitch) < 1)
+			return;
 		
-		if(!damageIndicator.isChecked())
+		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
+		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
+	}
+	
+	@Override
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		if(target == null || !damageIndicator.isChecked())
 			return;
 		
 		// GL settings

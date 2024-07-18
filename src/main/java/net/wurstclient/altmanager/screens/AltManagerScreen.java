@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -38,6 +38,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -86,14 +87,15 @@ public final class AltManagerScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, altManager.getList());
+		WurstClient wurst = WurstClient.INSTANCE;
 		
 		Exception folderException = altManager.getFolderException();
 		if(folderException != null && shouldAsk)
 		{
-			Text title =
-				Text.translatable("gui.wurst.altmanager.folder_error.title");
-			Text message = Text.translatable(
-				"gui.wurst.altmanager.folder_error.message", folderException);
+			Text title = Text.literal(
+				wurst.translate("gui.wurst.altmanager.folder_error.title"));
+			Text message = Text.literal(wurst.translate(
+				"gui.wurst.altmanager.folder_error.message", folderException));
 			Text buttonText = Text.translatable("gui.done");
 			
 			// This just sets shouldAsk to false and closes the message.
@@ -105,9 +107,10 @@ public final class AltManagerScreen extends Screen
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
 		{
-			Text title = Text.translatable("gui.wurst.altmanager.empty.title");
-			Text message =
-				Text.translatable("gui.wurst.altmanager.empty.message");
+			Text title = Text
+				.literal(wurst.translate("gui.wurst.altmanager.empty.title"));
+			Text message = Text
+				.literal(wurst.translate("gui.wurst.altmanager.empty.message"));
 			BooleanConsumer callback = this::confirmGenerate;
 			
 			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
@@ -420,7 +423,6 @@ public final class AltManagerScreen extends Screen
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// skin preview
@@ -457,13 +459,13 @@ public final class AltManagerScreen extends Screen
 			
 			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
 			
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, height, 0).next();
-			bufferBuilder.vertex(matrix, 0, height, 0).next();
-			tessellator.draw();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, 0, 0, 0);
+			bufferBuilder.vertex(matrix, width, 0, 0);
+			bufferBuilder.vertex(matrix, width, height, 0);
+			bufferBuilder.vertex(matrix, 0, height, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glDisable(GL11.GL_BLEND);
@@ -644,7 +646,6 @@ public final class AltManagerScreen extends Screen
 			MatrixStack matrixStack = context.getMatrices();
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
 			RenderSystem.setShader(GameRenderer::getPositionProgram);
 			
 			// green glow when logged in
@@ -659,13 +660,13 @@ public final class AltManagerScreen extends Screen
 				
 				RenderSystem.setShaderColor(0, 1, 0, opacity);
 				
-				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION);
-				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
-				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
-				tessellator.draw();
+				BufferBuilder bufferBuilder = tessellator
+					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				bufferBuilder.vertex(matrix, x - 2, y - 2, 0);
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0);
+				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0);
+				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0);
+				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 				
 				GL11.glEnable(GL11.GL_CULL_FACE);
 				GL11.glDisable(GL11.GL_BLEND);

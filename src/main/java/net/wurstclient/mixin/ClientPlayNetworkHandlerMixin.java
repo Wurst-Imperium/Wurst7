@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,7 +23,7 @@ import net.minecraft.network.listener.TickablePacketListener;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkData;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ServerMetadataS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -42,15 +42,15 @@ public abstract class ClientPlayNetworkHandlerMixin
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "onServerMetadata(Lnet/minecraft/network/packet/s2c/play/ServerMetadataS2CPacket;)V")
-	public void onOnServerMetadata(ServerMetadataS2CPacket packet,
-		CallbackInfo ci)
+		method = "onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
+	public void onOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
+		WurstClient wurst = WurstClient.INSTANCE;
+		if(!wurst.isEnabled())
 			return;
 		
 		// Remove Mojang's dishonest warning toast on safe servers
-		if(!packet.isSecureChatEnforced())
+		if(!packet.enforcesSecureChat())
 		{
 			client.getToastManager().toastQueue.removeIf(toast -> toast
 				.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);
@@ -58,10 +58,10 @@ public abstract class ClientPlayNetworkHandlerMixin
 		}
 		
 		// Add an honest warning toast on unsafe servers
-		MutableText title = Text.literal(ChatUtils.WURST_PREFIX).append(
-			Text.translatable("toast.wurst.nochatreports.unsafe_server.title"));
-		MutableText message = Text
-			.translatable("toast.wurst.nochatreports.unsafe_server.message");
+		MutableText title = Text.literal(ChatUtils.WURST_PREFIX
+			+ wurst.translate("toast.wurst.nochatreports.unsafe_server.title"));
+		MutableText message = Text.literal(
+			wurst.translate("toast.wurst.nochatreports.unsafe_server.message"));
 		
 		SystemToast systemToast = SystemToast.create(client,
 			SystemToast.Type.UNSECURE_SERVER_WARNING, title, message);

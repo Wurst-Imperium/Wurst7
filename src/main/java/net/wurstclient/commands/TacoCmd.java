@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -20,15 +20,16 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.util.RenderUtils;
 
 public final class TacoCmd extends Command
 	implements GUIRenderListener, UpdateListener
 {
 	private final Identifier[] tacos =
-		{new Identifier("wurst", "dancingtaco1.png"),
-			new Identifier("wurst", "dancingtaco2.png"),
-			new Identifier("wurst", "dancingtaco3.png"),
-			new Identifier("wurst", "dancingtaco4.png")};
+		{Identifier.of("wurst", "dancingtaco1.png"),
+			Identifier.of("wurst", "dancingtaco2.png"),
+			Identifier.of("wurst", "dancingtaco3.png"),
+			Identifier.of("wurst", "dancingtaco4.png")};
 	
 	private boolean enabled;
 	private int ticks = 0;
@@ -89,11 +90,8 @@ public final class TacoCmd extends Command
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		if(WURST.getHax().rainbowUiHack.isEnabled())
-		{
-			float[] acColor = WURST.getGui().getAcColor();
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 1);
-			
-		}else
+			RenderUtils.setShaderColor(WURST.getGui().getAcColor(), 1);
+		else
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Window sr = MC.getWindow();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,6 +21,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.BlockUtils;
 
 @SearchTags({"FastMine", "SpeedMine", "SpeedyGonzales", "fast break",
 	"fast mine", "speed mine", "speedy gonzales", "NoBreakDelay",
@@ -99,6 +100,10 @@ public final class FastBreakHack extends Hack
 			lastBlockPos = blockPos;
 			fastBreakBlock = random.nextDouble() <= activationChance.getValue();
 		}
+		
+		// Ignore unbreakable blocks to avoid slowdown issue
+		if(BlockUtils.isUnbreakable(blockPos))
+			return;
 		
 		if(!fastBreakBlock)
 			return;

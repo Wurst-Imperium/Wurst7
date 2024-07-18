@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,6 +25,8 @@ public final class FilterCrystalsSetting extends EntityFilterCheckbox
 	
 	public static FilterCrystalsSetting genericCombat(boolean checked)
 	{
-		return new FilterCrystalsSetting("Won't attack end crystals.", checked);
+		return new FilterCrystalsSetting(
+			"description.wurst.setting.generic.filter_crystals_combat",
+			checked);
 	}
 }

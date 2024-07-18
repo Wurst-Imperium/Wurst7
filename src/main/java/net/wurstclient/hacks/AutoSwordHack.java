@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,10 +9,12 @@ package net.wurstclient.hacks;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.MaceItem;
 import net.minecraft.item.ToolItem;
+import net.minecraft.item.TridentItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -33,12 +35,13 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back",
-		"Switches back to the previously selected slot after \u00a7lRelease time\u00a7r has passed.",
+		"Switch back", "Switches back to the previously selected slot after"
+			+ " \u00a7lRelease time\u00a7r has passed.",
 		true);
 	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
-		"Time until AutoSword will switch back from the weapon to the previously selected slot.\n\n"
+		"Time until AutoSword will switch back from the weapon to the"
+			+ " previously selected slot.\n\n"
 			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
 		10, 1, 200, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
@@ -57,14 +60,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		oldSlot = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		resetSlot();
@@ -80,7 +83,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			
 			if(entity instanceof LivingEntity
 				&& EntityUtils.IS_ATTACKABLE.test(entity))
-				setSlot();
+				setSlot(entity);
 		}
 		
 		// update timer
@@ -93,7 +96,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		resetSlot();
 	}
 	
-	public void setSlot()
+	public void setSlot(Entity entity)
 	{
 		// check if active
 		if(!isEnabled())
@@ -112,10 +115,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			if(MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
-			Item item = MC.player.getInventory().getStack(i).getItem();
-			
-			// get damage
-			float value = getValue(item);
+			// get weapon value
+			ItemStack stack = MC.player.getInventory().getStack(i);
+			float value = getValue(stack, entity);
 			
 			// compare with previous best weapon
 			if(value > bestValue)
@@ -140,21 +142,34 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		timer = releaseTime.getValueI();
 	}
 	
-	private float getValue(Item item)
+	private float getValue(ItemStack stack, Entity entity)
 	{
+		Item item = stack.getItem();
+		if(!(item instanceof ToolItem || item instanceof TridentItem
+			|| item instanceof MaceItem))
+			return Integer.MIN_VALUE;
+		
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			if(item instanceof ToolItem tool)
-				return ItemUtils.getAttackSpeed(tool);
-			break;
+			return (float)ItemUtils
+				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
+				.orElseThrow();
 			
+			// Client-side item-specific attack damage calculation no
+			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
-			if(item instanceof SwordItem sword)
-				return sword.getAttackDamage();
-			if(item instanceof MiningToolItem miningTool)
-				return miningTool.getAttackDamage();
-			break;
+			// EntityType<?> group = entity.getType();
+			float dmg = (float)ItemUtils
+				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
+				.orElseThrow();
+			
+			// Check for mace, get bonus damage from fall
+			if(item instanceof MaceItem mace)
+				dmg = mace.getBonusAttackDamage(MC.player, dmg,
+					entity.getDamageSources().playerAttack(MC.player));
+			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
+			return dmg;
 		}
 		
 		return Integer.MIN_VALUE;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -71,7 +71,7 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registries.BLOCK.get(new Identifier(name));
+			return Registries.BLOCK.get(Identifier.of(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
@@ -98,7 +98,7 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
@@ -110,6 +110,11 @@ public enum BlockUtils
 	public static float getHardness(BlockPos pos)
 	{
 		return getState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos);
+	}
+	
+	public static boolean isUnbreakable(BlockPos pos)
+	{
+		return getBlock(pos).getHardness() < 0;
 	}
 	
 	private static VoxelShape getOutlineShape(BlockPos pos)
@@ -132,13 +137,18 @@ public enum BlockUtils
 		return getState(pos).isOpaqueFullCube(MC.world, pos);
 	}
 	
-	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	public static BlockHitResult raycast(Vec3d from, Vec3d to,
+		RaycastContext.FluidHandling fluidHandling)
 	{
-		RaycastContext context =
-			new RaycastContext(from, to, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player);
+		RaycastContext context = new RaycastContext(from, to,
+			RaycastContext.ShapeType.COLLIDER, fluidHandling, MC.player);
 		
 		return MC.world.raycast(context);
+	}
+	
+	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	{
+		return raycast(from, to, RaycastContext.FluidHandling.NONE);
 	}
 	
 	public static boolean hasLineOfSight(Vec3d from, Vec3d to)

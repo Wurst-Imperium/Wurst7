@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -19,8 +19,9 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 
-@SearchTags({"ArrayList", "ModList", "CheatList", "mod list", "array list",
-	"hack list", "cheat list"})
+@SearchTags({"hack list", "HakList", "hak list", "HacksList", "hacks list",
+	"HaxList", "hax list", "ArrayList", "array list", "ModList", "mod list",
+	"CheatList", "cheat list"})
 @DontBlock
 public final class HackListOtf extends OtherFeature
 {

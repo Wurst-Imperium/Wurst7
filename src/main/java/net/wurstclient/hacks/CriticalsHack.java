@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -40,13 +41,13 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(LeftClickListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(LeftClickListener.class, this);
 	}
@@ -66,6 +67,10 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	public void doCritical()
 	{
 		if(!isEnabled())
+			return;
+		
+		if(WURST.getHax().maceDmgHack.isEnabled()
+			&& MC.player.getMainHandStack().isOf(Items.MACE))
 			return;
 		
 		if(!MC.player.isOnGround())

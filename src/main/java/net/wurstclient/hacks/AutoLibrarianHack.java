@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -16,17 +17,21 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.SelectMerchantTradeC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -69,10 +74,11 @@ public final class AutoLibrarianHack extends Hack
 			+ "You can also set a maximum price for each book, in case you"
 			+ " already have a villager selling it but you want it for a"
 			+ " cheaper price.",
-		"minecraft:depth_strider", "minecraft:efficiency",
-		"minecraft:feather_falling", "minecraft:fortune", "minecraft:looting",
-		"minecraft:mending", "minecraft:protection", "minecraft:respiration",
-		"minecraft:sharpness", "minecraft:silk_touch", "minecraft:unbreaking");
+		"minecraft:depth_strider;3", "minecraft:efficiency;5",
+		"minecraft:feather_falling;4", "minecraft:fortune;3",
+		"minecraft:looting;3", "minecraft:mending;1", "minecraft:protection;4",
+		"minecraft:respiration;3", "minecraft:sharpness;5",
+		"minecraft:silk_touch;1", "minecraft:unbreaking;3");
 	
 	private final CheckboxSetting lockInTrade = new CheckboxSetting(
 		"Lock in trade",
@@ -102,18 +108,12 @@ public final class AutoLibrarianHack extends Hack
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting("How to swing your hand when interacting with the"
-			+ " villager and job site.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.");
+			+ " villager and job site.");
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"
 			+ " the given threshold, so you can repair it before it breaks.\n"
-			+ "Can be adjusted from 0 (off) to 100.",
+			+ "Can be adjusted from 0 (off) to 100 remaining uses.",
 		1, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final OverlayRenderer overlay = new OverlayRenderer();
@@ -297,7 +297,7 @@ public final class AutoLibrarianHack extends Hack
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(jobSite,
 			params.side()))
-			swingHand.getSelected().swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
@@ -338,7 +338,8 @@ public final class AutoLibrarianHack extends Hack
 			? Hand.MAIN_HAND : Hand.OFF_HAND;
 		
 		// sneak-place to avoid activating trapdoors/chests/etc.
-		MC.options.sneakKey.setPressed(true);
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
+		sneakKey.setPressed(true);
 		if(!MC.player.isSneaking())
 			return;
 		
@@ -346,7 +347,7 @@ public final class AutoLibrarianHack extends Hack
 		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(jobSite);
 		if(params == null)
 		{
-			((IKeyBinding)MC.options.sneakKey).resetPressedState();
+			sneakKey.resetPressedState();
 			return;
 		}
 		
@@ -359,10 +360,10 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(result.isAccepted() && result.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// reset sneak
-		((IKeyBinding)MC.options.sneakKey).resetPressedState();
+		sneakKey.resetPressedState();
 	}
 	
 	private void openTradeScreen()
@@ -401,7 +402,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// swing hand
 		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
-			swingHand.getSelected().swing(hand);
+			swingHand.swing(hand);
 		
 		// set cooldown
 		MC.itemUseCooldown = 4;
@@ -418,23 +419,27 @@ public final class AutoLibrarianHack extends Hack
 		for(TradeOffer tradeOffer : tradeOffers)
 		{
 			ItemStack stack = tradeOffer.getSellItem();
-			if(!(stack.getItem() instanceof EnchantedBookItem book))
+			if(!(stack.getItem() instanceof EnchantedBookItem))
 				continue;
 			
-			NbtList enchantmentNbt = EnchantedBookItem.getEnchantmentNbt(stack);
-			if(enchantmentNbt.isEmpty())
+			Set<Entry<RegistryEntry<Enchantment>>> enchantmentLevelMap =
+				EnchantmentHelper.getEnchantments(stack)
+					.getEnchantmentEntries();
+			if(enchantmentLevelMap.isEmpty())
 				continue;
 			
-			NbtList bookNbt = EnchantedBookItem.getEnchantmentNbt(stack);
-			String enchantment = bookNbt.getCompound(0).getString("id");
-			int level = bookNbt.getCompound(0).getInt("lvl");
-			int price = tradeOffer.getAdjustedFirstBuyItem().getCount();
+			Object2IntMap.Entry<RegistryEntry<Enchantment>> firstEntry =
+				enchantmentLevelMap.stream().findFirst().orElseThrow();
+			
+			String enchantment = firstEntry.getKey().getIdAsString();
+			int level = firstEntry.getIntValue();
+			int price = tradeOffer.getDisplayedFirstBuyItem().getCount();
 			BookOffer bookOffer = new BookOffer(enchantment, level, price);
 			
-			if(!bookOffer.isValid())
+			if(!bookOffer.isFullyValid())
 			{
 				System.out.println("Found invalid enchanted book offer.\n"
-					+ "NBT data: " + stack.getNbt());
+					+ "Component data: " + enchantmentLevelMap);
 				continue;
 			}
 			

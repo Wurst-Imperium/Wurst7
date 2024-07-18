@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -74,7 +75,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
@@ -82,7 +83,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
@@ -160,7 +161,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
 			// set color
-			if(WURST.getFriends().contains(e.getEntityName()))
+			if(WURST.getFriends().contains(e.getName().getString()))
 				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
 			else
 			{
@@ -178,15 +179,17 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
+		if(players.isEmpty())
+			return;
+		
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION_COLOR);
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 		
 		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
@@ -199,7 +202,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			
 			float r, g, b;
 			
-			if(WURST.getFriends().contains(e.getEntityName()))
+			if(WURST.getFriends().contains(e.getName().getString()))
 			{
 				r = 0;
 				g = 0;
@@ -215,13 +218,13 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-				.color(r, g, b, 0.5F).next();
+				.color(r, g, b, 0.5F);
 			
 			bufferBuilder
 				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-				.color(r, g, b, 0.5F).next();
+				.color(r, g, b, 0.5F);
 		}
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

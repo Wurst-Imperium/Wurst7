@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -29,12 +29,12 @@ public final class FilterPetsSetting extends EntityFilterCheckbox
 	public static FilterPetsSetting genericCombat(boolean checked)
 	{
 		return new FilterPetsSetting(
-			"Won't attack tamed wolves, tamed horses, etc.", checked);
+			"description.wurst.setting.generic.filter_pets_combat", checked);
 	}
 	
 	public static FilterPetsSetting genericVision(boolean checked)
 	{
 		return new FilterPetsSetting(
-			"Won't show tamed wolves, tamed horses, etc.", checked);
+			"description.wurst.setting.generic.filter_pets_vision", checked);
 	}
 }

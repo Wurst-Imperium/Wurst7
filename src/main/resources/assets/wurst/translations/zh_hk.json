@@ -1,6 +1,6 @@
 {
   "description.wurst.hack.anchoraura": "自動放置（可選），充能並引爆重生錨以擊殺你附近嘅實體。",
-  "description.wurst.hack.antiafk": "隨便行，避免被伺服器掛機檢查。\n需 3x3 嘅區域。",
+  "description.wurst.hack.antiafk": "隨便行，避免被伺服器掛機檢查。",
   "OUTDATED.description.wurst.hack.antiblind": "以防盲咗。\n同 OptiFine（高清修復）唔兼容。",
   "description.wurst.hack.anticactus": "保護你避免受到仙人掌傷害。",
   "description.wurst.hack.antiknockback": "保護你唔會被其他生物或者玩家推動同埋用劍擊退。",
@@ -8,7 +8,6 @@
   "description.wurst.hack.antiwaterpush": "防止你被水流推動。",
   "description.wurst.hack.antiwobble": "關閉因反胃同埋傳送門引起嘅搖晃效果。",
   "description.wurst.hack.arrowdmg": "大量增加箭矢傷害，但會消耗大量飢餓值同降低精度。\n\n唔能夠用喺弩上，以及Paper伺服器中無法使用。",
-  "description.wurst.setting.arrowdmg.packets": "發送多少個網絡封包（請求）。\n更多封包 = 更高傷害。",
   "description.wurst.setting.arrowdmg.trident_yeet_mode": "當開啟後，三叉戟將飛更遠，但似乎並唔會影響傷害或激流飛行。\n\n§c§l警告:§r 如果你咁樣做會好容易導致你嘅三叉戟丟失!",
   "description.wurst.hack.autoarmor": "自動管理你嘅盔甲。",
   "description.wurst.hack.autobuild": "自動建築嘅功能。\n放一個方塊就開始自己自動建造。",
@@ -129,7 +128,6 @@
   "description.wurst.hack.safewalk": "防止你從方塊邊緣跌落嚟。",
   "description.wurst.hack.scaffoldwalk": "自動喺你嘅腳下搭方塊。",
   "description.wurst.hack.search": "幫助你搵到所需要嘅方塊並以彩虹色嘅方式高亮。",
-  "description.wurst.hack.servercrasher": "生成一個物品可以崩潰 1.15.x 嘅伺服器。\n§o僅限創造模式§r。",
   "description.wurst.hack.skinderp": "隨機切換你嘅皮膚。",
   "description.wurst.hack.sneak": "讓你自動保持潛行行走。",
   "description.wurst.hack.snowshoe": "可以讓你喺細雪上行走。",

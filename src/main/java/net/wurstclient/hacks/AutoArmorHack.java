@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -17,14 +18,18 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -63,7 +68,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
@@ -71,7 +76,7 @@ public final class AutoArmorHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketOutputListener.class, this);
@@ -175,18 +180,29 @@ public final class AutoArmorHack extends Hack
 	{
 		int armorPoints = item.getProtection();
 		int prtPoints = 0;
-		int armorToughness = (int)item.toughness;
-		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
+		int armorToughness = (int)item.getToughness();
+		int armorType = item.getMaterial().value().getProtection(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
-			Enchantment protection = Enchantments.PROTECTION;
-			int prtLvl = EnchantmentHelper.getLevel(protection, stack);
+			DynamicRegistryManager drm =
+				WurstClient.MC.world.getRegistryManager();
+			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
 			
-			ClientPlayerEntity player = MC.player;
-			DamageSource dmgSource =
-				player.getDamageSources().playerAttack(player);
-			prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
+			Optional<Reference<Enchantment>> protection =
+				registry.getEntry(Enchantments.PROTECTION);
+			int prtLvl = protection
+				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
+				.orElse(0);
+			
+			// ClientPlayerEntity player = MC.player;
+			// DamageSource dmgSource =
+			// player.getDamageSources().playerAttack(player);
+			// prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
+			
+			// Only the server can calculate protection amount as of
+			// 24w18a (1.21). Related bug: MC-196250
+			prtPoints = prtLvl;
 		}
 		
 		return armorPoints * 5 + prtPoints * 3 + armorToughness + armorType;

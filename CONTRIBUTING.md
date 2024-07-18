@@ -1,5 +1,27 @@
-# How To Help
-Thank you for considering to contribute! Here are some things you can help with, in no particular order:
+# Contributing Guidelines
+Thank you for considering to contribute! Here are some guidelines to help you get started.
+
+## Pull Requests
+
+### 1. Keep Pull Requests Small and Focused
+- **1 PR = 1 change**: Each pull request should address a single issue or add a single feature.
+- **Avoid Bloat**: Aim to keep the diff small and digestible. Don't stuff PRs with unrelated changes.
+
+### 2. Respect the Project's Scope and Vision
+- **Communicate Before Coding**: Open an issue to discuss any major changes before you start working on them. This can save you a lot of time and effort in case your idea is rejected. When in doubt, ask first.
+- **Avoid Breaking Changes**: When modifying existing features, it's usually better to make your changes optional. Your version may work better for you, but other people will often have different use cases that rely on the original behavior.
+
+### 3. Ensure Quality and Completeness
+- **Finish the Code**: Submit a PR only when it's complete, tested, and ready for review. Don't use pull requests as a dumping ground for half-baked prototypes.
+- If you need early feedback on a larger change, clearly mark the PR as a draft. You should have already started a discussion and gotten the go-ahead for your idea at this point.
+- **Watch the Checks**: Make sure that all automated checks are passing and that there aren't any merge conflicts. Fix such issues before asking for a review.
+
+### 4. Follow the Code Style
+- Run Eclipse's Clean Up and Format tools with the settings from the [codestyle folder](codestyle).
+- If you don't use Eclipse, you can run `./gradlew spotlessApply` instead. However, be aware that this isn't as thorough as Eclipse's tools.
+- For anything that these automated tools don't cover, please try to match the existing code style as closely as possible.
+
+## Other Ways To Help
 
 - fixing a typo
   - in the Wurst Client itself (look for the pen icon at the top right)
@@ -14,17 +36,6 @@ Thank you for considering to contribute! Here are some things you can help with,
   - Can you explain how the feature works?
   - Can you add the feature in a Pull Request?
   - Do you know anything else about the feature that hasn't been mentioned?
-- creating a pull request
-  - adding a new hack/command/etc.
-  - adding new settings to make Wurst more customizable
-  - adding/improving descriptions and tooltips to make Wurst easier to use
-- downloading and testing an existing pull request
-  - Can you confirm that it actually works?
-  - Did you find any problems with it?
-- writing a code review for an existing pull request
-  - looking for bugs in the code and pointing them out
-  - suggesting improvements
-  - checking that the code wasn't stolen from another client
 - helping with the [Wurst Wiki](https://wiki.wurstclient.net/)
   - translating Wurst Wiki articles to another language
   - adding screenshots of features where appropriate

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -48,12 +48,6 @@ public enum DefaultAutoBuildTemplates
 	PILLAR("Pillar",
 		new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {0, 3, 0}, {0, 4, 0},
 			{0, 5, 0}, {0, 6, 0}}),
-	
-	SWASTIKA("Swastika",
-		new int[][]{{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {0, 1, 0}, {0, 2, 0},
-			{1, 2, 0}, {2, 2, 0}, {2, 3, 0}, {2, 4, 0}, {0, 3, 0}, {0, 4, 0},
-			{-1, 4, 0}, {-2, 4, 0}, {-1, 2, 0}, {-2, 2, 0}, {-2, 1, 0},
-			{-2, 0, 0}}),
 	
 	TREE("Tree", new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {0, 3, 0},
 		{0, 4, 0}, {0, 3, -1}, {0, 3, 1}, {-1, 3, 0}, {1, 3, 0}, {0, 5, 0},

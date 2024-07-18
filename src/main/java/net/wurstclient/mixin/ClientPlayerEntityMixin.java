@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,16 +16,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -63,6 +67,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
+	}
+	
+	/**
+	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
+	 */
+	@WrapOperation(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z",
+			ordinal = 0),
+		method = "tickMovement()V")
+	private boolean wrapHasForwardMovement(Input input,
+		Operation<Boolean> original)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
+			return input.getMovementInput().length() > 1e-5F;
+		
+		return original.call(input);
 	}
 	
 	/**
@@ -142,8 +163,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = "updateNausea()V")
-	private void beforeUpdateNausea(CallbackInfo ci)
+		ordinal = 0), method = "tickNausea(Z)V")
+	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
@@ -159,14 +180,25 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = "updateNausea()V")
-	private void afterUpdateNausea(CallbackInfo ci)
+		ordinal = 1), method = "tickNausea(Z)V")
+	private void afterTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
 			return;
 		
 		client.currentScreen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	/**
+	 * This mixin allows AutoSprint to enable sprinting even when the player is
+	 * too hungry.
+	 */
+	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
+	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
+	{
+		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
+			cir.setReturnValue(true);
 	}
 	
 	/**
@@ -258,7 +290,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean hasStatusEffect(StatusEffect effect)
+	public boolean hasStatusEffect(RegistryEntry<StatusEffect> effect)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
@@ -274,5 +306,34 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
+	}
+	
+	@Override
+	public float getStepHeight()
+	{
+		return WurstClient.INSTANCE.getHax().stepHack
+			.adjustStepHeight(super.getStepHeight());
+	}
+	
+	// getter for GENERIC_BLOCK_INTERACTION_RANGE
+	@Override
+	public double getBlockInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getBlockInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
+	}
+	
+	// getter for GENERIC_ENTITY_INTERACTION_RANGE
+	@Override
+	public double getEntityInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getEntityInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
 	}
 }
