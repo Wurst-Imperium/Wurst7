@@ -9,19 +9,20 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -134,6 +135,31 @@ public final class AutoBuildHack extends Hack
 	}
 	
 	@Override
+	public void onRightClick(RightClickEvent event)
+	{
+		if(status != Status.IDLE)
+			return;
+		
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
+			|| !(hitResult instanceof BlockHitResult blockHitResult))
+			return;
+		
+		BlockPos hitResultPos = blockHitResult.getBlockPos();
+		if(!BlockUtils.canBeClicked(hitResultPos))
+			return;
+		
+		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
+		Direction direction = MC.player.getHorizontalFacing();
+		remainingBlocks = template.getPositions(startPos, direction);
+		
+		if(instaBuild.isChecked() && template.size() <= 64)
+			buildInstantly();
+		else
+			status = Status.BUILDING;
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		switch(status)
@@ -154,6 +180,108 @@ public final class AutoBuildHack extends Hack
 			buildNormally();
 			break;
 		}
+	}
+	
+	@Override
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		if(status != Status.BUILDING)
+			return;
+		
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		
+		matrixStack.push();
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
+		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		
+		double boxStart = 1 / 16.0;
+		double boxEnd = 15 / 16.0;
+		Box box = new Box(boxStart, boxStart, boxStart, boxEnd, boxEnd, boxEnd)
+			.offset(region.negate().toBlockPos());
+		
+		ArrayList<BlockPos> blocksToDraw = remainingBlocks.stream()
+			.filter(pos -> BlockUtils.getState(pos).isReplaceable()).limit(1024)
+			.collect(Collectors.toCollection(ArrayList::new));
+		
+		GL11.glDepthMask(false);
+		RenderSystem.setShaderColor(0, 1, 0, 0.15F);
+		
+		Vec3d eyesPos = RotationUtils.getEyesPos();
+		double rangeSq = range.getValueSq();
+		blocksToDraw.stream()
+			.filter(pos -> pos.getSquaredDistance(eyesPos) <= rangeSq)
+			.map(pos -> box.offset(pos)).forEach(
+				offsetBox -> RenderUtils.drawSolidBox(offsetBox, matrixStack));
+		
+		GL11.glDepthMask(true);
+		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
+		
+		blocksToDraw.stream().map(pos -> box.offset(pos)).forEach(
+			offsetBox -> RenderUtils.drawOutlinedBox(offsetBox, matrixStack));
+		
+		matrixStack.pop();
+		
+		// GL resets
+		GL11.glDisable(GL11.GL_BLEND);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+	}
+	
+	private void buildNormally()
+	{
+		remainingBlocks
+			.removeIf(pos -> !BlockUtils.getState(pos).isReplaceable());
+		
+		if(remainingBlocks.isEmpty())
+		{
+			status = Status.IDLE;
+			return;
+		}
+		
+		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
+			return;
+		
+		double rangeSq = range.getValueSq();
+		for(BlockPos pos : remainingBlocks)
+		{
+			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+			if(params == null || params.distanceSq() > rangeSq)
+				continue;
+			if(checkLOS.isChecked() && !params.lineOfSight())
+				continue;
+			
+			MC.itemUseCooldown = 4;
+			RotationUtils.getNeededRotations(params.hitVec())
+				.sendPlayerLookPacket();
+			InteractionSimulator.rightClickBlock(params.toHitResult());
+			break;
+		}
+	}
+	
+	private void buildInstantly()
+	{
+		double rangeSq = range.getValueSq();
+		
+		for(BlockPos pos : remainingBlocks)
+		{
+			if(!BlockUtils.getState(pos).isReplaceable())
+				continue;
+			
+			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
+			if(params == null || params.distanceSq() > rangeSq)
+				continue;
+			
+			InteractionSimulator.rightClickBlock(params.toHitResult(),
+				SwingHand.OFF);
+		}
+		
+		remainingBlocks.clear();
 	}
 	
 	private void loadSelectedTemplate()
@@ -178,168 +306,6 @@ public final class AutoBuildHack extends Hack
 			e.printStackTrace();
 			setEnabled(false);
 		}
-	}
-	
-	private void buildNormally()
-	{
-		updateRemainingBlocks();
-		
-		if(remainingBlocks.isEmpty())
-		{
-			status = Status.IDLE;
-			return;
-		}
-		
-		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
-			return;
-		
-		placeNextBlock();
-	}
-	
-	private void updateRemainingBlocks()
-	{
-		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext();)
-		{
-			BlockPos pos = itr.next();
-			BlockState state = BlockUtils.getState(pos);
-			
-			if(!state.isReplaceable())
-				itr.remove();
-		}
-	}
-	
-	private void placeNextBlock()
-	{
-		double rangeSq = range.getValueSq();
-		
-		for(BlockPos pos : remainingBlocks)
-		{
-			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > rangeSq)
-				continue;
-			if(checkLOS.isChecked() && !params.lineOfSight())
-				continue;
-			
-			MC.itemUseCooldown = 4;
-			RotationUtils.getNeededRotations(params.hitVec())
-				.sendPlayerLookPacket();
-			InteractionSimulator.rightClickBlock(params.toHitResult());
-			break;
-		}
-	}
-	
-	@Override
-	public void onRightClick(RightClickEvent event)
-	{
-		if(status != Status.IDLE)
-			return;
-		
-		HitResult hitResult = MC.crosshairTarget;
-		if(hitResult == null || hitResult.getPos() == null
-			|| hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult))
-			return;
-		
-		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
-		
-		BlockPos hitResultPos = blockHitResult.getBlockPos();
-		if(!BlockUtils.canBeClicked(hitResultPos))
-			return;
-		
-		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
-		Direction direction = MC.player.getHorizontalFacing();
-		remainingBlocks = template.getPositions(startPos, direction);
-		
-		if(instaBuild.isChecked() && template.size() <= 64)
-			buildInstantly();
-		else
-			status = Status.BUILDING;
-	}
-	
-	private void buildInstantly()
-	{
-		double rangeSq = range.getValueSq();
-		
-		for(BlockPos pos : remainingBlocks)
-		{
-			if(!BlockUtils.getState(pos).isReplaceable())
-				continue;
-			
-			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > rangeSq)
-				continue;
-			
-			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				SwingHand.OFF);
-		}
-		
-		remainingBlocks.clear();
-	}
-	
-	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		if(status != Status.BUILDING)
-			return;
-		
-		float scale = 7F / 8F;
-		double offset = (1.0 - scale) / 2.0;
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		double rangeSq = range.getValueSq();
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		int blocksDrawn = 0;
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		for(Iterator<BlockPos> itr = remainingBlocks.iterator(); itr.hasNext()
-			&& blocksDrawn < 1024;)
-		{
-			BlockPos pos = itr.next();
-			if(!BlockUtils.getState(pos).isReplaceable())
-				continue;
-			
-			matrixStack.push();
-			matrixStack.translate(pos.getX() - region.x(), pos.getY(),
-				pos.getZ() - region.z());
-			matrixStack.translate(offset, offset, offset);
-			matrixStack.scale(scale, scale, scale);
-			
-			Vec3d posVec = Vec3d.ofCenter(pos);
-			
-			if(eyesPos.squaredDistanceTo(posVec) <= rangeSq)
-				drawGreenBox(matrixStack);
-			else
-				RenderUtils.drawOutlinedBox(matrixStack);
-			
-			matrixStack.pop();
-			blocksDrawn++;
-		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		GL11.glDisable(GL11.GL_BLEND);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-	}
-	
-	private void drawGreenBox(MatrixStack matrixStack)
-	{
-		GL11.glDepthMask(false);
-		RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-		RenderUtils.drawSolidBox(matrixStack);
-		GL11.glDepthMask(true);
-		
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(matrixStack);
 	}
 	
 	private enum Status
