@@ -53,39 +53,27 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		new Thread(() -> {
-			try
-			{
-				translate(event);
-				
-			}catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}, "ChatTranslator").start();
+		Thread.ofVirtual().name("ChatTranslator")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
+			.start(() -> translate(event.getComponent().getString()));
 	}
 	
-	private void translate(ChatInputEvent event)
+	private void translate(String message)
 	{
-		String incomingMsg = event.getComponent().getString();
-		
-		String translatorPrefix =
+		String prefix =
 			"\u00a7a[\u00a7b" + langTo.getSelected().name + "\u00a7a]:\u00a7r ";
 		
-		if(incomingMsg.startsWith(ChatUtils.WURST_PREFIX)
-			|| incomingMsg.startsWith(translatorPrefix))
+		if(message.startsWith(ChatUtils.WURST_PREFIX)
+			|| message.startsWith(prefix))
 			return;
 		
-		String translated = GoogleTranslate.translate(incomingMsg,
+		String translated = GoogleTranslate.translate(message,
 			langFrom.getSelected().value, langTo.getSelected().value);
 		
 		if(translated == null)
 			return;
 		
-		Text translationMsg =
-			Text.literal(translatorPrefix).append(Text.literal(translated));
-		
-		MC.inGameHud.getChatHud().addMessage(translationMsg);
+		MC.inGameHud.getChatHud().addMessage(Text.literal(prefix + translated));
 	}
 	
 	public static enum FromLanguage
