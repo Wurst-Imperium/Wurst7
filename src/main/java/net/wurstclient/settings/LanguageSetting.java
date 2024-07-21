@@ -7,6 +7,8 @@
  */
 package net.wurstclient.settings;
 
+import net.minecraft.text.Text;
+
 public final class LanguageSetting extends EnumSetting<LanguageSetting.Language>
 {
 	private LanguageSetting(String name, String description, Language[] values,
@@ -71,16 +73,28 @@ public final class LanguageSetting extends EnumSetting<LanguageSetting.Language>
 		
 		private final String name;
 		private final String value;
+		private final String prefix;
 		
 		private Language(String name, String value)
 		{
 			this.name = name;
 			this.value = value;
+			prefix = "\u00a7a[\u00a7b" + value + "\u00a7a]:\u00a7r ";
 		}
 		
 		public String getValue()
 		{
 			return value;
+		}
+		
+		public String getPrefix()
+		{
+			return prefix;
+		}
+		
+		public Text prefixText(String s)
+		{
+			return Text.literal(prefix + s);
 		}
 		
 		@Override

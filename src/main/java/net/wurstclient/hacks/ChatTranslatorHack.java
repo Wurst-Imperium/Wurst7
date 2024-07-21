@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -24,19 +23,18 @@ import net.wurstclient.util.GoogleTranslate;
 	"google translator", "GoogleTranslation", "google translation"})
 public final class ChatTranslatorHack extends Hack implements ChatInputListener
 {
-	private final LanguageSetting langFrom =
+	private final LanguageSetting translateFrom =
 		LanguageSetting.withAutoDetect("Translate from", Language.AUTO_DETECT);
 	
-	private final LanguageSetting langTo =
+	private final LanguageSetting translateTo =
 		LanguageSetting.withoutAutoDetect("Translate to", Language.ENGLISH);
 	
 	public ChatTranslatorHack()
 	{
 		super("ChatTranslator");
 		setCategory(Category.CHAT);
-		
-		addSetting(langFrom);
-		addSetting(langTo);
+		addSetting(translateFrom);
+		addSetting(translateTo);
 	}
 	
 	@Override
@@ -54,26 +52,26 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		Thread.ofVirtual().name("ChatTranslator")
-			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
-			.start(() -> translate(event.getComponent().getString()));
-	}
-	
-	private void translate(String message)
-	{
-		String prefix =
-			"\u00a7a[\u00a7b" + langTo.getSelected() + "\u00a7a]:\u00a7r ";
+		String message = event.getComponent().getString();
+		Language fromLang = translateFrom.getSelected();
+		Language toLang = translateTo.getSelected();
 		
 		if(message.startsWith(ChatUtils.WURST_PREFIX)
-			|| message.startsWith(prefix))
+			|| message.startsWith(toLang.getPrefix()))
 			return;
 		
+		Thread.ofVirtual().name("ChatTranslator")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
+			.start(() -> showTranslated(message, fromLang, toLang));
+	}
+	
+	private void showTranslated(String message, Language fromLang,
+		Language toLang)
+	{
 		String translated = GoogleTranslate.translate(message,
-			langFrom.getSelected().getValue(), langTo.getSelected().getValue());
+			fromLang.getValue(), toLang.getValue());
 		
-		if(translated == null)
-			return;
-		
-		MC.inGameHud.getChatHud().addMessage(Text.literal(prefix + translated));
+		if(translated != null)
+			MC.inGameHud.getChatHud().addMessage(toLang.prefixText(translated));
 	}
 }
