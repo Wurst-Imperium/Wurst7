@@ -20,10 +20,10 @@ public class FilterOwnMessagesSetting extends CheckboxSetting
 	public FilterOwnMessagesSetting()
 	{
 		super("Filter own messages",
-			"Won't translate messages that appear to be sent by you.\n"
+			"Won't translate messages that appear to be sent by you.\n\n"
 				+ "It tries to detect your messages based on common chat formats"
-				+ " like \"<username>\", \"[username]\", or \"username:\". This"
-				+ " might not work correctly on some servers.",
+				+ " like \"<name>\", \"[name]\", or \"name:\". This might not"
+				+ " work correctly on some servers.",
 			true);
 	}
 	
