@@ -12,10 +12,10 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.chattranslator.FilterOwnMessagesSetting;
-import net.wurstclient.settings.LanguageSetting;
-import net.wurstclient.settings.LanguageSetting.Language;
+import net.wurstclient.hacks.chattranslator.GoogleTranslate;
+import net.wurstclient.hacks.chattranslator.LanguageSetting;
+import net.wurstclient.hacks.chattranslator.LanguageSetting.Language;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.GoogleTranslate;
 
 @SearchTags({"chat translator", "ChatTranslate", "chat translate",
 	"ChatTranslation", "chat translation", "AutoTranslate", "auto translate",
