@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.regex.Pattern;
+
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -80,10 +82,15 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	
 	private boolean isOwnMessage(String message)
 	{
-		String playerName = MC.getSession().getUsername();
-		return message.startsWith("<" + playerName + ">")
-			|| message.startsWith("[" + playerName + "]")
-			|| message.startsWith(playerName + ":");
+		// Escape username for regex
+		String playerName = Pattern.quote(MC.getSession().getUsername());
+		
+		// Allow up to 2 ranks before the username
+		String rankPattern = "(?:\\[[^\\]]+\\] ?){0,2}";
+		
+		// Build regex and check if it matches
+		String regex = "^" + rankPattern + "[<\\[]?" + playerName + "[>\\]:]";
+		return Pattern.compile(regex).matcher(message).find();
 	}
 	
 	private void showTranslated(String message, Language fromLang,
