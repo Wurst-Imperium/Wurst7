@@ -7,13 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.regex.Pattern;
-
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.hacks.chattranslator.FilterOwnMessagesSetting;
 import net.wurstclient.settings.LanguageSetting;
 import net.wurstclient.settings.LanguageSetting.Language;
 import net.wurstclient.util.ChatUtils;
@@ -32,16 +30,8 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	private final LanguageSetting translateTo =
 		LanguageSetting.withoutAutoDetect("Translate to", Language.ENGLISH);
 	
-	private final CheckboxSetting filterOwnMessages = new CheckboxSetting(
-		"Filter own messages",
-		"Won't translate messages that appear to be sent by you.\n"
-			+ "It tries to detect your messages based on common chat formats"
-			+ " like \"<username>\", \"[username]\", or \"username:\". This"
-			+ " might not work correctly on some servers.",
-		true);
-	
-	private Pattern ownMessagePattern;
-	private String lastUsername;
+	private final FilterOwnMessagesSetting filterOwnMessages =
+		new FilterOwnMessagesSetting();
 	
 	public ChatTranslatorHack()
 	{
@@ -75,32 +65,13 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 			|| message.startsWith(toLang.getPrefix()))
 			return;
 		
-		if(filterOwnMessages.isChecked() && isOwnMessage(message))
+		if(filterOwnMessages.isChecked()
+			&& filterOwnMessages.isOwnMessage(message))
 			return;
 		
 		Thread.ofVirtual().name("ChatTranslator")
 			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
 			.start(() -> showTranslated(message, fromLang, toLang));
-	}
-	
-	private boolean isOwnMessage(String message)
-	{
-		updateOwnMessagePattern();
-		return ownMessagePattern.matcher(message).find();
-	}
-	
-	private void updateOwnMessagePattern()
-	{
-		String username = MC.getSession().getUsername();
-		if(username.equals(lastUsername))
-			return;
-		
-		String rankPattern = "(?:\\[[^\\]]+\\] ?){0,2}";
-		String namePattern = Pattern.quote(username);
-		String regex = "^" + rankPattern + "[<\\[]?" + namePattern + "[>\\]:]";
-		
-		ownMessagePattern = Pattern.compile(regex);
-		lastUsername = username;
 	}
 	
 	private void showTranslated(String message, Language fromLang,
