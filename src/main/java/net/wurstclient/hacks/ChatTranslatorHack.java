@@ -11,6 +11,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.LanguageSetting;
 import net.wurstclient.settings.LanguageSetting.Language;
 import net.wurstclient.util.ChatUtils;
@@ -29,12 +30,21 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 	private final LanguageSetting translateTo =
 		LanguageSetting.withoutAutoDetect("Translate to", Language.ENGLISH);
 	
+	private final CheckboxSetting filterOwnMessages = new CheckboxSetting(
+		"Filter own messages",
+		"Won't translate messages that appear to be sent by you.\n"
+			+ "It tries to detect your messages based on common chat formats"
+			+ " like \"<username>\", \"[username]\", or \"username:\". This"
+			+ " might not work correctly on some servers.",
+		true);
+	
 	public ChatTranslatorHack()
 	{
 		super("ChatTranslator");
 		setCategory(Category.CHAT);
 		addSetting(translateFrom);
 		addSetting(translateTo);
+		addSetting(filterOwnMessages);
 	}
 	
 	@Override
@@ -60,9 +70,20 @@ public final class ChatTranslatorHack extends Hack implements ChatInputListener
 			|| message.startsWith(toLang.getPrefix()))
 			return;
 		
+		if(filterOwnMessages.isChecked() && isOwnMessage(message))
+			return;
+		
 		Thread.ofVirtual().name("ChatTranslator")
 			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
 			.start(() -> showTranslated(message, fromLang, toLang));
+	}
+	
+	private boolean isOwnMessage(String message)
+	{
+		String playerName = MC.getSession().getUsername();
+		return message.startsWith("<" + playerName + ">")
+			|| message.startsWith("[" + playerName + "]")
+			|| message.startsWith(playerName + ":");
 	}
 	
 	private void showTranslated(String message, Language fromLang,
