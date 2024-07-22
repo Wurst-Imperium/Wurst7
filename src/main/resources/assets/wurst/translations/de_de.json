@@ -54,7 +54,7 @@
   "description.wurst.hack.cameradistance": "Ermöglicht dir, den Kamera-Abstand in der 3rd-Person-Ansicht zu ändern.",
   "description.wurst.hack.cameranoclip": "Ermöglicht der Kamera in der 3rd-Person-Ansicht, durch Wände zu gehen.",
   "description.wurst.hack.cavefinder": "Markiert Höhlen in der ausgewählten Farbe, sodass du sie leichter finden kannst.",
-  "description.wurst.hack.chattranslator": "Übersetzt eingehende Chat-Nachrichten mit dem Google-Übersetzer.",
+  "description.wurst.hack.chattranslator": "Übersetzt Chat-Nachrichten mit dem Google-Übersetzer.",
   "description.wurst.hack.chestesp": "Markiert Kisten in deiner Umgebung.",
   "description.wurst.hack.clickaura": "Greift bei jedem Mausklick automatisch den nächsten Mob oder Spieler an.\n\n§c§lWARNUNG:§r ClickAuras sind generell auffälliger als Killauras und für Plugins leichter zu erkennen. Es ist empfohlen, statt ClickAura Killaura oder TriggerBot zu benutzen.",
   "description.wurst.hack.clickgui": "Fenster-basierte ClickGUI.",

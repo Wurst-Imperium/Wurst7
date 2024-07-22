@@ -47,7 +47,7 @@
   "description.wurst.hack.bunnyhop": "Примушує вас постійно стрибати.",
   "description.wurst.hack.cameranoclip": "Дозволяє камеру від 3-ї особи пройти через стіни.",
   "description.wurst.hack.cavefinder": "Допомагає знайти печери, підсвічуючи їх вибраним кольором.",
-  "description.wurst.hack.chattranslator": "Всі вхідні повідомлення в чаті будуть перекладатися Google перекладачем.",
+  "description.wurst.hack.chattranslator": "Перекладає повідомлення в чаті за допомогою Google перекладача.",
   "description.wurst.hack.chestesp": "Підсвічує вибраним кольором скрині поблизу.",
   "description.wurst.hack.clickaura": "Автоматично атакує найближчу сутність, коли ви натискаєте ЛКМ.\n\n§c§lУВАГА:§r ClickAura'и звичайно виглядають більш підозріло, ніж Killaura'и і легше виявляються плагінами. Краще використовувати Killaura або TriggerBot.",
   "description.wurst.hack.clickgui": "Інтерфейс із панелями.",

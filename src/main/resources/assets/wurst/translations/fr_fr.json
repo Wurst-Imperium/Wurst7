@@ -48,7 +48,7 @@
   "description.wurst.hack.bunnyhop": "Vous fait sauter automatiquement.",
   "description.wurst.hack.cameranoclip": "Permet à la caméra à la 3ème personne de traverser les murs.",
   "description.wurst.hack.cavefinder": "Vous aide à trouver des grottes en les mettant en surbrillance dans la couleur sélectionnée.",
-  "description.wurst.hack.chattranslator": "Traduit les messages de chat entrants à l'aide de Google Traduction.",
+  "description.wurst.hack.chattranslator": "Traduit les messages de chat à l'aide de Google Traduction.",
   "description.wurst.hack.chestesp": "Met en évidence les coffres à proximité.",
   "description.wurst.hack.clickaura": "Attaque automatiquement l'entité valide la plus proche chaque fois que vous cliquez.\n\n§c§lATTENTION:§r ClickAuras semble généralement plus suspect que Killauras et est plus facile à détecter pour les plugins. Il est recommandé d'utiliser Killaura ou TriggerBot à la place.",
   "description.wurst.hack.clickgui": "ClickGUI basé sur une fenêtre.",

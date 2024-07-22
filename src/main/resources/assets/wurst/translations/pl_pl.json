@@ -51,7 +51,7 @@
   "description.wurst.hack.cameradistance": "Pozwala zmienić odległość kamery w trzeciej osobie.",
   "description.wurst.hack.cameranoclip": "Umożliwia kamerze trzecio-osobowej na przenikanie przez ściany.",
   "description.wurst.hack.cavefinder": "Pomaga znaleźć jaskinie, podświetlając je wybranym kolorem.",
-  "description.wurst.hack.chattranslator": "Tłumaczy przychodzące wiadomości z czatu za pomocą Tłumacza Google.",
+  "description.wurst.hack.chattranslator": "Tłumaczy wiadomości z czatu za pomocą Tłumacza Google.",
   "description.wurst.hack.chestesp": "Podświetla pobliskie skrzynie.",
   "description.wurst.hack.clickaura": "Automatycznie atakuje najbliższy prawidłowy byt za każdym razem, gdy klikniesz.\n\n§c§lOSTRZEŻENIE:§r ClickAury generalnie wyglądają bardziej podejrzanie niż Killaury i są łatwiejsze do wykrycia przez pluginy. Zamiast tego zaleca się użycie Killaury lub TriggerBota.",
   "description.wurst.hack.clickgui": "ClickGUI oparty na okienkach.",

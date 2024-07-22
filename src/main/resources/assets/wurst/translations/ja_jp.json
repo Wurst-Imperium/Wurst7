@@ -56,7 +56,7 @@
   "description.wurst.hack.cameradistance": "3人称視点でカメラとプレイヤーの距離が変更できるようになる。",
   "description.wurst.hack.cameranoclip": "三人称視点のカメラがブロックを貫通するようになる。",
   "description.wurst.hack.cavefinder": "洞窟を選択した色でハイライト表示し、探しやすくする。",
-  "description.wurst.hack.chattranslator": "受信したメッセージをGoogle翻訳で翻訳する。",
+  "description.wurst.hack.chattranslator": "チャットメッセージをGoogle翻訳で翻訳する。",
   "description.wurst.hack.chestesp": "付近のチェストをハイライト表示する。",
   "description.wurst.hack.clickaura": "クリックすると、自動で一番近い有効なエンティティを攻撃する。\n\n§c§l注意: §rClickAuraはKillauraよりも怪しまれやすく、かつPluginに検知されやすいため、代わりにKillauraやTriggerBotの使用を推奨する。",
   "description.wurst.hack.clickgui": "ウィンドウタイプのClickGUI。",

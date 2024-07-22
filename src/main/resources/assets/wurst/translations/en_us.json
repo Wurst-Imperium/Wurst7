@@ -73,7 +73,7 @@
   "description.wurst.hack.cameradistance": "Allows you to change the camera distance in 3rd person.",
   "description.wurst.hack.cameranoclip": "Allows the camera in 3rd person to go through walls.",
   "description.wurst.hack.cavefinder": "Helps you to find caves by highlighting them in the selected color.",
-  "description.wurst.hack.chattranslator": "Translates incoming chat messages using Google Translate.",
+  "description.wurst.hack.chattranslator": "Translates chat messages using Google Translate.",
   "description.wurst.hack.chestesp": "Highlights nearby chests.",
   "description.wurst.hack.clickaura": "Automatically attacks the closest valid entity whenever you click.\n\n§c§lWARNING:§r ClickAuras generally look more suspicious than Killauras and are easier for plugins to detect. It is recommended to use Killaura or TriggerBot instead.",
   "description.wurst.hack.clickgui": "Window-based ClickGUI.",
