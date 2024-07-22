@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,15 +24,45 @@ public enum GoogleTranslate
 {
 	;
 	
-	private static final Pattern ALL_WHITESPACE = Pattern.compile("\\s+");
+	private static final HashMap<Character, String> simplifyMap;
+	static
+	{
+		simplifyMap = new HashMap<>();
+		simplifyMap.put(' ', "");
+		simplifyMap.put('\r', "");
+		simplifyMap.put('\n', "");
+		simplifyMap.put('\t', "");
+		simplifyMap.put('ä', "a");
+		simplifyMap.put('ö', "o");
+		simplifyMap.put('ü', "u");
+		simplifyMap.put('á', "a");
+		simplifyMap.put('é', "e");
+		simplifyMap.put('í', "i");
+		simplifyMap.put('ó', "o");
+		simplifyMap.put('ú', "u");
+		simplifyMap.put('à', "a");
+		simplifyMap.put('è', "e");
+		simplifyMap.put('ì', "i");
+		simplifyMap.put('ò', "o");
+		simplifyMap.put('ù', "u");
+		simplifyMap.put('â', "a");
+		simplifyMap.put('ê', "e");
+		simplifyMap.put('î', "i");
+		simplifyMap.put('ô', "o");
+		simplifyMap.put('û', "u");
+		simplifyMap.put('ã', "a");
+		simplifyMap.put('õ', "o");
+		simplifyMap.put('ñ', "n");
+		simplifyMap.put('ç', "c");
+	}
 	
 	public static String translate(String text, String langFrom, String langTo)
 	{
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
 		
-		// Detect if Google translate returned the original text, maybe with
-		// some whitespace or capitalization changes, and return null if so
+		// Return null if Google Translate just returned the original text,
+		// ignoring capitalization changes, whitespace, and broken characters
 		if(simplify(text).equals(simplify(translated)))
 			return null;
 		
@@ -114,6 +145,10 @@ public enum GoogleTranslate
 	
 	private static String simplify(String text)
 	{
-		return ALL_WHITESPACE.matcher(text).replaceAll("").toLowerCase();
+		StringBuilder sb = new StringBuilder();
+		for(char c : text.toLowerCase().toCharArray())
+			sb.append(simplifyMap.getOrDefault(c, String.valueOf(c)));
+		
+		return sb.toString();
 	}
 }
