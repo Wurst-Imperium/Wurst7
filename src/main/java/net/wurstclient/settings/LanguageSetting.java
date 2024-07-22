@@ -79,7 +79,7 @@ public final class LanguageSetting extends EnumSetting<LanguageSetting.Language>
 		{
 			this.name = name;
 			this.value = value;
-			prefix = "\u00a7a[\u00a7b" + value + "\u00a7a]:\u00a7r ";
+			prefix = "\u00a7a[\u00a7b" + name + "\u00a7a]:\u00a7r ";
 		}
 		
 		public String getValue()
