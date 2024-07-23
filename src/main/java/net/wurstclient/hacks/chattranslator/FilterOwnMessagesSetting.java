@@ -20,10 +20,7 @@ public class FilterOwnMessagesSetting extends CheckboxSetting
 	public FilterOwnMessagesSetting()
 	{
 		super("Filter own messages",
-			"Won't translate messages that appear to be sent by you.\n\n"
-				+ "It tries to detect your messages based on common chat formats"
-				+ " like \"<name>\", \"[name]\", or \"name:\". This might not"
-				+ " work correctly on some servers.",
+			"description.wurst.setting.chattranslator.filter_own_messages",
 			true);
 	}
 	

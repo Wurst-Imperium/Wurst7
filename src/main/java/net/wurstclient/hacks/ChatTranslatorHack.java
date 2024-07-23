@@ -33,38 +33,22 @@ public final class ChatTranslatorHack extends Hack
 	
 	private final LanguageSetting playerLanguage =
 		LanguageSetting.withoutAutoDetect("Your language",
-			"The main language that you can use and understand.\n\n"
-				+ "Your received messages will always be translated into this"
-				+ " language (if enabled).\n\n"
-				+ "When \"Detect sent language\" is turned off, all"
-				+ " sent messages are assumed to be in this language.",
+			"description.wurst.setting.chattranslator.your_language",
 			Language.ENGLISH);
 	
 	private final LanguageSetting otherLanguage =
 		LanguageSetting.withoutAutoDetect("Other language",
-			"The main language used by other players on the server.\n\n"
-				+ "Your sent messages will always be translated into this"
-				+ " language (if enabled).\n\n"
-				+ "When \"Detect received language\" is turned off, all"
-				+ " received messages are assumed to be in this language.",
+			"description.wurst.setting.chattranslator.other_language",
 			Language.CHINESE_SIMPLIFIED);
 	
 	private final CheckboxSetting autoDetectReceived =
 		new CheckboxSetting("Detect received language",
-			"Automatically detect the language of received messages.\n\n"
-				+ "Useful if other players are using a mix of different"
-				+ " languages.\n\n"
-				+ "If everyone is using the same language, turning this off"
-				+ " can improve accuracy.",
+			"description.wurst.setting.chattranslator.detect_received_language",
 			true);
 	
-	private final CheckboxSetting autoDetectSent =
-		new CheckboxSetting("Detect sent language",
-			"Automatically detect the language of sent messages.\n\n"
-				+ "Useful if you're using a mix of different languages.\n\n"
-				+ "If you're always using the same language, turning this off"
-				+ " can improve accuracy.",
-			true);
+	private final CheckboxSetting autoDetectSent = new CheckboxSetting(
+		"Detect sent language",
+		"description.wurst.setting.chattranslator.detect_sent_language", true);
 	
 	private final FilterOwnMessagesSetting filterOwnMessages =
 		new FilterOwnMessagesSetting();
