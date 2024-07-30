@@ -7,7 +7,11 @@
  */
 package net.wurstclient.commands;
 
+import java.util.Iterator;
+
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.Component;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -25,7 +29,9 @@ public final class ViewNbtCmd extends Command
 	public ViewNbtCmd()
 	{
 		super("viewnbt", "Shows you the NBT data of an item.", ".viewnbt",
-			"Copy to clipboard: .viewnbt copy");
+			"Copy to clipboard: .viewnbt copy",
+			"See all NBT fields: .viewnbt all",
+			"See specific NBT field: .viewnbt field <FIELD>");
 	}
 	
 	@Override
@@ -41,18 +47,52 @@ public final class ViewNbtCmd extends Command
 			.copyNbt();
 		String nbtString = tag.asString();
 		
-		switch(String.join(" ", args).toLowerCase())
+		String argString = String.join(" ", args).toLowerCase();
+		
+		if(argString.equals(""))
 		{
-			case "":
 			ChatUtils.message("NBT: " + nbtString);
-			break;
-			
-			case "copy":
+		}else if(argString.equals("copy"))
+		{
 			MC.keyboard.setClipboard(nbtString);
 			ChatUtils.message("NBT data copied to clipboard.");
-			break;
-			
-			default:
+		}else if(argString.equals("all"))
+		{ // print all component keys
+			ComponentMap cm = stack.getComponents();
+			Iterator<Component<?>> it = cm.iterator();
+			String chatstr = "";
+			while(it.hasNext())
+			{
+				Component<?> component = it.next();
+				// Get all component types excluding the "minecraft:"
+				chatstr += component.type().toString().substring(10) + '\n';
+			}
+			ChatUtils.message(chatstr);
+		}else if(args[0].equals("field"))
+		{
+			ComponentMap cm = stack.getComponents();
+			Iterator<Component<?>> it = cm.iterator();
+			boolean found = false;
+			while(it.hasNext())
+			{
+				Component<?> component = it.next();
+				// Get all component types excluding the "minecraft:"
+				String componentType =
+					component.type().toString().substring(10);
+				if(componentType.equals(args[1]))
+				{
+					found = true;
+					ChatUtils.message(
+						componentType + "=" + component.value().toString());
+					break;
+				}
+			}
+			if(!found)
+			{
+				ChatUtils.message("NBT " + args[1] + " not found");
+			}
+		}else
+		{
 			throw new CmdSyntaxError();
 		}
 	}
