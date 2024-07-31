@@ -10,7 +10,7 @@ package net.wurstclient.hacks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -86,20 +86,17 @@ public final class CriticalsHack extends Hack
 	
 	private void doPacketJump()
 	{
-		double posX = MC.player.getX();
-		double posY = MC.player.getY();
-		double posZ = MC.player.getZ();
-		
-		sendPos(posX, posY + 0.0625D, posZ, true);
-		sendPos(posX, posY, posZ, false);
-		sendPos(posX, posY + 1.1E-5D, posZ, false);
-		sendPos(posX, posY, posZ, false);
+		sendFakeY(0.0625, true);
+		sendFakeY(0, false);
+		sendFakeY(1.1e-5, false);
+		sendFakeY(0, false);
 	}
 	
-	private void sendPos(double x, double y, double z, boolean onGround)
+	private void sendFakeY(double offset, boolean onGround)
 	{
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, onGround));
+		MC.player.networkHandler
+			.sendPacket(new PositionAndOnGround(MC.player.getX(),
+				MC.player.getY() + offset, MC.player.getZ(), onGround));
 	}
 	
 	private void doMiniJump()
