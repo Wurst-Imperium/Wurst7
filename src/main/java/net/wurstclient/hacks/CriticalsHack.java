@@ -7,19 +7,19 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.LeftClickListener;
+import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.EnumSetting;
 
 @SearchTags({"Crits"})
-public final class CriticalsHack extends Hack implements LeftClickListener
+public final class CriticalsHack extends Hack
+	implements PlayerAttacksEntityListener
 {
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"\u00a7lPacket\u00a7r mode sends packets to server without actually moving you at all.\n\n"
@@ -43,30 +43,19 @@ public final class CriticalsHack extends Hack implements LeftClickListener
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(LeftClickListener.class, this);
+		EVENTS.add(PlayerAttacksEntityListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(LeftClickListener.class, this);
+		EVENTS.remove(PlayerAttacksEntityListener.class, this);
 	}
 	
 	@Override
-	public void onLeftClick(LeftClickEvent event)
+	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY
-			|| !(((EntityHitResult)MC.crosshairTarget)
-				.getEntity() instanceof LivingEntity))
-			return;
-		
-		doCritical();
-	}
-	
-	public void doCritical()
-	{
-		if(!isEnabled())
+		if(!(target instanceof LivingEntity))
 			return;
 		
 		if(WURST.getHax().maceDmgHack.isEnabled()
