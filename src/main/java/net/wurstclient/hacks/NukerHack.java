@@ -11,7 +11,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -147,55 +145,68 @@ public final class NukerHack extends Hack
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
-		ClientPlayerEntity player = MC.player;
 		Vec3d eyesVec = RotationUtils.getEyesPos();
 		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
-		ArrayList<BlockPos> blocks =
+		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
 				.filter(BlockUtils::canBeClicked)
-				.filter(mode.getSelected().getValidator(this))
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
-				.collect(Collectors.toCollection(ArrayList::new));
+				.filter(mode.getSelected().getValidator(this)).sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
 		
-		if(player.getAbilities().creativeMode)
+		// Break all blocks in creative mode
+		if(MC.player.getAbilities().creativeMode)
 		{
-			Stream<BlockPos> stream2 = blocks.parallelStream();
-			for(Set<BlockPos> set : prevBlocks)
-				stream2 = stream2.filter(pos -> !set.contains(pos));
-			List<BlockPos> blocks2 = stream2.collect(Collectors.toList());
-			
-			prevBlocks.addLast(new HashSet<>(blocks2));
-			while(prevBlocks.size() > 5)
-				prevBlocks.removeFirst();
-			
-			if(!blocks2.isEmpty())
-				currentBlock = blocks2.get(0);
-			
 			MC.interactionManager.cancelBlockBreaking();
 			renderer.resetProgress();
-			BlockBreaker.breakBlocksWithPacketSpam(blocks2);
+			
+			ArrayList<BlockPos> blocks = filterOutRecentBlocks(stream);
+			if(blocks.isEmpty())
+				return;
+			
+			currentBlock = blocks.get(0);
+			BlockBreaker.breakBlocksWithPacketSpam(blocks);
 			return;
 		}
 		
-		for(BlockPos pos : blocks)
-			if(BlockBreaker.breakOneBlock(pos))
-			{
-				currentBlock = pos;
-				break;
-			}
+		// Break the first valid block in survival mode
+		currentBlock =
+			stream.filter(BlockBreaker::breakOneBlock).findFirst().orElse(null);
 		
 		if(currentBlock == null)
+		{
 			MC.interactionManager.cancelBlockBreaking();
+			renderer.resetProgress();
+			return;
+		}
 		
-		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
+		if(BlockUtils.getHardness(currentBlock) < 1)
 			renderer.updateProgress();
 		else
 			renderer.resetProgress();
+	}
+	
+	/*
+	 * Waits 5 ticks before trying to break the same block again, which
+	 * makes it much more likely that the server will accept the block
+	 * breaking packets.
+	 */
+	private ArrayList<BlockPos> filterOutRecentBlocks(Stream<BlockPos> stream)
+	{
+		for(Set<BlockPos> set : prevBlocks)
+			stream = stream.filter(pos -> !set.contains(pos));
+		
+		ArrayList<BlockPos> blocks =
+			stream.collect(Collectors.toCollection(ArrayList::new));
+		
+		prevBlocks.addLast(new HashSet<>(blocks));
+		while(prevBlocks.size() > 5)
+			prevBlocks.removeFirst();
+		
+		return blocks;
 	}
 	
 	@Override
