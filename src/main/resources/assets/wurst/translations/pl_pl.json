@@ -4,7 +4,7 @@
   "description.wurst.hack.antiafk": "Spaceruje losowo dookoła, aby ukryć cię przed wykrywaczami AFK.",
   "description.wurst.hack.antiblind": "Zapobiega efektom oślepienia i ciemności.\nNiekompatybilny z OptiFine.",
   "description.wurst.hack.anticactus": "Ochrania cię przed obrażeniami od kaktusa.",
-  "description.wurst.hack.antihunger": "Spowalnia głód podczas chodzenia.",
+  "description.wurst.hack.antihunger": "Spowalnia głód podczas chodzenia.\n\n§c§lOSTRZEŻENIE:§r Istnieją doniesienia, że ten hack może powodować dodatkowe obrażenia od upadku w określonych, nieznanych warunkach.",
   "description.wurst.hack.antiknockback": "Zapobiega popychaniu cię przez innych graczy i moby.",
   "description.wurst.hack.antispam": "Blokuje spam na czacie, dodając licznik do powtarzających się wiadomości.",
   "description.wurst.hack.antiwaterpush": "Zapobiega popychaniu cię przez wodę.",

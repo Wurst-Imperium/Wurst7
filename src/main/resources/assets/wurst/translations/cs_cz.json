@@ -4,7 +4,7 @@
   "description.wurst.hack.antiafk": "Prochází se náhodně, aby vás skryl před AFK detektory.",
   "description.wurst.hack.antiblind": "Zabraňuje blindness a efekty tmy.\nNekompatibilní s OptiFinem.",
   "description.wurst.hack.anticactus": "Chrání vás před poškozením kaktusem.",
-  "description.wurst.hack.antihunger": "Zpomalí váš hlad, když chodíte.",
+  "description.wurst.hack.antihunger": "Zpomalí váš hlad, když chodíte.\n\n§c§lUPOZORNĚNÍ:§r Byly hlášeny případy, kdy tento hack způsobil zvýšené poškození pádem za specifických, neznámých podmínek.",
   "description.wurst.hack.antiknockback": "Zabraní strkání hráči a moby.",
   "description.wurst.hack.antispam": "Blokuje spam chatu přidáním čítače k opakovaným zprávám.",
   "description.wurst.hack.antiwaterpush": "Zabraňuje posouvání vodou.",

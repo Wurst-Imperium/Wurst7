@@ -4,7 +4,7 @@
   "description.wurst.hack.antiafk": "隨機走動，用於避免伺服器掛機檢測。",
   "description.wurst.hack.antiblind": "防止失明和黑暗效果。\n與 OptiFine不相容。",
   "description.wurst.hack.anticactus": "保護你免受仙人掌傷害。",
-  "description.wurst.hack.antihunger": "走路時減緩你的飢餓度。",
+  "description.wurst.hack.antihunger": "走路時減緩你的飢餓度。\n\n§c§l警告：§r 有報告指出，在某些特定但未知的情況下，此功能可能會導致你受到額外的掉落傷害。",
   "description.wurst.hack.antiknockback": "保護你不會被其他生物或玩家推動和用劍擊退。",
   "description.wurst.hack.antispam": "預防存在的重複刷屏，改為用計數器顯示。",
   "description.wurst.hack.antiwaterpush": "防止你被水流推動。",
