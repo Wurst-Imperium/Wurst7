@@ -30,6 +30,7 @@ import net.wurstclient.clickgui.ComboBoxPopup;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.util.RenderUtils;
 
 public final class ComboBoxComponent<T extends Enum<T>> extends Component
 {
@@ -154,8 +155,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -179,8 +179,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		// background
 		float bgAlpha = hBox ? opacity * 1.5F : opacity;
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			bgAlpha);
+		RenderUtils.setShaderColor(bgColor, bgAlpha);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x4, y1, 0).next();
@@ -190,7 +189,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		tessellator.draw();
 		
 		// outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x4, y1, 0).next();

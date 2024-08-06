@@ -8,6 +8,8 @@
 package net.wurstclient.other_features;
 
 import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.MouseScrollListener;
@@ -15,6 +17,7 @@ import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.MathUtils;
 
 @SearchTags({"telescope", "optifine"})
@@ -25,9 +28,15 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		50, 0.1, ValueDisplay.DECIMAL.withSuffix("x"));
 	
 	private final CheckboxSetting scroll = new CheckboxSetting(
-		"Use mouse wheel",
-		"If enabled, you can use the mouse wheel while zooming to zoom in even further.",
+		"Use mouse wheel", "If enabled, you can use the mouse wheel while"
+			+ " zooming to zoom in even further.",
 		true);
+	
+	private final TextFieldSetting keybind = new TextFieldSetting("Keybind",
+		"Determines the zoom keybind.\n\n"
+			+ "Instead of editing this value manually, you should go to Wurst"
+			+ " Options -> Zoom and set it there.",
+		"key.keyboard.v", this::isValidKeybind);
 	
 	private Double currentLevel;
 	private Double defaultMouseSensitivity;
@@ -39,6 +48,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			+ "Go to Wurst Options -> Zoom to change this keybind.");
 		addSetting(level);
 		addSetting(scroll);
+		addSetting(keybind);
 		EVENTS.add(MouseScrollListener.class, this);
 	}
 	
@@ -50,7 +60,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		if(currentLevel == null)
 			currentLevel = level.getValue();
 		
-		if(!WURST.getZoomKey().isPressed())
+		if(!isZoomKeyPressed())
 		{
 			currentLevel = level.getValue();
 			
@@ -78,7 +88,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	@Override
 	public void onMouseScroll(double amount)
 	{
-		if(!WURST.getZoomKey().isPressed() || !scroll.isChecked())
+		if(!isZoomKeyPressed() || !scroll.isChecked())
 			return;
 		
 		if(currentLevel == null)
@@ -95,7 +105,36 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	public boolean shouldPreventHotbarScrolling()
 	{
-		return WURST.getZoomKey().isPressed() && scroll.isChecked();
+		return isZoomKeyPressed() && scroll.isChecked();
+	}
+	
+	public Text getTranslatedKeybindName()
+	{
+		return InputUtil.fromTranslationKey(keybind.getValue())
+			.getLocalizedText();
+	}
+	
+	public void setBoundKey(String translationKey)
+	{
+		keybind.setValue(translationKey);
+	}
+	
+	private boolean isZoomKeyPressed()
+	{
+		return InputUtil.isKeyPressed(MC.getWindow().getHandle(),
+			InputUtil.fromTranslationKey(keybind.getValue()).getCode());
+	}
+	
+	private boolean isValidKeybind(String keybind)
+	{
+		try
+		{
+			return InputUtil.fromTranslationKey(keybind) != null;
+			
+		}catch(IllegalArgumentException e)
+		{
+			return false;
+		}
 	}
 	
 	public SliderSetting getLevelSetting()

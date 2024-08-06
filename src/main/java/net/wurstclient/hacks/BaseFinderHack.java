@@ -170,9 +170,8 @@ public final class BaseFinderHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		float[] colorF = color.getColorF();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.15F);
+		color.setAsShaderColor(0.15F);
 		
 		if(vertexBuffer != null)
 		{

@@ -70,7 +70,14 @@ public abstract class MinecraftClientMixin
 		super(name);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "handleInputEvents()V")
+	/**
+	 * Runs just before {@link MinecraftClient#handleInputEvents()}, bypassing
+	 * the <code>overlay == null && currentScreen == null</code> check in
+	 * {@link MinecraftClient#tick()}.
+	 */
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;overlay:Lnet/minecraft/client/gui/screen/Overlay;",
+		ordinal = 0), method = "tick()V")
 	private void onHandleInputEvents(CallbackInfo ci)
 	{
 		EventManager.fire(HandleInputEvent.INSTANCE);

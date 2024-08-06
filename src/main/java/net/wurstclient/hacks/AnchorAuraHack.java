@@ -48,37 +48,31 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"anchor aura", "CrystalAura", "crystal aura"})
 public final class AnchorAuraHack extends Hack implements UpdateListener
 {
-	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far AnchorAura will reach to place, charge and detonate anchors.",
-		6, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	private final SliderSetting range =
+		new SliderSetting("Range", "description.wurst.setting.anchoraura.range",
+			6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting autoPlace = new CheckboxSetting(
-		"Auto-place anchors",
-		"When enabled, AnchorAura will automatically place anchors near valid entities.\n"
-			+ "When disabled, AnchorAura will only charge and detonate manually placed anchors.",
-		true);
+	private final CheckboxSetting autoPlace =
+		new CheckboxSetting("Auto-place anchors",
+			"description.wurst.setting.anchoraura.auto-place_anchors", true);
 	
 	private final FacingSetting faceBlocks =
 		FacingSetting.withPacketSpam("Face anchors",
-			"Whether or not AnchorAura should face the correct direction when"
-				+ " placing and right-clicking respawn anchors.\n\n"
-				+ "Slower but can help with anti-cheat plugins.",
-			Facing.OFF);
+			"description.wurst.setting.anchoraura.face_anchors", Facing.OFF);
 	
-	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Ensures that you don't reach through blocks when placing or right-clicking respawn anchors.\n\n"
-			+ "Slower but can help with anti-cheat plugins.",
-		false);
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"description.wurst.setting.anchoraura.check_line_of_sight", false);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
 		"How AnchorAura should swing your hand when placing, charging and"
 			+ " detonating respawn anchors.",
 		SwingHand.CLIENT);
 	
-	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
-		"Take items from", "Where to look for respawn anchors and glowstone.",
-		TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
+	private final EnumSetting<TakeItemsFrom> takeItemsFrom =
+		new EnumSetting<>("Take items from",
+			"description.wurst.setting.anchoraura.take_items_from",
+			TakeItemsFrom.values(), TakeItemsFrom.INVENTORY);
 	
 	private final EntityFilterList entityFilters =
 		AnchorAuraFilterList.create();

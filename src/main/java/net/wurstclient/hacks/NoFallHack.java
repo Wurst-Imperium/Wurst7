@@ -19,11 +19,7 @@ import net.wurstclient.settings.CheckboxSetting;
 public final class NoFallHack extends Hack implements UpdateListener
 {
 	private final CheckboxSetting allowElytra = new CheckboxSetting(
-		"Allow elytra",
-		"Also tries to prevent fall damage while you are flying with an elytra.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r This can sometimes cause you to"
-			+ " stop flying unexpectedly.",
-		false);
+		"Allow elytra", "description.wurst.setting.nofall.allow_elytra", false);
 	
 	public NoFallHack()
 	{

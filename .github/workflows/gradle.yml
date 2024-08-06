@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - '**.java'
+      - '**.json'
       - 'gradle**'
       - 'build.gradle'
   pull_request:
     paths:
       - '**.java'
+      - '**.json'
       - 'gradle**'
       - 'build.gradle'
   # Makes it possible to run this workflow manually from the Actions tab
@@ -53,7 +55,7 @@ jobs:
       run: ./gradlew spotlessCheck
 
     - name: Execute Gradle build
-      run: ./gradlew build
+      run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: VirusTotal scan
       if: ${{ github.event_name == 'push' }}
