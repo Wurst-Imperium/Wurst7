@@ -25,6 +25,8 @@ public final class FilterCrystalsSetting extends EntityFilterCheckbox
 	
 	public static FilterCrystalsSetting genericCombat(boolean checked)
 	{
-		return new FilterCrystalsSetting("Won't attack end crystals.", checked);
+		return new FilterCrystalsSetting(
+			"description.wurst.setting.generic.filter_crystals_combat",
+			checked);
 	}
 }
