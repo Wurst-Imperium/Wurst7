@@ -1,6 +1,7 @@
 {
   "description.wurst.hack.aimassist": "Helps you aim at nearby entities.",
   "description.wurst.setting.aimassist.fov": "Field Of View - how far away from your crosshair an entity can be before it's ignored.\n360° = aims at entities all around you.",
+  "description.wurst.setting.aimassist.ignore_mouse_input": "Ignores some of your mouse input while AimAssist is aiming. This makes it harder for you to accidentally aim away from the target.",
   "description.wurst.setting.aimassist.check_line_of_sight": "Won't aim at entities behind blocks.",
   "description.wurst.setting.aimassist.aim_while_blocking": "Keeps aiming at entities while you're blocking with a shield or using items.",
   "description.wurst.hack.airplace": "Allows you to place blocks in mid-air.",
