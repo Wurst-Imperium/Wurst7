@@ -98,6 +98,7 @@ public final class BowAimbotHack extends Hack
 	{
 		// disable conflicting hacks
 		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().templateToolHack.setEnabled(false);
 		
 		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
