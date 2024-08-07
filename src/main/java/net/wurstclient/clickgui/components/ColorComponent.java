@@ -28,6 +28,7 @@ import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditColorScreen;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class ColorComponent extends Component
 {
@@ -110,8 +111,7 @@ public final class ColorComponent extends Component
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -134,8 +134,7 @@ public final class ColorComponent extends Component
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		RenderSystem.setShaderColor(color[0], color[1], color[2],
-			hovering ? 1F : opacity);
+		RenderUtils.setShaderColor(color, hovering ? 1F : opacity);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -145,7 +144,7 @@ public final class ColorComponent extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		tessellator.draw();
 		
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);

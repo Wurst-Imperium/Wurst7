@@ -20,6 +20,7 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.util.RenderUtils;
 
 public final class TacoCmd extends Command
 	implements GUIRenderListener, UpdateListener
@@ -89,11 +90,8 @@ public final class TacoCmd extends Command
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		if(WURST.getHax().rainbowUiHack.isEnabled())
-		{
-			float[] acColor = WURST.getGui().getAcColor();
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 1);
-			
-		}else
+			RenderUtils.setShaderColor(WURST.getGui().getAcColor(), 1);
+		else
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Window sr = MC.getWindow();
