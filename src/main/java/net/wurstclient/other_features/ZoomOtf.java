@@ -32,6 +32,11 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			+ " zooming to zoom in even further.",
 		true);
 	
+	private final CheckboxSetting zoomInScreens = new CheckboxSetting(
+		"Zoom in screens", "If enabled, you can also zoom while a screen (chat,"
+			+ " inventory, etc.) is open.",
+		false);
+	
 	private final TextFieldSetting keybind = new TextFieldSetting("Keybind",
 		"Determines the zoom keybind.\n\n"
 			+ "Instead of editing this value manually, you should go to Wurst"
@@ -48,6 +53,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			+ "Go to Wurst Options -> Zoom to change this keybind.");
 		addSetting(level);
 		addSetting(scroll);
+		addSetting(zoomInScreens);
 		addSetting(keybind);
 		EVENTS.add(MouseScrollListener.class, this);
 	}
@@ -121,6 +127,9 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	private boolean isZoomKeyPressed()
 	{
+		if(MC.currentScreen != null && !zoomInScreens.isChecked())
+			return false;
+		
 		return InputUtil.isKeyPressed(MC.getWindow().getHandle(),
 			InputUtil.fromTranslationKey(keybind.getValue()).getCode());
 	}

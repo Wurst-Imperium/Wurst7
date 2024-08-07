@@ -19,6 +19,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.AnimalArmorItem;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
@@ -109,10 +110,10 @@ public final class AutoArmorHack extends Hack
 			bestArmorSlots[type] = -1;
 			
 			ItemStack stack = inventory.getArmorStack(type);
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
+			if(!(stack.getItem() instanceof ArmorItem item)
+				|| item instanceof AnimalArmorItem)
 				continue;
 			
-			ArmorItem item = (ArmorItem)stack.getItem();
 			bestArmorValues[type] = getArmorValue(item, stack);
 		}
 		
@@ -121,10 +122,10 @@ public final class AutoArmorHack extends Hack
 		{
 			ItemStack stack = inventory.getStack(slot);
 			
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
+			if(!(stack.getItem() instanceof ArmorItem item)
+				|| item instanceof AnimalArmorItem)
 				continue;
 			
-			ArmorItem item = (ArmorItem)stack.getItem();
 			int armorType = item.getSlotType().getEntitySlotId();
 			int armorValue = getArmorValue(item, stack);
 			
