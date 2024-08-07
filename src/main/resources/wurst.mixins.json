@@ -3,8 +3,7 @@
   "minVersion": "0.8",
   "package": "net.wurstclient.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-  ],
+  "mixins": [],
   "client": [
     "AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
