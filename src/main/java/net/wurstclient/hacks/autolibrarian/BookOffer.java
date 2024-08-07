@@ -9,11 +9,11 @@ package net.wurstclient.hacks.autolibrarian;
 
 import java.util.Objects;
 
-import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.wurstclient.mixinterface.ILanguageManager;
+import net.wurstclient.WurstClient;
+import net.wurstclient.WurstTranslator;
 
 public record BookOffer(String id, int level, int price)
 	implements Comparable<BookOffer>
@@ -31,19 +31,21 @@ public record BookOffer(String id, int level, int price)
 	
 	public String getEnchantmentName()
 	{
-		TranslationStorage english = ILanguageManager.getEnglish();
+		WurstTranslator translator = WurstClient.INSTANCE.getTranslator();
 		Enchantment enchantment = getEnchantment();
-		return english.get(enchantment.getTranslationKey());
+		return translator.translateMcEnglish(enchantment.getTranslationKey());
 	}
 	
 	public String getEnchantmentNameWithLevel()
 	{
-		TranslationStorage english = ILanguageManager.getEnglish();
+		WurstTranslator translator = WurstClient.INSTANCE.getTranslator();
 		Enchantment enchantment = getEnchantment();
-		String name = english.get(enchantment.getTranslationKey());
+		String name =
+			translator.translateMcEnglish(enchantment.getTranslationKey());
 		
 		if(enchantment.getMaxLevel() > 1)
-			name += " " + english.get("enchantment.level." + level);
+			name += " "
+				+ translator.translateMcEnglish("enchantment.level." + level);
 		
 		return name;
 	}

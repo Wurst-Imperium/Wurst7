@@ -10,8 +10,10 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -25,16 +27,17 @@ public abstract class LivingEntityRendererMixin
 	/**
 	 * Disables the distance limit in hasLabel() if configured in NameTags.
 	 */
-	@Redirect(at = @At(value = "INVOKE",
+	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D",
 		ordinal = 0), method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z")
-	private double adjustDistance(EntityRenderDispatcher render, Entity entity)
+	private double adjustDistance(EntityRenderDispatcher render, Entity entity,
+		Operation<Double> original)
 	{
 		// pretend the distance is 1 so the check always passes
 		if(WurstClient.INSTANCE.getHax().nameTagsHack.isUnlimitedRange())
 			return 1;
 		
-		return render.getSquaredDistanceToCamera(entity);
+		return original.call(render, entity);
 	}
 	
 	/**
