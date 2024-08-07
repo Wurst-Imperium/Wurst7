@@ -31,6 +31,7 @@ import net.wurstclient.clickgui.SettingsWindow;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class FeatureButton extends Component
 {
@@ -179,7 +180,7 @@ public final class FeatureButton extends Component
 			RenderSystem.setShaderColor(0, 1, 0,
 				hHack ? opacity * 1.5F : opacity);
 		else
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			RenderUtils.setShaderColor(bgColor,
 				hHack ? opacity * 1.5F : opacity);
 		
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
@@ -202,7 +203,7 @@ public final class FeatureButton extends Component
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		RenderUtils.setShaderColor(bgColor,
 			hSettings ? opacity * 1.5F : opacity);
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
 		bufferBuilder.vertex(matrix, x3, y2, 0).next();
@@ -222,7 +223,7 @@ public final class FeatureButton extends Component
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
 		bufferBuilder.vertex(matrix, x1, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();

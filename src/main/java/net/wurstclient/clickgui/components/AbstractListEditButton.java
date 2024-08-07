@@ -25,6 +25,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.RenderUtils;
 
 public abstract class AbstractListEditButton extends Component
 {
@@ -91,8 +92,7 @@ public abstract class AbstractListEditButton extends Component
 			gui.setTooltip(getSetting().getWrappedDescription(200));
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0).next();
@@ -102,8 +102,7 @@ public abstract class AbstractListEditButton extends Component
 		tessellator.draw();
 		
 		// box
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			hBox ? opacity * 1.5F : opacity);
+		RenderUtils.setShaderColor(bgColor, hBox ? opacity * 1.5F : opacity);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();
@@ -111,7 +110,7 @@ public abstract class AbstractListEditButton extends Component
 		bufferBuilder.vertex(matrix, x2, y2, 0).next();
 		bufferBuilder.vertex(matrix, x2, y1, 0).next();
 		tessellator.draw();
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y1, 0).next();

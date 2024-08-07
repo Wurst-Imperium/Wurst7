@@ -139,12 +139,12 @@ public final class AirPlaceHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		Box box = new Box(renderPos.subtract(region.toBlockPos()));
-		float[] colorF = guideColor.getColorF();
-		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.1F);
+		
+		guideColor.setAsShaderColor(0.1F);
 		RenderUtils.drawSolidBox(box, matrixStack);
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		
+		guideColor.setAsShaderColor(0.75F);
 		RenderUtils.drawOutlinedBox(box, matrixStack);
 		
 		matrixStack.pop();

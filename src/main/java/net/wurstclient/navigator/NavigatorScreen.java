@@ -24,6 +24,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.util.RenderUtils;
 
 public abstract class NavigatorScreen extends Screen
 {
@@ -272,7 +273,7 @@ public abstract class NavigatorScreen extends Screen
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
@@ -342,7 +343,7 @@ public abstract class NavigatorScreen extends Screen
 		
 		// outline
 		float yi1 = y1 + 0.1F;
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, yi1, 0).next();
@@ -375,8 +376,7 @@ public abstract class NavigatorScreen extends Screen
 		WurstClient.INSTANCE.getGui().updateColors();
 		float[] bgColor = WurstClient.INSTANCE.getGui().getBgColor();
 		float opacity = WurstClient.INSTANCE.getGui().getOpacity();
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 	}
 	
 	protected final void setColorToForeground()
@@ -384,8 +384,7 @@ public abstract class NavigatorScreen extends Screen
 		WurstClient.INSTANCE.getGui().updateColors();
 		float[] bgColor = WurstClient.INSTANCE.getGui().getBgColor();
 		float opacity = WurstClient.INSTANCE.getGui().getOpacity();
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 	}
 	
 	protected final void drawBackgroundBox(MatrixStack matrixStack, int x1,
