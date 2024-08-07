@@ -11,7 +11,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -20,13 +19,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.wurstclient.Category;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
@@ -148,61 +145,68 @@ public final class NukerHack extends Hack
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
-		ClientPlayerEntity player = MC.player;
-		Vec3d eyesPos = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		double rangeSq = Math.pow(range.getValue(), 2);
-		int blockRange = (int)Math.ceil(range.getValue());
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = range.getValueSq();
+		int blockRange = range.getValueCeil();
 		
-		Vec3i rangeVec = new Vec3i(blockRange, blockRange, blockRange);
-		BlockPos min = eyesBlock.subtract(rangeVec);
-		BlockPos max = eyesBlock.add(rangeVec);
+		Stream<BlockPos> stream =
+			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+				.filter(BlockUtils::canBeClicked)
+				.filter(mode.getSelected().getValidator(this)).sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
 		
-		ArrayList<BlockPos> blocks = BlockUtils.getAllInBox(min, max);
-		Stream<BlockPos> stream = blocks.parallelStream();
-		
-		List<BlockPos> blocks2 = stream
-			.filter(pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(BlockUtils::canBeClicked)
-			.filter(mode.getSelected().getValidator(this))
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesPos.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toList());
-		
-		if(player.getAbilities().creativeMode)
+		// Break all blocks in creative mode
+		if(MC.player.getAbilities().creativeMode)
 		{
-			Stream<BlockPos> stream2 = blocks2.parallelStream();
-			for(Set<BlockPos> set : prevBlocks)
-				stream2 = stream2.filter(pos -> !set.contains(pos));
-			List<BlockPos> blocks3 = stream2.collect(Collectors.toList());
-			
-			prevBlocks.addLast(new HashSet<>(blocks3));
-			while(prevBlocks.size() > 5)
-				prevBlocks.removeFirst();
-			
-			if(!blocks3.isEmpty())
-				currentBlock = blocks3.get(0);
-			
 			MC.interactionManager.cancelBlockBreaking();
 			renderer.resetProgress();
-			BlockBreaker.breakBlocksWithPacketSpam(blocks3);
+			
+			ArrayList<BlockPos> blocks = filterOutRecentBlocks(stream);
+			if(blocks.isEmpty())
+				return;
+			
+			currentBlock = blocks.get(0);
+			BlockBreaker.breakBlocksWithPacketSpam(blocks);
 			return;
 		}
 		
-		for(BlockPos pos : blocks2)
-			if(BlockBreaker.breakOneBlock(pos))
-			{
-				currentBlock = pos;
-				break;
-			}
+		// Break the first valid block in survival mode
+		currentBlock =
+			stream.filter(BlockBreaker::breakOneBlock).findFirst().orElse(null);
 		
 		if(currentBlock == null)
+		{
 			MC.interactionManager.cancelBlockBreaking();
+			renderer.resetProgress();
+			return;
+		}
 		
-		if(currentBlock != null && BlockUtils.getHardness(currentBlock) < 1)
+		if(BlockUtils.getHardness(currentBlock) < 1)
 			renderer.updateProgress();
 		else
 			renderer.resetProgress();
+	}
+	
+	/*
+	 * Waits 5 ticks before trying to break the same block again, which
+	 * makes it much more likely that the server will accept the block
+	 * breaking packets.
+	 */
+	private ArrayList<BlockPos> filterOutRecentBlocks(Stream<BlockPos> stream)
+	{
+		for(Set<BlockPos> set : prevBlocks)
+			stream = stream.filter(pos -> !set.contains(pos));
+		
+		ArrayList<BlockPos> blocks =
+			stream.collect(Collectors.toCollection(ArrayList::new));
+		
+		prevBlocks.addLast(new HashSet<>(blocks));
+		while(prevBlocks.size() > 5)
+			prevBlocks.removeFirst();
+		
+		return blocks;
 	}
 	
 	@Override

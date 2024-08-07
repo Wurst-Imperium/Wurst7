@@ -16,10 +16,14 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.encryption.ClientPlayerSession;
 import net.minecraft.network.message.MessageChain;
 import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.wurstclient.Category;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -29,7 +33,7 @@ import net.wurstclient.util.ChatUtils;
 @SearchTags({"no chat reports", "NoEncryption", "no encryption",
 	"NoChatSigning", "no chat signing"})
 public final class NoChatReportsOtf extends OtherFeature
-	implements UpdateListener
+	implements UpdateListener, ChatInputListener
 {
 	private final CheckboxSetting disableSignatures =
 		new CheckboxSetting("Disable signatures", true)
@@ -47,6 +51,7 @@ public final class NoChatReportsOtf extends OtherFeature
 		addSetting(disableSignatures);
 		
 		ClientLoginConnectionEvents.INIT.register(this::onLoginStart);
+		EVENTS.add(ChatInputListener.class, this);
 	}
 	
 	@Override
@@ -69,6 +74,33 @@ public final class NoChatReportsOtf extends OtherFeature
 					MC);
 		
 		EVENTS.remove(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onReceivedMessage(ChatInputEvent event)
+	{
+		if(!isActive())
+			return;
+		
+		Text originalText = event.getComponent();
+		if(!(originalText
+			.getContent() instanceof TranslatableTextContent trContent))
+			return;
+		
+		if(!trContent.getKey().equals("chat.disabled.missingProfileKey"))
+			return;
+		
+		event.cancel();
+		
+		ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL,
+			"https://wurst.wiki/ncr");
+		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+			Text.literal("Original message: ").append(originalText));
+		
+		ChatUtils.component(Text.literal(
+			"The server is refusing to let you chat without enabling chat reports. See wurst.wiki/ncr")
+			.styled(
+				s -> s.withClickEvent(clickEvent).withHoverEvent(hoverEvent)));
 	}
 	
 	private void onLoginStart(ClientLoginNetworkHandler handler,

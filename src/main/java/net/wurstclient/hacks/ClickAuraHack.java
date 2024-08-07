@@ -136,7 +136,6 @@ public final class ClickAuraHack extends Hack
 			.sendPlayerLookPacket();
 		
 		// attack entity
-		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 		speed.resetTimer();
