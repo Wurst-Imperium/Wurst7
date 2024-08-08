@@ -56,6 +56,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().antiHungerHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 	}
 	

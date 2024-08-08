@@ -114,6 +114,8 @@ public final class AutoBuildHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().templateToolHack.setEnabled(false);
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RightClickListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -306,6 +308,11 @@ public final class AutoBuildHack extends Hack
 			e.printStackTrace();
 			setEnabled(false);
 		}
+	}
+	
+	public Path getFolder()
+	{
+		return templateSetting.getFolder();
 	}
 	
 	private enum Status

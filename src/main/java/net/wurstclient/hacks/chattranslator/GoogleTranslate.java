@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.hacks.chattranslator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,12 +24,46 @@ public enum GoogleTranslate
 {
 	;
 	
+	private static final HashMap<Character, String> simplifyMap;
+	static
+	{
+		simplifyMap = new HashMap<>();
+		simplifyMap.put(' ', "");
+		simplifyMap.put('\r', "");
+		simplifyMap.put('\n', "");
+		simplifyMap.put('\t', "");
+		simplifyMap.put('ä', "a");
+		simplifyMap.put('ö', "o");
+		simplifyMap.put('ü', "u");
+		simplifyMap.put('á', "a");
+		simplifyMap.put('é', "e");
+		simplifyMap.put('í', "i");
+		simplifyMap.put('ó', "o");
+		simplifyMap.put('ú', "u");
+		simplifyMap.put('à', "a");
+		simplifyMap.put('è', "e");
+		simplifyMap.put('ì', "i");
+		simplifyMap.put('ò', "o");
+		simplifyMap.put('ù', "u");
+		simplifyMap.put('â', "a");
+		simplifyMap.put('ê', "e");
+		simplifyMap.put('î', "i");
+		simplifyMap.put('ô', "o");
+		simplifyMap.put('û', "u");
+		simplifyMap.put('ã', "a");
+		simplifyMap.put('õ', "o");
+		simplifyMap.put('ñ', "n");
+		simplifyMap.put('ç', "c");
+	}
+	
 	public static String translate(String text, String langFrom, String langTo)
 	{
 		String html = getHTML(text, langFrom, langTo);
 		String translated = parseHTML(html);
 		
-		if(text.equalsIgnoreCase(translated))
+		// Return null if Google Translate just returned the original text,
+		// ignoring capitalization changes, whitespace, and broken characters
+		if(simplify(text).equals(simplify(translated)))
 			return null;
 		
 		return translated;
@@ -96,14 +131,24 @@ public enum GoogleTranslate
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		
 		Matcher matcher = pattern.matcher(html);
-		matcher.find();
-		String match = matcher.group(1);
+		if(!matcher.find())
+			return null;
 		
+		String match = matcher.group(1);
 		if(match == null || match.isEmpty())
 			return null;
 			
 		// deprecated in favor of org.apache.commons.text.StringEscapeUtils,
 		// which isn't bundled with Minecraft
 		return org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(match);
+	}
+	
+	private static String simplify(String text)
+	{
+		StringBuilder sb = new StringBuilder();
+		for(char c : text.toLowerCase().toCharArray())
+			sb.append(simplifyMap.getOrDefault(c, String.valueOf(c)));
+		
+		return sb.toString();
 	}
 }

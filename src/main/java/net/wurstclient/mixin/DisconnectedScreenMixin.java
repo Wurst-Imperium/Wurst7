@@ -75,15 +75,14 @@ public class DisconnectedScreenMixin extends Screen
 	
 	private void addReconnectButtons()
 	{
-		ButtonWidget reconnectButton = grid.add(
-			ButtonWidget.builder(Text.literal("Reconnect"),
-				b -> LastServerRememberer.reconnect(parent)).build(),
-			grid.copyPositioner().margin(2).marginTop(-6));
+		ButtonWidget reconnectButton = grid.add(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(parent))
+			.width(200).build());
 		
-		autoReconnectButton = grid.add(
-			ButtonWidget.builder(Text.literal("AutoReconnect"),
-				b -> pressAutoReconnect()).build(),
-			grid.copyPositioner().margin(2));
+		autoReconnectButton = grid.add(ButtonWidget
+			.builder(Text.literal("AutoReconnect"), b -> pressAutoReconnect())
+			.width(200).build());
 		
 		grid.refreshPositions();
 		Stream.of(reconnectButton, autoReconnectButton)
