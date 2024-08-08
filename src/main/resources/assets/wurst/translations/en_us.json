@@ -37,6 +37,7 @@
   "description.wurst.hack.autoleave": "Automatically leaves the server when your health is low.",
   "description.wurst.hack.autolibrarian": "Automatically trains a villager to become a librarian that sells a specific enchanted book. You can set up an entire trading hall in no time by using this hack.",
   "description.wurst.hack.autoeat": "Automatically eats food when necessary.",
+  "description.wurst.hack.autoplace": "Right click when your crosshair is pointing to a side face of a block.",
   "description.wurst.setting.autoeat.target_hunger": "Tries to keep the hunger bar at or above this level, but only if it doesn't waste any hunger points.",
   "description.wurst.setting.autoeat.min_hunger": "Always keeps the hunger bar at or above this level, even if it wastes some hunger points.\n6.5 - Cannot cause any waste with vanilla food items.\n10.0 - Completely ignores waste and just keeps the hunger bar full.",
   "description.wurst.setting.autoeat.injured_hunger": "Fills the hunger bar to at least this level when you are injured, even if it wastes some hunger points.\n10.0 - fastest healing\n9.0 - slowest healing\n<9.0 - no healing\n<3.5 - no sprinting",
