@@ -216,7 +216,6 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// attack entity
-		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, entity);
 		swingHand.swing(Hand.MAIN_HAND);
 		speed.resetTimer();

@@ -285,7 +285,6 @@ public final class ProtectHack extends Hack
 				return;
 			
 			// attack enemy
-			WURST.getHax().criticalsHack.doCritical();
 			MC.interactionManager.attackEntity(MC.player, enemy);
 			swingHand.swing(Hand.MAIN_HAND);
 			speed.resetTimer();

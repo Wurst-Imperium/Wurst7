@@ -7,17 +7,18 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.LeftClickListener;
+import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
-public final class MaceDmgHack extends Hack implements LeftClickListener
+public final class MaceDmgHack extends Hack
+	implements PlayerAttacksEntityListener
 {
 	public MaceDmgHack()
 	{
@@ -28,17 +29,17 @@ public final class MaceDmgHack extends Hack implements LeftClickListener
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(LeftClickListener.class, this);
+		EVENTS.add(PlayerAttacksEntityListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(LeftClickListener.class, this);
+		EVENTS.remove(PlayerAttacksEntityListener.class, this);
 	}
 	
 	@Override
-	public void onLeftClick(LeftClickEvent event)
+	public void onPlayerAttacksEntity(Entity target)
 	{
 		if(MC.crosshairTarget == null
 			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY)
@@ -58,12 +59,8 @@ public final class MaceDmgHack extends Hack implements LeftClickListener
 	
 	private void sendFakeY(double offset)
 	{
-		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
-		double posX = MC.player.getX();
-		double posY = MC.player.getY();
-		double posZ = MC.player.getZ();
-		
-		netHandler.sendPacket(
-			new PositionAndOnGround(posX, posY + offset, posZ, false));
+		MC.player.networkHandler
+			.sendPacket(new PositionAndOnGround(MC.player.getX(),
+				MC.player.getY() + offset, MC.player.getZ(), false));
 	}
 }

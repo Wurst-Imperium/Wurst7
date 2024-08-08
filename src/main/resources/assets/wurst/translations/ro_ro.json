@@ -48,7 +48,7 @@
   "description.wurst.hack.bunnyhop": "Sari automat.",
   "description.wurst.hack.cameranoclip": "Permite camerei 3rd person sa vada prin pereti.",
   "description.wurst.hack.cavefinder": "Te ajuta sa gasesti pesteri conturandu-le in culoarea aleasa.",
-  "description.wurst.hack.chattranslator": "Traduce mesajele de pe chat folosind Google Translate.",
+  "description.wurst.hack.chattranslator": "Traduce mesajele din chat folosind Google Translate.",
   "description.wurst.hack.chestesp": "Contureaza chesturile din apropiere.",
   "description.wurst.hack.clickaura": "Ataca automat cea mai apropiata entitate atunci cand dai click.\n\n§c§lATENTIE:§r ClickAura este mai suspicios decat Killaura si este mai usor de detectat de catre anumite plugin-uri. Este recomandat in schimb sa folosesti Killaura sau TriggerBot.",
   "description.wurst.hack.clickgui": "ClickGUI bazat pe windows.",
