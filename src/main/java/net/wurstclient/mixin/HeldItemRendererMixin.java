@@ -34,7 +34,7 @@ public abstract class HeldItemRendererMixin
 	{
 		// lower shield when blocking
 		if(item.getItem() == Items.SHIELD)
-			WurstClient.INSTANCE.getHax().noShieldOverlayHack
+			WurstClient.INSTANCE.getHax().noOverlayHack
 				.adjustShieldPosition(matrices, true);
 	}
 	
@@ -49,7 +49,7 @@ public abstract class HeldItemRendererMixin
 	{
 		// lower shield when not blocking
 		if(item.getItem() == Items.SHIELD)
-			WurstClient.INSTANCE.getHax().noShieldOverlayHack
+			WurstClient.INSTANCE.getHax().noOverlayHack
 				.adjustShieldPosition(matrices, false);
 	}
 }
