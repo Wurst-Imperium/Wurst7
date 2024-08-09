@@ -7,171 +7,142 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
+import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.hacks.chattranslator.FilterOwnMessagesSetting;
+import net.wurstclient.hacks.chattranslator.GoogleTranslate;
+import net.wurstclient.hacks.chattranslator.LanguageSetting;
+import net.wurstclient.hacks.chattranslator.LanguageSetting.Language;
+import net.wurstclient.hacks.chattranslator.WhatToTranslateSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.GoogleTranslate;
 
 @SearchTags({"chat translator", "ChatTranslate", "chat translate",
 	"ChatTranslation", "chat translation", "AutoTranslate", "auto translate",
 	"AutoTranslator", "auto translator", "AutoTranslation", "auto translation",
 	"GoogleTranslate", "google translate", "GoogleTranslator",
 	"google translator", "GoogleTranslation", "google translation"})
-public final class ChatTranslatorHack extends Hack implements ChatInputListener
+public final class ChatTranslatorHack extends Hack
+	implements ChatInputListener, ChatOutputListener
 {
-	private final EnumSetting<FromLanguage> langFrom = new EnumSetting<>(
-		"Translate from", FromLanguage.values(), FromLanguage.AUTO_DETECT);
+	private final WhatToTranslateSetting whatToTranslate =
+		new WhatToTranslateSetting();
 	
-	private final EnumSetting<ToLanguage> langTo = new EnumSetting<>(
-		"Translate to", ToLanguage.values(), ToLanguage.ENGLISH);
+	private final LanguageSetting playerLanguage =
+		LanguageSetting.withoutAutoDetect("Your language",
+			"description.wurst.setting.chattranslator.your_language",
+			Language.ENGLISH);
+	
+	private final LanguageSetting otherLanguage =
+		LanguageSetting.withoutAutoDetect("Other language",
+			"description.wurst.setting.chattranslator.other_language",
+			Language.CHINESE_SIMPLIFIED);
+	
+	private final CheckboxSetting autoDetectReceived =
+		new CheckboxSetting("Detect received language",
+			"description.wurst.setting.chattranslator.detect_received_language",
+			true);
+	
+	private final CheckboxSetting autoDetectSent = new CheckboxSetting(
+		"Detect sent language",
+		"description.wurst.setting.chattranslator.detect_sent_language", true);
+	
+	private final FilterOwnMessagesSetting filterOwnMessages =
+		new FilterOwnMessagesSetting();
 	
 	public ChatTranslatorHack()
 	{
 		super("ChatTranslator");
 		setCategory(Category.CHAT);
-		
-		addSetting(langFrom);
-		addSetting(langTo);
+		addSetting(whatToTranslate);
+		addSetting(playerLanguage);
+		addSetting(otherLanguage);
+		addSetting(autoDetectReceived);
+		addSetting(autoDetectSent);
+		addSetting(filterOwnMessages);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
 		EVENTS.add(ChatInputListener.class, this);
+		EVENTS.add(ChatOutputListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
+		EVENTS.remove(ChatOutputListener.class, this);
 	}
 	
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		new Thread(() -> {
-			try
-			{
-				translate(event);
-				
-			}catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}, "ChatTranslator").start();
-	}
-	
-	private void translate(ChatInputEvent event)
-	{
-		String incomingMsg = event.getComponent().getString();
-		
-		String translatorPrefix =
-			"\u00a7a[\u00a7b" + langTo.getSelected().name + "\u00a7a]:\u00a7r ";
-		
-		if(incomingMsg.startsWith(ChatUtils.WURST_PREFIX)
-			|| incomingMsg.startsWith(translatorPrefix))
+		if(!whatToTranslate.includesReceived())
 			return;
 		
-		String translated = GoogleTranslate.translate(incomingMsg,
-			langFrom.getSelected().value, langTo.getSelected().value);
+		String message = event.getComponent().getString();
+		Language fromLang = autoDetectReceived.isChecked()
+			? Language.AUTO_DETECT : otherLanguage.getSelected();
+		Language toLang = playerLanguage.getSelected();
+		
+		if(message.startsWith(ChatUtils.WURST_PREFIX)
+			|| message.startsWith(toLang.getPrefix()))
+			return;
+		
+		if(filterOwnMessages.isChecked()
+			&& filterOwnMessages.isOwnMessage(message))
+			return;
+		
+		Thread.ofVirtual().name("ChatTranslator")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
+			.start(() -> showTranslated(message, fromLang, toLang));
+	}
+	
+	private void showTranslated(String message, Language fromLang,
+		Language toLang)
+	{
+		String translated = GoogleTranslate.translate(message,
+			fromLang.getValue(), toLang.getValue());
+		
+		if(translated != null)
+			MC.inGameHud.getChatHud().addMessage(toLang.prefixText(translated));
+	}
+	
+	@Override
+	public void onSentMessage(ChatOutputEvent event)
+	{
+		if(!whatToTranslate.includesSent())
+			return;
+		
+		String message = event.getMessage();
+		Language fromLang = autoDetectSent.isChecked() ? Language.AUTO_DETECT
+			: playerLanguage.getSelected();
+		Language toLang = otherLanguage.getSelected();
+		
+		if(message.startsWith("/") || message.startsWith("."))
+			return;
+		
+		event.cancel();
+		
+		Thread.ofVirtual().name("ChatTranslator")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
+			.start(() -> sendTranslated(message, fromLang, toLang));
+	}
+	
+	private void sendTranslated(String message, Language fromLang,
+		Language toLang)
+	{
+		String translated = GoogleTranslate.translate(message,
+			fromLang.getValue(), toLang.getValue());
 		
 		if(translated == null)
-			return;
+			translated = message;
 		
-		Text translationMsg =
-			Text.literal(translatorPrefix).append(Text.literal(translated));
-		
-		MC.inGameHud.getChatHud().addMessage(translationMsg);
-	}
-	
-	public static enum FromLanguage
-	{
-		AUTO_DETECT("Detect Language", "auto"),
-		AFRIKAANS("Afrikaans", "af"),
-		ARABIC("Arabic", "ar"),
-		CZECH("Czech", "cs"),
-		CHINESE_SIMPLIFIED("Chinese (simplified)", "zh-CN"),
-		CHINESE_TRADITIONAL("Chinese (traditional)", "zh-TW"),
-		DANISH("Danish", "da"),
-		DUTCH("Dutch", "nl"),
-		ENGLISH("English", "en"),
-		FINNISH("Finnish", "fi"),
-		FRENCH("French", "fr"),
-		GERMAN("Deutsch!", "de"),
-		GREEK("Greek", "el"),
-		HINDI("Hindi", "hi"),
-		ITALIAN("Italian", "it"),
-		JAPANESE("Japanese", "ja"),
-		KOREAN("Korean", "ko"),
-		NORWEGIAN("Norwegian", "no"),
-		POLISH("Polish", "pl"),
-		PORTUGUESE("Portugese", "pt"),
-		RUSSIAN("Russian", "ru"),
-		SPANISH("Spanish", "es"),
-		SWAHILI("Swahili", "sw"),
-		SWEDISH("Swedish", "sv"),
-		TURKISH("Turkish", "tr");
-		
-		private final String name;
-		private final String value;
-		
-		private FromLanguage(String name, String value)
-		{
-			this.name = name;
-			this.value = value;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
-	}
-	
-	public static enum ToLanguage
-	{
-		AFRIKAANS("Afrikaans", "af"),
-		ARABIC("Arabic", "ar"),
-		CZECH("Czech", "cs"),
-		CHINESE_SIMPLIFIED("Chinese (simplified)", "zh-CN"),
-		CHINESE_TRADITIONAL("Chinese (traditional)", "zh-TW"),
-		DANISH("Danish", "da"),
-		DUTCH("Dutch", "nl"),
-		ENGLISH("English", "en"),
-		FINNISH("Finnish", "fi"),
-		FRENCH("French", "fr"),
-		GERMAN("Deutsch!", "de"),
-		GREEK("Greek", "el"),
-		HINDI("Hindi", "hi"),
-		ITALIAN("Italian", "it"),
-		JAPANESE("Japanese", "ja"),
-		KOREAN("Korean", "ko"),
-		NORWEGIAN("Norwegian", "no"),
-		POLISH("Polish", "pl"),
-		PORTUGUESE("Portugese", "pt"),
-		RUSSIAN("Russian", "ru"),
-		SPANISH("Spanish", "es"),
-		SWAHILI("Swahili", "sw"),
-		SWEDISH("Swedish", "sv"),
-		TURKISH("Turkish", "tr");
-		
-		private final String name;
-		private final String value;
-		
-		private ToLanguage(String name, String value)
-		{
-			this.name = name;
-			this.value = value;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
+		MC.getNetworkHandler().sendChatMessage(translated);
 	}
 }

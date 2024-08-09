@@ -4,7 +4,7 @@
   "description.wurst.hack.antiafk": "Cammina randomicamente per nasconderti dai detector di player AFK.",
   "description.wurst.hack.antiblind": "Previene la cecità ed effetti oscurità.\nIncompatibile con OptiFine.",
   "description.wurst.hack.anticactus": "Ti protegge dai danni causati dai cactus.",
-  "description.wurst.hack.antihunger": "Rallenta la tua fame quando cammini.",
+  "description.wurst.hack.antihunger": "Rallenta la tua fame quando cammini.\n\n§c§lATTENZIONE:§r Ci sono state segnalazioni di questo hack che causa danni da caduta extra in condizioni specifiche e sconosciute.",
   "description.wurst.hack.antiknockback": "Annulla il knockback (non permette alle entità di spingerti).",
   "description.wurst.hack.antispam": "Blocca gli spammer in chat mettendo un contatore per i messaggi.",
   "description.wurst.hack.antiwaterpush": "Non permette all'acqua di spingerti.",

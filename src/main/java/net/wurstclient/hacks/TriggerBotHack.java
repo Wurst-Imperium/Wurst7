@@ -157,7 +157,6 @@ public final class TriggerBotHack extends Hack
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
-		WURST.getHax().criticalsHack.doCritical();
 		
 		if(simulateMouseClick.isChecked())
 		{

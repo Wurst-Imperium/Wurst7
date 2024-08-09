@@ -75,6 +75,10 @@ public abstract class MinecraftClientMixin
 		ordinal = 0), method = "tick()V")
 	private void onHandleInputEvents(CallbackInfo ci)
 	{
+		// Make sure this event is not fired outside of gameplay
+		if(player == null)
+			return;
+		
 		EventManager.fire(HandleInputEvent.INSTANCE);
 	}
 	
