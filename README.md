@@ -22,13 +22,13 @@ Pull requests are welcome, but please make sure to read the [contributing guidel
 
 ## Translations
 
-We have a [Crowdin project](https://crowdin.com/project/wurst7) for translations. You can also submit translations here on GitHub, but Crowdin is preferred since it makes it much easier to resolve issues.
+The preferred way to submit translations is through a Pull Request here on GitHub.
 
 To enable translations in-game, go to Wurst Options > Translations > ON.
 
 Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
 
-The translation files are located in [this folder](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/lang), in case you need them.
+The translation files are located in [this folder](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/translations), in case you need them.
 
 ## License
 
