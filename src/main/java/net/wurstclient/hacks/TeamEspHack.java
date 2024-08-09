@@ -11,23 +11,19 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.render.*;
+import net.minecraft.text.TextColor;
+import net.wurstclient.settings.filters.FilterNpcLikeSetting;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -47,8 +43,9 @@ import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"player esp", "PlayerTracers", "player tracers"})
-public final class PlayerEspHack extends Hack implements UpdateListener,
+// Pretty much just cloned from PlayerEspHack.java
+@SearchTags({"team esp", "TeamTracers", "team tracers"})
+public final class TeamEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	private final EspStyleSetting style =
@@ -58,15 +55,16 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
-	private final EntityFilterList entityFilters = new EntityFilterList(
-		new FilterSleepingSetting("Won't show sleeping players.", false),
-		new FilterInvisibleSetting("Won't show invisible players.", false));
+	private final EntityFilterList entityFilters =
+		new EntityFilterList(FilterNpcLikeSetting.genericVision(false),
+			FilterSleepingSetting.genericVision(false),
+			FilterInvisibleSetting.genericVision(false));
 	
 	private final ArrayList<PlayerEntity> players = new ArrayList<>();
 	
-	public PlayerEspHack()
+	public TeamEspHack()
 	{
-		super("PlayerESP");
+		super("TeamESP");
 		setCategory(Category.RENDER);
 		
 		addSetting(style);
@@ -77,7 +75,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	@Override
 	protected void onEnable()
 	{
-		WURST.getHax().teamEspHack.setEnabled(false);
+		WURST.getHax().playerEspHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -161,14 +159,24 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			matrixStack.scale(e.getWidth() + extraSize,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
-			// set color
-			if(WURST.getFriends().contains(e.getName().getString()))
-				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
-			else
+			TextColor colorComponent = e.getDisplayName().getStyle().getColor();
+			
+			float r = 0.8f, g = 0.8f, b = 0.8f;
+			
+			if(colorComponent != null)
 			{
-				float f = MC.player.distanceTo(e) / 20F;
-				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+				int teamColor = colorComponent.getRgb();
+				
+				b = (float)(teamColor % 256);
+				g = (float)(teamColor % 65536 / 256);
+				r = (float)(teamColor / 65536);
+				
+				b /= 256;
+				g /= 256;
+				r /= 256;
 			}
+			
+			RenderSystem.setShaderColor(r, g, b, 0.5F);
 			
 			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
 			RenderUtils.drawOutlinedBox(bb, matrixStack);
@@ -201,20 +209,21 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			float r, g, b;
+			TextColor colorComponent = e.getDisplayName().getStyle().getColor();
 			
-			if(WURST.getFriends().contains(e.getName().getString()))
+			float r = 0.8f, g = 0.8f, b = 0.8f;
+			
+			if(colorComponent != null)
 			{
-				r = 0;
-				g = 0;
-				b = 1;
+				int teamColor = colorComponent.getRgb();
 				
-			}else
-			{
-				float f = MC.player.distanceTo(e) / 20F;
-				r = MathHelper.clamp(2 - f, 0, 1);
-				g = MathHelper.clamp(f, 0, 1);
-				b = 0;
+				b = (float)(teamColor % 256);
+				g = (float)(teamColor % 65536 / 256);
+				r = (float)(teamColor / 65536);
+				
+				b /= 256;
+				g /= 256;
+				r /= 256;
 			}
 			
 			bufferBuilder

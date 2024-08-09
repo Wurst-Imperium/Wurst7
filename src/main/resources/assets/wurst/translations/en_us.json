@@ -209,6 +209,7 @@
   "description.wurst.hack.spider": "Allows you to climb up walls like a spider.",
   "description.wurst.hack.step": "Allows you to step up full blocks.",
   "description.wurst.hack.templatetool": "Allows you to create custom templates for AutoBuild by scanning existing buildings.",
+  "description.wurst.hack.teamesp": "Highlights nearby teammates/enemies.\nESP boxes will appear in the same color of their name tag.",
   "description.wurst.hack.throw": "Uses an item multiple times. Can be used to throw snowballs and eggs, spawn mobs, place minecarts, etc. in very large quantities.\n\nThis can cause a lot of lag and even crash a server.",
   "description.wurst.hack.tillaura": "Automatically turns dirt, grass, etc. into farmland.\nNot to be confused with Killaura.",
   "description.wurst.hack.timer": "Changes the speed of almost everything.",

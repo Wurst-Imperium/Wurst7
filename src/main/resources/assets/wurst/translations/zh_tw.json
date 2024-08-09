@@ -144,6 +144,7 @@
   "description.wurst.hack.step": "允許你走上更高高度（取決於你的設定）的格子方塊。",
   "description.wurst.hack.throw": "迅速丟你手中種類的物品，可以用於丟雪球、雞蛋、刷怪蛋、礦車，諸如此類。\n\n會生成大量的數量，這會產生大量的lag且可能會導致服務器崩潰。",
   "description.wurst.hack.tillaura": "自動將泥土、草塊、諸如此類。轉化為耕地。\n不要和Killaura搞混。",
+  "description.wurst.hack.teamesp": "高亮透視附近的隊友或敵人。\n會顯示跟他們的名字標籤同樣顏色的框框。",
   "description.wurst.hack.timer": "改變大部分東西的速度。",
   "description.wurst.hack.tired": "讓你看起來很像2015年的Alexander。\n僅限其他玩家可視。",
   "description.wurst.hack.toomanyhax": "關閉那些你並不想要使用的功能。\n讓你確保你不會不小心開啟錯誤的作弊功能導致被服務器封禁。\n這個是給那些“只想作弊一點點的用戶”。\n\n使用指令§6. toomanyhax§r來選擇哪些功能需要被遮罩。\n輸入§6. help toomanyhax§r尋求更多。",
