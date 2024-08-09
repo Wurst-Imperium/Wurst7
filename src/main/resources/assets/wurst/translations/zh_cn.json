@@ -6,7 +6,7 @@
   "description.wurst.hack.antiblind": "防止失明和黑暗效果。\n与 OptiFine 不兼容。",
   "description.wurst.hack.anticactus": "保护你免受仙人掌伤害。",
   "description.wurst.hack.antientitypush": "保护你不会被玩家和其他生物推挤。",
-  "description.wurst.hack.antihunger": "在你走路时减缓你的饥饿状态。",
+  "description.wurst.hack.antihunger": "在你走路时减缓你的饥饿状态。\n\n§c§l警告：§r 有报告称在某些特定的、未知的情况下，此功能可能会导致你受到额外的摔落伤害。",
   "description.wurst.hack.antiknockback": "保护你不被其他生物或玩家推动和用剑击退。",
   "description.wurst.hack.antispam": "将重复的刷屏改为计数器显示。",
   "description.wurst.hack.antiwaterpush": "防止你被水流推动。",
