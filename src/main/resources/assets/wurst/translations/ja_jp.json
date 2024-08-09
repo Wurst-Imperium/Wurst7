@@ -6,7 +6,7 @@
   "description.wurst.hack.antiblind": "盲目や暗闇の効果を防ぎます。\nOptiFineとの互換性はありません。",
   "description.wurst.hack.anticactus": "サボテンのダメージを無効化する。",
   "description.wurst.hack.antientitypush": "プレイヤーやモブに押されるのを防ぎます。",
-  "description.wurst.hack.antihunger": "歩行中に空腹度ゲージの減少を抑える。",
+  "description.wurst.hack.antihunger": "歩行中に空腹度ゲージの減少を抑える。\n\n§c§l注意:§r 特定の不明な条件下で、このハックが追加の落下ダメージを引き起こす報告があります。",
   "description.wurst.hack.antiknockback": "プレイヤーやモブからのノックバックを無効化する。",
   "description.wurst.hack.antispam": "同じ内容のメッセージにカウントを表示し、チャットスパムを防ぐ。",
   "description.wurst.hack.antiwaterpush": "水に流されるのを防ぐ。",
