@@ -198,10 +198,7 @@ public final class NukerHack extends Hack
 			return;
 		}
 		
-		if(BlockUtils.getHardness(currentBlock) < 1)
-			overlay.updateProgress();
-		else
-			overlay.resetProgress();
+		overlay.updateProgress();
 	}
 	
 	private boolean shouldBreakBlock(BlockPos pos)
