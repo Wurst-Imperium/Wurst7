@@ -156,7 +156,7 @@ public final class NukerHack extends Hack
 		if(MC.options.attackKey.isPressed())
 			return;
 		
-		// abort if using IDNuker without an ID being set
+		// abort if using ID mode without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
@@ -246,19 +246,14 @@ public final class NukerHack extends Hack
 	@Override
 	public void onLeftClick(LeftClickEvent event)
 	{
-		if(mode.getSelected() != Mode.ID)
+		if(lockId.isChecked() || mode.getSelected() != Mode.ID)
 			return;
 		
-		if(lockId.isChecked())
+		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
+			|| bHitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.BLOCK)
-			return;
-		
-		BlockHitResult blockHitResult = (BlockHitResult)MC.crosshairTarget;
-		BlockPos pos = new BlockPos(blockHitResult.getBlockPos());
-		id.setBlockName(BlockUtils.getName(pos));
+		id.setBlockName(BlockUtils.getName(bHitResult.getBlockPos()));
 	}
 	
 	@Override

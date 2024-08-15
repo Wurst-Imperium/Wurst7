@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -35,7 +36,7 @@ import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"LegitNuker", "nuker legit", "legit nuker"})
 public final class NukerLegitHack extends Hack
-	implements LeftClickListener, RenderListener, UpdateListener
+	implements UpdateListener, LeftClickListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
@@ -112,25 +113,22 @@ public final class NukerLegitHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		// disable other nukers
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
-		// add listeners
-		EVENTS.add(LeftClickListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(LeftClickListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		// remove listeners
-		EVENTS.remove(LeftClickListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(LeftClickListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
@@ -139,30 +137,6 @@ public final class NukerLegitHack extends Hack
 		currentBlock = null;
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
-	}
-	
-	@Override
-	public void onLeftClick(LeftClickEvent event)
-	{
-		// check mode
-		if(mode.getSelected() != Mode.ID)
-			return;
-		
-		if(lockId.isChecked())
-			return;
-		
-		// check hitResult
-		if(MC.crosshairTarget == null
-			|| !(MC.crosshairTarget instanceof BlockHitResult))
-			return;
-		
-		// check pos
-		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-		if(pos == null || BlockUtils.getBlock(pos) == Blocks.AIR)
-			return;
-		
-		// set id
-		id.setBlockName(BlockUtils.getName(pos));
 	}
 	
 	@Override
@@ -247,6 +221,19 @@ public final class NukerLegitHack extends Hack
 		// damage block
 		MC.options.attackKey.setPressed(true);
 		return true;
+	}
+	
+	@Override
+	public void onLeftClick(LeftClickEvent event)
+	{
+		if(lockId.isChecked() || mode.getSelected() != Mode.ID)
+			return;
+		
+		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
+			|| bHitResult.getType() != HitResult.Type.BLOCK)
+			return;
+		
+		id.setBlockName(BlockUtils.getName(bHitResult.getBlockPos()));
 	}
 	
 	@Override
