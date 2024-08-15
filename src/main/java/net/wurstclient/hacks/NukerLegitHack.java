@@ -8,9 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
@@ -73,7 +70,7 @@ public final class NukerLegitHack extends Hack
 		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
 		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
-	private final OverlayRenderer renderer = new OverlayRenderer();
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
 	public NukerLegitHack()
@@ -91,7 +88,25 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().getRenderName(this);
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return getName();
+			
+			case ID:
+			return "IDNukerLegit [" + id.getShortBlockName() + "]";
+			
+			case MULTI_ID:
+			int ids = multiIdList.getBlockNames().size();
+			return "MultiIDNukerLegit [" + ids + (ids == 1 ? " ID]" : " IDs]");
+			
+			case FLAT:
+			return "FlatNukerLegit";
+			
+			case SMASH:
+			return "SmashNukerLegit";
+		}
 	}
 	
 	@Override
@@ -120,7 +135,7 @@ public final class NukerLegitHack extends Hack
 		
 		// resets
 		MC.options.attackKey.setPressed(false);
-		renderer.resetProgress();
+		overlay.resetProgress();
 		currentBlock = null;
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -155,10 +170,10 @@ public final class NukerLegitHack extends Hack
 	{
 		currentBlock = null;
 		
-		// abort if using IDNuker without an ID being set
+		// abort if using ID mode without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 		{
-			renderer.resetProgress();
+			overlay.resetProgress();
 			return;
 		}
 		
@@ -167,8 +182,8 @@ public final class NukerLegitHack extends Hack
 		
 		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, range.getValueCeil())
-				.filter(BlockUtils::canBeClicked)
-				.filter(mode.getSelected().getValidator(this)).sorted(Comparator
+				.filter(BlockUtils::canBeClicked).filter(this::shouldBreakBlock)
+				.sorted(Comparator
 					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
 		
 		// Break the first valid block
@@ -178,10 +193,32 @@ public final class NukerLegitHack extends Hack
 		if(currentBlock == null)
 		{
 			MC.options.attackKey.setPressed(false);
-			renderer.resetProgress();
+			overlay.resetProgress();
 		}
 		
-		renderer.updateProgress();
+		overlay.updateProgress();
+	}
+	
+	private boolean shouldBreakBlock(BlockPos pos)
+	{
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return true;
+			
+			case ID:
+			return BlockUtils.getName(pos).equals(id.getBlockName());
+			
+			case MULTI_ID:
+			return multiIdList.contains(BlockUtils.getBlock(pos));
+			
+			case FLAT:
+			return pos.getY() >= MC.player.getPos().getY();
+			
+			case SMASH:
+			return BlockUtils.getHardness(pos) >= 1;
+		}
 	}
 	
 	private boolean breakBlock(BlockPos pos)
@@ -215,57 +252,28 @@ public final class NukerLegitHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		renderer.render(matrixStack, partialTicks, currentBlock);
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private enum Mode
 	{
-		NORMAL("Normal", n -> "NukerLegit", (n, p) -> true),
-		
-		ID("ID",
-			n -> "IDNukerLegit ["
-				+ n.id.getBlockName().replace("minecraft:", "") + "]",
-			(n, p) -> BlockUtils.getName(p).equals(n.id.getBlockName())),
-		
-		MULTI_ID("MultiID",
-			n -> "MultiIDNuker [" + n.multiIdList.getBlockNames().size()
-				+ (n.multiIdList.getBlockNames().size() == 1 ? " ID]"
-					: " IDs]"),
-			(n, p) -> n.multiIdList.getBlockNames()
-				.contains(BlockUtils.getName(p))),
-		
-		FLAT("Flat", n -> "FlatNukerLegit",
-			(n, p) -> p.getY() >= MC.player.getPos().getY()),
-		
-		SMASH("Smash", n -> "SmashNukerLegit",
-			(n, p) -> BlockUtils.getHardness(p) >= 1);
+		NORMAL("Normal"),
+		ID("ID"),
+		MULTI_ID("MultiID"),
+		FLAT("Flat"),
+		SMASH("Smash");
 		
 		private final String name;
-		private final Function<NukerLegitHack, String> renderName;
-		private final BiPredicate<NukerLegitHack, BlockPos> validator;
 		
-		private Mode(String name, Function<NukerLegitHack, String> renderName,
-			BiPredicate<NukerLegitHack, BlockPos> validator)
+		private Mode(String name)
 		{
 			this.name = name;
-			this.renderName = renderName;
-			this.validator = validator;
 		}
 		
 		@Override
 		public String toString()
 		{
 			return name;
-		}
-		
-		public String getRenderName(NukerLegitHack n)
-		{
-			return renderName.apply(n);
-		}
-		
-		public Predicate<BlockPos> getValidator(NukerLegitHack n)
-		{
-			return p -> validator.test(n, p);
 		}
 	}
 }
