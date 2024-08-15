@@ -52,6 +52,26 @@ public final class BlockListSetting extends Setting
 		return Collections.unmodifiableList(blockNames);
 	}
 	
+	public int indexOf(String name)
+	{
+		return Collections.binarySearch(blockNames, name);
+	}
+	
+	public int indexOf(Block block)
+	{
+		return indexOf(BlockUtils.getName(block));
+	}
+	
+	public boolean contains(String name)
+	{
+		return indexOf(name) >= 0;
+	}
+	
+	public boolean contains(Block block)
+	{
+		return indexOf(block) >= 0;
+	}
+	
 	public void add(Block block)
 	{
 		String name = BlockUtils.getName(block);

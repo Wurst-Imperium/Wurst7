@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,7 +74,7 @@ public final class NukerHack extends Hack
 		"minecraft:raw_iron_block", "minecraft:redstone_ore");
 	
 	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
-	private final OverlayRenderer renderer = new OverlayRenderer();
+	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
 	public NukerHack()
@@ -94,7 +91,25 @@ public final class NukerHack extends Hack
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().getRenderName(this);
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return getName();
+			
+			case ID:
+			return "IDNuker [" + id.getShortBlockName() + "]";
+			
+			case MULTI_ID:
+			int ids = multiIdList.getBlockNames().size();
+			return "MultiIDNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
+			
+			case FLAT:
+			return "FlatNuker";
+			
+			case SMASH:
+			return "SmashNuker";
+		}
 	}
 	
 	@Override
@@ -126,7 +141,7 @@ public final class NukerHack extends Hack
 		}
 		
 		prevBlocks.clear();
-		renderer.resetProgress();
+		overlay.resetProgress();
 		
 		if(!lockId.isChecked())
 			id.setBlock(Blocks.AIR);
@@ -153,15 +168,15 @@ public final class NukerHack extends Hack
 		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-				.filter(BlockUtils::canBeClicked)
-				.filter(mode.getSelected().getValidator(this)).sorted(Comparator
+				.filter(BlockUtils::canBeClicked).filter(this::shouldBreakBlock)
+				.sorted(Comparator
 					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode)
 		{
 			MC.interactionManager.cancelBlockBreaking();
-			renderer.resetProgress();
+			overlay.resetProgress();
 			
 			ArrayList<BlockPos> blocks = filterOutRecentBlocks(stream);
 			if(blocks.isEmpty())
@@ -179,14 +194,36 @@ public final class NukerHack extends Hack
 		if(currentBlock == null)
 		{
 			MC.interactionManager.cancelBlockBreaking();
-			renderer.resetProgress();
+			overlay.resetProgress();
 			return;
 		}
 		
 		if(BlockUtils.getHardness(currentBlock) < 1)
-			renderer.updateProgress();
+			overlay.updateProgress();
 		else
-			renderer.resetProgress();
+			overlay.resetProgress();
+	}
+	
+	private boolean shouldBreakBlock(BlockPos pos)
+	{
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return true;
+			
+			case ID:
+			return BlockUtils.getName(pos).equals(id.getBlockName());
+			
+			case MULTI_ID:
+			return multiIdList.contains(BlockUtils.getBlock(pos));
+			
+			case FLAT:
+			return pos.getY() >= MC.player.getPos().getY();
+			
+			case SMASH:
+			return BlockUtils.getHardness(pos) >= 1;
+		}
 	}
 	
 	/*
@@ -230,57 +267,28 @@ public final class NukerHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		renderer.render(matrixStack, partialTicks, currentBlock);
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private enum Mode
 	{
-		NORMAL("Normal", NukerHack::getName, (n, p) -> true),
-		
-		ID("ID",
-			n -> "IDNuker [" + n.id.getBlockName().replace("minecraft:", "")
-				+ "]",
-			(n, p) -> BlockUtils.getName(p).equals(n.id.getBlockName())),
-		
-		MULTI_ID("MultiID",
-			n -> "MultiIDNuker [" + n.multiIdList.getBlockNames().size()
-				+ (n.multiIdList.getBlockNames().size() == 1 ? " ID]"
-					: " IDs]"),
-			(n, p) -> n.multiIdList.getBlockNames()
-				.contains(BlockUtils.getName(p))),
-		
-		FLAT("Flat", n -> "FlatNuker",
-			(n, p) -> p.getY() >= MC.player.getPos().getY()),
-		
-		SMASH("Smash", n -> "SmashNuker",
-			(n, p) -> BlockUtils.getHardness(p) >= 1);
+		NORMAL("Normal"),
+		ID("ID"),
+		MULTI_ID("MultiID"),
+		FLAT("Flat"),
+		SMASH("Smash");
 		
 		private final String name;
-		private final Function<NukerHack, String> renderName;
-		private final BiPredicate<NukerHack, BlockPos> validator;
 		
-		private Mode(String name, Function<NukerHack, String> renderName,
-			BiPredicate<NukerHack, BlockPos> validator)
+		private Mode(String name)
 		{
 			this.name = name;
-			this.renderName = renderName;
-			this.validator = validator;
 		}
 		
 		@Override
 		public String toString()
 		{
 			return name;
-		}
-		
-		public String getRenderName(NukerHack n)
-		{
-			return renderName.apply(n);
-		}
-		
-		public Predicate<BlockPos> getValidator(NukerHack n)
-		{
-			return p -> validator.test(n, p);
 		}
 	}
 }
