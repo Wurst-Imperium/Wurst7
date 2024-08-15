@@ -7,12 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
@@ -163,21 +162,17 @@ public final class NukerLegitHack extends Hack
 			return;
 		}
 		
-		// get valid blocks
-		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValueI(),
-			mode.getSelected().getValidator(this));
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
 		
-		// find closest valid block
-		for(BlockPos pos : validBlocks)
-		{
-			// break block
-			if(!breakBlockExtraLegit(pos))
-				continue;
-			
-			// set currentBlock if successful
-			currentBlock = pos;
-			break;
-		}
+		Stream<BlockPos> stream =
+			BlockUtils.getAllInBoxStream(eyesBlock, range.getValueCeil())
+				.filter(BlockUtils::canBeClicked)
+				.filter(mode.getSelected().getValidator(this)).sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
+		
+		// Break the first valid block
+		currentBlock = stream.filter(this::breakBlock).findFirst().orElse(null);
 		
 		// reset if no block was found
 		if(currentBlock == null)
@@ -189,20 +184,7 @@ public final class NukerLegitHack extends Hack
 		renderer.updateProgress();
 	}
 	
-	private ArrayList<BlockPos> getValidBlocks(int range,
-		Predicate<BlockPos> validator)
-	{
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos center = BlockPos.ofFloored(eyesVec);
-		
-		return BlockUtils.getAllInBoxStream(center, range)
-			.filter(BlockUtils::canBeClicked).filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.ofCenter(pos))))
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private boolean breakBlockExtraLegit(BlockPos pos)
+	private boolean breakBlock(BlockPos pos)
 	{
 		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
 		if(!params.lineOfSight() || params.distanceSq() > range.getValueSq())
