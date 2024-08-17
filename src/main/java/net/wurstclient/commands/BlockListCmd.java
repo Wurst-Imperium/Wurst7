@@ -7,7 +7,6 @@
  */
 package net.wurstclient.commands;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -90,9 +89,7 @@ public final class BlockListCmd extends Command
 				"\"" + inputBlockName + "\" is not a valid block.");
 		
 		String blockName = BlockUtils.getName(block);
-		int index =
-			Collections.binarySearch(setting.getBlockNames(), blockName);
-		if(index >= 0)
+		if(setting.contains(blockName))
 			throw new CmdError(feature.getName() + " " + setting.getName()
 				+ " already contains " + blockName);
 		
@@ -112,8 +109,7 @@ public final class BlockListCmd extends Command
 				"\"" + inputBlockName + "\" is not a valid block.");
 		
 		String blockName = BlockUtils.getName(block);
-		int index =
-			Collections.binarySearch(setting.getBlockNames(), blockName);
+		int index = setting.indexOf(blockName);
 		if(index < 0)
 			throw new CmdError(feature.getName() + " " + setting.getName()
 				+ " does not contain " + blockName);
