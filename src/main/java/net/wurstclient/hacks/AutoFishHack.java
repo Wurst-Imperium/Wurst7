@@ -9,10 +9,9 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -32,12 +31,6 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final SliderSetting validRange = new SliderSetting("Valid range",
-		"Any bites that occur outside of this range will be ignored.\n\n"
-			+ "Increase your range if bites are not being detected, decrease it"
-			+ " if other people's bites are being detected as yours.",
-		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
-	
 	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
 		"How long AutoFish will wait after a bite before reeling in.", 0, 0, 60,
 		1, ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
@@ -57,7 +50,7 @@ public final class AutoFishHack extends Hack
 	
 	private final FishingSpotManager fishingSpots = new FishingSpotManager();
 	private final AutoFishDebugDraw debugDraw =
-		new AutoFishDebugDraw(validRange, fishingSpots);
+		new AutoFishDebugDraw(fishingSpots);
 	private final AutoFishRodSelector rodSelector =
 		new AutoFishRodSelector(this);
 	
@@ -69,7 +62,6 @@ public final class AutoFishHack extends Hack
 	{
 		super("AutoFish");
 		setCategory(Category.OTHER);
-		addSetting(validRange);
 		addSetting(catchDelay);
 		addSetting(retryDelay);
 		addSetting(patience);
@@ -168,26 +160,20 @@ public final class AutoFishHack extends Hack
 	public void onReceivedPacket(PacketInputEvent event)
 	{
 		// check packet type
-		if(!(event.getPacket() instanceof PlaySoundS2CPacket sound))
+		if(!(event.getPacket() instanceof EntityTrackerUpdateS2CPacket update))
 			return;
 		
-		// check sound type
-		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH
-			.equals(sound.getSound().value()))
+		if(!(MC.world
+			.getEntityById(update.id()) instanceof FishingBobberEntity bobber))
+			return;
+		
+		ClientPlayerEntity player = MC.player;
+		
+		if(bobber != player.fishHook)
 			return;
 		
 		// check if player is fishing
 		if(!isFishing())
-			return;
-		
-		// register sound position
-		debugDraw.updateSoundPos(sound);
-		
-		// check sound position (Chebyshev distance)
-		Vec3d bobber = MC.player.fishHook.getPos();
-		double dx = Math.abs(sound.getX() - bobber.getX());
-		double dz = Math.abs(sound.getZ() - bobber.getZ());
-		if(Math.max(dx, dz) > validRange.getValue())
 			return;
 		
 		biteDetected = true;
