@@ -72,6 +72,11 @@ public class BlockListSetting extends Setting
 		return indexOf(block) >= 0;
 	}
 	
+	public int size()
+	{
+		return blockNames.size();
+	}
+	
 	public void add(Block block)
 	{
 		String name = BlockUtils.getName(block);

@@ -82,7 +82,7 @@ public final class NukerLegitHack extends Hack
 			return "IDNukerLegit [" + id.getShortBlockName() + "]";
 			
 			case MULTI_ID:
-			int ids = multiIdList.getBlockNames().size();
+			int ids = multiIdList.size();
 			return "MultiIDNukerLegit [" + ids + (ids == 1 ? " ID]" : " IDs]");
 			
 			case FLAT:

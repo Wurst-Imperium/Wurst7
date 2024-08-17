@@ -85,7 +85,7 @@ public final class NukerHack extends Hack
 			return "IDNuker [" + id.getShortBlockName() + "]";
 			
 			case MULTI_ID:
-			int ids = multiIdList.getBlockNames().size();
+			int ids = multiIdList.size();
 			return "MultiIDNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
 			
 			case FLAT:

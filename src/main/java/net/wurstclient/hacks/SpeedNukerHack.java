@@ -78,7 +78,7 @@ public final class SpeedNukerHack extends Hack
 			return "IDSpeedNuker [" + id.getShortBlockName() + "]";
 			
 			case MULTI_ID:
-			int ids = multiIdList.getBlockNames().size();
+			int ids = multiIdList.size();
 			return "MultiIDSpeedNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
 			
 			case FLAT:
