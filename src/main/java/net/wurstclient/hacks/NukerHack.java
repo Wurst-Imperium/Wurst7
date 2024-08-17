@@ -28,7 +28,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.NukerModeSetting;
+import net.wurstclient.settings.NukerModeSetting.NukerMode;
 import net.wurstclient.settings.NukerMultiIdListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -43,13 +44,7 @@ public final class NukerHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lNormal\u00a7r mode simply breaks everything around you.\n"
-			+ "\u00a7lID\u00a7r mode only breaks the selected block type. Left-click on a block to select it.\n"
-			+ "\u00a7lMultiID\u00a7r mode only breaks the block types in your MultiID List.\n"
-			+ "\u00a7lFlat\u00a7r mode flattens the area around you, but won't dig down.\n"
-			+ "\u00a7lSmash\u00a7r mode only breaks blocks that can be destroyed instantly (e.g. tall grass).",
-		Mode.values(), Mode.NORMAL);
+	private final NukerModeSetting mode = new NukerModeSetting();
 	
 	private final BlockSetting id =
 		new BlockSetting("ID", "The type of block to break in ID mode.\n"
@@ -146,7 +141,7 @@ public final class NukerHack extends Hack
 			return;
 		
 		// abort if using ID mode without an ID being set
-		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
+		if(mode.getSelected() == NukerMode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
 		Vec3d eyesVec = RotationUtils.getEyesPos();
@@ -235,7 +230,7 @@ public final class NukerHack extends Hack
 	@Override
 	public void onLeftClick(LeftClickEvent event)
 	{
-		if(lockId.isChecked() || mode.getSelected() != Mode.ID)
+		if(lockId.isChecked() || mode.getSelected() != NukerMode.ID)
 			return;
 		
 		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
@@ -249,27 +244,5 @@ public final class NukerHack extends Hack
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		overlay.render(matrixStack, partialTicks, currentBlock);
-	}
-	
-	private enum Mode
-	{
-		NORMAL("Normal"),
-		ID("ID"),
-		MULTI_ID("MultiID"),
-		FLAT("Flat"),
-		SMASH("Smash");
-		
-		private final String name;
-		
-		private Mode(String name)
-		{
-			this.name = name;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
