@@ -10,10 +10,6 @@ package net.wurstclient.commands;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.wurstclient.DontBlock;
 import net.wurstclient.Feature;
 import net.wurstclient.command.CmdError;
@@ -83,7 +79,7 @@ public final class BlockListCmd extends Command
 			throw new CmdSyntaxError();
 		
 		String inputBlockName = args[3];
-		Block block = getBlockFromNameOrID(inputBlockName);
+		Block block = BlockUtils.getBlockFromNameOrID(inputBlockName);
 		if(block == null)
 			throw new CmdSyntaxError(
 				"\"" + inputBlockName + "\" is not a valid block.");
@@ -103,7 +99,7 @@ public final class BlockListCmd extends Command
 			throw new CmdSyntaxError();
 		
 		String inputBlockName = args[3];
-		Block block = getBlockFromNameOrID(inputBlockName);
+		Block block = BlockUtils.getBlockFromNameOrID(inputBlockName);
 		if(block == null)
 			throw new CmdSyntaxError(
 				"\"" + inputBlockName + "\" is not a valid block.");
@@ -163,27 +159,5 @@ public final class BlockListCmd extends Command
 				+ " is not a BlockList setting.");
 		
 		return (BlockListSetting)setting;
-	}
-	
-	private Block getBlockFromNameOrID(String nameOrId)
-	{
-		if(MathUtils.isInteger(nameOrId))
-		{
-			BlockState state = Block.STATE_IDS.get(Integer.parseInt(nameOrId));
-			if(state == null)
-				return null;
-			
-			return state.getBlock();
-		}
-		
-		try
-		{
-			return Registries.BLOCK.getOrEmpty(Identifier.of(nameOrId))
-				.orElse(null);
-			
-		}catch(InvalidIdentifierException e)
-		{
-			return null;
-		}
 	}
 }
