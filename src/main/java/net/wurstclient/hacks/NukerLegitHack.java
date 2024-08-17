@@ -77,7 +77,6 @@ public final class NukerLegitHack extends Hack
 	public NukerLegitHack()
 	{
 		super("NukerLegit");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
@@ -188,7 +187,7 @@ public final class NukerLegitHack extends Hack
 			return multiIdList.contains(BlockUtils.getBlock(pos));
 			
 			case FLAT:
-			return pos.getY() >= MC.player.getPos().getY();
+			return pos.getY() >= MC.player.getY();
 			
 			case SMASH:
 			return BlockUtils.getHardness(pos) >= 1;

@@ -9,14 +9,11 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -76,7 +73,6 @@ public final class SpeedNukerHack extends Hack
 	public SpeedNukerHack()
 	{
 		super("SpeedNuker");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
@@ -88,20 +84,36 @@ public final class SpeedNukerHack extends Hack
 	@Override
 	public String getRenderName()
 	{
-		return mode.getSelected().renderName.apply(this);
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return getName();
+			
+			case ID:
+			return "IDSpeedNuker [" + id.getShortBlockName() + "]";
+			
+			case MULTI_ID:
+			int ids = multiIdList.getBlockNames().size();
+			return "MultiIDSpeedNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
+			
+			case FLAT:
+			return "FlatSpeedNuker";
+			
+			case SMASH:
+			return "SmashSpeedNuker";
+		}
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		// disable other nukers
 		WURST.getHax().autoMineHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
-		// add listeners
 		EVENTS.add(LeftClickListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
 	}
@@ -109,7 +121,6 @@ public final class SpeedNukerHack extends Hack
 	@Override
 	protected void onDisable()
 	{
-		// remove listeners
 		EVENTS.remove(LeftClickListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
 		
@@ -121,97 +132,77 @@ public final class SpeedNukerHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		// abort if using IDNuker without an ID being set
+		// abort if using ID mode without an ID being set
 		if(mode.getSelected() == Mode.ID && id.getBlock() == Blocks.AIR)
 			return;
 		
-		// get valid blocks
-		Iterable<BlockPos> validBlocks = getValidBlocks(range.getValue(),
-			pos -> mode.getSelected().validator.test(this, pos));
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = range.getValueSq();
+		int blockRange = range.getValueCeil();
 		
-		Iterator<BlockPos> autoToolIterator = validBlocks.iterator();
-		if(autoToolIterator.hasNext())
-			WURST.getHax().autoToolHack.equipIfEnabled(autoToolIterator.next());
+		ArrayList<BlockPos> blocks =
+			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+				.filter(BlockUtils::canBeClicked).filter(this::shouldBreakBlock)
+				.sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+				.collect(Collectors.toCollection(ArrayList::new));
 		
-		// break all blocks
-		BlockBreaker.breakBlocksWithPacketSpam(validBlocks);
+		if(!blocks.isEmpty())
+			WURST.getHax().autoToolHack.equipIfEnabled(blocks.get(0));
+		
+		BlockBreaker.breakBlocksWithPacketSpam(blocks);
 	}
 	
-	private ArrayList<BlockPos> getValidBlocks(double range,
-		Predicate<BlockPos> validator)
+	private boolean shouldBreakBlock(BlockPos pos)
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeSq = Math.pow(range + 0.5, 2);
-		int rangeI = (int)Math.ceil(range);
-		
-		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		
-		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(BlockUtils::canBeClicked).filter(validator)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
-			.collect(Collectors.toCollection(ArrayList::new));
+		switch(mode.getSelected())
+		{
+			default:
+			case NORMAL:
+			return true;
+			
+			case ID:
+			return BlockUtils.getName(pos).equals(id.getBlockName());
+			
+			case MULTI_ID:
+			return multiIdList.contains(BlockUtils.getBlock(pos));
+			
+			case FLAT:
+			return pos.getY() >= MC.player.getY();
+			
+			case SMASH:
+			return BlockUtils.getHardness(pos) >= 1;
+		}
 	}
 	
 	@Override
 	public void onLeftClick(LeftClickEvent event)
 	{
-		// check mode
-		if(mode.getSelected() != Mode.ID)
+		if(lockId.isChecked() || mode.getSelected() != Mode.ID)
 			return;
 		
-		if(lockId.isChecked())
+		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
+			|| bHitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		// check hitResult
-		if(MC.crosshairTarget == null
-			|| !(MC.crosshairTarget instanceof BlockHitResult))
-			return;
-		
-		// check pos
-		BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
-		if(pos == null || BlockUtils.getBlock(pos) == Blocks.AIR)
-			return;
-		
-		// set id
-		id.setBlockName(BlockUtils.getName(pos));
+		id.setBlockName(BlockUtils.getName(bHitResult.getBlockPos()));
 	}
 	
 	private enum Mode
 	{
-		NORMAL("Normal", n -> "SpeedNuker", (n, pos) -> true),
-		
-		ID("ID",
-			n -> "IDSpeedNuker ["
-				+ n.id.getBlockName().replace("minecraft:", "") + "]",
-			(n, pos) -> BlockUtils.getName(pos).equals(n.id.getBlockName())),
-		
-		MULTI_ID("MultiID",
-			n -> "MultiIDNuker [" + n.multiIdList.getBlockNames().size()
-				+ (n.multiIdList.getBlockNames().size() == 1 ? " ID]"
-					: " IDs]"),
-			(n, p) -> n.multiIdList.getBlockNames()
-				.contains(BlockUtils.getName(p))),
-		
-		FLAT("Flat", n -> "FlatSpeedNuker",
-			(n, pos) -> pos.getY() >= MC.player.getY()),
-		
-		SMASH("Smash", n -> "SmashSpeedNuker",
-			(n, pos) -> BlockUtils.getHardness(pos) >= 1);
+		NORMAL("Normal"),
+		ID("ID"),
+		MULTI_ID("MultiID"),
+		FLAT("Flat"),
+		SMASH("Smash");
 		
 		private final String name;
-		private final Function<SpeedNukerHack, String> renderName;
-		private final BiPredicate<SpeedNukerHack, BlockPos> validator;
 		
-		private Mode(String name, Function<SpeedNukerHack, String> renderName,
-			BiPredicate<SpeedNukerHack, BlockPos> validator)
+		private Mode(String name)
 		{
 			this.name = name;
-			this.renderName = renderName;
-			this.validator = validator;
 		}
 		
 		@Override

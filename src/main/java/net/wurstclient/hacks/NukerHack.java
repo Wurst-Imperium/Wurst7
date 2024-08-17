@@ -216,7 +216,7 @@ public final class NukerHack extends Hack
 			return multiIdList.contains(BlockUtils.getBlock(pos));
 			
 			case FLAT:
-			return pos.getY() >= MC.player.getPos().getY();
+			return pos.getY() >= MC.player.getY();
 			
 			case SMASH:
 			return BlockUtils.getHardness(pos) >= 1;
