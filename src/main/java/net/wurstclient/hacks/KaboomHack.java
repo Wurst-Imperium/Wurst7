@@ -31,7 +31,6 @@ public final class KaboomHack extends Hack implements UpdateListener
 	public KaboomHack()
 	{
 		super("Kaboom");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(power);
 	}
@@ -61,7 +60,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 				.affectWorld(true);
 		
 		// get valid blocks
-		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed(6);
+		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed();
 		
 		// break all blocks
 		for(int i = 0; i < power.getValueI(); i++)
@@ -71,20 +70,18 @@ public final class KaboomHack extends Hack implements UpdateListener
 		setEnabled(false);
 	}
 	
-	private ArrayList<BlockPos> getBlocksByDistanceReversed(double range)
+	private ArrayList<BlockPos> getBlocksByDistanceReversed()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		double rangeSq = Math.pow(range + 0.5, 2);
-		int rangeI = (int)Math.ceil(range);
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = 36;
+		int blockRange = 6;
 		
-		BlockPos center = BlockPos.ofFloored(RotationUtils.getEyesPos());
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		
-		return BlockUtils.getAllInBox(min, max).stream()
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.sorted(Comparator.comparingDouble(
-				pos -> -eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+		// farthest blocks first
+		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.sorted(Comparator
+				.comparingDouble(pos -> -pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }
