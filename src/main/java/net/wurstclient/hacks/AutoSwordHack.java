@@ -153,7 +153,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		{
 			case SPEED:
 			return (float)ItemUtils
-				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
+				.getAttribute(item, EntityAttributes.ATTACK_SPEED)
 				.orElseThrow();
 			
 			// Client-side item-specific attack damage calculation no
@@ -161,7 +161,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			case DAMAGE:
 			// EntityType<?> group = entity.getType();
 			float dmg = (float)ItemUtils
-				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
+				.getAttribute(item, EntityAttributes.ATTACK_DAMAGE)
 				.orElseThrow();
 			
 			// Check for mace, get bonus damage from fall
