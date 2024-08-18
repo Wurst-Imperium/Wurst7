@@ -87,11 +87,11 @@ public final class StepHack extends Hack implements UpdateListener
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
-			player.isOnGround()));
+			player.isOnGround(), MC.player.horizontalCollision));
 		
 		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
-			player.isOnGround()));
+			player.isOnGround(), MC.player.horizontalCollision));
 		
 		player.setPosition(player.getX(), player.getY() + stepHeight,
 			player.getZ());

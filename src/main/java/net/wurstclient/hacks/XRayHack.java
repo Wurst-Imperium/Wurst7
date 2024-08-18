@@ -165,8 +165,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(
-			isVisible(event.getState().getBlock(), event.getPos()));
+		// TODO: Find a new way to do this.
+		// event.setRendered(
+		// isVisible(event.getState().getBlock(), event.getPos()));
 	}
 	
 	@Override

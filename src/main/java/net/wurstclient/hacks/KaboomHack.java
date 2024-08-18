@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.explosion.Explosion;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -54,11 +53,12 @@ public final class KaboomHack extends Hack implements UpdateListener
 		// check fly-kick
 		if(!MC.player.getAbilities().creativeMode && !MC.player.isOnGround())
 			return;
-		
+			
+		// TODO: Find a new way to do this.
 		// do explosion particles
-		new Explosion(MC.world, MC.player, MC.player.getX(), MC.player.getY(),
-			MC.player.getZ(), 6F, false, Explosion.DestructionType.KEEP)
-				.affectWorld(true);
+		// new ExplosionImpl(MC.world, MC.player, MC.player.getX(),
+		// MC.player.getY(), MC.player.getZ(), 6F, false,
+		// Explosion.DestructionType.KEEP).affectWorld(true);
 		
 		// get valid blocks
 		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed(6);

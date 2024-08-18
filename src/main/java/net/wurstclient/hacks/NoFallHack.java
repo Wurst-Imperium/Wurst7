@@ -96,7 +96,8 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return;
 		
 		// send packet to stop fall damage
-		player.networkHandler.sendPacket(new OnGroundOnly(true));
+		player.networkHandler
+			.sendPacket(new OnGroundOnly(true, MC.player.horizontalCollision));
 	}
 	
 	private boolean isHoldingMace(ClientPlayerEntity player)

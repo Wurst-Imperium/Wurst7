@@ -302,7 +302,8 @@ public final class AutoFarmHack extends Hack
 					.interactBlock(MC.player, hand, params.toHitResult());
 				
 				// swing arm
-				if(result.isAccepted() && result.shouldSwingHand())
+				if(result instanceof ActionResult.Success success
+					&& success.swingSource() == ActionResult.SwingSource.CLIENT)
 					MC.player.networkHandler
 						.sendPacket(new HandSwingC2SPacket(hand));
 				
