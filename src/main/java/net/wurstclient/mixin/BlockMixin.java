@@ -29,7 +29,7 @@ public abstract class BlockMixin implements ItemConvertible
 	 * other blocks.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z",
+		method = "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z",
 		cancellable = true)
 	private static void onShouldDrawSide(BlockState state,
 		BlockState otherState, Direction direction,
