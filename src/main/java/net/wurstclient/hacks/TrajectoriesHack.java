@@ -90,8 +90,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
 		
-		RenderUtils.applyCameraRotationOnly();
-		
 		Trajectory trajectory = getTrajectory(partialTicks);
 		ArrayList<Vec3d> path = trajectory.path;
 		

@@ -95,11 +95,11 @@ public abstract class GameRendererMixin implements AutoCloseable
 			ordinal = 0),
 		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
 	private void onRenderWorldHandRendering(RenderTickCounter tickCounter,
-		CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2,
+		CallbackInfo ci, @Local(ordinal = 2) Matrix4f matrix4f3,
 		@Local(ordinal = 1) float tickDelta)
 	{
 		MatrixStack matrixStack = new MatrixStack();
-		matrixStack.multiplyPositionMatrix(matrix4f2);
+		matrixStack.multiplyPositionMatrix(matrix4f3);
 		RenderEvent event = new RenderEvent(matrixStack, tickDelta);
 		EventManager.fire(event);
 	}
