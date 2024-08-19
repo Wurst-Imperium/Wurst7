@@ -22,28 +22,37 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.wurstclient.WurstClient;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
 {
 	private final CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
-		"Shows where bites are occurring.", false);
+		"Shows where bites are occurring and where they will be detected."
+			+ " Useful for optimizing your 'Valid range' setting.",
+		false);
 	
 	private final ColorSetting ddColor = new ColorSetting("DD color",
 		"Color of the debug draw, if enabled.", Color.RED);
 	
+	private final SliderSetting validRange;
 	private final FishingSpotManager fishingSpots;
 	private Vec3d lastSoundPos;
 	
-	public AutoFishDebugDraw(FishingSpotManager fishingSpots)
+	public AutoFishDebugDraw(SliderSetting validRange,
+		FishingSpotManager fishingSpots)
 	{
+		this.validRange = validRange;
 		this.fishingSpots = fishingSpots;
 	}
 	
@@ -80,6 +89,10 @@ public final class AutoFishDebugDraw
 		
 		if(debugDraw.isChecked())
 		{
+			FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
+			if(bobber != null)
+				drawValidRange(matrixStack, partialTicks, bobber, region);
+			
 			if(lastSoundPos != null)
 				drawLastBite(matrixStack, region);
 			
@@ -95,6 +108,23 @@ public final class AutoFishDebugDraw
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+	}
+	
+	private void drawValidRange(MatrixStack matrixStack, float partialTicks,
+		FishingBobberEntity bobber, RegionPos region)
+	{
+		matrixStack.push();
+		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks)
+			.subtract(region.toVec3d());
+		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+		
+		ddColor.setAsShaderColor(0.5F);
+		
+		double vr = validRange.getValue();
+		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr);
+		RenderUtils.drawOutlinedBox(vrBox, matrixStack);
+		
+		matrixStack.pop();
 	}
 	
 	private void drawLastBite(MatrixStack matrixStack, RegionPos region)
