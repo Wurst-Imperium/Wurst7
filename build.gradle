@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.323"
+		classpath "org.kohsuke:github-api:1.324"
 	}
 }
 
