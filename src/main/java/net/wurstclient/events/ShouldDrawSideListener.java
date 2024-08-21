@@ -31,8 +31,8 @@ public interface ShouldDrawSideListener extends Listener
 			Direction direction)
 		{
 			this.state = Objects.requireNonNull(state);
-			this.otherState = Objects.requireNonNull(otherState);
-			this.direction = Objects.requireNonNull(direction);
+			this.otherState = otherState;
+			this.direction = direction;
 		}
 		
 		public BlockState getState()
