@@ -1,17 +1,27 @@
 {
-  "targets": [
-    "swap"
-  ],
+  "targets": {
+    "swap": {}
+  },
   "passes": [
     {
       "name": "lsd",
-      "intarget": "minecraft:main",
-      "outtarget": "swap"
+      "inputs": [
+        {
+          "sampler_name": "Diffuse",
+          "target": "minecraft:main"
+        }
+      ],
+      "output": "swap"
     },
     {
       "name": "blit",
-      "intarget": "swap",
-      "outtarget": "minecraft:main"
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "swap"
+        }
+      ],
+      "output": "minecraft:main"
     }
   ]
 }
