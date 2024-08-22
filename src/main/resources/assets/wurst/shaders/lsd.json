@@ -1,14 +1,6 @@
 {
-  "blend": {
-    "func": "add",
-    "srcrgb": "one",
-    "dstrgb": "zero"
-  },
-  "vertex": "sobel",
-  "fragment": "lsd",
-  "attributes": [
-    "Position"
-  ],
+  "vertex": "minecraft:post/sobel",
+  "fragment": "wurst:post/lsd",
   "samplers": [
     {
       "name": "DiffuseSampler"
@@ -48,7 +40,7 @@
       ]
     },
     {
-      "name": "Time",
+      "name": "GameTime",
       "type": "float",
       "count": 1,
       "values": [

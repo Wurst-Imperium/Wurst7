@@ -4,7 +4,7 @@
   },
   "passes": [
     {
-      "name": "lsd",
+      "program": "wurst:lsd",
       "inputs": [
         {
           "sampler_name": "Diffuse",
@@ -14,7 +14,7 @@
       "output": "swap"
     },
     {
-      "name": "blit",
+      "program": "minecraft:post/blit",
       "inputs": [
         {
           "sampler_name": "In",

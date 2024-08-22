@@ -17,13 +17,13 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -150,7 +150,7 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.enableBlend();
 			RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 			
 			BufferBuilder bufferBuilder =
 				tessellator.begin(VertexFormat.DrawMode.QUADS,
@@ -219,7 +219,7 @@ public abstract class ListWidget extends AbstractParentElement
 				if(p < top)
 					p = top;
 				
-				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+				RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, bottom, 0).color(0, 0, 0, 255);
@@ -430,7 +430,7 @@ public abstract class ListWidget extends AbstractParentElement
 		RenderSystem.enableBlend();
 		RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 		
 		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -458,7 +458,7 @@ public abstract class ListWidget extends AbstractParentElement
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1);
 		BufferBuilder bufferBuilder = tessellator

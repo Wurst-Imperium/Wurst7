@@ -86,6 +86,9 @@ public abstract class GameMenuScreenMixin extends Screen
 			v, w, h, fw, fh);
 		
 		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
 	@Unique
