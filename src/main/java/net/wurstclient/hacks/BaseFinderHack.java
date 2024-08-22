@@ -231,7 +231,7 @@ public final class BaseFinderHack extends Hack
 			matchingBlocks.clear();
 		
 		int stepSize = MC.world.getHeight() / 64;
-		int startY = MC.world.getTopY() - 1 - modulo * stepSize;
+		int startY = MC.world.getTopYInclusive() - 1 - modulo * stepSize;
 		int endY = startY - stepSize;
 		
 		BlockPos playerPos =

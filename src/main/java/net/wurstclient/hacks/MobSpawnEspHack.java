@@ -256,7 +256,7 @@ public final class MobSpawnEspHack extends Hack
 			int minY = world.getBottomY();
 			int minZ = chunk.getPos().getStartZ();
 			int maxX = chunk.getPos().getEndX();
-			int maxY = world.getTopY();
+			int maxY = world.getTopYInclusive();
 			int maxZ = chunk.getPos().getEndZ();
 			
 			for(int x = minX; x <= maxX; x++)
