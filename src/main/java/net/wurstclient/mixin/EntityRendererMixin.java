@@ -47,13 +47,6 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
 		CallbackInfo ci)
 	{
-		// TODO: Find a new way to do this, since LivingEntityRenderState does
-		// not contain health info.
-		// add HealthTags info
-		// if(state instanceof LivingEntityRenderState leState)
-		// text = WurstClient.INSTANCE.getHax().healthTagsHack
-		// .addHealth(leState, text);
-		
 		// do NameTags adjustments
 		wurstRenderLabelIfPresent(state, text, matrices, vertexConsumers,
 			light);
