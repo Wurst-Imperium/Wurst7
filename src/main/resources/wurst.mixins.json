@@ -31,7 +31,7 @@
     "DisconnectedRealmsScreenMixin",
     "DisconnectedScreenMixin",
     "EntityMixin",
-	"EntityRenderDispatcherMixin",
+    "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
