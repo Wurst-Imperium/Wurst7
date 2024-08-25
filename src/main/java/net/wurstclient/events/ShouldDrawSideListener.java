@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
 
@@ -23,16 +23,13 @@ public interface ShouldDrawSideListener extends Listener
 		extends Event<ShouldDrawSideListener>
 	{
 		private final BlockState state;
-		private final BlockState otherState;
-		private final Direction direction;
+		private final BlockPos pos;
 		private Boolean rendered; // null if unchanged
 		
-		public ShouldDrawSideEvent(BlockState state, BlockState otherState,
-			Direction direction)
+		public ShouldDrawSideEvent(BlockState state, BlockPos pos)
 		{
 			this.state = Objects.requireNonNull(state);
-			this.otherState = otherState;
-			this.direction = direction;
+			this.pos = pos;
 		}
 		
 		public BlockState getState()
@@ -40,14 +37,9 @@ public interface ShouldDrawSideListener extends Listener
 			return state;
 		}
 		
-		public BlockState getOtherState()
+		public BlockPos getPos()
 		{
-			return otherState;
-		}
-		
-		public Direction getDirection()
-		{
-			return direction;
+			return pos;
 		}
 		
 		public Boolean isRendered()

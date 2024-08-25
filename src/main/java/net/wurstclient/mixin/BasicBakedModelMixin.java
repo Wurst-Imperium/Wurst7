@@ -42,7 +42,7 @@ public class BasicBakedModelMixin
 			|| !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
 			return;
 		
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null, null);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(Boolean.FALSE.equals(event.isRendered()))

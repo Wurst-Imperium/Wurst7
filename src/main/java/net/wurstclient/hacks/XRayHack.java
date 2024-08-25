@@ -165,7 +165,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(isVisible(event.getState().getBlock(), null));
+		event.setRendered(
+			isVisible(event.getState().getBlock(), event.getPos()));
 	}
 	
 	@Override
@@ -182,8 +183,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 		int index = Collections.binarySearch(oreNamesCache, name);
 		boolean visible = index >= 0;
 		
-		// TODO: As of 24w33a (1.21.2), we can no longer see the position here,
-		// so the onlyExposed setting does nothing.
 		if(visible && onlyExposed.isChecked() && pos != null)
 			return !BlockUtils.isOpaqueFullCube(pos.up())
 				|| !BlockUtils.isOpaqueFullCube(pos.down())

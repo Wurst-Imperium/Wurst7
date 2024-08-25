@@ -12,6 +12,7 @@
     "BasicBakedModelMixin",
     "BlockEntityRenderDispatcherMixin",
     "BlockMixin",
+    "BlockRenderInfoMixin",
     "CactusBlockMixin",
     "CameraMixin",
     "ChatHudMixin",

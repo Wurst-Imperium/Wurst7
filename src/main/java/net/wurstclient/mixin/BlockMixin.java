@@ -13,36 +13,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemConvertible;
-import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hack.HackList;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible
 {
-	/**
-	 * This mixin allows X-Ray to show ores that would normally be obstructed by
-	 * other blocks.
-	 */
-	@Inject(at = @At("HEAD"),
-		method = "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z",
-		cancellable = true)
-	private static void onShouldDrawSide(BlockState state,
-		BlockState otherState, Direction direction,
-		CallbackInfoReturnable<Boolean> cir)
-	{
-		ShouldDrawSideEvent event =
-			new ShouldDrawSideEvent(state, otherState, direction);
-		EventManager.fire(event);
-		
-		if(event.isRendered() != null)
-			cir.setReturnValue(event.isRendered());
-	}
-	
 	@Inject(at = @At("HEAD"),
 		method = "getVelocityMultiplier()F",
 		cancellable = true)
