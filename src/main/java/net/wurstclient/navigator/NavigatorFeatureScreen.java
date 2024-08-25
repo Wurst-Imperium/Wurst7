@@ -353,7 +353,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
 		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		
 		// settings
@@ -495,7 +499,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		GL11.glEnable(GL11.GL_BLEND);
 		
 		// scissor box
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		context.disableScissor();
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		
 		// buttons below scissor box
 		for(ClickableWidget button : Screens.getButtons(this))

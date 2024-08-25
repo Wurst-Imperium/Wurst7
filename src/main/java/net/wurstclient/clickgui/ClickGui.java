@@ -740,11 +740,11 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x4, y3, 0);
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
-			net.minecraft.client.util.Window sr = MC.getWindow();
-			int sf = (int)sr.getScaleFactor();
-			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
-				window.getWidth() * sf, (y2 - y3) * sf);
-			GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
+			context.enableScissor(x1, y3, x2, y2);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
 			
 			matrixStack.push();
 			matrixStack.translate(x1, y4, 0);
@@ -796,11 +796,11 @@ public final class ClickGui
 			
 			matrixStack.pop();
 			matrix = matrixStack.peek().getPositionMatrix();
-			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+			context.disableScissor();
 		}
 		
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		
 		// window outline
 		RenderUtils.setShaderColor(acColor, 0.5F);
