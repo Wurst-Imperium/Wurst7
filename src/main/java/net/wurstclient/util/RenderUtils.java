@@ -9,7 +9,6 @@ package net.wurstclient.util;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -34,18 +33,29 @@ public enum RenderUtils
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
 	
-	public static void scissorBox(int startX, int startY, int endX, int endY)
+	/**
+	 * Enables a new scissor box with the given coordinates, while avoiding the
+	 * strange side-effects of Minecraft's own enableScissor() method.
+	 */
+	public static void enableScissor(DrawContext context, int x1, int y1,
+		int x2, int y2)
 	{
-		int width = endX - startX;
-		int height = endY - startY;
-		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.getWindow().getScaleFactor();
-		
-		int scissorX = (int)(startX * factor);
-		int scissorY = (int)(bottomY * factor);
-		int scissorWidth = (int)(width * factor);
-		int scissorHeight = (int)(height * factor);
-		GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.enableScissor(x1, y1, x2, y2);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+	}
+	
+	/**
+	 * Disables the current scissor box, while avoiding the strange side-effects
+	 * of Minecraft's own disableScissor() method.
+	 */
+	public static void disableScissor(DrawContext context)
+	{
+		context.disableScissor();
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 	}
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)

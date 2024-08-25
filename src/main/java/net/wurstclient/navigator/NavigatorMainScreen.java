@@ -254,8 +254,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 			hoveredFeature = -1;
 		
-		RenderUtils.scissorBox(0, 59, width, height - 42);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, 0, 59, width, height - 42);
 		
 		for(int i = Math.max(-scroll * 3 / 20 - 3, 0); i < navigatorDisplayList
 			.size(); i++)
@@ -272,7 +271,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				featureY);
 		}
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.disableScissor(context);
 		
 		// tooltip
 		if(tooltip != null)

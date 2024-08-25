@@ -740,11 +740,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x4, y3, 0);
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
-			RenderSystem.setShaderColor(1, 1, 1, 1);
-			context.enableScissor(x1, y3, x2, y2);
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
+			RenderUtils.enableScissor(context, x1, y3, x2, y2);
 			
 			matrixStack.push();
 			matrixStack.translate(x1, y4, 0);
@@ -796,7 +792,7 @@ public final class ClickGui
 			
 			matrixStack.pop();
 			matrix = matrixStack.peek().getPositionMatrix();
-			context.disableScissor();
+			RenderUtils.disableScissor(context);
 		}
 		
 		RenderSystem.enableBlend();

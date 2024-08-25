@@ -23,7 +23,6 @@ import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
@@ -130,27 +129,25 @@ public final class TabGui implements KeyPressListener
 		if(tabGuiOtf.isHidden())
 			return;
 		
+		// CURSED: TabGUI renders behind HackList without this
+		context.getVertexConsumers().draw();
+		
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.disableCull();
 		
 		matrixStack.push();
-		Window sr = WurstClient.MC.getWindow();
 		
 		int x = 2;
 		int y = 23;
 		
-		matrixStack.translate(x, y, 0);
+		matrixStack.translate(x, y, 100);
 		drawBox(matrixStack, 0, 0, width, height);
 		
-		double factor = sr.getScaleFactor();
-		GL11.glScissor((int)(x * factor),
-			(int)((sr.getScaledHeight() - height - y) * factor),
-			(int)(width * factor), (int)(height * factor));
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, x, y, x + width, y + height);
 		
 		int textY = 1;
 		
@@ -164,8 +161,8 @@ public final class TabGui implements KeyPressListener
 				txtColor, false);
 			textY += 10;
 		}
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		
+		RenderUtils.disableScissor(context);
 		
 		if(tabOpened)
 		{
@@ -178,10 +175,8 @@ public final class TabGui implements KeyPressListener
 			matrixStack.translate(width + 2, 0, 0);
 			drawBox(matrixStack, 0, 0, tab.width, tab.height);
 			
-			GL11.glScissor((int)(tabX * factor),
-				(int)((sr.getScaledHeight() - tab.height - tabY) * factor),
-				(int)(tab.width * factor), (int)(tab.height * factor));
-			GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			RenderUtils.enableScissor(context, tabX, tabY, tabX + tab.width,
+				tabY + tab.height);
 			
 			int tabTextY = 1;
 			for(int i = 0; i < tab.features.size(); i++)
@@ -199,8 +194,8 @@ public final class TabGui implements KeyPressListener
 					tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+			
+			RenderUtils.disableScissor(context);
 			
 			matrixStack.pop();
 		}
