@@ -11,8 +11,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -27,10 +31,11 @@ public final class KaboomHack extends Hack implements UpdateListener
 	private final SliderSetting power =
 		new SliderSetting("Power", 128, 32, 512, 32, ValueDisplay.INTEGER);
 	
+	private final Random random = Random.create();
+	
 	public KaboomHack()
 	{
 		super("Kaboom");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(power);
 	}
@@ -50,24 +55,26 @@ public final class KaboomHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		// check fly-kick
+		// Abort if flying to prevent getting kicked
 		if(!MC.player.getAbilities().creativeMode && !MC.player.isOnGround())
 			return;
-			
-		// TODO: Find a new way to do this.
-		// do explosion particles
-		// new ExplosionImpl(MC.world, MC.player, MC.player.getX(),
-		// MC.player.getY(), MC.player.getZ(), 6F, false,
-		// Explosion.DestructionType.KEEP).affectWorld(true);
 		
-		// get valid blocks
+		double x = MC.player.getX();
+		double y = MC.player.getY();
+		double z = MC.player.getZ();
+		
+		// Do explosion effect
+		float soundPitch =
+			(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
+		MC.world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
+			SoundCategory.BLOCKS, 4, soundPitch, false);
+		MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
+		
+		// Break all blocks
 		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed(6);
-		
-		// break all blocks
 		for(int i = 0; i < power.getValueI(); i++)
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
 		
-		// disable
 		setEnabled(false);
 	}
 	
