@@ -20,6 +20,7 @@ import net.minecraft.util.math.random.Random;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
@@ -31,6 +32,11 @@ public final class KaboomHack extends Hack implements UpdateListener
 	private final SliderSetting power =
 		new SliderSetting("Power", 128, 32, 512, 32, ValueDisplay.INTEGER);
 	
+	private final CheckboxSetting sound = new CheckboxSetting("Sound", true);
+	
+	private final CheckboxSetting particles =
+		new CheckboxSetting("Particles", true);
+	
 	private final Random random = Random.create();
 	
 	public KaboomHack()
@@ -38,6 +44,8 @@ public final class KaboomHack extends Hack implements UpdateListener
 		super("Kaboom");
 		setCategory(Category.BLOCKS);
 		addSetting(power);
+		addSetting(sound);
+		addSetting(particles);
 	}
 	
 	@Override
@@ -64,11 +72,17 @@ public final class KaboomHack extends Hack implements UpdateListener
 		double z = MC.player.getZ();
 		
 		// Do explosion effect
-		float soundPitch =
-			(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
-		MC.world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
-			SoundCategory.BLOCKS, 4, soundPitch, false);
-		MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
+		if(sound.isChecked())
+		{
+			float soundPitch =
+				(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
+			MC.world.playSound(x, y, z,
+				SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
+				SoundCategory.BLOCKS, 4, soundPitch, false);
+		}
+		if(particles.isChecked())
+			MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0,
+				0);
 		
 		// Break all blocks
 		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed();
