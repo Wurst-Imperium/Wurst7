@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -67,6 +68,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 			(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
 		MC.world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
 			SoundCategory.BLOCKS, 4, soundPitch, false);
+		MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
 		
 		// Break all blocks
 		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed();
