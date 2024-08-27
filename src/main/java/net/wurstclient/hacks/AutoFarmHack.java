@@ -15,7 +15,6 @@ import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -30,6 +29,7 @@ import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
@@ -303,8 +303,7 @@ public final class AutoFarmHack extends Hack
 				
 				// swing arm
 				if(result.isAccepted() && result.shouldSwingHand())
-					MC.player.networkHandler
-						.sendPacket(new HandSwingC2SPacket(hand));
+					SwingHand.SERVER.swing(hand);
 				
 				// reset cooldown
 				MC.itemUseCooldown = 4;

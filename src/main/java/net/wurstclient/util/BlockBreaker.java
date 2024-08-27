@@ -10,7 +10,6 @@ package net.wurstclient.util;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.util.Hand;
@@ -22,6 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.WurstClient;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 
 public enum BlockBreaker
 {
@@ -44,8 +44,7 @@ public enum BlockBreaker
 			return false;
 		
 		// swing arm
-		MC.player.networkHandler
-			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		SwingHand.SERVER.swing(Hand.MAIN_HAND);
 		
 		return true;
 	}
