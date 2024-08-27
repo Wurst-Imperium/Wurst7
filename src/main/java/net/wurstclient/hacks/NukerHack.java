@@ -7,12 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
@@ -34,6 +30,7 @@ import net.wurstclient.settings.NukerMultiIdListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreakingCache;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
@@ -57,7 +54,7 @@ public final class NukerHack extends Hack
 	private final NukerMultiIdListSetting multiIdList =
 		new NukerMultiIdListSetting();
 	
-	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
+	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
@@ -124,7 +121,7 @@ public final class NukerHack extends Hack
 			currentBlock = null;
 		}
 		
-		prevBlocks.clear();
+		cache.reset();
 		overlay.resetProgress();
 		
 		if(!lockId.isChecked())
@@ -162,7 +159,7 @@ public final class NukerHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
 			
-			ArrayList<BlockPos> blocks = filterOutRecentBlocks(stream);
+			ArrayList<BlockPos> blocks = cache.filterOutRecentBlocks(stream);
 			if(blocks.isEmpty())
 				return;
 			
@@ -205,26 +202,6 @@ public final class NukerHack extends Hack
 			case SMASH:
 			return BlockUtils.getHardness(pos) >= 1;
 		}
-	}
-	
-	/*
-	 * Waits 5 ticks before trying to break the same block again, which
-	 * makes it much more likely that the server will accept the block
-	 * breaking packets.
-	 */
-	private ArrayList<BlockPos> filterOutRecentBlocks(Stream<BlockPos> stream)
-	{
-		for(Set<BlockPos> set : prevBlocks)
-			stream = stream.filter(pos -> !set.contains(pos));
-		
-		ArrayList<BlockPos> blocks =
-			stream.collect(Collectors.toCollection(ArrayList::new));
-		
-		prevBlocks.addLast(new HashSet<>(blocks));
-		while(prevBlocks.size() > 5)
-			prevBlocks.removeFirst();
-		
-		return blocks;
 	}
 	
 	@Override
