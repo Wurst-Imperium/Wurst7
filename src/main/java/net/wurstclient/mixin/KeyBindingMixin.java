@@ -31,7 +31,11 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	{
 		long handle = WurstClient.MC.getWindow().getHandle();
 		int code = boundKey.getCode();
-		setPressed(InputUtil.isKeyPressed(handle, code));
+		
+		if(boundKey.getCategory() == InputUtil.Type.MOUSE)
+			setPressed(GLFW.glfwGetMouseButton(handle, code) == 1);
+		else
+			setPressed(InputUtil.isKeyPressed(handle, code));
 	}
 	
 	@Override
