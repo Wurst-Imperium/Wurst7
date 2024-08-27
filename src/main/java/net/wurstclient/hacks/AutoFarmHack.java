@@ -148,7 +148,7 @@ public final class AutoFarmHack extends Hack
 		if(!replanting)
 			harvest(blocksToHarvest);
 		
-		// upate busy state
+		// update busy state
 		busy = replanting || currentlyHarvesting != null;
 		
 		// update renderer
