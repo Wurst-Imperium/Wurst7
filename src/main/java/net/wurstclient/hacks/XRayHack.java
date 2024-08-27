@@ -86,7 +86,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		Math.random() < 0.01 ? "X-Wurst" : getName();
 	
 	private ArrayList<String> oreNamesCache;
-	private final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+	private final ThreadLocal<BlockPos.Mutable> mutablePosForExposedCheck =
+		ThreadLocal.withInitial(BlockPos.Mutable::new);
 	
 	public XRayHack()
 	{
@@ -193,6 +194,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	private boolean isExposed(BlockPos pos)
 	{
+		BlockPos.Mutable mutablePos = mutablePosForExposedCheck.get();
 		for(Direction direction : Direction.values())
 			if(!BlockUtils.isOpaqueFullCube(mutablePos.set(pos, direction)))
 				return true;
