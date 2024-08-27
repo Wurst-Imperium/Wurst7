@@ -18,6 +18,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
@@ -85,6 +86,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		Math.random() < 0.01 ? "X-Wurst" : getName();
 	
 	private ArrayList<String> oreNamesCache;
+	private final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 	
 	public XRayHack()
 	{
@@ -184,14 +186,18 @@ public final class XRayHack extends Hack implements UpdateListener,
 		boolean visible = index >= 0;
 		
 		if(visible && onlyExposed.isChecked() && pos != null)
-			return !BlockUtils.isOpaqueFullCube(pos.up())
-				|| !BlockUtils.isOpaqueFullCube(pos.down())
-				|| !BlockUtils.isOpaqueFullCube(pos.east())
-				|| !BlockUtils.isOpaqueFullCube(pos.west())
-				|| !BlockUtils.isOpaqueFullCube(pos.north())
-				|| !BlockUtils.isOpaqueFullCube(pos.south());
+			return isExposed(pos);
 		
 		return visible;
+	}
+	
+	private boolean isExposed(BlockPos pos)
+	{
+		for(Direction direction : Direction.values())
+			if(!BlockUtils.isOpaqueFullCube(mutablePos.set(pos, direction)))
+				return true;
+			
+		return false;
 	}
 	
 	/**
