@@ -30,12 +30,14 @@ import net.wurstclient.util.RotationUtils;
 public final class KaboomHack extends Hack implements UpdateListener
 {
 	private final SliderSetting power =
-		new SliderSetting("Power", 128, 32, 512, 32, ValueDisplay.INTEGER);
+		new SliderSetting("Power", "description.wurst.setting.kaboom.power",
+			128, 32, 512, 32, ValueDisplay.INTEGER);
 	
-	private final CheckboxSetting sound = new CheckboxSetting("Sound", true);
+	private final CheckboxSetting sound = new CheckboxSetting("Sound",
+		"description.wurst.setting.kaboom.sound", true);
 	
-	private final CheckboxSetting particles =
-		new CheckboxSetting("Particles", true);
+	private final CheckboxSetting particles = new CheckboxSetting("Particles",
+		"description.wurst.setting.kaboom.particles", true);
 	
 	private final Random random = Random.create();
 	
