@@ -136,7 +136,8 @@ public final class AutoFishRodSelector
 			return -1;
 		
 		DynamicRegistryManager drm = MC.world.getRegistryManager();
-		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		Registry<Enchantment> registry =
+			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 		
 		Optional<Reference<Enchantment>> luckOTS =
 			registry.getEntry(Enchantments.LUCK_OF_THE_SEA);

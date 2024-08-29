@@ -58,7 +58,8 @@ public final class EnchantCmd extends Command
 	private void enchant(ItemStack stack, int level)
 	{
 		DynamicRegistryManager drm = MC.world.getRegistryManager();
-		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		Registry<Enchantment> registry =
+			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 		
 		for(RegistryEntry<Enchantment> entry : registry.getIndexedEntries())
 		{

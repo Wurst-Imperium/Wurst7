@@ -196,7 +196,8 @@ public final class AutoToolHack extends Hack
 		{
 			DynamicRegistryManager drm =
 				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			Registry<Enchantment> registry =
+				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			
 			Optional<Reference<Enchantment>> efficiency =
 				registry.getEntry(Enchantments.EFFICIENCY);

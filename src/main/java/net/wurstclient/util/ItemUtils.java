@@ -48,7 +48,7 @@ public enum ItemUtils
 		
 		try
 		{
-			return Registries.ITEM.getOrEmpty(Identifier.of(nameOrId))
+			return Registries.ITEM.getOptionalValue(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)

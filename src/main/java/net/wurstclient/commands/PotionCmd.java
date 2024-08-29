@@ -144,7 +144,7 @@ public final class PotionCmd extends Command
 			try
 			{
 				Identifier identifier = Identifier.of(input);
-				effect = Registries.STATUS_EFFECT.get(identifier);
+				effect = Registries.STATUS_EFFECT.getEntry(identifier);
 				
 			}catch(InvalidIdentifierException e)
 			{

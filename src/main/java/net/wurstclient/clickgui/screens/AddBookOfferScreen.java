@@ -360,7 +360,8 @@ public final class AddBookOfferScreen extends Screen
 			this.screen = screen;
 			DynamicRegistryManager drm =
 				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			Registry<Enchantment> registry =
+				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			list = registry.stream().map(BookOffer::create)
 				.filter(BookOffer::isFullyValid).sorted()
 				.collect(Collectors.toList());
@@ -413,7 +414,8 @@ public final class AddBookOfferScreen extends Screen
 			if(isSelectedItem(index))
 				drawSelectionOutline(matrixStack, x, y);
 			
-			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
+			Item item =
+				Registries.ITEM.getEntry(Identifier.of("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			

@@ -182,7 +182,7 @@ public final class BlockListCmd extends Command
 		
 		try
 		{
-			return Registries.BLOCK.getOrEmpty(Identifier.of(nameOrId))
+			return Registries.BLOCK.getOptionalValue(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
