@@ -374,7 +374,6 @@ public abstract class ListWidget extends AbstractParentElement
 		float f)
 	{
 		int m = getItemCount();
-		Tessellator tessellator = Tessellator.getInstance();
 		
 		for(int n = 0; n < m; ++n)
 		{
@@ -383,30 +382,16 @@ public abstract class ListWidget extends AbstractParentElement
 			if(o > bottom || o + p < top)
 				updateItemPosition(n, i, o, f);
 			
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			if(renderSelection && isSelectedItem(n))
 			{
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
-				float g = isFocused() ? 1 : 0.5F;
-				RenderSystem.setShaderColor(g, g, g, 1);
-				BufferBuilder bufferBuilder = tessellator
-					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-				bufferBuilder.vertex(q, o + p + 2, 0);
-				bufferBuilder.vertex(r, o + p + 2, 0);
-				bufferBuilder.vertex(r, o - 2, 0);
-				bufferBuilder.vertex(q, o - 2, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-				RenderSystem.setShaderColor(0, 0, 0, 1);
-				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION);
-				bufferBuilder.vertex(q + 1, o + p + 1, 0);
-				bufferBuilder.vertex(r - 1, o + p + 1, 0);
-				bufferBuilder.vertex(r - 1, o - 1, 0);
-				bufferBuilder.vertex(q + 1, o - 1, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+				context.fill(q, o - 2, r, o + p + 2,
+					isFocused() ? 0xFFFFFFFF : 0xFF808080);
+				context.fill(q + 1, o - 1, r - 1, o + p + 1, 0xFF000000);
 			}
 			
-			RenderSystem.setShaderColor(1, 1, 1, 1);
 			renderItem(context, n, i, o, p, k, l, f);
 		}
 		

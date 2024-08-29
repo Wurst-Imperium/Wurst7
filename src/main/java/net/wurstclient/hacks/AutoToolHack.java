@@ -200,7 +200,7 @@ public final class AutoToolHack extends Hack
 				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			
 			Optional<Reference<Enchantment>> efficiency =
-				registry.getEntry(Enchantments.EFFICIENCY);
+				registry.getOptional(Enchantments.EFFICIENCY);
 			int effLvl = efficiency
 				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
 				.orElse(0);

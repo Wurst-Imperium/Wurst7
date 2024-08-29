@@ -71,7 +71,7 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registries.BLOCK.getEntry(Identifier.of(name));
+			return Registries.BLOCK.get(Identifier.of(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
@@ -98,8 +98,7 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registries.BLOCK.getOptionalValue(Identifier.of(nameOrId))
-				.orElse(null);
+			return Registries.BLOCK.get(Identifier.of(nameOrId));
 			
 		}catch(InvalidIdentifierException e)
 		{

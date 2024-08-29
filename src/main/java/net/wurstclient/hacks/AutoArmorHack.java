@@ -192,7 +192,7 @@ public final class AutoArmorHack extends Hack
 				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			
 			Optional<Reference<Enchantment>> protection =
-				registry.getEntry(Enchantments.PROTECTION);
+				registry.getOptional(Enchantments.PROTECTION);
 			int prtLvl = protection
 				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
 				.orElse(0);
