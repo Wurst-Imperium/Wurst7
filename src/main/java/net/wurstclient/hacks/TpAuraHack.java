@@ -131,8 +131,10 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// attack entity
-		RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter())
-			.sendPlayerLookPacket();
+		if(swingHand.getSelected() != SwingHand.OFF)
+			RotationUtils
+				.getNeededRotations(entity.getBoundingBox().getCenter())
+				.sendPlayerLookPacket();
 		
 		MC.interactionManager.attackEntity(player, entity);
 		swingHand.swing(Hand.MAIN_HAND);

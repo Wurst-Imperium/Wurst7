@@ -118,9 +118,10 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter())
-				.sendPlayerLookPacket();
+			if(swingHand.getSelected() != SwingHand.OFF)
+				RotationUtils
+					.getNeededRotations(entity.getBoundingBox().getCenter())
+					.sendPlayerLookPacket();
 			
 			MC.interactionManager.attackEntity(MC.player, entity);
 		}
