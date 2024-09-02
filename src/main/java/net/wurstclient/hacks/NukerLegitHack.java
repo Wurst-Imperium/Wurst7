@@ -181,7 +181,8 @@ public final class NukerLegitHack extends Hack
 	private boolean breakBlock(BlockPos pos)
 	{
 		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
-		if(!params.lineOfSight() || params.distanceSq() > range.getValueSq())
+		if(params == null || !params.lineOfSight()
+			|| params.distanceSq() > range.getValueSq())
 			return false;
 		
 		// face block
