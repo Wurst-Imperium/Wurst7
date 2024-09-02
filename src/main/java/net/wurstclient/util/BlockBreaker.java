@@ -7,6 +7,9 @@
  */
 package net.wurstclient.util;
 
+import java.util.Comparator;
+import java.util.function.Function;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -36,16 +39,21 @@ public enum BlockBreaker
 		if(params == null)
 			return false;
 		
+		return breakOneBlock(params);
+	}
+	
+	public static boolean breakOneBlock(BlockBreakingParams params)
+	{
 		// face block
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec);
 		
 		// damage block
-		if(!MC.interactionManager.updateBlockBreakingProgress(pos, params.side))
+		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos,
+			params.side))
 			return false;
 		
 		// swing arm
 		SwingHand.SERVER.swing(Hand.MAIN_HAND);
-		
 		return true;
 	}
 	
@@ -137,6 +145,27 @@ public enum BlockBreaker
 		{
 			return new BlockHitResult(hitVec, side, pos, false);
 		}
+	}
+	
+	/**
+	 * Returns a comparator that compares BlockBreakingParams by line of sight
+	 * first, then by distance.
+	 */
+	public static Comparator<BlockBreakingParams> comparingParams()
+	{
+		return Comparator.comparing(BlockBreakingParams::lineOfSight).reversed()
+			.thenComparing(params -> params.distanceSq);
+	}
+	
+	/**
+	 * Returns a comparator that compares BlockBreakingParams by line of sight
+	 * first, then by distance.
+	 */
+	public static <T> Comparator<T> comparingParams(
+		Function<T, BlockBreakingParams> keyExtractor)
+	{
+		return Comparator.<T, BlockBreakingParams> comparing(keyExtractor,
+			comparingParams());
 	}
 	
 	public static void breakBlocksWithPacketSpam(Iterable<BlockPos> blocks)

@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
@@ -30,6 +30,7 @@ import net.wurstclient.settings.NukerMultiIdListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
@@ -146,12 +147,12 @@ public final class NukerHack extends Hack
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
-		Stream<BlockPos> stream =
-			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-				.filter(BlockUtils::canBeClicked).filter(this::shouldBreakBlock)
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
+		Stream<BlockBreakingParams> stream = BlockUtils
+			.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(this::shouldBreakBlock)
+			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
+			.filter(params -> params.distanceSq() <= rangeSq)
+			.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode)
@@ -159,7 +160,8 @@ public final class NukerHack extends Hack
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
 			
-			ArrayList<BlockPos> blocks = cache.filterOutRecentBlocks(stream);
+			ArrayList<BlockPos> blocks = cache
+				.filterOutRecentBlocks(stream.map(BlockBreakingParams::pos));
 			if(blocks.isEmpty())
 				return;
 			
@@ -169,8 +171,8 @@ public final class NukerHack extends Hack
 		}
 		
 		// Break the first valid block in survival mode
-		currentBlock =
-			stream.filter(BlockBreaker::breakOneBlock).findFirst().orElse(null);
+		currentBlock = stream.filter(BlockBreaker::breakOneBlock)
+			.map(BlockBreakingParams::pos).findFirst().orElse(null);
 		
 		if(currentBlock == null)
 		{
