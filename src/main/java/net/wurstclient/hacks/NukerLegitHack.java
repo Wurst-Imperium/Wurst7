@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
@@ -136,15 +137,20 @@ public final class NukerLegitHack extends Hack
 		
 		Vec3d eyesVec = RotationUtils.getEyesPos();
 		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		double rangeSq = range.getValueSq();
+		int blockRange = range.getValueCeil();
 		
-		Stream<BlockPos> stream =
-			BlockUtils.getAllInBoxStream(eyesBlock, range.getValueCeil())
-				.filter(BlockUtils::canBeClicked).filter(this::shouldBreakBlock)
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)));
+		Stream<BlockBreakingParams> stream = BlockUtils
+			.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(this::shouldBreakBlock)
+			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
+			.filter(BlockBreakingParams::lineOfSight)
+			.filter(params -> params.distanceSq() <= rangeSq).sorted(
+				Comparator.comparingDouble(BlockBreakingParams::distanceSq));
 		
 		// Break the first valid block
-		currentBlock = stream.filter(this::breakBlock).findFirst().orElse(null);
+		currentBlock = stream.filter(this::breakBlock)
+			.map(BlockBreakingParams::pos).findFirst().orElse(null);
 		
 		// reset if no block was found
 		if(currentBlock == null)
@@ -178,20 +184,15 @@ public final class NukerLegitHack extends Hack
 		}
 	}
 	
-	private boolean breakBlock(BlockPos pos)
+	private boolean breakBlock(BlockBreakingParams params)
 	{
-		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
-		if(params == null || !params.lineOfSight()
-			|| params.distanceSq() > range.getValueSq())
-			return false;
-		
 		// face block
 		WURST.getRotationFaker().faceVectorClient(params.hitVec());
 		
-		WURST.getHax().autoToolHack.equipIfEnabled(pos);
+		WURST.getHax().autoToolHack.equipIfEnabled(params.pos());
 		
 		if(!MC.interactionManager.isBreakingBlock())
-			MC.interactionManager.attackBlock(pos, params.side());
+			MC.interactionManager.attackBlock(params.pos(), params.side());
 			
 		// if attack key is down but nothing happens,
 		// release it for one tick
