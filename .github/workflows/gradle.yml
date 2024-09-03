@@ -47,12 +47,8 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       uses: gradle/actions/dependency-submission@v4
 
-    - name: Check code style with Spotless
-      id: spotless_check
-      run: ./gradlew spotlessCheck
-
     - name: Execute Gradle build
-      run: ./gradlew build --stacktrace --warning-mode=fail
+      run: ./gradlew spotlessCheck build --stacktrace --warning-mode=fail
 
     - name: VirusTotal scan
       if: ${{ github.event_name == 'push' }}
