@@ -11,11 +11,15 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -23,6 +27,7 @@ import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.NukerModeSetting;
@@ -116,7 +121,8 @@ public final class NukerLegitHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
-		MC.options.attackKey.setPressed(false);
+		IKeyBinding.get(MC.options.attackKey).resetPressedState();
+		MC.interactionManager.cancelBlockBreaking();
 		overlay.resetProgress();
 		currentBlock = null;
 		if(!lockId.isChecked())
@@ -132,6 +138,16 @@ public final class NukerLegitHack extends Hack
 		if(mode.getSelected() == NukerMode.ID && id.getBlock() == Blocks.AIR)
 		{
 			overlay.resetProgress();
+			return;
+		}
+		
+		// Ignore the attack cooldown because opening any screen
+		// will set it to 10k ticks.
+		
+		if(MC.player.isRiding())
+		{
+			overlay.resetProgress();
+			MC.interactionManager.cancelBlockBreaking();
 			return;
 		}
 		
@@ -155,7 +171,7 @@ public final class NukerLegitHack extends Hack
 		// reset if no block was found
 		if(currentBlock == null)
 		{
-			MC.options.attackKey.setPressed(false);
+			IKeyBinding.get(MC.options.attackKey).resetPressedState();
 			overlay.resetProgress();
 		}
 		
@@ -186,25 +202,40 @@ public final class NukerLegitHack extends Hack
 	
 	private boolean breakBlock(BlockBreakingParams params)
 	{
-		// face block
+		ClientPlayerInteractionManager im = MC.interactionManager;
+		
 		WURST.getRotationFaker().faceVectorClient(params.hitVec());
-		
-		WURST.getHax().autoToolHack.equipIfEnabled(params.pos());
-		
-		if(!MC.interactionManager.isBreakingBlock())
-			MC.interactionManager.attackBlock(params.pos(), params.side());
-			
-		// if attack key is down but nothing happens,
-		// release it for one tick
-		if(MC.options.attackKey.isPressed()
-			&& !MC.interactionManager.isBreakingBlock())
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
+			|| !(hitResult instanceof BlockHitResult bHitResult))
 		{
-			MC.options.attackKey.setPressed(false);
+			im.cancelBlockBreaking();
 			return true;
 		}
 		
-		// damage block
-		MC.options.attackKey.setPressed(true);
+		BlockPos pos = bHitResult.getBlockPos();
+		BlockState state = MC.world.getBlockState(pos);
+		Direction side = bHitResult.getSide();
+		if(state.isAir() || !params.pos().equals(pos)
+			|| !params.side().equals(side))
+		{
+			im.cancelBlockBreaking();
+			return true;
+		}
+		
+		WURST.getHax().autoToolHack.equipIfEnabled(params.pos());
+		
+		if(MC.player.isUsingItem())
+			// This case doesn't cancel block breaking in vanilla Minecraft.
+			return true;
+		
+		if(im.updateBlockBreakingProgress(pos, side))
+		{
+			MC.particleManager.addBlockBreakingParticles(pos, side);
+			MC.player.swingHand(Hand.MAIN_HAND);
+			MC.options.attackKey.setPressed(true);
+		}
+		
 		return true;
 	}
 	
