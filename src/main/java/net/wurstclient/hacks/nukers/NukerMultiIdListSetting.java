@@ -5,11 +5,12 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.settings;
+package net.wurstclient.hacks.nukers;
 
 import net.wurstclient.hacks.NukerHack;
 import net.wurstclient.hacks.NukerLegitHack;
 import net.wurstclient.hacks.SpeedNukerHack;
+import net.wurstclient.settings.BlockListSetting;
 
 /**
  * A {@link BlockListSetting} named "MultiID List" containing all of Minecraft's
