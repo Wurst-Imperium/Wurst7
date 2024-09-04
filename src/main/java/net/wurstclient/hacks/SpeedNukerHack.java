@@ -68,25 +68,14 @@ public final class SpeedNukerHack extends Hack
 	@Override
 	public String getRenderName()
 	{
-		switch(mode.getSelected())
+		return getName() + switch(mode.getSelected())
 		{
-			default:
-			case NORMAL:
-			return getName();
-			
-			case ID:
-			return "IDSpeedNuker [" + id.getShortBlockName() + "]";
-			
-			case MULTI_ID:
-			int ids = multiIdList.size();
-			return "MultiIDSpeedNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
-			
-			case FLAT:
-			return "FlatSpeedNuker";
-			
-			case SMASH:
-			return "SmashSpeedNuker";
-		}
+			case ID -> " [ID:" + id.getShortBlockName() + "]";
+			case MULTI_ID -> " [MultiID:" + multiIdList.size() + "]";
+			case FLAT -> " [Flat]";
+			case SMASH -> " [Smash]";
+			default -> "";
+		};
 	}
 	
 	@Override

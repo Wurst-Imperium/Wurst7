@@ -73,25 +73,14 @@ public final class NukerHack extends Hack
 	@Override
 	public String getRenderName()
 	{
-		switch(mode.getSelected())
+		return getName() + switch(mode.getSelected())
 		{
-			default:
-			case NORMAL:
-			return getName();
-			
-			case ID:
-			return "IDNuker [" + id.getShortBlockName() + "]";
-			
-			case MULTI_ID:
-			int ids = multiIdList.size();
-			return "MultiIDNuker [" + ids + (ids == 1 ? " ID]" : " IDs]");
-			
-			case FLAT:
-			return "FlatNuker";
-			
-			case SMASH:
-			return "SmashNuker";
-		}
+			case ID -> " [ID:" + id.getShortBlockName() + "]";
+			case MULTI_ID -> " [MultiID:" + multiIdList.size() + "]";
+			case FLAT -> " [Flat]";
+			case SMASH -> " [Smash]";
+			default -> "";
+		};
 	}
 	
 	@Override
