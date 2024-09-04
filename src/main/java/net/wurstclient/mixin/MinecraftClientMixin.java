@@ -34,6 +34,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEvent;
 import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
@@ -120,6 +121,22 @@ public abstract class MinecraftClientMixin
 			return;
 		
 		WurstClient.INSTANCE.getFriends().middleClick(eHitResult.getEntity());
+	}
+	
+	/**
+	 * Allows hacks to cancel vanilla block breaking and replace it with their
+	 * own. Useful for Nuker-like hacks.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "handleBlockBreaking(Z)V",
+		cancellable = true)
+	private void onHandleBlockBreaking(boolean breaking, CallbackInfo ci)
+	{
+		HandleBlockBreakingEvent event = new HandleBlockBreakingEvent();
+		EventManager.fire(event);
+		
+		if(event.isCancelled())
+			ci.cancel();
 	}
 	
 	@Inject(at = @At("HEAD"),

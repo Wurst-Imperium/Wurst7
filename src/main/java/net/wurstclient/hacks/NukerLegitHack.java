@@ -23,6 +23,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.HandleBlockBreakingListener;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -42,8 +43,8 @@ import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"LegitNuker", "nuker legit", "legit nuker"})
-public final class NukerLegitHack extends Hack
-	implements UpdateListener, LeftClickListener, RenderListener
+public final class NukerLegitHack extends Hack implements UpdateListener,
+	LeftClickListener, HandleBlockBreakingListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
@@ -110,6 +111,7 @@ public final class NukerLegitHack extends Hack
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, this);
+		EVENTS.add(HandleBlockBreakingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -118,6 +120,7 @@ public final class NukerLegitHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(LeftClickListener.class, this);
+		EVENTS.remove(HandleBlockBreakingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
@@ -250,6 +253,14 @@ public final class NukerLegitHack extends Hack
 			return;
 		
 		id.setBlockName(BlockUtils.getName(bHitResult.getBlockPos()));
+	}
+	
+	@Override
+	public void onHandleBlockBreaking(HandleBlockBreakingEvent event)
+	{
+		// Cancel vanilla block breaking so we don't send the packets twice.
+		if(currentBlock != null)
+			event.cancel();
 	}
 	
 	@Override
