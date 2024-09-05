@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
@@ -28,12 +27,8 @@ import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.hacks.nukers.NukerModeSetting;
-import net.wurstclient.hacks.nukers.NukerModeSetting.NukerMode;
-import net.wurstclient.hacks.nukers.NukerMultiIdListSetting;
+import net.wurstclient.hacks.nukers.CommonNukerSettings;
 import net.wurstclient.mixinterface.IKeyBinding;
-import net.wurstclient.settings.BlockSetting;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
@@ -43,24 +38,14 @@ import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"LegitNuker", "nuker legit", "legit nuker"})
-public final class NukerLegitHack extends Hack implements UpdateListener,
-	LeftClickListener, HandleBlockBreakingListener, RenderListener
+public final class NukerLegitHack extends Hack
+	implements UpdateListener, HandleBlockBreakingListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.5, 0.05, ValueDisplay.DECIMAL);
 	
-	private final NukerModeSetting mode = new NukerModeSetting();
-	
-	private final BlockSetting id =
-		new BlockSetting("ID", "The type of block to break in ID mode.\n"
-			+ "air = won't break anything", "minecraft:air", true);
-	
-	private final CheckboxSetting lockId = new CheckboxSetting("Lock ID",
-		"Prevents changing the ID by clicking on blocks or restarting NukerLegit.",
-		false);
-	
-	private final NukerMultiIdListSetting multiIdList =
-		new NukerMultiIdListSetting();
+	private final CommonNukerSettings commonSettings =
+		new CommonNukerSettings();
 	
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
@@ -70,23 +55,13 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		super("NukerLegit");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		addSetting(mode);
-		addSetting(id);
-		addSetting(lockId);
-		addSetting(multiIdList);
+		commonSettings.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
 	public String getRenderName()
 	{
-		return getName() + switch(mode.getSelected())
-		{
-			case ID -> " [ID:" + id.getShortBlockName() + "]";
-			case MULTI_ID -> " [MultiID:" + multiIdList.size() + "]";
-			case FLAT -> " [Flat]";
-			case SMASH -> " [Smash]";
-			default -> "";
-		};
+		return getName() + commonSettings.getRenderNameSuffix();
 	}
 	
 	@Override
@@ -99,7 +74,7 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(LeftClickListener.class, this);
+		EVENTS.add(LeftClickListener.class, commonSettings);
 		EVENTS.add(HandleBlockBreakingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -108,7 +83,7 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(LeftClickListener.class, this);
+		EVENTS.remove(LeftClickListener.class, commonSettings);
 		EVENTS.remove(HandleBlockBreakingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
@@ -117,8 +92,7 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		MC.interactionManager.cancelBlockBreaking();
 		overlay.resetProgress();
 		currentBlock = null;
-		if(!lockId.isChecked())
-			id.setBlock(Blocks.AIR);
+		commonSettings.reset();
 	}
 	
 	@Override
@@ -126,8 +100,7 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 	{
 		currentBlock = null;
 		
-		// abort if using ID mode without an ID being set
-		if(mode.getSelected() == NukerMode.ID && id.getBlock() == Blocks.AIR)
+		if(commonSettings.isIdModeWithAir())
 		{
 			overlay.resetProgress();
 			return;
@@ -150,7 +123,7 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		
 		Stream<BlockBreakingParams> stream = BlockUtils
 			.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(this::shouldBreakBlock)
+			.filter(commonSettings::shouldBreakBlock)
 			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
 			.filter(BlockBreakingParams::lineOfSight)
 			.filter(params -> params.distanceSq() <= rangeSq).sorted(
@@ -168,28 +141,6 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		}
 		
 		overlay.updateProgress();
-	}
-	
-	private boolean shouldBreakBlock(BlockPos pos)
-	{
-		switch(mode.getSelected())
-		{
-			default:
-			case NORMAL:
-			return true;
-			
-			case ID:
-			return BlockUtils.getName(pos).equals(id.getBlockName());
-			
-			case MULTI_ID:
-			return multiIdList.contains(BlockUtils.getBlock(pos));
-			
-			case FLAT:
-			return pos.getY() >= MC.player.getY();
-			
-			case SMASH:
-			return BlockUtils.getHardness(pos) >= 1;
-		}
 	}
 	
 	private boolean breakBlock(BlockBreakingParams params)
@@ -229,19 +180,6 @@ public final class NukerLegitHack extends Hack implements UpdateListener,
 		}
 		
 		return true;
-	}
-	
-	@Override
-	public void onLeftClick(LeftClickEvent event)
-	{
-		if(lockId.isChecked() || mode.getSelected() != NukerMode.ID)
-			return;
-		
-		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
-			|| bHitResult.getType() != HitResult.Type.BLOCK)
-			return;
-		
-		id.setBlockName(BlockUtils.getName(bHitResult.getBlockPos()));
 	}
 	
 	@Override
