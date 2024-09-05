@@ -75,7 +75,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(chest.getItem() != Items.ELYTRA)
 			return;
 		
-		if(MC.player.isFallFlying())
+		if(MC.player.isGliding())
 		{
 			if(stopInWater.isChecked() && MC.player.isTouchingWater())
 			{
