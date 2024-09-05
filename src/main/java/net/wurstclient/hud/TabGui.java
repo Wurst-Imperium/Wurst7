@@ -130,7 +130,7 @@ public final class TabGui implements KeyPressListener
 			return;
 		
 		// CURSED: TabGUI renders behind HackList without this
-		context.getVertexConsumers().draw();
+		context.draw();
 		
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();

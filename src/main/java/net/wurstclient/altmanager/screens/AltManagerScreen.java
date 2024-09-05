@@ -673,6 +673,7 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
+			context.draw();
 			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
 				24, isSelectedItem(id));
 			

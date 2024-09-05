@@ -68,7 +68,7 @@ public final class StepHack extends Hack implements UpdateListener
 			&& player.input.movementSideways == 0)
 			return;
 		
-		if(player.input.jumping)
+		if(player.jumping)
 			return;
 		
 		Box box = player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
