@@ -38,7 +38,7 @@ public final class AutoFishHack extends Hack
 	private final EnumSetting<AutoFishHack.BiteMode> biteMode =
 		new EnumSetting<>("Bite mode",
 			"\u00a7lSound\u00a7r mode detects bites by listening for the bite sound."
-				+ "This method is less accurate, but is more resilient against"
+				+ " This method is less accurate, but is more resilient against"
 				+ " anti-cheats. See the \"Valid range\" setting.\n\n"
 				+ "\u00a7lEntity\u00a7r mode detects bites by checking for the"
 				+ " fishing hook's entity update packet. It's more accurate than"
