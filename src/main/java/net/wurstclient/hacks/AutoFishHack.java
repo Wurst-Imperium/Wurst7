@@ -35,20 +35,21 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class AutoFishHack extends Hack
 	implements UpdateListener, PacketInputListener, RenderListener
 {
-	private final EnumSetting<AutoFishHack.Mode> biteMode = new EnumSetting<>(
-		"Bite mode",
-		"\u00a7lSound\u00a7r mode detects bites by listening for the bite sound.\n"
-			+ "This method is less accurate, but is more resilient against anti-cheats.\n"
-			+ "See the \"Valid range\" setting.\n\n"
-			+ "\u00a7lEntity\u00a7r mode detects bites by listening for fishing hook's entity update packet.\n"
-			+ "It's more accurate than the sound method, but is less resilient against anti-cheats.",
-		AutoFishHack.Mode.values(), AutoFishHack.Mode.SOUND);
+	private final EnumSetting<AutoFishHack.BiteMode> biteMode =
+		new EnumSetting<>("Bite mode",
+			"\u00a7lSound\u00a7r mode detects bites by listening for the bite sound."
+				+ "This method is less accurate, but is more resilient against"
+				+ " anti-cheats. See the \"Valid range\" setting.\n\n"
+				+ "\u00a7lEntity\u00a7r mode detects bites by checking for the"
+				+ " fishing hook's entity update packet. It's more accurate than"
+				+ " the sound method, but is less resilient against anti-cheats.",
+			AutoFishHack.BiteMode.values(), AutoFishHack.BiteMode.SOUND);
 	
 	private final SliderSetting validRange = new SliderSetting("Valid range",
 		"Any bites that occur outside of this range will be ignored.\n\n"
 			+ "Increase your range if bites are not being detected, decrease it"
 			+ " if other people's bites are being detected as yours.\n\n"
-			+ "This setting has effect only when \"Mode\" is set to \"Sound\".",
+			+ "This setting has no effect when \"Bite mode\" is set to \"Entity\".",
 		1.5, 0.25, 8, 0.25, ValueDisplay.DECIMAL);
 	
 	private final SliderSetting catchDelay = new SliderSetting("Catch delay",
@@ -252,14 +253,14 @@ public final class AutoFishHack extends Hack
 			&& player.getMainHandStack().isOf(Items.FISHING_ROD);
 	}
 	
-	private enum Mode
+	private enum BiteMode
 	{
 		SOUND("Sound"),
 		ENTITY("Entity");
 		
 		private final String name;
 		
-		private Mode(String name)
+		private BiteMode(String name)
 		{
 			this.name = name;
 		}
