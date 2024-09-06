@@ -14,7 +14,11 @@ public final class NukerShapeSetting
 {
 	public NukerShapeSetting()
 	{
-		super("Shape", NukerShape.values(), NukerShape.SPHERE);
+		super("Shape",
+			"\u00a7lNote:\u00a7r If your range is set too high, the cube shape"
+				+ " will start to look like a sphere because you can't reach"
+				+ " the corners. Ranges 1-3 work best for the cube shape.",
+			NukerShape.values(), NukerShape.SPHERE);
 	}
 	
 	public enum NukerShape
