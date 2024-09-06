@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.hacks.nukers.NukerModeSetting.NukerMode;
+import net.wurstclient.hacks.nukers.NukerShapeSetting.NukerShape;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
@@ -25,6 +26,11 @@ import net.wurstclient.util.BlockUtils;
 public final class CommonNukerSettings implements LeftClickListener
 {
 	private static final MinecraftClient MC = WurstClient.MC;
+	
+	private final NukerShapeSetting shape = new NukerShapeSetting();
+	
+	private final CheckboxSetting flat = new CheckboxSetting("Flat mode",
+		"Won't break any blocks below your feet.", false);
 	
 	private final NukerModeSetting mode = new NukerModeSetting();
 	
@@ -41,7 +47,7 @@ public final class CommonNukerSettings implements LeftClickListener
 	
 	public Stream<Setting> getSettings()
 	{
-		return Stream.of(mode, id, lockId, multiIdList);
+		return Stream.of(shape, flat, mode, id, lockId, multiIdList);
 	}
 	
 	public void reset()
@@ -56,7 +62,6 @@ public final class CommonNukerSettings implements LeftClickListener
 		{
 			case ID -> " [ID:" + id.getShortBlockName() + "]";
 			case MULTI_ID -> " [MultiID:" + multiIdList.size() + "]";
-			case FLAT -> " [Flat]";
 			case SMASH -> " [Smash]";
 			default -> "";
 		};
@@ -68,8 +73,16 @@ public final class CommonNukerSettings implements LeftClickListener
 			&& id.getBlock() == Blocks.AIR;
 	}
 	
+	public boolean isSphereShape()
+	{
+		return shape.getSelected() == NukerShape.SPHERE;
+	}
+	
 	public boolean shouldBreakBlock(BlockPos pos)
 	{
+		if(flat.isChecked() && pos.getY() < MC.player.getY())
+			return false;
+		
 		switch(mode.getSelected())
 		{
 			default:
@@ -81,9 +94,6 @@ public final class CommonNukerSettings implements LeftClickListener
 			
 			case MULTI_ID:
 			return multiIdList.contains(BlockUtils.getBlock(pos));
-			
-			case FLAT:
-			return pos.getY() >= MC.player.getY();
 			
 			case SMASH:
 			return BlockUtils.getHardness(pos) >= 1;

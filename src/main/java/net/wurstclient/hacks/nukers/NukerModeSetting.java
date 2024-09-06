@@ -20,8 +20,6 @@ public final class NukerModeSetting
 				+ " Left-click on a block to select it.\n"
 				+ "\u00a7lMultiID\u00a7r mode only breaks the block types in"
 				+ " your MultiID List.\n"
-				+ "\u00a7lFlat\u00a7r mode flattens the area around you, but"
-				+ " won't dig down.\n"
 				+ "\u00a7lSmash\u00a7r mode only breaks blocks that can be"
 				+ " destroyed instantly (e.g. tall grass).",
 			NukerMode.values(), NukerMode.NORMAL);
@@ -32,7 +30,6 @@ public final class NukerModeSetting
 		NORMAL("Normal"),
 		ID("ID"),
 		MULTI_ID("MultiID"),
-		FLAT("Flat"),
 		SMASH("Smash");
 		
 		private final String name;

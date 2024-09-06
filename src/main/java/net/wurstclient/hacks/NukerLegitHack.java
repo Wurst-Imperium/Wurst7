@@ -118,7 +118,9 @@ public final class NukerLegitHack extends Hack
 		
 		Vec3d eyesVec = RotationUtils.getEyesPos();
 		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
-		double rangeSq = range.getValueSq();
+		double maxRange = MC.player.getBlockInteractionRange() + 1;
+		double rangeSq = commonSettings.isSphereShape() ? range.getValueSq()
+			: maxRange * maxRange;
 		int blockRange = range.getValueCeil();
 		
 		Stream<BlockBreakingParams> stream = BlockUtils

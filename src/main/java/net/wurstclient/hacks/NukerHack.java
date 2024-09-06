@@ -105,9 +105,12 @@ public final class NukerHack extends Hack
 		Stream<BlockBreakingParams> stream = BlockUtils
 			.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(commonSettings::shouldBreakBlock)
-			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
-			.filter(params -> params.distanceSq() <= rangeSq)
-			.sorted(BlockBreaker.comparingParams());
+			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull);
+		
+		if(commonSettings.isSphereShape())
+			stream = stream.filter(params -> params.distanceSq() <= rangeSq);
+		
+		stream = stream.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode)

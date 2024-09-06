@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -83,18 +84,24 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
-		ArrayList<BlockPos> blocks =
+		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
 				.filter(BlockUtils::canBeClicked)
-				.filter(commonSettings::shouldBreakBlock)
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
-				.collect(Collectors.toCollection(ArrayList::new));
+				.filter(commonSettings::shouldBreakBlock);
 		
-		if(!blocks.isEmpty())
-			WURST.getHax().autoToolHack.equipIfEnabled(blocks.get(0));
+		if(commonSettings.isSphereShape())
+			stream = stream
+				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq);
 		
+		ArrayList<BlockPos> blocks = stream
+			.sorted(Comparator
+				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+			.collect(Collectors.toCollection(ArrayList::new));
+		
+		if(blocks.isEmpty())
+			return;
+		
+		WURST.getHax().autoToolHack.equipIfEnabled(blocks.get(0));
 		BlockBreaker.breakBlocksWithPacketSpam(blocks);
 	}
 }
