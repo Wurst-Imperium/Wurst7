@@ -98,6 +98,9 @@ public final class AutoMineHack extends Hack
 			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return;
 		
+		if(!im.isBreakingBlock())
+			im.attackBlock(pos, side);
+		
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
 			MC.particleManager.addBlockBreakingParticles(pos, side);

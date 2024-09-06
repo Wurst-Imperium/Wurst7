@@ -174,6 +174,9 @@ public final class NukerLegitHack extends Hack
 			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return true;
 		
+		if(!im.isBreakingBlock())
+			im.attackBlock(pos, side);
+		
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
 			MC.particleManager.addBlockBreakingParticles(pos, side);
