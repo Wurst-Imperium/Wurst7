@@ -51,11 +51,13 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 	@Override
 	protected void onRemove(ChunkSearcher searcher)
 	{
+		@SuppressWarnings("resource")
 		VertexBuffer buffer = buffers.remove(searcher.getPos());
 		if(buffer != null)
 			buffer.close();
 	}
 	
+	@Override
 	public void reset()
 	{
 		super.reset();
