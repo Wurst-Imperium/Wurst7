@@ -51,10 +51,10 @@ import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.MinPriorityThreadFactory;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.chunk.ChunkUtils;
 
 @SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
 	"LightLevelOverlay", "light level overlay"})

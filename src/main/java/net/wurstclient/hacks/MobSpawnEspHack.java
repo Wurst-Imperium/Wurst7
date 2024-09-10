@@ -42,11 +42,11 @@ import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkSearcher.Result;
-import net.wurstclient.util.ChunkVertexBufferCoordinator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.chunk.ChunkSearcher;
+import net.wurstclient.util.chunk.ChunkSearcher.Result;
+import net.wurstclient.util.chunk.ChunkVertexBufferCoordinator;
 
 @SearchTags({"mob spawn esp", "LightLevelESP", "light level esp",
 	"LightLevelOverlay", "light level overlay"})

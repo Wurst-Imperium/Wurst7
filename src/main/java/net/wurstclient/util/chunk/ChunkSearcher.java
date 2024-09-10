@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.util.chunk;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.wurstclient.util.MinPriorityThreadFactory;
 
 /**
  * Searches the given {@link Chunk} for blocks matching the given query.

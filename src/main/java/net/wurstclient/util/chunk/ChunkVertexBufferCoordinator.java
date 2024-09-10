@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.util.chunk;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.wurstclient.settings.ChunkAreaSetting;
-import net.wurstclient.util.ChunkSearcher.Result;
+import net.wurstclient.util.chunk.ChunkSearcher.Result;
 
 public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 {
