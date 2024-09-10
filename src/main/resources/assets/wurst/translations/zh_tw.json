@@ -98,7 +98,7 @@
   "description.wurst.hack.masstpa": "給每個人發送TPA請求。\n\n§c§l警告：§r國內服務器使用會因為Wurst判斷的是英文而導致TPA仍在繼續。",
   "description.wurst.hack.mileycyrus": "類似全自動Shift蹲起。",
   "description.wurst.hack.mobesp": "高亮附近的生物。",
-  "description.wurst.hack.mobspawnesp": "高亮那些生物可以生成的區域。\n§e黃色§r - 可以在夜間生成\n§c紅色§r - 可以在任意時候生成",
+  "description.wurst.hack.mobspawnesp": "高亮那些生物可以生成的區域。",
   "description.wurst.hack.multiaura": "比Killaura更高級，能同一時間攻擊多個實體。",
   "description.wurst.hack.nameprotect": "隱藏所有玩家的名字。",
   "description.wurst.hack.nametags": "改變名字標籤大小使你可以經常可以看到他們，同時也能讓你看到那些正潜行的玩家名字標籤。",

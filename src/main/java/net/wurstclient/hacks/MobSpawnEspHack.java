@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.Color;
 import java.util.Map.Entry;
 
 import org.joml.Matrix4f;
@@ -38,6 +39,9 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
+import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ChunkSearcher;
 import net.wurstclient.util.ChunkSearcher.Result;
 import net.wurstclient.util.ChunkVertexBufferCoordinator;
@@ -52,6 +56,16 @@ public final class MobSpawnEspHack extends Hack
 	private final ChunkAreaSetting drawDistance =
 		new ChunkAreaSetting("Draw distance", "", ChunkArea.A9);
 	
+	private final ColorSetting nightColor = new ColorSetting("Night color",
+		"Color of the X at positions where mobs can spawn at night.",
+		Color.YELLOW);
+	
+	private final ColorSetting dayColor = new ColorSetting("Day color",
+		"Color of the X at positions where mobs can always spawn.", Color.RED);
+	
+	private final SliderSetting opacity =
+		new SliderSetting("Opacity", 0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
+	
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);
 	
@@ -64,6 +78,9 @@ public final class MobSpawnEspHack extends Hack
 		super("MobSpawnESP");
 		setCategory(Category.RENDER);
 		addSetting(drawDistance);
+		addSetting(nightColor);
+		addSetting(dayColor);
+		addSetting(opacity);
 		addSetting(depthTest);
 	}
 	
@@ -103,7 +120,7 @@ public final class MobSpawnEspHack extends Hack
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
 		
 		for(Entry<ChunkPos, VertexBuffer> entry : coordinator.getBuffers())
 		{
@@ -124,6 +141,7 @@ public final class MobSpawnEspHack extends Hack
 		}
 		
 		// GL resets
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		if(!depthTest)
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -175,10 +193,12 @@ public final class MobSpawnEspHack extends Hack
 		float z1 = pos.getZ() - region.z();
 		float z2 = z1 + 1;
 		
-		float r = 1;
-		float g = MC.world.getLightLevel(LightType.SKY, pos) < 8 ? 0 : 1;
-		float b = 0;
-		float a = 0.5F;
+		float[] color = MC.world.getLightLevel(LightType.SKY, pos) < 8
+			? dayColor.getColorF() : nightColor.getColorF();
+		float r = color[0];
+		float g = color[1];
+		float b = color[2];
+		float a = 1;
 		
 		bufferBuilder.vertex(x1, y, z1).color(r, g, b, a);
 		bufferBuilder.vertex(x2, y, z2).color(r, g, b, a);
