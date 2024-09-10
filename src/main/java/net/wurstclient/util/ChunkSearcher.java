@@ -8,6 +8,8 @@
 package net.wurstclient.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
@@ -90,6 +92,11 @@ public final class ChunkSearcher
 		future.cancel(false);
 	}
 	
+	public boolean isInterrupted()
+	{
+		return interrupted;
+	}
+	
 	public ChunkPos getPos()
 	{
 		return chunk.getPos();
@@ -106,6 +113,14 @@ public final class ChunkSearcher
 			return Stream.empty();
 		
 		return future.join().stream();
+	}
+	
+	public List<Result> getMatchesList()
+	{
+		if(future == null || future.isCancelled())
+			return List.of();
+		
+		return Collections.unmodifiableList(future.join());
 	}
 	
 	public boolean isDone()
