@@ -5,20 +5,22 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.util.chunk;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.wurstclient.util.MinPriorityThreadFactory;
 
 /**
  * Searches the given {@link Chunk} for blocks matching the given query.
@@ -34,11 +36,6 @@ public final class ChunkSearcher
 	
 	private CompletableFuture<ArrayList<Result>> future;
 	private boolean interrupted;
-	
-	public ChunkSearcher(Block block, Chunk chunk, DimensionType dimension)
-	{
-		this((pos, state) -> block == state.getBlock(), chunk, dimension);
-	}
 	
 	public ChunkSearcher(BiPredicate<BlockPos, BlockState> query, Chunk chunk,
 		DimensionType dimension)
@@ -96,6 +93,11 @@ public final class ChunkSearcher
 		future.cancel(false);
 	}
 	
+	public boolean isInterrupted()
+	{
+		return interrupted;
+	}
+	
 	public ChunkPos getPos()
 	{
 		return chunk.getPos();
@@ -112,6 +114,14 @@ public final class ChunkSearcher
 			return Stream.empty();
 		
 		return future.join().stream();
+	}
+	
+	public List<Result> getMatchesList()
+	{
+		if(future == null || future.isCancelled())
+			return List.of();
+		
+		return Collections.unmodifiableList(future.join());
 	}
 	
 	public boolean isDone()

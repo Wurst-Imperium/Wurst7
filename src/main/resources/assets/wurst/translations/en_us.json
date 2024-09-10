@@ -146,7 +146,7 @@
   "description.wurst.hack.masstpa": "Sends a TPA request to all players.",
   "description.wurst.hack.mileycyrus": "Makes you twerk.",
   "description.wurst.hack.mobesp": "Highlights nearby mobs.",
-  "description.wurst.hack.mobspawnesp": "Highlights areas where mobs can spawn.\n§eyellow§r - mobs can spawn at night\n§cred§r - mobs can always spawn",
+  "description.wurst.hack.mobspawnesp": "Highlights areas where mobs can spawn.",
   "description.wurst.hack.multiaura": "Faster Killaura that attacks multiple entities at once.",
   "description.wurst.hack.nameprotect": "Hides all player names.",
   "description.wurst.hack.nametags": "Changes the scale of the nametags so you can always read them. Also allows you to see the nametags of sneaking players.",
