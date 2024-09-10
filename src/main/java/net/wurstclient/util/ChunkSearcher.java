@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -34,11 +33,6 @@ public final class ChunkSearcher
 	
 	private CompletableFuture<ArrayList<Result>> future;
 	private boolean interrupted;
-	
-	public ChunkSearcher(Block block, Chunk chunk, DimensionType dimension)
-	{
-		this((pos, state) -> block == state.getBlock(), chunk, dimension);
-	}
 	
 	public ChunkSearcher(BiPredicate<BlockPos, BlockState> query, Chunk chunk,
 		DimensionType dimension)
