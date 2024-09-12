@@ -10,9 +10,11 @@ package net.wurstclient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.Lists;
@@ -31,8 +33,8 @@ public class WurstTranslator implements SynchronousResourceReloader
 	private final WurstClient wurst = WurstClient.INSTANCE;
 	private TranslationStorage mcEnglish;
 	
-	private final HashMap<String, String> englishOnlyStrings = new HashMap<>();
-	private final HashMap<String, String> currentLangStrings = new HashMap<>();
+	private Map<String, String> currentLangStrings = Map.of();
+	private Map<String, String> englishOnlyStrings = Map.of();
 	
 	@Override
 	public void reload(ResourceManager manager)
@@ -40,12 +42,16 @@ public class WurstTranslator implements SynchronousResourceReloader
 		mcEnglish = TranslationStorage.load(manager,
 			Lists.newArrayList("en_us"), false);
 		
-		currentLangStrings.clear();
+		HashMap<String, String> currentLangStrings = new HashMap<>();
 		loadTranslations(manager, getCurrentLangCodes(),
 			currentLangStrings::put);
+		this.currentLangStrings =
+			Collections.unmodifiableMap(currentLangStrings);
 		
-		englishOnlyStrings.clear();
+		HashMap<String, String> englishOnlyStrings = new HashMap<>();
 		loadTranslations(manager, List.of("en_us"), englishOnlyStrings::put);
+		this.englishOnlyStrings =
+			Collections.unmodifiableMap(englishOnlyStrings);
 	}
 	
 	/**
@@ -146,22 +152,23 @@ public class WurstTranslator implements SynchronousResourceReloader
 		return mcEnglish;
 	}
 	
-	public String getMinecraftsCurrentLanguage()
+	public Map<String, String> getMinecraftsCurrentLanguage()
 	{
-		return MinecraftClient.getInstance().getLanguageManager().getLanguage()
-			.toLowerCase();
+		return currentLangStrings;
 	}
 	
-	public String getWurstsCurrentLanguage()
+	public Map<String, String> getWurstsCurrentLanguage()
 	{
-		return isForcedEnglish() ? "en_us" : getMinecraftsCurrentLanguage();
+		return isForcedEnglish() ? englishOnlyStrings
+			: getMinecraftsCurrentLanguage();
 	}
 	
 	private ArrayList<String> getCurrentLangCodes()
 	{
 		// Weird bug: Some users have their language set to "en_US" instead of
 		// "en_us" for some reason. Last seen in 1.21.
-		String mainLangCode = getMinecraftsCurrentLanguage();
+		String mainLangCode = MinecraftClient.getInstance().getLanguageManager()
+			.getLanguage().toLowerCase();
 		
 		ArrayList<String> langCodes = new ArrayList<>();
 		langCodes.add("en_us");

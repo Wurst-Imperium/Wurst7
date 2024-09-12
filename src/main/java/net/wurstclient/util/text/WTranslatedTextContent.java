@@ -7,6 +7,7 @@
  */
 package net.wurstclient.util.text;
 
+import java.util.Map;
 import java.util.Objects;
 
 import net.wurstclient.WurstClient;
@@ -17,7 +18,7 @@ public final class WTranslatedTextContent implements WTextContent
 	private final String key;
 	private final Object[] args;
 	private String translation;
-	private String lastLanguage;
+	private Map<String, String> lastLanguage;
 	
 	public WTranslatedTextContent(String key, Object... args)
 	{
@@ -28,8 +29,8 @@ public final class WTranslatedTextContent implements WTextContent
 	private void update()
 	{
 		WurstTranslator translator = WurstClient.INSTANCE.getTranslator();
-		String language = translator.getWurstsCurrentLanguage();
-		if(language.equals(lastLanguage))
+		Map<String, String> language = translator.getWurstsCurrentLanguage();
+		if(language == lastLanguage)
 			return;
 		
 		translation = translator.translate(key, args);
