@@ -57,11 +57,10 @@ public final class MobSpawnEspHack extends Hack
 		new ChunkAreaSetting("Draw distance", "", ChunkArea.A9);
 	
 	private final ColorSetting nightColor = new ColorSetting("Night color",
-		"Color of the X at positions where mobs can spawn at night.",
-		Color.YELLOW);
+		"description.wurst.setting.mobspawnesp.night_color", Color.YELLOW);
 	
 	private final ColorSetting dayColor = new ColorSetting("Day color",
-		"Color of the X at positions where mobs can always spawn.", Color.RED);
+		"description.wurst.setting.mobspawnesp.day_color", Color.RED);
 	
 	private final SliderSetting opacity =
 		new SliderSetting("Opacity", 0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
