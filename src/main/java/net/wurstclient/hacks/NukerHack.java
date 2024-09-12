@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -22,6 +23,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.CommonNukerSettings;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
@@ -38,6 +40,9 @@ public final class NukerHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting("How Nuker should swing your hand when mining.");
+	
 	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
@@ -48,6 +53,7 @@ public final class NukerHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		commonSettings.getSettings().forEach(this::addSetting);
+		addSetting(swingHand);
 	}
 	
 	@Override
@@ -125,11 +131,12 @@ public final class NukerHack extends Hack
 			
 			currentBlock = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
+			swingHand.swing(Hand.MAIN_HAND);
 			return;
 		}
 		
 		// Break the first valid block in survival mode
-		currentBlock = stream.filter(BlockBreaker::breakOneBlock)
+		currentBlock = stream.filter(this::breakOneBlock)
 			.map(BlockBreakingParams::pos).findFirst().orElse(null);
 		
 		if(currentBlock == null)
@@ -140,6 +147,18 @@ public final class NukerHack extends Hack
 		}
 		
 		overlay.updateProgress();
+	}
+	
+	private boolean breakOneBlock(BlockBreakingParams params)
+	{
+		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+		
+		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
+			params.side()))
+			return false;
+		
+		swingHand.swing(Hand.MAIN_HAND);
+		return true;
 	}
 	
 	@Override
