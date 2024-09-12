@@ -146,12 +146,22 @@ public class WurstTranslator implements SynchronousResourceReloader
 		return mcEnglish;
 	}
 	
+	public String getMinecraftsCurrentLanguage()
+	{
+		return MinecraftClient.getInstance().getLanguageManager().getLanguage()
+			.toLowerCase();
+	}
+	
+	public String getWurstsCurrentLanguage()
+	{
+		return isForcedEnglish() ? "en_us" : getMinecraftsCurrentLanguage();
+	}
+	
 	private ArrayList<String> getCurrentLangCodes()
 	{
 		// Weird bug: Some users have their language set to "en_US" instead of
 		// "en_us" for some reason. Last seen in 1.21.
-		String mainLangCode = MinecraftClient.getInstance().getLanguageManager()
-			.getLanguage().toLowerCase();
+		String mainLangCode = getMinecraftsCurrentLanguage();
 		
 		ArrayList<String> langCodes = new ArrayList<>();
 		langCodes.add("en_us");
