@@ -41,7 +41,7 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		new CommonNukerSettings();
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How SpeedNuker should swing your hand when mining.", SwingHand.OFF);
+		SwingHandSetting.genericMiningDescription(this), SwingHand.OFF);
 	
 	public SpeedNukerHack()
 	{

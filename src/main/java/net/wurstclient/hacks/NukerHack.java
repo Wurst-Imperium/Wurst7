@@ -24,6 +24,7 @@ import net.wurstclient.hacks.nukers.CommonNukerSettings;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
@@ -40,8 +41,8 @@ public final class NukerHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting("How Nuker should swing your hand when mining.");
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		SwingHandSetting.genericMiningDescription(this), SwingHand.SERVER);
 	
 	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private final OverlayRenderer overlay = new OverlayRenderer();

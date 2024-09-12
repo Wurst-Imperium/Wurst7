@@ -49,9 +49,9 @@ public final class NukerLegitHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
-	private final SwingHandSetting swingHand = SwingHandSetting
-		.withoutOffOption("How NukerLegit should swing your hand when mining.",
-			SwingHand.CLIENT);
+	private final SwingHandSetting swingHand =
+		SwingHandSetting.withoutOffOption(
+			SwingHandSetting.genericMiningDescription(this), SwingHand.CLIENT);
 	
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;

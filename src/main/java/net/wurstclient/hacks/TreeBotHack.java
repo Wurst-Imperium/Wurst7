@@ -40,6 +40,7 @@ import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -65,8 +66,8 @@ public final class TreeBotHack extends Hack
 			+ " camera on the client-side. This is the most legit option, but"
 			+ " can be disorienting to look at.");
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How TreeBot should swing your hand when breaking logs and leaves.");
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.SERVER);
 	
 	private TreeFinder treeFinder;
 	private AngleFinder angleFinder;

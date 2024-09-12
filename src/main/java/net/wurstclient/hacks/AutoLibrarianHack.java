@@ -56,6 +56,7 @@ import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
@@ -107,8 +108,7 @@ public final class AutoLibrarianHack extends Hack
 			+ " can be disorienting to look at.");
 	
 	private final SwingHandSetting swingHand =
-		new SwingHandSetting("How to swing your hand when interacting with the"
-			+ " villager and job site.");
+		new SwingHandSetting(this, SwingHand.SERVER);
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"

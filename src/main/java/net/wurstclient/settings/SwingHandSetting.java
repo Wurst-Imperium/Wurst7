@@ -13,50 +13,67 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.util.text.WText;
 
 public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
 	private static final MinecraftClient MC = WurstClient.MC;
-	private static final String FULL_DESCRIPTION_SUFFIX =
+	private static final WText FULL_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix(true);
-	private static final String REDUCED_DESCRIPTION_SUFFIX =
+	private static final WText REDUCED_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix(false);
 	
-	private SwingHandSetting(String name, String description,
-		SwingHand[] values, SwingHand selected)
+	private SwingHandSetting(String name, WText description, SwingHand[] values,
+		SwingHand selected)
 	{
 		super(name, description, values, selected);
 	}
 	
-	public SwingHandSetting(String name, String description, SwingHand selected)
+	public SwingHandSetting(WText description, SwingHand selected)
 	{
-		this(name, description + FULL_DESCRIPTION_SUFFIX, SwingHand.values(),
-			selected);
+		this("Swing hand", description.append(FULL_DESCRIPTION_SUFFIX),
+			SwingHand.values(), selected);
 	}
 	
-	public SwingHandSetting(String description, SwingHand selected)
+	public SwingHandSetting(Hack hack, SwingHand selected)
 	{
-		this("Swing hand", description, selected);
+		this(hackDescription(hack), selected);
 	}
 	
-	public SwingHandSetting(String description)
-	{
-		this(description, SwingHand.SERVER);
-	}
-	
-	public static SwingHandSetting withoutOffOption(String name,
-		String description, SwingHand selected)
-	{
-		SwingHand[] values = {SwingHand.SERVER, SwingHand.CLIENT};
-		return new SwingHandSetting(name,
-			description + REDUCED_DESCRIPTION_SUFFIX, values, selected);
-	}
-	
-	public static SwingHandSetting withoutOffOption(String description,
+	public static SwingHandSetting withoutOffOption(WText description,
 		SwingHand selected)
 	{
-		return withoutOffOption("Swing hand", description, selected);
+		SwingHand[] values = {SwingHand.SERVER, SwingHand.CLIENT};
+		return new SwingHandSetting("Swing hand",
+			description.append(REDUCED_DESCRIPTION_SUFFIX), values, selected);
+	}
+	
+	public static SwingHandSetting withoutOffOption(Hack hack,
+		SwingHand selected)
+	{
+		return withoutOffOption(hackDescription(hack), selected);
+	}
+	
+	public static WText genericMiningDescription(Hack hack)
+	{
+		return WText.translated(
+			"description.wurst.setting.generic.swing_hand_mining",
+			hack.getName());
+	}
+	
+	public static WText genericCombatDescription(Hack hack)
+	{
+		return WText.translated(
+			"description.wurst.setting.generic.swing_hand_combat",
+			hack.getName());
+	}
+	
+	private static WText hackDescription(Hack hack)
+	{
+		return WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".swing_hand");
 	}
 	
 	public void swing(Hand hand)
@@ -64,44 +81,41 @@ public final class SwingHandSetting
 		getSelected().swing(hand);
 	}
 	
-	private static String buildDescriptionSuffix(boolean includeOff)
+	private static WText buildDescriptionSuffix(boolean includeOff)
 	{
-		StringBuilder builder = new StringBuilder("\n\n");
+		WText text = WText.literal("\n\n");
 		SwingHand[] values = includeOff ? SwingHand.values()
 			: new SwingHand[]{SwingHand.SERVER, SwingHand.CLIENT};
 		
 		for(SwingHand value : values)
-			builder.append("\u00a7l").append(value.name).append("\u00a7r - ")
+			text.append("\u00a7l" + value.name + "\u00a7r - ")
 				.append(value.description).append("\n\n");
 		
-		return builder.toString();
+		return text;
 	}
 	
 	public enum SwingHand
 	{
-		OFF("Off",
-			"Don't swing your hand at all. Will be detected by anti-cheat"
-				+ " plugins.",
-			hand -> {}),
+		OFF("Off", hand -> {}),
 		
 		SERVER("Server-side",
-			"Swing your hand on the server-side, without playing the animation"
-				+ " on the client-side.",
 			hand -> MC.player.networkHandler
 				.sendPacket(new HandSwingC2SPacket(hand))),
 		
-		CLIENT("Client-side",
-			"Swing your hand on the client-side. This is the most legit option.",
-			hand -> MC.player.swingHand(hand));
+		CLIENT("Client-side", hand -> MC.player.swingHand(hand));
+		
+		private static final String TRANSLATION_KEY_PREFIX =
+			"description.wurst.setting.generic.swing_hand.";
 		
 		private final String name;
-		private final String description;
+		private final WText description;
 		private final Consumer<Hand> swing;
 		
-		private SwingHand(String name, String description, Consumer<Hand> swing)
+		private SwingHand(String name, Consumer<Hand> swing)
 		{
 			this.name = name;
-			this.description = description;
+			description =
+				WText.translated(TRANSLATION_KEY_PREFIX + name().toLowerCase());
 			this.swing = swing;
 		}
 		
