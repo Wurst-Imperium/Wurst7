@@ -56,7 +56,7 @@ public final class TreeBotHack extends Hack
 		ValueDisplay.DECIMAL);
 	
 	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
-		"How to face the logs and leaves when breaking them.\n\n"
+		"How TreeBot should face the logs and leaves when breaking them.\n\n"
 			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
 			+ " detected by anti-cheat plugins.\n\n"
 			+ "\u00a7lServer-side\u00a7r - Face the blocks on the"

@@ -38,7 +38,7 @@
   "description.wurst.hack.autodrop": "Automatically drops unwanted items.",
   "description.wurst.hack.autoleave": "Automatically leaves the server when your health is low.",
   "description.wurst.hack.autolibrarian": "Automatically trains a villager to become a librarian that sells a specific enchanted book. You can set up an entire trading hall in no time by using this hack.",
-  "description.wurst.setting.autolibrarian.swing_hand": "How to swing your hand when interacting with the villager and job site.",
+  "description.wurst.setting.autolibrarian.swing_hand": "How AutoLibrarian should swing your hand when interacting with the villager and job site.",
   "description.wurst.hack.autoeat": "Automatically eats food when necessary.",
   "description.wurst.setting.autoeat.target_hunger": "Tries to keep the hunger bar at or above this level, but only if it doesn't waste any hunger points.",
   "description.wurst.setting.autoeat.min_hunger": "Always keeps the hunger bar at or above this level, even if it wastes some hunger points.\n6.5 - Cannot cause any waste with vanilla food items.\n10.0 - Completely ignores waste and just keeps the hunger bar full.",
