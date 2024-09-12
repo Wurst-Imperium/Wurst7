@@ -208,7 +208,7 @@ public final class MobSpawnEspHack extends Hack
 		float z2 = z1 + 1;
 		
 		int color = MC.world.getLightLevel(LightType.SKY, pos) < 8
-			? dayColor.getColorI() : nightColor.getColorI();
+			? cachedDayColor : cachedNightColor;
 		
 		bufferBuilder.vertex(x1, y, z1).color(color);
 		bufferBuilder.vertex(x2, y, z2).color(color);
