@@ -63,7 +63,12 @@ public final class ColorSetting extends Setting
 	
 	public int getColorI()
 	{
-		return color.getRGB();
+		return color.getRGB() | 0xFF000000;
+	}
+	
+	public int getColorI(int alpha)
+	{
+		return color.getRGB() & 0x00FFFFFF | alpha << 24;
 	}
 	
 	public int getRed()

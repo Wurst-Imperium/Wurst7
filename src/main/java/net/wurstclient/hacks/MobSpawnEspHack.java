@@ -73,6 +73,9 @@ public final class MobSpawnEspHack extends Hack
 		new ChunkVertexBufferCoordinator(this::isSpawnable, this::buildBuffer,
 			drawDistance);
 	
+	private int cachedDayColor;
+	private int cachedNightColor;
+	
 	public MobSpawnEspHack()
 	{
 		super("MobSpawnESP");
@@ -90,6 +93,9 @@ public final class MobSpawnEspHack extends Hack
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, coordinator);
 		EVENTS.add(RenderListener.class, this);
+		
+		cachedDayColor = dayColor.getColorI();
+		cachedNightColor = nightColor.getColorI();
 	}
 	
 	@Override
@@ -105,6 +111,14 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		if(dayColor.getColorI() != cachedDayColor
+			|| nightColor.getColorI() != cachedNightColor)
+		{
+			cachedDayColor = dayColor.getColorI();
+			cachedNightColor = nightColor.getColorI();
+			coordinator.reset();
+		}
+		
 		coordinator.update();
 	}
 	
@@ -193,16 +207,12 @@ public final class MobSpawnEspHack extends Hack
 		float z1 = pos.getZ() - region.z();
 		float z2 = z1 + 1;
 		
-		float[] color = MC.world.getLightLevel(LightType.SKY, pos) < 8
-			? dayColor.getColorF() : nightColor.getColorF();
-		float r = color[0];
-		float g = color[1];
-		float b = color[2];
-		float a = 1;
+		int color = MC.world.getLightLevel(LightType.SKY, pos) < 8
+			? dayColor.getColorI() : nightColor.getColorI();
 		
-		bufferBuilder.vertex(x1, y, z1).color(r, g, b, a);
-		bufferBuilder.vertex(x2, y, z2).color(r, g, b, a);
-		bufferBuilder.vertex(x2, y, z1).color(r, g, b, a);
-		bufferBuilder.vertex(x1, y, z2).color(r, g, b, a);
+		bufferBuilder.vertex(x1, y, z1).color(color);
+		bufferBuilder.vertex(x2, y, z2).color(color);
+		bufferBuilder.vertex(x2, y, z1).color(color);
+		bufferBuilder.vertex(x1, y, z2).color(color);
 	}
 }
