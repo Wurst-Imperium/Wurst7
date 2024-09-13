@@ -66,6 +66,7 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		EVENTS.add(LeftClickListener.class, commonSettings);
 		EVENTS.add(UpdateListener.class, this);

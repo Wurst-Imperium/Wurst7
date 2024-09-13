@@ -79,6 +79,7 @@ public final class NukerLegitHack extends Hack
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, commonSettings);
