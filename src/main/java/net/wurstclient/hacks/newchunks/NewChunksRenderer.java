@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -47,7 +48,7 @@ public final class NewChunksRenderer
 			return;
 		}
 		
-		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		vertexBuffers[i] = new VertexBuffer(Usage.STATIC_WRITE);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);
 		VertexBuffer.unbind();

@@ -15,6 +15,7 @@ import org.joml.Matrix4f;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -109,8 +110,8 @@ public final class ChestEspRenderer
 	public static void prepareBuffers()
 	{
 		closeBuffers();
-		solidBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		outlinedBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		solidBox = new VertexBuffer(Usage.STATIC_WRITE);
+		outlinedBox = new VertexBuffer(Usage.STATIC_WRITE);
 		
 		Box box = new Box(BlockPos.ORIGIN);
 		RenderUtils.drawSolidBox(box, solidBox);

@@ -19,6 +19,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -121,7 +122,7 @@ public final class AutoFarmRenderer
 		if(blocksToHarvest.isEmpty())
 			return;
 		
-		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		greenBuffer = new VertexBuffer(Usage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -149,7 +150,7 @@ public final class AutoFarmRenderer
 		if(plants.isEmpty())
 			return;
 		
-		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		cyanBuffer = new VertexBuffer(Usage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -177,7 +178,7 @@ public final class AutoFarmRenderer
 		if(blocksToReplant.isEmpty())
 			return;
 		
-		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		redBuffer = new VertexBuffer(Usage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		

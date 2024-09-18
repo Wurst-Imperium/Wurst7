@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -46,7 +47,7 @@ public class Tree implements AutoCloseable
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		vertexBuffer = new VertexBuffer(Usage.STATIC_WRITE);
 		
 		double boxMin = 1 / 16.0;
 		double boxMax = 15 / 16.0;
