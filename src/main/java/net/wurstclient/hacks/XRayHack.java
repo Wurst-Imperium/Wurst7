@@ -31,6 +31,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
@@ -81,6 +83,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 			+ "Remember to restart X-Ray when changing this setting.",
 		false);
 	
+	private final SliderSetting opacity = new SliderSetting("Opacity",
+		"Opacity of non-ore blocks when X-Ray is enabled.\n\n"
+			+ "Remember to restart X-Ray when changing this setting.",
+		0, 0, 0.99, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "off"));
+	
 	private final String optiFineWarning;
 	private final String renderName =
 		Math.random() < 0.01 ? "X-Wurst" : getName();
@@ -95,6 +102,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(ores);
 		addSetting(onlyExposed);
+		addSetting(opacity);
 		optiFineWarning = checkOptiFine();
 	}
 	
@@ -168,8 +176,12 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(
-			isVisible(event.getState().getBlock(), event.getPos()));
+		boolean visible =
+			isVisible(event.getState().getBlock(), event.getPos());
+		if(!visible && opacity.getValue() > 0)
+			return;
+		
+		event.setRendered(visible);
 	}
 	
 	@Override
@@ -180,7 +192,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 			event.cancel();
 	}
 	
-	private boolean isVisible(Block block, BlockPos pos)
+	public boolean isVisible(Block block, BlockPos pos)
 	{
 		String name = BlockUtils.getName(block);
 		int index = Collections.binarySearch(oreNamesCache, name);
@@ -200,6 +212,16 @@ public final class XRayHack extends Hack implements UpdateListener,
 				return true;
 			
 		return false;
+	}
+	
+	public boolean isOpacityMode()
+	{
+		return isEnabled() && opacity.getValue() > 0;
+	}
+	
+	public int getOpacityColorMask()
+	{
+		return (int)(opacity.getValue() * 255) << 24 | 0xFFFFFF;
 	}
 	
 	/**
@@ -223,4 +245,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
+	
+	// See RenderLayersMixin
 }
