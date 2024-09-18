@@ -20,7 +20,7 @@ import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(AbstractBlockRenderContext.class)
+@Mixin(value = AbstractBlockRenderContext.class, remap = false)
 public abstract class AbstractBlockRenderContextMixin
 {
 	@Shadow
