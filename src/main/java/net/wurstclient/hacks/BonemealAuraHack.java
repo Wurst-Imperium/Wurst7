@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
@@ -35,7 +35,7 @@ import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"bonemeal aura", "bone meal aura", "AutoBonemeal", "auto bonemeal",
 	"auto bone meal", "fertilizer"})
-public final class BonemealAuraHack extends Hack implements PostMotionListener
+public final class BonemealAuraHack extends Hack implements HandleInputListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -83,20 +83,23 @@ public final class BonemealAuraHack extends Hack implements PostMotionListener
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(PostMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(PostMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 	}
 	
 	@Override
-	public void onPostMotion()
+	public void onHandleInput()
 	{
 		// wait for right click timer
 		if(MC.itemUseCooldown > 0)
+			return;
+		
+		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
 			return;
 		
 		// get valid blocks
