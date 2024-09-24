@@ -31,7 +31,7 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
-public final class BlockListSetting extends Setting
+public class BlockListSetting extends Setting
 {
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
@@ -50,6 +50,31 @@ public final class BlockListSetting extends Setting
 	public List<String> getBlockNames()
 	{
 		return Collections.unmodifiableList(blockNames);
+	}
+	
+	public int indexOf(String name)
+	{
+		return Collections.binarySearch(blockNames, name);
+	}
+	
+	public int indexOf(Block block)
+	{
+		return indexOf(BlockUtils.getName(block));
+	}
+	
+	public boolean contains(String name)
+	{
+		return indexOf(name) >= 0;
+	}
+	
+	public boolean contains(Block block)
+	{
+		return indexOf(block) >= 0;
+	}
+	
+	public int size()
+	{
+		return blockNames.size();
 	}
 	
 	public void add(Block block)
