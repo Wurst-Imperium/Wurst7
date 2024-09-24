@@ -30,13 +30,14 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public class BlockListSetting extends Setting
 {
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public BlockListSetting(String name, String description, String... blocks)
+	public BlockListSetting(String name, WText description, String... blocks)
 	{
 		super(name, description);
 		
@@ -45,6 +46,12 @@ public class BlockListSetting extends Setting
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
+	}
+	
+	public BlockListSetting(String name, String descriptionKey,
+		String... blocks)
+	{
+		this(name, WText.translated(descriptionKey), blocks);
 	}
 	
 	public List<String> getBlockNames()
@@ -155,7 +162,7 @@ public class BlockListSetting extends Setting
 		JsonObject json = new JsonObject();
 		
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "BlockList");
 		
 		JsonArray defaultBlocksJson = new JsonArray();

@@ -31,6 +31,8 @@ import net.wurstclient.hacks.nukers.CommonNukerSettings;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -47,6 +49,10 @@ public final class NukerLegitHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
+	private final SwingHandSetting swingHand =
+		SwingHandSetting.withoutOffOption(
+			SwingHandSetting.genericMiningDescription(this), SwingHand.CLIENT);
+	
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
 	
@@ -56,6 +62,7 @@ public final class NukerLegitHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		commonSettings.getSettings().forEach(this::addSetting);
+		addSetting(swingHand);
 	}
 	
 	@Override
@@ -72,6 +79,7 @@ public final class NukerLegitHack extends Hack
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(LeftClickListener.class, commonSettings);
@@ -180,7 +188,7 @@ public final class NukerLegitHack extends Hack
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
 			MC.particleManager.addBlockBreakingParticles(pos, side);
-			MC.player.swingHand(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 			MC.options.attackKey.setPressed(true);
 		}
 		
