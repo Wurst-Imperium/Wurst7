@@ -45,7 +45,7 @@ public final class ProtectHack extends Hack
 		new AttackSpeedSliderSetting();
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How Protect should swing your hand when attacking.", SwingHand.CLIENT);
+		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);

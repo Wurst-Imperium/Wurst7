@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.util.chunk;
 
 import java.util.Objects;
 import java.util.stream.Stream;

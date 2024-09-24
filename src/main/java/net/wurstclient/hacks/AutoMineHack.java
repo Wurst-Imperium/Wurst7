@@ -47,6 +47,7 @@ public final class AutoMineHack extends Hack
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(HandleBlockBreakingListener.class, this);
