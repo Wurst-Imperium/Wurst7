@@ -37,7 +37,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -56,6 +55,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RegionPos;
@@ -883,8 +883,7 @@ public final class TunnellerHack extends Hack
 			side.getOpposite(), hitVec);
 		
 		// swing arm
-		MC.player.networkHandler
-			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		SwingHand.SERVER.swing(Hand.MAIN_HAND);
 		
 		// reset timer
 		MC.itemUseCooldown = 4;
@@ -949,8 +948,7 @@ public final class TunnellerHack extends Hack
 			return false;
 		
 		// swing arm
-		MC.player.networkHandler
-			.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+		SwingHand.SERVER.swing(Hand.MAIN_HAND);
 		
 		return true;
 	}

@@ -42,7 +42,7 @@ public final class HandNoClipHack extends Hack
 	
 	public boolean isBlockInList(BlockPos pos)
 	{
-		return blocks.getBlockNames().contains(BlockUtils.getName(pos));
+		return blocks.contains(BlockUtils.getName(pos));
 	}
 	
 	// See AbstractBlockStateMixin.onGetOutlineShape()
