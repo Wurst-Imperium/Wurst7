@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -35,7 +35,7 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"till aura", "HoeAura", "hoe aura", "FarmlandAura",
 	"farmland aura", "farm land aura", "AutoTill", "auto till", "AutoHoe",
 	"auto hoe"})
-public final class TillauraHack extends Hack implements PostMotionListener
+public final class TillauraHack extends Hack implements HandleInputListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far Tillaura will reach to till blocks.", 5, 1, 6, 0.05,
@@ -67,17 +67,17 @@ public final class TillauraHack extends Hack implements PostMotionListener
 	@Override
 	protected void onEnable()
 	{
-		EVENTS.add(PostMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		EVENTS.remove(PostMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 	}
 	
 	@Override
-	public void onPostMotion()
+	public void onHandleInput()
 	{
 		// wait for right click timer
 		if(MC.itemUseCooldown > 0)
