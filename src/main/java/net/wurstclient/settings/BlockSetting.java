@@ -62,6 +62,11 @@ public final class BlockSetting extends Setting
 		return blockName;
 	}
 	
+	public String getShortBlockName()
+	{
+		return blockName.replace("minecraft:", "");
+	}
+	
 	public void setBlock(Block block)
 	{
 		if(block == null)
