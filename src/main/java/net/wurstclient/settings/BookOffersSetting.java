@@ -30,13 +30,14 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonObject;
+import net.wurstclient.util.text.WText;
 
 public final class BookOffersSetting extends Setting
 {
 	private final ArrayList<BookOffer> offers = new ArrayList<>();
 	private final BookOffer[] defaultOffers;
 	
-	public BookOffersSetting(String name, String description,
+	public BookOffersSetting(String name, WText description,
 		String... enchantments)
 	{
 		super(name, description);
@@ -47,6 +48,12 @@ public final class BookOffersSetting extends Setting
 			.filter(BookOffer::isValid).distinct().sorted()
 			.forEach(offers::add);
 		defaultOffers = offers.toArray(new BookOffer[0]);
+	}
+	
+	public BookOffersSetting(String name, String descriptionKey,
+		String... enchantments)
+	{
+		this(name, WText.translated(descriptionKey), enchantments);
 	}
 	
 	public List<BookOffer> getOffers()
@@ -216,7 +223,7 @@ public final class BookOffersSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "BookOffers");
 		
 		JsonArray jsonDefaultOffers = new JsonArray();

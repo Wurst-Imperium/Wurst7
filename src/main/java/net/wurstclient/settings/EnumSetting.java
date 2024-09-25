@@ -20,6 +20,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ComboBoxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public class EnumSetting<T extends Enum<T>> extends Setting
 {
@@ -27,7 +28,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 	private T selected;
 	private final T defaultSelected;
 	
-	public EnumSetting(String name, String description, T[] values, T selected)
+	public EnumSetting(String name, WText description, T[] values, T selected)
 	{
 		super(name, description);
 		this.values = Objects.requireNonNull(values);
@@ -35,9 +36,15 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 		defaultSelected = selected;
 	}
 	
+	public EnumSetting(String name, String descriptionKey, T[] values,
+		T selected)
+	{
+		this(name, WText.translated(descriptionKey), values, selected);
+	}
+	
 	public EnumSetting(String name, T[] values, T selected)
 	{
-		this(name, "", values, selected);
+		this(name, WText.empty(), values, selected);
 	}
 	
 	public T[] getValues()
@@ -119,7 +126,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Enum");
 		
 		JsonArray values = new JsonArray();

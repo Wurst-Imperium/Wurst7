@@ -28,6 +28,7 @@ import net.wurstclient.clickgui.components.FileComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public final class FileSetting extends Setting
 {
@@ -35,13 +36,20 @@ public final class FileSetting extends Setting
 	private String selectedFile = "";
 	private final Consumer<Path> createDefaultFiles;
 	
-	public FileSetting(String name, String description, String folderName,
+	public FileSetting(String name, WText description, String folderName,
 		Consumer<Path> createDefaultFiles)
 	{
 		super(name, description);
 		folder = WurstClient.INSTANCE.getWurstFolder().resolve(folderName);
 		this.createDefaultFiles = createDefaultFiles;
 		setSelectedFileToDefault();
+	}
+	
+	public FileSetting(String name, String descriptionKey, String folderName,
+		Consumer<Path> createDefaultFiles)
+	{
+		this(name, WText.translated(descriptionKey), folderName,
+			createDefaultFiles);
 	}
 	
 	public Path getFolder()
@@ -169,7 +177,7 @@ public final class FileSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "File");
 		
 		Path mcFolder = WurstClient.INSTANCE.getWurstFolder().getParent();

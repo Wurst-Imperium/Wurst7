@@ -19,6 +19,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.CheckboxComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public class CheckboxSetting extends Setting implements CheckboxLock
 {
@@ -26,16 +27,21 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	private final boolean checkedByDefault;
 	private CheckboxLock lock;
 	
-	public CheckboxSetting(String name, String description, boolean checked)
+	public CheckboxSetting(String name, WText description, boolean checked)
 	{
 		super(name, description);
 		this.checked = checked;
 		checkedByDefault = checked;
 	}
 	
+	public CheckboxSetting(String name, String descriptionKey, boolean checked)
+	{
+		this(name, WText.translated(descriptionKey), checked);
+	}
+	
 	public CheckboxSetting(String name, boolean checked)
 	{
-		this(name, "", checked);
+		this(name, WText.empty(), checked);
 	}
 	
 	@Override
@@ -108,7 +114,7 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Checkbox");
 		json.addProperty("checkedByDefault", checkedByDefault);
 		return json;

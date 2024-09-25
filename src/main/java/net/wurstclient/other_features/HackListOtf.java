@@ -115,9 +115,9 @@ public final class HackListOtf extends OtherFeature
 		}
 	}
 	
-	public int getColor()
+	public int getColor(int alpha)
 	{
-		return color.getColorI() & 0x00FFFFFF;
+		return color.getColorI(alpha);
 	}
 	
 	public static enum Mode
