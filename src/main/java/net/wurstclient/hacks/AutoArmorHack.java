@@ -136,8 +136,9 @@ public final class AutoArmorHack extends Hack
 				continue;
 			
 			int armorValue = getArmorValue(stack);
+			ArmorData data = bestArmor.get(armorType);
 			
-			if(armorValue > bestArmor.get(armorType).armorValue())
+			if(data == null || armorValue > data.armorValue())
 				bestArmor.put(armorType, new ArmorData(slot, armorValue));
 		}
 		
@@ -147,7 +148,7 @@ public final class AutoArmorHack extends Hack
 		{
 			// check if better armor was found
 			ArmorData data = bestArmor.get(type);
-			if(data.invSlot() == -1)
+			if(data == null || data.invSlot() == -1)
 				continue;
 				
 			// check if armor can be swapped
