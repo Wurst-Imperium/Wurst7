@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.StatusEffectsDisplay;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.wurstclient.Category;
@@ -107,7 +107,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		
 		// don't move items while a container is open
 		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
+			&& !(MC.currentScreen instanceof StatusEffectsDisplay))
 			return;
 		
 		if(timer > 0)

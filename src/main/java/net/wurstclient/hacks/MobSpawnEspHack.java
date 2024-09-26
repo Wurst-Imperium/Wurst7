@@ -24,9 +24,9 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -349,7 +349,7 @@ public final class MobSpawnEspHack extends Hack
 			BuiltBuffer buffer = bufferBuilder.endNullable();
 			if(buffer != null)
 			{
-				vertexBuffer = new VertexBuffer(Usage.STATIC_WRITE);
+				vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffer.bind();
 				vertexBuffer.upload(buffer);
 				VertexBuffer.unbind();

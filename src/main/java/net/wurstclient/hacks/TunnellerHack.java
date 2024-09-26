@@ -22,9 +22,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.gl.Usage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
@@ -270,7 +270,7 @@ public final class TunnellerHack extends Hack
 		if(vertexBuffers[0] != null)
 			vertexBuffers[0].close();
 		
-		vertexBuffers[0] = new VertexBuffer(Usage.STATIC_WRITE);
+		vertexBuffers[0] = new VertexBuffer(GlUsage.STATIC_WRITE);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator
@@ -417,7 +417,7 @@ public final class TunnellerHack extends Hack
 			BuiltBuffer buffer = bufferBuilder.endNullable();
 			if(buffer != null)
 			{
-				vertexBuffers[1] = new VertexBuffer(Usage.STATIC_WRITE);
+				vertexBuffers[1] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[1].bind();
 				vertexBuffers[1].upload(buffer);
 				VertexBuffer.unbind();
@@ -518,7 +518,7 @@ public final class TunnellerHack extends Hack
 				for(BlockPos pos : blocks)
 					RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 				
-				vertexBuffers[2] = new VertexBuffer(Usage.STATIC_WRITE);
+				vertexBuffers[2] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[2].bind();
 				vertexBuffers[2].upload(bufferBuilder.end());
 				VertexBuffer.unbind();
@@ -666,7 +666,7 @@ public final class TunnellerHack extends Hack
 				
 				BuiltBuffer buffer = bufferBuilder.end();
 				
-				vertexBuffers[3] = new VertexBuffer(Usage.STATIC_WRITE);
+				vertexBuffers[3] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[3].bind();
 				vertexBuffers[3].upload(buffer);
 				VertexBuffer.unbind();
@@ -753,7 +753,7 @@ public final class TunnellerHack extends Hack
 			Vec3d torchVec =
 				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
 			
-			vertexBuffers[4] = new VertexBuffer(Usage.STATIC_WRITE);
+			vertexBuffers[4] = new VertexBuffer(GlUsage.STATIC_WRITE);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0),
 				vertexBuffers[4]);
 			
