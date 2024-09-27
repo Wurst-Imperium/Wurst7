@@ -26,7 +26,7 @@ public final class AddAltScreen extends AltEditorScreen
 	@Override
 	protected String getDoneButtonText()
 	{
-		return "Add";
+		return getPassword().isEmpty() ? "Add Cracked Alt" : "Add Premium Alt";
 	}
 	
 	@Override

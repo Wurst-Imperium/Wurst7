@@ -98,7 +98,7 @@
   "description.wurst.hack.masstpa": "Отправляет запрос на телепортацию всем игрокам.",
   "description.wurst.hack.mileycyrus": "Заставляет Вас тверкать.",
   "description.wurst.hack.mobesp": "Подсвечивает мобов неподалеку.",
-  "description.wurst.hack.mobspawnesp": "Показывает места в которых могут заспавниться мобы.\n§eжёлтым§r - мобы могут заспавниться ночью\n§cкрасным§r - мобы могут заспавниться когда угодно",
+  "description.wurst.hack.mobspawnesp": "Показывает места в которых могут заспавниться мобы.",
   "description.wurst.hack.multiaura": "Более быстрая Killaura которая атакует сразу несколько сущностей одновременно.",
   "description.wurst.hack.nameprotect": "Скрывает ники всех игроков.",
   "description.wurst.hack.nametags": "Увеличивает размер ников игроков чтобы их всегда можно было прочесть. Также позволяет видеть ники прячущихся приседанием игроков.",

@@ -29,13 +29,14 @@ import net.wurstclient.clickgui.components.ItemListEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public final class ItemListSetting extends Setting
 {
 	private final ArrayList<String> itemNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public ItemListSetting(String name, String description, String... items)
+	public ItemListSetting(String name, WText description, String... items)
 	{
 		super(name, description);
 		
@@ -45,6 +46,11 @@ public final class ItemListSetting extends Setting
 			.map(i -> Registries.ITEM.getId(i).toString()).distinct().sorted()
 			.forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
+	}
+	
+	public ItemListSetting(String name, String descriptionKey, String... items)
+	{
+		this(name, WText.translated(descriptionKey), items);
 	}
 	
 	public List<String> getItemNames()
@@ -130,7 +136,7 @@ public final class ItemListSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "ItemList");
 		
 		JsonArray defaultItems = new JsonArray();

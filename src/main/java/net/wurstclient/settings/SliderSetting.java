@@ -21,6 +21,7 @@ import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public class SliderSetting extends Setting implements SliderLock
 {
@@ -36,7 +37,7 @@ public class SliderSetting extends Setting implements SliderLock
 	private double usableMin;
 	private double usableMax;
 	
-	public SliderSetting(String name, String description, double value,
+	public SliderSetting(String name, WText description, double value,
 		double minimum, double maximum, double increment, ValueDisplay display)
 	{
 		super(name, description);
@@ -53,10 +54,17 @@ public class SliderSetting extends Setting implements SliderLock
 		this.display = display;
 	}
 	
+	public SliderSetting(String name, String descriptionKey, double value,
+		double minimum, double maximum, double increment, ValueDisplay display)
+	{
+		this(name, WText.translated(descriptionKey), value, minimum, maximum,
+			increment, display);
+	}
+	
 	public SliderSetting(String name, double value, double minimum,
 		double maximum, double increment, ValueDisplay display)
 	{
-		this(name, "", value, minimum, maximum, increment, display);
+		this(name, WText.empty(), value, minimum, maximum, increment, display);
 	}
 	
 	@Override
@@ -272,7 +280,7 @@ public class SliderSetting extends Setting implements SliderLock
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Slider");
 		
 		json.addProperty("defaultValue", defaultValue);
